@@ -3,7 +3,7 @@
 #define GPIOA_ODR      (*(volatile unsigned int*)0x40020014)
 
 void delay(void) {
-    for (volatile int i = 0; i < 50000; i++);
+    for (volatile int i = 0; i < 500000; i++);
 }
 
 int main(void) {

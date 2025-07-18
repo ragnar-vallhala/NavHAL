@@ -7,6 +7,8 @@ set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
 set(CMAKE_BINARY_SIZE ${TOOLCHAIN_PREFIX}size)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_EXE_LINKER_FLAGS "-nostdlib")
 
 # Defaults
 set(CMAKE_SYSTEM_PROCESSOR
@@ -79,3 +81,20 @@ add_custom_target(
   COMMAND ${CMAKE_COMMAND} --build . --target clean
   COMMAND ${CMAKE_COMMAND} -E rm -f ${PROJECT_NAME}.bin ${PROJECT_NAME}.elf
   COMMENT "Cleaning all build artifacts")
+
+# Documentation
+find_package(Doxygen)
+
+if(DOXYGEN_FOUND)
+  set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile)
+  set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.out)
+
+  add_custom_target(doc
+    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_IN}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "Generating API documentation with Doxygen"
+    VERBATIM
+  )
+else()
+  message(STATUS "Doxygen not found. 'doc' target will not be available.")
+endif()

@@ -1,4 +1,5 @@
-#include "core/cortex-m4/gpio.h"
+#define CORTEX_M4
+#include "navhal.h"
 
 void delay(void)
 {
@@ -8,15 +9,15 @@ void delay(void)
 
 int main(void)
 {
-    hal_gpio_setmode(GPIO_PA05, OUTPUT,0);
-    if (hal_gpio_getmode(GPIO_PA05) != OUTPUT)
+    hal_gpio_setmode(GPIO_PA05, GPIO_OUTPUT, 0);
+    if (hal_gpio_getmode(GPIO_PA05) != GPIO_OUTPUT)
         while (1)
             ;
     while (1)
     {
-        hal_gpio_digitalwrite(GPIO_PA05, HIGH);
+        hal_gpio_digitalwrite(GPIO_PA05, GPIO_HIGH);
         delay();
-        hal_gpio_digitalwrite(GPIO_PA05, LOW);
+        hal_gpio_digitalwrite(GPIO_PA05, GPIO_LOW);
         delay();
     }
 }

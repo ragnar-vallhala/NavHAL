@@ -1,6 +1,27 @@
+/**
+ * @file gpio_types.h
+ * @brief GPIO pin definitions and related types for NavHAL.
+ *
+ * This header defines enumerations for GPIO pins, modes,
+ * logic states, and pull-up/pull-down configurations.
+ *
+ * These types provide a hardware-independent abstraction
+ * for GPIO configuration and usage within NavHAL.
+ *
+ * @author Ashutosh Vishwakarma
+ * @date 2025-07-20
+ */
+
 #ifndef GPIO_TYPES_H
 #define GPIO_TYPES_H
 
+/**
+ * @enum hal_gpio_pin
+ * @brief Enumeration of GPIO pins across ports A to E.
+ *
+ * The naming convention is GPIO_PxYY where x is the port letter and
+ * YY is the pin number on that port.
+ */
 typedef enum
 {
     GPIO_PA00,
@@ -90,23 +111,35 @@ typedef enum
 
 } hal_gpio_pin;
 
+/**
+ * @enum hal_gpio_mode
+ * @brief GPIO pin modes.
+ */
 typedef enum
 {
-    INPUT,
-    OUTPUT
+    GPIO_INPUT, /**< Configure pin as input */
+    GPIO_OUTPUT /**< Configure pin as output */
 } hal_gpio_mode;
 
+/**
+ * @enum hal_gpio_state
+ * @brief GPIO pin logic levels.
+ */
 typedef enum
 {
-    LOW,
-    HIGH
+    GPIO_LOW = 0, /**< Logic low state */
+    GPIO_HIGH = 1 /**< Logic high state */
 } hal_gpio_state;
 
+/**
+ * @enum hal_gpio_pullup_pulldown
+ * @brief GPIO pull-up/pull-down resistor configuration.
+ */
 typedef enum
 {
-    GPIO_PUPD_NONE,
-    GPIO_PULLUP,
-    GPIO_PULLDOWN
+    GPIO_PUPD_NONE, /**< No pull resistor */
+    GPIO_PULLUP,    /**< Pull-up resistor enabled */
+    GPIO_PULLDOWN   /**< Pull-down resistor enabled */
 } hal_gpio_pullup_pulldown;
 
-#endif // !GPIO_TYPES_H
+#endif // GPIO_TYPES_H

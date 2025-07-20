@@ -1,5 +1,9 @@
-set(AVAILABLE_SAMPLES no_hal_blink)
-set(SAMPLE_DIRS 01_no_hal_blink)
+set(AVAILABLE_SAMPLES 
+no_hal_blink 
+hal_blink)
+set(SAMPLE_DIRS 
+01_no_hal_blink 
+01_hal_blink)
 
 # Check if sample is defined
 if(NOT DEFINED SAMPLE)

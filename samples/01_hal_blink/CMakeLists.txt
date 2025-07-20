@@ -11,12 +11,14 @@ endif()
 message(STATUS "Selected flasher: ${FLASHER}")
 message(STATUS "Selected flash address: ${FLASH_ADDRESS}")
 
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
+message(STATUS "Linker args ${CMAKE_EXE_LINKER_FLAGS}")
+
 add_executable(${SAMPLE} main.c startup.s)
 
-if(DEFINED STANDALONE)
-  set(CMAKE_EXE_LINKER_FLAGS
-      "-T ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld -nostdlib")
-endif()
+target_link_libraries(${SAMPLE} PUBLIC hal)
+
 
 
 if(NOT DEFINED FLASHER OR NOT DEFINED FLASH_ADDRESS)
@@ -33,7 +35,7 @@ add_custom_target(flash
   DEPENDS ${SAMPLE}
   COMMENT "Converting ELF to BIN and flashing to board"
 )
-
+message(STATUS "TARGET File ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin")
 # elf file size calculation
 add_custom_command(
   TARGET ${SAMPLE}

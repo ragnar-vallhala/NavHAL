@@ -1,9 +1,13 @@
 set(AVAILABLE_SAMPLES 
 no_hal_blink 
-hal_blink)
+hal_blink
+hal_pupd
+)
 set(SAMPLE_DIRS 
 01_no_hal_blink 
-01_hal_blink)
+01_hal_blink
+02_hal_pupd
+)
 
 # Check if sample is defined
 if(NOT DEFINED SAMPLE)

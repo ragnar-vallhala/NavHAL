@@ -102,4 +102,11 @@ typedef enum
     HIGH
 } hal_gpio_state;
 
+typedef enum
+{
+    GPIO_PUPD_NONE,
+    GPIO_PULLUP,
+    GPIO_PULLDOWN
+} hal_gpio_pullup_pulldown;
+
 #endif // !GPIO_TYPES_H

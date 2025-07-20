@@ -1,5 +1,5 @@
 CC = arm-none-eabi-gcc
-CFLAGS = -Wall -O0 -mcpu=cortex-m4 -mthumb
+CFLAGS = -Wall -Og -mcpu=cortex-m4 -mthumb
 
 all: main.elf
 

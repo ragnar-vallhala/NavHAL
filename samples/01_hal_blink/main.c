@@ -2,19 +2,21 @@
 
 void delay(void)
 {
-    for (volatile int i = 0; i < 100000; i++)
+    for (volatile int i = 0; i < 50000; i++)
         ;
 }
 
-
 int main(void)
 {
-    hal_gpio_setmode(GPIO_PA05,OUTPUT);
+    hal_gpio_setmode(GPIO_PA05, OUTPUT);
+    if (hal_gpio_getmode(GPIO_PA05) != OUTPUT)
+        while (1)
+            ;
     while (1)
     {
-        hal_gpio_digitalwrite(GPIO_PA05,HIGH);
+        hal_gpio_digitalwrite(GPIO_PA05, HIGH);
         delay();
-        hal_gpio_digitalwrite(GPIO_PA05,LOW);
+        hal_gpio_digitalwrite(GPIO_PA05, LOW);
         delay();
     }
 }

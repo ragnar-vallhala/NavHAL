@@ -23,6 +23,8 @@
 
 /// Common GPIO HAL header (architecture-agnostic interface)
 #include "common/hal_gpio.h"
+
+/// Common Clock HAL header (architecture-agnostic interface)
 #include "common/hal_clock.h"
 
 /** @} */ // end of NAVHAL

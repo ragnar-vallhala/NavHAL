@@ -107,7 +107,7 @@ hal_clock_config_t clk_cfg = {
     HAL_CLOCK_SOURCE_PLL};
 
 hal_pll_config_t pll_cfg = {
-    .input_src = HAL_CLOCK_SOURCE_HSI,
+    .input_src = HAL_CLOCK_SOURCE_HSE,
     .pll_m = 16,  // 16 MHz / 16 = 1 MHz
     .pll_n = 336, // 1 MHz * 336 = 336 MHz VCO
     .pll_p = 4,   // 336 / 4 = 84 MHz SYSCLK

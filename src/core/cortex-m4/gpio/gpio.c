@@ -1,8 +1,31 @@
+/**
+ * @file gpio.c
+ * @brief Cortex-M4 (STM32F4) GPIO HAL Implementation.
+ *
+ * This file provides the implementation of the GPIO Hardware Abstraction Layer (HAL)
+ * for Cortex-M4 based STM32F4 microcontrollers, specifically the STM32F401RE.
+ * It includes functions for configuring GPIO pins, reading and writing digital states,
+ * and managing GPIO port clocks through the RCC.
+ *
+ * Key features:
+ * - Configure GPIO pin modes (input, output, alternate function, analog)
+ * - Configure pull-up and pull-down resistors
+ * - Atomic digital write using BSRR register
+ * - Read digital input pin states
+ * - Automatic enabling of RCC clocks for GPIO ports
+ *
+ * The GPIO pins are encoded as port and pin numbers, supporting ports A–E and H.
+ * The code handles port indexing and provides safety checks on invalid ports.
+ *
+ * @author Ashutosh Vishwakarma
+ * @date 2025-07-20
+ */
+
 #include "core/cortex-m4/gpio.h"
 
 /**
  * @brief Extract GPIO port index from pin number.
- * 
+ *
  * The pin number encodes port and pin within port.
  * Ports 6 and 5 are invalid, port 7 maps to index 5 (GPIOH).
  *

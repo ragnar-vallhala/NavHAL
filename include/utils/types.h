@@ -15,5 +15,5 @@
 
 #include <stdint.h>       /**< Standard fixed-width integer types */
 #include "./gpio_types.h" /**< GPIO-specific type definitions */
-#include "./clock_types.h"
+#include "./clock_types.h" /**< Clock-specific type definitions */
 #endif // TYPES_H

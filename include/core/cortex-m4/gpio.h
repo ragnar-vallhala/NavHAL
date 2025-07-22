@@ -67,6 +67,10 @@ static volatile uint32_t *const GPIO_BASE[GPIO_PORT_COUNT] = {
  */
 #define GPIO_MODER_OFFSET 0x00
 
+#define GPIO_AFRL_OFFSET 0x20
+
+#define GPIO_AFRH_OFFSET 0x24
+
 /**
  * @brief GPIO output type register offset.
  * @ref stm32f401re_reference.pdf - page 158
@@ -143,6 +147,8 @@ hal_gpio_state hal_gpio_digitalread(hal_gpio_pin pin);
  * @param pin GPIO pin whose port needs to be enabled.
  */
 void hal_gpio_enable_rcc(hal_gpio_pin pin);
+
+void hal_gpio_set_alternate_function(hal_gpio_pin pin, hal_gpio_alternate_function_t alt_fn);
 
 /** @} */ // end of GPIO_API
 

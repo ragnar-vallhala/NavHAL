@@ -152,3 +152,14 @@ void hal_gpio_enable_rcc(hal_gpio_pin pin)
     if (!(RCC_AHB1ENR & (1 << port_number)))
         RCC_AHB1ENR |= (1 << port_number);
 }
+
+void hal_gpio_set_alternate_function(hal_gpio_pin pin, hal_gpio_alternate_function_t alt_fn)
+{
+    uint8_t port_number = _get_port(pin);
+    uint8_t pin_number = _get_pin(pin);
+    hal_gpio_setmode(pin, GPIO_AF, GPIO_PUPD_NONE);
+    uint8_t offset = pin_number > 7 ? GPIO_AFRH_OFFSET : GPIO_AFRL_OFFSET;
+    volatile uint32_t *afr = GPIO_BASE[port_number] + (offset / sizeof(uint32_t));
+    *afr &= (0xF << (4 * (pin_number % 8)));
+    *afr |= (alt_fn << (4 * (pin_number % 8)));
+}

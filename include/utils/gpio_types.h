@@ -117,8 +117,10 @@ typedef enum
  */
 typedef enum
 {
-    GPIO_INPUT, /**< Configure pin as input */
-    GPIO_OUTPUT /**< Configure pin as output */
+    GPIO_INPUT,  /**< Configure pin as input */
+    GPIO_OUTPUT, /**< Configure pin as output */
+    GPIO_AF,     /**< Configure pin as alternate function */
+    GPIO_ANALOG  /**< Configure pin as analog */
 } hal_gpio_mode;
 
 /**
@@ -141,5 +143,25 @@ typedef enum
     GPIO_PULLUP,    /**< Pull-up resistor enabled */
     GPIO_PULLDOWN   /**< Pull-down resistor enabled */
 } hal_gpio_pullup_pulldown;
+
+typedef enum
+{
+    GPIO_AF00,
+    GPIO_AF01,
+    GPIO_AF02,
+    GPIO_AF03,
+    GPIO_AF04,
+    GPIO_AF05,
+    GPIO_AF06,
+    GPIO_AF07,
+    GPIO_AF08,
+    GPIO_AF09,
+    GPIO_AF10,
+    GPIO_AF11,
+    GPIO_AF12,
+    GPIO_AF13,
+    GPIO_AF14,
+    GPIO_AF15
+} hal_gpio_alternate_function_t;
 
 #endif // GPIO_TYPES_H

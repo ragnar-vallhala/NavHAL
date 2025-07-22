@@ -27,6 +27,10 @@
 /// Common Clock HAL header (architecture-agnostic interface)
 #include "common/hal_clock.h"
 
+/// Common UART HAL header (architecture-agnostic interface)
+#include "common/hal_uart.h"
+
+
 /** @} */ // end of NAVHAL
 
 #endif // NAVHAL_H

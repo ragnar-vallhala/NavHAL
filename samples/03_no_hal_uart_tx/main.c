@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <stdio.h>
 #define CORTEX_M4
 #include "navhal.h"
 

@@ -40,11 +40,10 @@ typedef struct
 /** @defgroup RCC_BASE RCC Peripheral Base and Register Offsets
  * @{
  */
-#define RCC 0x40023800UL                      ///< RCC base address
-#define RCC_CR_OFFSET 0x00                    ///< Clock control register offset
-#define RCC_PLLCFGR_OFFSET 0x04               ///< PLL configuration register offset
-#define RCC_CFGR_OFFSET 0x08                  ///< Clock configuration register offset
-#define FLASH_INTERFACE_REGISTER 0x40023C00UL ///< Flash interface register base
+#define RCC 0x40023800UL        ///< RCC base address
+#define RCC_CR_OFFSET 0x00      ///< Clock control register offset
+#define RCC_PLLCFGR_OFFSET 0x04 ///< PLL configuration register offset
+#define RCC_CFGR_OFFSET 0x08    ///< Clock configuration register offset
 
 // RCC_CR register bit positions
 #define RCC_CR_HSE_ON_BIT 16    ///< HSE clock enable bit

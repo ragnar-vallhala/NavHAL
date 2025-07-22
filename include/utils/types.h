@@ -14,6 +14,7 @@
 #define TYPES_H
 
 #include <stdint.h>       /**< Standard fixed-width integer types */
+#include <stdbool.h>       /**< Standard boolean types */
 #include "./gpio_types.h" /**< GPIO-specific type definitions */
 #include "./clock_types.h" /**< Clock-specific type definitions */
 #endif // TYPES_H

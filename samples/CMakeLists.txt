@@ -3,12 +3,14 @@ no_hal_blink
 hal_blink
 hal_pupd
 no_hal_uart_tx
+hal_uart_tx
 )
 set(SAMPLE_DIRS 
 01_no_hal_blink 
 01_hal_blink
 02_hal_pupd
 03_no_hal_uart_tx
+03_hal_uart_tx
 )
 
 # Check if sample is defined

@@ -148,7 +148,19 @@ hal_gpio_state hal_gpio_digitalread(hal_gpio_pin pin);
  */
 void hal_gpio_enable_rcc(hal_gpio_pin pin);
 
+/**
+ * @brief Configure the alternate function for a GPIO pin.
+ *
+ * This function sets the alternate function for a given GPIO pin.
+ * Alternate functions are used when the pin is to be controlled by
+ * a peripheral (like UART, SPI, I2C, TIM, etc.) instead of used as
+ * a regular input/output pin.
+ *
+ * @param pin     The GPIO pin to configure.
+ * @param alt_fn  The alternate function number to assign (0–15 depending on MCU support).
+ */
 void hal_gpio_set_alternate_function(hal_gpio_pin pin, hal_gpio_alternate_function_t alt_fn);
+
 
 /** @} */ // end of GPIO_API
 

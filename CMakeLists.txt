@@ -34,6 +34,7 @@ message(STATUS "Building for vendor: ${VENDOR}")
 message(STATUS "Building for processor: ${CMAKE_SYSTEM_PROCESSOR}")
 
 # Paths
+set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 set(SRC_BOARD ${CMAKE_SOURCE_DIR}/src/board/${BOARD})
 set(SRC_CORE ${CMAKE_SOURCE_DIR}/src/core)
 set(SRC_VENDOR ${CMAKE_SOURCE_DIR}/src/vendor/${VENDOR})
@@ -57,8 +58,13 @@ if(NOT STANDALONE)
                                                                    # scripts
                                                                    # dynamically
 endif()
-
+if(STANDALONE)
+set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib") # can be
+endif()
 # subdirectories are commented, they will be added as code is added
+if(NOT STANDALONE)
+add_subdirectory(${SRC_DIR})
+endif()
 if(SAMPLE AND NOT STANDALONE)
   message(STATUS "Sample selected: ${SAMPLE} (with HAL)")
   message(STATUS  "Linker flag: ${CMAKE_EXE_LINKER_FLAGS}")

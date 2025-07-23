@@ -1,8 +1,14 @@
 var searchData=
 [
-  ['source_0',['source',['../structhal__clock__config__t.html#abf263f79955d8b9e108eb061e7c578fd',1,'hal_clock_config_t']]],
-  ['startup_2es_1',['startup.s',['../samples_201__hal__blink_2startup_8s.html',1,'(Global Namespace)'],['../samples_201__no__hal__blink_2startup_8s.html',1,'(Global Namespace)'],['../samples_202__hal__pupd_2startup_8s.html',1,'(Global Namespace)'],['../samples_203__hal__uart__tx_2startup_8s.html',1,'(Global Namespace)'],['../samples_203__no__hal__uart__tx_2startup_8s.html',1,'(Global Namespace)'],['../src_2core_2cortex-m4_2startup_2startup_8s.html',1,'(Global Namespace)']]],
-  ['stm32f401re_2',['GPIO Register Map (STM32F401RE)',['../group__GPIO__REGISTERS.html',1,'']]],
-  ['str_5fto_5ffloat_3',['str_to_float',['../conversion_8c.html#a46c5e2aed53bc864ac60784d05d97d2b',1,'str_to_float(const char *s):&#160;conversion.c'],['../conversion_8h.html#a46c5e2aed53bc864ac60784d05d97d2b',1,'str_to_float(const char *s):&#160;conversion.c']]],
-  ['str_5fto_5fint_4',['str_to_int',['../conversion_8c.html#a13c5c12f98c8a4c7fa6aacee4eca2cf5',1,'str_to_int(const char *s):&#160;conversion.c'],['../conversion_8h.html#a13c5c12f98c8a4c7fa6aacee4eca2cf5',1,'str_to_int(const char *s):&#160;conversion.c']]]
+  ['periph_5fbase_0',['periph_base',['../group__UART__REGISTERS.html#ga9171f49478fa86d932f89e78e73b88b0',1,'PERIPH_BASE:&#160;uart.h'],['../03__no__hal__uart__tx_2main_8c.html#a9171f49478fa86d932f89e78e73b88b0',1,'PERIPH_BASE:&#160;main.c']]],
+  ['peripheral_20base_20addresses_20and_20registers_1',['UART Peripheral Base Addresses and Registers',['../group__UART__REGISTERS.html',1,'']]],
+  ['peripheral_20base_20and_20register_20offsets_2',['RCC Peripheral Base and Register Offsets',['../group__RCC__BASE.html',1,'']]],
+  ['pll_5fcfg_3',['pll_cfg',['../03__no__hal__uart__tx_2main_8c.html#adf1b524219e8781fa7542fa90dd09912',1,'main.c']]],
+  ['pll_5fm_4',['pll_m',['../structhal__pll__config__t.html#a43380a9555d4e3bd71a833efa85e6578',1,'hal_pll_config_t']]],
+  ['pll_5fn_5',['pll_n',['../structhal__pll__config__t.html#a6a146e1ca36b642d99aafb1830f955f6',1,'hal_pll_config_t']]],
+  ['pll_5fp_6',['pll_p',['../structhal__pll__config__t.html#aa7554787c9621f7f2cb36f2bccacfb03',1,'hal_pll_config_t']]],
+  ['pll_5fq_7',['pll_q',['../structhal__pll__config__t.html#a033cac8290c4fa3900b0e122cea19a45',1,'hal_pll_config_t']]],
+  ['prerequisites_8',['Prerequisites',['../md_README.html#autotoc_md9',1,'']]],
+  ['project_20brief_9',['Project Brief',['../md_README.html#autotoc_md6',1,'']]],
+  ['project_20structure_10',['Project Structure',['../md_README.html#autotoc_md15',1,'']]]
 ];

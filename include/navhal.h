@@ -12,6 +12,7 @@
  * @date 2025-07-20
  */
 
+
 #ifndef NAVHAL_H
 #define NAVHAL_H
 
@@ -29,7 +30,6 @@
 
 /// Common UART HAL header (architecture-agnostic interface)
 #include "common/hal_uart.h"
-
 
 /** @} */ // end of NAVHAL
 

@@ -14,7 +14,7 @@ var searchData=
   ['hal_5fclock_5fget_5fapb1clk_11',['hal_clock_get_apb1clk',['../clock_8c.html#ab27c3a810ff6f1418e7737a7ad308798',1,'hal_clock_get_apb1clk():&#160;clock.c'],['../clock_8h.html#ab27c3a810ff6f1418e7737a7ad308798',1,'hal_clock_get_apb1clk():&#160;clock.c']]],
   ['hal_5fclock_5fget_5fapb2clk_12',['hal_clock_get_apb2clk',['../clock_8c.html#a74e0e66e7168083925979b598b96cf7e',1,'hal_clock_get_apb2clk():&#160;clock.c'],['../clock_8h.html#a74e0e66e7168083925979b598b96cf7e',1,'hal_clock_get_apb2clk():&#160;clock.c']]],
   ['hal_5fclock_5fget_5fsysclk_13',['hal_clock_get_sysclk',['../clock_8h.html#a8cb04036cf65c8966865b42e975c4558',1,'hal_clock_get_sysclk():&#160;clock.c'],['../clock_8c.html#a8cb04036cf65c8966865b42e975c4558',1,'hal_clock_get_sysclk():&#160;clock.c']]],
-  ['hal_5fclock_5finit_14',['hal_clock_init',['../clock_8c.html#a0968882ff01fef583e6a8b7a97be51ea',1,'hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg):&#160;clock.c'],['../clock_8h.html#a0968882ff01fef583e6a8b7a97be51ea',1,'hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg):&#160;clock.c']]],
+  ['hal_5fclock_5finit_14',['hal_clock_init',['../clock_8h.html#a0968882ff01fef583e6a8b7a97be51ea',1,'hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg):&#160;clock.c'],['../clock_8c.html#a0968882ff01fef583e6a8b7a97be51ea',1,'hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg):&#160;clock.c']]],
   ['hal_5fclock_5fsource_5fhse_15',['HAL_CLOCK_SOURCE_HSE',['../clock__types_8h.html#a5ea6776fc4182dcce8313aae7aefffe1a63fe55af719f040387f2cbd2728f64c9',1,'clock_types.h']]],
   ['hal_5fclock_5fsource_5fhsi_16',['HAL_CLOCK_SOURCE_HSI',['../clock__types_8h.html#a5ea6776fc4182dcce8313aae7aefffe1ab6e96fd0b556480b197d5dc539c3b504',1,'clock_types.h']]],
   ['hal_5fclock_5fsource_5fpll_17',['HAL_CLOCK_SOURCE_PLL',['../clock__types_8h.html#a5ea6776fc4182dcce8313aae7aefffe1ae661ab184a66fdc56b238f5f168c636c',1,'clock_types.h']]],
@@ -33,5 +33,6 @@ var searchData=
   ['hal_5fgpio_5fstate_30',['hal_gpio_state',['../gpio__types_8h.html#addd0001118ca8b0d1bb783478de95f78',1,'gpio_types.h']]],
   ['hal_5fpll_5fconfig_5ft_31',['hal_pll_config_t',['../structhal__pll__config__t.html',1,'']]],
   ['hal_5fuart_2eh_32',['hal_uart.h',['../hal__uart_8h.html',1,'']]],
-  ['hal_5fuart_5ft_33',['hal_uart_t',['../uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1',1,'uart.h']]]
+  ['hal_5fuart_5ft_33',['hal_uart_t',['../uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1',1,'uart.h']]],
+  ['hardware_20abstraction_20layer_34',['NavHAL — NAVRobotec Hardware Abstraction Layer',['../md_README.html',1,'']]]
 ];

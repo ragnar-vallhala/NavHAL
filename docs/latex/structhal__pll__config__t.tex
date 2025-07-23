@@ -1,0 +1,87 @@
+\doxysection{hal\+\_\+pll\+\_\+config\+\_\+t Struct Reference}
+\hypertarget{structhal__pll__config__t}{}\label{structhal__pll__config__t}\index{hal\_pll\_config\_t@{hal\_pll\_config\_t}}
+
+
+PLL configuration parameters.  
+
+
+
+
+{\ttfamily \#include $<$clock.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1}{hal\+\_\+clock\+\_\+source\+\_\+t}} \mbox{\hyperlink{structhal__pll__config__t_a3ee7a2ede1a550c1bcf2b3adf5e724ab}{input\+\_\+src}}
+\begin{DoxyCompactList}\small\item\em PLL input clock source (HSI or HSE) \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{structhal__pll__config__t_a43380a9555d4e3bd71a833efa85e6578}{pll\+\_\+m}}
+\begin{DoxyCompactList}\small\item\em PLL division factor for input clock (2 to 63) \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{structhal__pll__config__t_a6a146e1ca36b642d99aafb1830f955f6}{pll\+\_\+n}}
+\begin{DoxyCompactList}\small\item\em PLL multiplication factor for VCO (50 to 432) \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{structhal__pll__config__t_aa7554787c9621f7f2cb36f2bccacfb03}{pll\+\_\+p}}
+\begin{DoxyCompactList}\small\item\em PLL division factor for main system clock (2,4,6,8) \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{structhal__pll__config__t_a033cac8290c4fa3900b0e122cea19a45}{pll\+\_\+q}}
+\begin{DoxyCompactList}\small\item\em PLL division factor for USB clock (2 to 15) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+PLL configuration parameters. 
+
+Used to configure the PLL source and multiplication/division factors. 
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structhal__pll__config__t_a3ee7a2ede1a550c1bcf2b3adf5e724ab}\label{structhal__pll__config__t_a3ee7a2ede1a550c1bcf2b3adf5e724ab} 
+\index{hal\_pll\_config\_t@{hal\_pll\_config\_t}!input\_src@{input\_src}}
+\index{input\_src@{input\_src}!hal\_pll\_config\_t@{hal\_pll\_config\_t}}
+\doxysubsubsection{\texorpdfstring{input\_src}{input\_src}}
+{\footnotesize\ttfamily \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1}{hal\+\_\+clock\+\_\+source\+\_\+t}} hal\+\_\+pll\+\_\+config\+\_\+t\+::input\+\_\+src}
+
+
+
+PLL input clock source (HSI or HSE) 
+
+\Hypertarget{structhal__pll__config__t_a43380a9555d4e3bd71a833efa85e6578}\label{structhal__pll__config__t_a43380a9555d4e3bd71a833efa85e6578} 
+\index{hal\_pll\_config\_t@{hal\_pll\_config\_t}!pll\_m@{pll\_m}}
+\index{pll\_m@{pll\_m}!hal\_pll\_config\_t@{hal\_pll\_config\_t}}
+\doxysubsubsection{\texorpdfstring{pll\_m}{pll\_m}}
+{\footnotesize\ttfamily uint8\+\_\+t hal\+\_\+pll\+\_\+config\+\_\+t\+::pll\+\_\+m}
+
+
+
+PLL division factor for input clock (2 to 63) 
+
+\Hypertarget{structhal__pll__config__t_a6a146e1ca36b642d99aafb1830f955f6}\label{structhal__pll__config__t_a6a146e1ca36b642d99aafb1830f955f6} 
+\index{hal\_pll\_config\_t@{hal\_pll\_config\_t}!pll\_n@{pll\_n}}
+\index{pll\_n@{pll\_n}!hal\_pll\_config\_t@{hal\_pll\_config\_t}}
+\doxysubsubsection{\texorpdfstring{pll\_n}{pll\_n}}
+{\footnotesize\ttfamily uint16\+\_\+t hal\+\_\+pll\+\_\+config\+\_\+t\+::pll\+\_\+n}
+
+
+
+PLL multiplication factor for VCO (50 to 432) 
+
+\Hypertarget{structhal__pll__config__t_aa7554787c9621f7f2cb36f2bccacfb03}\label{structhal__pll__config__t_aa7554787c9621f7f2cb36f2bccacfb03} 
+\index{hal\_pll\_config\_t@{hal\_pll\_config\_t}!pll\_p@{pll\_p}}
+\index{pll\_p@{pll\_p}!hal\_pll\_config\_t@{hal\_pll\_config\_t}}
+\doxysubsubsection{\texorpdfstring{pll\_p}{pll\_p}}
+{\footnotesize\ttfamily uint8\+\_\+t hal\+\_\+pll\+\_\+config\+\_\+t\+::pll\+\_\+p}
+
+
+
+PLL division factor for main system clock (2,4,6,8) 
+
+\Hypertarget{structhal__pll__config__t_a033cac8290c4fa3900b0e122cea19a45}\label{structhal__pll__config__t_a033cac8290c4fa3900b0e122cea19a45} 
+\index{hal\_pll\_config\_t@{hal\_pll\_config\_t}!pll\_q@{pll\_q}}
+\index{pll\_q@{pll\_q}!hal\_pll\_config\_t@{hal\_pll\_config\_t}}
+\doxysubsubsection{\texorpdfstring{pll\_q}{pll\_q}}
+{\footnotesize\ttfamily uint8\+\_\+t hal\+\_\+pll\+\_\+config\+\_\+t\+::pll\+\_\+q}
+
+
+
+PLL division factor for USB clock (2 to 15) 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/core/cortex-\/m4/\mbox{\hyperlink{clock_8h}{clock.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,278 @@
+\doxysection{UART Peripheral Base Addresses and Registers}
+\hypertarget{group__UART__REGISTERS}{}\label{group__UART__REGISTERS}\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+
+
+Memory-\/mapped register definitions for UART peripherals.  
+
+
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}}~0x40000000\+UL
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00020000\+UL)
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00000000\+UL)
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga25b99d6065f1c8f751e78f43ade652cb}{APB2\+PERIPH\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x7400)
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x3800)
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}} + 0x4400)
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}}~0x40011000
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}}~0x40011400
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gad4baa1f26b04719fe3d4e2f02d7dde40}{RCC\+\_\+\+APB1\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga6d4cd87f49d551c356fed82cbbddc5a4}{RCC\+\_\+\+APB2\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x44))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gaf390c83858b5d97469c8b328231f1e54}{USART2\+\_\+\+SR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x00))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga498acd0c07bdee6e3b19a4bddd5b4244}{USART2\+\_\+\+DR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x04))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gae5530ccff0818ee6c53e71f013f28b46}{USART2\+\_\+\+BRR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x08))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga685289c8590aa5257387ed4ba6460097}{USART2\+\_\+\+CR1}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x0C))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga487db57656db6abc99b3e64f54096fd5}{USART1\+\_\+\+SR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}} + 0x00))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga6909af146975c44b99e68e2491ae96a6}{USART1\+\_\+\+DR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}} + 0x04))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gaacb1e95db24ea6e6abdd0ca2737f4242}{USART1\+\_\+\+BRR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}} + 0x08))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gaa0889f12c0e570ac578c26f7ca7f300e}{USART1\+\_\+\+CR1}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}} + 0x0C))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga475701e7a1d2ca39768a19b0d3a00695}{USART6\+\_\+\+SR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}} + 0x00))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gab08007a5a998177b3a423fc11c0daaf5}{USART6\+\_\+\+DR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}} + 0x04))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga0a4f781c389ce231e70343e359cb807e}{USART6\+\_\+\+BRR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}} + 0x08))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gabe070876f1daa7a63bda346a7c4d5ffa}{USART6\+\_\+\+CR1}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}} + 0x0C))
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gab840af4f735ec36419d61c7db3cfa00d}{RCC\+\_\+\+APB1\+ENR\+\_\+\+USART2\+EN}}~(1 $<$$<$ 17)
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga4666bb90842e8134b32e6a34a0f165f3}{RCC\+\_\+\+APB2\+ENR\+\_\+\+USART1\+EN}}~(1 $<$$<$ 4)
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga0569d91f3b18ae130b7a09e0100c4459}{RCC\+\_\+\+APB2\+ENR\+\_\+\+USART6\+EN}}~(1 $<$$<$ 5)
+\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga2bb650676aaae4a5203f372d497d5947}{USART\+\_\+\+CR1\+\_\+\+UE}}~(1 $<$$<$ 13)
+\begin{DoxyCompactList}\small\item\em USART Enable. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gade7f090b04fd78b755b43357ecaa9622}{USART\+\_\+\+CR1\+\_\+\+TE}}~(1 $<$$<$ 3)
+\begin{DoxyCompactList}\small\item\em Transmitter Enable. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gada0d5d407a22264de847bc1b40a17aeb}{USART\+\_\+\+CR1\+\_\+\+RE}}~(1 $<$$<$ 2)
+\begin{DoxyCompactList}\small\item\em Receiver Enable. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_ga65e9cddf0890113d405342f1d8b5b980}{USART\+\_\+\+SR\+\_\+\+TXE}}~(1 $<$$<$ 7)
+\begin{DoxyCompactList}\small\item\em Transmit Data Register Empty. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group__UART__REGISTERS_gaa0c99e2bb265b3d58a91aca7a93f7836}{USART\+\_\+\+SR\+\_\+\+RXNE}}~(1 $<$$<$ 5)
+\begin{DoxyCompactList}\small\item\em Read Data Register Not Empty. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Memory-\/mapped register definitions for UART peripherals. 
+
+Defines base addresses and register offsets for all supported UART peripherals, along with relevant bit definitions for control and status registers. 
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{group__UART__REGISTERS_ga811a9a4ca17f0a50354a9169541d56c4}\label{group__UART__REGISTERS_ga811a9a4ca17f0a50354a9169541d56c4} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!AHB1PERIPH\_BASE@{AHB1PERIPH\_BASE}}
+\index{AHB1PERIPH\_BASE@{AHB1PERIPH\_BASE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{AHB1PERIPH\_BASE}{AHB1PERIPH\_BASE}}
+{\footnotesize\ttfamily \#define AHB1\+PERIPH\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00020000\+UL)}
+
+\Hypertarget{group__UART__REGISTERS_ga45666d911f39addd4c8c0a0ac3388cfb}\label{group__UART__REGISTERS_ga45666d911f39addd4c8c0a0ac3388cfb} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!APB1PERIPH\_BASE@{APB1PERIPH\_BASE}}
+\index{APB1PERIPH\_BASE@{APB1PERIPH\_BASE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{APB1PERIPH\_BASE}{APB1PERIPH\_BASE}}
+{\footnotesize\ttfamily \#define APB1\+PERIPH\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00000000\+UL)}
+
+\Hypertarget{group__UART__REGISTERS_ga25b99d6065f1c8f751e78f43ade652cb}\label{group__UART__REGISTERS_ga25b99d6065f1c8f751e78f43ade652cb} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!APB2PERIPH\_BASE@{APB2PERIPH\_BASE}}
+\index{APB2PERIPH\_BASE@{APB2PERIPH\_BASE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{APB2PERIPH\_BASE}{APB2PERIPH\_BASE}}
+{\footnotesize\ttfamily \#define APB2\+PERIPH\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x7400)}
+
+\Hypertarget{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}\label{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!PERIPH\_BASE@{PERIPH\_BASE}}
+\index{PERIPH\_BASE@{PERIPH\_BASE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{PERIPH\_BASE}{PERIPH\_BASE}}
+{\footnotesize\ttfamily \#define PERIPH\+\_\+\+BASE~0x40000000\+UL}
+
+\Hypertarget{group__UART__REGISTERS_gad4baa1f26b04719fe3d4e2f02d7dde40}\label{group__UART__REGISTERS_gad4baa1f26b04719fe3d4e2f02d7dde40} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!RCC\_APB1ENR@{RCC\_APB1ENR}}
+\index{RCC\_APB1ENR@{RCC\_APB1ENR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR}{RCC\_APB1ENR}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+APB1\+ENR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))}
+
+\Hypertarget{group__UART__REGISTERS_gab840af4f735ec36419d61c7db3cfa00d}\label{group__UART__REGISTERS_gab840af4f735ec36419d61c7db3cfa00d} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!RCC\_APB1ENR\_USART2EN@{RCC\_APB1ENR\_USART2EN}}
+\index{RCC\_APB1ENR\_USART2EN@{RCC\_APB1ENR\_USART2EN}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR\_USART2EN}{RCC\_APB1ENR\_USART2EN}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+APB1\+ENR\+\_\+\+USART2\+EN~(1 $<$$<$ 17)}
+
+\Hypertarget{group__UART__REGISTERS_ga6d4cd87f49d551c356fed82cbbddc5a4}\label{group__UART__REGISTERS_ga6d4cd87f49d551c356fed82cbbddc5a4} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!RCC\_APB2ENR@{RCC\_APB2ENR}}
+\index{RCC\_APB2ENR@{RCC\_APB2ENR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB2ENR}{RCC\_APB2ENR}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+APB2\+ENR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x44))}
+
+\Hypertarget{group__UART__REGISTERS_ga4666bb90842e8134b32e6a34a0f165f3}\label{group__UART__REGISTERS_ga4666bb90842e8134b32e6a34a0f165f3} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!RCC\_APB2ENR\_USART1EN@{RCC\_APB2ENR\_USART1EN}}
+\index{RCC\_APB2ENR\_USART1EN@{RCC\_APB2ENR\_USART1EN}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB2ENR\_USART1EN}{RCC\_APB2ENR\_USART1EN}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+APB2\+ENR\+\_\+\+USART1\+EN~(1 $<$$<$ 4)}
+
+\Hypertarget{group__UART__REGISTERS_ga0569d91f3b18ae130b7a09e0100c4459}\label{group__UART__REGISTERS_ga0569d91f3b18ae130b7a09e0100c4459} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!RCC\_APB2ENR\_USART6EN@{RCC\_APB2ENR\_USART6EN}}
+\index{RCC\_APB2ENR\_USART6EN@{RCC\_APB2ENR\_USART6EN}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB2ENR\_USART6EN}{RCC\_APB2ENR\_USART6EN}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+APB2\+ENR\+\_\+\+USART6\+EN~(1 $<$$<$ 5)}
+
+\Hypertarget{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}\label{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!RCC\_BASE@{RCC\_BASE}}
+\index{RCC\_BASE@{RCC\_BASE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{RCC\_BASE}{RCC\_BASE}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x3800)}
+
+\Hypertarget{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}\label{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART1\_BASE@{USART1\_BASE}}
+\index{USART1\_BASE@{USART1\_BASE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART1\_BASE}{USART1\_BASE}}
+{\footnotesize\ttfamily \#define USART1\+\_\+\+BASE~0x40011000}
+
+\Hypertarget{group__UART__REGISTERS_gaacb1e95db24ea6e6abdd0ca2737f4242}\label{group__UART__REGISTERS_gaacb1e95db24ea6e6abdd0ca2737f4242} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART1\_BRR@{USART1\_BRR}}
+\index{USART1\_BRR@{USART1\_BRR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART1\_BRR}{USART1\_BRR}}
+{\footnotesize\ttfamily \#define USART1\+\_\+\+BRR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}} + 0x08))}
+
+\Hypertarget{group__UART__REGISTERS_gaa0889f12c0e570ac578c26f7ca7f300e}\label{group__UART__REGISTERS_gaa0889f12c0e570ac578c26f7ca7f300e} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART1\_CR1@{USART1\_CR1}}
+\index{USART1\_CR1@{USART1\_CR1}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART1\_CR1}{USART1\_CR1}}
+{\footnotesize\ttfamily \#define USART1\+\_\+\+CR1~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}} + 0x0C))}
+
+\Hypertarget{group__UART__REGISTERS_ga6909af146975c44b99e68e2491ae96a6}\label{group__UART__REGISTERS_ga6909af146975c44b99e68e2491ae96a6} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART1\_DR@{USART1\_DR}}
+\index{USART1\_DR@{USART1\_DR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART1\_DR}{USART1\_DR}}
+{\footnotesize\ttfamily \#define USART1\+\_\+\+DR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}} + 0x04))}
+
+\Hypertarget{group__UART__REGISTERS_ga487db57656db6abc99b3e64f54096fd5}\label{group__UART__REGISTERS_ga487db57656db6abc99b3e64f54096fd5} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART1\_SR@{USART1\_SR}}
+\index{USART1\_SR@{USART1\_SR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART1\_SR}{USART1\_SR}}
+{\footnotesize\ttfamily \#define USART1\+\_\+\+SR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}} + 0x00))}
+
+\Hypertarget{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}\label{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART2\_BASE@{USART2\_BASE}}
+\index{USART2\_BASE@{USART2\_BASE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART2\_BASE}{USART2\_BASE}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}} + 0x4400)}
+
+\Hypertarget{group__UART__REGISTERS_gae5530ccff0818ee6c53e71f013f28b46}\label{group__UART__REGISTERS_gae5530ccff0818ee6c53e71f013f28b46} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART2\_BRR@{USART2\_BRR}}
+\index{USART2\_BRR@{USART2\_BRR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART2\_BRR}{USART2\_BRR}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+BRR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x08))}
+
+\Hypertarget{group__UART__REGISTERS_ga685289c8590aa5257387ed4ba6460097}\label{group__UART__REGISTERS_ga685289c8590aa5257387ed4ba6460097} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART2\_CR1@{USART2\_CR1}}
+\index{USART2\_CR1@{USART2\_CR1}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART2\_CR1}{USART2\_CR1}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+CR1~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x0C))}
+
+\Hypertarget{group__UART__REGISTERS_ga498acd0c07bdee6e3b19a4bddd5b4244}\label{group__UART__REGISTERS_ga498acd0c07bdee6e3b19a4bddd5b4244} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART2\_DR@{USART2\_DR}}
+\index{USART2\_DR@{USART2\_DR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART2\_DR}{USART2\_DR}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+DR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x04))}
+
+\Hypertarget{group__UART__REGISTERS_gaf390c83858b5d97469c8b328231f1e54}\label{group__UART__REGISTERS_gaf390c83858b5d97469c8b328231f1e54} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART2\_SR@{USART2\_SR}}
+\index{USART2\_SR@{USART2\_SR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART2\_SR}{USART2\_SR}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+SR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x00))}
+
+\Hypertarget{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}\label{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART6\_BASE@{USART6\_BASE}}
+\index{USART6\_BASE@{USART6\_BASE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART6\_BASE}{USART6\_BASE}}
+{\footnotesize\ttfamily \#define USART6\+\_\+\+BASE~0x40011400}
+
+\Hypertarget{group__UART__REGISTERS_ga0a4f781c389ce231e70343e359cb807e}\label{group__UART__REGISTERS_ga0a4f781c389ce231e70343e359cb807e} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART6\_BRR@{USART6\_BRR}}
+\index{USART6\_BRR@{USART6\_BRR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART6\_BRR}{USART6\_BRR}}
+{\footnotesize\ttfamily \#define USART6\+\_\+\+BRR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}} + 0x08))}
+
+\Hypertarget{group__UART__REGISTERS_gabe070876f1daa7a63bda346a7c4d5ffa}\label{group__UART__REGISTERS_gabe070876f1daa7a63bda346a7c4d5ffa} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART6\_CR1@{USART6\_CR1}}
+\index{USART6\_CR1@{USART6\_CR1}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART6\_CR1}{USART6\_CR1}}
+{\footnotesize\ttfamily \#define USART6\+\_\+\+CR1~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}} + 0x0C))}
+
+\Hypertarget{group__UART__REGISTERS_gab08007a5a998177b3a423fc11c0daaf5}\label{group__UART__REGISTERS_gab08007a5a998177b3a423fc11c0daaf5} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART6\_DR@{USART6\_DR}}
+\index{USART6\_DR@{USART6\_DR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART6\_DR}{USART6\_DR}}
+{\footnotesize\ttfamily \#define USART6\+\_\+\+DR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}} + 0x04))}
+
+\Hypertarget{group__UART__REGISTERS_ga475701e7a1d2ca39768a19b0d3a00695}\label{group__UART__REGISTERS_ga475701e7a1d2ca39768a19b0d3a00695} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART6\_SR@{USART6\_SR}}
+\index{USART6\_SR@{USART6\_SR}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART6\_SR}{USART6\_SR}}
+{\footnotesize\ttfamily \#define USART6\+\_\+\+SR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}} + 0x00))}
+
+\Hypertarget{group__UART__REGISTERS_gada0d5d407a22264de847bc1b40a17aeb}\label{group__UART__REGISTERS_gada0d5d407a22264de847bc1b40a17aeb} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART\_CR1\_RE@{USART\_CR1\_RE}}
+\index{USART\_CR1\_RE@{USART\_CR1\_RE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART\_CR1\_RE}{USART\_CR1\_RE}}
+{\footnotesize\ttfamily \#define USART\+\_\+\+CR1\+\_\+\+RE~(1 $<$$<$ 2)}
+
+
+
+Receiver Enable. 
+
+\Hypertarget{group__UART__REGISTERS_gade7f090b04fd78b755b43357ecaa9622}\label{group__UART__REGISTERS_gade7f090b04fd78b755b43357ecaa9622} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART\_CR1\_TE@{USART\_CR1\_TE}}
+\index{USART\_CR1\_TE@{USART\_CR1\_TE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART\_CR1\_TE}{USART\_CR1\_TE}}
+{\footnotesize\ttfamily \#define USART\+\_\+\+CR1\+\_\+\+TE~(1 $<$$<$ 3)}
+
+
+
+Transmitter Enable. 
+
+\Hypertarget{group__UART__REGISTERS_ga2bb650676aaae4a5203f372d497d5947}\label{group__UART__REGISTERS_ga2bb650676aaae4a5203f372d497d5947} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART\_CR1\_UE@{USART\_CR1\_UE}}
+\index{USART\_CR1\_UE@{USART\_CR1\_UE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART\_CR1\_UE}{USART\_CR1\_UE}}
+{\footnotesize\ttfamily \#define USART\+\_\+\+CR1\+\_\+\+UE~(1 $<$$<$ 13)}
+
+
+
+USART Enable. 
+
+\Hypertarget{group__UART__REGISTERS_gaa0c99e2bb265b3d58a91aca7a93f7836}\label{group__UART__REGISTERS_gaa0c99e2bb265b3d58a91aca7a93f7836} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART\_SR\_RXNE@{USART\_SR\_RXNE}}
+\index{USART\_SR\_RXNE@{USART\_SR\_RXNE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART\_SR\_RXNE}{USART\_SR\_RXNE}}
+{\footnotesize\ttfamily \#define USART\+\_\+\+SR\+\_\+\+RXNE~(1 $<$$<$ 5)}
+
+
+
+Read Data Register Not Empty. 
+
+\Hypertarget{group__UART__REGISTERS_ga65e9cddf0890113d405342f1d8b5b980}\label{group__UART__REGISTERS_ga65e9cddf0890113d405342f1d8b5b980} 
+\index{UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}!USART\_SR\_TXE@{USART\_SR\_TXE}}
+\index{USART\_SR\_TXE@{USART\_SR\_TXE}!UART Peripheral Base Addresses and Registers@{UART Peripheral Base Addresses and Registers}}
+\doxysubsubsection{\texorpdfstring{USART\_SR\_TXE}{USART\_SR\_TXE}}
+{\footnotesize\ttfamily \#define USART\+\_\+\+SR\+\_\+\+TXE~(1 $<$$<$ 7)}
+
+
+
+Transmit Data Register Empty. 
+

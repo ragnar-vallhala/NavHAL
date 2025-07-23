@@ -1,0 +1,76 @@
+\doxysection{include/utils/clock\+\_\+types.h File Reference}
+\hypertarget{clock__types_8h}{}\label{clock__types_8h}\index{include/utils/clock\_types.h@{include/utils/clock\_types.h}}
+
+
+Clock HAL type definitions.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for clock\+\_\+types.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=184pt]{clock__types_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{clock__types_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em System clock configuration structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1}{hal\+\_\+clock\+\_\+source\+\_\+t}} \{ \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ab6e96fd0b556480b197d5dc539c3b504}{HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+HSI}}
+, \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1a63fe55af719f040387f2cbd2728f64c9}{HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+HSE}}
+, \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ae661ab184a66fdc56b238f5f168c636c}{HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+PLL}}
+ \}
+\begin{DoxyCompactList}\small\item\em Enumeration of possible system clock sources. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Clock HAL type definitions. 
+
+Defines clock source enumerations and clock configuration structures used by the clock HAL for Cortex-\/\+M4 MCUs.
+
+\begin{DoxyAuthor}{Author}
+Ashutosh Vishwakarma 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2025-\/07-\/21 
+\end{DoxyDate}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1}\label{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1} 
+\index{clock\_types.h@{clock\_types.h}!hal\_clock\_source\_t@{hal\_clock\_source\_t}}
+\index{hal\_clock\_source\_t@{hal\_clock\_source\_t}!clock\_types.h@{clock\_types.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_source\_t}{hal\_clock\_source\_t}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1}{hal\+\_\+clock\+\_\+source\+\_\+t}}}
+
+
+
+Enumeration of possible system clock sources. 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HAL\_CLOCK\_SOURCE\_HSI@{HAL\_CLOCK\_SOURCE\_HSI}!clock\_types.h@{clock\_types.h}}\index{clock\_types.h@{clock\_types.h}!HAL\_CLOCK\_SOURCE\_HSI@{HAL\_CLOCK\_SOURCE\_HSI}}}\Hypertarget{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ab6e96fd0b556480b197d5dc539c3b504}\label{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ab6e96fd0b556480b197d5dc539c3b504} 
+HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+HSI&Internal high-\/speed oscillator (\texorpdfstring{$\sim$}{\string~}16 MHz) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HAL\_CLOCK\_SOURCE\_HSE@{HAL\_CLOCK\_SOURCE\_HSE}!clock\_types.h@{clock\_types.h}}\index{clock\_types.h@{clock\_types.h}!HAL\_CLOCK\_SOURCE\_HSE@{HAL\_CLOCK\_SOURCE\_HSE}}}\Hypertarget{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1a63fe55af719f040387f2cbd2728f64c9}\label{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1a63fe55af719f040387f2cbd2728f64c9} 
+HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+HSE&External high-\/speed oscillator (user-\/provided crystal) \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HAL\_CLOCK\_SOURCE\_PLL@{HAL\_CLOCK\_SOURCE\_PLL}!clock\_types.h@{clock\_types.h}}\index{clock\_types.h@{clock\_types.h}!HAL\_CLOCK\_SOURCE\_PLL@{HAL\_CLOCK\_SOURCE\_PLL}}}\Hypertarget{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ae661ab184a66fdc56b238f5f168c636c}\label{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ae661ab184a66fdc56b238f5f168c636c} 
+HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+PLL&Phase-\/locked loop (derived clock) \\
+\hline
+
+\end{DoxyEnumFields}

@@ -1,0 +1,64 @@
+\doxysection{gpio.\+h}
+\hypertarget{gpio_8h_source}{}\label{gpio_8h_source}\index{include/core/cortex-\/m4/gpio.h@{include/core/cortex-\/m4/gpio.h}}
+\mbox{\hyperlink{gpio_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_GPIO\_H}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_GPIO\_H}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{types_8h}{utils/types.h}}"{}}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ RCC\_AHB1ENR\ (*(volatile\ uint32\_t\ *)0x40023830)}}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ GPIOA\ 0x40020000}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ GPIOB\ 0x40020400}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ GPIOC\ 0x40020800}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ GPIOD\ 0x40020C00}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#define\ GPIOE\ 0x40021000}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ GPIOH\ 0x40021C00}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ GPIO\_PORT\_COUNT\ 6}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00049\ \textcolor{keyword}{static}\ \textcolor{keyword}{volatile}\ uint32\_t\ *\textcolor{keyword}{const}\ GPIO\_BASE[\mbox{\hyperlink{group__GPIO__REGISTERS_gaf5eb82977ded49e09b93e0c7ae9468d6}{GPIO\_PORT\_COUNT}}]\ =\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ (uint32\_t\ *)\mbox{\hyperlink{group__GPIO__REGISTERS_gac485358099728ddae050db37924dd6b7}{GPIOA}},}
+\DoxyCodeLine{00051\ \ \ \ \ (uint32\_t\ *)\mbox{\hyperlink{group__GPIO__REGISTERS_ga68b66ac73be4c836db878a42e1fea3cd}{GPIOB}},}
+\DoxyCodeLine{00052\ \ \ \ \ (uint32\_t\ *)\mbox{\hyperlink{group__GPIO__REGISTERS_ga2dca03332d620196ba943bc2346eaa08}{GPIOC}},}
+\DoxyCodeLine{00053\ \ \ \ \ (uint32\_t\ *)\mbox{\hyperlink{group__GPIO__REGISTERS_ga7580b1a929ea9df59725ba9c18eba6ac}{GPIOD}},}
+\DoxyCodeLine{00054\ \ \ \ \ (uint32\_t\ *)\mbox{\hyperlink{group__GPIO__REGISTERS_gae04bdb5e8acc47cab1d0532e6b0d0763}{GPIOE}},}
+\DoxyCodeLine{00055\ \ \ \ \ (uint32\_t\ *)\mbox{\hyperlink{group__GPIO__REGISTERS_gadeacbb43ae86c879945afe98c679b285}{GPIOH}}\};}
+\DoxyCodeLine{00056\ }
+ \textcolor{comment}{// end of GPIO\_REGISTERS}\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ GPIO\_MODER\_OFFSET\ 0x00}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#define\ GPIO\_AFRL\_OFFSET\ 0x20}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#define\ GPIO\_AFRH\_OFFSET\ 0x24}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#define\ GPIO\_OTYPER\_OFFSET\ 0x04}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\#define\ GPIO\_PUPDR\_OFFSET\ 0x0C}}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#define\ GPIO\_IDR\_OFFSET\ 0x10}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\#define\ GPIO\_ODR\_OFFSET\ 0x14}}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#define\ GPIO\_BSRR\_OFFSET\ 0x18}}
+\DoxyCodeLine{00103\ }
+ \textcolor{comment}{// end of GPIO\_REGISTER\_OFFSETS}\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00118\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__GPIO__API_gab063b362fb73bcb899a122e5188e7e32}{hal\_gpio\_setmode}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin,\ \mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\_gpio\_mode}}\ mode,\ \mbox{\hyperlink{gpio__types_8h_ab08483829bc1df17783a8ad8cb49043e}{hal\_gpio\_pullup\_pulldown}}\ pupd);}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00126\ \mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\_gpio\_mode}}\ \mbox{\hyperlink{group__GPIO__API_gaf5915e39ede16cf7d68b4dc1ee02b78a}{hal\_gpio\_getmode}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin);}
+\DoxyCodeLine{00127\ }
+\DoxyCodeLine{00134\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__GPIO__API_gaa64ac2161a52147ab5e91fe399126638}{hal\_gpio\_digitalwrite}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin,\ \mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\_gpio\_state}}\ state);}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00142\ \mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\_gpio\_state}}\ \mbox{\hyperlink{group__GPIO__API_gacce35517ec183c7df6a1f67737ecebf6}{hal\_gpio\_digitalread}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin);}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00149\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__GPIO__API_ga4f525e1eaa75b82f304bc25cee240789}{hal\_gpio\_enable\_rcc}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin);}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00162\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__GPIO__API_ga07aab29e77970fa617d8ea0d1922e964}{hal\_gpio\_set\_alternate\_function}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin,\ \mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44}{hal\_gpio\_alternate\_function\_t}}\ alt\_fn);}
+\DoxyCodeLine{00163\ }
+\DoxyCodeLine{00164\ }
+ \textcolor{comment}{// end of GPIO\_API}\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CORTEX\_M4\_GPIO\_H}}
+
+\end{DoxyCode}

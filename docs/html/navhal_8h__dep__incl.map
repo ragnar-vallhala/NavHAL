@@ -1,0 +1,9 @@
+<map id="include/navhal.h" name="include/navhal.h">
+<area shape="rect" id="Node000001" title="Root header file for the NavHAL project by NavRobotec." alt="" coords="206,5,335,31"/>
+<area shape="rect" id="Node000002" href="$01__hal__blink_2main_8c.html" title=" " alt="" coords="5,79,168,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,38,132,81,130,76,231,33"/>
+<area shape="rect" id="Node000003" href="$03__hal__uart__tx_2main_8c.html" title=" " alt="" coords="192,79,349,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="273,44,273,79,268,79,268,44"/>
+<area shape="rect" id="Node000004" href="$03__no__hal__uart__tx_2main_8c.html" title=" " alt="" coords="374,79,554,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="312,33,419,76,417,81,310,38"/>
+</map>

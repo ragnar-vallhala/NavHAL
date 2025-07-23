@@ -1,0 +1,9 @@
+<map id="include/core/cortex&#45;m4/gpio.h" name="include/core/cortex&#45;m4/gpio.h">
+<area shape="rect" id="Node000001" title="GPIO HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="191,5,337,45"/>
+<area shape="rect" id="Node000002" href="$02__hal__pupd_2main_8c.html" title=" " alt="" coords="5,93,168,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,54,127,96,124,91,212,49"/>
+<area shape="rect" id="Node000003" href="$gpio_8c.html" title="Cortex&#45;M4 (STM32F4) GPIO HAL Implementation." alt="" coords="192,93,336,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="267,59,267,93,261,93,261,59"/>
+<area shape="rect" id="Node000004" href="$uart_8c.html" title="UART HAL implementation for Cortex&#45;M4 (STM32F401RE)" alt="" coords="360,93,504,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="314,49,396,91,394,96,312,54"/>
+</map>

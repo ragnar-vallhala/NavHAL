@@ -1,0 +1,259 @@
+\doxysection{samples/03\+\_\+no\+\_\+hal\+\_\+uart\+\_\+tx/main.c File Reference}
+\hypertarget{03__no__hal__uart__tx_2main_8c}{}\label{03__no__hal__uart__tx_2main_8c}\index{samples/03\_no\_hal\_uart\_tx/main.c@{samples/03\_no\_hal\_uart\_tx/main.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{03__no__hal__uart__tx_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}}~0x40000000\+UL
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00020000\+UL)
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00000000\+UL)
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x0000)
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x3800)
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}}~(\mbox{\hyperlink{group__UART__REGISTERS_ga45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}} + 0x4400)
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a305184464592fe039a4e47e9d88bdcc4}{RCC\+\_\+\+AHB1\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x30))
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad4baa1f26b04719fe3d4e2f02d7dde40}{RCC\+\_\+\+APB1\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a1234035224d2d22cd6be76a5ee04cf02}{GPIOA\+\_\+\+MODER}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}} + 0x00))
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a76606f8249e2d759341614b68d15e59a}{GPIOA\+\_\+\+AFRL}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}} + 0x20))
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_af390c83858b5d97469c8b328231f1e54}{USART2\+\_\+\+SR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x00))
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a498acd0c07bdee6e3b19a4bddd5b4244}{USART2\+\_\+\+DR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x04))
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ae5530ccff0818ee6c53e71f013f28b46}{USART2\+\_\+\+BRR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x08))
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a685289c8590aa5257387ed4ba6460097}{USART2\+\_\+\+CR1}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x0C))
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a6ff46fb3b30fc6792e4fd18fcb0941b5}{RCC\+\_\+\+AHB1\+ENR\+\_\+\+GPIOAEN}}~(1 $<$$<$ 0)
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ab840af4f735ec36419d61c7db3cfa00d}{RCC\+\_\+\+APB1\+ENR\+\_\+\+USART2\+EN}}~(1 $<$$<$ 17)
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a2bb650676aaae4a5203f372d497d5947}{USART\+\_\+\+CR1\+\_\+\+UE}}~(1 $<$$<$ 13)
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ade7f090b04fd78b755b43357ecaa9622}{USART\+\_\+\+CR1\+\_\+\+TE}}~(1 $<$$<$ 3)
+\item 
+\#define \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a65e9cddf0890113d405342f1d8b5b980}{USART\+\_\+\+SR\+\_\+\+TXE}}~(1 $<$$<$ 7)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a7b7c9f8b5da59962d0a309f028efedaa}{delay}} (volatile uint32\+\_\+t count)
+\item 
+void \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a2dbf78bac0a26fd3cc86e0d5d509c546}{uart2\+\_\+init}} (void)
+\item 
+void \mbox{\hyperlink{group__UART__API_gace45b7a16f634d2de9a483acab46a7c8}{uart2\+\_\+write\+\_\+char}} (char c)
+\begin{DoxyCompactList}\small\item\em Transmit a single character via USART2. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a14fa11132ccf9aa0c8258e137b8db7fe}{uart2\+\_\+write\+\_\+int}} (int num)
+\item 
+void \mbox{\hyperlink{group__UART__API_ga55c46e6a48433287fdf5a9d1defd5f5c}{uart2\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
+\begin{DoxyCompactList}\small\item\em Transmit a null-\/terminated string via USART2. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a0d7a51b3e857ba865e23324199ef6f28}{clk\+\_\+cfg}}
+\item 
+\mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\+\_\+cfg}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}\label{03__no__hal__uart__tx_2main_8c_a811a9a4ca17f0a50354a9169541d56c4} 
+\index{main.c@{main.c}!AHB1PERIPH\_BASE@{AHB1PERIPH\_BASE}}
+\index{AHB1PERIPH\_BASE@{AHB1PERIPH\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{AHB1PERIPH\_BASE}{AHB1PERIPH\_BASE}}
+{\footnotesize\ttfamily \#define AHB1\+PERIPH\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00020000\+UL)}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb}\label{03__no__hal__uart__tx_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb} 
+\index{main.c@{main.c}!APB1PERIPH\_BASE@{APB1PERIPH\_BASE}}
+\index{APB1PERIPH\_BASE@{APB1PERIPH\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{APB1PERIPH\_BASE}{APB1PERIPH\_BASE}}
+{\footnotesize\ttfamily \#define APB1\+PERIPH\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00000000\+UL)}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\label{03__no__hal__uart__tx_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \#define CORTEX\+\_\+\+M4}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a76606f8249e2d759341614b68d15e59a}\label{03__no__hal__uart__tx_2main_8c_a76606f8249e2d759341614b68d15e59a} 
+\index{main.c@{main.c}!GPIOA\_AFRL@{GPIOA\_AFRL}}
+\index{GPIOA\_AFRL@{GPIOA\_AFRL}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOA\_AFRL}{GPIOA\_AFRL}}
+{\footnotesize\ttfamily \#define GPIOA\+\_\+\+AFRL~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}} + 0x20))}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}\label{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa} 
+\index{main.c@{main.c}!GPIOA\_BASE@{GPIOA\_BASE}}
+\index{GPIOA\_BASE@{GPIOA\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOA\_BASE}{GPIOA\_BASE}}
+{\footnotesize\ttfamily \#define GPIOA\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x0000)}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a1234035224d2d22cd6be76a5ee04cf02}\label{03__no__hal__uart__tx_2main_8c_a1234035224d2d22cd6be76a5ee04cf02} 
+\index{main.c@{main.c}!GPIOA\_MODER@{GPIOA\_MODER}}
+\index{GPIOA\_MODER@{GPIOA\_MODER}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOA\_MODER}{GPIOA\_MODER}}
+{\footnotesize\ttfamily \#define GPIOA\+\_\+\+MODER~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}} + 0x00))}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a9171f49478fa86d932f89e78e73b88b0}\label{03__no__hal__uart__tx_2main_8c_a9171f49478fa86d932f89e78e73b88b0} 
+\index{main.c@{main.c}!PERIPH\_BASE@{PERIPH\_BASE}}
+\index{PERIPH\_BASE@{PERIPH\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{PERIPH\_BASE}{PERIPH\_BASE}}
+{\footnotesize\ttfamily \#define PERIPH\+\_\+\+BASE~0x40000000\+UL}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a305184464592fe039a4e47e9d88bdcc4}\label{03__no__hal__uart__tx_2main_8c_a305184464592fe039a4e47e9d88bdcc4} 
+\index{main.c@{main.c}!RCC\_AHB1ENR@{RCC\_AHB1ENR}}
+\index{RCC\_AHB1ENR@{RCC\_AHB1ENR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_AHB1ENR}{RCC\_AHB1ENR}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+AHB1\+ENR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x30))}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a6ff46fb3b30fc6792e4fd18fcb0941b5}\label{03__no__hal__uart__tx_2main_8c_a6ff46fb3b30fc6792e4fd18fcb0941b5} 
+\index{main.c@{main.c}!RCC\_AHB1ENR\_GPIOAEN@{RCC\_AHB1ENR\_GPIOAEN}}
+\index{RCC\_AHB1ENR\_GPIOAEN@{RCC\_AHB1ENR\_GPIOAEN}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_AHB1ENR\_GPIOAEN}{RCC\_AHB1ENR\_GPIOAEN}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+AHB1\+ENR\+\_\+\+GPIOAEN~(1 $<$$<$ 0)}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_ad4baa1f26b04719fe3d4e2f02d7dde40}\label{03__no__hal__uart__tx_2main_8c_ad4baa1f26b04719fe3d4e2f02d7dde40} 
+\index{main.c@{main.c}!RCC\_APB1ENR@{RCC\_APB1ENR}}
+\index{RCC\_APB1ENR@{RCC\_APB1ENR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR}{RCC\_APB1ENR}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+APB1\+ENR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_ga0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_ab840af4f735ec36419d61c7db3cfa00d}\label{03__no__hal__uart__tx_2main_8c_ab840af4f735ec36419d61c7db3cfa00d} 
+\index{main.c@{main.c}!RCC\_APB1ENR\_USART2EN@{RCC\_APB1ENR\_USART2EN}}
+\index{RCC\_APB1ENR\_USART2EN@{RCC\_APB1ENR\_USART2EN}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR\_USART2EN}{RCC\_APB1ENR\_USART2EN}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+APB1\+ENR\+\_\+\+USART2\+EN~(1 $<$$<$ 17)}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a0e681b03f364532055d88f63fec0d99d}\label{03__no__hal__uart__tx_2main_8c_a0e681b03f364532055d88f63fec0d99d} 
+\index{main.c@{main.c}!RCC\_BASE@{RCC\_BASE}}
+\index{RCC\_BASE@{RCC\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_BASE}{RCC\_BASE}}
+{\footnotesize\ttfamily \#define RCC\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x3800)}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_ade83162a04bca0b15b39018a8e8ec090}\label{03__no__hal__uart__tx_2main_8c_ade83162a04bca0b15b39018a8e8ec090} 
+\index{main.c@{main.c}!USART2\_BASE@{USART2\_BASE}}
+\index{USART2\_BASE@{USART2\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{USART2\_BASE}{USART2\_BASE}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+BASE~(\mbox{\hyperlink{group__UART__REGISTERS_ga45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}} + 0x4400)}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_ae5530ccff0818ee6c53e71f013f28b46}\label{03__no__hal__uart__tx_2main_8c_ae5530ccff0818ee6c53e71f013f28b46} 
+\index{main.c@{main.c}!USART2\_BRR@{USART2\_BRR}}
+\index{USART2\_BRR@{USART2\_BRR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{USART2\_BRR}{USART2\_BRR}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+BRR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x08))}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a685289c8590aa5257387ed4ba6460097}\label{03__no__hal__uart__tx_2main_8c_a685289c8590aa5257387ed4ba6460097} 
+\index{main.c@{main.c}!USART2\_CR1@{USART2\_CR1}}
+\index{USART2\_CR1@{USART2\_CR1}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{USART2\_CR1}{USART2\_CR1}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+CR1~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x0C))}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a498acd0c07bdee6e3b19a4bddd5b4244}\label{03__no__hal__uart__tx_2main_8c_a498acd0c07bdee6e3b19a4bddd5b4244} 
+\index{main.c@{main.c}!USART2\_DR@{USART2\_DR}}
+\index{USART2\_DR@{USART2\_DR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{USART2\_DR}{USART2\_DR}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+DR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x04))}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_af390c83858b5d97469c8b328231f1e54}\label{03__no__hal__uart__tx_2main_8c_af390c83858b5d97469c8b328231f1e54} 
+\index{main.c@{main.c}!USART2\_SR@{USART2\_SR}}
+\index{USART2\_SR@{USART2\_SR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{USART2\_SR}{USART2\_SR}}
+{\footnotesize\ttfamily \#define USART2\+\_\+\+SR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{group__UART__REGISTERS_gade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}} + 0x00))}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_ade7f090b04fd78b755b43357ecaa9622}\label{03__no__hal__uart__tx_2main_8c_ade7f090b04fd78b755b43357ecaa9622} 
+\index{main.c@{main.c}!USART\_CR1\_TE@{USART\_CR1\_TE}}
+\index{USART\_CR1\_TE@{USART\_CR1\_TE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{USART\_CR1\_TE}{USART\_CR1\_TE}}
+{\footnotesize\ttfamily \#define USART\+\_\+\+CR1\+\_\+\+TE~(1 $<$$<$ 3)}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a2bb650676aaae4a5203f372d497d5947}\label{03__no__hal__uart__tx_2main_8c_a2bb650676aaae4a5203f372d497d5947} 
+\index{main.c@{main.c}!USART\_CR1\_UE@{USART\_CR1\_UE}}
+\index{USART\_CR1\_UE@{USART\_CR1\_UE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{USART\_CR1\_UE}{USART\_CR1\_UE}}
+{\footnotesize\ttfamily \#define USART\+\_\+\+CR1\+\_\+\+UE~(1 $<$$<$ 13)}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a65e9cddf0890113d405342f1d8b5b980}\label{03__no__hal__uart__tx_2main_8c_a65e9cddf0890113d405342f1d8b5b980} 
+\index{main.c@{main.c}!USART\_SR\_TXE@{USART\_SR\_TXE}}
+\index{USART\_SR\_TXE@{USART\_SR\_TXE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{USART\_SR\_TXE}{USART\_SR\_TXE}}
+{\footnotesize\ttfamily \#define USART\+\_\+\+SR\+\_\+\+TXE~(1 $<$$<$ 7)}
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a7b7c9f8b5da59962d0a309f028efedaa}\label{03__no__hal__uart__tx_2main_8c_a7b7c9f8b5da59962d0a309f028efedaa} 
+\index{main.c@{main.c}!delay@{delay}}
+\index{delay@{delay}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{delay()}{delay()}}
+{\footnotesize\ttfamily void delay (\begin{DoxyParamCaption}\item[{volatile uint32\+\_\+t}]{count }\end{DoxyParamCaption})}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\label{03__no__hal__uart__tx_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a2dbf78bac0a26fd3cc86e0d5d509c546}\label{03__no__hal__uart__tx_2main_8c_a2dbf78bac0a26fd3cc86e0d5d509c546} 
+\index{main.c@{main.c}!uart2\_init@{uart2\_init}}
+\index{uart2\_init@{uart2\_init}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{uart2\_init()}{uart2\_init()}}
+{\footnotesize\ttfamily void uart2\+\_\+init (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a14fa11132ccf9aa0c8258e137b8db7fe}\label{03__no__hal__uart__tx_2main_8c_a14fa11132ccf9aa0c8258e137b8db7fe} 
+\index{main.c@{main.c}!uart2\_write\_int@{uart2\_write\_int}}
+\index{uart2\_write\_int@{uart2\_write\_int}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{uart2\_write\_int()}{uart2\_write\_int()}}
+{\footnotesize\ttfamily void uart2\+\_\+write\+\_\+int (\begin{DoxyParamCaption}\item[{int}]{num }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{03__no__hal__uart__tx_2main_8c_a0d7a51b3e857ba865e23324199ef6f28}\label{03__no__hal__uart__tx_2main_8c_a0d7a51b3e857ba865e23324199ef6f28} 
+\index{main.c@{main.c}!clk\_cfg@{clk\_cfg}}
+\index{clk\_cfg@{clk\_cfg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{clk\_cfg}{clk\_cfg}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} clk\+\_\+cfg}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ae661ab184a66fdc56b238f5f168c636c}{HAL\_CLOCK\_SOURCE\_PLL}}\}}
+
+\end{DoxyCode}
+\Hypertarget{03__no__hal__uart__tx_2main_8c_adf1b524219e8781fa7542fa90dd09912}\label{03__no__hal__uart__tx_2main_8c_adf1b524219e8781fa7542fa90dd09912} 
+\index{main.c@{main.c}!pll\_cfg@{pll\_cfg}}
+\index{pll\_cfg@{pll\_cfg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{pll\_cfg}{pll\_cfg}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} pll\+\_\+cfg}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ .input\_src\ =\ \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1a63fe55af719f040387f2cbd2728f64c9}{HAL\_CLOCK\_SOURCE\_HSE}},}
+\DoxyCodeLine{\ \ \ \ .pll\_m\ =\ 16,\ \ }
+\DoxyCodeLine{\ \ \ \ .pll\_n\ =\ 336,\ }
+\DoxyCodeLine{\ \ \ \ .pll\_p\ =\ 4,\ \ \ }
+\DoxyCodeLine{\ \ \ \ .pll\_q\ =\ 7\ \ \ \ }
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}

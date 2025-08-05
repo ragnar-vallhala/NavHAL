@@ -13,8 +13,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include <stdint.h>       /**< Standard fixed-width integer types */
-#include <stdbool.h>       /**< Standard boolean types */
-#include "./gpio_types.h" /**< GPIO-specific type definitions */
-#include "./clock_types.h" /**< Clock-specific type definitions */
-#endif // TYPES_H
+#include "clock_types.h" /**< Clock-specific type definitions */
+#include "gpio_types.h"  /**< GPIO-specific type definitions */
+#include "timer_types.h" /**< Timer-specific type definitions */
+#include <stdbool.h>     /**< Standard boolean types */
+#include <stdint.h>      /**< Standard fixed-width integer types */
+#endif                   // TYPES_H

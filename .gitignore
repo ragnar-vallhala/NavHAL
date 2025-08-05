@@ -1,5 +1,7 @@
 /build
 /.vscode
 /docs
+.cache/
 *.elf
 *.bin
+*.json 

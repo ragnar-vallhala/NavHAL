@@ -1,14 +1,21 @@
 cmake_minimum_required(VERSION 3.20)
+
+# Prevent macOS-specific flags
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_OSX_ARCHITECTURES "" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS_INIT "" CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS_INIT "" CACHE STRING "" FORCE)
+# set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
 project(ARM_Cortex_HAL C ASM)
 
 # Toolchain settings
-set(CMAKE_SYSTEM_NAME Generic)
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
 set(CMAKE_BINARY_SIZE ${TOOLCHAIN_PREFIX}size)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
 
 # Defaults
 set(CMAKE_SYSTEM_PROCESSOR
@@ -39,13 +46,15 @@ set(SRC_BOARD ${CMAKE_SOURCE_DIR}/src/board/${BOARD})
 set(SRC_CORE ${CMAKE_SOURCE_DIR}/src/core)
 set(SRC_VENDOR ${CMAKE_SOURCE_DIR}/src/vendor/${VENDOR})
 set(DIR_SAMPLES ${CMAKE_SOURCE_DIR}/samples)
-
 # Compiler Flags [UPDATE] thumb mode is on for now, can be removed later and
 # choosen dynamically
 set(CMAKE_C_FLAGS
-    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb -Wall -O0 -g -std=c11") # C++
-                                                                     # standard
-                                                                     # 11
+"-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb -Wall -O0 -g -std=c11") # C++
+# standard
+# 11
+
+
+
 set(CMAKE_ASM_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb")
 
 if(NOT STANDALONE)
@@ -65,6 +74,7 @@ endif()
 if(NOT STANDALONE)
 add_subdirectory(${SRC_DIR})
 endif()
+
 if(SAMPLE AND NOT STANDALONE)
   message(STATUS "Sample selected: ${SAMPLE} (with HAL)")
   message(STATUS  "Linker flag: ${CMAKE_EXE_LINKER_FLAGS}")
@@ -106,3 +116,4 @@ if(DOXYGEN_FOUND)
 else()
   message(STATUS "Doxygen not found. 'doc' target will not be available.")
 endif()
+

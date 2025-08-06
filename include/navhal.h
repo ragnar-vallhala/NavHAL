@@ -30,7 +30,8 @@
 /// Common UART HAL header (architecture-agnostic interface)
 #include "common/hal_uart.h"
 
-
+/// Common UART HAL header (architecture-agnostic interface)
+#include "common/hal_timer.h"
 /** @} */ // end of NAVHAL
 
 #endif // NAVHAL_H

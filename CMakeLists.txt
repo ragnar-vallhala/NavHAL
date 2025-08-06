@@ -8,6 +8,10 @@ set(CMAKE_CXX_FLAGS_INIT "" CACHE STRING "" FORCE)
 # set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
 project(ARM_Cortex_HAL C ASM)
 
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_COMPILE_COMMANDS_OUTPUT "${CMAKE_SOURCE_DIR}/compile_commands.json")
+
 # Toolchain settings
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
@@ -116,4 +120,10 @@ if(DOXYGEN_FOUND)
 else()
   message(STATUS "Doxygen not found. 'doc' target will not be available.")
 endif()
+
+add_custom_target(copy_compile_commands ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_BINARY_DIR}/compile_commands.json
+        ${CMAKE_SOURCE_DIR}/compile_commands.json
+)
 

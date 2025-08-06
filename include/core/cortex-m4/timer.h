@@ -37,6 +37,8 @@
 #define TIM_ADV_EGR_OFFSET 0x14 // Event generator
 #define TIM_ADV_EGR_UG_BIT 0x00 // Reinitialize the timer
 #define TIM_ADV_CNT_OFFSET 0X24
+#define TIM_ADV_DIER_OFFSET 0X0C  // DMA and Interrupt register
+#define TIM_ADV_DIER_UIE_BIT 0x00 // Update Interrupt enable bit
 
 // GP Timer 2-5 on APB1
 // Labled as GP1
@@ -50,6 +52,10 @@
 #define TIM_GP1_EGR_OFFSET 0x14 // Event generator
 #define TIM_GP1_EGR_UG_BIT 0x00 // Reinitialize the timer
 #define TIM_GP1_CNT_OFFSET 0X24
+#define TIM_GP1_DIER_OFFSET 0X0C  // DMA and Interrupt register
+#define TIM_GP1_DIER_UIE_BIT 0x00 // Update Interrupt enable bit
+#define TIM_GP1_SR_OFFSET 0x10    // Update Interrupt enable bit
+#define TIM_GP1_SR_UIF_BIT 0x00   // Update Interrupt enable bit
 
 // GP Timer 9-11 on APB1
 // Labled as GP2
@@ -62,6 +68,10 @@
 #define TIM_GP2_EGR_OFFSET 0x14 // Event generator
 #define TIM_GP2_EGR_UG_BIT 0x0  // Reinitialize the timer
 #define TIM_GP2_CNT_OFFSET 0X24
+#define TIM_GP2_DIER_OFFSET 0X0C  // DMA and Interrupt register
+#define TIM_GP2_DIER_UIE_BIT 0x00 // Update Interrupt enable bit
+#define TIM_GP2_SR_OFFSET 0x10    // Update Interrupt enable bit
+#define TIM_GP2_SR_UIF_BIT 0x00   // Update Interrupt enable bit
 
 // SysTick Control and Status Register
 #define SYST_CSR (*(volatile uint32_t *)0xE000E010)
@@ -96,10 +106,10 @@ uint32_t timer_get_count(hal_timer_t timer);
 
 // Timer Interrupt Management
 void timer_enable_interrupt(hal_timer_t timer);
-void timer_disable_interrupt(hal_timer_t timer);
-void timer_clear_interrupt_flag(hal_timer_t timer);
-void timer_attach_callback(hal_timer_t timer, void (*callback)(void));
-void timer_detach_callback(hal_timer_t timer);
+void timer_disable_interrupt(hal_timer_t timer); // [TODO]
+void timer_clear_interrupt_flag(hal_timer_t timer); // [TODO]
+void timer_attach_callback(hal_timer_t timer, void (*callback)(void)); 
+void timer_detach_callback(hal_timer_t timer); // [TODO]
 
 // Timer IRQ Handlers
 void TIM2_IRQHandler(void);

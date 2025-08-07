@@ -106,10 +106,15 @@ uint32_t timer_get_count(hal_timer_t timer);
 
 // Timer Interrupt Management
 void timer_enable_interrupt(hal_timer_t timer);
-void timer_disable_interrupt(hal_timer_t timer); // [TODO]
-void timer_clear_interrupt_flag(hal_timer_t timer); // [TODO]
-void timer_attach_callback(hal_timer_t timer, void (*callback)(void)); 
-void timer_detach_callback(hal_timer_t timer); // [TODO]
+void timer_disable_interrupt(
+    hal_timer_t timer); // [TODO]Add support for all timers
+void timer_clear_interrupt_flag(
+    hal_timer_t timer); // [TODO]Add support for all timers
+void timer_attach_callback(
+    hal_timer_t timer,
+    void (*callback)(void)); //[TODO] Add support for all timers
+void timer_detach_callback(
+    hal_timer_t timer); // [TODO] Add support for all timers
 
 // Timer IRQ Handlers
 void TIM2_IRQHandler(void);

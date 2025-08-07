@@ -383,3 +383,27 @@ void timer_attach_callback(hal_timer_t timer, void (*callback)(void)) {
     break;
   }
 }
+void timer_detach_callback(hal_timer_t timer) {
+  // [TODO]: add all timer interrupts
+  switch (timer) {
+  case TIM1:
+    break; // [TODO] Implement the complex interrupt options
+  case TIM2:
+    hal_interrupt_detach_callback(TIM2_IRQn);
+    break;
+  case TIM3:
+    hal_interrupt_detach_callback(TIM3_IRQn);
+    break;
+  case TIM4:
+    hal_interrupt_detach_callback(TIM4_IRQn);
+    break;
+  case TIM5:
+    hal_interrupt_detach_callback(TIM5_IRQn);
+    break;
+  case TIM9:
+    hal_interrupt_detach_callback(TIM1_BRK_TIM9_IRQn);
+    break;
+  default:
+    break;
+  }
+}

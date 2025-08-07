@@ -280,43 +280,39 @@ uint32_t timer_get_count(hal_timer_t timer) {
   return 0;
 }
 
-void TIM2_IRQHandler() {
-  uint32_t timer_base = _get_timer_base(TIM2);
+void timer_clear_interrupt_flag(hal_timer_t timer) {
+  // for tim2-5  & 9only
+  uint32_t timer_base = _get_timer_base(timer);
   volatile uint32_t *timer_sr =
       (volatile uint32_t *)(timer_base + TIM_GP1_SR_OFFSET);
-  (*timer_sr) &= (~(1 << TIM_GP1_SR_UIF_BIT));
+  if (timer >= TIM2 && timer <= TIM5) {
+    (*timer_sr) &= (~(1 << TIM_GP1_SR_UIF_BIT));
+  } else if (timer >= TIM9 && timer <= TIM11)
+    (*timer_sr) &= (~(1 << TIM_GP2_SR_UIF_BIT));
+}
+
+void TIM2_IRQHandler() {
+  timer_clear_interrupt_flag(TIM2);
   hal_handle_interrupt(TIM2_IRQn);
 }
 
 void TIM3_IRQHandler() {
-  uint32_t timer_base = _get_timer_base(TIM3);
-  volatile uint32_t *timer_sr =
-      (volatile uint32_t *)(timer_base + TIM_GP1_SR_OFFSET);
-  (*timer_sr) &= (~(1 << TIM_GP1_SR_UIF_BIT));
+  timer_clear_interrupt_flag(TIM3);
   hal_handle_interrupt(TIM3_IRQn);
 }
 
 void TIM4_IRQHandler() {
-  uint32_t timer_base = _get_timer_base(TIM4);
-  volatile uint32_t *timer_sr =
-      (volatile uint32_t *)(timer_base + TIM_GP1_SR_OFFSET);
-  (*timer_sr) &= (~(1 << TIM_GP1_SR_UIF_BIT));
+  timer_clear_interrupt_flag(TIM4);
   hal_handle_interrupt(TIM4_IRQn);
 }
 
 void TIM5_IRQHandler() {
-  uint32_t timer_base = _get_timer_base(TIM5);
-  volatile uint32_t *timer_sr =
-      (volatile uint32_t *)(timer_base + TIM_GP1_SR_OFFSET);
-  (*timer_sr) &= (~(1 << TIM_GP1_SR_UIF_BIT));
+  timer_clear_interrupt_flag(TIM5);
   hal_handle_interrupt(TIM5_IRQn);
 }
 
 void TIM1BRK_TIM9_IRQHandler() {
-  uint32_t timer_base = _get_timer_base(TIM9);
-  volatile uint32_t *timer_sr =
-      (volatile uint32_t *)(timer_base + TIM_GP2_SR_OFFSET);
-  (*timer_sr) &= (~(1 << TIM_GP1_SR_UIF_BIT));
+  timer_clear_interrupt_flag(TIM9);
   hal_handle_interrupt(TIM1_BRK_TIM9_IRQn); // shared with TIM1 BRK
 }
 

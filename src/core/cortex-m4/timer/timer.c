@@ -280,6 +280,40 @@ uint32_t timer_get_count(hal_timer_t timer) {
   return 0;
 }
 
+uint32_t timer_get_frequency(hal_timer_t timer) {
+  uint32_t timer_base = _get_timer_base(timer);
+  if (timer_base == 0)
+    return 0;
+
+  // 1. Get clock
+  uint32_t timer_clk = hal_clock_get_apb1clk(); // default for TIM2-TIM5
+  if (timer == TIM1 || timer == TIM9 || timer == TIM10 || timer == TIM11) {
+    timer_clk = hal_clock_get_apb2clk(); // For advanced timers
+  }
+
+  // 2. Get prescaler and ARR
+  uint32_t prescaler = 0;
+  uint32_t arr = 0;
+
+  if (timer == TIM1) {
+    prescaler = *((volatile uint32_t *)(timer_base + TIM_ADV_PSC_OFFSET));
+    arr = *((volatile uint32_t *)(timer_base + TIM_ADV_ARR_OFFSET));
+  } else if (timer >= TIM2 && timer <= TIM5) {
+    prescaler = *((volatile uint32_t *)(timer_base + TIM_GP1_PSC_OFFSET));
+    arr = *((volatile uint32_t *)(timer_base + TIM_GP1_ARR_OFFSET));
+  } else if (timer >= TIM9 && timer <= TIM11) {
+    prescaler = *((volatile uint16_t *)(timer_base + TIM_GP2_PSC_OFFSET));
+    arr = *((volatile uint16_t *)(timer_base + TIM_GP2_ARR_OFFSET));
+  }
+
+  if (arr == 0x0)
+    arr = 0xFFFF; // Prevent division by zero
+
+  // 3. Calculate frequency
+  uint32_t freq = timer_clk / (prescaler + 1) / (arr + 1);
+  return freq;
+}
+
 void timer_clear_interrupt_flag(hal_timer_t timer) {
   // for tim2-5  & 9only
   uint32_t timer_base = _get_timer_base(timer);
@@ -402,6 +436,76 @@ void timer_detach_callback(hal_timer_t timer) {
     break;
   case TIM9:
     hal_interrupt_detach_callback(TIM1_BRK_TIM9_IRQn);
+    break;
+  default:
+    break;
+  }
+}
+
+void timer_set_compare(hal_timer_t timer, uint8_t channel,
+                       uint32_t compare_value) {
+  uint32_t timer_base = _get_timer_base(timer);
+  if (channel < 1 || channel > 4)
+    return; // only 4 valid channels
+  volatile uint32_t *ccr_reg =
+      (volatile uint32_t *)(timer_base + TIMx_CCR1_OFFSET + (channel - 1) * 4);
+  *ccr_reg = compare_value;
+  volatile uint32_t *ccmr_reg;
+  if (channel <= 2)
+    ccmr_reg = (volatile uint32_t *)(timer_base + TIMx_CCMR1_OFFSET);
+  else
+    ccmr_reg = (volatile uint32_t *)(timer_base + TIMx_CCMR2_OFFSET);
+
+  (*ccmr_reg) &= (0x7 << TIMx_CCMR1_OC1M_BIT);
+  (*ccmr_reg) |= (TIMx_CCMR1_OC1M_PWM_MODE1 << TIMx_CCMR1_OC1M_BIT);
+  (*ccmr_reg) |= (1 << TIMx_CCMR1_OC1PE_BIT);
+  timer_enable_channel(timer, channel);
+}
+void timer_enable_channel(hal_timer_t timer, uint32_t channel) {
+
+  uint32_t timer_base = _get_timer_base(timer);
+  volatile uint32_t *ccer_reg =
+      (volatile uint32_t *)(timer_base + TIMx_CCER_OFFSET);
+
+  if (channel < 1 || channel > 4)
+    return; // only 4 valid channels
+  switch (channel) {
+  case 1:
+    *ccer_reg |= (1 << TIMx_CCER_CC1E_BIT);
+    break;
+  case 2:
+    *ccer_reg |= (1 << TIMx_CCER_CC2E_BIT);
+    break;
+  case 3:
+    *ccer_reg |= (1 << TIMx_CCER_CC3E_BIT);
+    break;
+  case 4:
+    *ccer_reg |= (1 << TIMx_CCER_CC4E_BIT);
+    break;
+  default:
+    break;
+  }
+}
+void timer_disable_channel(hal_timer_t timer, uint32_t channel) {
+
+  uint32_t timer_base = _get_timer_base(timer);
+  volatile uint32_t *ccer_reg =
+      (volatile uint32_t *)(timer_base + TIMx_CCER_OFFSET);
+
+  if (channel < 1 || channel > 4)
+    return; // only 4 valid channels
+  switch (channel) {
+  case 1:
+    *ccer_reg &= ~(1 << TIMx_CCER_CC1E_BIT);
+    break;
+  case 2:
+    *ccer_reg &= ~(1 << TIMx_CCER_CC2E_BIT);
+    break;
+  case 3:
+    *ccer_reg &= ~(1 << TIMx_CCER_CC3E_BIT);
+    break;
+  case 4:
+    *ccer_reg &= ~(1 << TIMx_CCER_CC4E_BIT);
     break;
   default:
     break;

@@ -1,6 +1,8 @@
 #ifndef CORTEX_M4_TIMER_H
 #define CORTEX_M4_TIMER_H
+#include "utils/timer_types.h"
 #include "utils/types.h"
+#include <stdint.h>
 
 #define RCC_BASE 0x40023800
 
@@ -84,6 +86,28 @@
 #define SYST_CSR_EN_BIT 0
 #define SYST_CSR_TICKINT_BIT 1
 #define SYST_CSR_CLKSOURCE_BIT 2
+
+#define TIMx_CCR1_OFFSET 0x34
+#define TIMx_CCER_OFFSET 0x20
+#define TIMx_CCER_CC1E_BIT 0
+#define TIMx_CCER_CC2E_BIT 4
+#define TIMx_CCER_CC3E_BIT 8
+#define TIMx_CCER_CC4E_BIT 12
+#define TIMx_CCMR1_OFFSET 0x18
+#define TIMx_CCMR2_OFFSET 0x1c
+#define TIMx_CCMR1_OC1M_BIT 4
+
+#define TIMx_CCMR1_OC1M_PWM_MODE1                                              \
+  0x6 // In upcounting, channel 1 is active as long as TIMx_CNT<TIMx_CCR1 else
+      // inactive. In downcounting, channel 1 is inactive (OC1REF=‘0) as long as
+      // TIMx_CNT>TIMx_CCR1 else active (OC1REF=1)
+
+#define TIMx_CCMR1_OC1M_PWM_MODE2                                              \
+  0x07 // In upcounting, channel 1 is inactive as long as TIMx_CNT<TIMx_CCR1
+       // else active. In downcounting, channel 1 is active as long as
+       // TIMx_CNT>TIMx_CCR1 else inactive.
+#define TIMx_CCMR1_OC1PE_BIT 3
+
 // SysTick Timer Functions
 // TIM5 is used for systick
 void systick_init(uint32_t tick_us);
@@ -127,8 +151,9 @@ void TIM12_IRQHandler(void);
 // PWM and Output Compare (Future Stage)
 void timer_set_compare(hal_timer_t timer, uint8_t channel,
                        uint32_t compare_value);
-void timer_enable_pwm(hal_timer_t timer, uint8_t channel);
-void timer_disable_pwm(hal_timer_t timer, uint8_t channel);
+void timer_enable_channel(hal_timer_t timer, uint32_t channel);
+
+void timer_disable_channel(hal_timer_t timer, uint32_t channel);
 
 // Utility Functions
 uint32_t timer_get_frequency(hal_timer_t timer);

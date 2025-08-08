@@ -7,6 +7,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c
 ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c
 ${CMAKE_CURRENT_SOURCE_DIR}/timer/timer.c
 ${CMAKE_CURRENT_SOURCE_DIR}/interrupt/interrupt.c
+${CMAKE_CURRENT_SOURCE_DIR}/pwm/pwm.c
 )
 
 target_link_libraries(hal gcc)

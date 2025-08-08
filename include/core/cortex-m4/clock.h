@@ -97,7 +97,7 @@ void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg);
  *
  * @return System clock frequency in Hertz.
  */
-uint32_t hal_clock_get_sysclk();
+uint32_t hal_clock_get_sysclk(void);
 
 /**
  * @brief Get the current AHB bus clock frequency in Hz.
@@ -106,7 +106,7 @@ uint32_t hal_clock_get_sysclk();
  *
  * @return AHB bus clock frequency in Hertz.
  */
-uint32_t hal_clock_get_ahbclk();
+uint32_t hal_clock_get_ahbclk(void);
 
 /**
  * @brief Get the current APB1 bus clock frequency in Hz.
@@ -115,7 +115,7 @@ uint32_t hal_clock_get_ahbclk();
  *
  * @return APB1 bus clock frequency in Hertz.
  */
-uint32_t hal_clock_get_apb1clk();
+uint32_t hal_clock_get_apb1clk(void);
 
 /**
  * @brief Get the current APB2 bus clock frequency in Hz.
@@ -124,6 +124,6 @@ uint32_t hal_clock_get_apb1clk();
  *
  * @return APB2 bus clock frequency in Hertz.
  */
-uint32_t hal_clock_get_apb2clk();
+uint32_t hal_clock_get_apb2clk(void);
 
 #endif // CORTEX_M4_CLOCK_H

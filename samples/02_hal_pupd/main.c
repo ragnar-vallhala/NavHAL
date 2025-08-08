@@ -9,7 +9,7 @@ void delay(void)
 int main(void)
 {
     hal_gpio_setmode(GPIO_PA05, GPIO_OUTPUT, 0);
-    hal_gpio_setmode(GPIO_PA06, GPIO_INPUT, GPIO_PULLDOWN);
+    hal_gpio_setmode(GPIO_PA06, GPIO_INPUT, GPIO_PULLUP);
     if (hal_gpio_getmode(GPIO_PA05) != GPIO_OUTPUT)
         while (1)
             ;

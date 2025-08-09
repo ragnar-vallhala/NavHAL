@@ -1,6 +1,8 @@
 #ifndef CORTEX_M4_TIMER_H
 #define CORTEX_M4_TIMER_H
+#include "utils/timer_types.h"
 #include "utils/types.h"
+#include <stdint.h>
 
 #define RCC_BASE 0x40023800
 
@@ -37,6 +39,8 @@
 #define TIM_ADV_EGR_OFFSET 0x14 // Event generator
 #define TIM_ADV_EGR_UG_BIT 0x00 // Reinitialize the timer
 #define TIM_ADV_CNT_OFFSET 0X24
+#define TIM_ADV_DIER_OFFSET 0X0C  // DMA and Interrupt register
+#define TIM_ADV_DIER_UIE_BIT 0x00 // Update Interrupt enable bit
 
 // GP Timer 2-5 on APB1
 // Labled as GP1
@@ -50,6 +54,10 @@
 #define TIM_GP1_EGR_OFFSET 0x14 // Event generator
 #define TIM_GP1_EGR_UG_BIT 0x00 // Reinitialize the timer
 #define TIM_GP1_CNT_OFFSET 0X24
+#define TIM_GP1_DIER_OFFSET 0X0C  // DMA and Interrupt register
+#define TIM_GP1_DIER_UIE_BIT 0x00 // Update Interrupt enable bit
+#define TIM_GP1_SR_OFFSET 0x10    // Update Interrupt enable bit
+#define TIM_GP1_SR_UIF_BIT 0x00   // Update Interrupt enable bit
 
 // GP Timer 9-11 on APB1
 // Labled as GP2
@@ -62,6 +70,10 @@
 #define TIM_GP2_EGR_OFFSET 0x14 // Event generator
 #define TIM_GP2_EGR_UG_BIT 0x0  // Reinitialize the timer
 #define TIM_GP2_CNT_OFFSET 0X24
+#define TIM_GP2_DIER_OFFSET 0X0C  // DMA and Interrupt register
+#define TIM_GP2_DIER_UIE_BIT 0x00 // Update Interrupt enable bit
+#define TIM_GP2_SR_OFFSET 0x10    // Update Interrupt enable bit
+#define TIM_GP2_SR_UIF_BIT 0x00   // Update Interrupt enable bit
 
 // SysTick Control and Status Register
 #define SYST_CSR (*(volatile uint32_t *)0xE000E010)
@@ -74,6 +86,28 @@
 #define SYST_CSR_EN_BIT 0
 #define SYST_CSR_TICKINT_BIT 1
 #define SYST_CSR_CLKSOURCE_BIT 2
+
+#define TIMx_CCR1_OFFSET 0x34
+#define TIMx_CCER_OFFSET 0x20
+#define TIMx_CCER_CC1E_BIT 0
+#define TIMx_CCER_CC2E_BIT 4
+#define TIMx_CCER_CC3E_BIT 8
+#define TIMx_CCER_CC4E_BIT 12
+#define TIMx_CCMR1_OFFSET 0x18
+#define TIMx_CCMR2_OFFSET 0x1c
+#define TIMx_CCMR1_OC1M_BIT 4
+
+#define TIMx_CCMR1_OC1M_PWM_MODE1                                              \
+  0x6 // In upcounting, channel 1 is active as long as TIMx_CNT<TIMx_CCR1 else
+      // inactive. In downcounting, channel 1 is inactive (OC1REF=‘0) as long as
+      // TIMx_CNT>TIMx_CCR1 else active (OC1REF=1)
+
+#define TIMx_CCMR1_OC1M_PWM_MODE2                                              \
+  0x07 // In upcounting, channel 1 is inactive as long as TIMx_CNT<TIMx_CCR1
+       // else active. In downcounting, channel 1 is active as long as
+       // TIMx_CNT>TIMx_CCR1 else inactive.
+#define TIMx_CCMR1_OC1PE_BIT 3
+
 // SysTick Timer Functions
 // TIM5 is used for systick
 void systick_init(uint32_t tick_us);
@@ -96,10 +130,15 @@ uint32_t timer_get_count(hal_timer_t timer);
 
 // Timer Interrupt Management
 void timer_enable_interrupt(hal_timer_t timer);
-void timer_disable_interrupt(hal_timer_t timer);
-void timer_clear_interrupt_flag(hal_timer_t timer);
-void timer_attach_callback(hal_timer_t timer, void (*callback)(void));
-void timer_detach_callback(hal_timer_t timer);
+void timer_disable_interrupt(
+    hal_timer_t timer); // [TODO]Add support for all timers
+void timer_clear_interrupt_flag(
+    hal_timer_t timer); // [TODO]Add support for all timers
+void timer_attach_callback(
+    hal_timer_t timer,
+    void (*callback)(void)); //[TODO] Add support for all timers
+void timer_detach_callback(
+    hal_timer_t timer); // [TODO] Add support for all timers
 
 // Timer IRQ Handlers
 void TIM2_IRQHandler(void);
@@ -112,8 +151,9 @@ void TIM12_IRQHandler(void);
 // PWM and Output Compare (Future Stage)
 void timer_set_compare(hal_timer_t timer, uint8_t channel,
                        uint32_t compare_value);
-void timer_enable_pwm(hal_timer_t timer, uint8_t channel);
-void timer_disable_pwm(hal_timer_t timer, uint8_t channel);
+void timer_enable_channel(hal_timer_t timer, uint32_t channel);
+
+void timer_disable_channel(hal_timer_t timer, uint32_t channel);
 
 // Utility Functions
 uint32_t timer_get_frequency(hal_timer_t timer);

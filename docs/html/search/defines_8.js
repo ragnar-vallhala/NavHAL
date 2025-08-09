@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['stringify_0',['STRINGIFY',['../CMakeCCompilerId_8c.html#a43e1cad902b6477bec893cb6430bd6c8',1,'CMakeCCompilerId.c']]],
-  ['stringify_5fhelper_1',['STRINGIFY_HELPER',['../CMakeCCompilerId_8c.html#a2ae9b72bb13abaabfcf2ee0ba7d3fa1d',1,'CMakeCCompilerId.c']]]
+  ['weak_5falias_0',['WEAK_ALIAS',['../samples_205__hal__systick_2startup_8c.html#a0c9a16e7e880e73ecd32e1bacc6d668b',1,'WEAK_ALIAS:&#160;startup.c'],['../src_2core_2cortex-m4_2startup_2startup_8c.html#a0c9a16e7e880e73ecd32e1bacc6d668b',1,'WEAK_ALIAS:&#160;startup.c']]]
 ];

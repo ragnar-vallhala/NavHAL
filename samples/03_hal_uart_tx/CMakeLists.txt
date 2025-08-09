@@ -17,7 +17,14 @@ message(STATUS "Linker args ${CMAKE_EXE_LINKER_FLAGS}")
 
 add_executable(${SAMPLE} main.c startup.s)
 
-target_link_libraries(${SAMPLE} PUBLIC hal)
+# target_link_libraries(${SAMPLE} hal)
+
+target_link_libraries(${SAMPLE} PRIVATE
+  -Wl,--start-group
+    -Wl,--whole-archive hal -Wl,--no-whole-archive
+    -lgcc
+  -Wl,--end-group
+)
 
 
 

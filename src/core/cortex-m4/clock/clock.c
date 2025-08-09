@@ -136,7 +136,7 @@ void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg)
  *
  * @return SYSCLK frequency in Hertz.
  */
-uint32_t hal_clock_get_sysclk()
+uint32_t hal_clock_get_sysclk(void)
 {
     volatile uint32_t *const RCC_CFGR = (volatile uint32_t *)(RCC + RCC_CFGR_OFFSET);
     volatile uint32_t *const RCC_PLLCFGR = (volatile uint32_t *)(RCC + RCC_PLLCFGR_OFFSET);
@@ -239,7 +239,7 @@ static uint32_t _decode_apb_prescaler(uint32_t val)
  *
  * @return AHB bus clock frequency in Hertz.
  */
-uint32_t hal_clock_get_ahbclk()
+uint32_t hal_clock_get_ahbclk(void)
 {
     volatile uint32_t *const RCC_CFGR = (volatile uint32_t *)(RCC + RCC_CFGR_OFFSET);
     uint32_t prescaler = ((*RCC_CFGR) >> RCC_CFGR_HPRE_BIT) & 0xF;
@@ -253,7 +253,7 @@ uint32_t hal_clock_get_ahbclk()
  *
  * @return APB1 bus clock frequency in Hertz.
  */
-uint32_t hal_clock_get_apb1clk()
+uint32_t hal_clock_get_apb1clk(void)
 {
     volatile uint32_t *const RCC_CFGR = (volatile uint32_t *)(RCC + RCC_CFGR_OFFSET);
     uint32_t prescaler = ((*RCC_CFGR) >> RCC_CFGR_PPRE1_BIT) & 0x7;
@@ -267,7 +267,7 @@ uint32_t hal_clock_get_apb1clk()
  *
  * @return APB2 bus clock frequency in Hertz.
  */
-uint32_t hal_clock_get_apb2clk()
+uint32_t hal_clock_get_apb2clk(void)
 {
     volatile uint32_t *const RCC_CFGR = (volatile uint32_t *)(RCC + RCC_CFGR_OFFSET);
     uint32_t prescaler = ((*RCC_CFGR) >> RCC_CFGR_PPRE2_BIT) & 0x7;

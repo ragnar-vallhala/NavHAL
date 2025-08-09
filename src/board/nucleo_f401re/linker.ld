@@ -9,11 +9,14 @@ SECTIONS {
     KEEP(*(.isr_vector))   /* interrupt vector table */
     *(.text*)
     *(.rodata*)
+    *(.ARM.exidx*)
+    *(.ARM.extab*)
   } > FLASH
 
   .data : AT (ADDR(.text) + SIZEOF(.text)) {
     _sdata = .;
     *(.data*)
+    . = ALIGN(4);
     _edata = .;
   } > RAM
 

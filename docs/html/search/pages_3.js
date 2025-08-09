@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['layer_0',['NavHAL — NAVRobotec Hardware Abstraction Layer',['../md_README.html',1,'']]],
-  ['license_1',['LICENSE',['../md_LICENSE.html',1,'']]]
+  ['documentation_0',['Documentation',['../md__r_e_a_d_m_e.html#autotoc_md20',1,'Documentation'],['../index.html',1,'NavHAL Documentation']]]
 ];

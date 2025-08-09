@@ -3,6 +3,7 @@
 \mbox{\hyperlink{uart_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ }
+\DoxyCodeLine{00023\ }
 \DoxyCodeLine{00024\ \textcolor{preprocessor}{\ \#ifndef\ CORTEX\_M4\_UART\_H}}
 \DoxyCodeLine{00025\ \textcolor{preprocessor}{\ \#define\ CORTEX\_M4\_UART\_H}}
 \DoxyCodeLine{00026\ \ }
@@ -15,6 +16,7 @@
 \DoxyCodeLine{00038\ \ \ \ \ \ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1aaf76a57275179b99587134229e1263b9}{UART6}}\ \ }
 \DoxyCodeLine{00039\ \ \}\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}};}
 \DoxyCodeLine{00040\ \ }
+\DoxyCodeLine{00058\ \ }
 \DoxyCodeLine{00059\ \textcolor{preprocessor}{\ \#define\ uart2\_write(val)\ \_Generic((val),\ \(\backslash\)}}
 \DoxyCodeLine{00060\ \textcolor{preprocessor}{\ \ \ \ \ char:\ uart2\_write\_char,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
 \DoxyCodeLine{00061\ \textcolor{preprocessor}{\ \ \ \ \ signed\ char:\ uart2\_write\_int,\ \ \ \ \ \ \ \ \(\backslash\)}}
@@ -65,8 +67,9 @@
 \DoxyCodeLine{00106\ \textcolor{preprocessor}{\ \ \ \ \ double:\ uart6\_write\_float,\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
 \DoxyCodeLine{00107\ \textcolor{preprocessor}{\ \ \ \ \ const\ char\ *:\ uart6\_write\_string,\ \ \ \ \(\backslash\)}}
 \DoxyCodeLine{00108\ \textcolor{preprocessor}{\ \ \ \ \ char\ *:\ uart6\_write\_string)(val)}}
-\DoxyCodeLine{00109\ \ }
- \textcolor{comment}{// end of UART\_WRITE\_MACROS}\DoxyCodeLine{00111\ \ }
+\DoxyCodeLine{00109\ \ \ \textcolor{comment}{//\ end\ of\ UART\_WRITE\_MACROS}}
+\DoxyCodeLine{00111\ \ }
+\DoxyCodeLine{00119\ \ }
 \DoxyCodeLine{00120\ \ \textcolor{comment}{/*\ Peripheral\ memory\ map\ */}}
 \DoxyCodeLine{00121\ \textcolor{preprocessor}{\ \#define\ PERIPH\_BASE\ \ \ \ \ \ \ \ 0x40000000UL}}
 \DoxyCodeLine{00122\ \textcolor{preprocessor}{\ \#define\ AHB1PERIPH\_BASE\ \ \ \ (PERIPH\_BASE\ +\ 0x00020000UL)}}
@@ -116,65 +119,66 @@
 \DoxyCodeLine{00166\ \ \textcolor{comment}{/*\ Status\ register\ bits\ */}}
 \DoxyCodeLine{00167\ \textcolor{preprocessor}{\ \#define\ USART\_SR\_TXE\ \ \ (1\ <<\ 7)\ \ }}
 \DoxyCodeLine{00168\ \textcolor{preprocessor}{\ \#define\ USART\_SR\_RXNE\ \ (1\ <<\ 5)\ \ }}
-\DoxyCodeLine{00169\ \ }
- \textcolor{comment}{// end of UART\_REGISTERS}\DoxyCodeLine{00171\ \ }
-\DoxyCodeLine{00190\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_gad320bd1e821aac6c1b38c8bcb8003104}{uart\_init}}(uint32\_t\ baudrate,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
+\DoxyCodeLine{00169\ \ \ \textcolor{comment}{//\ end\ of\ UART\_REGISTERS}}
+\DoxyCodeLine{00171\ \ }
+\DoxyCodeLine{00180\ \ }
+\DoxyCodeLine{00190\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gad320bd1e821aac6c1b38c8bcb8003104}{uart\_init}}(uint32\_t\ baudrate,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
 \DoxyCodeLine{00191\ \ }
-\DoxyCodeLine{00200\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga6f144300396d4d9afe21f41a72a99ab8}{uart\_write\_char}}(\textcolor{keywordtype}{char}\ c,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
+\DoxyCodeLine{00200\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga6f144300396d4d9afe21f41a72a99ab8}{uart\_write\_char}}(\textcolor{keywordtype}{char}\ c,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
 \DoxyCodeLine{00201\ \ }
-\DoxyCodeLine{00210\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga183ba35371040029a29a3cde221539fa}{uart\_write\_int}}(int32\_t\ num,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
+\DoxyCodeLine{00210\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga183ba35371040029a29a3cde221539fa}{uart\_write\_int}}(int32\_t\ num,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
 \DoxyCodeLine{00211\ \ }
-\DoxyCodeLine{00221\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga662be19e5a7667eeae26bd36e869fd2d}{uart\_write\_float}}(\textcolor{keywordtype}{float}\ num,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
+\DoxyCodeLine{00221\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga662be19e5a7667eeae26bd36e869fd2d}{uart\_write\_float}}(\textcolor{keywordtype}{float}\ num,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
 \DoxyCodeLine{00222\ \ }
-\DoxyCodeLine{00231\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_gab0bd03dc5a6de94637fb1536e883c546}{uart\_write\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
+\DoxyCodeLine{00231\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gab0bd03dc5a6de94637fb1536e883c546}{uart\_write\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s,\ \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
 \DoxyCodeLine{00232\ \ }
 \DoxyCodeLine{00233\ \ \textcolor{comment}{/*\ USART1\ specific\ functions\ */}}
 \DoxyCodeLine{00234\ \ }
-\DoxyCodeLine{00240\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga3cc37d73aa435b454452d7a60a635e39}{uart1\_init}}(uint32\_t\ baudrate);}
+\DoxyCodeLine{00240\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3cc37d73aa435b454452d7a60a635e39}{uart1\_init}}(uint32\_t\ baudrate);}
 \DoxyCodeLine{00241\ \ }
-\DoxyCodeLine{00245\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\_write\_char}}(\textcolor{keywordtype}{char}\ c);}
+\DoxyCodeLine{00245\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\_write\_char}}(\textcolor{keywordtype}{char}\ c);}
 \DoxyCodeLine{00246\ \ }
-\DoxyCodeLine{00250\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}}(int32\_t\ num);}
+\DoxyCodeLine{00250\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}}(int32\_t\ num);}
 \DoxyCodeLine{00251\ \ }
-\DoxyCodeLine{00255\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga8595ce32dbc8da8200d337fca8d7930e}{uart1\_write\_float}}(\textcolor{keywordtype}{float}\ num);}
+\DoxyCodeLine{00255\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga8595ce32dbc8da8200d337fca8d7930e}{uart1\_write\_float}}(\textcolor{keywordtype}{float}\ num);}
 \DoxyCodeLine{00256\ \ }
-\DoxyCodeLine{00260\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_gac86a702823358a08deca96365ed41cae}{uart1\_write\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s);}
+\DoxyCodeLine{00260\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac86a702823358a08deca96365ed41cae}{uart1\_write\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s);}
 \DoxyCodeLine{00261\ \ }
 \DoxyCodeLine{00262\ \ \textcolor{comment}{/*\ USART2\ specific\ functions\ */}}
 \DoxyCodeLine{00263\ \ }
 \DoxyCodeLine{00267\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_a2dbf78bac0a26fd3cc86e0d5d509c546}{uart2\_init}}(uint32\_t\ baudrate);}
-\DoxyCodeLine{00268\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_gace45b7a16f634d2de9a483acab46a7c8}{uart2\_write\_char}}(\textcolor{keywordtype}{char}\ c);}
-\DoxyCodeLine{00269\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}}(int32\_t\ num);}
-\DoxyCodeLine{00270\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga3784763020352ac6913e355c4ac7a337}{uart2\_write\_float}}(\textcolor{keywordtype}{float}\ num);}
-\DoxyCodeLine{00271\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga55c46e6a48433287fdf5a9d1defd5f5c}{uart2\_write\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s);}
+\DoxyCodeLine{00268\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gace45b7a16f634d2de9a483acab46a7c8}{uart2\_write\_char}}(\textcolor{keywordtype}{char}\ c);}
+\DoxyCodeLine{00269\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}}(int32\_t\ num);}
+\DoxyCodeLine{00270\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3784763020352ac6913e355c4ac7a337}{uart2\_write\_float}}(\textcolor{keywordtype}{float}\ num);}
+\DoxyCodeLine{00271\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga55c46e6a48433287fdf5a9d1defd5f5c}{uart2\_write\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s);}
 \DoxyCodeLine{00272\ \ }
 \DoxyCodeLine{00273\ \ \textcolor{comment}{/*\ USART6\ specific\ functions\ */}}
 \DoxyCodeLine{00274\ \ }
-\DoxyCodeLine{00278\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga7cd48d1d49f0dee1adff1be915793bb6}{uart6\_init}}(uint32\_t\ baudrate);}
-\DoxyCodeLine{00279\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\_write\_char}}(\textcolor{keywordtype}{char}\ c);}
-\DoxyCodeLine{00280\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}}(int32\_t\ num);}
-\DoxyCodeLine{00281\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_ga3a2f8786049010a947207fc47c7ad409}{uart6\_write\_float}}(\textcolor{keywordtype}{float}\ num);}
-\DoxyCodeLine{00282\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group__UART__API_gacd0a2ffc721c3e9af1501307d74f5173}{uart6\_write\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s);}
+\DoxyCodeLine{00278\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga7cd48d1d49f0dee1adff1be915793bb6}{uart6\_init}}(uint32\_t\ baudrate);}
+\DoxyCodeLine{00279\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\_write\_char}}(\textcolor{keywordtype}{char}\ c);}
+\DoxyCodeLine{00280\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}}(int32\_t\ num);}
+\DoxyCodeLine{00281\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3a2f8786049010a947207fc47c7ad409}{uart6\_write\_float}}(\textcolor{keywordtype}{float}\ num);}
+\DoxyCodeLine{00282\ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gacd0a2ffc721c3e9af1501307d74f5173}{uart6\_write\_string}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *s);}
 \DoxyCodeLine{00283\ \ }
-\DoxyCodeLine{00292\ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{group__UART__API_ga86ffdb11e32f205ce3b1e9b0fb259c8e}{uart\_read\_char}}(\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
+\DoxyCodeLine{00292\ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga86ffdb11e32f205ce3b1e9b0fb259c8e}{uart\_read\_char}}(\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
 \DoxyCodeLine{00293\ \ }
-\DoxyCodeLine{00300\ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{group__UART__API_gaa3a9166c481a902a7b2c291eb3127a78}{uart\_available}}(\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
+\DoxyCodeLine{00300\ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa3a9166c481a902a7b2c291eb3127a78}{uart\_available}}(\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\_uart\_t}}\ uart);}
 \DoxyCodeLine{00301\ \ }
 \DoxyCodeLine{00302\ \ \textcolor{comment}{/*\ USART1\ specific\ receive\ functions\ */}}
-\DoxyCodeLine{00303\ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{group__UART__API_ga242042066c0dcfee02c34f51ae65cc8a}{uart1\_available}}(\textcolor{keywordtype}{void});}
-\DoxyCodeLine{00304\ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{group__UART__API_ga223b61a491de01b4b3ee16a1d15113d1}{uart1\_read\_char}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00303\ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga242042066c0dcfee02c34f51ae65cc8a}{uart1\_available}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00304\ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga223b61a491de01b4b3ee16a1d15113d1}{uart1\_read\_char}}(\textcolor{keywordtype}{void});}
 \DoxyCodeLine{00305\ \ }
 \DoxyCodeLine{00306\ \ \textcolor{comment}{/*\ USART2\ specific\ receive\ functions\ */}}
-\DoxyCodeLine{00307\ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{group__UART__API_gae67708662af5b29151196c9ba24cf20d}{uart2\_available}}(\textcolor{keywordtype}{void});}
-\DoxyCodeLine{00308\ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{group__UART__API_ga894a9fccabee5ec32e916ba78998fad5}{uart2\_read\_char}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00307\ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gae67708662af5b29151196c9ba24cf20d}{uart2\_available}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00308\ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga894a9fccabee5ec32e916ba78998fad5}{uart2\_read\_char}}(\textcolor{keywordtype}{void});}
 \DoxyCodeLine{00309\ \ }
 \DoxyCodeLine{00310\ \ \textcolor{comment}{/*\ USART6\ specific\ receive\ functions\ */}}
-\DoxyCodeLine{00311\ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{group__UART__API_gaf49cf7ca045c2feb52c025951e6e50e4}{uart6\_available}}(\textcolor{keywordtype}{void});}
-\DoxyCodeLine{00312\ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{group__UART__API_gaa40d7d81e58a648bf5c64a4735bfb7f3}{uart6\_read\_char}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00311\ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaf49cf7ca045c2feb52c025951e6e50e4}{uart6\_available}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00312\ \ \textcolor{keywordtype}{char}\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa40d7d81e58a648bf5c64a4735bfb7f3}{uart6\_read\_char}}(\textcolor{keywordtype}{void});}
 \DoxyCodeLine{00313\ \ }
-\DoxyCodeLine{00330\ \ uint32\_t\ \mbox{\hyperlink{group__UART__API_ga5c510005052783f5cec97c0ac7731071}{uart2\_read\_until}}(\textcolor{keywordtype}{char}\ *buffer,\ uint32\_t\ maxlen,\ \textcolor{keywordtype}{char}\ delimiter);}
-\DoxyCodeLine{00331\ \ }
- \textcolor{comment}{// end of UART\_API}\DoxyCodeLine{00333\ \ }
+\DoxyCodeLine{00330\ \ uint32\_t\ \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga5c510005052783f5cec97c0ac7731071}{uart2\_read\_until}}(\textcolor{keywordtype}{char}\ *buffer,\ uint32\_t\ maxlen,\ \textcolor{keywordtype}{char}\ delimiter);}
+\DoxyCodeLine{00331\ \ \ \textcolor{comment}{//\ end\ of\ UART\_API}}
+\DoxyCodeLine{00333\ \ }
 \DoxyCodeLine{00334\ \textcolor{preprocessor}{\ \#endif\ }\textcolor{comment}{//\ !CORTEX\_M4\_UART\_H}}
 
 \end{DoxyCode}

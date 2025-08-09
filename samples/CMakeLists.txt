@@ -4,6 +4,9 @@ hal_blink
 hal_pupd
 no_hal_uart_tx
 hal_uart_tx
+hal_timer
+hal_systick
+hal_blink_delay
 )
 set(SAMPLE_DIRS 
 01_no_hal_blink 
@@ -11,6 +14,9 @@ set(SAMPLE_DIRS
 02_hal_pupd
 03_no_hal_uart_tx
 03_hal_uart_tx
+04_hal_timer
+05_hal_systick
+06_hal_blink_delay
 )
 
 # Check if sample is defined

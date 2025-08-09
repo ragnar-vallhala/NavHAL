@@ -2,7 +2,8 @@
 \hypertarget{03__hal__uart__tx_2main_8c}{}\label{03__hal__uart__tx_2main_8c}\index{samples/03\_hal\_uart\_tx/main.c@{samples/03\_hal\_uart\_tx/main.c}}
 {\ttfamily \#include $<$stdint.\+h$>$}\newline
 {\ttfamily \#include "{}navhal.\+h"{}}\newline
-Include dependency graph for main.\+c\+:\nopagebreak
+Include dependency graph for main.\+c\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -20,28 +21,37 @@ Include dependency graph for main.\+c\+:\nopagebreak
 void \mbox{\hyperlink{03__hal__uart__tx_2main_8c_a7b7c9f8b5da59962d0a309f028efedaa}{delay}} (volatile uint32\+\_\+t count)
 \item 
 int \mbox{\hyperlink{03__hal__uart__tx_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Main entry point. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
+\label{doc-define-members}
+\Hypertarget{03__hal__uart__tx_2main_8c_doc-define-members}
 \doxysubsection{Macro Definition Documentation}
-\Hypertarget{03__hal__uart__tx_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\label{03__hal__uart__tx_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
-\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\Hypertarget{03__hal__uart__tx_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
 \index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
 \doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
-{\footnotesize\ttfamily \#define CORTEX\+\_\+\+M4}
+{\footnotesize\ttfamily \label{03__hal__uart__tx_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
 
 
 
+\label{doc-func-members}
+\Hypertarget{03__hal__uart__tx_2main_8c_doc-func-members}
 \doxysubsection{Function Documentation}
-\Hypertarget{03__hal__uart__tx_2main_8c_a7b7c9f8b5da59962d0a309f028efedaa}\label{03__hal__uart__tx_2main_8c_a7b7c9f8b5da59962d0a309f028efedaa} 
-\index{main.c@{main.c}!delay@{delay}}
+\Hypertarget{03__hal__uart__tx_2main_8c_a7b7c9f8b5da59962d0a309f028efedaa}\index{main.c@{main.c}!delay@{delay}}
 \index{delay@{delay}!main.c@{main.c}}
 \doxysubsubsection{\texorpdfstring{delay()}{delay()}}
-{\footnotesize\ttfamily void delay (\begin{DoxyParamCaption}\item[{volatile uint32\+\_\+t}]{count }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily \label{03__hal__uart__tx_2main_8c_a7b7c9f8b5da59962d0a309f028efedaa} 
+void delay (\begin{DoxyParamCaption}\item[{volatile uint32\+\_\+t}]{count}{}\end{DoxyParamCaption})}
 
-\Hypertarget{03__hal__uart__tx_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\label{03__hal__uart__tx_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
-\index{main.c@{main.c}!main@{main}}
+\Hypertarget{03__hal__uart__tx_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
 \index{main@{main}!main.c@{main.c}}
 \doxysubsubsection{\texorpdfstring{main()}{main()}}
-{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily \label{03__hal__uart__tx_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
 
+
+
+Main entry point. 
+
+Initializes GPIOA pin 5 as output and toggles it in an infinite loop. Typically connected to an LED (e.\+g., onboard LED on Nucleo boards). 

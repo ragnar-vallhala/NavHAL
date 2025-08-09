@@ -7,5 +7,6 @@ var searchData=
   ['hal_5fgpio_5fpin_4',['hal_gpio_pin',['../gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6',1,'gpio_types.h']]],
   ['hal_5fgpio_5fpullup_5fpulldown_5',['hal_gpio_pullup_pulldown',['../gpio__types_8h.html#ab08483829bc1df17783a8ad8cb49043e',1,'gpio_types.h']]],
   ['hal_5fgpio_5fstate_6',['hal_gpio_state',['../gpio__types_8h.html#addd0001118ca8b0d1bb783478de95f78',1,'gpio_types.h']]],
-  ['hal_5fuart_5ft_7',['hal_uart_t',['../uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1',1,'uart.h']]]
+  ['hal_5ftimer_5ft_7',['hal_timer_t',['../timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db',1,'timer_types.h']]],
+  ['hal_5fuart_5ft_8',['hal_uart_t',['../uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1',1,'uart.h']]]
 ];

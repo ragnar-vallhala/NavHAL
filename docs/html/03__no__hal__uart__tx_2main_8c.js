@@ -23,9 +23,9 @@ var 03__no__hal__uart__tx_2main_8c =
     [ "delay", "03__no__hal__uart__tx_2main_8c.html#a7b7c9f8b5da59962d0a309f028efedaa", null ],
     [ "main", "03__no__hal__uart__tx_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe", null ],
     [ "uart2_init", "03__no__hal__uart__tx_2main_8c.html#a2dbf78bac0a26fd3cc86e0d5d509c546", null ],
-    [ "uart2_write_char", "group__UART__API.html#gace45b7a16f634d2de9a483acab46a7c8", null ],
+    [ "uart2_write_char", "group___u_a_r_t___a_p_i.html#gace45b7a16f634d2de9a483acab46a7c8", null ],
     [ "uart2_write_int", "03__no__hal__uart__tx_2main_8c.html#a14fa11132ccf9aa0c8258e137b8db7fe", null ],
-    [ "uart2_write_string", "group__UART__API.html#ga55c46e6a48433287fdf5a9d1defd5f5c", null ],
+    [ "uart2_write_string", "group___u_a_r_t___a_p_i.html#ga55c46e6a48433287fdf5a9d1defd5f5c", null ],
     [ "clk_cfg", "03__no__hal__uart__tx_2main_8c.html#a0d7a51b3e857ba865e23324199ef6f28", null ],
     [ "pll_cfg", "03__no__hal__uart__tx_2main_8c.html#adf1b524219e8781fa7542fa90dd09912", null ]
 ];

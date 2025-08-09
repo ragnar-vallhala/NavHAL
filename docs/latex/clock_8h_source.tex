@@ -3,6 +3,7 @@
 \mbox{\hyperlink{clock_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ }
+\DoxyCodeLine{00020\ }
 \DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_CLOCK\_H}}
 \DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_CLOCK\_H}}
 \DoxyCodeLine{00023\ }
@@ -53,15 +54,16 @@
 \DoxyCodeLine{00076\ \textcolor{preprocessor}{\#define\ FLASH\_INTERFACE\_REGISTER\ 0x40023C00\ }}
 \DoxyCodeLine{00077\ \textcolor{preprocessor}{\#define\ FLASH\_ACR\_LATENCY\_BIT\ 0\ \ \ \ \ \ \ \ \ \ \ \ \ }}
 \DoxyCodeLine{00078\ }
-\DoxyCodeLine{00090\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}{hal\_clock\_init}}(\mbox{\hyperlink{structhal__clock__config__t}{hal\_clock\_config\_t}}\ *cfg,\ \mbox{\hyperlink{structhal__pll__config__t}{hal\_pll\_config\_t}}\ *\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\_cfg}});}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00090\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}{hal\_clock\_init}}(\mbox{\hyperlink{structhal__clock__config__t}{hal\_clock\_config\_t}}\ *\mbox{\hyperlink{05__hal__systick_2main_8c_a921c2505bac76424f5f96cc1e4f62986}{cfg}},\ \mbox{\hyperlink{structhal__pll__config__t}{hal\_pll\_config\_t}}\ *\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\_cfg}});}
 \DoxyCodeLine{00091\ }
-\DoxyCodeLine{00100\ uint32\_t\ \mbox{\hyperlink{clock_8h_a8cb04036cf65c8966865b42e975c4558}{hal\_clock\_get\_sysclk}}();}
+\DoxyCodeLine{00100\ uint32\_t\ \mbox{\hyperlink{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0}{hal\_clock\_get\_sysclk}}(\textcolor{keywordtype}{void});}
 \DoxyCodeLine{00101\ }
-\DoxyCodeLine{00109\ uint32\_t\ \mbox{\hyperlink{clock_8h_a4aee4134f247ae939111a86a507db22e}{hal\_clock\_get\_ahbclk}}();}
+\DoxyCodeLine{00109\ uint32\_t\ \mbox{\hyperlink{clock_8h_ac405b089ad197ec8fcec53489064cb5f}{hal\_clock\_get\_ahbclk}}(\textcolor{keywordtype}{void});}
 \DoxyCodeLine{00110\ }
-\DoxyCodeLine{00118\ uint32\_t\ \mbox{\hyperlink{clock_8h_ab27c3a810ff6f1418e7737a7ad308798}{hal\_clock\_get\_apb1clk}}();}
+\DoxyCodeLine{00118\ uint32\_t\ \mbox{\hyperlink{clock_8h_a2b3d3447fb02cf495b0c6f28ad9a4ae8}{hal\_clock\_get\_apb1clk}}(\textcolor{keywordtype}{void});}
 \DoxyCodeLine{00119\ }
-\DoxyCodeLine{00127\ uint32\_t\ \mbox{\hyperlink{clock_8h_a74e0e66e7168083925979b598b96cf7e}{hal\_clock\_get\_apb2clk}}();}
+\DoxyCodeLine{00127\ uint32\_t\ \mbox{\hyperlink{clock_8h_abe4fcf4dc3f2a13b1f2602c0348aeba5}{hal\_clock\_get\_apb2clk}}(\textcolor{keywordtype}{void});}
 \DoxyCodeLine{00128\ }
 \DoxyCodeLine{00129\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CORTEX\_M4\_CLOCK\_H}}
 

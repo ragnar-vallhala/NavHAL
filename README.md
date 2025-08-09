@@ -50,11 +50,20 @@ NavHAL is developed and maintained by **NAVRobotec**, a company dedicated to inn
 ### Building a Sample
 
 ```bash
+# =====BUILD NO HAL VERSION=====
+
 mkdir build && cd build
 cmake .. -DSAMPLE=no_hal_blink -DSTANDALONE=ON
 cmake --build .
 ```
 
+```bash
+#=====BUILD HAL VERSION=====
+
+mkdir build && cd build
+cmake .. -DSAMPLE=hal_blink -DSTANDALONE=OFF
+cmake --build .
+```
 ### Flashing Firmware
 
 ```bash
@@ -68,7 +77,7 @@ cmake --build . --target flash
 Generate API documentation using:
 
 ```bash
-cmake --build . --target doc_doxygen
+cmake --build . --target doc
 ```
 
 Documentation will be available in `docs/html`.
@@ -82,9 +91,13 @@ Documentation will be available in `docs/html`.
 ├── samples/               # Example samples
 ├── src/                   # Core HAL source files
 ├── include/               # HAL public headers
+├── cmake                  # cmake build configuration 
+├── datasheets             # reference datasheets
+├── tests                  # unit tests
 ├── CMakeLists.txt         # Build configuration
 ├── Doxyfile               # Doxygen config
 └── README.md              # This file
+
 ```
 
 ---

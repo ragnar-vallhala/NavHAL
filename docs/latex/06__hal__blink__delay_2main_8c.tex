@@ -1,0 +1,75 @@
+\doxysection{samples/06\+\_\+hal\+\_\+blink\+\_\+delay/main.c File Reference}
+\hypertarget{06__hal__blink__delay_2main_8c}{}\label{06__hal__blink__delay_2main_8c}\index{samples/06\_hal\_blink\_delay/main.c@{samples/06\_hal\_blink\_delay/main.c}}
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{06__hal__blink__delay_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{06__hal__blink__delay_2main_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}{main}} ()
+\begin{DoxyCompactList}\small\item\em Main entry point. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \mbox{\hyperlink{06__hal__blink__delay_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\+\_\+cfg}}
+\item 
+\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \mbox{\hyperlink{06__hal__blink__delay_2main_8c_a921c2505bac76424f5f96cc1e4f62986}{cfg}} = \{.source = \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1a63fe55af719f040387f2cbd2728f64c9}{HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+HSE}}\}
+\end{DoxyCompactItemize}
+
+
+\label{doc-define-members}
+\Hypertarget{06__hal__blink__delay_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{06__hal__blink__delay_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{06__hal__blink__delay_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+
+
+\label{doc-func-members}
+\Hypertarget{06__hal__blink__delay_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{06__hal__blink__delay_2main_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{06__hal__blink__delay_2main_8c_ae66f6b31b5ad750f1fe042a706a4e3d4} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Main entry point. 
+
+Initializes GPIOA pin 5 as output and toggles it in an infinite loop. Typically connected to an LED (e.\+g., onboard LED on Nucleo boards). 
+
+\label{doc-var-members}
+\Hypertarget{06__hal__blink__delay_2main_8c_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{06__hal__blink__delay_2main_8c_a921c2505bac76424f5f96cc1e4f62986}\index{main.c@{main.c}!cfg@{cfg}}
+\index{cfg@{cfg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{cfg}{cfg}}
+{\footnotesize\ttfamily \label{06__hal__blink__delay_2main_8c_a921c2505bac76424f5f96cc1e4f62986} 
+\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} cfg = \{.source = \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1a63fe55af719f040387f2cbd2728f64c9}{HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+HSE}}\}}
+
+\Hypertarget{06__hal__blink__delay_2main_8c_adf1b524219e8781fa7542fa90dd09912}\index{main.c@{main.c}!pll\_cfg@{pll\_cfg}}
+\index{pll\_cfg@{pll\_cfg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{pll\_cfg}{pll\_cfg}}
+{\footnotesize\ttfamily \label{06__hal__blink__delay_2main_8c_adf1b524219e8781fa7542fa90dd09912} 
+\mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} pll\+\_\+cfg}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{.input\_src\ =}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1a63fe55af719f040387f2cbd2728f64c9}{HAL\_CLOCK\_SOURCE\_HSE}},\ }
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .pll\_m\ =\ 8,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .pll\_n\ =\ 168,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .pll\_p\ =\ 2,}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ .pll\_q\ =\ 7\}}
+
+\end{DoxyCode}

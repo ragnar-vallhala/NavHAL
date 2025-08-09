@@ -26,23 +26,22 @@ var NAVTREE =
 [
   [ "NavHAL", "index.html", [
     [ "NavHAL Documentation", "index.html", null ],
-    [ "LICENSE", "md_LICENSE.html", null ],
+    [ "LICENSE", "md__l_i_c_e_n_s_e.html", null ],
     [ "mainpage", "md_mainpage.html", null ],
-    [ "NavHAL — NAVRobotec Hardware Abstraction Layer", "md_README.html", [
-      [ "Overview", "md_README.html#autotoc_md2", null ],
-      [ "Key Features", "md_README.html#autotoc_md4", null ],
-      [ "Project Brief", "md_README.html#autotoc_md6", null ],
-      [ "</blockquote>", "md_README.html#autotoc_md7", null ],
-      [ "Getting Started", "md_README.html#autotoc_md8", [
-        [ "Prerequisites", "md_README.html#autotoc_md9", null ],
-        [ "Building a Sample", "md_README.html#autotoc_md10", null ],
-        [ "Flashing Firmware", "md_README.html#autotoc_md11", null ]
+    [ "NavHAL — NAVRobotec Hardware Abstraction Layer", "md__r_e_a_d_m_e.html", [
+      [ "Overview", "md__r_e_a_d_m_e.html#autotoc_md9", null ],
+      [ "Key Features", "md__r_e_a_d_m_e.html#autotoc_md11", null ],
+      [ "Project Brief", "md__r_e_a_d_m_e.html#autotoc_md13", null ],
+      [ "Getting Started", "md__r_e_a_d_m_e.html#autotoc_md15", [
+        [ "Prerequisites", "md__r_e_a_d_m_e.html#autotoc_md16", null ],
+        [ "Building a Sample", "md__r_e_a_d_m_e.html#autotoc_md17", null ],
+        [ "Flashing Firmware", "md__r_e_a_d_m_e.html#autotoc_md18", null ]
       ] ],
-      [ "Documentation", "md_README.html#autotoc_md13", null ],
-      [ "Project Structure", "md_README.html#autotoc_md15", null ],
-      [ "Contributing", "md_README.html#autotoc_md17", null ],
-      [ "License", "md_README.html#autotoc_md19", null ],
-      [ "Contact", "md_README.html#autotoc_md21", null ]
+      [ "Documentation", "md__r_e_a_d_m_e.html#autotoc_md20", null ],
+      [ "Project Structure", "md__r_e_a_d_m_e.html#autotoc_md22", null ],
+      [ "Contributing", "md__r_e_a_d_m_e.html#autotoc_md24", null ],
+      [ "License", "md__r_e_a_d_m_e.html#autotoc_md26", null ],
+      [ "Contact", "md__r_e_a_d_m_e.html#autotoc_md28", null ]
     ] ],
     [ "Topics", "topics.html", "topics" ],
     [ "Classes", "annotated.html", [
@@ -70,8 +69,10 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "01__hal__blink_2main_8c.html",
-"group__HAL__GPIO.html"
+"gpio__types_8h.html#afff59088389c415758284fcfdef93fdaaa1ea38ffc304a6c32480a65b5fec7302",
+"timer_8h.html#a83b0f84566157416c2a9b5dc2dc43037"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+var SYNCONMSG = 'click to disable panel synchronization';
+var SYNCOFFMSG = 'click to enable panel synchronization';
+var LISTOFALLMEMBERS = 'List of all members';

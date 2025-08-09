@@ -1,4 +1,4 @@
-\chapter{Nav\+HAL Documentation}
+\chapter{Nav\+HAL Documentation }
 \hypertarget{index}{}\label{index}\index{NavHAL Documentation@{NavHAL Documentation}}
 Nav\+HAL is a hardware abstraction layer for embedded systems, offering clean interfaces for GPIO, UART, and more.
 
@@ -7,6 +7,70 @@ Nav\+HAL is a hardware abstraction layer for embedded systems, offering clean in
 \item Easy to port
 \item Minimal dependencies
 \item Lightweight and architecture-\/agnostic
-\end{DoxyItemize}
+\item C++ wrapper layer and RTOS integration planned
+\end{DoxyItemize}\hypertarget{index_autotoc_md0}{}\doxysubsection{\texorpdfstring{Getting Started}{Getting Started}}\label{index_autotoc_md0}
 
-📘 Git\+Hub Pages\+: \href{https://ragnar-vallhala.github.io/NavHAL/}{\texttt{ https\+://ragnar-\/vallhala.\+github.\+io/\+Nav\+HAL/}} 
+\begin{DoxyEnumerate}
+\item Clone the repository\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git\ clone\ https://github.com/ragnar-\/vallhala/NavHAL.git}
+
+\end{DoxyCode}
+
+\item Build a sample\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \#\ =====BUILD\ NO\ HAL\ VERSION=====}
+\DoxyCodeLine{}
+\DoxyCodeLine{mkdir\ build\ \&\&\ cd\ build}
+\DoxyCodeLine{cmake\ ..\ -\/DSAMPLE=no\_hal\_blink\ -\/DSTANDALONE=ON}
+\DoxyCodeLine{cmake\ -\/-\/build\ .}
+
+\end{DoxyCode}
+ 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#=====BUILD\ HAL\ VERSION=====}
+\DoxyCodeLine{}
+\DoxyCodeLine{mkdir\ build\ \&\&\ cd\ build}
+\DoxyCodeLine{cmake\ ..\ -\/DSAMPLE=hal\_blink\ -\/DSTANDALONE=OFF}
+\DoxyCodeLine{cmake\ -\/-\/build\ .}
+
+\end{DoxyCode}
+
+\item Flash to your board\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake\ -\/-\/build\ .\ -\/-\/target\ flash}
+
+\end{DoxyCode}
+
+\end{DoxyEnumerate}\hypertarget{index_autotoc_md1}{}\doxysubsection{\texorpdfstring{Supported Platforms\+:}{Supported Platforms\+:}}\label{index_autotoc_md1}
+\hypertarget{index_autotoc_md2}{}\doxysubsubsection{\texorpdfstring{Microcontrollers\+:}{Microcontrollers\+:}}\label{index_autotoc_md2}
+
+\begin{DoxyItemize}
+\item STM32 (HAL \& LL)
+\item Raspberry Pi Pico
+\item AVR ATmega series(planned)
+\item ESP32 (planned)
+\end{DoxyItemize}\hypertarget{index_autotoc_md3}{}\doxysubsubsection{\texorpdfstring{Architectures\+:}{Architectures\+:}}\label{index_autotoc_md3}
+
+\begin{DoxyItemize}
+\item ARM Cortex-\/M
+\item AVR (planned)
+\item RISC-\/V (planned)
+\item Other 32-\/bit/8-\/bit MCUs (planned)
+\end{DoxyItemize}\hypertarget{index_autotoc_md4}{}\doxysubsubsection{\texorpdfstring{Operating Modes\+:}{Operating Modes\+:}}\label{index_autotoc_md4}
+Bare-\/metal and RTOS-\/integrated environments\hypertarget{index_autotoc_md5}{}\doxysubsubsection{\texorpdfstring{Supported Toolchains\+:}{Supported Toolchains\+:}}\label{index_autotoc_md5}
+
+\begin{DoxyItemize}
+\item GCC ARM
+\item CMAKE-\/based builds
+\end{DoxyItemize}\hypertarget{index_autotoc_md6}{}\doxysubsection{\texorpdfstring{Contribution \& support}{Contribution \& support}}\label{index_autotoc_md6}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Contributions\ are\ welcome!\ Submit\ pull\ request,\ open\ issues,\ or\ suggest\ features.}
+\DoxyCodeLine{}
+\DoxyCodeLine{Join\ discussions\ on\ GitHub\ or\ contact\ via\ email.}
+
+\end{DoxyCode}
+
+
+Git\+Hub Pages\+: \href{https://ragnar-vallhala.github.io/NavHAL/}{\texttt{https\+://ragnar-\/vallhala.\+github.\+io/\+Nav\+HAL/}} 

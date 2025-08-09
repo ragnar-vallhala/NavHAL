@@ -18,4 +18,5 @@
 #include "timer_types.h" /**< Timer-specific type definitions */
 #include <stdbool.h>     /**< Standard boolean types */
 #include <stdint.h>      /**< Standard fixed-width integer types */
-#endif                   // TYPES_H
+#define __IO volatile
+#endif // TYPES_H

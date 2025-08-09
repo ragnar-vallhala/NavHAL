@@ -17,10 +17,10 @@ typedef struct {
   volatile uint32_t RESERVED0[32]; // Reserved space to pad to 0xE000E400
   volatile uint8_t IPR[60]; // Interrupt Priority Registers (8-bit) (0xE000E400
                             // - 0xE000E4EC)
-} NVIC_TypeDef;
+} NVIC_Typedef;
 
 #define NVIC_BASE_ADDR 0xE000E100UL
-#define NVIC ((NVIC_TypeDef *)NVIC_BASE_ADDR)
+#define NVIC ((NVIC_Typedef *)NVIC_BASE_ADDR)
 
 typedef enum {
   /******  Cortex-M4 Processor Exceptions Numbers

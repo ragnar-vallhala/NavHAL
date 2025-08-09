@@ -2,9 +2,9 @@
  * @file gpio.h
  * @brief GPIO HAL implementation for Cortex-M4 (STM32F401RE).
  *
- * This header provides low-level register definitions and functions to configure
- * and control GPIO peripherals on Cortex-M4-based microcontrollers, specifically
- * STM32F401RE in this implementation.
+ * This header provides low-level register definitions and functions to
+ * configure and control GPIO peripherals on Cortex-M4-based microcontrollers,
+ * specifically STM32F401RE in this implementation.
  *
  * @ingroup HAL_GPIO
  *
@@ -47,12 +47,8 @@
 
 /// Base address table for each GPIO port
 static volatile uint32_t *const GPIO_BASE[GPIO_PORT_COUNT] = {
-    (uint32_t *)GPIOA,
-    (uint32_t *)GPIOB,
-    (uint32_t *)GPIOC,
-    (uint32_t *)GPIOD,
-    (uint32_t *)GPIOE,
-    (uint32_t *)GPIOH};
+    (uint32_t *)GPIOA, (uint32_t *)GPIOB, (uint32_t *)GPIOC,
+    (uint32_t *)GPIOD, (uint32_t *)GPIOE, (uint32_t *)GPIOH};
 
 /** @} */ // end of GPIO_REGISTERS
 
@@ -115,7 +111,8 @@ static volatile uint32_t *const GPIO_BASE[GPIO_PORT_COUNT] = {
  * @param mode  The pin mode (input, output, alternate, analog).
  * @param pupd  Pull configuration (no pull, pull-up, pull-down).
  */
-void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode, hal_gpio_pullup_pulldown pupd);
+void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode,
+                      hal_gpio_pullup_pulldown pupd);
 
 /**
  * @brief Get the current mode of a GPIO pin.
@@ -157,10 +154,11 @@ void hal_gpio_enable_rcc(hal_gpio_pin pin);
  * a regular input/output pin.
  *
  * @param pin     The GPIO pin to configure.
- * @param alt_fn  The alternate function number to assign (0–15 depending on MCU support).
+ * @param alt_fn  The alternate function number to assign (0–15 depending on MCU
+ * support).
  */
-void hal_gpio_set_alternate_function(hal_gpio_pin pin, hal_gpio_alternate_function_t alt_fn);
-
+void hal_gpio_set_alternate_function(hal_gpio_pin pin,
+                                     hal_gpio_alternate_function_t alt_fn);
 
 /** @} */ // end of GPIO_API
 

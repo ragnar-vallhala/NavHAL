@@ -13,7 +13,7 @@ void systick_init(uint32_t tick_us) {
   // systick interrupt is not under the NVIC
   tick_duration_us = tick_us;
   uint32_t ahbclk = hal_clock_get_ahbclk();
-  uint64_t reload_value = ((uint64_t)ahbclk / 1000000ULL) * tick_us - 1;
+  uint64_t reload_value = (((uint64_t)ahbclk * tick_us) / 1000000ULL) - 1;
   reload_value &= 0xffffff; // set the reload value as 24bit only
   uint32_t reload = (uint32_t)reload_value;
   tick_reload_value = reload;

@@ -107,7 +107,25 @@ typedef enum
     GPIO_PE12,
     GPIO_PE13,
     GPIO_PE14,
-    GPIO_PE15
+    GPIO_PE15,
+
+    GPIO_PH00,
+    GPIO_PH01,
+    GPIO_PH02,
+    GPIO_PH03,
+    GPIO_PH04,
+    GPIO_PH05,
+    GPIO_PH06,
+    GPIO_PH07,
+    GPIO_PH08,
+    GPIO_PH09,
+    GPIO_PH10,
+    GPIO_PH11,
+    GPIO_PH12,
+    GPIO_PH13,
+    GPIO_PH14,
+    GPIO_PH15
+
 
 } hal_gpio_pin;
 

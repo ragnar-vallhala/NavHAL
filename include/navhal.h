@@ -2,9 +2,10 @@
  * @file navhal.h
  * @brief Root header file for the NavHAL project by NavRobotec.
  *
- * NavHAL is the official hardware abstraction layer (HAL) developed by NavRobotec.
- * It provides a clean, modular, and extensible C interface to abstract peripheral
- * control (such as GPIO, UART, timers) across multiple microcontroller architectures.
+ * NavHAL is the official hardware abstraction layer (HAL) developed by
+ * NavRobotec. It provides a clean, modular, and extensible C interface to
+ * abstract peripheral control (such as GPIO, UART, timers) across multiple
+ * microcontroller architectures.
  *
  * Include this file in your application to access the full HAL API.
  *

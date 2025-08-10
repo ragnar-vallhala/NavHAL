@@ -12,6 +12,7 @@
  */
 
 #include "core/cortex-m4/clock.h"
+#include "core/cortex-m4/flash_reg.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include <stdint.h>
 

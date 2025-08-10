@@ -122,8 +122,5 @@ typedef enum {
 #define RCC_CFGR_PPRE1_DIV4 0x5 ///< APB1 clock: AHB divided by 4
 #define RCC_CFGR_PPRE2_DIV2 0x4 ///< APB2 clock: AHB divided by 2
 
-// Flash Interface Control
-#define FLASH_INTERFACE_REGISTER 0x40023C00 ///< Flash Interface base address
-#define FLASH_ACR_LATENCY_BIT 0             ///< Flash ACR Latency bits
 
 #endif // !CORTEX_M4_RCC_REG_H

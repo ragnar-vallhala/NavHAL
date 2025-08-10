@@ -6,7 +6,7 @@ set(CMAKE_OSX_ARCHITECTURES "" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS_INIT "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_INIT "" CACHE STRING "" FORCE)
 # set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
-project(ARM_Cortex_HAL C ASM)
+project(NavHAL C ASM )
 
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

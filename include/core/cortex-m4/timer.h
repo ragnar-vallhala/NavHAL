@@ -1,18 +1,18 @@
 #ifndef CORTEX_M4_TIMER_H
 #define CORTEX_M4_TIMER_H
+#include "common/hal_types.h"
 #include "utils/timer_types.h"
-#include "utils/types.h"
 #include <stdint.h>
 
 #define RCC_BASE 0x40023800
 
-#define RCC_APB1ENR (*(volatile uint32_t *)(RCC_BASE + 0x40))
+#define RCC_APB1ENR (*(__IO uint32_t *)(RCC_BASE + 0x40))
 #define RCC_APB1ENR_TIM2_OFFSET 0
 #define RCC_APB1ENR_TIM3_OFFSET 1
 #define RCC_APB1ENR_TIM4_OFFSET 2
 #define RCC_APB1ENR_TIM5_OFFSET 3
 
-#define RCC_APB2ENR (*(volatile uint32_t *)(RCC_BASE + 0x44))
+#define RCC_APB2ENR (*(__IO uint32_t *)(RCC_BASE + 0x44))
 #define RCC_APB2ENR_TIM1_OFFSET 0
 #define RCC_APB2ENR_TIM9_OFFSET 16
 #define RCC_APB2ENR_TIM10_OFFSET 17
@@ -76,13 +76,13 @@
 #define TIM_GP2_SR_UIF_BIT 0x00   // Update Interrupt enable bit
 
 // SysTick Control and Status Register
-#define SYST_CSR (*(volatile uint32_t *)0xE000E010)
+#define SYST_CSR (*(__IO uint32_t *)0xE000E010)
 // SysTick Reload Value Register
-#define SYST_RVR (*(volatile uint32_t *)0xE000E014)
+#define SYST_RVR (*(__IO uint32_t *)0xE000E014)
 // SysTick Current Value Register
-#define SYST_CVR (*(volatile uint32_t *)0xE000E018)
+#define SYST_CVR (*(__IO uint32_t *)0xE000E018)
 // SysTick Calibration Register
-#define SYST_CALIB (*(volatile uint32_t *)0xE000E01C)
+#define SYST_CALIB (*(__IO uint32_t *)0xE000E01C)
 #define SYST_CSR_EN_BIT 0
 #define SYST_CSR_TICKINT_BIT 1
 #define SYST_CSR_CLKSOURCE_BIT 2

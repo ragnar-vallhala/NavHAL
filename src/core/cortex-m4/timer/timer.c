@@ -313,6 +313,9 @@ uint32_t timer_get_frequency(hal_timer_t timer) {
   uint32_t freq = timer_clk / (prescaler + 1) / (arr + 1);
   return freq;
 }
+void timer_set_arr(hal_timer_t timer, uint32_t channel, uint32_t arr){
+
+}
 
 void timer_clear_interrupt_flag(hal_timer_t timer) {
   // for tim2-5  & 9only
@@ -460,6 +463,28 @@ void timer_set_compare(hal_timer_t timer, uint8_t channel,
   (*ccmr_reg) |= (TIMx_CCMR1_OC1M_PWM_MODE1 << TIMx_CCMR1_OC1M_BIT);
   (*ccmr_reg) |= (1 << TIMx_CCMR1_OC1PE_BIT);
   timer_enable_channel(timer, channel);
+}
+uint32_t timer_get_compare(hal_timer_t timer, uint32_t channel) {
+
+  uint32_t timer_base = _get_timer_base(timer);
+  if (channel < 1 || channel > 4)
+    return 0; // only 4 valid channels
+  return *(volatile uint32_t *)(timer_base + TIMx_CCR1_OFFSET +
+                                (channel - 1) * 4);
+}
+uint32_t timer_get_arr(hal_timer_t timer, uint32_t channel) {
+  uint32_t timer_base = _get_timer_base(timer);
+  if (timer_base == 0)
+    return 0;
+  volatile uint32_t arr = 0;
+  if (timer == TIM1) {
+    arr = *((volatile uint32_t *)(timer_base + TIM_ADV_ARR_OFFSET));
+  } else if (timer >= TIM2 && timer <= TIM5) {
+    arr = *((volatile uint32_t *)(timer_base + TIM_GP1_ARR_OFFSET));
+  } else if (timer >= TIM9 && timer <= TIM11) {
+    arr = *((volatile uint16_t *)(timer_base + TIM_GP2_ARR_OFFSET));
+  }
+  return arr;
 }
 void timer_enable_channel(hal_timer_t timer, uint32_t channel) {
 

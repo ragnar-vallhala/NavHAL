@@ -88,6 +88,9 @@
 #define SYST_CSR_CLKSOURCE_BIT 2
 
 #define TIMx_CCR1_OFFSET 0x34
+#define TIMx_CCR2_OFFSET 0x38
+#define TIMx_CCR3_OFFSET 0x3C
+#define TIMx_CCR4_OFFSET 0x40
 #define TIMx_CCER_OFFSET 0x20
 #define TIMx_CCER_CC1E_BIT 0
 #define TIMx_CCER_CC2E_BIT 4
@@ -151,6 +154,9 @@ void TIM12_IRQHandler(void);
 // PWM and Output Compare (Future Stage)
 void timer_set_compare(hal_timer_t timer, uint8_t channel,
                        uint32_t compare_value);
+uint32_t timer_get_compare(hal_timer_t timer, uint32_t channel);
+uint32_t timer_get_arr(hal_timer_t timer, uint32_t channel);
+void timer_set_arr(hal_timer_t timer, uint32_t channel, uint32_t arr);
 void timer_enable_channel(hal_timer_t timer, uint32_t channel);
 
 void timer_disable_channel(hal_timer_t timer, uint32_t channel);

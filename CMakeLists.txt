@@ -7,8 +7,6 @@ set(CMAKE_C_FLAGS_INIT "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_INIT "" CACHE STRING "" FORCE)
 # set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
 project(NavHAL C ASM )
-
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_COMPILE_COMMANDS_OUTPUT "${CMAKE_SOURCE_DIR}/compile_commands.json")
 
@@ -128,3 +126,23 @@ add_custom_target(copy_compile_commands ALL
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
+
+# Tests
+if(TEST)
+  message("Tests enabled")
+  include_directories(${CMAKE_SOURCE_DIR}/extern/unity/src ${CMAKE_SOURCE_DIR}/include)
+  file(GLOB TEST_SRC ${CMAKE_SOURCE_DIR}/tests/*.c)
+  file(GLOB UNITY_SRC ${CMAKE_SOURCE_DIR}/extern/unity/src/*.c)
+  file(GLOB_RECURSE HAL_SRC ${SRC_CORE}/*.c )
+  message("Files: ${HAL_SRC}")
+  add_executable(tests ${TEST_SRC} ${UNITY_SRC})
+  target_link_libraries(tests PRIVATE c gcc)
+  set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/tests/linker.ld -nostdlib")
+  target_compile_options(tests PRIVATE -march=armv7e-m -fno-exceptions 
+  -fno-unwind-tables
+  -fno-asynchronous-unwind-tables
+  )
+  target_sources(tests PRIVATE ${HAL_SRC})
+  enable_testing()
+  add_test(NAME tests COMMAND tests)
+endif()

@@ -115,8 +115,23 @@ void hal_gpio_enable_rcc(hal_gpio_pin pin) {
 void hal_gpio_set_alternate_function(hal_gpio_pin pin,
                                      hal_gpio_alternate_function_t alt_fn) {
   hal_gpio_setmode(pin, GPIO_AF, GPIO_PUPD_NONE);
-  if (GPIO_GET_PIN(pin) < 8)
-    GPIO_GET_PORT(pin)->AFRL |= (alt_fn << (4 * (GPIO_GET_PIN(pin) % 8)));
-  else
-    GPIO_GET_PORT(pin)->AFRH |= (alt_fn << (4 * (GPIO_GET_PIN(pin) % 8)));
+  uint8_t pin_num = GPIO_GET_PIN(pin);
+  uint32_t mask = 0xF << (4 * (pin_num % 8));
+  if (pin_num < 8) {
+    GPIO_GET_PORT(pin)->AFRL &= ~mask;                     // clear bits
+    GPIO_GET_PORT(pin)->AFRL |= (alt_fn << (4 * pin_num)); // set new value
+  } else {
+    GPIO_GET_PORT(pin)->AFRH &= ~mask; // clear bits
+    GPIO_GET_PORT(pin)->AFRH |=
+        (alt_fn << (4 * (pin_num % 8))); // set new value
+  }
+}
+
+void hal_gpio_set_output_type(hal_gpio_pin pin, hal_gpio_output_type otyper) {
+  GPIO_GET_PORT(pin)->OTYPER &= ~(0x1 << GPIO_GET_PIN(pin));
+  GPIO_GET_PORT(pin)->OTYPER |= ((otyper & 0x1) << GPIO_GET_PIN(pin));
+}
+void hal_gpio_set_output_speed(hal_gpio_pin pin, hal_gpio_output_speed speed) {
+  GPIO_GET_PORT(pin)->OSPEEDR &= ~(0x3 << GPIO_GET_PIN(pin));
+  GPIO_GET_PORT(pin)->OSPEEDR |= ((speed & 0x3) << GPIO_GET_PIN(pin));
 }

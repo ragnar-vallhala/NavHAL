@@ -18,8 +18,7 @@
 #ifndef CORTEX_M4_GPIO_H
 #define CORTEX_M4_GPIO_H
 
-#include "utils/types.h"
-
+#include "utils/gpio_types.h"
 /**
  * @brief Set the mode and pull configuration of a GPIO pin.
  *
@@ -76,6 +75,8 @@ void hal_gpio_enable_rcc(hal_gpio_pin pin);
 void hal_gpio_set_alternate_function(hal_gpio_pin pin,
                                      hal_gpio_alternate_function_t alt_fn);
 
+void hal_gpio_set_output_type(hal_gpio_pin pin, hal_gpio_output_type otyper);
+void hal_gpio_set_output_speed(hal_gpio_pin pin, hal_gpio_output_speed speed);
 /** @} */ // end of GPIO_API
 
 #endif // CORTEX_M4_GPIO_H

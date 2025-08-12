@@ -135,6 +135,7 @@ if(TEST)
   file(GLOB UNITY_SRC ${CMAKE_SOURCE_DIR}/extern/unity/src/*.c)
   file(GLOB_RECURSE HAL_SRC ${SRC_CORE}/*.c )
   message("Files: ${HAL_SRC}")
+  add_compile_definitions(UNITY_OUTPUT_COLOR)
   add_executable(tests ${TEST_SRC} ${UNITY_SRC})
   target_link_libraries(tests PRIVATE c gcc)
   set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/tests/linker.ld -nostdlib")
@@ -145,4 +146,25 @@ if(TEST)
   target_sources(tests PRIVATE ${HAL_SRC})
   enable_testing()
   add_test(NAME tests COMMAND tests)
+  
+  # Bianry flasher
+  if(NOT DEFINED FLASHER)
+    set(FLASHER st-flash) # Default flasher for STM Boards
+  endif()
+
+  # Bianry flash address
+  if(NOT DEFINED FLASH_ADDRESS)
+   set(FLASH_ADDRESS 0x8000000) # Default address for stm32_nucleo_f401re
+  endif()
+   
+   message(STATUS "Selected flasher: ${FLASHER}")
+   message(STATUS "Selected flash address: ${FLASH_ADDRESS}")
+   
+   add_custom_target(hal_test
+     COMMAND ${CMAKE_OBJCOPY} -O binary tests tests.bin
+     COMMAND ${FLASHER} write tests.bin ${FLASH_ADDRESS}
+     DEPENDS tests
+     COMMENT "Converting ELF to BIN and flashing to board"
+   )
+   message(STATUS "TARGET File tests.bin")
 endif()

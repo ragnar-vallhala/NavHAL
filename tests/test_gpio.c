@@ -1,50 +1,48 @@
-#include "core/cortex-m4/gpio_reg.h"
-#include "core/cortex-m4/uart.h"
-#include "utils/gpio_types.h"
 #define CORTEX_M4
+#include "core/cortex-m4/gpio_reg.h"
 #include "navhal.h"
+#define UNITY_OUTPUT_COLOR
 #include "unity.h"
 #include <stdint.h>
 
-int putchar(int ch) {
-  uart2_write_char(ch);
-  return ch;
-}
-void abort(void) {
-  while (1) {
-  }
-}
-
-void *memcpy(void *dest, const void *src, unsigned int n) {
-  char *d = dest;
-  const char *s = src;
-  while (n--) {
-    *d++ = *s++;
-  }
-  return dest;
+#define TEST_PIN GPIO_PC09
+#define TEST_AF GPIO_AF07
+void test_hal_gpio_setmode(void) {
+  hal_gpio_setmode(TEST_PIN, GPIO_OUTPUT, GPIO_PUPD_NONE);
+  TEST_ASSERT_EQUAL_UINT32(
+      GPIO_OUTPUT,
+      (GPIO_GET_PORT(TEST_PIN)->MODER >> (GPIO_GET_PIN(TEST_PIN) * 2)) & 0x3);
 }
 
-void setUp(void) { uart2_init(9600); }
-void tearDown(void) {}
-// Mock hal_gpio_digitalwrite to manipulate GPIO_PORT for testing
-
-#include "unity.h"
+void test_hal_gpio_getmode(void) {
+  hal_gpio_setmode(TEST_PIN, GPIO_OUTPUT, GPIO_PUPD_NONE);
+  TEST_ASSERT_EQUAL_UINT32(
+      hal_gpio_getmode(TEST_PIN),
+      (GPIO_GET_PORT(TEST_PIN)->MODER >> (GPIO_GET_PIN(TEST_PIN) * 2)) & 0x3);
+}
 
 void test_hal_gpio_digitalwrite_sets_pin_high(void) {
-  GPIO_GET_PORT(GPIO_PA05)->BSRR = 0;
-  hal_gpio_digitalwrite(GPIO_PA05, GPIO_HIGH);
-  TEST_ASSERT_EQUAL_UINT32(1 << 5, GPIO_GET_PORT(GPIO_PA05)->BSRR);
+  hal_gpio_setmode(TEST_PIN, GPIO_OUTPUT, GPIO_PUPD_NONE);
+  hal_gpio_digitalwrite(TEST_PIN, GPIO_HIGH);
+  TEST_ASSERT_EQUAL_UINT32(
+      1, (GPIO_GET_PORT(TEST_PIN)->ODR >> GPIO_GET_PIN(TEST_PIN)) & 0x1);
 }
 
 void test_hal_gpio_digitalwrite_sets_pin_low(void) {
-  GPIO_GET_PORT(GPIO_PA05)->BSRR = 0;
-  hal_gpio_digitalwrite(GPIO_PA05, GPIO_LOW);
-  TEST_ASSERT_EQUAL_UINT32(1 << (5 + 16), GPIO_GET_PORT(GPIO_PA05)->BSRR);
+  hal_gpio_setmode(TEST_PIN, GPIO_OUTPUT, GPIO_PUPD_NONE);
+  hal_gpio_digitalwrite(TEST_PIN, GPIO_LOW);
+  TEST_ASSERT_EQUAL_UINT32(
+      0, (GPIO_GET_PORT(TEST_PIN)->ODR >> GPIO_GET_PIN(TEST_PIN)) & 0x1);
 }
 
-int main(void) {
-  UNITY_BEGIN();
-  RUN_TEST(test_hal_gpio_digitalwrite_sets_pin_high);
-  RUN_TEST(test_hal_gpio_digitalwrite_sets_pin_low);
-  return UNITY_END();
+void test_gpio_set_alternate_function(void) {
+  hal_gpio_set_alternate_function(TEST_PIN, TEST_AF);
+  if (GPIO_GET_PIN(TEST_PIN) < 8)
+    TEST_ASSERT_EQUAL_UINT32(TEST_AF, (GPIO_GET_PORT(TEST_PIN)->AFRL >>
+                                       ((4 * (GPIO_GET_PIN(TEST_PIN) % 8)))) &
+                                          0xf);
+  else
+    TEST_ASSERT_EQUAL_UINT32(TEST_AF, (GPIO_GET_PORT(TEST_PIN)->AFRH >>
+                                       ((4 * (GPIO_GET_PIN(TEST_PIN) % 8)))) &
+                                          0xf);
 }

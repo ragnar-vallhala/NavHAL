@@ -10,5 +10,5 @@ digraph "samples/06_hal_blink_delay"
   dir_dce71e11ce415528bfa34ee2ec96a279 [label="06_hal_blink_delay", fillcolor="#edf0f7", color="grey25", style="filled,bold", URL="dir_dce71e11ce415528bfa34ee2ec96a279.html",tooltip=""];
   }
   dir_d44c64559bbebec7f509842c48db8b23 [label="include", fillcolor="#edf0f7", color="red", style="filled", URL="dir_d44c64559bbebec7f509842c48db8b23.html",tooltip=""];
-  dir_dce71e11ce415528bfa34ee2ec96a279->dir_d44c64559bbebec7f509842c48db8b23 [headlabel="1", labeldistance=1.5 headhref="dir_000007_000015.html" href="dir_000007_000015.html" color="steelblue1" fontcolor="steelblue1"];
+  dir_dce71e11ce415528bfa34ee2ec96a279->dir_d44c64559bbebec7f509842c48db8b23 [headlabel="1", labeldistance=1.5 headhref="dir_000007_000017.html" href="dir_000007_000017.html" color="steelblue1" fontcolor="steelblue1"];
 }

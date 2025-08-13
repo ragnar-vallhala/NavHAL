@@ -1,3 +1,19 @@
+/**
+ * @file timer.c
+ * @brief Timer, SysTick and timer-peripheral helpers for STM32F4 (Cortex-M4).
+ *
+ * @details
+ * This translation unit implements:
+ * - SysTick initialization and a microsecond tick counter.
+ * - Busy-wait delay helpers (`delay_us`, `delay_ms`).
+ * - Timer peripheral base lookup, RCC enable, init/start/stop/reset.
+ * - Timer interrupt control, attach/detach callbacks and IRQ handlers.
+ * - Channel compare and PWM setup helpers.
+ *
+ * All logic is intentionally low-level (direct register access) and matches
+ * the STM32F4 register layout / behavior expected by the rest of the HAL.
+ */
+
 #include "core/cortex-m4/timer.h"
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/interrupt.h"
@@ -5,10 +21,35 @@
 #include "utils/timer_types.h"
 #include <stdint.h>
 
+/**
+ * @brief Global system tick counter (increments in SysTick_Handler).
+ *
+ * @note Unit: ticks (tick duration set by systick_init).
+ */
 static volatile uint64_t systick_ticks = 0;     // global ticks
+
+/**
+ * @brief SysTick tick duration in microseconds.
+ *
+ * @note Default value is 1 us until systick_init is called.
+ */
 static volatile uint32_t tick_duration_us = 1;  // global tick duration in us
+
+/**
+ * @brief SysTick reload value (24-bit) currently configured.
+ */
 static volatile uint32_t tick_reload_value = 0; // ticks relaod value
 
+/**
+ * @brief Initialize the SysTick timer to generate periodic ticks.
+ *
+ * @param tick_us Tick period in microseconds.
+ *
+ * @note The SysTick reload is limited to 24 bits; this function clips the
+ *       computed reload value to 24 bits. The function configures SysTick
+ *       to use the selected clock source, enables the SysTick interrupt
+ *       and starts the timer.
+ */
 void systick_init(uint32_t tick_us) {
   // systick interrupt is not under the NVIC
   tick_duration_us = tick_us;
@@ -26,6 +67,15 @@ void systick_init(uint32_t tick_us) {
                                      // ahbclk/8 and if it's 1 it runs at ahbclk
 }
 
+/**
+ * @brief Busy-wait for the specified number of microseconds.
+ *
+ * @param us Number of microseconds to delay.
+ *
+ * @note This is a blocking busy-wait that uses hal_get_tick() and the
+ *       configured tick duration. It will wait at least one tick if
+ *       the requested delay is smaller than the tick duration.
+ */
 void delay_us(uint64_t us) {
   volatile uint64_t ticks_needed = us / hal_get_tick_duration_us();
   if (ticks_needed ==
@@ -37,17 +87,64 @@ void delay_us(uint64_t us) {
   ;
 }
 
+/**
+ * @brief Busy-wait for the specified number of milliseconds.
+ *
+ * @param ms Number of milliseconds to delay.
+ */
 void delay_ms(uint32_t ms) { delay_us(ms * 1000); }
 
+/**
+ * @brief Return the current system tick count.
+ *
+ * @return Current tick count.
+ */
 uint64_t hal_get_tick(void) { return systick_ticks; }
+
+/**
+ * @brief Return the configured tick duration in microseconds.
+ *
+ * @return Tick duration (us).
+ */
 uint32_t hal_get_tick_duration_us(void) { return tick_duration_us; }
+
+/**
+ * @brief Return the SysTick reload value (24-bit truncated).
+ *
+ * @return Reload value currently configured in SYST_RVR.
+ */
 uint32_t hal_get_tick_reload_value(void) { return tick_reload_value; }
 
+/**
+ * @brief Return system uptime in milliseconds.
+ *
+ * @return Milliseconds since tick counter started.
+ */
 uint32_t hal_get_millis(void) { return hal_get_micros() / 1000; }
+
+/**
+ * @brief Return system uptime in microseconds.
+ *
+ * @return Microseconds since tick counter started.
+ */
 uint32_t hal_get_micros(void) {
   return hal_get_tick() * hal_get_tick_duration_us();
 }
+
+/**
+ * @brief SysTick interrupt handler increments the global tick counter.
+ *
+ * @note This handler is intended to be wired into the vector table.
+ */
 void SysTick_Handler(void) { systick_ticks++; }
+
+/**
+ * @internal
+ * @brief Map hal_timer_t to the timer peripheral base address.
+ *
+ * @param timer Timer identifier (hal_timer_t).
+ * @return Base address of the timer peripheral or 0 if invalid.
+ */
 uint32_t _get_timer_base(hal_timer_t timer) {
   switch (timer) {
   case TIM1:
@@ -71,6 +168,12 @@ uint32_t _get_timer_base(hal_timer_t timer) {
   }
 }
 
+/**
+ * @internal
+ * @brief Enable peripheral clock for the given timer in RCC registers.
+ *
+ * @param timer Timer identifier (hal_timer_t).
+ */
 void _enable_timer_rcc(hal_timer_t timer) {
   switch (timer) {
   case TIM1:
@@ -102,6 +205,14 @@ void _enable_timer_rcc(hal_timer_t timer) {
   }
 }
 
+/**
+ * @internal
+ * @brief Initialize a General Purpose timer on APB1 (TIM2-TIM5).
+ *
+ * @param timer Timer identifier.
+ * @param prescaler Prescaler value to write to PSC register.
+ * @param auto_reload Auto-reload (ARR) value.
+ */
 void _timer_gp1_init(hal_timer_t timer, uint32_t prescaler,
                      uint32_t auto_reload) {
   uint32_t timer_base = _get_timer_base(timer);
@@ -140,6 +251,14 @@ void _timer_gp1_init(hal_timer_t timer, uint32_t prescaler,
   (*timx_cr1) = (1 << TIM_GP1_CR1_CEN_BIT);
 }
 
+/**
+ * @internal
+ * @brief Initialize a General Purpose timer on APB2 (TIM9-TIM11).
+ *
+ * @param timer Timer identifier.
+ * @param prescaler Prescaler value to write to PSC register (16-bit).
+ * @param auto_reload Auto-reload (ARR) value (16-bit).
+ */
 void _timer_gp2_init(hal_timer_t timer, uint32_t prescaler,
                      uint32_t auto_reload) {
   uint32_t timer_base = _get_timer_base(timer);
@@ -177,6 +296,14 @@ void _timer_gp2_init(hal_timer_t timer, uint32_t prescaler,
   (*timx_cr1) = (1 << TIM_GP2_CR1_CEN_BIT);
 }
 
+/**
+ * @internal
+ * @brief Initialize an Advanced timer (TIM1).
+ *
+ * @param timer Timer identifier.
+ * @param prescaler Prescaler value to write to PSC register.
+ * @param auto_reload Auto-reload (ARR) value.
+ */
 void _timer_adv_init(hal_timer_t timer, uint32_t prescaler,
                      uint32_t auto_reload) {
   uint32_t timer_base = _get_timer_base(timer);
@@ -214,6 +341,14 @@ void _timer_adv_init(hal_timer_t timer, uint32_t prescaler,
 
   (*timx_cr1) = (1 << TIM_ADV_CR1_CEN_BIT);
 }
+
+/**
+ * @brief Initialize a timer based on its type (advanced / gp1 / gp2).
+ *
+ * @param timer Timer identifier.
+ * @param prescaler Prescaler value.
+ * @param auto_reload Auto-reload value.
+ */
 void timer_init(hal_timer_t timer, uint32_t prescaler, uint32_t auto_reload) {
   if (timer == TIM1)
     _timer_adv_init(timer, prescaler, auto_reload);
@@ -223,6 +358,11 @@ void timer_init(hal_timer_t timer, uint32_t prescaler, uint32_t auto_reload) {
     _timer_gp2_init(timer, prescaler, auto_reload);
 }
 
+/**
+ * @brief Start the specified timer.
+ *
+ * @param timer Timer identifier.
+ */
 void timer_start(hal_timer_t timer) {
   uint32_t timer_base = _get_timer_base(timer);
   if (timer == TIM1) {
@@ -240,6 +380,11 @@ void timer_start(hal_timer_t timer) {
   }
 }
 
+/**
+ * @brief Stop the specified timer.
+ *
+ * @param timer Timer identifier.
+ */
 void timer_stop(hal_timer_t timer) {
   uint32_t timer_base = _get_timer_base(timer);
   if (timer == TIM1) {
@@ -256,6 +401,12 @@ void timer_stop(hal_timer_t timer) {
     (*timer_cr1) = (*timer_cr1) & (~(1 << TIM_GP2_CR1_CEN_BIT));
   }
 }
+
+/**
+ * @brief Reset timer counter to zero.
+ *
+ * @param timer Timer identifier.
+ */
 void timer_reset(hal_timer_t timer) {
   uint32_t timer_base = _get_timer_base(timer);
 
@@ -268,6 +419,12 @@ void timer_reset(hal_timer_t timer) {
   }
 }
 
+/**
+ * @brief Get the current counter value for a timer.
+ *
+ * @param timer Timer identifier.
+ * @return Current counter value or 0 if invalid timer.
+ */
 uint32_t timer_get_count(hal_timer_t timer) {
   uint32_t timer_base = _get_timer_base(timer);
   if (timer == TIM1) {
@@ -280,6 +437,15 @@ uint32_t timer_get_count(hal_timer_t timer) {
   return 0;
 }
 
+/**
+ * @brief Calculate the timer's current base frequency using PSC and ARR.
+ *
+ * @param timer Timer identifier.
+ * @return Timer frequency in Hz or 0 if invalid timer.
+ *
+ * @note This reads PSC and ARR directly from timer registers and uses
+ *       the appropriate APB clock for the timer.
+ */
 uint32_t timer_get_frequency(hal_timer_t timer) {
   uint32_t timer_base = _get_timer_base(timer);
   if (timer_base == 0)
@@ -314,6 +480,13 @@ uint32_t timer_get_frequency(hal_timer_t timer) {
   return freq;
 }
 
+/**
+ * @brief Clear timer update interrupt flag for supported timers.
+ *
+ * @param timer Timer identifier.
+ *
+ * @note Currently supports TIM2-TIM5 and TIM9-TIM11 patterns used in this HAL.
+ */
 void timer_clear_interrupt_flag(hal_timer_t timer) {
   // for tim2-5  & 9only
   uint32_t timer_base = _get_timer_base(timer);
@@ -325,31 +498,56 @@ void timer_clear_interrupt_flag(hal_timer_t timer) {
     (*timer_sr) &= (~(1 << TIM_GP2_SR_UIF_BIT));
 }
 
+/**
+ * @brief IRQ handler wrapper for TIM2.
+ *
+ * Clears the flag and dispatches to the HAL interrupt handler table.
+ */
 void TIM2_IRQHandler() {
   timer_clear_interrupt_flag(TIM2);
   hal_handle_interrupt(TIM2_IRQn);
 }
 
+/**
+ * @brief IRQ handler wrapper for TIM3.
+ */
 void TIM3_IRQHandler() {
   timer_clear_interrupt_flag(TIM3);
   hal_handle_interrupt(TIM3_IRQn);
 }
 
+/**
+ * @brief IRQ handler wrapper for TIM4.
+ */
 void TIM4_IRQHandler() {
   timer_clear_interrupt_flag(TIM4);
   hal_handle_interrupt(TIM4_IRQn);
 }
 
+/**
+ * @brief IRQ handler wrapper for TIM5.
+ */
 void TIM5_IRQHandler() {
   timer_clear_interrupt_flag(TIM5);
   hal_handle_interrupt(TIM5_IRQn);
 }
 
+/**
+ * @brief IRQ handler for TIM1 BRK and TIM9 shared vector.
+ *
+ * @note This function clears TIM9's flag and dispatches using the shared IRQn.
+ */
 void TIM1BRK_TIM9_IRQHandler() {
   timer_clear_interrupt_flag(TIM9);
   hal_handle_interrupt(TIM1_BRK_TIM9_IRQn); // shared with TIM1 BRK
 }
 
+/**
+ * @internal
+ * @brief Set the update interrupt enable bit in DIER for the specified timer.
+ *
+ * @param timer Timer identifier.
+ */
 void _set_interrupt_enable_bit(hal_timer_t timer) {
   uint32_t timer_base = _get_timer_base(timer);
   if (timer == TIM1) {
@@ -367,6 +565,13 @@ void _set_interrupt_enable_bit(hal_timer_t timer) {
   }
 }
 
+/**
+ * @brief Enable timer interrupts (NVIC + DIER UIE) for supported timers.
+ *
+ * @param timer Timer identifier.
+ *
+ * @note For TIM1 more complex options exist and are left TODO in the original.
+ */
 void timer_enable_interrupt(hal_timer_t timer) {
   // [TODO]: add all timer interrupts
   switch (timer) {
@@ -393,6 +598,12 @@ void timer_enable_interrupt(hal_timer_t timer) {
   _set_interrupt_enable_bit(timer);
 }
 
+/**
+ * @brief Attach a callback to the timer's HAL interrupt table.
+ *
+ * @param timer Timer identifier.
+ * @param callback Function pointer to call when the timer IRQ fires.
+ */
 void timer_attach_callback(hal_timer_t timer, void (*callback)(void)) {
   // [TODO]: add all timer interrupts
   switch (timer) {
@@ -417,6 +628,12 @@ void timer_attach_callback(hal_timer_t timer, void (*callback)(void)) {
     break;
   }
 }
+
+/**
+ * @brief Detach a previously attached callback for the given timer.
+ *
+ * @param timer Timer identifier.
+ */
 void timer_detach_callback(hal_timer_t timer) {
   // [TODO]: add all timer interrupts
   switch (timer) {
@@ -442,6 +659,15 @@ void timer_detach_callback(hal_timer_t timer) {
   }
 }
 
+/**
+ * @brief Set the compare (CCR) register for a timer channel and configure CCMR.
+ *
+ * @param timer Timer identifier.
+ * @param channel Channel number (1-4).
+ * @param compare_value Value to write into CCRx.
+ *
+ * @note This function sets PWM mode 1 and enables the channel after writing CCR.
+ */
 void timer_set_compare(hal_timer_t timer, uint8_t channel,
                        uint32_t compare_value) {
   uint32_t timer_base = _get_timer_base(timer);
@@ -461,6 +687,13 @@ void timer_set_compare(hal_timer_t timer, uint8_t channel,
   (*ccmr_reg) |= (1 << TIMx_CCMR1_OC1PE_BIT);
   timer_enable_channel(timer, channel);
 }
+
+/**
+ * @brief Enable output on the specified timer channel (CCxE).
+ *
+ * @param timer Timer identifier.
+ * @param channel Channel number (1-4).
+ */
 void timer_enable_channel(hal_timer_t timer, uint32_t channel) {
 
   uint32_t timer_base = _get_timer_base(timer);
@@ -486,6 +719,13 @@ void timer_enable_channel(hal_timer_t timer, uint32_t channel) {
     break;
   }
 }
+
+/**
+ * @brief Disable output on the specified timer channel (CCxE = 0).
+ *
+ * @param timer Timer identifier.
+ * @param channel Channel number (1-4).
+ */
 void timer_disable_channel(hal_timer_t timer, uint32_t channel) {
 
   uint32_t timer_base = _get_timer_base(timer);

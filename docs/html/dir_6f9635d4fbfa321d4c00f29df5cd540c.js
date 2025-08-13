@@ -7,5 +7,7 @@ var dir_6f9635d4fbfa321d4c00f29df5cd540c =
     [ "03_no_hal_uart_tx", "dir_2605397a8a7e541cfe6761deea394259.html", "dir_2605397a8a7e541cfe6761deea394259" ],
     [ "04_hal_timer", "dir_4c83c172628b412275559c3f3cbb6ca5.html", "dir_4c83c172628b412275559c3f3cbb6ca5" ],
     [ "05_hal_systick", "dir_181f178495f6eac8b0a0d114349d77b2.html", "dir_181f178495f6eac8b0a0d114349d77b2" ],
-    [ "06_hal_blink_delay", "dir_dce71e11ce415528bfa34ee2ec96a279.html", "dir_dce71e11ce415528bfa34ee2ec96a279" ]
+    [ "06_hal_blink_delay", "dir_dce71e11ce415528bfa34ee2ec96a279.html", "dir_dce71e11ce415528bfa34ee2ec96a279" ],
+    [ "07_hal_pwm", "dir_ca89224e11f1f76439c1de95b9bc030f.html", "dir_ca89224e11f1f76439c1de95b9bc030f" ],
+    [ "08_no_hal_pwm", "dir_16f8223323deac1d1961d17936a54ca3.html", "dir_16f8223323deac1d1961d17936a54ca3" ]
 ];

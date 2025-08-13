@@ -2,95 +2,176 @@
 \hypertarget{gpio_8c}{}\label{gpio_8c}\index{src/core/cortex-\/m4/gpio/gpio.c@{src/core/cortex-\/m4/gpio/gpio.c}}
 
 
-Cortex-\/\+M4 (STM32\+F4) GPIO HAL Implementation.  
+HAL GPIO driver implementation for STM32\+F4 series.  
 
 
 {\ttfamily \#include "{}core/cortex-\/m4/gpio.\+h"{}}\newline
+{\ttfamily \#include "{}core/cortex-\/m4/gpio\+\_\+reg.\+h"{}}\newline
+{\ttfamily \#include "{}core/cortex-\/m4/rcc\+\_\+reg.\+h"{}}\newline
 Include dependency graph for gpio.\+c\+:
 % FIG 0
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-uint8\+\_\+t \mbox{\hyperlink{gpio_8c_a33e3e85384fdddbde5b76d9152591dd0}{\+\_\+get\+\_\+port}} (uint16\+\_\+t n)
-\begin{DoxyCompactList}\small\item\em Extract GPIO port index from pin number. \end{DoxyCompactList}\item 
-uint8\+\_\+t \mbox{\hyperlink{gpio_8c_af9c75250dddc697fb94422b45c298175}{\+\_\+get\+\_\+pin}} (uint16\+\_\+t n)
-\begin{DoxyCompactList}\small\item\em Extract pin number within port from pin number. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___g_p_i_o___a_p_i_gab063b362fb73bcb899a122e5188e7e32}{hal\+\_\+gpio\+\_\+setmode}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin, \mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\+\_\+gpio\+\_\+mode}} mode, \mbox{\hyperlink{gpio__types_8h_ab08483829bc1df17783a8ad8cb49043e}{hal\+\_\+gpio\+\_\+pullup\+\_\+pulldown}} pupd)
-\begin{DoxyCompactList}\small\item\em Set GPIO pin mode and pull-\/up/pull-\/down configuration. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\+\_\+gpio\+\_\+mode}} \mbox{\hyperlink{group___g_p_i_o___a_p_i_gaf5915e39ede16cf7d68b4dc1ee02b78a}{hal\+\_\+gpio\+\_\+getmode}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin)
-\begin{DoxyCompactList}\small\item\em Get the mode configuration of a GPIO pin. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___g_p_i_o___a_p_i_gaa64ac2161a52147ab5e91fe399126638}{hal\+\_\+gpio\+\_\+digitalwrite}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin, \mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\+\_\+gpio\+\_\+state}} state)
-\begin{DoxyCompactList}\small\item\em Write a digital logic level to a GPIO pin. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\+\_\+gpio\+\_\+state}} \mbox{\hyperlink{group___g_p_i_o___a_p_i_gacce35517ec183c7df6a1f67737ecebf6}{hal\+\_\+gpio\+\_\+digitalread}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin)
-\begin{DoxyCompactList}\small\item\em Read the current digital logic level of a GPIO pin. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___g_p_i_o___a_p_i_ga4f525e1eaa75b82f304bc25cee240789}{hal\+\_\+gpio\+\_\+enable\+\_\+rcc}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin)
-\begin{DoxyCompactList}\small\item\em Enable the RCC clock for the GPIO port. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___g_p_i_o___a_p_i_ga07aab29e77970fa617d8ea0d1922e964}{hal\+\_\+gpio\+\_\+set\+\_\+alternate\+\_\+function}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin, \mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44}{hal\+\_\+gpio\+\_\+alternate\+\_\+function\+\_\+t}} alt\+\_\+fn)
-\begin{DoxyCompactList}\small\item\em Configure the alternate function for a GPIO pin. \end{DoxyCompactList}\end{DoxyCompactItemize}
+void \mbox{\hyperlink{gpio_8c_ab063b362fb73bcb899a122e5188e7e32}{hal\+\_\+gpio\+\_\+setmode}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin, \mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\+\_\+gpio\+\_\+mode}} mode, \mbox{\hyperlink{gpio__types_8h_ab08483829bc1df17783a8ad8cb49043e}{hal\+\_\+gpio\+\_\+pullup\+\_\+pulldown}} pupd)
+\begin{DoxyCompactList}\small\item\em Configure the mode and pull-\/up/pull-\/down for a GPIO pin. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\+\_\+gpio\+\_\+mode}} \mbox{\hyperlink{gpio_8c_af5915e39ede16cf7d68b4dc1ee02b78a}{hal\+\_\+gpio\+\_\+getmode}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin)
+\begin{DoxyCompactList}\small\item\em Get the current mode of a GPIO pin. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{gpio_8c_aa64ac2161a52147ab5e91fe399126638}{hal\+\_\+gpio\+\_\+digitalwrite}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin, \mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\+\_\+gpio\+\_\+state}} state)
+\begin{DoxyCompactList}\small\item\em Write a digital value to a GPIO pin. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\+\_\+gpio\+\_\+state}} \mbox{\hyperlink{gpio_8c_acce35517ec183c7df6a1f67737ecebf6}{hal\+\_\+gpio\+\_\+digitalread}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin)
+\begin{DoxyCompactList}\small\item\em Read the digital value from a GPIO pin. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{gpio_8c_a4f525e1eaa75b82f304bc25cee240789}{hal\+\_\+gpio\+\_\+enable\+\_\+rcc}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin)
+\begin{DoxyCompactList}\small\item\em Enable the RCC clock for the GPIO port of a given pin. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{gpio_8c_a07aab29e77970fa617d8ea0d1922e964}{hal\+\_\+gpio\+\_\+set\+\_\+alternate\+\_\+function}} (\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}} pin, \mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44}{hal\+\_\+gpio\+\_\+alternate\+\_\+function\+\_\+t}} alt\+\_\+fn)
+\begin{DoxyCompactList}\small\item\em Configure the alternate function of a GPIO pin. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
-Cortex-\/\+M4 (STM32\+F4) GPIO HAL Implementation. 
+HAL GPIO driver implementation for STM32\+F4 series. 
 
-This file provides the implementation of the GPIO Hardware Abstraction Layer (HAL) for Cortex-\/\+M4 based STM32\+F4 microcontrollers, specifically the STM32\+F401\+RE. It includes functions for configuring GPIO pins, reading and writing digital states, and managing GPIO port clocks through the RCC.
+This file contains the implementation of the high-\/level HAL functions declared in {\ttfamily \doxylink{gpio_8h}{gpio.\+h}} for configuring and controlling GPIO pins.
 
-Key features\+:
+The functions in this file handle\+:
 \begin{DoxyItemize}
-\item Configure GPIO pin modes (input, output, alternate function, analog)
-\item Configure pull-\/up and pull-\/down resistors
-\item Atomic digital write using BSRR register
-\item Read digital input pin states
-\item Automatic enabling of RCC clocks for GPIO ports
+\item Pin mode configuration
+\item Pull-\/up/pull-\/down settings
+\item Digital read/write operations
+\item RCC clock enabling for GPIO ports
+\item Alternate function selection 
 \end{DoxyItemize}
-
-The GPIO pins are encoded as port and pin numbers, supporting ports A–E and H. The code handles port indexing and provides safety checks on invalid ports.
-
-\begin{DoxyAuthor}{Author}
-Ashutosh Vishwakarma 
-\end{DoxyAuthor}
-\begin{DoxyDate}{Date}
-2025-\/07-\/20 
-\end{DoxyDate}
-
 
 \label{doc-func-members}
 \Hypertarget{gpio_8c_doc-func-members}
 \doxysubsection{Function Documentation}
-\Hypertarget{gpio_8c_af9c75250dddc697fb94422b45c298175}\index{gpio.c@{gpio.c}!\_get\_pin@{\_get\_pin}}
-\index{\_get\_pin@{\_get\_pin}!gpio.c@{gpio.c}}
-\doxysubsubsection{\texorpdfstring{\_get\_pin()}{\_get\_pin()}}
-{\footnotesize\ttfamily \label{gpio_8c_af9c75250dddc697fb94422b45c298175} 
-uint8\+\_\+t \+\_\+get\+\_\+pin (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{n}{}\end{DoxyParamCaption})}
+\Hypertarget{gpio_8c_acce35517ec183c7df6a1f67737ecebf6}\index{gpio.c@{gpio.c}!hal\_gpio\_digitalread@{hal\_gpio\_digitalread}}
+\index{hal\_gpio\_digitalread@{hal\_gpio\_digitalread}!gpio.c@{gpio.c}}
+\doxysubsubsection{\texorpdfstring{hal\_gpio\_digitalread()}{hal\_gpio\_digitalread()}}
+{\footnotesize\ttfamily \label{gpio_8c_acce35517ec183c7df6a1f67737ecebf6} 
+\mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\+\_\+gpio\+\_\+state}} hal\+\_\+gpio\+\_\+digitalread (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}}}]{pin}{}\end{DoxyParamCaption})}
 
 
 
-Extract pin number within port from pin number. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em n} & Encoded GPIO pin number. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Pin number within port (0–15). 
-\end{DoxyReturn}
-\Hypertarget{gpio_8c_a33e3e85384fdddbde5b76d9152591dd0}\index{gpio.c@{gpio.c}!\_get\_port@{\_get\_port}}
-\index{\_get\_port@{\_get\_port}!gpio.c@{gpio.c}}
-\doxysubsubsection{\texorpdfstring{\_get\_port()}{\_get\_port()}}
-{\footnotesize\ttfamily \label{gpio_8c_a33e3e85384fdddbde5b76d9152591dd0} 
-uint8\+\_\+t \+\_\+get\+\_\+port (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{n}{}\end{DoxyParamCaption})}
-
-
-
-Extract GPIO port index from pin number. 
-
-The pin number encodes port and pin within port. Ports 6 and 5 are invalid, port 7 maps to index 5 (GPIOH).
+Read the digital value from a GPIO pin. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em n} & Encoded GPIO pin number. \\
+{\em pin} & Pin identifier. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-Port index in GPIO\+\_\+\+BASE array. 
+Current pin state (high or low). 
 \end{DoxyReturn}
+\Hypertarget{gpio_8c_aa64ac2161a52147ab5e91fe399126638}\index{gpio.c@{gpio.c}!hal\_gpio\_digitalwrite@{hal\_gpio\_digitalwrite}}
+\index{hal\_gpio\_digitalwrite@{hal\_gpio\_digitalwrite}!gpio.c@{gpio.c}}
+\doxysubsubsection{\texorpdfstring{hal\_gpio\_digitalwrite()}{hal\_gpio\_digitalwrite()}}
+{\footnotesize\ttfamily \label{gpio_8c_aa64ac2161a52147ab5e91fe399126638} 
+void hal\+\_\+gpio\+\_\+digitalwrite (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}}}]{pin}{, }\item[{\mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\+\_\+gpio\+\_\+state}}}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Write a digital value to a GPIO pin. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin identifier. \\
+\hline
+{\em state} & Desired pin state (high or low). 
+\begin{DoxyCode}{1}
+\DoxyCodeLine{\textcolor{comment}{//\ Example:\ Set\ PA5\ high}}
+\DoxyCodeLine{\mbox{\hyperlink{gpio_8h_aa64ac2161a52147ab5e91fe399126638}{hal\_gpio\_digitalwrite}}(PA5,\ HAL\_GPIO\_HIGH);}
+
+\end{DoxyCode}
+ \\
+\hline
+\end{DoxyParams}
+\Hypertarget{gpio_8c_a4f525e1eaa75b82f304bc25cee240789}\index{gpio.c@{gpio.c}!hal\_gpio\_enable\_rcc@{hal\_gpio\_enable\_rcc}}
+\index{hal\_gpio\_enable\_rcc@{hal\_gpio\_enable\_rcc}!gpio.c@{gpio.c}}
+\doxysubsubsection{\texorpdfstring{hal\_gpio\_enable\_rcc()}{hal\_gpio\_enable\_rcc()}}
+{\footnotesize\ttfamily \label{gpio_8c_a4f525e1eaa75b82f304bc25cee240789} 
+void hal\+\_\+gpio\+\_\+enable\+\_\+rcc (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}}}]{pin}{}\end{DoxyParamCaption})}
+
+
+
+Enable the RCC clock for the GPIO port of a given pin. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin identifier. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This function is usually called automatically by other GPIO functions, but can be called manually if required. 
+\end{DoxyNote}
+\Hypertarget{gpio_8c_af5915e39ede16cf7d68b4dc1ee02b78a}\index{gpio.c@{gpio.c}!hal\_gpio\_getmode@{hal\_gpio\_getmode}}
+\index{hal\_gpio\_getmode@{hal\_gpio\_getmode}!gpio.c@{gpio.c}}
+\doxysubsubsection{\texorpdfstring{hal\_gpio\_getmode()}{hal\_gpio\_getmode()}}
+{\footnotesize\ttfamily \label{gpio_8c_af5915e39ede16cf7d68b4dc1ee02b78a} 
+\mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\+\_\+gpio\+\_\+mode}} hal\+\_\+gpio\+\_\+getmode (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}}}]{pin}{}\end{DoxyParamCaption})}
+
+
+
+Get the current mode of a GPIO pin. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin identifier. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The current GPIO mode of the pin. 
+\end{DoxyReturn}
+\Hypertarget{gpio_8c_a07aab29e77970fa617d8ea0d1922e964}\index{gpio.c@{gpio.c}!hal\_gpio\_set\_alternate\_function@{hal\_gpio\_set\_alternate\_function}}
+\index{hal\_gpio\_set\_alternate\_function@{hal\_gpio\_set\_alternate\_function}!gpio.c@{gpio.c}}
+\doxysubsubsection{\texorpdfstring{hal\_gpio\_set\_alternate\_function()}{hal\_gpio\_set\_alternate\_function()}}
+{\footnotesize\ttfamily \label{gpio_8c_a07aab29e77970fa617d8ea0d1922e964} 
+void hal\+\_\+gpio\+\_\+set\+\_\+alternate\+\_\+function (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}}}]{pin}{, }\item[{\mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44}{hal\+\_\+gpio\+\_\+alternate\+\_\+function\+\_\+t}}}]{alt\+\_\+fn}{}\end{DoxyParamCaption})}
+
+
+
+Configure the alternate function of a GPIO pin. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin identifier. \\
+\hline
+{\em alt\+\_\+fn} & Alternate function number/type. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This function will internally set the pin mode to alternate function mode. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Example:\ Set\ PA2\ to\ USART2\_TX\ alternate\ function}}
+\DoxyCodeLine{\mbox{\hyperlink{gpio_8h_a07aab29e77970fa617d8ea0d1922e964}{hal\_gpio\_set\_alternate\_function}}(PA2,\ HAL\_GPIO\_AF\_USART2);}
+
+\end{DoxyCode}
+ 
+\end{DoxyNote}
+\Hypertarget{gpio_8c_ab063b362fb73bcb899a122e5188e7e32}\index{gpio.c@{gpio.c}!hal\_gpio\_setmode@{hal\_gpio\_setmode}}
+\index{hal\_gpio\_setmode@{hal\_gpio\_setmode}!gpio.c@{gpio.c}}
+\doxysubsubsection{\texorpdfstring{hal\_gpio\_setmode()}{hal\_gpio\_setmode()}}
+{\footnotesize\ttfamily \label{gpio_8c_ab063b362fb73bcb899a122e5188e7e32} 
+void hal\+\_\+gpio\+\_\+setmode (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\+\_\+gpio\+\_\+pin}}}]{pin}{, }\item[{\mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\+\_\+gpio\+\_\+mode}}}]{mode}{, }\item[{\mbox{\hyperlink{gpio__types_8h_ab08483829bc1df17783a8ad8cb49043e}{hal\+\_\+gpio\+\_\+pullup\+\_\+pulldown}}}]{pupd}{}\end{DoxyParamCaption})}
+
+
+
+Configure the mode and pull-\/up/pull-\/down for a GPIO pin. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin identifier. \\
+\hline
+{\em mode} & GPIO mode (input, output, alternate function, analog). \\
+\hline
+{\em pupd} & Pull-\/up/pull-\/down configuration. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This function automatically enables the RCC clock for the GPIO port. 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Example:\ Configure\ PA5\ as\ output\ with\ no\ pull-\/up/pull-\/down}}
+\DoxyCodeLine{\mbox{\hyperlink{gpio_8h_ab063b362fb73bcb899a122e5188e7e32}{hal\_gpio\_setmode}}(PA5,\ HAL\_GPIO\_MODE\_OUTPUT,\ HAL\_GPIO\_NO\_PULL);}
+
+\end{DoxyCode}
+ 
+\end{DoxyNote}

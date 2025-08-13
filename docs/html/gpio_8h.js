@@ -1,25 +1,9 @@
 var gpio_8h =
 [
-    [ "GPIO_AFRH_OFFSET", "group___g_p_i_o___r_e_g_i_s_t_e_r___o_f_f_s_e_t_s.html#gafdfc1903c8131e8c47c81bc89401f12e", null ],
-    [ "GPIO_AFRL_OFFSET", "group___g_p_i_o___r_e_g_i_s_t_e_r___o_f_f_s_e_t_s.html#ga2a111ee9e5845dcba61cf1d7fe0eb43f", null ],
-    [ "GPIO_BSRR_OFFSET", "group___g_p_i_o___r_e_g_i_s_t_e_r___o_f_f_s_e_t_s.html#gab59269075e8b69c81512c1cd3627e07c", null ],
-    [ "GPIO_IDR_OFFSET", "group___g_p_i_o___r_e_g_i_s_t_e_r___o_f_f_s_e_t_s.html#gaf540e84125f7b294a9c848c9aadb1c5b", null ],
-    [ "GPIO_MODER_OFFSET", "group___g_p_i_o___r_e_g_i_s_t_e_r___o_f_f_s_e_t_s.html#gabd2bf74240b288f8d42e6e6aa157ba52", null ],
-    [ "GPIO_ODR_OFFSET", "group___g_p_i_o___r_e_g_i_s_t_e_r___o_f_f_s_e_t_s.html#gaa3e399f4df7c85cf125eda0d604170ac", null ],
-    [ "GPIO_OTYPER_OFFSET", "group___g_p_i_o___r_e_g_i_s_t_e_r___o_f_f_s_e_t_s.html#ga424a9ba00d1b8767830a4ba2876b81b7", null ],
-    [ "GPIO_PORT_COUNT", "group___g_p_i_o___r_e_g_i_s_t_e_r_s.html#gaf5eb82977ded49e09b93e0c7ae9468d6", null ],
-    [ "GPIO_PUPDR_OFFSET", "group___g_p_i_o___r_e_g_i_s_t_e_r___o_f_f_s_e_t_s.html#ga84120440ba15610fb77bf33f6b6ff0dc", null ],
-    [ "GPIOA", "group___g_p_i_o___r_e_g_i_s_t_e_r_s.html#gac485358099728ddae050db37924dd6b7", null ],
-    [ "GPIOB", "group___g_p_i_o___r_e_g_i_s_t_e_r_s.html#ga68b66ac73be4c836db878a42e1fea3cd", null ],
-    [ "GPIOC", "group___g_p_i_o___r_e_g_i_s_t_e_r_s.html#ga2dca03332d620196ba943bc2346eaa08", null ],
-    [ "GPIOD", "group___g_p_i_o___r_e_g_i_s_t_e_r_s.html#ga7580b1a929ea9df59725ba9c18eba6ac", null ],
-    [ "GPIOE", "group___g_p_i_o___r_e_g_i_s_t_e_r_s.html#gae04bdb5e8acc47cab1d0532e6b0d0763", null ],
-    [ "GPIOH", "group___g_p_i_o___r_e_g_i_s_t_e_r_s.html#gadeacbb43ae86c879945afe98c679b285", null ],
-    [ "RCC_AHB1ENR", "group___g_p_i_o___r_e_g_i_s_t_e_r_s.html#ga305184464592fe039a4e47e9d88bdcc4", null ],
-    [ "hal_gpio_digitalread", "group___g_p_i_o___a_p_i.html#gacce35517ec183c7df6a1f67737ecebf6", null ],
-    [ "hal_gpio_digitalwrite", "group___g_p_i_o___a_p_i.html#gaa64ac2161a52147ab5e91fe399126638", null ],
-    [ "hal_gpio_enable_rcc", "group___g_p_i_o___a_p_i.html#ga4f525e1eaa75b82f304bc25cee240789", null ],
-    [ "hal_gpio_getmode", "group___g_p_i_o___a_p_i.html#gaf5915e39ede16cf7d68b4dc1ee02b78a", null ],
-    [ "hal_gpio_set_alternate_function", "group___g_p_i_o___a_p_i.html#ga07aab29e77970fa617d8ea0d1922e964", null ],
-    [ "hal_gpio_setmode", "group___g_p_i_o___a_p_i.html#gab063b362fb73bcb899a122e5188e7e32", null ]
+    [ "hal_gpio_digitalread", "gpio_8h.html#acce35517ec183c7df6a1f67737ecebf6", null ],
+    [ "hal_gpio_digitalwrite", "gpio_8h.html#aa64ac2161a52147ab5e91fe399126638", null ],
+    [ "hal_gpio_enable_rcc", "gpio_8h.html#a4f525e1eaa75b82f304bc25cee240789", null ],
+    [ "hal_gpio_getmode", "gpio_8h.html#af5915e39ede16cf7d68b4dc1ee02b78a", null ],
+    [ "hal_gpio_set_alternate_function", "gpio_8h.html#a07aab29e77970fa617d8ea0d1922e964", null ],
+    [ "hal_gpio_setmode", "gpio_8h.html#ab063b362fb73bcb899a122e5188e7e32", null ]
 ];

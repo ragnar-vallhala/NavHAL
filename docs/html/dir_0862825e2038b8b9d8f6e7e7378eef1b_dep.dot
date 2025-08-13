@@ -10,5 +10,5 @@ digraph "samples/03_hal_uart_tx"
   dir_0862825e2038b8b9d8f6e7e7378eef1b [label="03_hal_uart_tx", fillcolor="#edf0f7", color="grey25", style="filled,bold", URL="dir_0862825e2038b8b9d8f6e7e7378eef1b.html",tooltip=""];
   }
   dir_d44c64559bbebec7f509842c48db8b23 [label="include", fillcolor="#edf0f7", color="red", style="filled", URL="dir_d44c64559bbebec7f509842c48db8b23.html",tooltip=""];
-  dir_0862825e2038b8b9d8f6e7e7378eef1b->dir_d44c64559bbebec7f509842c48db8b23 [headlabel="1", labeldistance=1.5 headhref="dir_000003_000015.html" href="dir_000003_000015.html" color="steelblue1" fontcolor="steelblue1"];
+  dir_0862825e2038b8b9d8f6e7e7378eef1b->dir_d44c64559bbebec7f509842c48db8b23 [headlabel="1", labeldistance=1.5 headhref="dir_000003_000017.html" href="dir_000003_000017.html" color="steelblue1" fontcolor="steelblue1"];
 }

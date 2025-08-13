@@ -1,0 +1,798 @@
+\doxysection{include/core/cortex-\/m4/interrupt.h File Reference}
+\hypertarget{interrupt_8h}{}\label{interrupt_8h}\index{include/core/cortex-\/m4/interrupt.h@{include/core/cortex-\/m4/interrupt.h}}
+
+
+NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32\+F4.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for interrupt.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_n_v_i_c___typedef}{NVIC\+\_\+\+Typedef}}
+\begin{DoxyCompactList}\small\item\em Nested Vectored Interrupt Controller (NVIC) register map. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{interrupt_8h_a425ec323753362f97c4b9ad5d31ad2c9}{NVIC\+\_\+\+BASE\+\_\+\+ADDR}}~0x\+E000\+E100\+UL
+\begin{DoxyCompactList}\small\item\em Base address of the NVIC registers. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{interrupt_8h_ac8e97e8ce56ae9f57da1363a937f8a17}{NVIC}}~((\mbox{\hyperlink{struct_n_v_i_c___typedef}{NVIC\+\_\+\+Typedef}} \texorpdfstring{$\ast$}{*})\mbox{\hyperlink{interrupt_8h_a425ec323753362f97c4b9ad5d31ad2c9}{NVIC\+\_\+\+BASE\+\_\+\+ADDR}})
+\begin{DoxyCompactList}\small\item\em NVIC register access macro. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} \{ \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ade177d9c70c89e084093024b932a4e30}{Non\+Maskable\+Int\+\_\+\+IRQn}} = -\/14
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab1a222a34a32f0ef5ac65e714efc1f85}{Hard\+Fault\+\_\+\+IRQn}} = -\/13
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a33ff1cf7098de65d61b6354fee6cd5aa}{Memory\+Management\+\_\+\+IRQn}} = -\/12
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8693500eff174f16119e96234fee73af}{Bus\+Fault\+\_\+\+IRQn}} = -\/11
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6895237c9443601ac832efa635dd8bbf}{Usage\+Fault\+\_\+\+IRQn}} = -\/10
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4ce820b3cc6cf3a796b41aadc0cf1237}{SVCall\+\_\+\+IRQn}} = -\/5
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8e033fcef7aed98a31c60a7de206722c}{Debug\+Monitor\+\_\+\+IRQn}} = -\/4
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a03c3cc89984928816d81793fc7bce4a2}{Pend\+SV\+\_\+\+IRQn}} = -\/2
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6dbff8f8543325f3474cbae2446776e7}{Sys\+Tick\+\_\+\+IRQn}} = -\/1
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a971089d7566ef902dfa0c80ac3a8fd52}{WWDG\+\_\+\+IRQn}} = 0
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab0b51ffcc4dcf5661141b79c8e5bd924}{PVD\+\_\+\+IRQn}} = 1
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac127cca7ae48bcf93924209f04e5e5a1}{TAMP\+\_\+\+STAMP\+\_\+\+IRQn}} = 2
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a173ccc3f31df1f7e43de2ddeab3d1777}{RTC\+\_\+\+WKUP\+\_\+\+IRQn}} = 3
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a91b73963ce243a1d031576d49e137fab}{FLASH\+\_\+\+IRQn}} = 4
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a5710b22392997bac63daa5c999730f77}{RCC\+\_\+\+IRQn}} = 5
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab6aa6f87d26bbc6cf99b067b8d75c2f7}{EXTI0\+\_\+\+IRQn}} = 6
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae4badcdecdb94eb10129c4c0577c5e19}{EXTI1\+\_\+\+IRQn}} = 7
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a082cb3f7839069a0715fd76c7eacbbc9}{EXTI2\+\_\+\+IRQn}} = 8
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8add889c84ba5de466ced209069e05d602}{EXTI3\+\_\+\+IRQn}} = 9
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab70a40106ca4486770df5d2072d9ac0e}{EXTI4\+\_\+\+IRQn}} = 10
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9ee33e72512c4cfb301b216f4fb9d68c}{DMA1\+\_\+\+Stream0\+\_\+\+IRQn}} = 11
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa45ca2c955060e2c2a7cbbe1d6753285}{DMA1\+\_\+\+Stream1\+\_\+\+IRQn}} = 12
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0d9ec75e4478e70235b705d5a6b3efd8}{DMA1\+\_\+\+Stream2\+\_\+\+IRQn}} = 13
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af77770e080206a7558decf09344fb2e2}{DMA1\+\_\+\+Stream3\+\_\+\+IRQn}} = 14
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aee2aaf365c6c297a63cee41ecae2301a}{DMA1\+\_\+\+Stream4\+\_\+\+IRQn}} = 15
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac92efa72399fe58fa615d8bf8fd64a4e}{DMA1\+\_\+\+Stream5\+\_\+\+IRQn}} = 16
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aef5e2b68f62f6f1781fab894f0b8f486}{DMA1\+\_\+\+Stream6\+\_\+\+IRQn}} = 17
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4d69175258ae261dd545001e810421b3}{ADC\+\_\+\+IRQn}} = 18
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9ceb5175f7c10cf436955173c2246877}{CAN1\+\_\+\+TX\+\_\+\+IRQn}} = 19
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab6bf73ac43a9856b3f2759a59f3d25b5}{CAN1\+\_\+\+RX0\+\_\+\+IRQn}} = 20
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af71ef06c4f9ff0e1691c21ff3670acd4}{CAN1\+\_\+\+RX1\+\_\+\+IRQn}} = 21
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0f5f129d88a5606a378811e43039e274}{CAN1\+\_\+\+SCE\+\_\+\+IRQn}} = 22
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa3aa50e0353871985facf62d055faa52}{EXTI9\+\_\+5\+\_\+\+IRQn}} = 23
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab35b4ce63cfb11453f84a3695c6df368}{TIM1\+\_\+\+BRK\+\_\+\+TIM9\+\_\+\+IRQn}} = 24
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa3879e49013035601e17f83a51e0829f}{TIM1\+\_\+\+UP\+\_\+\+TIM10\+\_\+\+IRQn}} = 25
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab1a744bdceb8eface6ff57dd036e608e}{TIM1\+\_\+\+TRG\+\_\+\+COM\+\_\+\+TIM11\+\_\+\+IRQn}} = 26
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af312f0a21f600f9b286427e50c549ca9}{TIM1\+\_\+\+CC\+\_\+\+IRQn}} = 27
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3a4e2095a926e4095d3c846eb1c98afa}{TIM2\+\_\+\+IRQn}} = 28
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a985574288f66e2a00e97387424a9a2d8}{TIM3\+\_\+\+IRQn}} = 29
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a368b899ca740b9ae0d75841f3abf68c4}{TIM4\+\_\+\+IRQn}} = 30
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9852dbbe8c014e716ce7e03a7b809751}{I2\+C1\+\_\+\+EV\+\_\+\+IRQn}} = 31
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a2ec363869f4488782dc10a60abce3b34}{I2\+C1\+\_\+\+ER\+\_\+\+IRQn}} = 32
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3020193786527c47d2e4d8c92ceee804}{I2\+C2\+\_\+\+EV\+\_\+\+IRQn}} = 33
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a60c35f2d48d512bd6818bc9fef7053d7}{I2\+C2\+\_\+\+ER\+\_\+\+IRQn}} = 34
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aacdff1a9c42582ed663214cbe62c1174}{SPI1\+\_\+\+IRQn}} = 35
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a505fbd4ccf7c2a14c8b76dc9e58f7ede}{SPI2\+\_\+\+IRQn}} = 36
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ad97cb163e1f678367e37c50d54d161ab}{USART1\+\_\+\+IRQn}} = 37
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3f9c48714d0e5baaba6613343f0da68e}{USART2\+\_\+\+IRQn}} = 38
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8afb13802afc1f5fdf5c90e73ee99e5ff3}{USART3\+\_\+\+IRQn}} = 39
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9fb0ad0c850234d1983fafdb17378e2f}{EXTI15\+\_\+10\+\_\+\+IRQn}} = 40
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8afe09d6563a21a1540f658163a76a3b37}{RTC\+\_\+\+Alarm\+\_\+\+IRQn}} = 41
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa612f35c4440359c35acbaa3c1458c5f}{OTG\+\_\+\+FS\+\_\+\+WKUP\+\_\+\+IRQn}} = 42
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3e01328006d19f7d32354271b9f61dce}{TIM8\+\_\+\+BRK\+\_\+\+TIM12\+\_\+\+IRQn}} = 43
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa8d8f67a98f24de6f0b36ad6b1f29a7d}{TIM8\+\_\+\+UP\+\_\+\+TIM13\+\_\+\+IRQn}} = 44
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae252b31c3a341acbe9a467e243137307}{TIM8\+\_\+\+TRG\+\_\+\+COM\+\_\+\+TIM14\+\_\+\+IRQn}} = 45
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a637750639eff4e2b4aae80ed6f3cf67f}{TIM8\+\_\+\+CC\+\_\+\+IRQn}} = 46
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aedaa9c14e7e5fa9c0dcbb0c2455546e8}{DMA1\+\_\+\+Stream7\+\_\+\+IRQn}} = 47
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab58dc79a081058857f73965f5305479b}{FMC\+\_\+\+IRQn}} = 48
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a16fe70a39348f3f27906dc268b5654e3}{SDIO\+\_\+\+IRQn}} = 49
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aed2eb3f4bb721d55fcc1003125956645}{TIM5\+\_\+\+IRQn}} = 50
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4e9331739fb76a2ca7781fede070ae44}{SPI3\+\_\+\+IRQn}} = 51
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aded5314b20c6e4e80cb6ab0668ffb8d5}{UART4\+\_\+\+IRQn}} = 52
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac55a11a64aae7432544d0ab0d4f7de09}{UART5\+\_\+\+IRQn}} = 53
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a5f581e9aedfaccd9b1db9ec793804b45}{TIM6\+\_\+\+DAC\+\_\+\+IRQn}} = 54
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a53cadc1e164ec85d0ea4cd143608e8e1}{TIM7\+\_\+\+IRQn}} = 55
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a1e5055722630fd4b12aff421964c2ebb}{DMA2\+\_\+\+Stream0\+\_\+\+IRQn}} = 56
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a98abb3f02c1feb3831706bc1b82307cb}{DMA2\+\_\+\+Stream1\+\_\+\+IRQn}} = 57
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8abf5e189f3ac7aad9f65e65ea5a0f3b36}{DMA2\+\_\+\+Stream2\+\_\+\+IRQn}} = 58
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3ff8f3439f509e6e985eb960e63e1be4}{DMA2\+\_\+\+Stream3\+\_\+\+IRQn}} = 59
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae54eb8b30273b38a0576f75aba24eec0}{DMA2\+\_\+\+Stream4\+\_\+\+IRQn}} = 60
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ad71328dd95461b7c55b568cf25966f6a}{ETH\+\_\+\+IRQn}} = 61
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0485578005e12c2e2c0fb253a844ec6f}{ETH\+\_\+\+WKUP\+\_\+\+IRQn}} = 62
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af6b8fbc990ac71c8425647bb684788a4}{CAN2\+\_\+\+TX\+\_\+\+IRQn}} = 63
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a851fd2f2ab1418710e7da80e1bdf348a}{CAN2\+\_\+\+RX0\+\_\+\+IRQn}} = 64
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab5023ff845be31a488ab63a0b8cf2b7a}{CAN2\+\_\+\+RX1\+\_\+\+IRQn}} = 65
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a56c0b5758f26f31494e74aab9273f9fd}{CAN2\+\_\+\+SCE\+\_\+\+IRQn}} = 66
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa60a30b7ef03446a46fd72e084911f7e}{OTG\+\_\+\+FS\+\_\+\+IRQn}} = 67
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a933d4686213973abc01845a3da1c8a03}{DMA2\+\_\+\+Stream5\+\_\+\+IRQn}} = 68
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a21570761ad0b5ed751adc831691b7800}{DMA2\+\_\+\+Stream6\+\_\+\+IRQn}} = 69
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3d4cc0cd9b4d71e7ee002c4f8c1f8a77}{DMA2\+\_\+\+Stream7\+\_\+\+IRQn}} = 70
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa92bcb2bc3a87be869f05c5b07f04b8c}{USART6\+\_\+\+IRQn}} = 71
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8326db2d570cb865ffa1d49fa29d562a}{I2\+C3\+\_\+\+EV\+\_\+\+IRQn}} = 72
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6e954232d164a6942ebc7a6bd6f7736e}{I2\+C3\+\_\+\+ER\+\_\+\+IRQn}} = 73
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a60b6cc4b6dbeca39e29a475d26c9e080}{OTG\+\_\+\+HS\+\_\+\+EP1\+\_\+\+OUT\+\_\+\+IRQn}} = 74
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a1b040a7f76278a73cf5ea4c51f1be047}{OTG\+\_\+\+HS\+\_\+\+EP1\+\_\+\+IN\+\_\+\+IRQn}} = 75
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9e5c9d81dd3985a88094f8158c0f0267}{OTG\+\_\+\+HS\+\_\+\+WKUP\+\_\+\+IRQn}} = 76
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aad2d5e47d27fe3a02f7059b20bb729c0}{OTG\+\_\+\+HS\+\_\+\+IRQn}} = 77
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ace3c0fc2c4d05a7c02e3c987da5bc8e8}{DCMI\+\_\+\+IRQn}} = 78
+, \newline
+\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a70c9645bf48ca539510cc8f7d974f017}{CRYP\+\_\+\+IRQn}} = 79
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a86a161642b54055f9bbea3937e6352de}{HASH\+\_\+\+RNG\+\_\+\+IRQn}} = 80
+, \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa6b8ff01b016a798c6e639728c179e4f}{FPU\+\_\+\+IRQn}} = 81
+ \}
+\begin{DoxyCompactList}\small\item\em IRQ numbers for Cortex-\/\+M4 and STM32\+F4 specific interrupts. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int8\+\_\+t \mbox{\hyperlink{interrupt_8h_af5a39d871f4e853eeb1c18aec31bb9c2}{hal\+\_\+enable\+\_\+interrupt}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Enable a specific interrupt. \end{DoxyCompactList}\item 
+int8\+\_\+t \mbox{\hyperlink{interrupt_8h_acee16c5665334d7c548ed969f3b2d874}{hal\+\_\+disable\+\_\+interrupt}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Disable a specific interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_a258112bcdeb4fada66d8adc357c6eb5d}{hal\+\_\+clear\+\_\+interrupt\+\_\+flag}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Clear the pending flag for an interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca}{hal\+\_\+interrupt\+\_\+attach\+\_\+callback}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt, void(\texorpdfstring{$\ast$}{*}callback)(void))
+\begin{DoxyCompactList}\small\item\em Attach a callback function to an interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_ac066d5830d23093468acb3a714ead9c5}{hal\+\_\+interrupt\+\_\+detach\+\_\+callback}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Detach a callback function from an interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_ae6e7c5068b926209dbd3e94d42ec3ea2}{hal\+\_\+handle\+\_\+interrupt}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Central interrupt handler function. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_ad1fc0820aaa8ab23baa842489b92285f}{hal\+\_\+set\+\_\+interrupt\+\_\+priority}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt, uint8\+\_\+t priority)
+\begin{DoxyCompactList}\small\item\em Set priority for a specific interrupt. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369}{hal\+\_\+get\+\_\+interrupt\+\_\+priority}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Get priority for a specific interrupt. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb}{hal\+\_\+is\+\_\+interrupt\+\_\+pending}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Check if an interrupt is pending. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5}{hal\+\_\+enable\+\_\+global\+\_\+interrupts}} (uint32\+\_\+t state)
+\begin{DoxyCompactList}\small\item\em Enable global interrupts. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{interrupt_8h_a598755bfca19d040a2e7f9daf5e5f373}{hal\+\_\+disable\+\_\+global\+\_\+interrupts}} (void)
+\begin{DoxyCompactList}\small\item\em Disable global interrupts. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_abadf71a2fdecd688f09853aadde4837e}{hal\+\_\+clear\+\_\+all\+\_\+pending\+\_\+interrupts}} (void)
+\begin{DoxyCompactList}\small\item\em Clear all pending interrupts. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32\+F4. 
+
+This header provides\+:
+\begin{DoxyItemize}
+\item NVIC register mapping for the Cortex-\/\+M4 interrupt controller.
+\item Enumeration of all Cortex-\/\+M4 and STM32\+F4-\/specific IRQ numbers.
+\item HAL functions to enable/disable interrupts, set priorities, attach/detach callbacks, and query pending/active interrupt status.
+\end{DoxyItemize}
+
+The definitions are tailored for the STM32\+F4 series but are based on the ARM Cortex-\/\+M4 NVIC architecture. All register mappings match the reference manual. 
+
+\label{doc-define-members}
+\Hypertarget{interrupt_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{interrupt_8h_ac8e97e8ce56ae9f57da1363a937f8a17}\index{interrupt.h@{interrupt.h}!NVIC@{NVIC}}
+\index{NVIC@{NVIC}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{NVIC}{NVIC}}
+{\footnotesize\ttfamily \label{interrupt_8h_ac8e97e8ce56ae9f57da1363a937f8a17} 
+\#define NVIC~((\mbox{\hyperlink{struct_n_v_i_c___typedef}{NVIC\+\_\+\+Typedef}} \texorpdfstring{$\ast$}{*})\mbox{\hyperlink{interrupt_8h_a425ec323753362f97c4b9ad5d31ad2c9}{NVIC\+\_\+\+BASE\+\_\+\+ADDR}})}
+
+
+
+NVIC register access macro. 
+
+\Hypertarget{interrupt_8h_a425ec323753362f97c4b9ad5d31ad2c9}\index{interrupt.h@{interrupt.h}!NVIC\_BASE\_ADDR@{NVIC\_BASE\_ADDR}}
+\index{NVIC\_BASE\_ADDR@{NVIC\_BASE\_ADDR}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{NVIC\_BASE\_ADDR}{NVIC\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{interrupt_8h_a425ec323753362f97c4b9ad5d31ad2c9} 
+\#define NVIC\+\_\+\+BASE\+\_\+\+ADDR~0x\+E000\+E100\+UL}
+
+
+
+Base address of the NVIC registers. 
+
+
+
+\label{doc-enum-members}
+\Hypertarget{interrupt_8h_doc-enum-members}
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}\index{interrupt.h@{interrupt.h}!IRQn\_Type@{IRQn\_Type}}
+\index{IRQn\_Type@{IRQn\_Type}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{IRQn\_Type}{IRQn\_Type}}
+{\footnotesize\ttfamily \label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8} 
+enum \mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}
+
+
+
+IRQ numbers for Cortex-\/\+M4 and STM32\+F4 specific interrupts. 
+
+Negative values represent Cortex-\/\+M4 core exceptions. Zero and positive values represent STM32\+F4 peripheral interrupts. \begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NonMaskableInt\_IRQn@{NonMaskableInt\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!NonMaskableInt\_IRQn@{NonMaskableInt\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ade177d9c70c89e084093024b932a4e30}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ade177d9c70c89e084093024b932a4e30} 
+Non\+Maskable\+Int\+\_\+\+IRQn&2 Non Maskable Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HardFault\_IRQn@{HardFault\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!HardFault\_IRQn@{HardFault\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab1a222a34a32f0ef5ac65e714efc1f85}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab1a222a34a32f0ef5ac65e714efc1f85} 
+Hard\+Fault\+\_\+\+IRQn&3 Hard Fault Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MemoryManagement\_IRQn@{MemoryManagement\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!MemoryManagement\_IRQn@{MemoryManagement\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a33ff1cf7098de65d61b6354fee6cd5aa}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a33ff1cf7098de65d61b6354fee6cd5aa} 
+Memory\+Management\+\_\+\+IRQn&4 Memory Management Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BusFault\_IRQn@{BusFault\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!BusFault\_IRQn@{BusFault\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8693500eff174f16119e96234fee73af}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8693500eff174f16119e96234fee73af} 
+Bus\+Fault\+\_\+\+IRQn&5 Bus Fault Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UsageFault\_IRQn@{UsageFault\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!UsageFault\_IRQn@{UsageFault\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6895237c9443601ac832efa635dd8bbf}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6895237c9443601ac832efa635dd8bbf} 
+Usage\+Fault\+\_\+\+IRQn&6 Usage Fault Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SVCall\_IRQn@{SVCall\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!SVCall\_IRQn@{SVCall\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4ce820b3cc6cf3a796b41aadc0cf1237}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4ce820b3cc6cf3a796b41aadc0cf1237} 
+SVCall\+\_\+\+IRQn&11 SV Call Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DebugMonitor\_IRQn@{DebugMonitor\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DebugMonitor\_IRQn@{DebugMonitor\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8e033fcef7aed98a31c60a7de206722c}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8e033fcef7aed98a31c60a7de206722c} 
+Debug\+Monitor\+\_\+\+IRQn&12 Debug Monitor Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PendSV\_IRQn@{PendSV\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!PendSV\_IRQn@{PendSV\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a03c3cc89984928816d81793fc7bce4a2}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a03c3cc89984928816d81793fc7bce4a2} 
+Pend\+SV\+\_\+\+IRQn&14 Pend SV Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SysTick\_IRQn@{SysTick\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!SysTick\_IRQn@{SysTick\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6dbff8f8543325f3474cbae2446776e7}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6dbff8f8543325f3474cbae2446776e7} 
+Sys\+Tick\+\_\+\+IRQn&15 System Tick Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{WWDG\_IRQn@{WWDG\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!WWDG\_IRQn@{WWDG\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a971089d7566ef902dfa0c80ac3a8fd52}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a971089d7566ef902dfa0c80ac3a8fd52} 
+WWDG\+\_\+\+IRQn&Window Watchdog Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PVD\_IRQn@{PVD\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!PVD\_IRQn@{PVD\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab0b51ffcc4dcf5661141b79c8e5bd924}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab0b51ffcc4dcf5661141b79c8e5bd924} 
+PVD\+\_\+\+IRQn&PVD through EXTI Line detection Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TAMP\_STAMP\_IRQn@{TAMP\_STAMP\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TAMP\_STAMP\_IRQn@{TAMP\_STAMP\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac127cca7ae48bcf93924209f04e5e5a1}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac127cca7ae48bcf93924209f04e5e5a1} 
+TAMP\+\_\+\+STAMP\+\_\+\+IRQn&Tamper and Time\+Stamp interrupts \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RTC\_WKUP\_IRQn@{RTC\_WKUP\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!RTC\_WKUP\_IRQn@{RTC\_WKUP\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a173ccc3f31df1f7e43de2ddeab3d1777}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a173ccc3f31df1f7e43de2ddeab3d1777} 
+RTC\+\_\+\+WKUP\+\_\+\+IRQn&RTC Wakeup interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FLASH\_IRQn@{FLASH\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!FLASH\_IRQn@{FLASH\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a91b73963ce243a1d031576d49e137fab}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a91b73963ce243a1d031576d49e137fab} 
+FLASH\+\_\+\+IRQn&FLASH global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RCC\_IRQn@{RCC\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!RCC\_IRQn@{RCC\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a5710b22392997bac63daa5c999730f77}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a5710b22392997bac63daa5c999730f77} 
+RCC\+\_\+\+IRQn&RCC global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXTI0\_IRQn@{EXTI0\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!EXTI0\_IRQn@{EXTI0\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab6aa6f87d26bbc6cf99b067b8d75c2f7}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab6aa6f87d26bbc6cf99b067b8d75c2f7} 
+EXTI0\+\_\+\+IRQn&EXTI Line0 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXTI1\_IRQn@{EXTI1\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!EXTI1\_IRQn@{EXTI1\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae4badcdecdb94eb10129c4c0577c5e19}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae4badcdecdb94eb10129c4c0577c5e19} 
+EXTI1\+\_\+\+IRQn&EXTI Line1 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXTI2\_IRQn@{EXTI2\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!EXTI2\_IRQn@{EXTI2\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a082cb3f7839069a0715fd76c7eacbbc9}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a082cb3f7839069a0715fd76c7eacbbc9} 
+EXTI2\+\_\+\+IRQn&EXTI Line2 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXTI3\_IRQn@{EXTI3\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!EXTI3\_IRQn@{EXTI3\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8add889c84ba5de466ced209069e05d602}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8add889c84ba5de466ced209069e05d602} 
+EXTI3\+\_\+\+IRQn&EXTI Line3 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXTI4\_IRQn@{EXTI4\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!EXTI4\_IRQn@{EXTI4\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab70a40106ca4486770df5d2072d9ac0e}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab70a40106ca4486770df5d2072d9ac0e} 
+EXTI4\+\_\+\+IRQn&EXTI Line4 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA1\_Stream0\_IRQn@{DMA1\_Stream0\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA1\_Stream0\_IRQn@{DMA1\_Stream0\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9ee33e72512c4cfb301b216f4fb9d68c}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9ee33e72512c4cfb301b216f4fb9d68c} 
+DMA1\+\_\+\+Stream0\+\_\+\+IRQn&DMA1 Stream 0 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA1\_Stream1\_IRQn@{DMA1\_Stream1\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA1\_Stream1\_IRQn@{DMA1\_Stream1\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa45ca2c955060e2c2a7cbbe1d6753285}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa45ca2c955060e2c2a7cbbe1d6753285} 
+DMA1\+\_\+\+Stream1\+\_\+\+IRQn&DMA1 Stream 1 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA1\_Stream2\_IRQn@{DMA1\_Stream2\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA1\_Stream2\_IRQn@{DMA1\_Stream2\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0d9ec75e4478e70235b705d5a6b3efd8}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0d9ec75e4478e70235b705d5a6b3efd8} 
+DMA1\+\_\+\+Stream2\+\_\+\+IRQn&DMA1 Stream 2 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA1\_Stream3\_IRQn@{DMA1\_Stream3\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA1\_Stream3\_IRQn@{DMA1\_Stream3\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af77770e080206a7558decf09344fb2e2}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af77770e080206a7558decf09344fb2e2} 
+DMA1\+\_\+\+Stream3\+\_\+\+IRQn&DMA1 Stream 3 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA1\_Stream4\_IRQn@{DMA1\_Stream4\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA1\_Stream4\_IRQn@{DMA1\_Stream4\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aee2aaf365c6c297a63cee41ecae2301a}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aee2aaf365c6c297a63cee41ecae2301a} 
+DMA1\+\_\+\+Stream4\+\_\+\+IRQn&DMA1 Stream 4 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA1\_Stream5\_IRQn@{DMA1\_Stream5\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA1\_Stream5\_IRQn@{DMA1\_Stream5\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac92efa72399fe58fa615d8bf8fd64a4e}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac92efa72399fe58fa615d8bf8fd64a4e} 
+DMA1\+\_\+\+Stream5\+\_\+\+IRQn&DMA1 Stream 5 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA1\_Stream6\_IRQn@{DMA1\_Stream6\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA1\_Stream6\_IRQn@{DMA1\_Stream6\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aef5e2b68f62f6f1781fab894f0b8f486}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aef5e2b68f62f6f1781fab894f0b8f486} 
+DMA1\+\_\+\+Stream6\+\_\+\+IRQn&DMA1 Stream 6 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ADC\_IRQn@{ADC\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!ADC\_IRQn@{ADC\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4d69175258ae261dd545001e810421b3}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4d69175258ae261dd545001e810421b3} 
+ADC\+\_\+\+IRQn&ADC1, ADC2 and ADC3 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CAN1\_TX\_IRQn@{CAN1\_TX\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!CAN1\_TX\_IRQn@{CAN1\_TX\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9ceb5175f7c10cf436955173c2246877}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9ceb5175f7c10cf436955173c2246877} 
+CAN1\+\_\+\+TX\+\_\+\+IRQn&CAN1 TX Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CAN1\_RX0\_IRQn@{CAN1\_RX0\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!CAN1\_RX0\_IRQn@{CAN1\_RX0\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab6bf73ac43a9856b3f2759a59f3d25b5}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab6bf73ac43a9856b3f2759a59f3d25b5} 
+CAN1\+\_\+\+RX0\+\_\+\+IRQn&CAN1 RX0 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CAN1\_RX1\_IRQn@{CAN1\_RX1\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!CAN1\_RX1\_IRQn@{CAN1\_RX1\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af71ef06c4f9ff0e1691c21ff3670acd4}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af71ef06c4f9ff0e1691c21ff3670acd4} 
+CAN1\+\_\+\+RX1\+\_\+\+IRQn&CAN1 RX1 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CAN1\_SCE\_IRQn@{CAN1\_SCE\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!CAN1\_SCE\_IRQn@{CAN1\_SCE\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0f5f129d88a5606a378811e43039e274}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0f5f129d88a5606a378811e43039e274} 
+CAN1\+\_\+\+SCE\+\_\+\+IRQn&CAN1 SCE Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXTI9\_5\_IRQn@{EXTI9\_5\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!EXTI9\_5\_IRQn@{EXTI9\_5\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa3aa50e0353871985facf62d055faa52}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa3aa50e0353871985facf62d055faa52} 
+EXTI9\+\_\+5\+\_\+\+IRQn&External Line\mbox{[}9\+:5\mbox{]} Interrupts \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM1\_BRK\_TIM9\_IRQn@{TIM1\_BRK\_TIM9\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM1\_BRK\_TIM9\_IRQn@{TIM1\_BRK\_TIM9\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab35b4ce63cfb11453f84a3695c6df368}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab35b4ce63cfb11453f84a3695c6df368} 
+TIM1\+\_\+\+BRK\+\_\+\+TIM9\+\_\+\+IRQn&TIM1 Break and TIM9 Interrupts \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM1\_UP\_TIM10\_IRQn@{TIM1\_UP\_TIM10\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM1\_UP\_TIM10\_IRQn@{TIM1\_UP\_TIM10\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa3879e49013035601e17f83a51e0829f}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa3879e49013035601e17f83a51e0829f} 
+TIM1\+\_\+\+UP\+\_\+\+TIM10\+\_\+\+IRQn&TIM1 Update and TIM10 Interrupts \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM1\_TRG\_COM\_TIM11\_IRQn@{TIM1\_TRG\_COM\_TIM11\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM1\_TRG\_COM\_TIM11\_IRQn@{TIM1\_TRG\_COM\_TIM11\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab1a744bdceb8eface6ff57dd036e608e}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab1a744bdceb8eface6ff57dd036e608e} 
+TIM1\+\_\+\+TRG\+\_\+\+COM\+\_\+\+TIM11\+\_\+\+IRQn&TIM1 Trigger and Commutation + TIM11 Interrupts \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM1\_CC\_IRQn@{TIM1\_CC\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM1\_CC\_IRQn@{TIM1\_CC\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af312f0a21f600f9b286427e50c549ca9}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af312f0a21f600f9b286427e50c549ca9} 
+TIM1\+\_\+\+CC\+\_\+\+IRQn&TIM1 Capture Compare Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM2\_IRQn@{TIM2\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM2\_IRQn@{TIM2\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3a4e2095a926e4095d3c846eb1c98afa}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3a4e2095a926e4095d3c846eb1c98afa} 
+TIM2\+\_\+\+IRQn&TIM2 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM3\_IRQn@{TIM3\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM3\_IRQn@{TIM3\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a985574288f66e2a00e97387424a9a2d8}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a985574288f66e2a00e97387424a9a2d8} 
+TIM3\+\_\+\+IRQn&TIM3 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM4\_IRQn@{TIM4\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM4\_IRQn@{TIM4\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a368b899ca740b9ae0d75841f3abf68c4}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a368b899ca740b9ae0d75841f3abf68c4} 
+TIM4\+\_\+\+IRQn&TIM4 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{I2C1\_EV\_IRQn@{I2C1\_EV\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!I2C1\_EV\_IRQn@{I2C1\_EV\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9852dbbe8c014e716ce7e03a7b809751}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9852dbbe8c014e716ce7e03a7b809751} 
+I2\+C1\+\_\+\+EV\+\_\+\+IRQn&I2\+C1 event interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{I2C1\_ER\_IRQn@{I2C1\_ER\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!I2C1\_ER\_IRQn@{I2C1\_ER\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a2ec363869f4488782dc10a60abce3b34}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a2ec363869f4488782dc10a60abce3b34} 
+I2\+C1\+\_\+\+ER\+\_\+\+IRQn&I2\+C1 error interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{I2C2\_EV\_IRQn@{I2C2\_EV\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!I2C2\_EV\_IRQn@{I2C2\_EV\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3020193786527c47d2e4d8c92ceee804}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3020193786527c47d2e4d8c92ceee804} 
+I2\+C2\+\_\+\+EV\+\_\+\+IRQn&I2\+C2 event interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{I2C2\_ER\_IRQn@{I2C2\_ER\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!I2C2\_ER\_IRQn@{I2C2\_ER\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a60c35f2d48d512bd6818bc9fef7053d7}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a60c35f2d48d512bd6818bc9fef7053d7} 
+I2\+C2\+\_\+\+ER\+\_\+\+IRQn&I2\+C2 error interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SPI1\_IRQn@{SPI1\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!SPI1\_IRQn@{SPI1\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aacdff1a9c42582ed663214cbe62c1174}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aacdff1a9c42582ed663214cbe62c1174} 
+SPI1\+\_\+\+IRQn&SPI1 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SPI2\_IRQn@{SPI2\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!SPI2\_IRQn@{SPI2\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a505fbd4ccf7c2a14c8b76dc9e58f7ede}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a505fbd4ccf7c2a14c8b76dc9e58f7ede} 
+SPI2\+\_\+\+IRQn&SPI2 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{USART1\_IRQn@{USART1\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!USART1\_IRQn@{USART1\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ad97cb163e1f678367e37c50d54d161ab}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ad97cb163e1f678367e37c50d54d161ab} 
+USART1\+\_\+\+IRQn&USART1 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{USART2\_IRQn@{USART2\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!USART2\_IRQn@{USART2\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3f9c48714d0e5baaba6613343f0da68e}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3f9c48714d0e5baaba6613343f0da68e} 
+USART2\+\_\+\+IRQn&USART2 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{USART3\_IRQn@{USART3\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!USART3\_IRQn@{USART3\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8afb13802afc1f5fdf5c90e73ee99e5ff3}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8afb13802afc1f5fdf5c90e73ee99e5ff3} 
+USART3\+\_\+\+IRQn&USART3 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EXTI15\_10\_IRQn@{EXTI15\_10\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!EXTI15\_10\_IRQn@{EXTI15\_10\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9fb0ad0c850234d1983fafdb17378e2f}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9fb0ad0c850234d1983fafdb17378e2f} 
+EXTI15\+\_\+10\+\_\+\+IRQn&External Line\mbox{[}15\+:10\mbox{]} Interrupts \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RTC\_Alarm\_IRQn@{RTC\_Alarm\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!RTC\_Alarm\_IRQn@{RTC\_Alarm\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8afe09d6563a21a1540f658163a76a3b37}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8afe09d6563a21a1540f658163a76a3b37} 
+RTC\+\_\+\+Alarm\+\_\+\+IRQn&RTC Alarm (A and B) through EXTI Line \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OTG\_FS\_WKUP\_IRQn@{OTG\_FS\_WKUP\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!OTG\_FS\_WKUP\_IRQn@{OTG\_FS\_WKUP\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa612f35c4440359c35acbaa3c1458c5f}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa612f35c4440359c35acbaa3c1458c5f} 
+OTG\+\_\+\+FS\+\_\+\+WKUP\+\_\+\+IRQn&USB OTG FS Wakeup through EXTI line \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM8\_BRK\_TIM12\_IRQn@{TIM8\_BRK\_TIM12\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM8\_BRK\_TIM12\_IRQn@{TIM8\_BRK\_TIM12\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3e01328006d19f7d32354271b9f61dce}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3e01328006d19f7d32354271b9f61dce} 
+TIM8\+\_\+\+BRK\+\_\+\+TIM12\+\_\+\+IRQn&TIM8 Break and TIM12 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM8\_UP\_TIM13\_IRQn@{TIM8\_UP\_TIM13\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM8\_UP\_TIM13\_IRQn@{TIM8\_UP\_TIM13\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa8d8f67a98f24de6f0b36ad6b1f29a7d}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa8d8f67a98f24de6f0b36ad6b1f29a7d} 
+TIM8\+\_\+\+UP\+\_\+\+TIM13\+\_\+\+IRQn&TIM8 Update and TIM13 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM8\_TRG\_COM\_TIM14\_IRQn@{TIM8\_TRG\_COM\_TIM14\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM8\_TRG\_COM\_TIM14\_IRQn@{TIM8\_TRG\_COM\_TIM14\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae252b31c3a341acbe9a467e243137307}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae252b31c3a341acbe9a467e243137307} 
+TIM8\+\_\+\+TRG\+\_\+\+COM\+\_\+\+TIM14\+\_\+\+IRQn&TIM8 Trigger and Commutation + TIM14 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM8\_CC\_IRQn@{TIM8\_CC\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM8\_CC\_IRQn@{TIM8\_CC\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a637750639eff4e2b4aae80ed6f3cf67f}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a637750639eff4e2b4aae80ed6f3cf67f} 
+TIM8\+\_\+\+CC\+\_\+\+IRQn&TIM8 Capture Compare Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA1\_Stream7\_IRQn@{DMA1\_Stream7\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA1\_Stream7\_IRQn@{DMA1\_Stream7\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aedaa9c14e7e5fa9c0dcbb0c2455546e8}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aedaa9c14e7e5fa9c0dcbb0c2455546e8} 
+DMA1\+\_\+\+Stream7\+\_\+\+IRQn&DMA1 Stream7 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FMC\_IRQn@{FMC\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!FMC\_IRQn@{FMC\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab58dc79a081058857f73965f5305479b}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab58dc79a081058857f73965f5305479b} 
+FMC\+\_\+\+IRQn&FMC global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SDIO\_IRQn@{SDIO\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!SDIO\_IRQn@{SDIO\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a16fe70a39348f3f27906dc268b5654e3}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a16fe70a39348f3f27906dc268b5654e3} 
+SDIO\+\_\+\+IRQn&SDIO global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM5\_IRQn@{TIM5\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM5\_IRQn@{TIM5\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aed2eb3f4bb721d55fcc1003125956645}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aed2eb3f4bb721d55fcc1003125956645} 
+TIM5\+\_\+\+IRQn&TIM5 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SPI3\_IRQn@{SPI3\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!SPI3\_IRQn@{SPI3\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4e9331739fb76a2ca7781fede070ae44}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4e9331739fb76a2ca7781fede070ae44} 
+SPI3\+\_\+\+IRQn&SPI3 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UART4\_IRQn@{UART4\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!UART4\_IRQn@{UART4\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aded5314b20c6e4e80cb6ab0668ffb8d5}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aded5314b20c6e4e80cb6ab0668ffb8d5} 
+UART4\+\_\+\+IRQn&UART4 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UART5\_IRQn@{UART5\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!UART5\_IRQn@{UART5\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac55a11a64aae7432544d0ab0d4f7de09}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac55a11a64aae7432544d0ab0d4f7de09} 
+UART5\+\_\+\+IRQn&UART5 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM6\_DAC\_IRQn@{TIM6\_DAC\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM6\_DAC\_IRQn@{TIM6\_DAC\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a5f581e9aedfaccd9b1db9ec793804b45}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a5f581e9aedfaccd9b1db9ec793804b45} 
+TIM6\+\_\+\+DAC\+\_\+\+IRQn&TIM6 global + DAC1\&2 underrun error interrupts \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TIM7\_IRQn@{TIM7\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!TIM7\_IRQn@{TIM7\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a53cadc1e164ec85d0ea4cd143608e8e1}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a53cadc1e164ec85d0ea4cd143608e8e1} 
+TIM7\+\_\+\+IRQn&TIM7 global interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA2\_Stream0\_IRQn@{DMA2\_Stream0\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA2\_Stream0\_IRQn@{DMA2\_Stream0\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a1e5055722630fd4b12aff421964c2ebb}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a1e5055722630fd4b12aff421964c2ebb} 
+DMA2\+\_\+\+Stream0\+\_\+\+IRQn&DMA2 Stream 0 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA2\_Stream1\_IRQn@{DMA2\_Stream1\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA2\_Stream1\_IRQn@{DMA2\_Stream1\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a98abb3f02c1feb3831706bc1b82307cb}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a98abb3f02c1feb3831706bc1b82307cb} 
+DMA2\+\_\+\+Stream1\+\_\+\+IRQn&DMA2 Stream 1 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA2\_Stream2\_IRQn@{DMA2\_Stream2\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA2\_Stream2\_IRQn@{DMA2\_Stream2\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8abf5e189f3ac7aad9f65e65ea5a0f3b36}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8abf5e189f3ac7aad9f65e65ea5a0f3b36} 
+DMA2\+\_\+\+Stream2\+\_\+\+IRQn&DMA2 Stream 2 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA2\_Stream3\_IRQn@{DMA2\_Stream3\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA2\_Stream3\_IRQn@{DMA2\_Stream3\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3ff8f3439f509e6e985eb960e63e1be4}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3ff8f3439f509e6e985eb960e63e1be4} 
+DMA2\+\_\+\+Stream3\+\_\+\+IRQn&DMA2 Stream 3 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA2\_Stream4\_IRQn@{DMA2\_Stream4\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA2\_Stream4\_IRQn@{DMA2\_Stream4\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae54eb8b30273b38a0576f75aba24eec0}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae54eb8b30273b38a0576f75aba24eec0} 
+DMA2\+\_\+\+Stream4\+\_\+\+IRQn&DMA2 Stream 4 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ETH\_IRQn@{ETH\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!ETH\_IRQn@{ETH\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ad71328dd95461b7c55b568cf25966f6a}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ad71328dd95461b7c55b568cf25966f6a} 
+ETH\+\_\+\+IRQn&Ethernet global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ETH\_WKUP\_IRQn@{ETH\_WKUP\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!ETH\_WKUP\_IRQn@{ETH\_WKUP\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0485578005e12c2e2c0fb253a844ec6f}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0485578005e12c2e2c0fb253a844ec6f} 
+ETH\+\_\+\+WKUP\+\_\+\+IRQn&Ethernet Wakeup through EXTI line \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CAN2\_TX\_IRQn@{CAN2\_TX\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!CAN2\_TX\_IRQn@{CAN2\_TX\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af6b8fbc990ac71c8425647bb684788a4}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8af6b8fbc990ac71c8425647bb684788a4} 
+CAN2\+\_\+\+TX\+\_\+\+IRQn&CAN2 TX Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CAN2\_RX0\_IRQn@{CAN2\_RX0\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!CAN2\_RX0\_IRQn@{CAN2\_RX0\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a851fd2f2ab1418710e7da80e1bdf348a}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a851fd2f2ab1418710e7da80e1bdf348a} 
+CAN2\+\_\+\+RX0\+\_\+\+IRQn&CAN2 RX0 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CAN2\_RX1\_IRQn@{CAN2\_RX1\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!CAN2\_RX1\_IRQn@{CAN2\_RX1\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab5023ff845be31a488ab63a0b8cf2b7a}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab5023ff845be31a488ab63a0b8cf2b7a} 
+CAN2\+\_\+\+RX1\+\_\+\+IRQn&CAN2 RX1 Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CAN2\_SCE\_IRQn@{CAN2\_SCE\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!CAN2\_SCE\_IRQn@{CAN2\_SCE\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a56c0b5758f26f31494e74aab9273f9fd}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a56c0b5758f26f31494e74aab9273f9fd} 
+CAN2\+\_\+\+SCE\+\_\+\+IRQn&CAN2 SCE Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OTG\_FS\_IRQn@{OTG\_FS\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!OTG\_FS\_IRQn@{OTG\_FS\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa60a30b7ef03446a46fd72e084911f7e}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa60a30b7ef03446a46fd72e084911f7e} 
+OTG\+\_\+\+FS\+\_\+\+IRQn&USB OTG FS global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA2\_Stream5\_IRQn@{DMA2\_Stream5\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA2\_Stream5\_IRQn@{DMA2\_Stream5\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a933d4686213973abc01845a3da1c8a03}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a933d4686213973abc01845a3da1c8a03} 
+DMA2\+\_\+\+Stream5\+\_\+\+IRQn&DMA2 Stream 5 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA2\_Stream6\_IRQn@{DMA2\_Stream6\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA2\_Stream6\_IRQn@{DMA2\_Stream6\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a21570761ad0b5ed751adc831691b7800}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a21570761ad0b5ed751adc831691b7800} 
+DMA2\+\_\+\+Stream6\+\_\+\+IRQn&DMA2 Stream 6 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DMA2\_Stream7\_IRQn@{DMA2\_Stream7\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DMA2\_Stream7\_IRQn@{DMA2\_Stream7\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3d4cc0cd9b4d71e7ee002c4f8c1f8a77}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3d4cc0cd9b4d71e7ee002c4f8c1f8a77} 
+DMA2\+\_\+\+Stream7\+\_\+\+IRQn&DMA2 Stream 7 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{USART6\_IRQn@{USART6\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!USART6\_IRQn@{USART6\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa92bcb2bc3a87be869f05c5b07f04b8c}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa92bcb2bc3a87be869f05c5b07f04b8c} 
+USART6\+\_\+\+IRQn&USART6 global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{I2C3\_EV\_IRQn@{I2C3\_EV\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!I2C3\_EV\_IRQn@{I2C3\_EV\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8326db2d570cb865ffa1d49fa29d562a}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8326db2d570cb865ffa1d49fa29d562a} 
+I2\+C3\+\_\+\+EV\+\_\+\+IRQn&I2\+C3 event Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{I2C3\_ER\_IRQn@{I2C3\_ER\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!I2C3\_ER\_IRQn@{I2C3\_ER\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6e954232d164a6942ebc7a6bd6f7736e}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6e954232d164a6942ebc7a6bd6f7736e} 
+I2\+C3\+\_\+\+ER\+\_\+\+IRQn&I2\+C3 error Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OTG\_HS\_EP1\_OUT\_IRQn@{OTG\_HS\_EP1\_OUT\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!OTG\_HS\_EP1\_OUT\_IRQn@{OTG\_HS\_EP1\_OUT\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a60b6cc4b6dbeca39e29a475d26c9e080}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a60b6cc4b6dbeca39e29a475d26c9e080} 
+OTG\+\_\+\+HS\+\_\+\+EP1\+\_\+\+OUT\+\_\+\+IRQn&USB OTG HS Endpoint 1 Out Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OTG\_HS\_EP1\_IN\_IRQn@{OTG\_HS\_EP1\_IN\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!OTG\_HS\_EP1\_IN\_IRQn@{OTG\_HS\_EP1\_IN\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a1b040a7f76278a73cf5ea4c51f1be047}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a1b040a7f76278a73cf5ea4c51f1be047} 
+OTG\+\_\+\+HS\+\_\+\+EP1\+\_\+\+IN\+\_\+\+IRQn&USB OTG HS Endpoint 1 In Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OTG\_HS\_WKUP\_IRQn@{OTG\_HS\_WKUP\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!OTG\_HS\_WKUP\_IRQn@{OTG\_HS\_WKUP\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9e5c9d81dd3985a88094f8158c0f0267}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9e5c9d81dd3985a88094f8158c0f0267} 
+OTG\+\_\+\+HS\+\_\+\+WKUP\+\_\+\+IRQn&USB OTG HS Wakeup through EXTI Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{OTG\_HS\_IRQn@{OTG\_HS\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!OTG\_HS\_IRQn@{OTG\_HS\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aad2d5e47d27fe3a02f7059b20bb729c0}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aad2d5e47d27fe3a02f7059b20bb729c0} 
+OTG\+\_\+\+HS\+\_\+\+IRQn&USB OTG HS global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DCMI\_IRQn@{DCMI\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!DCMI\_IRQn@{DCMI\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ace3c0fc2c4d05a7c02e3c987da5bc8e8}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8ace3c0fc2c4d05a7c02e3c987da5bc8e8} 
+DCMI\+\_\+\+IRQn&DCMI global Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CRYP\_IRQn@{CRYP\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!CRYP\_IRQn@{CRYP\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a70c9645bf48ca539510cc8f7d974f017}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a70c9645bf48ca539510cc8f7d974f017} 
+CRYP\+\_\+\+IRQn&Cryptographic Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HASH\_RNG\_IRQn@{HASH\_RNG\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!HASH\_RNG\_IRQn@{HASH\_RNG\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a86a161642b54055f9bbea3937e6352de}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8a86a161642b54055f9bbea3937e6352de} 
+HASH\+\_\+\+RNG\+\_\+\+IRQn&Hash and RNG Interrupt \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FPU\_IRQn@{FPU\_IRQn}!interrupt.h@{interrupt.h}}\index{interrupt.h@{interrupt.h}!FPU\_IRQn@{FPU\_IRQn}}}\Hypertarget{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa6b8ff01b016a798c6e639728c179e4f}\label{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa6b8ff01b016a798c6e639728c179e4f} 
+FPU\+\_\+\+IRQn&Floating Point Unit Interrupt \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\label{doc-func-members}
+\Hypertarget{interrupt_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{interrupt_8h_abadf71a2fdecd688f09853aadde4837e}\index{interrupt.h@{interrupt.h}!hal\_clear\_all\_pending\_interrupts@{hal\_clear\_all\_pending\_interrupts}}
+\index{hal\_clear\_all\_pending\_interrupts@{hal\_clear\_all\_pending\_interrupts}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clear\_all\_pending\_interrupts()}{hal\_clear\_all\_pending\_interrupts()}}
+{\footnotesize\ttfamily \label{interrupt_8h_abadf71a2fdecd688f09853aadde4837e} 
+void hal\+\_\+clear\+\_\+all\+\_\+pending\+\_\+interrupts (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Clear all pending interrupts. 
+
+\begin{DoxyNote}{Note}
+\mbox{[}TODO\mbox{]} Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_a258112bcdeb4fada66d8adc357c6eb5d}\index{interrupt.h@{interrupt.h}!hal\_clear\_interrupt\_flag@{hal\_clear\_interrupt\_flag}}
+\index{hal\_clear\_interrupt\_flag@{hal\_clear\_interrupt\_flag}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clear\_interrupt\_flag()}{hal\_clear\_interrupt\_flag()}}
+{\footnotesize\ttfamily \label{interrupt_8h_a258112bcdeb4fada66d8adc357c6eb5d} 
+void hal\+\_\+clear\+\_\+interrupt\+\_\+flag (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Clear the pending flag for an interrupt. 
+
+\begin{DoxyNote}{Note}
+\mbox{[}TODO\mbox{]} Implementation specific to STM32\+F4 pending flags. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_a598755bfca19d040a2e7f9daf5e5f373}\index{interrupt.h@{interrupt.h}!hal\_disable\_global\_interrupts@{hal\_disable\_global\_interrupts}}
+\index{hal\_disable\_global\_interrupts@{hal\_disable\_global\_interrupts}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_disable\_global\_interrupts()}{hal\_disable\_global\_interrupts()}}
+{\footnotesize\ttfamily \label{interrupt_8h_a598755bfca19d040a2e7f9daf5e5f373} 
+uint32\+\_\+t hal\+\_\+disable\+\_\+global\+\_\+interrupts (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Disable global interrupts. 
+
+\begin{DoxyReturn}{Returns}
+Previous interrupt state. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+\mbox{[}TODO\mbox{]} Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_acee16c5665334d7c548ed969f3b2d874}\index{interrupt.h@{interrupt.h}!hal\_disable\_interrupt@{hal\_disable\_interrupt}}
+\index{hal\_disable\_interrupt@{hal\_disable\_interrupt}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_disable\_interrupt()}{hal\_disable\_interrupt()}}
+{\footnotesize\ttfamily \label{interrupt_8h_acee16c5665334d7c548ed969f3b2d874} 
+int8\+\_\+t hal\+\_\+disable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Disable a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number to disable. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, -\/1 on failure. 
+\end{DoxyReturn}
+\Hypertarget{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5}\index{interrupt.h@{interrupt.h}!hal\_enable\_global\_interrupts@{hal\_enable\_global\_interrupts}}
+\index{hal\_enable\_global\_interrupts@{hal\_enable\_global\_interrupts}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_enable\_global\_interrupts()}{hal\_enable\_global\_interrupts()}}
+{\footnotesize\ttfamily \label{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5} 
+void hal\+\_\+enable\+\_\+global\+\_\+interrupts (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Enable global interrupts. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em state} & Optional state flag. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+\mbox{[}TODO\mbox{]} Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_af5a39d871f4e853eeb1c18aec31bb9c2}\index{interrupt.h@{interrupt.h}!hal\_enable\_interrupt@{hal\_enable\_interrupt}}
+\index{hal\_enable\_interrupt@{hal\_enable\_interrupt}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_enable\_interrupt()}{hal\_enable\_interrupt()}}
+{\footnotesize\ttfamily \label{interrupt_8h_af5a39d871f4e853eeb1c18aec31bb9c2} 
+int8\+\_\+t hal\+\_\+enable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Enable a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number to enable. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 on success, -\/1 on failure. 
+\end{DoxyReturn}
+\Hypertarget{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369}\index{interrupt.h@{interrupt.h}!hal\_get\_interrupt\_priority@{hal\_get\_interrupt\_priority}}
+\index{hal\_get\_interrupt\_priority@{hal\_get\_interrupt\_priority}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_get\_interrupt\_priority()}{hal\_get\_interrupt\_priority()}}
+{\footnotesize\ttfamily \label{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369} 
+uint8\+\_\+t hal\+\_\+get\+\_\+interrupt\+\_\+priority (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Get priority for a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Priority value. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+\mbox{[}TODO\mbox{]} Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_ae6e7c5068b926209dbd3e94d42ec3ea2}\index{interrupt.h@{interrupt.h}!hal\_handle\_interrupt@{hal\_handle\_interrupt}}
+\index{hal\_handle\_interrupt@{hal\_handle\_interrupt}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_handle\_interrupt()}{hal\_handle\_interrupt()}}
+{\footnotesize\ttfamily \label{interrupt_8h_ae6e7c5068b926209dbd3e94d42ec3ea2} 
+void hal\+\_\+handle\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Central interrupt handler function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number that occurred. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca}\index{interrupt.h@{interrupt.h}!hal\_interrupt\_attach\_callback@{hal\_interrupt\_attach\_callback}}
+\index{hal\_interrupt\_attach\_callback@{hal\_interrupt\_attach\_callback}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_interrupt\_attach\_callback()}{hal\_interrupt\_attach\_callback()}}
+{\footnotesize\ttfamily \label{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca} 
+void hal\+\_\+interrupt\+\_\+attach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{callback~}{)(void)}\end{DoxyParamCaption})}
+
+
+
+Attach a callback function to an interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+{\em callback} & Pointer to the callback function. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{interrupt_8h_ac066d5830d23093468acb3a714ead9c5}\index{interrupt.h@{interrupt.h}!hal\_interrupt\_detach\_callback@{hal\_interrupt\_detach\_callback}}
+\index{hal\_interrupt\_detach\_callback@{hal\_interrupt\_detach\_callback}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_interrupt\_detach\_callback()}{hal\_interrupt\_detach\_callback()}}
+{\footnotesize\ttfamily \label{interrupt_8h_ac066d5830d23093468acb3a714ead9c5} 
+void hal\+\_\+interrupt\+\_\+detach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Detach a callback function from an interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb}\index{interrupt.h@{interrupt.h}!hal\_is\_interrupt\_pending@{hal\_is\_interrupt\_pending}}
+\index{hal\_is\_interrupt\_pending@{hal\_is\_interrupt\_pending}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_is\_interrupt\_pending()}{hal\_is\_interrupt\_pending()}}
+{\footnotesize\ttfamily \label{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb} 
+int hal\+\_\+is\+\_\+interrupt\+\_\+pending (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Check if an interrupt is pending. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if pending, 0 if not. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+\mbox{[}TODO\mbox{]} Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_ad1fc0820aaa8ab23baa842489b92285f}\index{interrupt.h@{interrupt.h}!hal\_set\_interrupt\_priority@{hal\_set\_interrupt\_priority}}
+\index{hal\_set\_interrupt\_priority@{hal\_set\_interrupt\_priority}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_set\_interrupt\_priority()}{hal\_set\_interrupt\_priority()}}
+{\footnotesize\ttfamily \label{interrupt_8h_ad1fc0820aaa8ab23baa842489b92285f} 
+void hal\+\_\+set\+\_\+interrupt\+\_\+priority (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{, }\item[{uint8\+\_\+t}]{priority}{}\end{DoxyParamCaption})}
+
+
+
+Set priority for a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+{\em priority} & Priority value. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+\mbox{[}TODO\mbox{]} Implementation pending. 
+\end{DoxyNote}

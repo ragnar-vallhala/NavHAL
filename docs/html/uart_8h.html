@@ -108,7 +108,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>UART HAL implementation for Cortex-M4 (STM32F401RE).  
+<p>UART driver interface for STM32F4 (Cortex-M4).  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="types_8h_source.html">utils/types.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -145,44 +145,42 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:gaff2eef2dac8eee46420e54b78311428e" id="r_gaff2eef2dac8eee46420e54b78311428e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html#gaff2eef2dac8eee46420e54b78311428e">uart2_write</a>(val)</td></tr>
-<tr class="memitem:gaaca3ea66e1779ff991e98e1366159cde" id="r_gaaca3ea66e1779ff991e98e1366159cde"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html#gaaca3ea66e1779ff991e98e1366159cde">uart1_write</a>(val)</td></tr>
-<tr class="memitem:gaf0d663a2d8b4067c6aba42304b09b875" id="r_gaf0d663a2d8b4067c6aba42304b09b875"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html#gaf0d663a2d8b4067c6aba42304b09b875">uart6_write</a>(val)</td></tr>
-<tr class="memitem:ga9171f49478fa86d932f89e78e73b88b0" id="r_ga9171f49478fa86d932f89e78e73b88b0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a>&#160;&#160;&#160;0x40000000UL</td></tr>
-<tr class="memitem:ga811a9a4ca17f0a50354a9169541d56c4" id="r_ga811a9a4ca17f0a50354a9169541d56c4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga811a9a4ca17f0a50354a9169541d56c4">AHB1PERIPH_BASE</a>&#160;&#160;&#160;(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a> + 0x00020000UL)</td></tr>
-<tr class="memitem:ga45666d911f39addd4c8c0a0ac3388cfb" id="r_ga45666d911f39addd4c8c0a0ac3388cfb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga45666d911f39addd4c8c0a0ac3388cfb">APB1PERIPH_BASE</a>&#160;&#160;&#160;(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a> + 0x00000000UL)</td></tr>
-<tr class="memitem:ga25b99d6065f1c8f751e78f43ade652cb" id="r_ga25b99d6065f1c8f751e78f43ade652cb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga25b99d6065f1c8f751e78f43ade652cb">APB2PERIPH_BASE</a>&#160;&#160;&#160;(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a> + 0x7400)</td></tr>
-<tr class="memitem:ga0e681b03f364532055d88f63fec0d99d" id="r_ga0e681b03f364532055d88f63fec0d99d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga0e681b03f364532055d88f63fec0d99d">RCC_BASE</a>&#160;&#160;&#160;(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga811a9a4ca17f0a50354a9169541d56c4">AHB1PERIPH_BASE</a> + 0x3800)</td></tr>
-<tr class="memitem:gade83162a04bca0b15b39018a8e8ec090" id="r_gade83162a04bca0b15b39018a8e8ec090"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a>&#160;&#160;&#160;(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga45666d911f39addd4c8c0a0ac3388cfb">APB1PERIPH_BASE</a> + 0x4400)</td></tr>
-<tr class="memitem:ga86162ab3f740db9026c1320d46938b4d" id="r_ga86162ab3f740db9026c1320d46938b4d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga86162ab3f740db9026c1320d46938b4d">USART1_BASE</a>&#160;&#160;&#160;0x40011000</td></tr>
-<tr class="memitem:gade4d3907fd0387ee832f426f52d568bb" id="r_gade4d3907fd0387ee832f426f52d568bb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a>&#160;&#160;&#160;0x40011400</td></tr>
-<tr class="memitem:gad4baa1f26b04719fe3d4e2f02d7dde40" id="r_gad4baa1f26b04719fe3d4e2f02d7dde40"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gad4baa1f26b04719fe3d4e2f02d7dde40">RCC_APB1ENR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="timer_8h.html#a0e681b03f364532055d88f63fec0d99d">RCC_BASE</a> + 0x40))</td></tr>
-<tr class="memitem:ga6d4cd87f49d551c356fed82cbbddc5a4" id="r_ga6d4cd87f49d551c356fed82cbbddc5a4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga6d4cd87f49d551c356fed82cbbddc5a4">RCC_APB2ENR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="timer_8h.html#a0e681b03f364532055d88f63fec0d99d">RCC_BASE</a> + 0x44))</td></tr>
-<tr class="memitem:gaf390c83858b5d97469c8b328231f1e54" id="r_gaf390c83858b5d97469c8b328231f1e54"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gaf390c83858b5d97469c8b328231f1e54">USART2_SR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x00))</td></tr>
-<tr class="memitem:ga498acd0c07bdee6e3b19a4bddd5b4244" id="r_ga498acd0c07bdee6e3b19a4bddd5b4244"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga498acd0c07bdee6e3b19a4bddd5b4244">USART2_DR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x04))</td></tr>
-<tr class="memitem:gae5530ccff0818ee6c53e71f013f28b46" id="r_gae5530ccff0818ee6c53e71f013f28b46"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gae5530ccff0818ee6c53e71f013f28b46">USART2_BRR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x08))</td></tr>
-<tr class="memitem:ga685289c8590aa5257387ed4ba6460097" id="r_ga685289c8590aa5257387ed4ba6460097"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga685289c8590aa5257387ed4ba6460097">USART2_CR1</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x0C))</td></tr>
-<tr class="memitem:ga487db57656db6abc99b3e64f54096fd5" id="r_ga487db57656db6abc99b3e64f54096fd5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga487db57656db6abc99b3e64f54096fd5">USART1_SR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x00))</td></tr>
-<tr class="memitem:ga6909af146975c44b99e68e2491ae96a6" id="r_ga6909af146975c44b99e68e2491ae96a6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga6909af146975c44b99e68e2491ae96a6">USART1_DR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x04))</td></tr>
-<tr class="memitem:gaacb1e95db24ea6e6abdd0ca2737f4242" id="r_gaacb1e95db24ea6e6abdd0ca2737f4242"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gaacb1e95db24ea6e6abdd0ca2737f4242">USART1_BRR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x08))</td></tr>
-<tr class="memitem:gaa0889f12c0e570ac578c26f7ca7f300e" id="r_gaa0889f12c0e570ac578c26f7ca7f300e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gaa0889f12c0e570ac578c26f7ca7f300e">USART1_CR1</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x0C))</td></tr>
-<tr class="memitem:ga475701e7a1d2ca39768a19b0d3a00695" id="r_ga475701e7a1d2ca39768a19b0d3a00695"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga475701e7a1d2ca39768a19b0d3a00695">USART6_SR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x00))</td></tr>
-<tr class="memitem:gab08007a5a998177b3a423fc11c0daaf5" id="r_gab08007a5a998177b3a423fc11c0daaf5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gab08007a5a998177b3a423fc11c0daaf5">USART6_DR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x04))</td></tr>
-<tr class="memitem:ga0a4f781c389ce231e70343e359cb807e" id="r_ga0a4f781c389ce231e70343e359cb807e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga0a4f781c389ce231e70343e359cb807e">USART6_BRR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x08))</td></tr>
-<tr class="memitem:gabe070876f1daa7a63bda346a7c4d5ffa" id="r_gabe070876f1daa7a63bda346a7c4d5ffa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gabe070876f1daa7a63bda346a7c4d5ffa">USART6_CR1</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x0C))</td></tr>
-<tr class="memitem:gab840af4f735ec36419d61c7db3cfa00d" id="r_gab840af4f735ec36419d61c7db3cfa00d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gab840af4f735ec36419d61c7db3cfa00d">RCC_APB1ENR_USART2EN</a>&#160;&#160;&#160;(1 &lt;&lt; 17)</td></tr>
-<tr class="memitem:ga4666bb90842e8134b32e6a34a0f165f3" id="r_ga4666bb90842e8134b32e6a34a0f165f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga4666bb90842e8134b32e6a34a0f165f3">RCC_APB2ENR_USART1EN</a>&#160;&#160;&#160;(1 &lt;&lt; 4)</td></tr>
-<tr class="memitem:ga0569d91f3b18ae130b7a09e0100c4459" id="r_ga0569d91f3b18ae130b7a09e0100c4459"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga0569d91f3b18ae130b7a09e0100c4459">RCC_APB2ENR_USART6EN</a>&#160;&#160;&#160;(1 &lt;&lt; 5)</td></tr>
-<tr class="memitem:ga2bb650676aaae4a5203f372d497d5947" id="r_ga2bb650676aaae4a5203f372d497d5947"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga2bb650676aaae4a5203f372d497d5947">USART_CR1_UE</a>&#160;&#160;&#160;(1 &lt;&lt; 13)</td></tr>
-<tr class="memdesc:ga2bb650676aaae4a5203f372d497d5947"><td class="mdescLeft">&#160;</td><td class="mdescRight">USART Enable.  <br /></td></tr>
-<tr class="memitem:gade7f090b04fd78b755b43357ecaa9622" id="r_gade7f090b04fd78b755b43357ecaa9622"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gade7f090b04fd78b755b43357ecaa9622">USART_CR1_TE</a>&#160;&#160;&#160;(1 &lt;&lt; 3)</td></tr>
-<tr class="memdesc:gade7f090b04fd78b755b43357ecaa9622"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmitter Enable.  <br /></td></tr>
-<tr class="memitem:gada0d5d407a22264de847bc1b40a17aeb" id="r_gada0d5d407a22264de847bc1b40a17aeb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gada0d5d407a22264de847bc1b40a17aeb">USART_CR1_RE</a>&#160;&#160;&#160;(1 &lt;&lt; 2)</td></tr>
-<tr class="memdesc:gada0d5d407a22264de847bc1b40a17aeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Receiver Enable.  <br /></td></tr>
-<tr class="memitem:ga65e9cddf0890113d405342f1d8b5b980" id="r_ga65e9cddf0890113d405342f1d8b5b980"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#ga65e9cddf0890113d405342f1d8b5b980">USART_SR_TXE</a>&#160;&#160;&#160;(1 &lt;&lt; 7)</td></tr>
-<tr class="memdesc:ga65e9cddf0890113d405342f1d8b5b980"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit Data Register Empty.  <br /></td></tr>
-<tr class="memitem:gaa0c99e2bb265b3d58a91aca7a93f7836" id="r_gaa0c99e2bb265b3d58a91aca7a93f7836"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___r_e_g_i_s_t_e_r_s.html#gaa0c99e2bb265b3d58a91aca7a93f7836">USART_SR_RXNE</a>&#160;&#160;&#160;(1 &lt;&lt; 5)</td></tr>
-<tr class="memdesc:gaa0c99e2bb265b3d58a91aca7a93f7836"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Data Register Not Empty.  <br /></td></tr>
+<tr class="memitem:aff2eef2dac8eee46420e54b78311428e" id="r_aff2eef2dac8eee46420e54b78311428e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff2eef2dac8eee46420e54b78311428e">uart2_write</a>(val)</td></tr>
+<tr class="memdesc:aff2eef2dac8eee46420e54b78311428e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Macro for writing various data types to UART2.  <br /></td></tr>
+<tr class="memitem:aaca3ea66e1779ff991e98e1366159cde" id="r_aaca3ea66e1779ff991e98e1366159cde"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaca3ea66e1779ff991e98e1366159cde">uart1_write</a>(val)</td></tr>
+<tr class="memdesc:aaca3ea66e1779ff991e98e1366159cde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Macro for writing various data types to UART1.  <br /></td></tr>
+<tr class="memitem:af0d663a2d8b4067c6aba42304b09b875" id="r_af0d663a2d8b4067c6aba42304b09b875"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af0d663a2d8b4067c6aba42304b09b875">uart6_write</a>(val)</td></tr>
+<tr class="memdesc:af0d663a2d8b4067c6aba42304b09b875"><td class="mdescLeft">&#160;</td><td class="mdescRight">Macro for writing various data types to UART6.  <br /></td></tr>
+<tr class="memitem:a9171f49478fa86d932f89e78e73b88b0" id="r_a9171f49478fa86d932f89e78e73b88b0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a>&#160;&#160;&#160;0x40000000UL</td></tr>
+<tr class="memitem:a811a9a4ca17f0a50354a9169541d56c4" id="r_a811a9a4ca17f0a50354a9169541d56c4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a811a9a4ca17f0a50354a9169541d56c4">AHB1PERIPH_BASE</a>&#160;&#160;&#160;(<a class="el" href="#a9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a> + 0x00020000UL)</td></tr>
+<tr class="memitem:a45666d911f39addd4c8c0a0ac3388cfb" id="r_a45666d911f39addd4c8c0a0ac3388cfb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45666d911f39addd4c8c0a0ac3388cfb">APB1PERIPH_BASE</a>&#160;&#160;&#160;(<a class="el" href="#a9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a> + 0x00000000UL)</td></tr>
+<tr class="memitem:a25b99d6065f1c8f751e78f43ade652cb" id="r_a25b99d6065f1c8f751e78f43ade652cb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a25b99d6065f1c8f751e78f43ade652cb">APB2PERIPH_BASE</a>&#160;&#160;&#160;(<a class="el" href="#a9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a> + 0x7400)</td></tr>
+<tr class="memitem:a0e681b03f364532055d88f63fec0d99d" id="r_a0e681b03f364532055d88f63fec0d99d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0e681b03f364532055d88f63fec0d99d">RCC_BASE</a>&#160;&#160;&#160;(<a class="el" href="#a811a9a4ca17f0a50354a9169541d56c4">AHB1PERIPH_BASE</a> + 0x3800)</td></tr>
+<tr class="memitem:ade83162a04bca0b15b39018a8e8ec090" id="r_ade83162a04bca0b15b39018a8e8ec090"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a>&#160;&#160;&#160;(<a class="el" href="#a45666d911f39addd4c8c0a0ac3388cfb">APB1PERIPH_BASE</a> + 0x4400)</td></tr>
+<tr class="memitem:a86162ab3f740db9026c1320d46938b4d" id="r_a86162ab3f740db9026c1320d46938b4d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86162ab3f740db9026c1320d46938b4d">USART1_BASE</a>&#160;&#160;&#160;0x40011000</td></tr>
+<tr class="memitem:ade4d3907fd0387ee832f426f52d568bb" id="r_ade4d3907fd0387ee832f426f52d568bb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a>&#160;&#160;&#160;0x40011400</td></tr>
+<tr class="memitem:ad4baa1f26b04719fe3d4e2f02d7dde40" id="r_ad4baa1f26b04719fe3d4e2f02d7dde40"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad4baa1f26b04719fe3d4e2f02d7dde40">RCC_APB1ENR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="timer_8h.html#a0e681b03f364532055d88f63fec0d99d">RCC_BASE</a> + 0x40))</td></tr>
+<tr class="memitem:a6d4cd87f49d551c356fed82cbbddc5a4" id="r_a6d4cd87f49d551c356fed82cbbddc5a4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d4cd87f49d551c356fed82cbbddc5a4">RCC_APB2ENR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="timer_8h.html#a0e681b03f364532055d88f63fec0d99d">RCC_BASE</a> + 0x44))</td></tr>
+<tr class="memitem:af390c83858b5d97469c8b328231f1e54" id="r_af390c83858b5d97469c8b328231f1e54"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af390c83858b5d97469c8b328231f1e54">USART2_SR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x00))</td></tr>
+<tr class="memitem:a498acd0c07bdee6e3b19a4bddd5b4244" id="r_a498acd0c07bdee6e3b19a4bddd5b4244"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a498acd0c07bdee6e3b19a4bddd5b4244">USART2_DR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x04))</td></tr>
+<tr class="memitem:ae5530ccff0818ee6c53e71f013f28b46" id="r_ae5530ccff0818ee6c53e71f013f28b46"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae5530ccff0818ee6c53e71f013f28b46">USART2_BRR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x08))</td></tr>
+<tr class="memitem:a685289c8590aa5257387ed4ba6460097" id="r_a685289c8590aa5257387ed4ba6460097"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a685289c8590aa5257387ed4ba6460097">USART2_CR1</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x0C))</td></tr>
+<tr class="memitem:a487db57656db6abc99b3e64f54096fd5" id="r_a487db57656db6abc99b3e64f54096fd5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a487db57656db6abc99b3e64f54096fd5">USART1_SR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#a86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x00))</td></tr>
+<tr class="memitem:a6909af146975c44b99e68e2491ae96a6" id="r_a6909af146975c44b99e68e2491ae96a6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6909af146975c44b99e68e2491ae96a6">USART1_DR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#a86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x04))</td></tr>
+<tr class="memitem:aacb1e95db24ea6e6abdd0ca2737f4242" id="r_aacb1e95db24ea6e6abdd0ca2737f4242"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aacb1e95db24ea6e6abdd0ca2737f4242">USART1_BRR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#a86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x08))</td></tr>
+<tr class="memitem:aa0889f12c0e570ac578c26f7ca7f300e" id="r_aa0889f12c0e570ac578c26f7ca7f300e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa0889f12c0e570ac578c26f7ca7f300e">USART1_CR1</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#a86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x0C))</td></tr>
+<tr class="memitem:a475701e7a1d2ca39768a19b0d3a00695" id="r_a475701e7a1d2ca39768a19b0d3a00695"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a475701e7a1d2ca39768a19b0d3a00695">USART6_SR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x00))</td></tr>
+<tr class="memitem:ab08007a5a998177b3a423fc11c0daaf5" id="r_ab08007a5a998177b3a423fc11c0daaf5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab08007a5a998177b3a423fc11c0daaf5">USART6_DR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x04))</td></tr>
+<tr class="memitem:a0a4f781c389ce231e70343e359cb807e" id="r_a0a4f781c389ce231e70343e359cb807e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0a4f781c389ce231e70343e359cb807e">USART6_BRR</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x08))</td></tr>
+<tr class="memitem:abe070876f1daa7a63bda346a7c4d5ffa" id="r_abe070876f1daa7a63bda346a7c4d5ffa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe070876f1daa7a63bda346a7c4d5ffa">USART6_CR1</a>&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x0C))</td></tr>
+<tr class="memitem:ab840af4f735ec36419d61c7db3cfa00d" id="r_ab840af4f735ec36419d61c7db3cfa00d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab840af4f735ec36419d61c7db3cfa00d">RCC_APB1ENR_USART2EN</a>&#160;&#160;&#160;(1 &lt;&lt; 17)</td></tr>
+<tr class="memitem:a4666bb90842e8134b32e6a34a0f165f3" id="r_a4666bb90842e8134b32e6a34a0f165f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4666bb90842e8134b32e6a34a0f165f3">RCC_APB2ENR_USART1EN</a>&#160;&#160;&#160;(1 &lt;&lt; 4)</td></tr>
+<tr class="memitem:a0569d91f3b18ae130b7a09e0100c4459" id="r_a0569d91f3b18ae130b7a09e0100c4459"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0569d91f3b18ae130b7a09e0100c4459">RCC_APB2ENR_USART6EN</a>&#160;&#160;&#160;(1 &lt;&lt; 5)</td></tr>
+<tr class="memitem:a2bb650676aaae4a5203f372d497d5947" id="r_a2bb650676aaae4a5203f372d497d5947"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2bb650676aaae4a5203f372d497d5947">USART_CR1_UE</a>&#160;&#160;&#160;(1 &lt;&lt; 13)</td></tr>
+<tr class="memitem:ade7f090b04fd78b755b43357ecaa9622" id="r_ade7f090b04fd78b755b43357ecaa9622"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade7f090b04fd78b755b43357ecaa9622">USART_CR1_TE</a>&#160;&#160;&#160;(1 &lt;&lt; 3)</td></tr>
+<tr class="memitem:ada0d5d407a22264de847bc1b40a17aeb" id="r_ada0d5d407a22264de847bc1b40a17aeb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada0d5d407a22264de847bc1b40a17aeb">USART_CR1_RE</a>&#160;&#160;&#160;(1 &lt;&lt; 2)</td></tr>
+<tr class="memitem:a65e9cddf0890113d405342f1d8b5b980" id="r_a65e9cddf0890113d405342f1d8b5b980"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65e9cddf0890113d405342f1d8b5b980">USART_SR_TXE</a>&#160;&#160;&#160;(1 &lt;&lt; 7)</td></tr>
+<tr class="memitem:aa0c99e2bb265b3d58a91aca7a93f7836" id="r_aa0c99e2bb265b3d58a91aca7a93f7836"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa0c99e2bb265b3d58a91aca7a93f7836">USART_SR_RXNE</a>&#160;&#160;&#160;(1 &lt;&lt; 5)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-enum-members" class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -190,86 +188,611 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1a1131083beae26b9314a6fca36032b44a">UART2</a>
 , <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1aaf76a57275179b99587134229e1263b9">UART6</a>
  }</td></tr>
-<tr class="memdesc:a1eb2dbbb5cd864c8d0e19f71d7f168d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">UART identifier enumeration.  <a href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">More...</a><br /></td></tr>
+<tr class="memdesc:a1eb2dbbb5cd864c8d0e19f71d7f168d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumeration of available UART peripherals.  <a href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gad320bd1e821aac6c1b38c8bcb8003104" id="r_gad320bd1e821aac6c1b38c8bcb8003104"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gad320bd1e821aac6c1b38c8bcb8003104">uart_init</a> (uint32_t baudrate, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:gad320bd1e821aac6c1b38c8bcb8003104"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the specified UART peripheral.  <br /></td></tr>
-<tr class="memitem:ga6f144300396d4d9afe21f41a72a99ab8" id="r_ga6f144300396d4d9afe21f41a72a99ab8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga6f144300396d4d9afe21f41a72a99ab8">uart_write_char</a> (char c, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:ga6f144300396d4d9afe21f41a72a99ab8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via the specified UART.  <br /></td></tr>
-<tr class="memitem:ga183ba35371040029a29a3cde221539fa" id="r_ga183ba35371040029a29a3cde221539fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga183ba35371040029a29a3cde221539fa">uart_write_int</a> (int32_t num, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:ga183ba35371040029a29a3cde221539fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via UART.  <br /></td></tr>
-<tr class="memitem:ga662be19e5a7667eeae26bd36e869fd2d" id="r_ga662be19e5a7667eeae26bd36e869fd2d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga662be19e5a7667eeae26bd36e869fd2d">uart_write_float</a> (float num, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:ga662be19e5a7667eeae26bd36e869fd2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via UART.  <br /></td></tr>
-<tr class="memitem:gab0bd03dc5a6de94637fb1536e883c546" id="r_gab0bd03dc5a6de94637fb1536e883c546"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gab0bd03dc5a6de94637fb1536e883c546">uart_write_string</a> (const char *s, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:gab0bd03dc5a6de94637fb1536e883c546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via UART.  <br /></td></tr>
-<tr class="memitem:ga3cc37d73aa435b454452d7a60a635e39" id="r_ga3cc37d73aa435b454452d7a60a635e39"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga3cc37d73aa435b454452d7a60a635e39">uart1_init</a> (uint32_t baudrate)</td></tr>
-<tr class="memdesc:ga3cc37d73aa435b454452d7a60a635e39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize USART1 peripheral.  <br /></td></tr>
-<tr class="memitem:gaa8786e97a38fd49fd129cc704cb6fadd" id="r_gaa8786e97a38fd49fd129cc704cb6fadd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaa8786e97a38fd49fd129cc704cb6fadd">uart1_write_char</a> (char c)</td></tr>
-<tr class="memdesc:gaa8786e97a38fd49fd129cc704cb6fadd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via USART1.  <br /></td></tr>
-<tr class="memitem:ga81b1a7af3a848606f23985f8d9a87708" id="r_ga81b1a7af3a848606f23985f8d9a87708"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a> (int32_t num)</td></tr>
-<tr class="memdesc:ga81b1a7af3a848606f23985f8d9a87708"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via USART1.  <br /></td></tr>
-<tr class="memitem:ga8595ce32dbc8da8200d337fca8d7930e" id="r_ga8595ce32dbc8da8200d337fca8d7930e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga8595ce32dbc8da8200d337fca8d7930e">uart1_write_float</a> (float num)</td></tr>
-<tr class="memdesc:ga8595ce32dbc8da8200d337fca8d7930e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via USART1.  <br /></td></tr>
-<tr class="memitem:gac86a702823358a08deca96365ed41cae" id="r_gac86a702823358a08deca96365ed41cae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gac86a702823358a08deca96365ed41cae">uart1_write_string</a> (const char *s)</td></tr>
-<tr class="memdesc:gac86a702823358a08deca96365ed41cae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via USART1.  <br /></td></tr>
-<tr class="memitem:gaf897c816fdda40f69b1f8377878db96a" id="r_gaf897c816fdda40f69b1f8377878db96a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaf897c816fdda40f69b1f8377878db96a">uart2_init</a> (uint32_t baudrate)</td></tr>
-<tr class="memdesc:gaf897c816fdda40f69b1f8377878db96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize USART2 peripheral.  <br /></td></tr>
-<tr class="memitem:gace45b7a16f634d2de9a483acab46a7c8" id="r_gace45b7a16f634d2de9a483acab46a7c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gace45b7a16f634d2de9a483acab46a7c8">uart2_write_char</a> (char c)</td></tr>
-<tr class="memdesc:gace45b7a16f634d2de9a483acab46a7c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via USART2.  <br /></td></tr>
-<tr class="memitem:gac9e624e43c7053a70ed42b1c780ad792" id="r_gac9e624e43c7053a70ed42b1c780ad792"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a> (int32_t num)</td></tr>
-<tr class="memdesc:gac9e624e43c7053a70ed42b1c780ad792"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via USART2.  <br /></td></tr>
-<tr class="memitem:ga3784763020352ac6913e355c4ac7a337" id="r_ga3784763020352ac6913e355c4ac7a337"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga3784763020352ac6913e355c4ac7a337">uart2_write_float</a> (float num)</td></tr>
-<tr class="memdesc:ga3784763020352ac6913e355c4ac7a337"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via USART2.  <br /></td></tr>
-<tr class="memitem:ga55c46e6a48433287fdf5a9d1defd5f5c" id="r_ga55c46e6a48433287fdf5a9d1defd5f5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga55c46e6a48433287fdf5a9d1defd5f5c">uart2_write_string</a> (const char *s)</td></tr>
-<tr class="memdesc:ga55c46e6a48433287fdf5a9d1defd5f5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via USART2.  <br /></td></tr>
-<tr class="memitem:ga7cd48d1d49f0dee1adff1be915793bb6" id="r_ga7cd48d1d49f0dee1adff1be915793bb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga7cd48d1d49f0dee1adff1be915793bb6">uart6_init</a> (uint32_t baudrate)</td></tr>
-<tr class="memdesc:ga7cd48d1d49f0dee1adff1be915793bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize USART6 peripheral.  <br /></td></tr>
-<tr class="memitem:gac0de3d3f47debf2a24b349fa74b7a030" id="r_gac0de3d3f47debf2a24b349fa74b7a030"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gac0de3d3f47debf2a24b349fa74b7a030">uart6_write_char</a> (char c)</td></tr>
-<tr class="memdesc:gac0de3d3f47debf2a24b349fa74b7a030"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via USART6.  <br /></td></tr>
-<tr class="memitem:ga01667e67896e48e6cf21a05385566819" id="r_ga01667e67896e48e6cf21a05385566819"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga01667e67896e48e6cf21a05385566819">uart6_write_int</a> (int32_t num)</td></tr>
-<tr class="memdesc:ga01667e67896e48e6cf21a05385566819"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via USART6.  <br /></td></tr>
-<tr class="memitem:ga3a2f8786049010a947207fc47c7ad409" id="r_ga3a2f8786049010a947207fc47c7ad409"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga3a2f8786049010a947207fc47c7ad409">uart6_write_float</a> (float num)</td></tr>
-<tr class="memdesc:ga3a2f8786049010a947207fc47c7ad409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via USART6.  <br /></td></tr>
-<tr class="memitem:gacd0a2ffc721c3e9af1501307d74f5173" id="r_gacd0a2ffc721c3e9af1501307d74f5173"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gacd0a2ffc721c3e9af1501307d74f5173">uart6_write_string</a> (const char *s)</td></tr>
-<tr class="memdesc:gacd0a2ffc721c3e9af1501307d74f5173"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via USART6.  <br /></td></tr>
-<tr class="memitem:ga86ffdb11e32f205ce3b1e9b0fb259c8e" id="r_ga86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga86ffdb11e32f205ce3b1e9b0fb259c8e">uart_read_char</a> (<a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:ga86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from the specified UART.  <br /></td></tr>
-<tr class="memitem:gaa3a9166c481a902a7b2c291eb3127a78" id="r_gaa3a9166c481a902a7b2c291eb3127a78"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaa3a9166c481a902a7b2c291eb3127a78">uart_available</a> (<a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:gaa3a9166c481a902a7b2c291eb3127a78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read.  <br /></td></tr>
-<tr class="memitem:ga242042066c0dcfee02c34f51ae65cc8a" id="r_ga242042066c0dcfee02c34f51ae65cc8a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga242042066c0dcfee02c34f51ae65cc8a">uart1_available</a> (void)</td></tr>
-<tr class="memdesc:ga242042066c0dcfee02c34f51ae65cc8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from USART1.  <br /></td></tr>
-<tr class="memitem:ga223b61a491de01b4b3ee16a1d15113d1" id="r_ga223b61a491de01b4b3ee16a1d15113d1"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga223b61a491de01b4b3ee16a1d15113d1">uart1_read_char</a> (void)</td></tr>
-<tr class="memdesc:ga223b61a491de01b4b3ee16a1d15113d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from USART1.  <br /></td></tr>
-<tr class="memitem:gae67708662af5b29151196c9ba24cf20d" id="r_gae67708662af5b29151196c9ba24cf20d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gae67708662af5b29151196c9ba24cf20d">uart2_available</a> (void)</td></tr>
-<tr class="memdesc:gae67708662af5b29151196c9ba24cf20d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from USART2.  <br /></td></tr>
-<tr class="memitem:ga894a9fccabee5ec32e916ba78998fad5" id="r_ga894a9fccabee5ec32e916ba78998fad5"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga894a9fccabee5ec32e916ba78998fad5">uart2_read_char</a> (void)</td></tr>
-<tr class="memdesc:ga894a9fccabee5ec32e916ba78998fad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from USART2.  <br /></td></tr>
-<tr class="memitem:gaf49cf7ca045c2feb52c025951e6e50e4" id="r_gaf49cf7ca045c2feb52c025951e6e50e4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaf49cf7ca045c2feb52c025951e6e50e4">uart6_available</a> (void)</td></tr>
-<tr class="memdesc:gaf49cf7ca045c2feb52c025951e6e50e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from USART6.  <br /></td></tr>
-<tr class="memitem:gaa40d7d81e58a648bf5c64a4735bfb7f3" id="r_gaa40d7d81e58a648bf5c64a4735bfb7f3"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaa40d7d81e58a648bf5c64a4735bfb7f3">uart6_read_char</a> (void)</td></tr>
-<tr class="memdesc:gaa40d7d81e58a648bf5c64a4735bfb7f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from USART6.  <br /></td></tr>
-<tr class="memitem:ga5c510005052783f5cec97c0ac7731071" id="r_ga5c510005052783f5cec97c0ac7731071"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga5c510005052783f5cec97c0ac7731071">uart2_read_until</a> (char *buffer, uint32_t maxlen, char delimiter)</td></tr>
-<tr class="memdesc:ga5c510005052783f5cec97c0ac7731071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read characters into a buffer until a delimiter is found or max length is reached.  <br /></td></tr>
+<tr class="memitem:ad320bd1e821aac6c1b38c8bcb8003104" id="r_ad320bd1e821aac6c1b38c8bcb8003104"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad320bd1e821aac6c1b38c8bcb8003104">uart_init</a> (uint32_t baudrate, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:ad320bd1e821aac6c1b38c8bcb8003104"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the specified UART peripheral.  <br /></td></tr>
+<tr class="memitem:a6f144300396d4d9afe21f41a72a99ab8" id="r_a6f144300396d4d9afe21f41a72a99ab8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f144300396d4d9afe21f41a72a99ab8">uart_write_char</a> (char c, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:a6f144300396d4d9afe21f41a72a99ab8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a character to the specified UART.  <br /></td></tr>
+<tr class="memitem:a183ba35371040029a29a3cde221539fa" id="r_a183ba35371040029a29a3cde221539fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a183ba35371040029a29a3cde221539fa">uart_write_int</a> (int32_t num, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:a183ba35371040029a29a3cde221539fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an integer to the specified UART.  <br /></td></tr>
+<tr class="memitem:a662be19e5a7667eeae26bd36e869fd2d" id="r_a662be19e5a7667eeae26bd36e869fd2d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a662be19e5a7667eeae26bd36e869fd2d">uart_write_float</a> (float num, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:a662be19e5a7667eeae26bd36e869fd2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a floating-point number to the specified UART.  <br /></td></tr>
+<tr class="memitem:ab0bd03dc5a6de94637fb1536e883c546" id="r_ab0bd03dc5a6de94637fb1536e883c546"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0bd03dc5a6de94637fb1536e883c546">uart_write_string</a> (const char *s, <a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:ab0bd03dc5a6de94637fb1536e883c546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a string to the specified UART.  <br /></td></tr>
+<tr class="memitem:a3cc37d73aa435b454452d7a60a635e39" id="r_a3cc37d73aa435b454452d7a60a635e39"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3cc37d73aa435b454452d7a60a635e39">uart1_init</a> (uint32_t baudrate)</td></tr>
+<tr class="memdesc:a3cc37d73aa435b454452d7a60a635e39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize UART1 peripheral.  <br /></td></tr>
+<tr class="memitem:aa8786e97a38fd49fd129cc704cb6fadd" id="r_aa8786e97a38fd49fd129cc704cb6fadd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa8786e97a38fd49fd129cc704cb6fadd">uart1_write_char</a> (char c)</td></tr>
+<tr class="memdesc:aa8786e97a38fd49fd129cc704cb6fadd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a character to UART1.  <br /></td></tr>
+<tr class="memitem:a81b1a7af3a848606f23985f8d9a87708" id="r_a81b1a7af3a848606f23985f8d9a87708"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a> (int32_t num)</td></tr>
+<tr class="memdesc:a81b1a7af3a848606f23985f8d9a87708"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an integer to UART1 as ASCII.  <br /></td></tr>
+<tr class="memitem:a8595ce32dbc8da8200d337fca8d7930e" id="r_a8595ce32dbc8da8200d337fca8d7930e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8595ce32dbc8da8200d337fca8d7930e">uart1_write_float</a> (float num)</td></tr>
+<tr class="memdesc:a8595ce32dbc8da8200d337fca8d7930e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a floating-point number to UART1.  <br /></td></tr>
+<tr class="memitem:ac86a702823358a08deca96365ed41cae" id="r_ac86a702823358a08deca96365ed41cae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac86a702823358a08deca96365ed41cae">uart1_write_string</a> (const char *s)</td></tr>
+<tr class="memdesc:ac86a702823358a08deca96365ed41cae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a null-terminated string to UART1.  <br /></td></tr>
+<tr class="memitem:af897c816fdda40f69b1f8377878db96a" id="r_af897c816fdda40f69b1f8377878db96a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af897c816fdda40f69b1f8377878db96a">uart2_init</a> (uint32_t baudrate)</td></tr>
+<tr class="memdesc:af897c816fdda40f69b1f8377878db96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize UART2 peripheral.  <br /></td></tr>
+<tr class="memitem:ace45b7a16f634d2de9a483acab46a7c8" id="r_ace45b7a16f634d2de9a483acab46a7c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ace45b7a16f634d2de9a483acab46a7c8">uart2_write_char</a> (char c)</td></tr>
+<tr class="memdesc:ace45b7a16f634d2de9a483acab46a7c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a character to UART2.  <br /></td></tr>
+<tr class="memitem:ac9e624e43c7053a70ed42b1c780ad792" id="r_ac9e624e43c7053a70ed42b1c780ad792"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a> (int32_t num)</td></tr>
+<tr class="memdesc:ac9e624e43c7053a70ed42b1c780ad792"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an integer to UART2 as ASCII.  <br /></td></tr>
+<tr class="memitem:a3784763020352ac6913e355c4ac7a337" id="r_a3784763020352ac6913e355c4ac7a337"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3784763020352ac6913e355c4ac7a337">uart2_write_float</a> (float num)</td></tr>
+<tr class="memdesc:a3784763020352ac6913e355c4ac7a337"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a floating-point number to UART2.  <br /></td></tr>
+<tr class="memitem:a55c46e6a48433287fdf5a9d1defd5f5c" id="r_a55c46e6a48433287fdf5a9d1defd5f5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55c46e6a48433287fdf5a9d1defd5f5c">uart2_write_string</a> (const char *s)</td></tr>
+<tr class="memdesc:a55c46e6a48433287fdf5a9d1defd5f5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a null-terminated string to UART2.  <br /></td></tr>
+<tr class="memitem:a7cd48d1d49f0dee1adff1be915793bb6" id="r_a7cd48d1d49f0dee1adff1be915793bb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7cd48d1d49f0dee1adff1be915793bb6">uart6_init</a> (uint32_t baudrate)</td></tr>
+<tr class="memdesc:a7cd48d1d49f0dee1adff1be915793bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize UART6 peripheral.  <br /></td></tr>
+<tr class="memitem:ac0de3d3f47debf2a24b349fa74b7a030" id="r_ac0de3d3f47debf2a24b349fa74b7a030"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac0de3d3f47debf2a24b349fa74b7a030">uart6_write_char</a> (char c)</td></tr>
+<tr class="memdesc:ac0de3d3f47debf2a24b349fa74b7a030"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a character to UART6.  <br /></td></tr>
+<tr class="memitem:a01667e67896e48e6cf21a05385566819" id="r_a01667e67896e48e6cf21a05385566819"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a> (int32_t num)</td></tr>
+<tr class="memdesc:a01667e67896e48e6cf21a05385566819"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an integer to UART6 as ASCII.  <br /></td></tr>
+<tr class="memitem:a3a2f8786049010a947207fc47c7ad409" id="r_a3a2f8786049010a947207fc47c7ad409"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a2f8786049010a947207fc47c7ad409">uart6_write_float</a> (float num)</td></tr>
+<tr class="memdesc:a3a2f8786049010a947207fc47c7ad409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a floating-point number to UART6.  <br /></td></tr>
+<tr class="memitem:acd0a2ffc721c3e9af1501307d74f5173" id="r_acd0a2ffc721c3e9af1501307d74f5173"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd0a2ffc721c3e9af1501307d74f5173">uart6_write_string</a> (const char *s)</td></tr>
+<tr class="memdesc:acd0a2ffc721c3e9af1501307d74f5173"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a null-terminated string to UART6.  <br /></td></tr>
+<tr class="memitem:a86ffdb11e32f205ce3b1e9b0fb259c8e" id="r_a86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86ffdb11e32f205ce3b1e9b0fb259c8e">uart_read_char</a> (<a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:a86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a character from the specified UART.  <br /></td></tr>
+<tr class="memitem:aa3a9166c481a902a7b2c291eb3127a78" id="r_aa3a9166c481a902a7b2c291eb3127a78"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3a9166c481a902a7b2c291eb3127a78">uart_available</a> (<a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:aa3a9166c481a902a7b2c291eb3127a78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available in the specified UART's receive buffer.  <br /></td></tr>
+<tr class="memitem:a242042066c0dcfee02c34f51ae65cc8a" id="r_a242042066c0dcfee02c34f51ae65cc8a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a242042066c0dcfee02c34f51ae65cc8a">uart1_available</a> (void)</td></tr>
+<tr class="memdesc:a242042066c0dcfee02c34f51ae65cc8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if UART1 has data available.  <br /></td></tr>
+<tr class="memitem:a223b61a491de01b4b3ee16a1d15113d1" id="r_a223b61a491de01b4b3ee16a1d15113d1"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a223b61a491de01b4b3ee16a1d15113d1">uart1_read_char</a> (void)</td></tr>
+<tr class="memdesc:a223b61a491de01b4b3ee16a1d15113d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from UART1.  <br /></td></tr>
+<tr class="memitem:ae67708662af5b29151196c9ba24cf20d" id="r_ae67708662af5b29151196c9ba24cf20d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae67708662af5b29151196c9ba24cf20d">uart2_available</a> (void)</td></tr>
+<tr class="memdesc:ae67708662af5b29151196c9ba24cf20d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if UART2 has data available.  <br /></td></tr>
+<tr class="memitem:a894a9fccabee5ec32e916ba78998fad5" id="r_a894a9fccabee5ec32e916ba78998fad5"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a894a9fccabee5ec32e916ba78998fad5">uart2_read_char</a> (void)</td></tr>
+<tr class="memdesc:a894a9fccabee5ec32e916ba78998fad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from UART2.  <br /></td></tr>
+<tr class="memitem:af49cf7ca045c2feb52c025951e6e50e4" id="r_af49cf7ca045c2feb52c025951e6e50e4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af49cf7ca045c2feb52c025951e6e50e4">uart6_available</a> (void)</td></tr>
+<tr class="memdesc:af49cf7ca045c2feb52c025951e6e50e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if UART6 has data available.  <br /></td></tr>
+<tr class="memitem:aa40d7d81e58a648bf5c64a4735bfb7f3" id="r_aa40d7d81e58a648bf5c64a4735bfb7f3"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa40d7d81e58a648bf5c64a4735bfb7f3">uart6_read_char</a> (void)</td></tr>
+<tr class="memdesc:aa40d7d81e58a648bf5c64a4735bfb7f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from UART6.  <br /></td></tr>
+<tr class="memitem:a5c510005052783f5cec97c0ac7731071" id="r_a5c510005052783f5cec97c0ac7731071"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5c510005052783f5cec97c0ac7731071">uart2_read_until</a> (char *buffer, uint32_t maxlen, char delimiter)</td></tr>
+<tr class="memdesc:a5c510005052783f5cec97c0ac7731071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read characters from UART2 until a delimiter or maximum length is reached.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>UART HAL implementation for Cortex-M4 (STM32F401RE). </p>
-<p>This header defines memory-mapped registers, macros, and function prototypes for UART (USART1, USART2, USART6) peripheral control on the STM32F401RE MCU.</p>
-<p>The implementation provides:</p><ul>
-<li>UART initialization with configurable baud rates</li>
-<li>Character, integer, float, and string transmission</li>
-<li>Character reception</li>
-<li>Data availability checking</li>
-<li>Type-generic write macros for simplified usage</li>
-<li>Support for all three available UART peripherals (USART1, USART2, USART6)</li>
-</ul>
-<dl class="section note"><dt>Note</dt><dd>Architecture-specific for STM32F401RE. Included through dispatcher based on <span class="tt">CORTEX_M4</span>. </dd>
-<dd>
-All UART functions are blocking (polling mode) implementations.</dd></dl>
-<dl class="section author"><dt>Author</dt><dd>Ashutosh Vishwakarma </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2025-07-23 </dd></dl>
-</div><a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>
+<div class="textblock"><p>UART driver interface for STM32F4 (Cortex-M4). </p>
+<p>This file provides the definitions, macros, and function declarations for UART communication, including initialization, data transmission, reception, and availability checks for UART1, UART2, and UART6. </p>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a id="a811a9a4ca17f0a50354a9169541d56c4" name="a811a9a4ca17f0a50354a9169541d56c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a811a9a4ca17f0a50354a9169541d56c4">&#9670;&#160;</a></span>AHB1PERIPH_BASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define AHB1PERIPH_BASE&#160;&#160;&#160;(<a class="el" href="#a9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a> + 0x00020000UL)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a45666d911f39addd4c8c0a0ac3388cfb" name="a45666d911f39addd4c8c0a0ac3388cfb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45666d911f39addd4c8c0a0ac3388cfb">&#9670;&#160;</a></span>APB1PERIPH_BASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define APB1PERIPH_BASE&#160;&#160;&#160;(<a class="el" href="#a9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a> + 0x00000000UL)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a25b99d6065f1c8f751e78f43ade652cb" name="a25b99d6065f1c8f751e78f43ade652cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25b99d6065f1c8f751e78f43ade652cb">&#9670;&#160;</a></span>APB2PERIPH_BASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define APB2PERIPH_BASE&#160;&#160;&#160;(<a class="el" href="#a9171f49478fa86d932f89e78e73b88b0">PERIPH_BASE</a> + 0x7400)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9171f49478fa86d932f89e78e73b88b0" name="a9171f49478fa86d932f89e78e73b88b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9171f49478fa86d932f89e78e73b88b0">&#9670;&#160;</a></span>PERIPH_BASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PERIPH_BASE&#160;&#160;&#160;0x40000000UL</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad4baa1f26b04719fe3d4e2f02d7dde40" name="ad4baa1f26b04719fe3d4e2f02d7dde40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4baa1f26b04719fe3d4e2f02d7dde40">&#9670;&#160;</a></span>RCC_APB1ENR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RCC_APB1ENR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="timer_8h.html#a0e681b03f364532055d88f63fec0d99d">RCC_BASE</a> + 0x40))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab840af4f735ec36419d61c7db3cfa00d" name="ab840af4f735ec36419d61c7db3cfa00d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab840af4f735ec36419d61c7db3cfa00d">&#9670;&#160;</a></span>RCC_APB1ENR_USART2EN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RCC_APB1ENR_USART2EN&#160;&#160;&#160;(1 &lt;&lt; 17)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6d4cd87f49d551c356fed82cbbddc5a4" name="a6d4cd87f49d551c356fed82cbbddc5a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d4cd87f49d551c356fed82cbbddc5a4">&#9670;&#160;</a></span>RCC_APB2ENR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RCC_APB2ENR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="timer_8h.html#a0e681b03f364532055d88f63fec0d99d">RCC_BASE</a> + 0x44))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4666bb90842e8134b32e6a34a0f165f3" name="a4666bb90842e8134b32e6a34a0f165f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4666bb90842e8134b32e6a34a0f165f3">&#9670;&#160;</a></span>RCC_APB2ENR_USART1EN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RCC_APB2ENR_USART1EN&#160;&#160;&#160;(1 &lt;&lt; 4)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0569d91f3b18ae130b7a09e0100c4459" name="a0569d91f3b18ae130b7a09e0100c4459"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0569d91f3b18ae130b7a09e0100c4459">&#9670;&#160;</a></span>RCC_APB2ENR_USART6EN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RCC_APB2ENR_USART6EN&#160;&#160;&#160;(1 &lt;&lt; 5)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0e681b03f364532055d88f63fec0d99d" name="a0e681b03f364532055d88f63fec0d99d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e681b03f364532055d88f63fec0d99d">&#9670;&#160;</a></span>RCC_BASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RCC_BASE&#160;&#160;&#160;(<a class="el" href="#a811a9a4ca17f0a50354a9169541d56c4">AHB1PERIPH_BASE</a> + 0x3800)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaca3ea66e1779ff991e98e1366159cde" name="aaca3ea66e1779ff991e98e1366159cde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaca3ea66e1779ff991e98e1366159cde">&#9670;&#160;</a></span>uart1_write</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define uart1_write</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>val</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    _Generic((val), \</div>
+<div class="line">    <span class="keywordtype">char</span>: <a class="code hl_function" href="#aa8786e97a38fd49fd129cc704cb6fadd">uart1_write_char</a>,              \</div>
+<div class="line">    <span class="keywordtype">signed</span> <span class="keywordtype">char</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>,        \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>,      \</div>
+<div class="line">    <span class="keywordtype">short</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>,              \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>,     \</div>
+<div class="line">    <span class="keywordtype">int</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>,                \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>,       \</div>
+<div class="line">    <span class="keywordtype">long</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>,               \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>,      \</div>
+<div class="line">    <span class="keywordtype">long</span> <span class="keywordtype">long</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>,          \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span>: <a class="code hl_function" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a>, \</div>
+<div class="line">    <span class="keywordtype">float</span>: <a class="code hl_function" href="#a8595ce32dbc8da8200d337fca8d7930e">uart1_write_float</a>,            \</div>
+<div class="line">    <span class="keywordtype">double</span>: <a class="code hl_function" href="#a8595ce32dbc8da8200d337fca8d7930e">uart1_write_float</a>,           \</div>
+<div class="line">    <span class="keyword">const</span> <span class="keywordtype">char</span> *: <a class="code hl_function" href="#ac86a702823358a08deca96365ed41cae">uart1_write_string</a>,    \</div>
+<div class="line">    <span class="keywordtype">char</span> *: <a class="code hl_function" href="#ac86a702823358a08deca96365ed41cae">uart1_write_string</a>)(val)</div>
+<div class="ttc" id="auart_8h_html_a81b1a7af3a848606f23985f8d9a87708"><div class="ttname"><a href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a></div><div class="ttdeci">void uart1_write_int(int32_t num)</div><div class="ttdoc">Write an integer to UART1 as ASCII.</div><div class="ttdef"><b>Definition</b> uart.c:228</div></div>
+<div class="ttc" id="auart_8h_html_a8595ce32dbc8da8200d337fca8d7930e"><div class="ttname"><a href="#a8595ce32dbc8da8200d337fca8d7930e">uart1_write_float</a></div><div class="ttdeci">void uart1_write_float(float num)</div><div class="ttdoc">Write a floating-point number to UART1.</div><div class="ttdef"><b>Definition</b> uart.c:317</div></div>
+<div class="ttc" id="auart_8h_html_aa8786e97a38fd49fd129cc704cb6fadd"><div class="ttname"><a href="#aa8786e97a38fd49fd129cc704cb6fadd">uart1_write_char</a></div><div class="ttdeci">void uart1_write_char(char c)</div><div class="ttdoc">Write a character to UART1.</div><div class="ttdef"><b>Definition</b> uart.c:168</div></div>
+<div class="ttc" id="auart_8h_html_ac86a702823358a08deca96365ed41cae"><div class="ttname"><a href="#ac86a702823358a08deca96365ed41cae">uart1_write_string</a></div><div class="ttdeci">void uart1_write_string(const char *s)</div><div class="ttdoc">Write a null-terminated string to UART1.</div><div class="ttdef"><b>Definition</b> uart.c:368</div></div>
+</div><!-- fragment -->
+<p>Macro for writing various data types to UART1. </p>
+
+</div>
+</div>
+<a id="aff2eef2dac8eee46420e54b78311428e" name="aff2eef2dac8eee46420e54b78311428e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff2eef2dac8eee46420e54b78311428e">&#9670;&#160;</a></span>uart2_write</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define uart2_write</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>val</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    _Generic((val), \</div>
+<div class="line">    <span class="keywordtype">char</span>: <a class="code hl_function" href="#ace45b7a16f634d2de9a483acab46a7c8">uart2_write_char</a>,              \</div>
+<div class="line">    <span class="keywordtype">signed</span> <span class="keywordtype">char</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>,        \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>,      \</div>
+<div class="line">    <span class="keywordtype">short</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>,              \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>,     \</div>
+<div class="line">    <span class="keywordtype">int</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>,                \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>,       \</div>
+<div class="line">    <span class="keywordtype">long</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>,               \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>,      \</div>
+<div class="line">    <span class="keywordtype">long</span> <span class="keywordtype">long</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>,          \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span>: <a class="code hl_function" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a>, \</div>
+<div class="line">    <span class="keywordtype">float</span>: <a class="code hl_function" href="#a3784763020352ac6913e355c4ac7a337">uart2_write_float</a>,            \</div>
+<div class="line">    <span class="keywordtype">double</span>: <a class="code hl_function" href="#a3784763020352ac6913e355c4ac7a337">uart2_write_float</a>,           \</div>
+<div class="line">    <span class="keyword">const</span> <span class="keywordtype">char</span> *: <a class="code hl_function" href="#a55c46e6a48433287fdf5a9d1defd5f5c">uart2_write_string</a>,    \</div>
+<div class="line">    <span class="keywordtype">char</span> *: <a class="code hl_function" href="#a55c46e6a48433287fdf5a9d1defd5f5c">uart2_write_string</a>)(val)</div>
+<div class="ttc" id="auart_8h_html_a3784763020352ac6913e355c4ac7a337"><div class="ttname"><a href="#a3784763020352ac6913e355c4ac7a337">uart2_write_float</a></div><div class="ttdeci">void uart2_write_float(float num)</div><div class="ttdoc">Write a floating-point number to UART2.</div><div class="ttdef"><b>Definition</b> uart.c:298</div></div>
+<div class="ttc" id="auart_8h_html_a55c46e6a48433287fdf5a9d1defd5f5c"><div class="ttname"><a href="#a55c46e6a48433287fdf5a9d1defd5f5c">uart2_write_string</a></div><div class="ttdeci">void uart2_write_string(const char *s)</div><div class="ttdoc">Write a null-terminated string to UART2.</div><div class="ttdef"><b>Definition</b> main.c:97</div></div>
+<div class="ttc" id="auart_8h_html_ac9e624e43c7053a70ed42b1c780ad792"><div class="ttname"><a href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a></div><div class="ttdeci">void uart2_write_int(int32_t num)</div><div class="ttdoc">Write an integer to UART2 as ASCII.</div><div class="ttdef"><b>Definition</b> uart.c:194</div></div>
+<div class="ttc" id="auart_8h_html_ace45b7a16f634d2de9a483acab46a7c8"><div class="ttname"><a href="#ace45b7a16f634d2de9a483acab46a7c8">uart2_write_char</a></div><div class="ttdeci">void uart2_write_char(char c)</div><div class="ttdoc">Write a character to UART2.</div><div class="ttdef"><b>Definition</b> main.c:61</div></div>
+</div><!-- fragment -->
+<p>Macro for writing various data types to UART2. </p>
+
+</div>
+</div>
+<a id="af0d663a2d8b4067c6aba42304b09b875" name="af0d663a2d8b4067c6aba42304b09b875"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0d663a2d8b4067c6aba42304b09b875">&#9670;&#160;</a></span>uart6_write</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define uart6_write</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>val</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    _Generic((val), \</div>
+<div class="line">    <span class="keywordtype">char</span>: <a class="code hl_function" href="#ac0de3d3f47debf2a24b349fa74b7a030">uart6_write_char</a>,              \</div>
+<div class="line">    <span class="keywordtype">signed</span> <span class="keywordtype">char</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>,        \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>,      \</div>
+<div class="line">    <span class="keywordtype">short</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>,              \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">short</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>,     \</div>
+<div class="line">    <span class="keywordtype">int</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>,                \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>,       \</div>
+<div class="line">    <span class="keywordtype">long</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>,               \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>,      \</div>
+<div class="line">    <span class="keywordtype">long</span> <span class="keywordtype">long</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>,          \</div>
+<div class="line">    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span>: <a class="code hl_function" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a>, \</div>
+<div class="line">    <span class="keywordtype">float</span>: <a class="code hl_function" href="#a3a2f8786049010a947207fc47c7ad409">uart6_write_float</a>,            \</div>
+<div class="line">    <span class="keywordtype">double</span>: <a class="code hl_function" href="#a3a2f8786049010a947207fc47c7ad409">uart6_write_float</a>,           \</div>
+<div class="line">    <span class="keyword">const</span> <span class="keywordtype">char</span> *: <a class="code hl_function" href="#acd0a2ffc721c3e9af1501307d74f5173">uart6_write_string</a>,    \</div>
+<div class="line">    <span class="keywordtype">char</span> *: <a class="code hl_function" href="#acd0a2ffc721c3e9af1501307d74f5173">uart6_write_string</a>)(val)</div>
+<div class="ttc" id="auart_8h_html_a01667e67896e48e6cf21a05385566819"><div class="ttname"><a href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a></div><div class="ttdeci">void uart6_write_int(int32_t num)</div><div class="ttdoc">Write an integer to UART6 as ASCII.</div><div class="ttdef"><b>Definition</b> uart.c:262</div></div>
+<div class="ttc" id="auart_8h_html_a3a2f8786049010a947207fc47c7ad409"><div class="ttname"><a href="#a3a2f8786049010a947207fc47c7ad409">uart6_write_float</a></div><div class="ttdeci">void uart6_write_float(float num)</div><div class="ttdoc">Write a floating-point number to UART6.</div><div class="ttdef"><b>Definition</b> uart.c:336</div></div>
+<div class="ttc" id="auart_8h_html_ac0de3d3f47debf2a24b349fa74b7a030"><div class="ttname"><a href="#ac0de3d3f47debf2a24b349fa74b7a030">uart6_write_char</a></div><div class="ttdeci">void uart6_write_char(char c)</div><div class="ttdoc">Write a character to UART6.</div><div class="ttdef"><b>Definition</b> uart.c:182</div></div>
+<div class="ttc" id="auart_8h_html_acd0a2ffc721c3e9af1501307d74f5173"><div class="ttname"><a href="#acd0a2ffc721c3e9af1501307d74f5173">uart6_write_string</a></div><div class="ttdeci">void uart6_write_string(const char *s)</div><div class="ttdoc">Write a null-terminated string to UART6.</div><div class="ttdef"><b>Definition</b> uart.c:381</div></div>
+</div><!-- fragment -->
+<p>Macro for writing various data types to UART6. </p>
+
+</div>
+</div>
+<a id="a86162ab3f740db9026c1320d46938b4d" name="a86162ab3f740db9026c1320d46938b4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86162ab3f740db9026c1320d46938b4d">&#9670;&#160;</a></span>USART1_BASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART1_BASE&#160;&#160;&#160;0x40011000</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aacb1e95db24ea6e6abdd0ca2737f4242" name="aacb1e95db24ea6e6abdd0ca2737f4242"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacb1e95db24ea6e6abdd0ca2737f4242">&#9670;&#160;</a></span>USART1_BRR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART1_BRR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#a86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x08))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa0889f12c0e570ac578c26f7ca7f300e" name="aa0889f12c0e570ac578c26f7ca7f300e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0889f12c0e570ac578c26f7ca7f300e">&#9670;&#160;</a></span>USART1_CR1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART1_CR1&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#a86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x0C))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6909af146975c44b99e68e2491ae96a6" name="a6909af146975c44b99e68e2491ae96a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6909af146975c44b99e68e2491ae96a6">&#9670;&#160;</a></span>USART1_DR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART1_DR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#a86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x04))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a487db57656db6abc99b3e64f54096fd5" name="a487db57656db6abc99b3e64f54096fd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a487db57656db6abc99b3e64f54096fd5">&#9670;&#160;</a></span>USART1_SR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART1_SR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#a86162ab3f740db9026c1320d46938b4d">USART1_BASE</a> + 0x00))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ade83162a04bca0b15b39018a8e8ec090" name="ade83162a04bca0b15b39018a8e8ec090"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade83162a04bca0b15b39018a8e8ec090">&#9670;&#160;</a></span>USART2_BASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART2_BASE&#160;&#160;&#160;(<a class="el" href="#a45666d911f39addd4c8c0a0ac3388cfb">APB1PERIPH_BASE</a> + 0x4400)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae5530ccff0818ee6c53e71f013f28b46" name="ae5530ccff0818ee6c53e71f013f28b46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5530ccff0818ee6c53e71f013f28b46">&#9670;&#160;</a></span>USART2_BRR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART2_BRR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x08))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a685289c8590aa5257387ed4ba6460097" name="a685289c8590aa5257387ed4ba6460097"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a685289c8590aa5257387ed4ba6460097">&#9670;&#160;</a></span>USART2_CR1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART2_CR1&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x0C))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a498acd0c07bdee6e3b19a4bddd5b4244" name="a498acd0c07bdee6e3b19a4bddd5b4244"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a498acd0c07bdee6e3b19a4bddd5b4244">&#9670;&#160;</a></span>USART2_DR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART2_DR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x04))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af390c83858b5d97469c8b328231f1e54" name="af390c83858b5d97469c8b328231f1e54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af390c83858b5d97469c8b328231f1e54">&#9670;&#160;</a></span>USART2_SR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART2_SR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade83162a04bca0b15b39018a8e8ec090">USART2_BASE</a> + 0x00))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ade4d3907fd0387ee832f426f52d568bb" name="ade4d3907fd0387ee832f426f52d568bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade4d3907fd0387ee832f426f52d568bb">&#9670;&#160;</a></span>USART6_BASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART6_BASE&#160;&#160;&#160;0x40011400</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0a4f781c389ce231e70343e359cb807e" name="a0a4f781c389ce231e70343e359cb807e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a4f781c389ce231e70343e359cb807e">&#9670;&#160;</a></span>USART6_BRR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART6_BRR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x08))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abe070876f1daa7a63bda346a7c4d5ffa" name="abe070876f1daa7a63bda346a7c4d5ffa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe070876f1daa7a63bda346a7c4d5ffa">&#9670;&#160;</a></span>USART6_CR1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART6_CR1&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x0C))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab08007a5a998177b3a423fc11c0daaf5" name="ab08007a5a998177b3a423fc11c0daaf5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab08007a5a998177b3a423fc11c0daaf5">&#9670;&#160;</a></span>USART6_DR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART6_DR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x04))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a475701e7a1d2ca39768a19b0d3a00695" name="a475701e7a1d2ca39768a19b0d3a00695"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a475701e7a1d2ca39768a19b0d3a00695">&#9670;&#160;</a></span>USART6_SR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART6_SR&#160;&#160;&#160;(*(volatile uint32_t *)(<a class="el" href="#ade4d3907fd0387ee832f426f52d568bb">USART6_BASE</a> + 0x00))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ada0d5d407a22264de847bc1b40a17aeb" name="ada0d5d407a22264de847bc1b40a17aeb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada0d5d407a22264de847bc1b40a17aeb">&#9670;&#160;</a></span>USART_CR1_RE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART_CR1_RE&#160;&#160;&#160;(1 &lt;&lt; 2)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ade7f090b04fd78b755b43357ecaa9622" name="ade7f090b04fd78b755b43357ecaa9622"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade7f090b04fd78b755b43357ecaa9622">&#9670;&#160;</a></span>USART_CR1_TE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART_CR1_TE&#160;&#160;&#160;(1 &lt;&lt; 3)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2bb650676aaae4a5203f372d497d5947" name="a2bb650676aaae4a5203f372d497d5947"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bb650676aaae4a5203f372d497d5947">&#9670;&#160;</a></span>USART_CR1_UE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART_CR1_UE&#160;&#160;&#160;(1 &lt;&lt; 13)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa0c99e2bb265b3d58a91aca7a93f7836" name="aa0c99e2bb265b3d58a91aca7a93f7836"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0c99e2bb265b3d58a91aca7a93f7836">&#9670;&#160;</a></span>USART_SR_RXNE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART_SR_RXNE&#160;&#160;&#160;(1 &lt;&lt; 5)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a65e9cddf0890113d405342f1d8b5b980" name="a65e9cddf0890113d405342f1d8b5b980"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a65e9cddf0890113d405342f1d8b5b980">&#9670;&#160;</a></span>USART_SR_TXE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define USART_SR_TXE&#160;&#160;&#160;(1 &lt;&lt; 7)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>
 <a id="a1eb2dbbb5cd864c8d0e19f71d7f168d1" name="a1eb2dbbb5cd864c8d0e19f71d7f168d1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">&#9670;&#160;</a></span>hal_uart_t</h2>
 
@@ -282,16 +805,827 @@ All UART functions are blocking (polling mode) implementations.</dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>UART identifier enumeration. </p>
-<p>Identifies which UART peripheral to use for operations. </p>
+<p>Enumeration of available UART peripherals. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1eb2dbbb5cd864c8d0e19f71d7f168d1ad78b5dd576e9a3ab80d6c77ff9d1cd27" name="a1eb2dbbb5cd864c8d0e19f71d7f168d1ad78b5dd576e9a3ab80d6c77ff9d1cd27"></a>UART1&#160;</td><td class="fielddoc"><p>USART1 - APB2 peripheral, typically higher speed. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1eb2dbbb5cd864c8d0e19f71d7f168d1ad78b5dd576e9a3ab80d6c77ff9d1cd27" name="a1eb2dbbb5cd864c8d0e19f71d7f168d1ad78b5dd576e9a3ab80d6c77ff9d1cd27"></a>UART1&#160;</td><td class="fielddoc"><p>UART1 peripheral </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a1eb2dbbb5cd864c8d0e19f71d7f168d1a1131083beae26b9314a6fca36032b44a" name="a1eb2dbbb5cd864c8d0e19f71d7f168d1a1131083beae26b9314a6fca36032b44a"></a>UART2&#160;</td><td class="fielddoc"><p>USART2 - APB1 peripheral. </p>
+<tr><td class="fieldname"><a id="a1eb2dbbb5cd864c8d0e19f71d7f168d1a1131083beae26b9314a6fca36032b44a" name="a1eb2dbbb5cd864c8d0e19f71d7f168d1a1131083beae26b9314a6fca36032b44a"></a>UART2&#160;</td><td class="fielddoc"><p>UART2 peripheral </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a1eb2dbbb5cd864c8d0e19f71d7f168d1aaf76a57275179b99587134229e1263b9" name="a1eb2dbbb5cd864c8d0e19f71d7f168d1aaf76a57275179b99587134229e1263b9"></a>UART6&#160;</td><td class="fielddoc"><p>USART6 - APB2 peripheral. </p>
+<tr><td class="fieldname"><a id="a1eb2dbbb5cd864c8d0e19f71d7f168d1aaf76a57275179b99587134229e1263b9" name="a1eb2dbbb5cd864c8d0e19f71d7f168d1aaf76a57275179b99587134229e1263b9"></a>UART6&#160;</td><td class="fielddoc"><p>UART6 peripheral </p>
 </td></tr>
 </table>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="a242042066c0dcfee02c34f51ae65cc8a" name="a242042066c0dcfee02c34f51ae65cc8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a242042066c0dcfee02c34f51ae65cc8a">&#9670;&#160;</a></span>uart1_available()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int uart1_available </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if UART1 has data available. </p>
+<dl class="section return"><dt>Returns</dt><dd>Non-zero if data ready, zero if none. </dd></dl>
+
+</div>
+</div>
+<a id="a3cc37d73aa435b454452d7a60a635e39" name="a3cc37d73aa435b454452d7a60a635e39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cc37d73aa435b454452d7a60a635e39">&#9670;&#160;</a></span>uart1_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart1_init </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>baudrate</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize UART1 peripheral. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">baudrate</td><td>Desired baudrate.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Configures GPIO PA9 for alternate function AF7, enables USART1 clock, sets baudrate register, enables transmitter, and enables USART. </dd></dl>
+
+</div>
+</div>
+<a id="a223b61a491de01b4b3ee16a1d15113d1" name="a223b61a491de01b4b3ee16a1d15113d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a223b61a491de01b4b3ee16a1d15113d1">&#9670;&#160;</a></span>uart1_read_char()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char uart1_read_char </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read a single character from UART1. </p>
+<dl class="section return"><dt>Returns</dt><dd>Character read.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Blocks until a character is available. </dd></dl>
+
+</div>
+</div>
+<a id="aa8786e97a38fd49fd129cc704cb6fadd" name="aa8786e97a38fd49fd129cc704cb6fadd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8786e97a38fd49fd129cc704cb6fadd">&#9670;&#160;</a></span>uart1_write_char()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart1_write_char </td>
+          <td>(</td>
+          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>c</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a character to UART1. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">c</td><td>Character to send.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Waits until transmit data register is empty. </dd></dl>
+
+</div>
+</div>
+<a id="a8595ce32dbc8da8200d337fca8d7930e" name="a8595ce32dbc8da8200d337fca8d7930e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8595ce32dbc8da8200d337fca8d7930e">&#9670;&#160;</a></span>uart1_write_float()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart1_write_float </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a floating-point number to UART1. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Float value to send. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a81b1a7af3a848606f23985f8d9a87708" name="a81b1a7af3a848606f23985f8d9a87708"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81b1a7af3a848606f23985f8d9a87708">&#9670;&#160;</a></span>uart1_write_int()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart1_write_int </td>
+          <td>(</td>
+          <td class="paramtype">int32_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write an integer to UART1 as ASCII. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Integer to send. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac86a702823358a08deca96365ed41cae" name="ac86a702823358a08deca96365ed41cae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac86a702823358a08deca96365ed41cae">&#9670;&#160;</a></span>uart1_write_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart1_write_string </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a null-terminated string to UART1. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Pointer to string to send. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae67708662af5b29151196c9ba24cf20d" name="ae67708662af5b29151196c9ba24cf20d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae67708662af5b29151196c9ba24cf20d">&#9670;&#160;</a></span>uart2_available()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int uart2_available </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if UART2 has data available. </p>
+<dl class="section return"><dt>Returns</dt><dd>Non-zero if data ready, zero if none. </dd></dl>
+
+</div>
+</div>
+<a id="af897c816fdda40f69b1f8377878db96a" name="af897c816fdda40f69b1f8377878db96a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af897c816fdda40f69b1f8377878db96a">&#9670;&#160;</a></span>uart2_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart2_init </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>baudrate</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize UART2 peripheral. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">baudrate</td><td>Desired baudrate.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Configures GPIO PA2 and PA3 for alternate function AF7, enables USART2 clock, sets baudrate register, enables transmitter and receiver, and enables USART. </dd></dl>
+
+</div>
+</div>
+<a id="a894a9fccabee5ec32e916ba78998fad5" name="a894a9fccabee5ec32e916ba78998fad5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a894a9fccabee5ec32e916ba78998fad5">&#9670;&#160;</a></span>uart2_read_char()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char uart2_read_char </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read a single character from UART2. </p>
+<dl class="section return"><dt>Returns</dt><dd>Character read.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Blocks until a character is available. </dd></dl>
+
+</div>
+</div>
+<a id="a5c510005052783f5cec97c0ac7731071" name="a5c510005052783f5cec97c0ac7731071"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c510005052783f5cec97c0ac7731071">&#9670;&#160;</a></span>uart2_read_until()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t uart2_read_until </td>
+          <td>(</td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>maxlen</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>delimiter</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read characters from UART2 until a delimiter or maximum length is reached. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">buffer</td><td>Destination buffer. </td></tr>
+    <tr><td class="paramname">maxlen</td><td>Maximum number of bytes to read. </td></tr>
+    <tr><td class="paramname">delimiter</td><td>Character to stop reading at. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Number of bytes read.</dd></dl>
+<p>Read characters from UART2 until a delimiter or maximum length is reached.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">buffer</td><td>Pointer to buffer to store received characters. </td></tr>
+    <tr><td class="paramname">maxlen</td><td>Maximum buffer length (including null terminator). </td></tr>
+    <tr><td class="paramname">delimiter</td><td>Character to stop reading at. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Number of characters read (excluding null terminator).</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Reads until delimiter is encountered or maxlen-1 characters are read. Null-terminates the buffer. </dd></dl>
+
+</div>
+</div>
+<a id="ace45b7a16f634d2de9a483acab46a7c8" name="ace45b7a16f634d2de9a483acab46a7c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace45b7a16f634d2de9a483acab46a7c8">&#9670;&#160;</a></span>uart2_write_char()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart2_write_char </td>
+          <td>(</td>
+          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>c</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a character to UART2. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">c</td><td>Character to send.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Waits until transmit data register is empty. </dd></dl>
+
+</div>
+</div>
+<a id="a3784763020352ac6913e355c4ac7a337" name="a3784763020352ac6913e355c4ac7a337"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3784763020352ac6913e355c4ac7a337">&#9670;&#160;</a></span>uart2_write_float()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart2_write_float </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a floating-point number to UART2. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Float value to send.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Prints sign, integer part, decimal point, and 5 decimal digits of fraction. </dd></dl>
+
+</div>
+</div>
+<a id="ac9e624e43c7053a70ed42b1c780ad792" name="ac9e624e43c7053a70ed42b1c780ad792"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9e624e43c7053a70ed42b1c780ad792">&#9670;&#160;</a></span>uart2_write_int()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart2_write_int </td>
+          <td>(</td>
+          <td class="paramtype">int32_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write an integer to UART2 as ASCII. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Integer to send. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a55c46e6a48433287fdf5a9d1defd5f5c" name="a55c46e6a48433287fdf5a9d1defd5f5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55c46e6a48433287fdf5a9d1defd5f5c">&#9670;&#160;</a></span>uart2_write_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart2_write_string </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a null-terminated string to UART2. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Pointer to string to send. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af49cf7ca045c2feb52c025951e6e50e4" name="af49cf7ca045c2feb52c025951e6e50e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af49cf7ca045c2feb52c025951e6e50e4">&#9670;&#160;</a></span>uart6_available()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int uart6_available </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if UART6 has data available. </p>
+<dl class="section return"><dt>Returns</dt><dd>Non-zero if data ready, zero if none. </dd></dl>
+
+</div>
+</div>
+<a id="a7cd48d1d49f0dee1adff1be915793bb6" name="a7cd48d1d49f0dee1adff1be915793bb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cd48d1d49f0dee1adff1be915793bb6">&#9670;&#160;</a></span>uart6_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart6_init </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>baudrate</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize UART6 peripheral. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">baudrate</td><td>Desired baudrate.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Configures GPIO PC6 for alternate function AF7, enables USART6 clock, sets baudrate register, enables transmitter, and enables USART. </dd></dl>
+
+</div>
+</div>
+<a id="aa40d7d81e58a648bf5c64a4735bfb7f3" name="aa40d7d81e58a648bf5c64a4735bfb7f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa40d7d81e58a648bf5c64a4735bfb7f3">&#9670;&#160;</a></span>uart6_read_char()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char uart6_read_char </td>
+          <td>(</td>
+          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read a single character from UART6. </p>
+<dl class="section return"><dt>Returns</dt><dd>Character read.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Blocks until a character is available. </dd></dl>
+
+</div>
+</div>
+<a id="ac0de3d3f47debf2a24b349fa74b7a030" name="ac0de3d3f47debf2a24b349fa74b7a030"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0de3d3f47debf2a24b349fa74b7a030">&#9670;&#160;</a></span>uart6_write_char()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart6_write_char </td>
+          <td>(</td>
+          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>c</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a character to UART6. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">c</td><td>Character to send.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Waits until transmit data register is empty. </dd></dl>
+
+</div>
+</div>
+<a id="a3a2f8786049010a947207fc47c7ad409" name="a3a2f8786049010a947207fc47c7ad409"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a2f8786049010a947207fc47c7ad409">&#9670;&#160;</a></span>uart6_write_float()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart6_write_float </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a floating-point number to UART6. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Float value to send. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a01667e67896e48e6cf21a05385566819" name="a01667e67896e48e6cf21a05385566819"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01667e67896e48e6cf21a05385566819">&#9670;&#160;</a></span>uart6_write_int()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart6_write_int </td>
+          <td>(</td>
+          <td class="paramtype">int32_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write an integer to UART6 as ASCII. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Integer to send. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="acd0a2ffc721c3e9af1501307d74f5173" name="acd0a2ffc721c3e9af1501307d74f5173"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd0a2ffc721c3e9af1501307d74f5173">&#9670;&#160;</a></span>uart6_write_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart6_write_string </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a null-terminated string to UART6. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Pointer to string to send. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa3a9166c481a902a7b2c291eb3127a78" name="aa3a9166c481a902a7b2c291eb3127a78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3a9166c481a902a7b2c291eb3127a78">&#9670;&#160;</a></span>uart_available()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int uart_available </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Check if data is available in the specified UART's receive buffer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">uart</td><td>UART peripheral. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Number of bytes available.</dd></dl>
+<p>Check if data is available in the specified UART's receive buffer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Non-zero if data available, zero otherwise; -1 if invalid UART. </dd></dl>
+
+</div>
+</div>
+<a id="ad320bd1e821aac6c1b38c8bcb8003104" name="ad320bd1e821aac6c1b38c8bcb8003104"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad320bd1e821aac6c1b38c8bcb8003104">&#9670;&#160;</a></span>uart_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart_init </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>baudrate</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize the specified UART peripheral. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">baudrate</td><td>UART baud rate. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral to initialize.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Initialize the specified UART peripheral.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">baudrate</td><td>Desired UART baudrate. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral identifier (UART1, UART2, UART6). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a86ffdb11e32f205ce3b1e9b0fb259c8e" name="a86ffdb11e32f205ce3b1e9b0fb259c8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86ffdb11e32f205ce3b1e9b0fb259c8e">&#9670;&#160;</a></span>uart_read_char()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char uart_read_char </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read a character from the specified UART. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">uart</td><td>UART peripheral. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Character read.</dd></dl>
+<p>Read a character from the specified UART.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Character read from UART data register. </dd></dl>
+
+</div>
+</div>
+<a id="a6f144300396d4d9afe21f41a72a99ab8" name="a6f144300396d4d9afe21f41a72a99ab8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f144300396d4d9afe21f41a72a99ab8">&#9670;&#160;</a></span>uart_write_char()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart_write_char </td>
+          <td>(</td>
+          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a character to the specified UART. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">c</td><td>Character to transmit. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Write a character to the specified UART.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">c</td><td>Character to send. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a662be19e5a7667eeae26bd36e869fd2d" name="a662be19e5a7667eeae26bd36e869fd2d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a662be19e5a7667eeae26bd36e869fd2d">&#9670;&#160;</a></span>uart_write_float()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart_write_float </td>
+          <td>(</td>
+          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>num</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a floating-point number to the specified UART. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Float to transmit. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Write a floating-point number to the specified UART.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Float value to send. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a183ba35371040029a29a3cde221539fa" name="a183ba35371040029a29a3cde221539fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a183ba35371040029a29a3cde221539fa">&#9670;&#160;</a></span>uart_write_int()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart_write_int </td>
+          <td>(</td>
+          <td class="paramtype">int32_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write an integer to the specified UART. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Integer to transmit. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Write an integer to the specified UART.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num</td><td>Integer to send. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab0bd03dc5a6de94637fb1536e883c546" name="ab0bd03dc5a6de94637fb1536e883c546"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0bd03dc5a6de94637fb1536e883c546">&#9670;&#160;</a></span>uart_write_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void uart_write_string </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write a string to the specified UART. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Null-terminated string to transmit. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Write a string to the specified UART.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>Pointer to string to send. </td></tr>
+    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

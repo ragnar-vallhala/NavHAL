@@ -1,0 +1,65 @@
+\doxysection{include/core/cortex-\/m4/rcc\+\_\+reg.h File Reference}
+\hypertarget{rcc__reg_8h}{}\label{rcc__reg_8h}\index{include/core/cortex-\/m4/rcc\_reg.h@{include/core/cortex-\/m4/rcc\_reg.h}}
+
+
+Register map for Reset and Clock Control (RCC) peripheral on STM32\+F4 series.  
+
+
+{\ttfamily \#include "{}utils/types.\+h"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for rcc\+\_\+reg.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_r_c_c___typedef}{RCC\+\_\+\+Typedef}}
+\begin{DoxyCompactList}\small\item\em RCC register map structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{rcc__reg_8h_aa918567a93fe95a5e24ba45dcbb89afa}{RCC\+\_\+\+BASE\+\_\+\+ADDR}}~0x40023800
+\begin{DoxyCompactList}\small\item\em Base address of RCC peripheral. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{rcc__reg_8h_a74944438a086975793d26ae48d5882d4}{RCC}}~((\mbox{\hyperlink{struct_r_c_c___typedef}{RCC\+\_\+\+Typedef}} \texorpdfstring{$\ast$}{*})\mbox{\hyperlink{rcc__reg_8h_aa918567a93fe95a5e24ba45dcbb89afa}{RCC\+\_\+\+BASE\+\_\+\+ADDR}})
+\begin{DoxyCompactList}\small\item\em Pointer to RCC peripheral registers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Register map for Reset and Clock Control (RCC) peripheral on STM32\+F4 series. 
+
+This header defines the memory-\/mapped structure for the RCC peripheral, located at base address {\ttfamily 0x40023800} on STM32\+F4 microcontrollers.
+
+Each member corresponds to a 32-\/bit hardware register controlling clock sources, prescalers, peripheral resets, and clock enables.
+
+Reserved fields are placeholders to maintain correct register offsets and must not be modified. 
+
+\label{doc-define-members}
+\Hypertarget{rcc__reg_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{rcc__reg_8h_a74944438a086975793d26ae48d5882d4}\index{rcc\_reg.h@{rcc\_reg.h}!RCC@{RCC}}
+\index{RCC@{RCC}!rcc\_reg.h@{rcc\_reg.h}}
+\doxysubsubsection{\texorpdfstring{RCC}{RCC}}
+{\footnotesize\ttfamily \label{rcc__reg_8h_a74944438a086975793d26ae48d5882d4} 
+\#define RCC~((\mbox{\hyperlink{struct_r_c_c___typedef}{RCC\+\_\+\+Typedef}} \texorpdfstring{$\ast$}{*})\mbox{\hyperlink{rcc__reg_8h_aa918567a93fe95a5e24ba45dcbb89afa}{RCC\+\_\+\+BASE\+\_\+\+ADDR}})}
+
+
+
+Pointer to RCC peripheral registers. 
+
+Example usage\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{comment}{//\ Enable\ GPIOA\ clock}}
+\DoxyCodeLine{\mbox{\hyperlink{group___r_c_c___b_a_s_e_ga74944438a086975793d26ae48d5882d4}{RCC}}-\/>AHB1ENR\ |=\ (1\ <<\ 0);}
+
+\end{DoxyCode}
+ \Hypertarget{rcc__reg_8h_aa918567a93fe95a5e24ba45dcbb89afa}\index{rcc\_reg.h@{rcc\_reg.h}!RCC\_BASE\_ADDR@{RCC\_BASE\_ADDR}}
+\index{RCC\_BASE\_ADDR@{RCC\_BASE\_ADDR}!rcc\_reg.h@{rcc\_reg.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_BASE\_ADDR}{RCC\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{rcc__reg_8h_aa918567a93fe95a5e24ba45dcbb89afa} 
+\#define RCC\+\_\+\+BASE\+\_\+\+ADDR~0x40023800}
+
+
+
+Base address of RCC peripheral. 
+

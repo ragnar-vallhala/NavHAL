@@ -14,5 +14,5 @@ digraph "include/core"
   dir_ee6d435a46042ad3b1ab4491874ef656 [label="cortex-m4", fillcolor="#a2b4d6", color="grey25", style="filled", URL="dir_ee6d435a46042ad3b1ab4491874ef656.html",tooltip=""];
   }
   }
-  dir_ee6d435a46042ad3b1ab4491874ef656->dir_821002d4f10779a80d4fb17bc32f21f1 [headlabel="4", labeldistance=1.5 headhref="dir_000012_000022.html" href="dir_000012_000022.html" color="steelblue1" fontcolor="steelblue1"];
+  dir_ee6d435a46042ad3b1ab4491874ef656->dir_821002d4f10779a80d4fb17bc32f21f1 [headlabel="8", labeldistance=1.5 headhref="dir_000014_000026.html" href="dir_000014_000026.html" color="steelblue1" fontcolor="steelblue1"];
 }

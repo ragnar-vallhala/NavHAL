@@ -107,7 +107,12 @@ $(function() {
   <div class="headertitle"><div class="title">timer.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="types_8h_source.html">utils/types.h</a>&quot;</code><br />
+
+<p>Timer and SysTick register defines and API for STM32F4 (Cortex-M4).  
+<a href="#details">More...</a></p>
+<div class="textblock"><code>#include &quot;<a class="el" href="timer__types_8h_source.html">utils/timer_types.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="types_8h_source.html">utils/types.h</a>&quot;</code><br />
+<code>#include &lt;stdint.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for timer.h:</div>
 <div class="dyncontent">
@@ -149,6 +154,8 @@ Macros</h2></td></tr>
 <tr class="memitem:a976c9c69020ce73578f72803a7571007" id="r_a976c9c69020ce73578f72803a7571007"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a976c9c69020ce73578f72803a7571007">TIM_ADV_EGR_OFFSET</a>&#160;&#160;&#160;0x14</td></tr>
 <tr class="memitem:aacd50f83bf4442081aac3889cee6136f" id="r_aacd50f83bf4442081aac3889cee6136f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aacd50f83bf4442081aac3889cee6136f">TIM_ADV_EGR_UG_BIT</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:ade619d61a63db3c7406fbb645a066c39" id="r_ade619d61a63db3c7406fbb645a066c39"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade619d61a63db3c7406fbb645a066c39">TIM_ADV_CNT_OFFSET</a>&#160;&#160;&#160;0X24</td></tr>
+<tr class="memitem:a96634d8454d22d7c7b80c0984d294a23" id="r_a96634d8454d22d7c7b80c0984d294a23"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96634d8454d22d7c7b80c0984d294a23">TIM_ADV_DIER_OFFSET</a>&#160;&#160;&#160;0X0C</td></tr>
+<tr class="memitem:a79d6e987cb4885a3d87c2727ce17a83e" id="r_a79d6e987cb4885a3d87c2727ce17a83e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a79d6e987cb4885a3d87c2727ce17a83e">TIM_ADV_DIER_UIE_BIT</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:acc4b5565188edc64cf2de299e3acd376" id="r_acc4b5565188edc64cf2de299e3acd376"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc4b5565188edc64cf2de299e3acd376">TIM_GP1_CR1_OFFSET</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:a529013f72964cd04c9ae951aebed8b36" id="r_a529013f72964cd04c9ae951aebed8b36"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a529013f72964cd04c9ae951aebed8b36">TIM_GP1_CR1_CEN_BIT</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:a83b0f84566157416c2a9b5dc2dc43037" id="r_a83b0f84566157416c2a9b5dc2dc43037"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a83b0f84566157416c2a9b5dc2dc43037">TIM_GP1_PSC_OFFSET</a>&#160;&#160;&#160;  0x28</td></tr>
@@ -156,6 +163,10 @@ Macros</h2></td></tr>
 <tr class="memitem:aaa13389071f74fa4d47be939e0b829a2" id="r_aaa13389071f74fa4d47be939e0b829a2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa13389071f74fa4d47be939e0b829a2">TIM_GP1_EGR_OFFSET</a>&#160;&#160;&#160;0x14</td></tr>
 <tr class="memitem:a8654f986ac5599009d0bd54b4128ed32" id="r_a8654f986ac5599009d0bd54b4128ed32"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8654f986ac5599009d0bd54b4128ed32">TIM_GP1_EGR_UG_BIT</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:af6e371d0130920fe177ff894ba02455a" id="r_af6e371d0130920fe177ff894ba02455a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af6e371d0130920fe177ff894ba02455a">TIM_GP1_CNT_OFFSET</a>&#160;&#160;&#160;0X24</td></tr>
+<tr class="memitem:a8a22ffd9e999934aa3513c9d4e840c88" id="r_a8a22ffd9e999934aa3513c9d4e840c88"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8a22ffd9e999934aa3513c9d4e840c88">TIM_GP1_DIER_OFFSET</a>&#160;&#160;&#160;0X0C</td></tr>
+<tr class="memitem:af92d3f7035eb47561b2ece9a64eb0c00" id="r_af92d3f7035eb47561b2ece9a64eb0c00"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af92d3f7035eb47561b2ece9a64eb0c00">TIM_GP1_DIER_UIE_BIT</a>&#160;&#160;&#160;0x00</td></tr>
+<tr class="memitem:a69ee77edf438e1cb5756197bf2f63033" id="r_a69ee77edf438e1cb5756197bf2f63033"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69ee77edf438e1cb5756197bf2f63033">TIM_GP1_SR_OFFSET</a>&#160;&#160;&#160;0x10</td></tr>
+<tr class="memitem:af8453c74167e2cf1d017d049c0971796" id="r_af8453c74167e2cf1d017d049c0971796"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8453c74167e2cf1d017d049c0971796">TIM_GP1_SR_UIF_BIT</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:a2bea659c5a8f33c37534b3a06e2a835f" id="r_a2bea659c5a8f33c37534b3a06e2a835f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2bea659c5a8f33c37534b3a06e2a835f">TIM_GP2_CR1_OFFSET</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:aedd3cc91b790427b05ff16cf2fa0317d" id="r_aedd3cc91b790427b05ff16cf2fa0317d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aedd3cc91b790427b05ff16cf2fa0317d">TIM_GP2_CR1_CEN_BIT</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:a7f64fad8ae66ffb0738b8ca4338a4d9e" id="r_a7f64fad8ae66ffb0738b8ca4338a4d9e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7f64fad8ae66ffb0738b8ca4338a4d9e">TIM_GP2_PSC_OFFSET</a>&#160;&#160;&#160;  0x28</td></tr>
@@ -163,6 +174,10 @@ Macros</h2></td></tr>
 <tr class="memitem:ad42762db56c95fd0032f87cad92cb6f1" id="r_ad42762db56c95fd0032f87cad92cb6f1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad42762db56c95fd0032f87cad92cb6f1">TIM_GP2_EGR_OFFSET</a>&#160;&#160;&#160;0x14</td></tr>
 <tr class="memitem:acd9abbbccfc0ad1618d634a0fd3109a1" id="r_acd9abbbccfc0ad1618d634a0fd3109a1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd9abbbccfc0ad1618d634a0fd3109a1">TIM_GP2_EGR_UG_BIT</a>&#160;&#160;&#160;0x0</td></tr>
 <tr class="memitem:a312d391bcc9e06db047ebfa2a727df00" id="r_a312d391bcc9e06db047ebfa2a727df00"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a312d391bcc9e06db047ebfa2a727df00">TIM_GP2_CNT_OFFSET</a>&#160;&#160;&#160;0X24</td></tr>
+<tr class="memitem:a05789f2f7133046c5e3085711850006d" id="r_a05789f2f7133046c5e3085711850006d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a05789f2f7133046c5e3085711850006d">TIM_GP2_DIER_OFFSET</a>&#160;&#160;&#160;0X0C</td></tr>
+<tr class="memitem:accde5ace9559193c2db9f7c5e2a345a4" id="r_accde5ace9559193c2db9f7c5e2a345a4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#accde5ace9559193c2db9f7c5e2a345a4">TIM_GP2_DIER_UIE_BIT</a>&#160;&#160;&#160;0x00</td></tr>
+<tr class="memitem:a912c786aa817e90312f74a96b58154d6" id="r_a912c786aa817e90312f74a96b58154d6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a912c786aa817e90312f74a96b58154d6">TIM_GP2_SR_OFFSET</a>&#160;&#160;&#160;0x10</td></tr>
+<tr class="memitem:a4c01776c4720aa126cff923b056b0c54" id="r_a4c01776c4720aa126cff923b056b0c54"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c01776c4720aa126cff923b056b0c54">TIM_GP2_SR_UIF_BIT</a>&#160;&#160;&#160;0x00</td></tr>
 <tr class="memitem:ab26b3fc75982181f81b185b206e897f6" id="r_ab26b3fc75982181f81b185b206e897f6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab26b3fc75982181f81b185b206e897f6">SYST_CSR</a>&#160;&#160;&#160;(*(volatile uint32_t *)0xE000E010)</td></tr>
 <tr class="memitem:a4e8efcc1f2b551dbf3cb0aae1231e380" id="r_a4e8efcc1f2b551dbf3cb0aae1231e380"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e8efcc1f2b551dbf3cb0aae1231e380">SYST_RVR</a>&#160;&#160;&#160;(*(volatile uint32_t *)0xE000E014)</td></tr>
 <tr class="memitem:ae3dc4d2dbfdf38c593a5581415fecfed" id="r_ae3dc4d2dbfdf38c593a5581415fecfed"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae3dc4d2dbfdf38c593a5581415fecfed">SYST_CVR</a>&#160;&#160;&#160;(*(volatile uint32_t *)0xE000E018)</td></tr>
@@ -170,43 +185,84 @@ Macros</h2></td></tr>
 <tr class="memitem:a697f471baebab2b1bad6d79624763849" id="r_a697f471baebab2b1bad6d79624763849"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a697f471baebab2b1bad6d79624763849">SYST_CSR_EN_BIT</a>&#160;&#160;&#160;0</td></tr>
 <tr class="memitem:a29275d55dd1d5dfc200a76ee9d861b97" id="r_a29275d55dd1d5dfc200a76ee9d861b97"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a29275d55dd1d5dfc200a76ee9d861b97">SYST_CSR_TICKINT_BIT</a>&#160;&#160;&#160;1</td></tr>
 <tr class="memitem:a8042c451d1439fcf234bbfac884726ad" id="r_a8042c451d1439fcf234bbfac884726ad"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8042c451d1439fcf234bbfac884726ad">SYST_CSR_CLKSOURCE_BIT</a>&#160;&#160;&#160;2</td></tr>
+<tr class="memitem:a7db2e33b59690fc9503670e07e187e0f" id="r_a7db2e33b59690fc9503670e07e187e0f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7db2e33b59690fc9503670e07e187e0f">TIMx_CCR1_OFFSET</a>&#160;&#160;&#160;0x34</td></tr>
+<tr class="memitem:a47607025f0de48cf154da76d38802c95" id="r_a47607025f0de48cf154da76d38802c95"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a47607025f0de48cf154da76d38802c95">TIMx_CCER_OFFSET</a>&#160;&#160;&#160;0x20</td></tr>
+<tr class="memitem:a7f946dd229dbd90448b2f98bf305aa30" id="r_a7f946dd229dbd90448b2f98bf305aa30"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7f946dd229dbd90448b2f98bf305aa30">TIMx_CCER_CC1E_BIT</a>&#160;&#160;&#160;0</td></tr>
+<tr class="memitem:ae2559d75cd0b376c90e9c26984526a83" id="r_ae2559d75cd0b376c90e9c26984526a83"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2559d75cd0b376c90e9c26984526a83">TIMx_CCER_CC2E_BIT</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memitem:ad428f7cf869c9b56fa0518a566008acc" id="r_ad428f7cf869c9b56fa0518a566008acc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad428f7cf869c9b56fa0518a566008acc">TIMx_CCER_CC3E_BIT</a>&#160;&#160;&#160;8</td></tr>
+<tr class="memitem:a0410808296c03b2edc65445be61860df" id="r_a0410808296c03b2edc65445be61860df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0410808296c03b2edc65445be61860df">TIMx_CCER_CC4E_BIT</a>&#160;&#160;&#160;12</td></tr>
+<tr class="memitem:ab11ac5036effe72ede1e3e0b0f9607c8" id="r_ab11ac5036effe72ede1e3e0b0f9607c8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab11ac5036effe72ede1e3e0b0f9607c8">TIMx_CCMR1_OFFSET</a>&#160;&#160;&#160;0x18</td></tr>
+<tr class="memitem:aa103576ee7445b013d679ef6857b6bcd" id="r_aa103576ee7445b013d679ef6857b6bcd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa103576ee7445b013d679ef6857b6bcd">TIMx_CCMR2_OFFSET</a>&#160;&#160;&#160;0x1c</td></tr>
+<tr class="memitem:ac02ef8500f45b05c52ed9c67867cdd10" id="r_ac02ef8500f45b05c52ed9c67867cdd10"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac02ef8500f45b05c52ed9c67867cdd10">TIMx_CCMR1_OC1M_BIT</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memitem:ab36c307fd9bbf913fba72b839bc43b24" id="r_ab36c307fd9bbf913fba72b839bc43b24"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab36c307fd9bbf913fba72b839bc43b24">TIMx_CCMR1_OC1M_PWM_MODE1</a>&#160;&#160;&#160;  0x6</td></tr>
+<tr class="memitem:ad51fec526c99f12323d5cbe67e0a11f2" id="r_ad51fec526c99f12323d5cbe67e0a11f2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad51fec526c99f12323d5cbe67e0a11f2">TIMx_CCMR1_OC1M_PWM_MODE2</a>&#160;&#160;&#160;  0x07</td></tr>
+<tr class="memitem:a2350947146efbf7fee217b0b684ac4b4" id="r_a2350947146efbf7fee217b0b684ac4b4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2350947146efbf7fee217b0b684ac4b4">TIMx_CCMR1_OC1PE_BIT</a>&#160;&#160;&#160;3</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a51591e1b5e966fd8031bed4ff27ba3b7" id="r_a51591e1b5e966fd8031bed4ff27ba3b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51591e1b5e966fd8031bed4ff27ba3b7">systick_init</a> (uint32_t tick_us)</td></tr>
+<tr class="memdesc:a51591e1b5e966fd8031bed4ff27ba3b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the SysTick timer to generate periodic ticks.  <br /></td></tr>
 <tr class="memitem:ab7cce8122024d7ba47bf10f434956de4" id="r_ab7cce8122024d7ba47bf10f434956de4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab7cce8122024d7ba47bf10f434956de4">delay_ms</a> (uint32_t ms)</td></tr>
+<tr class="memdesc:ab7cce8122024d7ba47bf10f434956de4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Busy-wait for the specified number of milliseconds.  <br /></td></tr>
 <tr class="memitem:a025aed4c2e0c624b412158b404806a2a" id="r_a025aed4c2e0c624b412158b404806a2a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a025aed4c2e0c624b412158b404806a2a">delay_us</a> (uint64_t us)</td></tr>
+<tr class="memdesc:a025aed4c2e0c624b412158b404806a2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Busy-wait for the specified number of microseconds.  <br /></td></tr>
 <tr class="memitem:a8aea94afb2c6534c316c01aca84dacb3" id="r_a8aea94afb2c6534c316c01aca84dacb3"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8aea94afb2c6534c316c01aca84dacb3">hal_get_tick</a> (void)</td></tr>
+<tr class="memdesc:a8aea94afb2c6534c316c01aca84dacb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current system tick count.  <br /></td></tr>
 <tr class="memitem:abb6898e3bf58a48224867791dbdefdf3" id="r_abb6898e3bf58a48224867791dbdefdf3"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abb6898e3bf58a48224867791dbdefdf3">hal_get_tick_duration_us</a> (void)</td></tr>
+<tr class="memdesc:abb6898e3bf58a48224867791dbdefdf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the configured tick duration in microseconds.  <br /></td></tr>
 <tr class="memitem:a3dafc6a0248d43b6a4c076b7dbcfc23f" id="r_a3dafc6a0248d43b6a4c076b7dbcfc23f"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3dafc6a0248d43b6a4c076b7dbcfc23f">hal_get_tick_reload_value</a> (void)</td></tr>
+<tr class="memdesc:a3dafc6a0248d43b6a4c076b7dbcfc23f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the SysTick reload value (24-bit truncated).  <br /></td></tr>
 <tr class="memitem:a71ab66b2798cd4aafcfe0a24b9154594" id="r_a71ab66b2798cd4aafcfe0a24b9154594"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a71ab66b2798cd4aafcfe0a24b9154594">hal_get_millis</a> (void)</td></tr>
+<tr class="memdesc:a71ab66b2798cd4aafcfe0a24b9154594"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return system uptime in milliseconds.  <br /></td></tr>
 <tr class="memitem:ade6c3437a366ce7aaf9617e69a848df9" id="r_ade6c3437a366ce7aaf9617e69a848df9"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade6c3437a366ce7aaf9617e69a848df9">hal_get_micros</a> (void)</td></tr>
+<tr class="memdesc:ade6c3437a366ce7aaf9617e69a848df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return system uptime in microseconds.  <br /></td></tr>
 <tr class="memitem:ab5e09814056d617c521549e542639b7e" id="r_ab5e09814056d617c521549e542639b7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5e09814056d617c521549e542639b7e">SysTick_Handler</a> (void)</td></tr>
+<tr class="memdesc:ab5e09814056d617c521549e542639b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">SysTick interrupt handler increments the global tick counter.  <br /></td></tr>
 <tr class="memitem:abd90df18c8f6730a6ba675cf639247a4" id="r_abd90df18c8f6730a6ba675cf639247a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abd90df18c8f6730a6ba675cf639247a4">hal_systick_set_callback</a> (void(*cb)(void))</td></tr>
 <tr class="memitem:adfbc1cc33f34b935f0b0ee61d2d3f6f8" id="r_adfbc1cc33f34b935f0b0ee61d2d3f6f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adfbc1cc33f34b935f0b0ee61d2d3f6f8">timer_init</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t prescaler, uint32_t auto_reload)</td></tr>
+<tr class="memdesc:adfbc1cc33f34b935f0b0ee61d2d3f6f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a timer based on its type (advanced / gp1 / gp2).  <br /></td></tr>
 <tr class="memitem:a49fb0f6c6b9a4802601a452618672e52" id="r_a49fb0f6c6b9a4802601a452618672e52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a49fb0f6c6b9a4802601a452618672e52">timer_start</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
+<tr class="memdesc:a49fb0f6c6b9a4802601a452618672e52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start the specified timer.  <br /></td></tr>
 <tr class="memitem:a196e32e61e4a4d6cb50e46ebffb1e0b8" id="r_a196e32e61e4a4d6cb50e46ebffb1e0b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a196e32e61e4a4d6cb50e46ebffb1e0b8">timer_stop</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
+<tr class="memdesc:a196e32e61e4a4d6cb50e46ebffb1e0b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop the specified timer.  <br /></td></tr>
 <tr class="memitem:ab50e7d8e6b8713a9a96abc6dd3a9e932" id="r_ab50e7d8e6b8713a9a96abc6dd3a9e932"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab50e7d8e6b8713a9a96abc6dd3a9e932">timer_reset</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
+<tr class="memdesc:ab50e7d8e6b8713a9a96abc6dd3a9e932"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset timer counter to zero.  <br /></td></tr>
 <tr class="memitem:a19aba4b4d8462e4f84b6eeabda21423c" id="r_a19aba4b4d8462e4f84b6eeabda21423c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19aba4b4d8462e4f84b6eeabda21423c">timer_get_count</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
+<tr class="memdesc:a19aba4b4d8462e4f84b6eeabda21423c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current counter value for a timer.  <br /></td></tr>
 <tr class="memitem:a4ee300cb9e4b9356f445bbc7d0d7549f" id="r_a4ee300cb9e4b9356f445bbc7d0d7549f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ee300cb9e4b9356f445bbc7d0d7549f">timer_enable_interrupt</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
+<tr class="memdesc:a4ee300cb9e4b9356f445bbc7d0d7549f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable timer interrupts (NVIC + DIER UIE) for supported timers.  <br /></td></tr>
 <tr class="memitem:a4784a158d5bf211d3f07cc83ca0b78c2" id="r_a4784a158d5bf211d3f07cc83ca0b78c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4784a158d5bf211d3f07cc83ca0b78c2">timer_disable_interrupt</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
 <tr class="memitem:a6226a8f2f8b305c2a319ade05a77886c" id="r_a6226a8f2f8b305c2a319ade05a77886c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6226a8f2f8b305c2a319ade05a77886c">timer_clear_interrupt_flag</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
+<tr class="memdesc:a6226a8f2f8b305c2a319ade05a77886c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear timer update interrupt flag for supported timers.  <br /></td></tr>
 <tr class="memitem:a45f9a07b1ec73b7c758005623d8ab0e5" id="r_a45f9a07b1ec73b7c758005623d8ab0e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45f9a07b1ec73b7c758005623d8ab0e5">timer_attach_callback</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, void(*callback)(void))</td></tr>
+<tr class="memdesc:a45f9a07b1ec73b7c758005623d8ab0e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach a callback to the timer's HAL interrupt table.  <br /></td></tr>
 <tr class="memitem:a834d3bef7882671645ad5d3c58fa69bc" id="r_a834d3bef7882671645ad5d3c58fa69bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a834d3bef7882671645ad5d3c58fa69bc">timer_detach_callback</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
+<tr class="memdesc:a834d3bef7882671645ad5d3c58fa69bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detach a previously attached callback for the given timer.  <br /></td></tr>
 <tr class="memitem:a38ad4725462bdc5e86c4ead4f04b9fc2" id="r_a38ad4725462bdc5e86c4ead4f04b9fc2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a38ad4725462bdc5e86c4ead4f04b9fc2">TIM2_IRQHandler</a> (void)</td></tr>
+<tr class="memdesc:a38ad4725462bdc5e86c4ead4f04b9fc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">IRQ handler wrapper for TIM2.  <br /></td></tr>
 <tr class="memitem:ac8e51d2183b5230cbd5481f8867adce9" id="r_ac8e51d2183b5230cbd5481f8867adce9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac8e51d2183b5230cbd5481f8867adce9">TIM3_IRQHandler</a> (void)</td></tr>
+<tr class="memdesc:ac8e51d2183b5230cbd5481f8867adce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">IRQ handler wrapper for TIM3.  <br /></td></tr>
 <tr class="memitem:a7133f3f78767503641d307386e68bd28" id="r_a7133f3f78767503641d307386e68bd28"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7133f3f78767503641d307386e68bd28">TIM4_IRQHandler</a> (void)</td></tr>
+<tr class="memdesc:a7133f3f78767503641d307386e68bd28"><td class="mdescLeft">&#160;</td><td class="mdescRight">IRQ handler wrapper for TIM4.  <br /></td></tr>
 <tr class="memitem:a5e66446caf21dd90191dc07a13ce2378" id="r_a5e66446caf21dd90191dc07a13ce2378"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5e66446caf21dd90191dc07a13ce2378">TIM5_IRQHandler</a> (void)</td></tr>
+<tr class="memdesc:a5e66446caf21dd90191dc07a13ce2378"><td class="mdescLeft">&#160;</td><td class="mdescRight">IRQ handler wrapper for TIM5.  <br /></td></tr>
 <tr class="memitem:a903756e157645ae9961b3e937c593c34" id="r_a903756e157645ae9961b3e937c593c34"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a903756e157645ae9961b3e937c593c34">TIM9_IRQHandler</a> (void)</td></tr>
 <tr class="memitem:aa6691f9947ff72bae0c9a47f5023cd39" id="r_aa6691f9947ff72bae0c9a47f5023cd39"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa6691f9947ff72bae0c9a47f5023cd39">TIM12_IRQHandler</a> (void)</td></tr>
 <tr class="memitem:a3b5738efe72c1bd7130276a8f59b8234" id="r_a3b5738efe72c1bd7130276a8f59b8234"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b5738efe72c1bd7130276a8f59b8234">timer_set_compare</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint8_t channel, uint32_t compare_value)</td></tr>
-<tr class="memitem:a88f8507e6211bf708ff51187d308e00d" id="r_a88f8507e6211bf708ff51187d308e00d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88f8507e6211bf708ff51187d308e00d">timer_enable_pwm</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint8_t channel)</td></tr>
-<tr class="memitem:ad4f6dcd8d4cecddd113099a86df853e1" id="r_ad4f6dcd8d4cecddd113099a86df853e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad4f6dcd8d4cecddd113099a86df853e1">timer_disable_pwm</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint8_t channel)</td></tr>
+<tr class="memdesc:a3b5738efe72c1bd7130276a8f59b8234"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the compare (CCR) register for a timer channel and configure CCMR.  <br /></td></tr>
+<tr class="memitem:ab790fdb4ee5e3bfe9477a2bbfb89e13d" id="r_ab790fdb4ee5e3bfe9477a2bbfb89e13d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab790fdb4ee5e3bfe9477a2bbfb89e13d">timer_enable_channel</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t channel)</td></tr>
+<tr class="memdesc:ab790fdb4ee5e3bfe9477a2bbfb89e13d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable output on the specified timer channel (CCxE).  <br /></td></tr>
+<tr class="memitem:a0d3035840fb20d5213a70d0e33994584" id="r_a0d3035840fb20d5213a70d0e33994584"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d3035840fb20d5213a70d0e33994584">timer_disable_channel</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t channel)</td></tr>
+<tr class="memdesc:a0d3035840fb20d5213a70d0e33994584"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable output on the specified timer channel (CCxE = 0).  <br /></td></tr>
 <tr class="memitem:a6b2fb6cbff774094130a964475db6b25" id="r_a6b2fb6cbff774094130a964475db6b25"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b2fb6cbff774094130a964475db6b25">timer_get_frequency</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
+<tr class="memdesc:a6b2fb6cbff774094130a964475db6b25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the timer's current base frequency using PSC and ARR.  <br /></td></tr>
 <tr class="memitem:ad6a8de2e162397553b3421265987fb7b" id="r_ad6a8de2e162397553b3421265987fb7b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad6a8de2e162397553b3421265987fb7b">timer_set_prescaler</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t prescaler)</td></tr>
 <tr class="memitem:a159fed92e0cdfaa14198b84dafe12f80" id="r_a159fed92e0cdfaa14198b84dafe12f80"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a159fed92e0cdfaa14198b84dafe12f80">timer_set_auto_reload</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t arr)</td></tr>
 </table>
-<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Timer and SysTick register defines and API for STM32F4 (Cortex-M4). </p>
+<p>This header contains register offsets, bit definitions, SysTick control, timer base addresses, and the public timer/SysTick API used by the HAL. All defines and function prototypes are intended for the STM32F4 series on a Cortex-M4 core. </p>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="ad4baa1f26b04719fe3d4e2f02d7dde40" name="ad4baa1f26b04719fe3d4e2f02d7dde40"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad4baa1f26b04719fe3d4e2f02d7dde40">&#9670;&#160;</a></span>RCC_APB1ENR</h2>
 
@@ -627,6 +683,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a96634d8454d22d7c7b80c0984d294a23" name="a96634d8454d22d7c7b80c0984d294a23"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96634d8454d22d7c7b80c0984d294a23">&#9670;&#160;</a></span>TIM_ADV_DIER_OFFSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_ADV_DIER_OFFSET&#160;&#160;&#160;0X0C</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a79d6e987cb4885a3d87c2727ce17a83e" name="a79d6e987cb4885a3d87c2727ce17a83e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79d6e987cb4885a3d87c2727ce17a83e">&#9670;&#160;</a></span>TIM_ADV_DIER_UIE_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_ADV_DIER_UIE_BIT&#160;&#160;&#160;0x00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a976c9c69020ce73578f72803a7571007" name="a976c9c69020ce73578f72803a7571007"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a976c9c69020ce73578f72803a7571007">&#9670;&#160;</a></span>TIM_ADV_EGR_OFFSET</h2>
 
@@ -725,6 +809,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a8a22ffd9e999934aa3513c9d4e840c88" name="a8a22ffd9e999934aa3513c9d4e840c88"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a22ffd9e999934aa3513c9d4e840c88">&#9670;&#160;</a></span>TIM_GP1_DIER_OFFSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_GP1_DIER_OFFSET&#160;&#160;&#160;0X0C</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af92d3f7035eb47561b2ece9a64eb0c00" name="af92d3f7035eb47561b2ece9a64eb0c00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af92d3f7035eb47561b2ece9a64eb0c00">&#9670;&#160;</a></span>TIM_GP1_DIER_UIE_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_GP1_DIER_UIE_BIT&#160;&#160;&#160;0x00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aaa13389071f74fa4d47be939e0b829a2" name="aaa13389071f74fa4d47be939e0b829a2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaa13389071f74fa4d47be939e0b829a2">&#9670;&#160;</a></span>TIM_GP1_EGR_OFFSET</h2>
 
@@ -761,6 +873,34 @@ Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define TIM_GP1_PSC_OFFSET&#160;&#160;&#160;  0x28</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a69ee77edf438e1cb5756197bf2f63033" name="a69ee77edf438e1cb5756197bf2f63033"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69ee77edf438e1cb5756197bf2f63033">&#9670;&#160;</a></span>TIM_GP1_SR_OFFSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_GP1_SR_OFFSET&#160;&#160;&#160;0x10</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af8453c74167e2cf1d017d049c0971796" name="af8453c74167e2cf1d017d049c0971796"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8453c74167e2cf1d017d049c0971796">&#9670;&#160;</a></span>TIM_GP1_SR_UIF_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_GP1_SR_UIF_BIT&#160;&#160;&#160;0x00</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -823,6 +963,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a05789f2f7133046c5e3085711850006d" name="a05789f2f7133046c5e3085711850006d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05789f2f7133046c5e3085711850006d">&#9670;&#160;</a></span>TIM_GP2_DIER_OFFSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_GP2_DIER_OFFSET&#160;&#160;&#160;0X0C</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="accde5ace9559193c2db9f7c5e2a345a4" name="accde5ace9559193c2db9f7c5e2a345a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#accde5ace9559193c2db9f7c5e2a345a4">&#9670;&#160;</a></span>TIM_GP2_DIER_UIE_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_GP2_DIER_UIE_BIT&#160;&#160;&#160;0x00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ad42762db56c95fd0032f87cad92cb6f1" name="ad42762db56c95fd0032f87cad92cb6f1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad42762db56c95fd0032f87cad92cb6f1">&#9670;&#160;</a></span>TIM_GP2_EGR_OFFSET</h2>
 
@@ -865,6 +1033,202 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a912c786aa817e90312f74a96b58154d6" name="a912c786aa817e90312f74a96b58154d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a912c786aa817e90312f74a96b58154d6">&#9670;&#160;</a></span>TIM_GP2_SR_OFFSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_GP2_SR_OFFSET&#160;&#160;&#160;0x10</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4c01776c4720aa126cff923b056b0c54" name="a4c01776c4720aa126cff923b056b0c54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c01776c4720aa126cff923b056b0c54">&#9670;&#160;</a></span>TIM_GP2_SR_UIF_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIM_GP2_SR_UIF_BIT&#160;&#160;&#160;0x00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7f946dd229dbd90448b2f98bf305aa30" name="a7f946dd229dbd90448b2f98bf305aa30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f946dd229dbd90448b2f98bf305aa30">&#9670;&#160;</a></span>TIMx_CCER_CC1E_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCER_CC1E_BIT&#160;&#160;&#160;0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae2559d75cd0b376c90e9c26984526a83" name="ae2559d75cd0b376c90e9c26984526a83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2559d75cd0b376c90e9c26984526a83">&#9670;&#160;</a></span>TIMx_CCER_CC2E_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCER_CC2E_BIT&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad428f7cf869c9b56fa0518a566008acc" name="ad428f7cf869c9b56fa0518a566008acc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad428f7cf869c9b56fa0518a566008acc">&#9670;&#160;</a></span>TIMx_CCER_CC3E_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCER_CC3E_BIT&#160;&#160;&#160;8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0410808296c03b2edc65445be61860df" name="a0410808296c03b2edc65445be61860df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0410808296c03b2edc65445be61860df">&#9670;&#160;</a></span>TIMx_CCER_CC4E_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCER_CC4E_BIT&#160;&#160;&#160;12</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a47607025f0de48cf154da76d38802c95" name="a47607025f0de48cf154da76d38802c95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47607025f0de48cf154da76d38802c95">&#9670;&#160;</a></span>TIMx_CCER_OFFSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCER_OFFSET&#160;&#160;&#160;0x20</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac02ef8500f45b05c52ed9c67867cdd10" name="ac02ef8500f45b05c52ed9c67867cdd10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac02ef8500f45b05c52ed9c67867cdd10">&#9670;&#160;</a></span>TIMx_CCMR1_OC1M_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCMR1_OC1M_BIT&#160;&#160;&#160;4</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab36c307fd9bbf913fba72b839bc43b24" name="ab36c307fd9bbf913fba72b839bc43b24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab36c307fd9bbf913fba72b839bc43b24">&#9670;&#160;</a></span>TIMx_CCMR1_OC1M_PWM_MODE1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCMR1_OC1M_PWM_MODE1&#160;&#160;&#160;  0x6</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad51fec526c99f12323d5cbe67e0a11f2" name="ad51fec526c99f12323d5cbe67e0a11f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad51fec526c99f12323d5cbe67e0a11f2">&#9670;&#160;</a></span>TIMx_CCMR1_OC1M_PWM_MODE2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCMR1_OC1M_PWM_MODE2&#160;&#160;&#160;  0x07</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2350947146efbf7fee217b0b684ac4b4" name="a2350947146efbf7fee217b0b684ac4b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2350947146efbf7fee217b0b684ac4b4">&#9670;&#160;</a></span>TIMx_CCMR1_OC1PE_BIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCMR1_OC1PE_BIT&#160;&#160;&#160;3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab11ac5036effe72ede1e3e0b0f9607c8" name="ab11ac5036effe72ede1e3e0b0f9607c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab11ac5036effe72ede1e3e0b0f9607c8">&#9670;&#160;</a></span>TIMx_CCMR1_OFFSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCMR1_OFFSET&#160;&#160;&#160;0x18</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa103576ee7445b013d679ef6857b6bcd" name="aa103576ee7445b013d679ef6857b6bcd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa103576ee7445b013d679ef6857b6bcd">&#9670;&#160;</a></span>TIMx_CCMR2_OFFSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCMR2_OFFSET&#160;&#160;&#160;0x1c</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7db2e33b59690fc9503670e07e187e0f" name="a7db2e33b59690fc9503670e07e187e0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7db2e33b59690fc9503670e07e187e0f">&#9670;&#160;</a></span>TIMx_CCR1_OFFSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TIMx_CCR1_OFFSET&#160;&#160;&#160;0x34</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="ab7cce8122024d7ba47bf10f434956de4" name="ab7cce8122024d7ba47bf10f434956de4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab7cce8122024d7ba47bf10f434956de4">&#9670;&#160;</a></span>delay_ms()</h2>
@@ -880,6 +1244,14 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Busy-wait for the specified number of milliseconds. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ms</td><td>Number of milliseconds to delay. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -898,6 +1270,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Busy-wait for the specified number of microseconds. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">us</td><td>Number of microseconds to delay.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>This is a blocking busy-wait that uses <a class="el" href="timer_8c.html#a8aea94afb2c6534c316c01aca84dacb3" title="Return the current system tick count.">hal_get_tick()</a> and the configured tick duration. It will wait at least one tick if the requested delay is smaller than the tick duration. </dd></dl>
+
 </div>
 </div>
 <a id="ade6c3437a366ce7aaf9617e69a848df9" name="ade6c3437a366ce7aaf9617e69a848df9"></a>
@@ -914,6 +1295,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return system uptime in microseconds. </p>
+<dl class="section return"><dt>Returns</dt><dd>Microseconds since tick counter started. </dd></dl>
 
 </div>
 </div>
@@ -932,6 +1316,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Return system uptime in milliseconds. </p>
+<dl class="section return"><dt>Returns</dt><dd>Milliseconds since tick counter started. </dd></dl>
+
 </div>
 </div>
 <a id="a8aea94afb2c6534c316c01aca84dacb3" name="a8aea94afb2c6534c316c01aca84dacb3"></a>
@@ -948,6 +1335,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return the current system tick count. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current tick count. </dd></dl>
 
 </div>
 </div>
@@ -966,6 +1356,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Return the configured tick duration in microseconds. </p>
+<dl class="section return"><dt>Returns</dt><dd>Tick duration (us). </dd></dl>
+
 </div>
 </div>
 <a id="a3dafc6a0248d43b6a4c076b7dbcfc23f" name="a3dafc6a0248d43b6a4c076b7dbcfc23f"></a>
@@ -982,6 +1375,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return the SysTick reload value (24-bit truncated). </p>
+<dl class="section return"><dt>Returns</dt><dd>Reload value currently configured in SYST_RVR. </dd></dl>
 
 </div>
 </div>
@@ -1017,6 +1413,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>SysTick interrupt handler increments the global tick counter. </p>
+<dl class="section note"><dt>Note</dt><dd>This handler is intended to be wired into the vector table. </dd></dl>
+
 </div>
 </div>
 <a id="a51591e1b5e966fd8031bed4ff27ba3b7" name="a51591e1b5e966fd8031bed4ff27ba3b7"></a>
@@ -1033,6 +1432,15 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Initialize the SysTick timer to generate periodic ticks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tick_us</td><td>Tick period in microseconds.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>The SysTick reload is limited to 24 bits; this function clips the computed reload value to 24 bits. The function configures SysTick to use the selected clock source, enables the SysTick interrupt and starts the timer. </dd></dl>
 
 </div>
 </div>
@@ -1068,6 +1476,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>IRQ handler wrapper for TIM2. </p>
+<p>Clears the flag and dispatches to the HAL interrupt handler table. </p>
+
 </div>
 </div>
 <a id="ac8e51d2183b5230cbd5481f8867adce9" name="ac8e51d2183b5230cbd5481f8867adce9"></a>
@@ -1084,6 +1495,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>IRQ handler wrapper for TIM3. </p>
 
 </div>
 </div>
@@ -1102,6 +1515,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>IRQ handler wrapper for TIM4. </p>
+
 </div>
 </div>
 <a id="a5e66446caf21dd90191dc07a13ce2378" name="a5e66446caf21dd90191dc07a13ce2378"></a>
@@ -1118,6 +1533,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>IRQ handler wrapper for TIM5. </p>
 
 </div>
 </div>
@@ -1157,6 +1574,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Attach a callback to the timer's HAL interrupt table. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+    <tr><td class="paramname">callback</td><td>Function pointer to call when the timer IRQ fires. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a6226a8f2f8b305c2a319ade05a77886c" name="a6226a8f2f8b305c2a319ade05a77886c"></a>
@@ -1174,6 +1600,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Clear timer update interrupt flag for supported timers. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Currently supports TIM2-TIM5 and TIM9-TIM11 patterns used in this HAL. </dd></dl>
+
 </div>
 </div>
 <a id="a834d3bef7882671645ad5d3c58fa69bc" name="a834d3bef7882671645ad5d3c58fa69bc"></a>
@@ -1190,6 +1625,44 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Detach a previously attached callback for the given timer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a0d3035840fb20d5213a70d0e33994584" name="a0d3035840fb20d5213a70d0e33994584"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d3035840fb20d5213a70d0e33994584">&#9670;&#160;</a></span>timer_disable_channel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void timer_disable_channel </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Disable output on the specified timer channel (CCxE = 0). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+    <tr><td class="paramname">channel</td><td>Channel number (1-4). </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1210,24 +1683,33 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad4f6dcd8d4cecddd113099a86df853e1" name="ad4f6dcd8d4cecddd113099a86df853e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4f6dcd8d4cecddd113099a86df853e1">&#9670;&#160;</a></span>timer_disable_pwm()</h2>
+<a id="ab790fdb4ee5e3bfe9477a2bbfb89e13d" name="ab790fdb4ee5e3bfe9477a2bbfb89e13d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab790fdb4ee5e3bfe9477a2bbfb89e13d">&#9670;&#160;</a></span>timer_enable_channel()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void timer_disable_pwm </td>
+          <td class="memname">void timer_enable_channel </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>&#160;)</td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Enable output on the specified timer channel (CCxE). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+    <tr><td class="paramname">channel</td><td>Channel number (1-4). </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1246,26 +1728,14 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a88f8507e6211bf708ff51187d308e00d" name="a88f8507e6211bf708ff51187d308e00d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a88f8507e6211bf708ff51187d308e00d">&#9670;&#160;</a></span>timer_enable_pwm()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_enable_pwm </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
+<p>Enable timer interrupts (NVIC + DIER UIE) for supported timers. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>For TIM1 more complex options exist and are left TODO in the original. </dd></dl>
 
 </div>
 </div>
@@ -1284,6 +1754,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Get the current counter value for a timer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Current counter value or 0 if invalid timer. </dd></dl>
+
 </div>
 </div>
 <a id="a6b2fb6cbff774094130a964475db6b25" name="a6b2fb6cbff774094130a964475db6b25"></a>
@@ -1300,6 +1779,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Calculate the timer's current base frequency using PSC and ARR. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Timer frequency in Hz or 0 if invalid timer.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This reads PSC and ARR directly from timer registers and uses the appropriate APB clock for the timer. </dd></dl>
 
 </div>
 </div>
@@ -1327,6 +1816,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Initialize a timer based on its type (advanced / gp1 / gp2). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+    <tr><td class="paramname">prescaler</td><td>Prescaler value. </td></tr>
+    <tr><td class="paramname">auto_reload</td><td>Auto-reload value. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="ab50e7d8e6b8713a9a96abc6dd3a9e932" name="ab50e7d8e6b8713a9a96abc6dd3a9e932"></a>
@@ -1343,6 +1842,14 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Reset timer counter to zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1391,6 +1898,17 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Set the compare (CCR) register for a timer channel and configure CCMR. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+    <tr><td class="paramname">channel</td><td>Channel number (1-4). </td></tr>
+    <tr><td class="paramname">compare_value</td><td>Value to write into CCRx.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>This function sets PWM mode 1 and enables the channel after writing CCR. </dd></dl>
+
 </div>
 </div>
 <a id="ad6a8de2e162397553b3421265987fb7b" name="ad6a8de2e162397553b3421265987fb7b"></a>
@@ -1429,6 +1947,14 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Start the specified timer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <a id="a196e32e61e4a4d6cb50e46ebffb1e0b8" name="a196e32e61e4a4d6cb50e46ebffb1e0b8"></a>
@@ -1445,6 +1971,14 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Stop the specified timer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

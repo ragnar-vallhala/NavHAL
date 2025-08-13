@@ -6,7 +6,7 @@ digraph "samples/02_hal_pupd/main.c"
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   Node1 [id="Node000001",label="samples/02_hal_pupd\l/main.c",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge9_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="core/cortex-m4/gpio.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$gpio_8h.html",tooltip="GPIO HAL implementation for Cortex-M4 (STM32F401RE)."];
+  Node2 [id="Node000002",label="core/cortex-m4/gpio.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$gpio_8h.html",tooltip="HAL interface for GPIO control on STM32F4 series."];
   Node2 -> Node3 [id="edge10_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="utils/types.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$types_8h.html",tooltip="Centralized type definitions include for NavHAL."];
   Node3 -> Node4 [id="edge11_Node000003_Node000004",color="steelblue1",style="solid",tooltip=" "];

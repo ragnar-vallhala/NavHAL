@@ -10,5 +10,5 @@ digraph "src/core/cortex-m4/gpio"
   dir_0594592f2a5a27aba932b8230bd80cd6 [label="gpio", fillcolor="#edf0f7", color="grey25", style="filled,bold", URL="dir_0594592f2a5a27aba932b8230bd80cd6.html",tooltip=""];
   }
   dir_d44c64559bbebec7f509842c48db8b23 [label="include", fillcolor="#edf0f7", color="red", style="filled", URL="dir_d44c64559bbebec7f509842c48db8b23.html",tooltip=""];
-  dir_0594592f2a5a27aba932b8230bd80cd6->dir_d44c64559bbebec7f509842c48db8b23 [headlabel="1", labeldistance=1.5 headhref="dir_000014_000015.html" href="dir_000014_000015.html" color="steelblue1" fontcolor="steelblue1"];
+  dir_0594592f2a5a27aba932b8230bd80cd6->dir_d44c64559bbebec7f509842c48db8b23 [headlabel="3", labeldistance=1.5 headhref="dir_000016_000017.html" href="dir_000016_000017.html" color="steelblue1" fontcolor="steelblue1"];
 }

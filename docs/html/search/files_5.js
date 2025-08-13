@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['main_2ec_0',['main.c',['../01__hal__blink_2main_8c.html',1,'(Global Namespace)'],['../01__no__hal__blink_2main_8c.html',1,'(Global Namespace)'],['../02__hal__pupd_2main_8c.html',1,'(Global Namespace)'],['../03__hal__uart__tx_2main_8c.html',1,'(Global Namespace)'],['../03__no__hal__uart__tx_2main_8c.html',1,'(Global Namespace)'],['../04__hal__timer_2main_8c.html',1,'(Global Namespace)'],['../05__hal__systick_2main_8c.html',1,'(Global Namespace)'],['../06__hal__blink__delay_2main_8c.html',1,'(Global Namespace)']]],
-  ['mainpage_2emd_1',['mainpage.md',['../mainpage_8md.html',1,'']]]
+  ['license_2emd_0',['LICENSE.md',['../_l_i_c_e_n_s_e_8md.html',1,'']]]
 ];

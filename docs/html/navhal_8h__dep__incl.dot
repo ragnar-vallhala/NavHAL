@@ -17,4 +17,6 @@ digraph "include/navhal.h"
   Node6 [id="Node000006",label="samples/05_hal_systick\l/main.c",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$05__hal__systick_2main_8c.html",tooltip=" "];
   Node1 -> Node7 [id="edge6_Node000001_Node000007",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node7 [id="Node000007",label="samples/06_hal_blink\l_delay/main.c",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$06__hal__blink__delay_2main_8c.html",tooltip=" "];
+  Node1 -> Node8 [id="edge7_Node000001_Node000008",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node8 [id="Node000008",label="samples/07_hal_pwm\l/main.c",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$07__hal__pwm_2main_8c.html",tooltip=" "];
 }

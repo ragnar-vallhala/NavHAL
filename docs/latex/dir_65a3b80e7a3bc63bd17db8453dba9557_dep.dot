@@ -10,5 +10,5 @@ digraph "src/core/cortex-m4/uart"
   dir_65a3b80e7a3bc63bd17db8453dba9557 [label="uart", fillcolor="#edf0f7", color="grey25", style="filled,bold", URL="dir_65a3b80e7a3bc63bd17db8453dba9557.html",tooltip=""];
   }
   dir_d44c64559bbebec7f509842c48db8b23 [label="include", fillcolor="#edf0f7", color="red", style="filled", URL="dir_d44c64559bbebec7f509842c48db8b23.html",tooltip=""];
-  dir_65a3b80e7a3bc63bd17db8453dba9557->dir_d44c64559bbebec7f509842c48db8b23 [headlabel="3", labeldistance=1.5 headhref="dir_000021_000015.html" href="dir_000021_000015.html" color="steelblue1" fontcolor="steelblue1"];
+  dir_65a3b80e7a3bc63bd17db8453dba9557->dir_d44c64559bbebec7f509842c48db8b23 [headlabel="3", labeldistance=1.5 headhref="dir_000025_000017.html" href="dir_000025_000017.html" color="steelblue1" fontcolor="steelblue1"];
 }

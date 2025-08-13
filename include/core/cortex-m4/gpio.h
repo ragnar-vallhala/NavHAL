@@ -1,165 +1,75 @@
-/**
- * @file gpio.h
- * @brief GPIO HAL implementation for Cortex-M4 (STM32F401RE).
- *
- * This header provides low-level register definitions and functions to
- * configure and control GPIO peripherals on Cortex-M4-based microcontrollers,
- * specifically STM32F401RE in this implementation.
- *
- * @ingroup HAL_GPIO
- *
- * @note This file is architecture-specific. It is included through the common
- * `hal_gpio.h` dispatcher based on the target definition (e.g., `CORTEX_M4`).
- *
- * @author Ashutosh Vishwakarma
- * @date 2025-07-20
- */
-
 #ifndef CORTEX_M4_GPIO_H
 #define CORTEX_M4_GPIO_H
 
+/**
+ * @file gpio.h
+ * @brief HAL interface for GPIO control on STM32F4 series.
+ * @details
+ * This header declares high-level functions for configuring and using
+ * General-Purpose I/O (GPIO) pins, including mode setup, digital read/write,
+ * pull-up/pull-down configuration, RCC enabling, and alternate function selection.
+ *
+ * These functions provide an abstraction layer over the low-level
+ * register access defined in `cortex_m4_gpio_reg.h`.
+ */
+
 #include "utils/types.h"
 
-/** @defgroup GPIO_REGISTERS GPIO Register Map (STM32F401RE)
- *  @brief Memory-mapped I/O register definitions for GPIO.
- *  @{
- */
-
 /**
- * @brief RCC AHB1 peripheral clock enable register.
- * @ref stm32f401re_reference.pdf - page 118
- */
-#define RCC_AHB1ENR (*(volatile uint32_t *)0x40023830)
-
-/**
- * @brief Base addresses of GPIO ports.
- * @ref stm32f401re.pdf - page 52
- */
-#define GPIOA 0x40020000
-#define GPIOB 0x40020400
-#define GPIOC 0x40020800
-#define GPIOD 0x40020C00
-#define GPIOE 0x40021000
-#define GPIOH 0x40021C00
-
-/// Total number of GPIO ports supported (A–E and H)
-#define GPIO_PORT_COUNT 6
-
-/// Base address table for each GPIO port
-static volatile uint32_t *const GPIO_BASE[GPIO_PORT_COUNT] = {
-    (uint32_t *)GPIOA, (uint32_t *)GPIOB, (uint32_t *)GPIOC,
-    (uint32_t *)GPIOD, (uint32_t *)GPIOE, (uint32_t *)GPIOH};
-
-/** @} */ // end of GPIO_REGISTERS
-
-/** @defgroup GPIO_REGISTER_OFFSETS GPIO Register Offsets
- *  @brief Offsets for specific control and data registers.
- *  @{
- */
-
-/**
- * @brief GPIO mode register offset.
- * @ref stm32f401re_reference.pdf - page 158
- */
-#define GPIO_MODER_OFFSET 0x00
-
-#define GPIO_AFRL_OFFSET 0x20
-
-#define GPIO_AFRH_OFFSET 0x24
-
-/**
- * @brief GPIO output type register offset.
- * @ref stm32f401re_reference.pdf - page 158
- */
-#define GPIO_OTYPER_OFFSET 0x04
-
-/**
- * @brief GPIO pull-up/pull-down register offset.
- * @ref stm32f401re_reference.pdf - page 159
- */
-#define GPIO_PUPDR_OFFSET 0x0C
-
-/**
- * @brief GPIO input data register offset.
- * @ref stm32f401re_reference.pdf - page 160
- */
-#define GPIO_IDR_OFFSET 0x10
-
-/**
- * @brief GPIO output data register offset.
- * @ref stm32f401re_reference.pdf - page 160
- */
-#define GPIO_ODR_OFFSET 0x14
-
-/**
- * @brief GPIO bit set/reset register offset.
- * @ref stm32f401re_reference.pdf - page 161
- */
-#define GPIO_BSRR_OFFSET 0x18
-
-/** @} */ // end of GPIO_REGISTER_OFFSETS
-
-/** @defgroup GPIO_API GPIO HAL Functions (Cortex-M4)
- *  @brief Function declarations for GPIO HAL.
- *  @{
- */
-
-/**
- * @brief Set the mode and pull configuration of a GPIO pin.
- *
- * @param pin   The GPIO pin (PORTx_PINy encoded).
- * @param mode  The pin mode (input, output, alternate, analog).
- * @param pupd  Pull configuration (no pull, pull-up, pull-down).
+ * @brief Configure the mode and pull-up/pull-down for a GPIO pin.
+ * @param pin Pin identifier.
+ * @param mode GPIO mode (input, output, alternate function, analog).
+ * @param pupd Pull-up/pull-down configuration.
+ * @code
+ * // Example: Configure PA5 as output with no pull-up/pull-down
+ * hal_gpio_setmode(PA5, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_NO_PULL);
+ * @endcode
  */
 void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode,
                       hal_gpio_pullup_pulldown pupd);
 
 /**
  * @brief Get the current mode of a GPIO pin.
- *
- * @param pin The GPIO pin.
- * @return The current mode of the pin.
+ * @param pin Pin identifier.
+ * @return The current GPIO mode of the pin.
  */
 hal_gpio_mode hal_gpio_getmode(hal_gpio_pin pin);
 
 /**
- * @brief Write a logic level to a GPIO pin.
- *
- * @param pin   The GPIO pin to write to.
- * @param state GPIO_HIGH or GPIO_LOW.
+ * @brief Write a digital value to a GPIO pin.
+ * @param pin Pin identifier.
+ * @param state Desired pin state (high or low).
+ * @code
+ * // Example: Set PA5 high
+ * hal_gpio_digitalwrite(PA5, HAL_GPIO_HIGH);
+ * @endcode
  */
 void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state);
 
 /**
- * @brief Read the logic level from a GPIO pin.
- *
- * @param pin The GPIO pin to read from.
- * @return GPIO_HIGH or GPIO_LOW.
+ * @brief Read the digital value from a GPIO pin.
+ * @param pin Pin identifier.
+ * @return Current pin state (high or low).
  */
 hal_gpio_state hal_gpio_digitalread(hal_gpio_pin pin);
 
 /**
- * @brief Enable the RCC peripheral clock for the GPIO port.
- *
- * @param pin GPIO pin whose port needs to be enabled.
+ * @brief Enable the RCC clock for the GPIO port of a given pin.
+ * @param pin Pin identifier.
+ * @note Must be called before configuring or using the pin.
  */
 void hal_gpio_enable_rcc(hal_gpio_pin pin);
 
 /**
- * @brief Configure the alternate function for a GPIO pin.
- *
- * This function sets the alternate function for a given GPIO pin.
- * Alternate functions are used when the pin is to be controlled by
- * a peripheral (like UART, SPI, I2C, TIM, etc.) instead of used as
- * a regular input/output pin.
- *
- * @param pin     The GPIO pin to configure.
- * @param alt_fn  The alternate function number to assign (0–15 depending on MCU
- * support).
+ * @brief Configure the alternate function of a GPIO pin.
+ * @param pin Pin identifier.
+ * @param alt_fn Alternate function number/type.
+ * @code
+ * // Example: Set PA2 to USART2_TX alternate function
+ * hal_gpio_set_alternate_function(PA2, HAL_GPIO_AF_USART2);
+ * @endcode
  */
 void hal_gpio_set_alternate_function(hal_gpio_pin pin,
                                      hal_gpio_alternate_function_t alt_fn);
-
-/** @} */ // end of GPIO_API
 
 #endif // CORTEX_M4_GPIO_H

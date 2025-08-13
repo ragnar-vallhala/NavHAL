@@ -13,8 +13,19 @@
  * register access defined in `cortex_m4_gpio_reg.h`.
  */
 
-#include "utils/types.h"
+/**
+ * @file gpio.h
+ * @brief HAL interface for GPIO control on STM32F4 series.
+ * @details
+ * This header declares high-level functions for configuring and using
+ * General-Purpose I/O (GPIO) pins, including mode setup, digital read/write,
+ * pull-up/pull-down configuration, RCC enabling, and alternate function selection.
+ *
+ * These functions provide an abstraction layer over the low-level
+ * register access defined in `cortex_m4_gpio_reg.h`.
+ */
 
+#include "utils/gpio_types.h"
 /**
  * @brief Configure the mode and pull-up/pull-down for a GPIO pin.
  * @param pin Pin identifier.
@@ -71,5 +82,9 @@ void hal_gpio_enable_rcc(hal_gpio_pin pin);
  */
 void hal_gpio_set_alternate_function(hal_gpio_pin pin,
                                      hal_gpio_alternate_function_t alt_fn);
+
+void hal_gpio_set_output_type(hal_gpio_pin pin, hal_gpio_output_type otyper);
+void hal_gpio_set_output_speed(hal_gpio_pin pin, hal_gpio_output_speed speed);
+/** @} */ // end of GPIO_API
 
 #endif // CORTEX_M4_GPIO_H

@@ -54,7 +54,7 @@ void systick_init(uint32_t tick_us) {
   // systick interrupt is not under the NVIC
   tick_duration_us = tick_us;
   uint32_t ahbclk = hal_clock_get_ahbclk();
-  uint64_t reload_value = ((uint64_t)ahbclk / 1000000ULL) * tick_us - 1;
+  uint64_t reload_value = (((uint64_t)ahbclk * tick_us) / 1000000ULL) - 1;
   reload_value &= 0xffffff; // set the reload value as 24bit only
   uint32_t reload = (uint32_t)reload_value;
   tick_reload_value = reload;
@@ -479,14 +479,10 @@ uint32_t timer_get_frequency(hal_timer_t timer) {
   uint32_t freq = timer_clk / (prescaler + 1) / (arr + 1);
   return freq;
 }
+void timer_set_arr(hal_timer_t timer, uint32_t channel, uint32_t arr){
 
-/**
- * @brief Clear timer update interrupt flag for supported timers.
- *
- * @param timer Timer identifier.
- *
- * @note Currently supports TIM2-TIM5 and TIM9-TIM11 patterns used in this HAL.
- */
+}
+
 void timer_clear_interrupt_flag(hal_timer_t timer) {
   // for tim2-5  & 9only
   uint32_t timer_base = _get_timer_base(timer);
@@ -687,13 +683,28 @@ void timer_set_compare(hal_timer_t timer, uint8_t channel,
   (*ccmr_reg) |= (1 << TIMx_CCMR1_OC1PE_BIT);
   timer_enable_channel(timer, channel);
 }
+uint32_t timer_get_compare(hal_timer_t timer, uint32_t channel) {
 
-/**
- * @brief Enable output on the specified timer channel (CCxE).
- *
- * @param timer Timer identifier.
- * @param channel Channel number (1-4).
- */
+  uint32_t timer_base = _get_timer_base(timer);
+  if (channel < 1 || channel > 4)
+    return 0; // only 4 valid channels
+  return *(volatile uint32_t *)(timer_base + TIMx_CCR1_OFFSET +
+                                (channel - 1) * 4);
+}
+uint32_t timer_get_arr(hal_timer_t timer, uint32_t channel) {
+  uint32_t timer_base = _get_timer_base(timer);
+  if (timer_base == 0)
+    return 0;
+  volatile uint32_t arr = 0;
+  if (timer == TIM1) {
+    arr = *((volatile uint32_t *)(timer_base + TIM_ADV_ARR_OFFSET));
+  } else if (timer >= TIM2 && timer <= TIM5) {
+    arr = *((volatile uint32_t *)(timer_base + TIM_GP1_ARR_OFFSET));
+  } else if (timer >= TIM9 && timer <= TIM11) {
+    arr = *((volatile uint16_t *)(timer_base + TIM_GP2_ARR_OFFSET));
+  }
+  return arr;
+}
 void timer_enable_channel(hal_timer_t timer, uint32_t channel) {
 
   uint32_t timer_base = _get_timer_base(timer);

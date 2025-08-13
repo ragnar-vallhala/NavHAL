@@ -9,6 +9,9 @@ hal_systick
 hal_blink_delay
 hal_pwm
 no_hal_pwm
+hal_clock
+no_hal_i2c
+hal_i2c
 )
 set(SAMPLE_DIRS 
 01_no_hal_blink 
@@ -21,6 +24,10 @@ set(SAMPLE_DIRS
 06_hal_blink_delay
 07_hal_pwm
 08_no_hal_pwm
+09_hal_clock
+10_no_hal_i2c
+11_hal_i2c
+
 )
 
 # Check if sample is defined

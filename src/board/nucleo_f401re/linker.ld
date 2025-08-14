@@ -4,14 +4,23 @@ MEMORY
   RAM   (rwx) : ORIGIN = 0x20000000, LENGTH = 96K
 }
 
+
+
 SECTIONS {
-  .text : {
-    KEEP(*(.isr_vector))   /* interrupt vector table */
-    *(.text*)
-    *(.rodata*)
-    *(.ARM.exidx*)
-    *(.ARM.extab*)
+  
+  .isr_vector : {
+    KEEP(*(.isr_vector))
+    . = ALIGN(4);   
   } > FLASH
+  
+  .text : {
+    
+    *(.text*)
+    
+    *(.rodata*)
+    
+  } > FLASH
+
 
   .data : AT (ADDR(.text) + SIZEOF(.text)) {
     _sdata = .;

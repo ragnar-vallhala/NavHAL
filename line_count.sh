@@ -9,7 +9,7 @@ echo "---------------------------------"
 # Directly count number of files
 total_files=$(find . \
   -type f \
-  \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" \
+  \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp"  -o -name "*.txt"\
      -o -name "*.s" -o -name "*.S" -o -name "*.py" -o -name "*.sh" \) \
   ! -path "./build/*" \
   ! -path "./.git/*" \
@@ -21,7 +21,7 @@ total_files=$(find . \
 index=1
 find . \
   -type f \
-  \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" \
+  \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" -o -name "*.txt" \
      -o -name "*.s" -o -name "*.S" -o -name "*.py" -o -name "*.sh" \) \
   ! -path "./build/*" \
   ! -path "./.git/*" \

@@ -25,6 +25,7 @@
 .cpu cortex-m3
 .thumb
 
+.global SysTick_Handler
 .global Reset_Handler
 .global _estack
 
@@ -34,10 +35,23 @@
  * and the address of the Reset_Handler.
  */
 .section .isr_vector, "a", %progbits
-.word _estack             // Initial stack pointer (top of stack)
-.word Reset_Handler       // Address of the Reset_Handler function
-
-/**
+    .word  _estack                 /* 1. Top of Stack */
+    .word  Reset_Handler           /* 2. Reset Handler */
+    .word  Reset_Handler           /* 3. NMI Handler */
+    .word  Reset_Handler           /* 4. Hard Fault Handler */
+    .word  Reset_Handler           /* 5. MPU Fault Handler */
+    .word  Reset_Handler           /* 6. Bus Fault Handler */
+    .word  Reset_Handler           /* 7. Usage Fault Handler */
+    .word  0                       /* 8. Reserved */
+    .word  0                       /* 9. Reserved */
+    .word  0                       /* 10. Reserved */
+    .word  0                       /* 11. Reserved */
+    .word  Reset_Handler           /* 12. SVCall Handler */
+    .word  Reset_Handler           /* 13. Debug Monitor Handler */
+    .word  0                       /* 14. Reserved */
+    .word  Reset_Handler           /* 15. PendSV Handler */
+    .word  SysTick_Handler         /* 16. SysTick Handler */
+/*
  * @brief Reset Handler
  * This is the entry point after a reset. It copies initialized data from
  * flash to RAM, zeroes the .bss section, and then calls main().
@@ -78,6 +92,7 @@ zero:
 
     // Call main function
 call_main:
+    cpsie i  // enable interrupts
     bl main
 
     // If main returns, loop forever

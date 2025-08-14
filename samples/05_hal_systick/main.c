@@ -1,7 +1,3 @@
-#include "core/cortex-m4/clock.h"
-#include "core/cortex-m4/timer.h"
-#include "core/cortex-m4/uart.h"
-#include "utils/clock_types.h"
 #define CORTEX_M4
 #include "navhal.h"
 
@@ -33,38 +29,38 @@ int main() {
   systick_init(1000);
   uart2_init(9600);
 
-  // timer_init(TIM2, 128, 50000);
-  // timer_enable_interrupt(TIM2);
-  // timer_attach_callback(TIM2, print2);
-  //
-  // timer_init(TIM3, 128, 50000);
-  // timer_enable_interrupt(TIM3);
-  // timer_attach_callback(TIM3, print3);
-  //
-  // timer_init(TIM4, 128, 50000);
-  // timer_enable_interrupt(TIM4);
-  // timer_attach_callback(TIM4, print4);
-  //
-  // timer_init(TIM5, 128, 50000);
-  // timer_enable_interrupt(TIM5);
-  // timer_attach_callback(TIM5, print5);
-  //
-  // timer_init(TIM9, 128, 50000);
-  // timer_enable_interrupt(TIM9);
-  // timer_attach_callback(TIM9, print9);
+  timer_init(TIM2, 0, 21000000);
+  timer_enable_interrupt(TIM2);
+  timer_attach_callback(TIM2, print2);
+  
+  timer_init(TIM3, 0, 21000000);
+  timer_enable_interrupt(TIM3);
+  timer_attach_callback(TIM3, print3);
+  
+  timer_init(TIM4, 0, 21000000);
+  timer_enable_interrupt(TIM4);
+  timer_attach_callback(TIM4, print4);
+  
+  timer_init(TIM5, 0, 21000000);
+  timer_enable_interrupt(TIM5);
+  timer_attach_callback(TIM5, print5);
+  
+  timer_init(TIM9, 0, 21000000);
+  timer_enable_interrupt(TIM9);
+  timer_attach_callback(TIM9, print9);
 
   while (1) {
-    uart2_write("SysTicks: ");
-    uart2_write(hal_get_tick());
-    uart2_write(", AHB: ");
-    uart2_write(hal_clock_get_ahbclk());
-    uart2_write(", APB1: ");
-    uart2_write(hal_clock_get_apb1clk());
-    uart2_write(", APB2: ");
-    uart2_write(hal_clock_get_apb2clk());
+    // uart2_write("SysTicks: ");
+    // uart2_write(hal_get_tick());
+    // uart2_write(", AHB: ");
+    // uart2_write(hal_clock_get_ahbclk());
+    // uart2_write(", APB1: ");
+    // uart2_write(hal_clock_get_apb1clk());
+    // uart2_write(", APB2: ");
+    // uart2_write(hal_clock_get_apb2clk());
     // uart2_write(", Millis: ");
     // uart2_write(timer_get_count(TIM5));
-    uart2_write("\n\r");
+    // uart2_write("\n\r");
     delay_ms(1000);
   }
 }

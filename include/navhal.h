@@ -35,4 +35,8 @@
 #include "common/hal_timer.h"
 /** @} */ // end of NAVHAL
 
+#include "common/hal_pwm.h"
+
+#include "common/hal_12c.h"
+
 #endif // NAVHAL_H

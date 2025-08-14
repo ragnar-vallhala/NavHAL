@@ -29,11 +29,17 @@ int main(void) {
   hal_gpio_set_output_speed(GPIO_PB09, GPIO_VERY_HIGH_SPEED);
 
   // Initialize I2C
-  hal_i2c_init(I2C_BUS, &i2c_config);
-
+  hal_i2c_status_t status = hal_i2c_init(I2C_BUS, &i2c_config);
+  status = hal_i2c_init(I2C_BUS, &i2c_config);
+  if (status != HAL_I2C_OK) {
+    uart2_write("HAL I2C init status: ");
+    uart2_write(status);
+    uart2_write("\n");
+    while (1)
+      ;
+  }
   uint8_t tx_buf[2];
   uint8_t rx_buf[2];
-  hal_i2c_status_t status;
 
   while (1) {
     // Start temperature measurement

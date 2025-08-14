@@ -1,0 +1,11 @@
+digraph "Clock HAL"
+{
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir=LR;
+  Node1 [id="Node000001",label="Clock HAL",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Clock abstraction for multiple architectures."];
+  Node2 [id="Node000002",label="Core HAL",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___n_a_v_h_a_l.html",tooltip="Top-level includes for the NavHAL framework."];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+}

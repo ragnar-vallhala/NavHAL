@@ -1,0 +1,224 @@
+\doxysection{include/core/cortex-\/m4/clock.h File Reference}
+\hypertarget{clock_8h}{}\label{clock_8h}\index{include/core/cortex-\/m4/clock.h@{include/core/cortex-\/m4/clock.h}}
+
+
+Clock HAL implementation for Cortex-\/\+M4 (STM32\+F401\+RE).  
+
+
+{\ttfamily \#include "{}utils/types.\+h"{}}\newline
+Include dependency graph for clock.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em PLL configuration parameters. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga74944438a086975793d26ae48d5882d4}{RCC}}~0x40023800\+UL
+\begin{DoxyCompactList}\small\item\em RCC base address. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga6df8d81c05c07cb0c26bbf27ea7fe55c}{RCC\+\_\+\+CR\+\_\+\+OFFSET}}~0x00
+\begin{DoxyCompactList}\small\item\em Clock control register offset. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga4189481857f7425df84455219b54371d}{RCC\+\_\+\+PLLCFGR\+\_\+\+OFFSET}}~0x04
+\begin{DoxyCompactList}\small\item\em PLL configuration register offset. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_gafb1e90a88869585b970749de3c16ce4a}{RCC\+\_\+\+CFGR\+\_\+\+OFFSET}}~0x08
+\begin{DoxyCompactList}\small\item\em Clock configuration register offset. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga8ea16f4ec52cd4facc9298f13b93ecb3}{RCC\+\_\+\+CR\+\_\+\+HSE\+\_\+\+ON\+\_\+\+BIT}}~16
+\begin{DoxyCompactList}\small\item\em HSE clock enable bit. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_gadf4d93865fe92e5c898894eaac4d877e}{RCC\+\_\+\+CR\+\_\+\+HSE\+\_\+\+READY\+\_\+\+BIT}}~17
+\begin{DoxyCompactList}\small\item\em HSE clock ready flag bit. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga16a5aecf5b75ad7fa25fc70bcfec8033}{RCC\+\_\+\+CR\+\_\+\+HSI\+\_\+\+ON\+\_\+\+BIT}}~0
+\begin{DoxyCompactList}\small\item\em HSI clock enable bit. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_gac9a51737f0602336f92aaba23a6c50d9}{RCC\+\_\+\+CR\+\_\+\+HSI\+\_\+\+READY\+\_\+\+BIT}}~1
+\begin{DoxyCompactList}\small\item\em HSI clock ready flag bit. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_gafabd8648ccb5ffc8635a5c0c2fa1e79d}{RCC\+\_\+\+CR\+\_\+\+PLL\+\_\+\+ON\+\_\+\+BIT}}~24
+\begin{DoxyCompactList}\small\item\em PLL enable bit. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_gae7323fb614360e394836159af75fa186}{RCC\+\_\+\+CR\+\_\+\+PLL\+\_\+\+READY\+\_\+\+BIT}}~25
+\begin{DoxyCompactList}\small\item\em PLL ready flag bit. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga2d369ff60a8373f1419c1f1821336dc6}{RCC\+\_\+\+PLLCFGR\+\_\+\+SRC\+\_\+\+BIT}}~22
+\begin{DoxyCompactList}\small\item\em PLL source selection bit. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga9de55c5934db725ac111f5da7cf51127}{RCC\+\_\+\+PLLCFGR\+\_\+\+PLLM\+\_\+\+BIT}}~0
+\begin{DoxyCompactList}\small\item\em PLLM bits (6 bits) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga54c5b68aa65e2586877090bdb45a79ab}{RCC\+\_\+\+PLLCFGR\+\_\+\+PLLN\+\_\+\+BIT}}~6
+\begin{DoxyCompactList}\small\item\em PLLN bits (9 bits) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga4afe0a18460ce183f3d775d5b67b808b}{RCC\+\_\+\+PLLCFGR\+\_\+\+PLLP\+\_\+\+BIT}}~16
+\begin{DoxyCompactList}\small\item\em PLLP bits (2 bits) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga1061770c6f680b08b445774a9741acbb}{RCC\+\_\+\+PLLCFGR\+\_\+\+PLLQ\+\_\+\+BIT}}~24
+\begin{DoxyCompactList}\small\item\em PLLQ bits (4 bits) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga4c292f9dbb00877a04481fc6838d0356}{RCC\+\_\+\+CFGR\+\_\+\+HPRE\+\_\+\+BIT}}~4
+\begin{DoxyCompactList}\small\item\em AHB prescaler bits (4 bits) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga8db4c40c95df72a7303256eab04dbe11}{RCC\+\_\+\+CFGR\+\_\+\+PPRE1\+\_\+\+BIT}}~10
+\begin{DoxyCompactList}\small\item\em APB1 prescaler bits (3 bits) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga9dec67e76675eb509510cc920261991c}{RCC\+\_\+\+CFGR\+\_\+\+PPRE2\+\_\+\+BIT}}~13
+\begin{DoxyCompactList}\small\item\em APB2 prescaler bits (3 bits) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga0db399aa7cfbe2c1202953de9bd3e90f}{RCC\+\_\+\+CFGR\+\_\+\+SW\+\_\+\+BIT}}~0
+\begin{DoxyCompactList}\small\item\em System clock switch bits (2 bits) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_gaabb2d6d1cbfe98214bb2c767203f1352}{RCC\+\_\+\+CFGR\+\_\+\+SWS\+\_\+\+BIT}}~2
+\begin{DoxyCompactList}\small\item\em System clock switch status bits (2 bits) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga2b7d7f29b09a49c31404fc0d44645c84}{RCC\+\_\+\+CFGR\+\_\+\+HPRE\+\_\+\+DIV1}}~0x0
+\begin{DoxyCompactList}\small\item\em AHB clock\+: SYSCLK not divided. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga0e340725f46e9462d9b02a079b9fa8ae}{RCC\+\_\+\+CFGR\+\_\+\+PPRE1\+\_\+\+DIV4}}~0x5
+\begin{DoxyCompactList}\small\item\em APB1 clock\+: AHB divided by 4. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga99d9c91eaad122460d324a71cc939d1b}{RCC\+\_\+\+CFGR\+\_\+\+PPRE2\+\_\+\+DIV2}}~0x4
+\begin{DoxyCompactList}\small\item\em APB2 clock\+: AHB divided by 2. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga9de1f4d1c7782cc9033f593e6729737f}{FLASH\+\_\+\+INTERFACE\+\_\+\+REGISTER}}~0x40023\+C00
+\begin{DoxyCompactList}\small\item\em Flash Interface base address. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{group___r_c_c___b_a_s_e_ga1d4c68cf6964431b0df5b0a02dbfeac3}{FLASH\+\_\+\+ACR\+\_\+\+LATENCY\+\_\+\+BIT}}~0
+\begin{DoxyCompactList}\small\item\em Flash ACR Latency bits. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}{hal\+\_\+clock\+\_\+init}} (\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{05__hal__systick_2main_8c_a921c2505bac76424f5f96cc1e4f62986}{cfg}}, \mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\+\_\+cfg}})
+\begin{DoxyCompactList}\small\item\em Initialize system clock with given configuration. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0}{hal\+\_\+clock\+\_\+get\+\_\+sysclk}} (void)
+\begin{DoxyCompactList}\small\item\em Get the current system clock frequency (SYSCLK) in Hz. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{clock_8h_ac405b089ad197ec8fcec53489064cb5f}{hal\+\_\+clock\+\_\+get\+\_\+ahbclk}} (void)
+\begin{DoxyCompactList}\small\item\em Get the current AHB bus clock frequency in Hz. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{clock_8h_a2b3d3447fb02cf495b0c6f28ad9a4ae8}{hal\+\_\+clock\+\_\+get\+\_\+apb1clk}} (void)
+\begin{DoxyCompactList}\small\item\em Get the current APB1 bus clock frequency in Hz. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{clock_8h_abe4fcf4dc3f2a13b1f2602c0348aeba5}{hal\+\_\+clock\+\_\+get\+\_\+apb2clk}} (void)
+\begin{DoxyCompactList}\small\item\em Get the current APB2 bus clock frequency in Hz. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Clock HAL implementation for Cortex-\/\+M4 (STM32\+F401\+RE). 
+
+This header provides register definitions, configuration structures, and function declarations to initialize and retrieve system and bus clocks on Cortex-\/\+M4 microcontrollers, specifically STM32\+F401\+RE in this implementation.
+
+It supports configuring the system clock source including HSI, HSE, and PLL, PLL parameter setup, and clock prescaler controls for AHB and APB buses.
+
+\begin{DoxyNote}{Note}
+This file is architecture-\/specific and included through the common {\ttfamily \doxylink{hal__clock_8h}{hal\+\_\+clock.\+h}} dispatcher based on target definitions (e.\+g., {\ttfamily CORTEX\+\_\+\+M4}).
+\end{DoxyNote}
+\begin{DoxyAuthor}{Author}
+Ashutosh Vishwakarma 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2025-\/07-\/21 
+\end{DoxyDate}
+
+
+\label{doc-func-members}
+\Hypertarget{clock_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{clock_8h_ac405b089ad197ec8fcec53489064cb5f}\index{clock.h@{clock.h}!hal\_clock\_get\_ahbclk@{hal\_clock\_get\_ahbclk}}
+\index{hal\_clock\_get\_ahbclk@{hal\_clock\_get\_ahbclk}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_get\_ahbclk()}{hal\_clock\_get\_ahbclk()}}
+{\footnotesize\ttfamily \label{clock_8h_ac405b089ad197ec8fcec53489064cb5f} 
+uint32\+\_\+t hal\+\_\+clock\+\_\+get\+\_\+ahbclk (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get the current AHB bus clock frequency in Hz. 
+
+Calculated from SYSCLK frequency divided by AHB prescaler.
+
+\begin{DoxyReturn}{Returns}
+AHB bus clock frequency in Hertz.
+\end{DoxyReturn}
+Get the current AHB bus clock frequency in Hz.
+
+Calculated as SYSCLK divided by AHB prescaler.
+
+\begin{DoxyReturn}{Returns}
+AHB bus clock frequency in Hertz. 
+\end{DoxyReturn}
+\Hypertarget{clock_8h_a2b3d3447fb02cf495b0c6f28ad9a4ae8}\index{clock.h@{clock.h}!hal\_clock\_get\_apb1clk@{hal\_clock\_get\_apb1clk}}
+\index{hal\_clock\_get\_apb1clk@{hal\_clock\_get\_apb1clk}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_get\_apb1clk()}{hal\_clock\_get\_apb1clk()}}
+{\footnotesize\ttfamily \label{clock_8h_a2b3d3447fb02cf495b0c6f28ad9a4ae8} 
+uint32\+\_\+t hal\+\_\+clock\+\_\+get\+\_\+apb1clk (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get the current APB1 bus clock frequency in Hz. 
+
+Calculated from SYSCLK frequency divided by APB1 prescaler.
+
+\begin{DoxyReturn}{Returns}
+APB1 bus clock frequency in Hertz.
+\end{DoxyReturn}
+Get the current APB1 bus clock frequency in Hz.
+
+Calculated as SYSCLK divided by APB1 prescaler.
+
+\begin{DoxyReturn}{Returns}
+APB1 bus clock frequency in Hertz. 
+\end{DoxyReturn}
+\Hypertarget{clock_8h_abe4fcf4dc3f2a13b1f2602c0348aeba5}\index{clock.h@{clock.h}!hal\_clock\_get\_apb2clk@{hal\_clock\_get\_apb2clk}}
+\index{hal\_clock\_get\_apb2clk@{hal\_clock\_get\_apb2clk}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_get\_apb2clk()}{hal\_clock\_get\_apb2clk()}}
+{\footnotesize\ttfamily \label{clock_8h_abe4fcf4dc3f2a13b1f2602c0348aeba5} 
+uint32\+\_\+t hal\+\_\+clock\+\_\+get\+\_\+apb2clk (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get the current APB2 bus clock frequency in Hz. 
+
+Calculated from SYSCLK frequency divided by APB2 prescaler.
+
+\begin{DoxyReturn}{Returns}
+APB2 bus clock frequency in Hertz.
+\end{DoxyReturn}
+Get the current APB2 bus clock frequency in Hz.
+
+Calculated as SYSCLK divided by APB2 prescaler.
+
+\begin{DoxyReturn}{Returns}
+APB2 bus clock frequency in Hertz. 
+\end{DoxyReturn}
+\Hypertarget{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0}\index{clock.h@{clock.h}!hal\_clock\_get\_sysclk@{hal\_clock\_get\_sysclk}}
+\index{hal\_clock\_get\_sysclk@{hal\_clock\_get\_sysclk}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_get\_sysclk()}{hal\_clock\_get\_sysclk()}}
+{\footnotesize\ttfamily \label{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0} 
+uint32\+\_\+t hal\+\_\+clock\+\_\+get\+\_\+sysclk (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get the current system clock frequency (SYSCLK) in Hz. 
+
+Reads RCC registers and calculates SYSCLK frequency based on current clock source and PLL settings.
+
+\begin{DoxyReturn}{Returns}
+System clock frequency in Hertz.
+\end{DoxyReturn}
+Get the current system clock frequency (SYSCLK) in Hz.
+
+Detects the current SYSCLK source and calculates frequency based on configured clock source and PLL parameters.
+
+\begin{DoxyReturn}{Returns}
+SYSCLK frequency in Hertz. 
+\end{DoxyReturn}
+\Hypertarget{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}\index{clock.h@{clock.h}!hal\_clock\_init@{hal\_clock\_init}}
+\index{hal\_clock\_init@{hal\_clock\_init}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_init()}{hal\_clock\_init()}}
+{\footnotesize\ttfamily \label{clock_8h_a0968882ff01fef583e6a8b7a97be51ea} 
+void hal\+\_\+clock\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{cfg}{, }\item[{\mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{pll\+\_\+cfg}{}\end{DoxyParamCaption})}
+
+
+
+Initialize system clock with given configuration. 
+
+Configures the system clock source (HSI, HSE, PLL), PLL parameters, flash latency, and bus prescalers (AHB, APB1, APB2).
+
+
+\begin{DoxyParams}{Parameters}
+{\em cfg} & Pointer to clock configuration structure (source selection). \\
+\hline
+{\em pll\+\_\+cfg} & Pointer to PLL configuration structure if PLL is used.\\
+\hline
+\end{DoxyParams}
+Initialize system clock with given configuration.
+
+Enables and waits for the selected clock source (HSI, HSE, or PLL). If PLL is selected, configures PLL parameters and switches system clock source to PLL output.
+
+
+\begin{DoxyParams}{Parameters}
+{\em cfg} & Pointer to clock configuration structure specifying source. \\
+\hline
+{\em pll\+\_\+cfg} & Pointer to PLL configuration structure (used if source is PLL). \\
+\hline
+\end{DoxyParams}

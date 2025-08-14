@@ -1,0 +1,13 @@
+<map id="samples/03_hal_uart_tx/main.c" name="samples/03_hal_uart_tx/main.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="130,5,287,45"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="124,93,195,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,47,176,83,172,80,194,44"/>
+<area shape="rect" id="Node000003" href="$navhal_8h.html" title="Root header file for the NavHAL project by NavRobotec." alt="" coords="219,93,297,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="223,44,246,80,241,83,218,47"/>
+<area shape="rect" id="Node000004" href="$hal__gpio_8h.html" title="Architecture&#45;agnostic GPIO HAL entry point for NavHAL." alt="" coords="5,167,156,192"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="230,121,123,164,121,159,229,116"/>
+<area shape="rect" id="Node000005" href="$hal__clock_8h.html" title="Architecture&#45;agnostic Clock HAL entry point for NavHAL." alt="" coords="180,167,336,192"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="261,119,261,153,255,153,255,119"/>
+<area shape="rect" id="Node000006" href="$hal__uart_8h.html" title=" " alt="" coords="360,167,508,192"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="287,116,393,159,391,164,285,121"/>
+</map>

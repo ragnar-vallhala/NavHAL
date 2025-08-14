@@ -1,0 +1,102 @@
+\chapter{Nav\+HAL — NAVRobotec Hardware Abstraction Layer}
+\hypertarget{md_README}{}\label{md_README}\index{NavHAL — NAVRobotec Hardware Abstraction Layer@{NavHAL — NAVRobotec Hardware Abstraction Layer}}
+\label{md_README_autotoc_md0}%
+\Hypertarget{md_README_autotoc_md0}%
+ \mbox{[}\mbox{]}(LICENSE) \href{https://github.com/ragnar-vallhala/NavHAL/actions}{\texttt{ }} \href{https://codecov.io/gh/ragnar-vallhala/NavHAL}{\texttt{ }} \href{docs/html/index.html}{\texttt{ }} \href{https://github.com/ragnar-vallhala/NavHAL/stargazers}{\texttt{ }} \href{https://github.com/ragnar-vallhala/NavHAL/issues}{\texttt{ }}
+
+\DoxyHorRuler{0}
+\hypertarget{md_README_autotoc_md2}{}\doxysection{\texorpdfstring{Overview}{Overview}}\label{md_README_autotoc_md2}
+{\bfseries{Nav\+HAL}} is a professional, cross-\/platform hardware abstraction layer (HAL) written in C, designed for embedded systems across multiple architectures. It is architecture-\/agnostic by design, enabling scalable and portable embedded software development. Future extensions will provide C++ wrappers and RTOS integration to deliver a clean, modular, and extensible interface suitable for modern embedded projects.
+
+Nav\+HAL is developed and maintained by {\bfseries{NAVRobotec}}, a company dedicated to innovative and robust embedded solutions.
+
+\DoxyHorRuler{0}
+\hypertarget{md_README_autotoc_md4}{}\doxysection{\texorpdfstring{Key Features}{Key Features}}\label{md_README_autotoc_md4}
+
+\begin{DoxyItemize}
+\item Architecture-\/independent HAL supporting multiple MCU families (ARM, AVR, RISC-\/V, etc.)
+\item Clean, minimal, and efficient C core for portability and performance
+\item Designed with modularity for easy extension and maintenance
+\item Planned C++ wrapper layer for object-\/oriented APIs
+\item Integration-\/ready with RTOS and bare-\/metal environments
+\item Professional-\/grade tooling with CMake build system and Doxygen documentation
+\end{DoxyItemize}
+
+\DoxyHorRuler{0}
+\hypertarget{md_README_autotoc_md6}{}\doxysection{\texorpdfstring{Project Brief}{Project Brief}}\label{md_README_autotoc_md6}
+\begin{quote}
+{\itshape A cross-\/platform hardware abstraction layer for embedded systems, enabling scalable and architecture-\/agnostic development.} \end{quote}
+\hypertarget{md_README_autotoc_md7}{}\doxysection{\texorpdfstring{$<$/blockquote$>$}{</blockquote>}}\label{md_README_autotoc_md7}
+\hypertarget{md_README_autotoc_md8}{}\doxysection{\texorpdfstring{Getting Started}{Getting Started}}\label{md_README_autotoc_md8}
+\hypertarget{md_README_autotoc_md9}{}\doxysubsection{\texorpdfstring{Prerequisites}{Prerequisites}}\label{md_README_autotoc_md9}
+
+\begin{DoxyItemize}
+\item ARM GCC Toolchain ({\ttfamily arm-\/none-\/eabi-\/gcc}) or other toolchains depending on target architecture
+\item CMake (version 3.\+15 or higher recommended)
+\item Ninja or Make build system
+\item Flashing tools (e.\+g., {\ttfamily st-\/flash} for STM32 boards)
+\item Doxygen (for generating documentation)
+\end{DoxyItemize}\hypertarget{md_README_autotoc_md10}{}\doxysubsection{\texorpdfstring{Building a Sample}{Building a Sample}}\label{md_README_autotoc_md10}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{mkdir\ build\ \&\&\ cd\ build}
+\DoxyCodeLine{cmake\ ..\ -\/DSAMPLE=no\_hal\_blink\ -\/DSTANDALONE=ON}
+\DoxyCodeLine{cmake\ -\/-\/build\ .}
+
+\end{DoxyCode}
+\hypertarget{md_README_autotoc_md11}{}\doxysubsection{\texorpdfstring{Flashing Firmware}{Flashing Firmware}}\label{md_README_autotoc_md11}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake\ -\/-\/build\ .\ -\/-\/target\ flash}
+
+\end{DoxyCode}
+
+
+\DoxyHorRuler{0}
+\hypertarget{md_README_autotoc_md13}{}\doxysection{\texorpdfstring{Documentation}{Documentation}}\label{md_README_autotoc_md13}
+Generate API documentation using\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{cmake\ -\/-\/build\ .\ -\/-\/target\ doc\_doxygen}
+
+\end{DoxyCode}
+
+
+Documentation will be available in {\ttfamily docs/html}.
+
+\DoxyHorRuler{0}
+\hypertarget{md_README_autotoc_md15}{}\doxysection{\texorpdfstring{Project Structure}{Project Structure}}\label{md_README_autotoc_md15}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{/}
+\DoxyCodeLine{├──\ samples/\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ Example\ samples}
+\DoxyCodeLine{├──\ src/\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ Core\ HAL\ source\ files}
+\DoxyCodeLine{├──\ include/\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ HAL\ public\ headers}
+\DoxyCodeLine{├──\ CMakeLists.txt\ \ \ \ \ \ \ \ \ \#\ Build\ configuration}
+\DoxyCodeLine{├──\ Doxyfile\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ Doxygen\ config}
+\DoxyCodeLine{└──\ README.md\ \ \ \ \ \ \ \ \ \ \ \ \ \ \#\ This\ file}
+
+\end{DoxyCode}
+
+
+\DoxyHorRuler{0}
+\hypertarget{md_README_autotoc_md17}{}\doxysection{\texorpdfstring{Contributing}{Contributing}}\label{md_README_autotoc_md17}
+Contributions, bug reports, and feature requests are welcome. Please follow the coding style and submit pull requests.
+
+\DoxyHorRuler{0}
+\hypertarget{md_README_autotoc_md19}{}\doxysection{\texorpdfstring{License}{License}}\label{md_README_autotoc_md19}
+MIT License — see \mbox{[}LICENSE\mbox{]}(LICENSE) for details.
+
+\DoxyHorRuler{0}
+\hypertarget{md_README_autotoc_md21}{}\doxysection{\texorpdfstring{Contact}{Contact}}\label{md_README_autotoc_md21}
+NAVRobotec — Man Meets Machine
+
+Email\+: \href{mailto:support@navrobotec.com}{\texttt{ support@navrobotec.\+com}}
+
+Website\+: \href{https://navrobotec.com}{\texttt{ https\+://navrobotec.\+com}}
+
+\DoxyHorRuler{0}
+
+
+Thank you for exploring Nav\+HAL — the future of portable embedded hardware abstraction! 

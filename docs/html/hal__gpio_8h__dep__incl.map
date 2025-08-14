@@ -1,0 +1,11 @@
+<map id="include/common/hal_gpio.h" name="include/common/hal_gpio.h">
+<area shape="rect" id="Node000001" title="Architecture&#45;agnostic GPIO HAL entry point for NavHAL." alt="" coords="193,5,348,45"/>
+<area shape="rect" id="Node000002" href="$navhal_8h.html" title="Root header file for the NavHAL project by NavRobotec." alt="" coords="206,93,335,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="273,59,273,93,268,93,268,59"/>
+<area shape="rect" id="Node000003" href="$01__hal__blink_2main_8c.html" title=" " alt="" coords="5,167,168,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="233,126,132,169,130,164,231,121"/>
+<area shape="rect" id="Node000004" href="$03__hal__uart__tx_2main_8c.html" title=" " alt="" coords="192,167,349,207"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="273,132,273,167,268,167,268,132"/>
+<area shape="rect" id="Node000005" href="$03__no__hal__uart__tx_2main_8c.html" title=" " alt="" coords="374,167,554,207"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="312,121,419,164,417,169,310,126"/>
+</map>

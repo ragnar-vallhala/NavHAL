@@ -1,3 +1,13 @@
+/**
+ * @file timer.h
+ * @brief Timer and SysTick register defines and API for STM32F4 (Cortex-M4).
+ * @details
+ * This header contains register offsets, bit definitions, SysTick control,
+ * timer base addresses, and the public timer/SysTick API used by the HAL.
+ * All defines and function prototypes are intended for the STM32F4 series
+ * on a Cortex-M4 core.
+ */
+
 #ifndef CORTEX_M4_TIMER_H
 #define CORTEX_M4_TIMER_H
 #include "common/hal_types.h"

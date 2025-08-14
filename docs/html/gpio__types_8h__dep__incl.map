@@ -1,0 +1,21 @@
+<map id="include/utils/gpio_types.h" name="include/utils/gpio_types.h">
+<area shape="rect" id="Node000001" title="GPIO pin definitions and related types for NavHAL." alt="" coords="183,5,316,45"/>
+<area shape="rect" id="Node000002" href="$types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="173,93,326,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,59,252,93,247,93,247,59"/>
+<area shape="rect" id="Node000003" href="$clock_8h.html" title="Clock HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="5,167,152,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="213,127,121,169,119,164,211,122"/>
+<area shape="rect" id="Node000006" href="$gpio_8h.html" title="GPIO HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="348,167,495,207"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="288,122,381,164,379,169,285,127"/>
+<area shape="rect" id="Node000009" href="$uart_8h.html" title="UART HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="176,167,323,207"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="252,132,252,167,247,167,247,132"/>
+<area shape="rect" id="Node000004" href="$clock_8c.html" title="Cortex&#45;M4 (STM32F4) Clock HAL Implementation." alt="" coords="5,255,149,295"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="81,221,80,254,75,254,75,221"/>
+<area shape="rect" id="Node000005" href="$uart_8c.html" title="UART HAL implementation for Cortex&#45;M4 (STM32F401RE)" alt="" coords="173,255,317,295"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="128,210,210,252,208,257,126,215"/>
+<area shape="poly" id="edge8_Node000006_Node000005" title=" " alt="" coords="372,215,285,257,283,252,369,210"/>
+<area shape="rect" id="Node000007" href="$02__hal__pupd_2main_8c.html" title=" " alt="" coords="341,255,504,295"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="425,221,425,254,420,254,419,221"/>
+<area shape="rect" id="Node000008" href="$gpio_8c.html" title="Cortex&#45;M4 (STM32F4) GPIO HAL Implementation." alt="" coords="528,255,672,295"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="474,210,562,252,560,257,472,215"/>
+<area shape="poly" id="edge10_Node000009_Node000005" title=" " alt="" coords="250,221,249,255,244,254,245,220"/>
+</map>

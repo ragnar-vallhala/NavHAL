@@ -1,6 +1,6 @@
 /**
  * @file uart.h
- * @brief UART HAL implementation for Cortex-M4 (STM32F401RE).
+ * @brief UART driver interface for STM32F4 (Cortex-M4).
  *
  * This header defines memory-mapped registers, macros, and function prototypes
  * for UART (USART1, USART2, USART6) peripheral control on the STM32F401RE MCU.

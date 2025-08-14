@@ -1,0 +1,179 @@
+\doxysection{samples/08\+\_\+no\+\_\+hal\+\_\+pwm/main.c File Reference}
+\hypertarget{08__no__hal__pwm_2main_8c}{}\label{08__no__hal__pwm_2main_8c}\index{samples/08\_no\_hal\_pwm/main.c@{samples/08\_no\_hal\_pwm/main.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for main.\+c\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}}~0x40000000
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}}~(\mbox{\hyperlink{uart_8h_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00020000)
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}}~(\mbox{\hyperlink{uart_8h_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00000000)
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}}~(\mbox{\hyperlink{uart_8h_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x3800)
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}}~(\mbox{\hyperlink{uart_8h_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x0000)
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}}~(\mbox{\hyperlink{uart_8h_a45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}} + 0x0000)
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a305184464592fe039a4e47e9d88bdcc4}{RCC\+\_\+\+AHB1\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x30))
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_ad4baa1f26b04719fe3d4e2f02d7dde40}{RCC\+\_\+\+APB1\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a1234035224d2d22cd6be76a5ee04cf02}{GPIOA\+\_\+\+MODER}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}} + 0x00))
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a76606f8249e2d759341614b68d15e59a}{GPIOA\+\_\+\+AFRL}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}} + 0x20))
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_af0e1e8b150a6a80588c2de7b4abe1994}{TIM2\+\_\+\+PSC}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x28))
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a7e23a551449bab7a29e421d494b5fb4f}{TIM2\+\_\+\+ARR}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x2C))
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a6521924eaaa3365f52a534bed3b2393e}{TIM2\+\_\+\+CCR1}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x34))
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a805228ae9456a296165b49af8767fdea}{TIM2\+\_\+\+CCMR1}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x18))
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a80fc209e74f4074596daeafe34adc232}{TIM2\+\_\+\+CCER}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x20))
+\item 
+\#define \mbox{\hyperlink{08__no__hal__pwm_2main_8c_ab24fffc378e2c8b41357f644a85db741}{TIM2\+\_\+\+CR1}}~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x00))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a55259f946d5eeb2bb9779d7646bf3f94}{pwm\+\_\+pa5\+\_\+init}} (uint32\+\_\+t frequency, float duty\+\_\+cycle\+\_\+percent)
+\item 
+void \mbox{\hyperlink{08__no__hal__pwm_2main_8c_abb9ee10191569258e0f22bdd0a95ba62}{delay}} ()
+\item 
+int \mbox{\hyperlink{08__no__hal__pwm_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\begin{DoxyCompactList}\small\item\em Main entry point. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\label{doc-define-members}
+\Hypertarget{08__no__hal__pwm_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{08__no__hal__pwm_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}\index{main.c@{main.c}!AHB1PERIPH\_BASE@{AHB1PERIPH\_BASE}}
+\index{AHB1PERIPH\_BASE@{AHB1PERIPH\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{AHB1PERIPH\_BASE}{AHB1PERIPH\_BASE}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a811a9a4ca17f0a50354a9169541d56c4} 
+\#define AHB1\+PERIPH\+\_\+\+BASE~(\mbox{\hyperlink{uart_8h_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00020000)}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb}\index{main.c@{main.c}!APB1PERIPH\_BASE@{APB1PERIPH\_BASE}}
+\index{APB1PERIPH\_BASE@{APB1PERIPH\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{APB1PERIPH\_BASE}{APB1PERIPH\_BASE}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb} 
+\#define APB1\+PERIPH\+\_\+\+BASE~(\mbox{\hyperlink{uart_8h_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00000000)}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a76606f8249e2d759341614b68d15e59a}\index{main.c@{main.c}!GPIOA\_AFRL@{GPIOA\_AFRL}}
+\index{GPIOA\_AFRL@{GPIOA\_AFRL}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOA\_AFRL}{GPIOA\_AFRL}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a76606f8249e2d759341614b68d15e59a} 
+\#define GPIOA\+\_\+\+AFRL~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}} + 0x20))}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}\index{main.c@{main.c}!GPIOA\_BASE@{GPIOA\_BASE}}
+\index{GPIOA\_BASE@{GPIOA\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOA\_BASE}{GPIOA\_BASE}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa} 
+\#define GPIOA\+\_\+\+BASE~(\mbox{\hyperlink{uart_8h_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x0000)}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a1234035224d2d22cd6be76a5ee04cf02}\index{main.c@{main.c}!GPIOA\_MODER@{GPIOA\_MODER}}
+\index{GPIOA\_MODER@{GPIOA\_MODER}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOA\_MODER}{GPIOA\_MODER}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a1234035224d2d22cd6be76a5ee04cf02} 
+\#define GPIOA\+\_\+\+MODER~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_ad7723846cc5db8e43a44d78cf21f6efa}{GPIOA\+\_\+\+BASE}} + 0x00))}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a9171f49478fa86d932f89e78e73b88b0}\index{main.c@{main.c}!PERIPH\_BASE@{PERIPH\_BASE}}
+\index{PERIPH\_BASE@{PERIPH\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{PERIPH\_BASE}{PERIPH\_BASE}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a9171f49478fa86d932f89e78e73b88b0} 
+\#define PERIPH\+\_\+\+BASE~0x40000000}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a305184464592fe039a4e47e9d88bdcc4}\index{main.c@{main.c}!RCC\_AHB1ENR@{RCC\_AHB1ENR}}
+\index{RCC\_AHB1ENR@{RCC\_AHB1ENR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_AHB1ENR}{RCC\_AHB1ENR}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a305184464592fe039a4e47e9d88bdcc4} 
+\#define RCC\+\_\+\+AHB1\+ENR~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x30))}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_ad4baa1f26b04719fe3d4e2f02d7dde40}\index{main.c@{main.c}!RCC\_APB1ENR@{RCC\_APB1ENR}}
+\index{RCC\_APB1ENR@{RCC\_APB1ENR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR}{RCC\_APB1ENR}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_ad4baa1f26b04719fe3d4e2f02d7dde40} 
+\#define RCC\+\_\+\+APB1\+ENR~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a0e681b03f364532055d88f63fec0d99d}\index{main.c@{main.c}!RCC\_BASE@{RCC\_BASE}}
+\index{RCC\_BASE@{RCC\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_BASE}{RCC\_BASE}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a0e681b03f364532055d88f63fec0d99d} 
+\#define RCC\+\_\+\+BASE~(\mbox{\hyperlink{uart_8h_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x3800)}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a7e23a551449bab7a29e421d494b5fb4f}\index{main.c@{main.c}!TIM2\_ARR@{TIM2\_ARR}}
+\index{TIM2\_ARR@{TIM2\_ARR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{TIM2\_ARR}{TIM2\_ARR}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a7e23a551449bab7a29e421d494b5fb4f} 
+\#define TIM2\+\_\+\+ARR~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x2C))}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a00d0fe6ad532ab32f0f81cafca8d3aa5}\index{main.c@{main.c}!TIM2\_BASE@{TIM2\_BASE}}
+\index{TIM2\_BASE@{TIM2\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{TIM2\_BASE}{TIM2\_BASE}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a00d0fe6ad532ab32f0f81cafca8d3aa5} 
+\#define TIM2\+\_\+\+BASE~(\mbox{\hyperlink{uart_8h_a45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}} + 0x0000)}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a80fc209e74f4074596daeafe34adc232}\index{main.c@{main.c}!TIM2\_CCER@{TIM2\_CCER}}
+\index{TIM2\_CCER@{TIM2\_CCER}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{TIM2\_CCER}{TIM2\_CCER}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a80fc209e74f4074596daeafe34adc232} 
+\#define TIM2\+\_\+\+CCER~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x20))}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a805228ae9456a296165b49af8767fdea}\index{main.c@{main.c}!TIM2\_CCMR1@{TIM2\_CCMR1}}
+\index{TIM2\_CCMR1@{TIM2\_CCMR1}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{TIM2\_CCMR1}{TIM2\_CCMR1}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a805228ae9456a296165b49af8767fdea} 
+\#define TIM2\+\_\+\+CCMR1~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x18))}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a6521924eaaa3365f52a534bed3b2393e}\index{main.c@{main.c}!TIM2\_CCR1@{TIM2\_CCR1}}
+\index{TIM2\_CCR1@{TIM2\_CCR1}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{TIM2\_CCR1}{TIM2\_CCR1}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a6521924eaaa3365f52a534bed3b2393e} 
+\#define TIM2\+\_\+\+CCR1~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x34))}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_ab24fffc378e2c8b41357f644a85db741}\index{main.c@{main.c}!TIM2\_CR1@{TIM2\_CR1}}
+\index{TIM2\_CR1@{TIM2\_CR1}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{TIM2\_CR1}{TIM2\_CR1}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_ab24fffc378e2c8b41357f644a85db741} 
+\#define TIM2\+\_\+\+CR1~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x00))}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_af0e1e8b150a6a80588c2de7b4abe1994}\index{main.c@{main.c}!TIM2\_PSC@{TIM2\_PSC}}
+\index{TIM2\_PSC@{TIM2\_PSC}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{TIM2\_PSC}{TIM2\_PSC}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_af0e1e8b150a6a80588c2de7b4abe1994} 
+\#define TIM2\+\_\+\+PSC~(\texorpdfstring{$\ast$}{*}(volatile unsigned int \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a00d0fe6ad532ab32f0f81cafca8d3aa5}{TIM2\+\_\+\+BASE}} + 0x28))}
+
+
+
+\label{doc-func-members}
+\Hypertarget{08__no__hal__pwm_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{08__no__hal__pwm_2main_8c_abb9ee10191569258e0f22bdd0a95ba62}\index{main.c@{main.c}!delay@{delay}}
+\index{delay@{delay}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{delay()}{delay()}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_abb9ee10191569258e0f22bdd0a95ba62} 
+void delay (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{08__no__hal__pwm_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Main entry point. 
+
+Main application entry point.
+
+Initializes GPIOA pin 5 as output and toggles it in an infinite loop. Typically connected to an LED (e.\+g., onboard LED on Nucleo boards). \Hypertarget{08__no__hal__pwm_2main_8c_a55259f946d5eeb2bb9779d7646bf3f94}\index{main.c@{main.c}!pwm\_pa5\_init@{pwm\_pa5\_init}}
+\index{pwm\_pa5\_init@{pwm\_pa5\_init}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{pwm\_pa5\_init()}{pwm\_pa5\_init()}}
+{\footnotesize\ttfamily \label{08__no__hal__pwm_2main_8c_a55259f946d5eeb2bb9779d7646bf3f94} 
+void pwm\+\_\+pa5\+\_\+init (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{frequency}{, }\item[{float}]{duty\+\_\+cycle\+\_\+percent}{}\end{DoxyParamCaption})}
+

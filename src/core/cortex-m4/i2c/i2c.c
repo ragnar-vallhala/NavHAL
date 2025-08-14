@@ -11,6 +11,7 @@
 // I²C2 → PB10 / PB11
 // I²C3 → PA8 / PB4
 
+#define TIMEOUT 1000000
 #define I2C1_EN 1
 #define I2C2_EN 2
 #define I2C3_EN 4
@@ -18,8 +19,14 @@ static uint8_t __i2c_init_status = 0;
 
 // Initializes the I2C peripheral
 
+uint8_t hal_i2c_get_init_status(void) { return __i2c_init_status; }
+
 hal_i2c_status_t hal_i2c_init(hal_i2c_bus_t bus, hal_i2c_config_t *config) {
+  if (__i2c_init_status & (1 << bus))
+    return HAL_I2C_ERR_REINIT; // avoid reintialization
+
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
+
   if (config->own_address == I2C_MASTER) {
     RCC->APB1ENR |= I2C_APB1ENR_MASK(bus); // Enable base clock
 
@@ -48,14 +55,26 @@ hal_i2c_status_t hal_i2c_init(hal_i2c_bus_t bus, hal_i2c_config_t *config) {
           ((uint32_t)((I2C->CR2 & I2C_CR2_FREQ_MASK) * 300) / 1000) + 1;
     }
     I2C->CR1 |= I2C_CR1_PE_MASK;
+    switch (bus) {
+    case I2C1:
+      __i2c_init_status += 1;
+      break;
+    case I2C2:
+      __i2c_init_status += 2;
+      break;
+    case I2C3:
+      __i2c_init_status += 4;
+      break;
+    default:
+      break;
+    }
     return HAL_I2C_OK;
+
   } else {
     // [TODO] Implement slave mode
     return HAL_I2C_ERR_BUS;
   }
 }
-
-#define TIMEOUT 1000000
 
 int _wait_flag(volatile uint32_t *reg, uint32_t mask) {
   int timeout = TIMEOUT;

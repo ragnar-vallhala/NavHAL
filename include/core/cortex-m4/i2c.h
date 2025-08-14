@@ -9,7 +9,8 @@ typedef enum {
   HAL_I2C_OK = 0,
   HAL_I2C_ERR_TIMEOUT,
   HAL_I2C_ERR_BUS,
-  HAL_I2C_ERR_NACK
+  HAL_I2C_ERR_NACK,
+  HAL_I2C_ERR_REINIT
 } hal_i2c_status_t;
 typedef enum { I2C1 = 0, I2C2 = 1, I2C3 = 2 } hal_i2c_bus_t;
 typedef enum { STANDARD_MODE = 0, FAST_MODE = 1 } hal_i2c_speed_t;
@@ -39,5 +40,5 @@ hal_i2c_status_t hal_i2c_read(uint8_t bus, uint8_t dev_addr, uint8_t *data,
 hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
                                     const uint8_t *tx_data, uint16_t tx_len,
                                     uint8_t *rx_data, uint16_t rx_len);
-
+uint8_t hal_i2c_get_init_status(void);
 #endif // !CORTEX_M4_I2C_H

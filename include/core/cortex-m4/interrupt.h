@@ -12,8 +12,6 @@
  * NVIC architecture. All register mappings match the reference manual.
  */
 
-#ifndef INTERRUPT_H
-#define INTERRUPT_H
 #ifndef CORTEX_M4_INTERRUPT_H
 #define CORTEX_M4_INTERRUPT_H
 

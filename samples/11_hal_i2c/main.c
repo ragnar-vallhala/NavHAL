@@ -1,8 +1,3 @@
-#include "core/cortex-m4/gpio.h"
-#include "core/cortex-m4/i2c.h"
-#include "core/cortex-m4/timer.h"
-#include "core/cortex-m4/uart.h"
-#include "utils/gpio_types.h"
 #define CORTEX_M4
 #include "navhal.h"
 

@@ -1,22 +1,10 @@
 #define CORTEX_M4
 #include "navhal.h"
 
-// HAL PLL config for the clock
-hal_pll_config_t pll_cfg = {.input_src =
-                                HAL_CLOCK_SOURCE_HSE, // external crystal 8 MHz
-                            .pll_m = 8,
-                            .pll_n = 168,
-                            .pll_p = 2,
-                            .pll_q = 7};
 
-// setting the clock config
-//
-hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSE};
 
 int main() {
-  // Initialized the clock
-  hal_clock_init(&cfg, &pll_cfg);
-  // Start system tick with a interval of 40us
+
   systick_init(40);
   // Intialized the UART with a baud rate of 9600
   uart2_init(9600);

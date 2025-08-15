@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nvic_5ftypedef_0',['NVIC_Typedef',['../struct_n_v_i_c___typedef.html',1,'']]]
+  ['i2c_5freg_5ftypedef_0',['I2C_Reg_Typedef',['../struct_i2_c___reg___typedef.html',1,'']]]
 ];

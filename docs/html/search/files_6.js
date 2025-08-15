@@ -1,5 +1,11 @@
 var searchData=
 [
-  ['main_2ec_0',['main.c',['../01__hal__blink_2main_8c.html',1,'(Global Namespace)'],['../01__no__hal__blink_2main_8c.html',1,'(Global Namespace)'],['../02__hal__pupd_2main_8c.html',1,'(Global Namespace)'],['../03__hal__uart__tx_2main_8c.html',1,'(Global Namespace)'],['../03__no__hal__uart__tx_2main_8c.html',1,'(Global Namespace)'],['../04__hal__timer_2main_8c.html',1,'(Global Namespace)'],['../05__hal__systick_2main_8c.html',1,'(Global Namespace)'],['../06__hal__blink__delay_2main_8c.html',1,'(Global Namespace)'],['../07__hal__pwm_2main_8c.html',1,'(Global Namespace)'],['../08__no__hal__pwm_2main_8c.html',1,'(Global Namespace)']]],
-  ['mainpage_2emd_1',['mainpage.md',['../mainpage_8md.html',1,'']]]
+  ['hal_5f12c_2eh_0',['hal_12c.h',['../hal__12c_8h.html',1,'']]],
+  ['hal_5fclock_2eh_1',['hal_clock.h',['../hal__clock_8h.html',1,'']]],
+  ['hal_5fgpio_2eh_2',['hal_gpio.h',['../hal__gpio_8h.html',1,'']]],
+  ['hal_5fpwm_2eh_3',['hal_pwm.h',['../hal__pwm_8h.html',1,'']]],
+  ['hal_5fstatus_2eh_4',['hal_status.h',['../hal__status_8h.html',1,'']]],
+  ['hal_5ftimer_2eh_5',['hal_timer.h',['../hal__timer_8h.html',1,'']]],
+  ['hal_5ftypes_2eh_6',['hal_types.h',['../hal__types_8h.html',1,'']]],
+  ['hal_5fuart_2eh_7',['hal_uart.h',['../hal__uart_8h.html',1,'']]]
 ];

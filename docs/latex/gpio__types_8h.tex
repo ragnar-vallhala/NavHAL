@@ -5,8 +5,13 @@
 GPIO pin definitions and related types for Nav\+HAL.  
 
 
-This graph shows which files directly or indirectly include this file\+:
-% FIG 0
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gpio__types_8h__dep__incl}
+\end{center}
+\end{figure}
 \doxysubsubsection*{Enumerations}
 \begin{DoxyCompactItemize}
 \item 
@@ -147,6 +152,16 @@ enum \mbox{\hyperlink{gpio__types_8h_ab08483829bc1df17783a8ad8cb49043e}{hal\+\_\
 , \mbox{\hyperlink{gpio__types_8h_ab08483829bc1df17783a8ad8cb49043ea54d3458b8a69bc77fc3f19e0dfdabd19}{GPIO\+\_\+\+PULLDOWN}}
  \}
 \begin{DoxyCompactList}\small\item\em GPIO pull-\/up/pull-\/down resistor configuration. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{gpio__types_8h_af1245830de642fd67cc728bc217b9efe}{hal\+\_\+gpio\+\_\+output\+\_\+type}} \{ \mbox{\hyperlink{gpio__types_8h_af1245830de642fd67cc728bc217b9efea2ede6e0f1b50e67e840a93701323c775}{GPIO\+\_\+\+PUSH\+\_\+\+PULL}} = 0
+, \mbox{\hyperlink{gpio__types_8h_af1245830de642fd67cc728bc217b9efea5b0c623028002305892a4558ef0a6222}{GPIO\+\_\+\+OPEN\+\_\+\+DRAIN}}
+ \}
+\item 
+enum \mbox{\hyperlink{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49d}{hal\+\_\+gpio\+\_\+output\+\_\+speed}} \{ \mbox{\hyperlink{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49dadad1d99afc424c9903c2116308da5778}{GPIO\+\_\+\+LOW\+\_\+\+SPEED}} = 0
+, \mbox{\hyperlink{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49da83efc1b373fff74ccc8ff155acb523bb}{GPIO\+\_\+\+MEDIUM\+\_\+\+SPEED}}
+, \mbox{\hyperlink{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49dadb3d95caeba959c63a9709ca19a9cd04}{GPIO\+\_\+\+HIGH\+\_\+\+SPEED}}
+, \mbox{\hyperlink{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49daf7087f6e3a0ec17c4e20a95a42e694f1}{GPIO\+\_\+\+VERY\+\_\+\+HIGH\+\_\+\+SPEED}}
+ \}
+\item 
 enum \mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44}{hal\+\_\+gpio\+\_\+alternate\+\_\+function\+\_\+t}} \{ \newline
 \mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44a72d65b9922c2c9c82c2cbb318ca9ecaf}{GPIO\+\_\+\+AF00}}
 , \mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44af20962b41ad5081823f2591f07e7dee0}{GPIO\+\_\+\+AF01}}
@@ -286,6 +301,46 @@ GPIO\+\_\+\+AF&Configure pin as alternate function \\
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{GPIO\_ANALOG@{GPIO\_ANALOG}!gpio\_types.h@{gpio\_types.h}}\index{gpio\_types.h@{gpio\_types.h}!GPIO\_ANALOG@{GPIO\_ANALOG}}}\Hypertarget{gpio__types_8h_afff59088389c415758284fcfdef93fdaae8bd62cf000e751ffdce5a9de1c0dcc0}\label{gpio__types_8h_afff59088389c415758284fcfdef93fdaae8bd62cf000e751ffdce5a9de1c0dcc0} 
 GPIO\+\_\+\+ANALOG&Configure pin as analog \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49d}\index{gpio\_types.h@{gpio\_types.h}!hal\_gpio\_output\_speed@{hal\_gpio\_output\_speed}}
+\index{hal\_gpio\_output\_speed@{hal\_gpio\_output\_speed}!gpio\_types.h@{gpio\_types.h}}
+\doxysubsubsection{\texorpdfstring{hal\_gpio\_output\_speed}{hal\_gpio\_output\_speed}}
+{\footnotesize\ttfamily \label{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49d} 
+enum \mbox{\hyperlink{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49d}{hal\+\_\+gpio\+\_\+output\+\_\+speed}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GPIO\_LOW\_SPEED@{GPIO\_LOW\_SPEED}!gpio\_types.h@{gpio\_types.h}}\index{gpio\_types.h@{gpio\_types.h}!GPIO\_LOW\_SPEED@{GPIO\_LOW\_SPEED}}}\Hypertarget{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49dadad1d99afc424c9903c2116308da5778}\label{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49dadad1d99afc424c9903c2116308da5778} 
+GPIO\+\_\+\+LOW\+\_\+\+SPEED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GPIO\_MEDIUM\_SPEED@{GPIO\_MEDIUM\_SPEED}!gpio\_types.h@{gpio\_types.h}}\index{gpio\_types.h@{gpio\_types.h}!GPIO\_MEDIUM\_SPEED@{GPIO\_MEDIUM\_SPEED}}}\Hypertarget{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49da83efc1b373fff74ccc8ff155acb523bb}\label{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49da83efc1b373fff74ccc8ff155acb523bb} 
+GPIO\+\_\+\+MEDIUM\+\_\+\+SPEED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GPIO\_HIGH\_SPEED@{GPIO\_HIGH\_SPEED}!gpio\_types.h@{gpio\_types.h}}\index{gpio\_types.h@{gpio\_types.h}!GPIO\_HIGH\_SPEED@{GPIO\_HIGH\_SPEED}}}\Hypertarget{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49dadb3d95caeba959c63a9709ca19a9cd04}\label{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49dadb3d95caeba959c63a9709ca19a9cd04} 
+GPIO\+\_\+\+HIGH\+\_\+\+SPEED&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GPIO\_VERY\_HIGH\_SPEED@{GPIO\_VERY\_HIGH\_SPEED}!gpio\_types.h@{gpio\_types.h}}\index{gpio\_types.h@{gpio\_types.h}!GPIO\_VERY\_HIGH\_SPEED@{GPIO\_VERY\_HIGH\_SPEED}}}\Hypertarget{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49daf7087f6e3a0ec17c4e20a95a42e694f1}\label{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49daf7087f6e3a0ec17c4e20a95a42e694f1} 
+GPIO\+\_\+\+VERY\+\_\+\+HIGH\+\_\+\+SPEED&\\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{gpio__types_8h_af1245830de642fd67cc728bc217b9efe}\index{gpio\_types.h@{gpio\_types.h}!hal\_gpio\_output\_type@{hal\_gpio\_output\_type}}
+\index{hal\_gpio\_output\_type@{hal\_gpio\_output\_type}!gpio\_types.h@{gpio\_types.h}}
+\doxysubsubsection{\texorpdfstring{hal\_gpio\_output\_type}{hal\_gpio\_output\_type}}
+{\footnotesize\ttfamily \label{gpio__types_8h_af1245830de642fd67cc728bc217b9efe} 
+enum \mbox{\hyperlink{gpio__types_8h_af1245830de642fd67cc728bc217b9efe}{hal\+\_\+gpio\+\_\+output\+\_\+type}}}
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GPIO\_PUSH\_PULL@{GPIO\_PUSH\_PULL}!gpio\_types.h@{gpio\_types.h}}\index{gpio\_types.h@{gpio\_types.h}!GPIO\_PUSH\_PULL@{GPIO\_PUSH\_PULL}}}\Hypertarget{gpio__types_8h_af1245830de642fd67cc728bc217b9efea2ede6e0f1b50e67e840a93701323c775}\label{gpio__types_8h_af1245830de642fd67cc728bc217b9efea2ede6e0f1b50e67e840a93701323c775} 
+GPIO\+\_\+\+PUSH\+\_\+\+PULL&push pull otyper \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GPIO\_OPEN\_DRAIN@{GPIO\_OPEN\_DRAIN}!gpio\_types.h@{gpio\_types.h}}\index{gpio\_types.h@{gpio\_types.h}!GPIO\_OPEN\_DRAIN@{GPIO\_OPEN\_DRAIN}}}\Hypertarget{gpio__types_8h_af1245830de642fd67cc728bc217b9efea5b0c623028002305892a4558ef0a6222}\label{gpio__types_8h_af1245830de642fd67cc728bc217b9efea5b0c623028002305892a4558ef0a6222} 
+GPIO\+\_\+\+OPEN\+\_\+\+DRAIN&open drain otyper \\
 \hline
 
 \end{DoxyEnumFields}

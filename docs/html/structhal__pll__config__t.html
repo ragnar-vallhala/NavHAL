@@ -108,7 +108,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>PLL configuration parameters.  
+<p>PLL (Phase Locked Loop) configuration structure.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="clock_8h_source.html">clock.h</a>&gt;</code></p>
@@ -116,19 +116,14 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a3ee7a2ede1a550c1bcf2b3adf5e724ab" id="r_a3ee7a2ede1a550c1bcf2b3adf5e724ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="clock__types_8h.html#a5ea6776fc4182dcce8313aae7aefffe1">hal_clock_source_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3ee7a2ede1a550c1bcf2b3adf5e724ab">input_src</a></td></tr>
-<tr class="memdesc:a3ee7a2ede1a550c1bcf2b3adf5e724ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">PLL input clock source (HSI or HSE)  <br /></td></tr>
 <tr class="memitem:a43380a9555d4e3bd71a833efa85e6578" id="r_a43380a9555d4e3bd71a833efa85e6578"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43380a9555d4e3bd71a833efa85e6578">pll_m</a></td></tr>
-<tr class="memdesc:a43380a9555d4e3bd71a833efa85e6578"><td class="mdescLeft">&#160;</td><td class="mdescRight">PLL division factor for input clock (2 to 63)  <br /></td></tr>
 <tr class="memitem:a6a146e1ca36b642d99aafb1830f955f6" id="r_a6a146e1ca36b642d99aafb1830f955f6"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6a146e1ca36b642d99aafb1830f955f6">pll_n</a></td></tr>
-<tr class="memdesc:a6a146e1ca36b642d99aafb1830f955f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">PLL multiplication factor for VCO (50 to 432)  <br /></td></tr>
 <tr class="memitem:aa7554787c9621f7f2cb36f2bccacfb03" id="r_aa7554787c9621f7f2cb36f2bccacfb03"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa7554787c9621f7f2cb36f2bccacfb03">pll_p</a></td></tr>
-<tr class="memdesc:aa7554787c9621f7f2cb36f2bccacfb03"><td class="mdescLeft">&#160;</td><td class="mdescRight">PLL division factor for main system clock (2,4,6,8)  <br /></td></tr>
 <tr class="memitem:a033cac8290c4fa3900b0e122cea19a45" id="r_a033cac8290c4fa3900b0e122cea19a45"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a033cac8290c4fa3900b0e122cea19a45">pll_q</a></td></tr>
-<tr class="memdesc:a033cac8290c4fa3900b0e122cea19a45"><td class="mdescLeft">&#160;</td><td class="mdescRight">PLL division factor for USB clock (2 to 15)  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>PLL configuration parameters. </p>
-<p>Used to configure the PLL source and multiplication/division factors. </p>
+<div class="textblock"><p>PLL (Phase Locked Loop) configuration structure. </p>
+<p>This structure defines the parameters for configuring the PLL to generate the system clock from the selected input source. </p>
 </div><a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
 <a id="a3ee7a2ede1a550c1bcf2b3adf5e724ab" name="a3ee7a2ede1a550c1bcf2b3adf5e724ab"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3ee7a2ede1a550c1bcf2b3adf5e724ab">&#9670;&#160;</a></span>input_src</h2>
@@ -141,8 +136,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>PLL input clock source (HSI or HSE) </p>
+<p>Clock input source for PLL. </p>
 
 </div>
 </div>
@@ -157,8 +151,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>PLL division factor for input clock (2 to 63) </p>
+<p>Division factor for PLL input. </p>
 
 </div>
 </div>
@@ -173,8 +166,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>PLL multiplication factor for VCO (50 to 432) </p>
+<p>Multiplication factor for PLL VCO. </p>
 
 </div>
 </div>
@@ -189,8 +181,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>PLL division factor for main system clock (2,4,6,8) </p>
+<p>Division factor for main system clock. </p>
 
 </div>
 </div>
@@ -205,8 +196,7 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>PLL division factor for USB clock (2 to 15) </p>
+<p>Division factor for peripheral clocks. </p>
 
 </div>
 </div>

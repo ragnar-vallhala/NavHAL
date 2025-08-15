@@ -1,3 +1,15 @@
+/**
+ * @file pwm.h
+ * @brief HAL interface for PWM (Pulse Width Modulation) configuration and control.
+ *
+ * @details
+ * This header provides:
+ * - PWM handle structure linking hardware timers and channels.
+ * - Functions to initialize, start, stop, and configure PWM signals.
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
+ */
+
 #ifndef PWM_H
 #define PWM_H
 
@@ -5,8 +17,7 @@
 #include <stdint.h>
 
 /**
- * @file pwm.h
- * @brief Handle structure for PWM (Pulse Width Modulation) configuration.
+ * @brief PWM handle structure linking timer and channel.
  */
 typedef struct {
   hal_timer_t timer;   /**< Hardware timer used for PWM generation. */
@@ -52,4 +63,4 @@ void hal_pwm_set_duty_cycle(PWM_Handle *pwm, float dutyCycle);
  */
 void hal_pwm_set_frequency(PWM_Handle *pwm, uint32_t frequency);
 
-#endif // !PWM_H
+#endif // PWM_H

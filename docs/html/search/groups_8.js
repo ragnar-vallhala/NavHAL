@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['rcc_20peripheral_20base_20and_20register_20offsets_0',['RCC Peripheral Base and Register Offsets',['../group___r_c_c___b_a_s_e.html',1,'']]],
-  ['register_20offsets_1',['RCC Peripheral Base and Register Offsets',['../group___r_c_c___b_a_s_e.html',1,'']]],
-  ['registers_2',['UART Peripheral Base Addresses and Registers',['../group___u_a_r_t___r_e_g_i_s_t_e_r_s.html',1,'']]]
+  ['type_20generic_20write_20macros_0',['Type-Generic Write Macros',['../group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html',1,'']]]
 ];

@@ -2,24 +2,26 @@
 \hypertarget{hal__gpio_8h}{}\label{hal__gpio_8h}\index{include/common/hal\_gpio.h@{include/common/hal\_gpio.h}}
 
 
-Architecture-\/agnostic GPIO HAL entry point for Nav\+HAL.  
+Hardware Abstraction Layer (HAL) interface for General Purpose Input/\+Output (GPIO).  
 
 
 This graph shows which files directly or indirectly include this file\+:
-% FIG 0
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hal__gpio_8h__dep__incl}
+\end{center}
+\end{figure}
 
 
 \doxysubsection{Detailed Description}
-Architecture-\/agnostic GPIO HAL entry point for Nav\+HAL. 
+Hardware Abstraction Layer (HAL) interface for General Purpose Input/\+Output (GPIO). 
 
-This file includes the appropriate architecture-\/specific GPIO HAL implementation based on the target MCU defined at compile time (e.\+g., CORTEX\+\_\+\+M4).
+This header file provides the interface for including the appropriate GPIO driver implementation based on the target architecture. For Cortex-\/\+M4 targets, it includes the {\ttfamily \doxylink{gpio_8h}{core/cortex-\/m4/gpio.\+h}} header.
 
-\begin{DoxyNote}{Note}
-This file should be included by user applications via {\ttfamily \doxylink{navhal_8h}{navhal.\+h}}. Direct inclusion is not recommended unless you are customizing the HAL.
-\end{DoxyNote}
-\begin{DoxyAuthor}{Author}
-Ashutosh Vishwakarma 
-\end{DoxyAuthor}
-\begin{DoxyDate}{Date}
-2025-\/07-\/20 
-\end{DoxyDate}
+The HAL GPIO module provides a platform-\/independent way to configure and control GPIO pins for input, output, and alternate functions.
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}

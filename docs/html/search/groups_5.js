@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['offsets_0',['RCC Peripheral Base and Register Offsets',['../group___r_c_c___b_a_s_e.html',1,'']]]
+  ['macros_0',['Type-Generic Write Macros',['../group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html',1,'']]]
 ];

@@ -1,8 +1,13 @@
 \doxysection{samples/05\+\_\+hal\+\_\+systick/startup.c File Reference}
 \hypertarget{samples_205__hal__systick_2startup_8c}{}\label{samples_205__hal__systick_2startup_8c}\index{samples/05\_hal\_systick/startup.c@{samples/05\_hal\_systick/startup.c}}
 {\ttfamily \#include $<$stdint.\+h$>$}\newline
-Include dependency graph for startup.\+c\+:
-% FIG 0
+Include dependency graph for startup.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=201pt]{samples_205__hal__systick_2startup_8c__incl}
+\end{center}
+\end{figure}
 \doxysubsubsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
@@ -74,7 +79,148 @@ int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})\hspac
 
 Main entry point. 
 
-Initializes GPIOA pin 5 as output and toggles it in an infinite loop. Typically connected to an LED (e.\+g., onboard LED on Nucleo boards). \Hypertarget{samples_205__hal__systick_2startup_8c_a6ad7a5e3ee69cb6db6a6b9111ba898bc}\index{startup.c@{startup.c}!NMI\_Handler@{NMI\_Handler}}
+Initializes GPIOA pin 5 as output and toggles it in an infinite loop. Typically connected to an LED (e.\+g., onboard LED on Nucleo boards).
+
+Main entry point.
+
+
+\begin{DoxyItemize}
+\item Initializes system clock using PLL.
+\item Configures Sys\+Tick timer.
+\item Initializes UART2 for console output.
+\item Configures multiple timers with interrupts and attaches callbacks.
+\item Enters infinite loop with optional debug prints. 
+\end{DoxyItemize}\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 1 ms tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Send string over UART2
+
+\texorpdfstring{$<$}{<} Wait for 1 second
+
+\texorpdfstring{$<$}{<} Buffer to hold timer count as string
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 1 ms tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Initialize TIM5 with auto-\/reload 1e9
+
+\texorpdfstring{$<$}{<} Convert timer value to string
+
+\texorpdfstring{$<$}{<} Print label
+
+\texorpdfstring{$<$}{<} Print TIM5 counter value
+
+\texorpdfstring{$<$}{<} Newline and carriage return
+
+\texorpdfstring{$<$}{<} Initialize system clock with PLL
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 1 ms tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+Initialize TIM2, enable interrupt, attach callback
+
+Initialize TIM3, enable interrupt, attach callback
+
+Initialize TIM4, enable interrupt, attach callback
+
+Initialize TIM5, enable interrupt, attach callback
+
+Initialize TIM9, enable interrupt, attach callback
+
+Optional debug prints uart2\+\_\+write("{}\+Sys\+Ticks\+: "{}); \doxylink{group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s_gaff2eef2dac8eee46420e54b78311428e}{uart2\+\_\+write(hal\+\_\+get\+\_\+tick())}; uart2\+\_\+write("{}, Millis\+: "{}); \doxylink{group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s_gaff2eef2dac8eee46420e54b78311428e}{uart2\+\_\+write(timer\+\_\+get\+\_\+count(\+TIM5))}; uart2\+\_\+write("{}\textbackslash{}n\textbackslash{}r"{});
+
+\texorpdfstring{$<$}{<} Optional 1-\/second delay
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 40 µs tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Configure PA05 as output
+
+\texorpdfstring{$<$}{<} Initialize TIM5 with prescaler 0 and auto-\/reload 1e9
+
+\texorpdfstring{$<$}{<} Set PA05 HIGH
+
+\texorpdfstring{$<$}{<} Delay 500 ms
+
+\texorpdfstring{$<$}{<} Set PA05 LOW
+
+\texorpdfstring{$<$}{<} Delay 500 ms
+
+\texorpdfstring{$<$}{<} Print label
+
+\texorpdfstring{$<$}{<} Print system millis
+
+\texorpdfstring{$<$}{<} Newline and carriage return
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 40 µs tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Set PB10 as alternate function
+
+\texorpdfstring{$<$}{<} AF1 for TIM2\+\_\+\+CH3
+
+\texorpdfstring{$<$}{<} Initialize PWM handle on TIM2, channel 3
+
+\texorpdfstring{$<$}{<} Init PWM at 15 k\+Hz, 10\% duty cycle
+
+\texorpdfstring{$<$}{<} Start PWM output
+
+\texorpdfstring{$<$}{<} Variable for duty cycle update
+
+\texorpdfstring{$<$}{<} Update PWM duty cycle
+
+\texorpdfstring{$<$}{<} Increment duty cycle by 1\%
+
+\texorpdfstring{$<$}{<} Reset to 0\% after 100\%
+
+\texorpdfstring{$<$}{<} Print current duty cycle over UART2
+
+\texorpdfstring{$<$}{<} Newline and carriage return
+
+\texorpdfstring{$<$}{<} Delay 10 ms
+
+\texorpdfstring{$<$}{<} Initialize system clock with PLL
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 40 µs tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Print SYSCLK label
+
+\texorpdfstring{$<$}{<} Print system clock
+
+\texorpdfstring{$<$}{<} Print APB1\+CLK label
+
+\texorpdfstring{$<$}{<} Print APB1 clock
+
+\texorpdfstring{$<$}{<} Print APB2\+CLK label
+
+\texorpdfstring{$<$}{<} Print APB2 clock
+
+\texorpdfstring{$<$}{<} Print AHBCLK label
+
+\texorpdfstring{$<$}{<} Print AHB clock
+
+\texorpdfstring{$<$}{<} Newline
+
+\texorpdfstring{$<$}{<} Wait 1 second
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick for delays
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Stop execution if I2C init fails
+
+\texorpdfstring{$<$}{<} Wait for conversion (\texorpdfstring{$\sim$}{\string~}4.5 ms for temperature)
+
+\texorpdfstring{$<$}{<} Assumes uart2\+\_\+write\+\_\+int exists
+
+\texorpdfstring{$<$}{<} Wait 1 second before next measurement\Hypertarget{samples_205__hal__systick_2startup_8c_a6ad7a5e3ee69cb6db6a6b9111ba898bc}\index{startup.c@{startup.c}!NMI\_Handler@{NMI\_Handler}}
 \index{NMI\_Handler@{NMI\_Handler}!startup.c@{startup.c}}
 \doxysubsubsection{\texorpdfstring{NMI\_Handler()}{NMI\_Handler()}}
 {\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a6ad7a5e3ee69cb6db6a6b9111ba898bc} 

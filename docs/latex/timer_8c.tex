@@ -11,8 +11,13 @@ Timer, Sys\+Tick and timer-\/peripheral helpers for STM32\+F4 (Cortex-\/\+M4).
 {\ttfamily \#include "{}core/cortex-\/m4/uart.\+h"{}}\newline
 {\ttfamily \#include "{}utils/timer\+\_\+types.\+h"{}}\newline
 {\ttfamily \#include $<$stdint.\+h$>$}\newline
-Include dependency graph for timer.\+c\+:
-% FIG 0
+Include dependency graph for timer.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{timer_8c__incl}
+\end{center}
+\end{figure}
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -56,8 +61,10 @@ uint32\+\_\+t \mbox{\hyperlink{timer_8c_a19aba4b4d8462e4f84b6eeabda21423c}{timer
 \begin{DoxyCompactList}\small\item\em Get the current counter value for a timer. \end{DoxyCompactList}\item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8c_a6b2fb6cbff774094130a964475db6b25}{timer\+\_\+get\+\_\+frequency}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
 \begin{DoxyCompactList}\small\item\em Calculate the timer\textquotesingle{}s current base frequency using PSC and ARR. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{timer_8c_a0b6c91f4ad622097b4e2787abce9873e}{timer\+\_\+set\+\_\+arr}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel, uint32\+\_\+t arr)
+\item 
 void \mbox{\hyperlink{timer_8c_a6226a8f2f8b305c2a319ade05a77886c}{timer\+\_\+clear\+\_\+interrupt\+\_\+flag}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
-\begin{DoxyCompactList}\small\item\em Clear timer update interrupt flag for supported timers. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8c_a69ed77607e30e5935ea2d6994e94be10}{TIM2\+\_\+\+IRQHandler}} ()
 \begin{DoxyCompactList}\small\item\em IRQ handler wrapper for TIM2. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8c_a2f59315000eb73fdeac2ab44fcd8b972}{TIM3\+\_\+\+IRQHandler}} ()
@@ -78,8 +85,12 @@ void \mbox{\hyperlink{timer_8c_a834d3bef7882671645ad5d3c58fa69bc}{timer\+\_\+det
 \begin{DoxyCompactList}\small\item\em Detach a previously attached callback for the given timer. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8c_a3b5738efe72c1bd7130276a8f59b8234}{timer\+\_\+set\+\_\+compare}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint8\+\_\+t channel, uint32\+\_\+t compare\+\_\+value)
 \begin{DoxyCompactList}\small\item\em Set the compare (CCR) register for a timer channel and configure CCMR. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8c_a043ef2140caa620a1ed1af968fff5b46}{timer\+\_\+get\+\_\+compare}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
+\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8c_a566a41b6f3c8e66b0736719528da6245}{timer\+\_\+get\+\_\+arr}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
+\item 
 void \mbox{\hyperlink{timer_8c_ab790fdb4ee5e3bfe9477a2bbfb89e13d}{timer\+\_\+enable\+\_\+channel}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
-\begin{DoxyCompactList}\small\item\em Enable output on the specified timer channel (CCxE). \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8c_a0d3035840fb20d5213a70d0e33994584}{timer\+\_\+disable\+\_\+channel}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
 \begin{DoxyCompactList}\small\item\em Disable output on the specified timer channel (CCxE = 0). \end{DoxyCompactList}\end{DoxyCompactItemize}
 
@@ -342,18 +353,6 @@ Attach a callback to the timer\textquotesingle{}s HAL interrupt table.
 {\footnotesize\ttfamily \label{timer_8c_a6226a8f2f8b305c2a319ade05a77886c} 
 void timer\+\_\+clear\+\_\+interrupt\+\_\+flag (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
 
-
-
-Clear timer update interrupt flag for supported timers. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyNote}{Note}
-Currently supports TIM2-\/\+TIM5 and TIM9-\/\+TIM11 patterns used in this HAL. 
-\end{DoxyNote}
 \Hypertarget{timer_8c_a834d3bef7882671645ad5d3c58fa69bc}\index{timer.c@{timer.c}!timer\_detach\_callback@{timer\_detach\_callback}}
 \index{timer\_detach\_callback@{timer\_detach\_callback}!timer.c@{timer.c}}
 \doxysubsubsection{\texorpdfstring{timer\_detach\_callback()}{timer\_detach\_callback()}}
@@ -392,17 +391,6 @@ Disable output on the specified timer channel (CCxE = 0).
 {\footnotesize\ttfamily \label{timer_8c_ab790fdb4ee5e3bfe9477a2bbfb89e13d} 
 void timer\+\_\+enable\+\_\+channel (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
 
-
-
-Enable output on the specified timer channel (CCxE). 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
-\hline
-{\em channel} & Channel number (1-\/4). \\
-\hline
-\end{DoxyParams}
 \Hypertarget{timer_8c_a4ee300cb9e4b9356f445bbc7d0d7549f}\index{timer.c@{timer.c}!timer\_enable\_interrupt@{timer\_enable\_interrupt}}
 \index{timer\_enable\_interrupt@{timer\_enable\_interrupt}!timer.c@{timer.c}}
 \doxysubsubsection{\texorpdfstring{timer\_enable\_interrupt()}{timer\_enable\_interrupt()}}
@@ -421,6 +409,18 @@ Enable timer interrupts (NVIC + DIER UIE) for supported timers.
 \begin{DoxyNote}{Note}
 For TIM1 more complex options exist and are left TODO in the original. 
 \end{DoxyNote}
+\Hypertarget{timer_8c_a566a41b6f3c8e66b0736719528da6245}\index{timer.c@{timer.c}!timer\_get\_arr@{timer\_get\_arr}}
+\index{timer\_get\_arr@{timer\_get\_arr}!timer.c@{timer.c}}
+\doxysubsubsection{\texorpdfstring{timer\_get\_arr()}{timer\_get\_arr()}}
+{\footnotesize\ttfamily \label{timer_8c_a566a41b6f3c8e66b0736719528da6245} 
+uint32\+\_\+t timer\+\_\+get\+\_\+arr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8c_a043ef2140caa620a1ed1af968fff5b46}\index{timer.c@{timer.c}!timer\_get\_compare@{timer\_get\_compare}}
+\index{timer\_get\_compare@{timer\_get\_compare}!timer.c@{timer.c}}
+\doxysubsubsection{\texorpdfstring{timer\_get\_compare()}{timer\_get\_compare()}}
+{\footnotesize\ttfamily \label{timer_8c_a043ef2140caa620a1ed1af968fff5b46} 
+uint32\+\_\+t timer\+\_\+get\+\_\+compare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
+
 \Hypertarget{timer_8c_a19aba4b4d8462e4f84b6eeabda21423c}\index{timer.c@{timer.c}!timer\_get\_count@{timer\_get\_count}}
 \index{timer\_get\_count@{timer\_get\_count}!timer.c@{timer.c}}
 \doxysubsubsection{\texorpdfstring{timer\_get\_count()}{timer\_get\_count()}}
@@ -494,6 +494,12 @@ Reset timer counter to zero.
 {\em timer} & Timer identifier. \\
 \hline
 \end{DoxyParams}
+\Hypertarget{timer_8c_a0b6c91f4ad622097b4e2787abce9873e}\index{timer.c@{timer.c}!timer\_set\_arr@{timer\_set\_arr}}
+\index{timer\_set\_arr@{timer\_set\_arr}!timer.c@{timer.c}}
+\doxysubsubsection{\texorpdfstring{timer\_set\_arr()}{timer\_set\_arr()}}
+{\footnotesize\ttfamily \label{timer_8c_a0b6c91f4ad622097b4e2787abce9873e} 
+void timer\+\_\+set\+\_\+arr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{, }\item[{uint32\+\_\+t}]{arr}{}\end{DoxyParamCaption})}
+
 \Hypertarget{timer_8c_a3b5738efe72c1bd7130276a8f59b8234}\index{timer.c@{timer.c}!timer\_set\_compare@{timer\_set\_compare}}
 \index{timer\_set\_compare@{timer\_set\_compare}!timer.c@{timer.c}}
 \doxysubsubsection{\texorpdfstring{timer\_set\_compare()}{timer\_set\_compare()}}

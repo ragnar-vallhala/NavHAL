@@ -2,24 +2,26 @@
 \hypertarget{hal__clock_8h}{}\label{hal__clock_8h}\index{include/common/hal\_clock.h@{include/common/hal\_clock.h}}
 
 
-Architecture-\/agnostic Clock HAL entry point for Nav\+HAL.  
+Hardware Abstraction Layer (HAL) interface for clock management.  
 
 
 This graph shows which files directly or indirectly include this file\+:
-% FIG 0
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hal__clock_8h__dep__incl}
+\end{center}
+\end{figure}
 
 
 \doxysubsection{Detailed Description}
-Architecture-\/agnostic Clock HAL entry point for Nav\+HAL. 
+Hardware Abstraction Layer (HAL) interface for clock management. 
 
-This file includes the appropriate architecture-\/specific Clock HAL implementation based on the target MCU defined at compile time (e.\+g., CORTEX\+\_\+\+M4).
+This header file provides the interface for including the appropriate clock driver implementation based on the target architecture. For Cortex-\/\+M4 targets, it includes the {\ttfamily \doxylink{clock_8h}{core/cortex-\/m4/clock.\+h}} header.
 
-\begin{DoxyNote}{Note}
-This file should be included by user applications via {\ttfamily \doxylink{navhal_8h}{navhal.\+h}}. Direct inclusion is not recommended unless you are customizing the HAL.
-\end{DoxyNote}
-\begin{DoxyAuthor}{Author}
-Ashutosh Vishwakarma 
-\end{DoxyAuthor}
-\begin{DoxyDate}{Date}
-2025-\/07-\/21 
-\end{DoxyDate}
+The HAL clock module provides an abstraction over the hardware-\/specific clock control mechanisms, enabling platform-\/independent code to manage system and peripheral clocks.
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}

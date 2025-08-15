@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['pwm_2ec_0',['pwm.c',['../pwm_8c.html',1,'']]],
-  ['pwm_2eh_1',['pwm.h',['../pwm_8h.html',1,'']]]
+  ['license_2emd_0',['LICENSE.md',['../_l_i_c_e_n_s_e_8md.html',1,'']]]
 ];

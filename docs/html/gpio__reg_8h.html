@@ -108,7 +108,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Register map and base addresses for GPIO ports on STM32F4 series.  
+<p>Cortex-M4 GPIO register definitions and access macros.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="types_8h_source.html">utils/types.h</a>&quot;</code><br />
 <code>#include &lt;stdint.h&gt;</code><br />
@@ -116,11 +116,40 @@ $(function() {
 Include dependency graph for gpio_reg.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="gpio__reg_8h__incl.png" border="0" usemap="#ainclude_2core_2cortex-m4_2gpio__reg_8h" loading="lazy" alt=""/></div>
+<map name="ainclude_2core_2cortex-m4_2gpio__reg_8h" id="ainclude_2core_2cortex-m4_2gpio__reg_8h">
+<area shape="rect" title="Cortex&#45;M4 GPIO register definitions and access macros." alt="" coords="404,5,536,46"/>
+<area shape="rect" href="types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="330,94,423,120"/>
+<area shape="poly" title=" " alt="" coords="448,48,404,86,401,82,445,44"/>
+<area shape="rect" title=" " alt="" coords="184,330,249,356"/>
+<area shape="poly" title=" " alt="" coords="506,44,547,72,586,109,600,129,609,151,609,173,600,195,567,233,527,264,482,289,435,308,387,322,341,332,264,342,264,337,340,327,386,317,433,303,480,284,524,260,563,229,596,192,604,172,603,152,596,132,582,112,543,77,503,49"/>
+<area shape="rect" href="clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="91,168,193,193"/>
+<area shape="poly" title=" " alt="" coords="337,123,197,165,196,160,336,118"/>
+<area shape="poly" title=" " alt="" coords="331,123,291,141,273,154,257,169,237,205,225,244,220,282,218,314,213,314,214,282,220,243,232,202,253,166,269,150,288,136,329,118"/>
+<area shape="rect" href="gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="268,168,363,193"/>
+<area shape="poly" title=" " alt="" coords="368,122,337,157,333,154,364,118"/>
+<area shape="rect" href="timer__types_8h.html" title=" " alt="" coords="386,168,487,193"/>
+<area shape="poly" title=" " alt="" coords="388,118,419,154,415,157,384,122"/>
+<area shape="rect" title=" " alt="" coords="511,168,586,193"/>
+<area shape="poly" title=" " alt="" coords="407,118,506,159,504,164,405,123"/>
+<area shape="rect" href="rcc__reg_8h.html" title=" " alt="" coords="11,241,142,282"/>
+<area shape="poly" title=" " alt="" coords="134,195,104,231,100,228,130,192"/>
+<area shape="poly" title=" " alt="" coords="150,193,207,315,202,317,145,195"/>
+<area shape="rect" href="hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="5,330,148,356"/>
+<area shape="poly" title=" " alt="" coords="79,282,79,314,74,314,74,282"/>
+<area shape="poly" title=" " alt="" coords="113,280,183,320,181,324,110,285"/>
+</map>
 </div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="gpio__reg_8h__dep__incl.png" border="0" usemap="#ainclude_2core_2cortex-m4_2gpio__reg_8hdep" loading="lazy" alt=""/></div>
+<map name="ainclude_2core_2cortex-m4_2gpio__reg_8hdep" id="ainclude_2core_2cortex-m4_2gpio__reg_8hdep">
+<area shape="rect" title="Cortex&#45;M4 GPIO register definitions and access macros." alt="" coords="78,5,210,46"/>
+<area shape="rect" href="gpio_8c.html" title="HAL GPIO driver implementation for STM32F4 series." alt="" coords="5,94,136,135"/>
+<area shape="poly" title=" " alt="" coords="120,60,89,95,85,92,116,56"/>
+<area shape="rect" href="test__gpio_8c.html" title=" " alt="" coords="159,102,278,127"/>
+<area shape="poly" title=" " alt="" coords="173,56,210,99,206,103,169,60"/>
+</map>
 </div>
 </div>
 <p><a href="gpio__reg_8h_source.html">Go to the source code of this file.</a></p>
@@ -128,33 +157,33 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:GPIOx_5FTypedef" id="r_GPIOx_5FTypedef"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_g_p_i_ox___typedef.html">GPIOx_Typedef</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">GPIO port register map structure.  <a href="struct_g_p_i_ox___typedef.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">GPIO port register structure.  <a href="struct_g_p_i_ox___typedef.html#details">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a312c4a0ecb7f7df814b6dc660acff0e1" id="r_a312c4a0ecb7f7df814b6dc660acff0e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a312c4a0ecb7f7df814b6dc660acff0e1">GPIOA_BASE_ADDR</a>&#160;&#160;&#160;0x40020000</td></tr>
-<tr class="memdesc:a312c4a0ecb7f7df814b6dc660acff0e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base address of GPIOA port registers.  <br /></td></tr>
 <tr class="memitem:a93393583ac13481b25732f754b300efd" id="r_a93393583ac13481b25732f754b300efd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93393583ac13481b25732f754b300efd">GPIOB_BASE_ADDR</a>&#160;&#160;&#160;0x40020400</td></tr>
-<tr class="memdesc:a93393583ac13481b25732f754b300efd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base address of GPIOB port registers.  <br /></td></tr>
 <tr class="memitem:a92e9aec75c825d01a0d4c5ebe9a09e38" id="r_a92e9aec75c825d01a0d4c5ebe9a09e38"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92e9aec75c825d01a0d4c5ebe9a09e38">GPIOC_BASE_ADDR</a>&#160;&#160;&#160;0x40020800</td></tr>
-<tr class="memdesc:a92e9aec75c825d01a0d4c5ebe9a09e38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base address of GPIOC port registers.  <br /></td></tr>
 <tr class="memitem:a5542cfab7e2101bae98b650d19a19e90" id="r_a5542cfab7e2101bae98b650d19a19e90"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5542cfab7e2101bae98b650d19a19e90">GPIOD_BASE_ADDR</a>&#160;&#160;&#160;0x40020C00</td></tr>
-<tr class="memdesc:a5542cfab7e2101bae98b650d19a19e90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base address of GPIOD port registers.  <br /></td></tr>
 <tr class="memitem:a223cb9c5def01f7315fbf6fa5322bc9b" id="r_a223cb9c5def01f7315fbf6fa5322bc9b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a223cb9c5def01f7315fbf6fa5322bc9b">GPIOE_BASE_ADDR</a>&#160;&#160;&#160;0x40021000</td></tr>
-<tr class="memdesc:a223cb9c5def01f7315fbf6fa5322bc9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base address of GPIOE port registers.  <br /></td></tr>
 <tr class="memitem:a03ec8a869ee6f256c882978a71fa5ffa" id="r_a03ec8a869ee6f256c882978a71fa5ffa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03ec8a869ee6f256c882978a71fa5ffa">GPIOH_BASE_ADDR</a>&#160;&#160;&#160;0x40021C00</td></tr>
-<tr class="memdesc:a03ec8a869ee6f256c882978a71fa5ffa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base address of GPIOH port registers.  <br /></td></tr>
-<tr class="memitem:a2f48db2915042d2e1e819453ff05c0ab" id="r_a2f48db2915042d2e1e819453ff05c0ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a>(n)</td></tr>
-<tr class="memdesc:a2f48db2915042d2e1e819453ff05c0ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get GPIO port number from pin index.  <br /></td></tr>
-<tr class="memitem:a00d2d6c40a947794f1c27e984b84f1db" id="r_a00d2d6c40a947794f1c27e984b84f1db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a00d2d6c40a947794f1c27e984b84f1db">GPIO_GET_PORT</a>(n)</td></tr>
-<tr class="memdesc:a00d2d6c40a947794f1c27e984b84f1db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get GPIO port structure pointer from pin index.  <br /></td></tr>
-<tr class="memitem:a3c789f3a6c3190c9c8cc399c6cf2ee29" id="r_a3c789f3a6c3190c9c8cc399c6cf2ee29"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c789f3a6c3190c9c8cc399c6cf2ee29">GPIO_GET_PIN</a>(n)</td></tr>
-<tr class="memdesc:a3c789f3a6c3190c9c8cc399c6cf2ee29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get pin number within its port.  <br /></td></tr>
+<tr class="memitem:a2f48db2915042d2e1e819453ff05c0ab" id="r_a2f48db2915042d2e1e819453ff05c0ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a>(<a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a>)</td></tr>
+<tr class="memitem:a00d2d6c40a947794f1c27e984b84f1db" id="r_a00d2d6c40a947794f1c27e984b84f1db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a00d2d6c40a947794f1c27e984b84f1db">GPIO_GET_PORT</a>(<a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a>)</td></tr>
+<tr class="memitem:a3c789f3a6c3190c9c8cc399c6cf2ee29" id="r_a3c789f3a6c3190c9c8cc399c6cf2ee29"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c789f3a6c3190c9c8cc399c6cf2ee29">GPIO_GET_PIN</a>(<a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a>)</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Register map and base addresses for GPIO ports on STM32F4 series. </p>
-<p>This header defines the memory-mapped structure for GPIO port registers, as well as macros for accessing GPIO ports and pins on STM32F4 microcontrollers.</p>
-<p>The GPIO ports are located at fixed base addresses in the AHB1 peripheral space. Each port consists of control registers for mode, type, speed, pull-up/pull-down, input/output data, bit set/reset, lock, and alternate functions. </p>
+<div class="textblock"><p>Cortex-M4 GPIO register definitions and access macros. </p>
+<p>This header defines the GPIO register structure and macros to access GPIO ports and pins on Cortex-M4 microcontrollers.</p>
+<p>Structures:</p><ul>
+<li><span class="tt"><a class="el" href="struct_g_p_i_ox___typedef.html" title="GPIO port register structure.">GPIOx_Typedef</a></span> : Represents the memory-mapped GPIO registers for a port.</li>
+</ul>
+<p>Macros:</p><ul>
+<li><span class="tt">GPIOA_BASE_ADDR</span> to <span class="tt">GPIOH_BASE_ADDR</span> : Base addresses of GPIO ports.</li>
+<li><span class="tt"><a class="el" href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER(n)</a></span> : Compute the port number from a pin number.</li>
+<li><span class="tt"><a class="el" href="#a00d2d6c40a947794f1c27e984b84f1db">GPIO_GET_PORT(n)</a></span> : Get a pointer to the GPIO port structure.</li>
+<li><span class="tt"><a class="el" href="#a3c789f3a6c3190c9c8cc399c6cf2ee29">GPIO_GET_PIN(n)</a></span> : Get the pin number within a port.</li>
+</ul>
+<dl class="section copyright"><dt>Copyright</dt><dd>© NAVROBOTEC PVT. LTD. </dd></dl>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a3c789f3a6c3190c9c8cc399c6cf2ee29" name="a3c789f3a6c3190c9c8cc399c6cf2ee29"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3c789f3a6c3190c9c8cc399c6cf2ee29">&#9670;&#160;</a></span>GPIO_GET_PIN</h2>
@@ -165,21 +194,14 @@ Macros</h2></td></tr>
         <tr>
           <td class="memname">#define GPIO_GET_PIN</td>
           <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>n</em></span></td><td>)</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em><a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(n % 16)</div>
-</div><!-- fragment -->
-<p>Get pin number within its port. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">n</td><td>Pin index (0..127). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Pin number (0..15). </dd></dl>
+<b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_variable" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a> % 16)</div>
+<div class="ttc" id="atest__unity__parameterized_8c_html_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67"><div class="ttname"><a href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a></div><div class="ttdeci">float n</div><div class="ttdef"><b>Definition</b> test_unity_parameterized.c:278</div></div>
+</div><!-- fragment --><p>Get pin number within the port from absolute pin number </p>
 
 </div>
 </div>
@@ -192,28 +214,16 @@ Macros</h2></td></tr>
         <tr>
           <td class="memname">#define GPIO_GET_PORT</td>
           <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>n</em></span></td><td>)</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em><a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  ((<a class="code hl_struct" href="struct_g_p_i_ox___typedef.html">GPIOx_Typedef</a> *)(<a class="code hl_define" href="#a312c4a0ecb7f7df814b6dc660acff0e1">GPIOA_BASE_ADDR</a> + ((<a class="code hl_define" href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a>(n)) * 0x400)))</div>
-<div class="ttc" id="agpio__reg_8h_html_a2f48db2915042d2e1e819453ff05c0ab"><div class="ttname"><a href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a></div><div class="ttdeci">#define GPIO_GET_PORT_NUMBER(n)</div><div class="ttdoc">Get GPIO port number from pin index.</div><div class="ttdef"><b>Definition</b> gpio_reg.h:55</div></div>
-<div class="ttc" id="agpio__reg_8h_html_a312c4a0ecb7f7df814b6dc660acff0e1"><div class="ttname"><a href="#a312c4a0ecb7f7df814b6dc660acff0e1">GPIOA_BASE_ADDR</a></div><div class="ttdeci">#define GPIOA_BASE_ADDR</div><div class="ttdoc">Base address of GPIOA port registers.</div><div class="ttdef"><b>Definition</b> gpio_reg.h:37</div></div>
-<div class="ttc" id="astruct_g_p_i_ox___typedef_html"><div class="ttname"><a href="struct_g_p_i_ox___typedef.html">GPIOx_Typedef</a></div><div class="ttdoc">GPIO port register map structure.</div><div class="ttdef"><b>Definition</b> gpio_reg.h:23</div></div>
-</div><!-- fragment -->
-<p>Get GPIO port structure pointer from pin index. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">n</td><td>Pin index (0..127). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Pointer to the corresponding <span class="tt"><a class="el" href="struct_g_p_i_ox___typedef.html" title="GPIO port register map structure.">GPIOx_Typedef</a></span>. <div class="fragment"><div class="line"><span class="comment">// Example: set pin 5 (PA5) high</span></div>
-<div class="line"><a class="code hl_define" href="#a00d2d6c40a947794f1c27e984b84f1db">GPIO_GET_PORT</a>(5)-&gt;BSRR = (1 &lt;&lt; <a class="code hl_define" href="#a3c789f3a6c3190c9c8cc399c6cf2ee29">GPIO_GET_PIN</a>(5));</div>
-<div class="ttc" id="agpio__reg_8h_html_a00d2d6c40a947794f1c27e984b84f1db"><div class="ttname"><a href="#a00d2d6c40a947794f1c27e984b84f1db">GPIO_GET_PORT</a></div><div class="ttdeci">#define GPIO_GET_PORT(n)</div><div class="ttdoc">Get GPIO port structure pointer from pin index.</div><div class="ttdef"><b>Definition</b> gpio_reg.h:66</div></div>
-<div class="ttc" id="agpio__reg_8h_html_a3c789f3a6c3190c9c8cc399c6cf2ee29"><div class="ttname"><a href="#a3c789f3a6c3190c9c8cc399c6cf2ee29">GPIO_GET_PIN</a></div><div class="ttdeci">#define GPIO_GET_PIN(n)</div><div class="ttdoc">Get pin number within its port.</div><div class="ttdef"><b>Definition</b> gpio_reg.h:74</div></div>
-</div><!-- fragment --> </dd></dl>
+<b>Value:</b><div class="fragment"><div class="line">  ((<a class="code hl_struct" href="struct_g_p_i_ox___typedef.html">GPIOx_Typedef</a> *)(<a class="code hl_define" href="#a312c4a0ecb7f7df814b6dc660acff0e1">GPIOA_BASE_ADDR</a> + ((<a class="code hl_define" href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a>(<a class="code hl_variable" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a>)) * 0x400)))</div>
+<div class="ttc" id="agpio__reg_8h_html_a2f48db2915042d2e1e819453ff05c0ab"><div class="ttname"><a href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a></div><div class="ttdeci">#define GPIO_GET_PORT_NUMBER(n)</div><div class="ttdef"><b>Definition</b> gpio_reg.h:65</div></div>
+<div class="ttc" id="agpio__reg_8h_html_a312c4a0ecb7f7df814b6dc660acff0e1"><div class="ttname"><a href="#a312c4a0ecb7f7df814b6dc660acff0e1">GPIOA_BASE_ADDR</a></div><div class="ttdeci">#define GPIOA_BASE_ADDR</div><div class="ttdef"><b>Definition</b> gpio_reg.h:57</div></div>
+<div class="ttc" id="astruct_g_p_i_ox___typedef_html"><div class="ttname"><a href="struct_g_p_i_ox___typedef.html">GPIOx_Typedef</a></div><div class="ttdoc">GPIO port register structure.</div><div class="ttdef"><b>Definition</b> gpio_reg.h:43</div></div>
+</div><!-- fragment --><p>Get pointer to GPIO port structure from absolute pin number </p>
 
 </div>
 </div>
@@ -226,22 +236,13 @@ Macros</h2></td></tr>
         <tr>
           <td class="memname">#define GPIO_GET_PORT_NUMBER</td>
           <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>n</em></span></td><td>)</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em><a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(n / 16 == 5 ? 7 : n / 16)</div>
-</div><!-- fragment -->
-<p>Get GPIO port number from pin index. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">n</td><td>Pin index (0..127). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Port number (0 for GPIOA, 1 for GPIOB, etc.). </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Special case: port 5 maps to port H (index 7). </dd></dl>
+<b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_variable" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a> / 16 == 5 ? 7 : <a class="code hl_variable" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a> / 16)</div>
+</div><!-- fragment --><p>Get port number from absolute pin number </p>
 
 </div>
 </div>
@@ -256,8 +257,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Base address of GPIOA port registers. </p>
+<p>Base addresses for GPIO ports GPIOA base address </p>
 
 </div>
 </div>
@@ -272,8 +272,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Base address of GPIOB port registers. </p>
+<p>GPIOB base address </p>
 
 </div>
 </div>
@@ -288,8 +287,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Base address of GPIOC port registers. </p>
+<p>GPIOC base address </p>
 
 </div>
 </div>
@@ -304,8 +302,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Base address of GPIOD port registers. </p>
+<p>GPIOD base address </p>
 
 </div>
 </div>
@@ -320,8 +317,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Base address of GPIOE port registers. </p>
+<p>GPIOE base address </p>
 
 </div>
 </div>
@@ -336,8 +332,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Base address of GPIOH port registers. </p>
+<p>GPIOH base address </p>
 
 </div>
 </div>

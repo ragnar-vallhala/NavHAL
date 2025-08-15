@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['weak_5falias_0',['WEAK_ALIAS',['../samples_205__hal__systick_2startup_8c.html#a0c9a16e7e880e73ecd32e1bacc6d668b',1,'WEAK_ALIAS:&#160;startup.c'],['../src_2core_2cortex-m4_2startup_2startup_8c.html#a0c9a16e7e880e73ecd32e1bacc6d668b',1,'WEAK_ALIAS:&#160;startup.c']]]
+  ['periph_5fbase_0',['PERIPH_BASE',['../samples_203__no__hal__uart__tx_2main_8c.html#a9171f49478fa86d932f89e78e73b88b0',1,'PERIPH_BASE:&#160;main.c'],['../samples_208__no__hal__pwm_2main_8c.html#a9171f49478fa86d932f89e78e73b88b0',1,'PERIPH_BASE:&#160;main.c'],['../samples_210__no__hal__i2c_2main_8c.html#a9171f49478fa86d932f89e78e73b88b0',1,'PERIPH_BASE:&#160;main.c']]]
 ];

@@ -115,25 +115,31 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="gpio__types_8h__dep__incl.png" border="0" usemap="#ainclude_2utils_2gpio__types_8hdep" loading="lazy" alt=""/></div>
 <map name="ainclude_2utils_2gpio__types_8hdep" id="ainclude_2utils_2gpio__types_8hdep">
-<area shape="rect" title="GPIO pin definitions and related types for NavHAL." alt="" coords="183,5,316,45"/>
-<area shape="rect" href="types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="173,93,326,119"/>
-<area shape="poly" title=" " alt="" coords="252,59,252,93,247,93,247,59"/>
-<area shape="rect" href="clock_8h.html" title="Clock HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="5,167,152,207"/>
-<area shape="poly" title=" " alt="" coords="213,127,121,169,119,164,211,122"/>
-<area shape="rect" href="gpio_8h.html" title="GPIO HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="348,167,495,207"/>
-<area shape="poly" title=" " alt="" coords="288,122,381,164,379,169,285,127"/>
-<area shape="rect" href="uart_8h.html" title="UART HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="176,167,323,207"/>
-<area shape="poly" title=" " alt="" coords="252,132,252,167,247,167,247,132"/>
-<area shape="rect" href="clock_8c.html" title="Cortex&#45;M4 (STM32F4) Clock HAL Implementation." alt="" coords="5,255,149,295"/>
-<area shape="poly" title=" " alt="" coords="81,221,80,254,75,254,75,221"/>
-<area shape="rect" href="uart_8c.html" title="UART HAL implementation for Cortex&#45;M4 (STM32F401RE)" alt="" coords="173,255,317,295"/>
-<area shape="poly" title=" " alt="" coords="128,210,210,252,208,257,126,215"/>
-<area shape="poly" title=" " alt="" coords="372,215,285,257,283,252,369,210"/>
-<area shape="rect" href="02__hal__pupd_2main_8c.html" title=" " alt="" coords="341,255,504,295"/>
-<area shape="poly" title=" " alt="" coords="425,221,425,254,420,254,419,221"/>
-<area shape="rect" href="gpio_8c.html" title="Cortex&#45;M4 (STM32F4) GPIO HAL Implementation." alt="" coords="528,255,672,295"/>
-<area shape="poly" title=" " alt="" coords="474,210,562,252,560,257,472,215"/>
-<area shape="poly" title=" " alt="" coords="250,221,249,255,244,254,245,220"/>
+<area shape="rect" title="GPIO pin definitions and related types for NavHAL." alt="" coords="409,5,527,46"/>
+<area shape="rect" href="gpio_8h.html" title="Cortex&#45;M4 specific GPIO HAL interface." alt="" coords="53,94,184,135"/>
+<area shape="poly" title=" " alt="" coords="394,48,185,99,184,94,393,43"/>
+<area shape="rect" href="i2c_8h.html" title="Cortex&#45;M4 I²C HAL interface." alt="" coords="630,94,762,135"/>
+<area shape="poly" title=" " alt="" coords="535,49,645,91,643,96,533,54"/>
+<area shape="rect" href="types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="399,102,536,127"/>
+<area shape="poly" title=" " alt="" coords="470,62,470,101,465,101,465,62"/>
+<area shape="rect" href="gpio_8c.html" title="HAL GPIO driver implementation for STM32F4 series." alt="" coords="5,271,136,312"/>
+<area shape="poly" title=" " alt="" coords="74,146,57,164,44,184,39,206,42,229,60,270,55,272,37,230,34,206,39,182,53,160,71,143"/>
+<area shape="rect" href="uart_8c.html" title="UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6." alt="" coords="53,183,184,223"/>
+<area shape="poly" title=" " alt="" coords="121,150,121,182,116,182,116,150"/>
+<area shape="rect" href="i2c_8c.html" title=" " alt="" coords="648,271,778,312"/>
+<area shape="poly" title=" " alt="" coords="725,146,742,182,745,206,742,231,727,272,722,270,737,229,740,206,737,183,720,149"/>
+<area shape="rect" href="_unity_helper_8h.html" title=" " alt="" coords="363,183,573,223"/>
+<area shape="poly" title=" " alt="" coords="470,143,470,183,465,183,465,143"/>
+<area shape="rect" href="gpio__reg_8h.html" title="Cortex&#45;M4 GPIO register definitions and access macros." alt="" coords="208,183,339,223"/>
+<area shape="poly" title=" " alt="" coords="428,136,318,185,316,180,426,131"/>
+<area shape="rect" href="i2c__reg_8h.html" title="Cortex&#45;M4 I²C peripheral register definitions and bit masks." alt="" coords="597,183,728,223"/>
+<area shape="poly" title=" " alt="" coords="510,131,619,180,617,185,508,136"/>
+<area shape="rect" href="_unity_helper_8c.html" title=" " alt="" coords="363,271,573,312"/>
+<area shape="poly" title=" " alt="" coords="470,239,470,271,465,271,465,239"/>
+<area shape="poly" title=" " alt="" coords="215,232,118,273,116,268,212,227"/>
+<area shape="rect" href="test__gpio_8c.html" title=" " alt="" coords="214,279,332,304"/>
+<area shape="poly" title=" " alt="" coords="276,239,276,279,270,279,270,239"/>
+<area shape="poly" title=" " alt="" coords="684,236,704,270,699,272,679,238"/>
 </map>
 </div>
 </div>
@@ -279,6 +285,14 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#ab08483829bc1df17783a8ad8cb49043ea54d3458b8a69bc77fc3f19e0dfdabd19">GPIO_PULLDOWN</a>
  }</td></tr>
 <tr class="memdesc:ab08483829bc1df17783a8ad8cb49043e"><td class="mdescLeft">&#160;</td><td class="mdescRight">GPIO pull-up/pull-down resistor configuration.  <a href="#ab08483829bc1df17783a8ad8cb49043e">More...</a><br /></td></tr>
+<tr class="memitem:af1245830de642fd67cc728bc217b9efe" id="r_af1245830de642fd67cc728bc217b9efe"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1245830de642fd67cc728bc217b9efe">hal_gpio_output_type</a> { <a class="el" href="#af1245830de642fd67cc728bc217b9efea2ede6e0f1b50e67e840a93701323c775">GPIO_PUSH_PULL</a> = 0
+, <a class="el" href="#af1245830de642fd67cc728bc217b9efea5b0c623028002305892a4558ef0a6222">GPIO_OPEN_DRAIN</a>
+ }</td></tr>
+<tr class="memitem:a02f2d9f3bc1519f03c439c8d90dea49d" id="r_a02f2d9f3bc1519f03c439c8d90dea49d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a02f2d9f3bc1519f03c439c8d90dea49d">hal_gpio_output_speed</a> { <a class="el" href="#a02f2d9f3bc1519f03c439c8d90dea49dadad1d99afc424c9903c2116308da5778">GPIO_LOW_SPEED</a> = 0
+, <a class="el" href="#a02f2d9f3bc1519f03c439c8d90dea49da83efc1b373fff74ccc8ff155acb523bb">GPIO_MEDIUM_SPEED</a>
+, <a class="el" href="#a02f2d9f3bc1519f03c439c8d90dea49dadb3d95caeba959c63a9709ca19a9cd04">GPIO_HIGH_SPEED</a>
+, <a class="el" href="#a02f2d9f3bc1519f03c439c8d90dea49daf7087f6e3a0ec17c4e20a95a42e694f1">GPIO_VERY_HIGH_SPEED</a>
+ }</td></tr>
 <tr class="memitem:a22b67ee171c3baed3b2d4c9eeb3c6c44" id="r_a22b67ee171c3baed3b2d4c9eeb3c6c44"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22b67ee171c3baed3b2d4c9eeb3c6c44">hal_gpio_alternate_function_t</a> { <br />
 &#160;&#160;<a class="el" href="#a22b67ee171c3baed3b2d4c9eeb3c6c44a72d65b9922c2c9c82c2cbb318ca9ecaf">GPIO_AF00</a>
 , <a class="el" href="#a22b67ee171c3baed3b2d4c9eeb3c6c44af20962b41ad5081823f2591f07e7dee0">GPIO_AF01</a>
@@ -362,6 +376,46 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="afff59088389c415758284fcfdef93fdaa4f337be62bffa181ae4561d17dfba4bc" name="afff59088389c415758284fcfdef93fdaa4f337be62bffa181ae4561d17dfba4bc"></a>GPIO_AF&#160;</td><td class="fielddoc"><p>Configure pin as alternate function </p>
 </td></tr>
 <tr><td class="fieldname"><a id="afff59088389c415758284fcfdef93fdaae8bd62cf000e751ffdce5a9de1c0dcc0" name="afff59088389c415758284fcfdef93fdaae8bd62cf000e751ffdce5a9de1c0dcc0"></a>GPIO_ANALOG&#160;</td><td class="fielddoc"><p>Configure pin as analog </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a02f2d9f3bc1519f03c439c8d90dea49d" name="a02f2d9f3bc1519f03c439c8d90dea49d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02f2d9f3bc1519f03c439c8d90dea49d">&#9670;&#160;</a></span>hal_gpio_output_speed</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a02f2d9f3bc1519f03c439c8d90dea49d">hal_gpio_output_speed</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a02f2d9f3bc1519f03c439c8d90dea49dadad1d99afc424c9903c2116308da5778" name="a02f2d9f3bc1519f03c439c8d90dea49dadad1d99afc424c9903c2116308da5778"></a>GPIO_LOW_SPEED&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a02f2d9f3bc1519f03c439c8d90dea49da83efc1b373fff74ccc8ff155acb523bb" name="a02f2d9f3bc1519f03c439c8d90dea49da83efc1b373fff74ccc8ff155acb523bb"></a>GPIO_MEDIUM_SPEED&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a02f2d9f3bc1519f03c439c8d90dea49dadb3d95caeba959c63a9709ca19a9cd04" name="a02f2d9f3bc1519f03c439c8d90dea49dadb3d95caeba959c63a9709ca19a9cd04"></a>GPIO_HIGH_SPEED&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a02f2d9f3bc1519f03c439c8d90dea49daf7087f6e3a0ec17c4e20a95a42e694f1" name="a02f2d9f3bc1519f03c439c8d90dea49daf7087f6e3a0ec17c4e20a95a42e694f1"></a>GPIO_VERY_HIGH_SPEED&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="af1245830de642fd67cc728bc217b9efe" name="af1245830de642fd67cc728bc217b9efe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1245830de642fd67cc728bc217b9efe">&#9670;&#160;</a></span>hal_gpio_output_type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#af1245830de642fd67cc728bc217b9efe">hal_gpio_output_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af1245830de642fd67cc728bc217b9efea2ede6e0f1b50e67e840a93701323c775" name="af1245830de642fd67cc728bc217b9efea2ede6e0f1b50e67e840a93701323c775"></a>GPIO_PUSH_PULL&#160;</td><td class="fielddoc"><p>push pull otyper </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af1245830de642fd67cc728bc217b9efea5b0c623028002305892a4558ef0a6222" name="af1245830de642fd67cc728bc217b9efea5b0c623028002305892a4558ef0a6222"></a>GPIO_OPEN_DRAIN&#160;</td><td class="fielddoc"><p>open drain otyper </p>
 </td></tr>
 </table>
 

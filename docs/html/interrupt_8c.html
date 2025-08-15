@@ -114,6 +114,21 @@ $(function() {
 Include dependency graph for interrupt.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="interrupt_8c__incl.png" border="0" usemap="#asrc_2core_2cortex-m4_2interrupt_2interrupt_8c" loading="lazy" alt=""/></div>
+<map name="asrc_2core_2cortex-m4_2interrupt_2interrupt_8c" id="asrc_2core_2cortex-m4_2interrupt_2interrupt_8c">
+<area shape="rect" title=" " alt="" coords="186,5,320,46"/>
+<area shape="rect" href="interrupt_8h.html" title="NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32F4." alt="" coords="45,94,216,120"/>
+<area shape="poly" title=" " alt="" coords="224,49,163,88,160,83,221,44"/>
+<area shape="rect" title=" " alt="" coords="176,256,240,282"/>
+<area shape="poly" title=" " alt="" coords="252,47,215,241,210,240,247,46"/>
+<area shape="rect" href="hal__status_8h.html" title=" " alt="" coords="290,94,437,120"/>
+<area shape="poly" title=" " alt="" coords="282,44,336,82,333,87,279,49"/>
+<area shape="rect" href="interrupt__reg_8h.html" title="Cortex&#45;M4 NVIC (Nested Vector Interrupt Controller) register definitions." alt="" coords="5,168,165,208"/>
+<area shape="poly" title=" " alt="" coords="126,121,106,156,101,153,121,119"/>
+<area shape="poly" title=" " alt="" coords="144,118,162,140,179,166,195,205,205,241,200,242,190,207,175,169,158,143,140,122"/>
+<area shape="rect" href="hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="8,256,151,282"/>
+<area shape="poly" title=" " alt="" coords="86,209,84,241,79,241,81,209"/>
+<area shape="poly" title=" " alt="" coords="117,206,178,245,175,250,114,211"/>
+</map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
@@ -122,15 +137,15 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:af5a39d871f4e853eeb1c18aec31bb9c2" id="r_af5a39d871f4e853eeb1c18aec31bb9c2"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af5a39d871f4e853eeb1c18aec31bb9c2">hal_enable_interrupt</a> (<a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
+<tr class="memitem:af5a39d871f4e853eeb1c18aec31bb9c2" id="r_af5a39d871f4e853eeb1c18aec31bb9c2"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af5a39d871f4e853eeb1c18aec31bb9c2">hal_enable_interrupt</a> (<a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
 <tr class="memdesc:af5a39d871f4e853eeb1c18aec31bb9c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable a specific interrupt.  <br /></td></tr>
-<tr class="memitem:acee16c5665334d7c548ed969f3b2d874" id="r_acee16c5665334d7c548ed969f3b2d874"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acee16c5665334d7c548ed969f3b2d874">hal_disable_interrupt</a> (<a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
+<tr class="memitem:acee16c5665334d7c548ed969f3b2d874" id="r_acee16c5665334d7c548ed969f3b2d874"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acee16c5665334d7c548ed969f3b2d874">hal_disable_interrupt</a> (<a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
 <tr class="memdesc:acee16c5665334d7c548ed969f3b2d874"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable a specific interrupt.  <br /></td></tr>
-<tr class="memitem:ae13d3a1cf10aecee622e6669d9621cca" id="r_ae13d3a1cf10aecee622e6669d9621cca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae13d3a1cf10aecee622e6669d9621cca">hal_interrupt_attach_callback</a> (<a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt, void(*callback)(void))</td></tr>
-<tr class="memdesc:ae13d3a1cf10aecee622e6669d9621cca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach a callback function to an interrupt.  <br /></td></tr>
-<tr class="memitem:ac066d5830d23093468acb3a714ead9c5" id="r_ac066d5830d23093468acb3a714ead9c5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac066d5830d23093468acb3a714ead9c5">hal_interrupt_detach_callback</a> (<a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
-<tr class="memdesc:ac066d5830d23093468acb3a714ead9c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detach a callback function from an interrupt.  <br /></td></tr>
-<tr class="memitem:ae6e7c5068b926209dbd3e94d42ec3ea2" id="r_ae6e7c5068b926209dbd3e94d42ec3ea2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6e7c5068b926209dbd3e94d42ec3ea2">hal_handle_interrupt</a> (<a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
+<tr class="memitem:ae13d3a1cf10aecee622e6669d9621cca" id="r_ae13d3a1cf10aecee622e6669d9621cca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae13d3a1cf10aecee622e6669d9621cca">hal_interrupt_attach_callback</a> (<a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt, void(*callback)(void))</td></tr>
+<tr class="memdesc:ae13d3a1cf10aecee622e6669d9621cca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach a callback function to a specific interrupt.  <br /></td></tr>
+<tr class="memitem:ac066d5830d23093468acb3a714ead9c5" id="r_ac066d5830d23093468acb3a714ead9c5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac066d5830d23093468acb3a714ead9c5">hal_interrupt_detach_callback</a> (<a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
+<tr class="memdesc:ac066d5830d23093468acb3a714ead9c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detach a callback function from a specific interrupt.  <br /></td></tr>
+<tr class="memitem:ae6e7c5068b926209dbd3e94d42ec3ea2" id="r_ae6e7c5068b926209dbd3e94d42ec3ea2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6e7c5068b926209dbd3e94d42ec3ea2">hal_handle_interrupt</a> (<a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
 <tr class="memdesc:ae6e7c5068b926209dbd3e94d42ec3ea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Central interrupt handler function.  <br /></td></tr>
 </table>
 <a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
@@ -158,7 +173,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int8_t hal_disable_interrupt </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -167,11 +182,11 @@ Functions</h2></td></tr>
 <p>Disable a specific interrupt. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt</td><td>IRQ number to disable. </td></tr>
+    <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on failure. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if successful, -1 if failed. </dd></dl>
 
 </div>
 </div>
@@ -184,7 +199,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int8_t hal_enable_interrupt </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -193,11 +208,11 @@ Functions</h2></td></tr>
 <p>Enable a specific interrupt. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt</td><td>IRQ number to enable. </td></tr>
+    <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on failure. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if successful, -1 if failed. </dd></dl>
 
 </div>
 </div>
@@ -210,7 +225,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void hal_handle_interrupt </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -235,7 +250,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void hal_interrupt_attach_callback </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span>, </td>
+          <td class="paramtype"><a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -245,11 +260,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Attach a callback function to an interrupt. </p>
+<p>Attach a callback function to a specific interrupt. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>
-    <tr><td class="paramname">callback</td><td>Pointer to the callback function. </td></tr>
+    <tr><td class="paramname">callback</td><td>Function pointer to be called when interrupt occurs. </td></tr>
   </table>
   </dd>
 </dl>
@@ -265,13 +280,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void hal_interrupt_detach_callback </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="interrupt_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a></td>          <td class="paramname"><span class="paramname"><em>interrupt</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Detach a callback function from an interrupt. </p>
+<p>Detach a callback function from a specific interrupt. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>

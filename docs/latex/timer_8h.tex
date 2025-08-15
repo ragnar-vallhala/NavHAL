@@ -5,19 +5,29 @@
 Timer and Sys\+Tick register defines and API for STM32\+F4 (Cortex-\/\+M4).  
 
 
+{\ttfamily \#include "{}common/hal\+\_\+types.\+h"{}}\newline
 {\ttfamily \#include "{}utils/timer\+\_\+types.\+h"{}}\newline
-{\ttfamily \#include "{}utils/types.\+h"{}}\newline
 {\ttfamily \#include $<$stdint.\+h$>$}\newline
-Include dependency graph for timer.\+h\+:
-% FIG 0
-This graph shows which files directly or indirectly include this file\+:
-% FIG 1
+Include dependency graph for timer.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{timer_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{timer_8h__dep__incl}
+\end{center}
+\end{figure}
 \doxysubsubsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
 \#define \mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}}~0x40023800
 \item 
-\#define \mbox{\hyperlink{timer_8h_ad4baa1f26b04719fe3d4e2f02d7dde40}{RCC\+\_\+\+APB1\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))
+\#define \mbox{\hyperlink{timer_8h_ad4baa1f26b04719fe3d4e2f02d7dde40}{RCC\+\_\+\+APB1\+ENR}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))
 \item 
 \#define \mbox{\hyperlink{timer_8h_ac6ad426a632607a5035fbf297e1edd8c}{RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM2\+\_\+\+OFFSET}}~0
 \item 
@@ -27,7 +37,7 @@ This graph shows which files directly or indirectly include this file\+:
 \item 
 \#define \mbox{\hyperlink{timer_8h_a5e45f1a2a23f0a3c18bec520c2712b3c}{RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM5\+\_\+\+OFFSET}}~3
 \item 
-\#define \mbox{\hyperlink{timer_8h_a6d4cd87f49d551c356fed82cbbddc5a4}{RCC\+\_\+\+APB2\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x44))
+\#define \mbox{\hyperlink{timer_8h_a6d4cd87f49d551c356fed82cbbddc5a4}{RCC\+\_\+\+APB2\+ENR}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x44))
 \item 
 \#define \mbox{\hyperlink{timer_8h_a083808714d9ba08f1bf3b3d4459c27d3}{RCC\+\_\+\+APB2\+ENR\+\_\+\+TIM1\+\_\+\+OFFSET}}~0
 \item 
@@ -115,13 +125,13 @@ This graph shows which files directly or indirectly include this file\+:
 \item 
 \#define \mbox{\hyperlink{timer_8h_a4c01776c4720aa126cff923b056b0c54}{TIM\+\_\+\+GP2\+\_\+\+SR\+\_\+\+UIF\+\_\+\+BIT}}~0x00
 \item 
-\#define \mbox{\hyperlink{timer_8h_ab26b3fc75982181f81b185b206e897f6}{SYST\+\_\+\+CSR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E010)
+\#define \mbox{\hyperlink{timer_8h_ab26b3fc75982181f81b185b206e897f6}{SYST\+\_\+\+CSR}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E010)
 \item 
-\#define \mbox{\hyperlink{timer_8h_a4e8efcc1f2b551dbf3cb0aae1231e380}{SYST\+\_\+\+RVR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E014)
+\#define \mbox{\hyperlink{timer_8h_a4e8efcc1f2b551dbf3cb0aae1231e380}{SYST\+\_\+\+RVR}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E014)
 \item 
-\#define \mbox{\hyperlink{timer_8h_ae3dc4d2dbfdf38c593a5581415fecfed}{SYST\+\_\+\+CVR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E018)
+\#define \mbox{\hyperlink{timer_8h_ae3dc4d2dbfdf38c593a5581415fecfed}{SYST\+\_\+\+CVR}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E018)
 \item 
-\#define \mbox{\hyperlink{timer_8h_a2d37582dd39f59744e340cce09230250}{SYST\+\_\+\+CALIB}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E01C)
+\#define \mbox{\hyperlink{timer_8h_a2d37582dd39f59744e340cce09230250}{SYST\+\_\+\+CALIB}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E01C)
 \item 
 \#define \mbox{\hyperlink{timer_8h_a697f471baebab2b1bad6d79624763849}{SYST\+\_\+\+CSR\+\_\+\+EN\+\_\+\+BIT}}~0
 \item 
@@ -130,6 +140,12 @@ This graph shows which files directly or indirectly include this file\+:
 \#define \mbox{\hyperlink{timer_8h_a8042c451d1439fcf234bbfac884726ad}{SYST\+\_\+\+CSR\+\_\+\+CLKSOURCE\+\_\+\+BIT}}~2
 \item 
 \#define \mbox{\hyperlink{timer_8h_a7db2e33b59690fc9503670e07e187e0f}{TIMx\+\_\+\+CCR1\+\_\+\+OFFSET}}~0x34
+\item 
+\#define \mbox{\hyperlink{timer_8h_ab16c518ae1295427da45d58e2ff4fa78}{TIMx\+\_\+\+CCR2\+\_\+\+OFFSET}}~0x38
+\item 
+\#define \mbox{\hyperlink{timer_8h_a20fe8095c3094708c677ca302a441e1e}{TIMx\+\_\+\+CCR3\+\_\+\+OFFSET}}~0x3C
+\item 
+\#define \mbox{\hyperlink{timer_8h_a4bc0002005eab5b83806c10d7e9ee3cb}{TIMx\+\_\+\+CCR4\+\_\+\+OFFSET}}~0x40
 \item 
 \#define \mbox{\hyperlink{timer_8h_a47607025f0de48cf154da76d38802c95}{TIMx\+\_\+\+CCER\+\_\+\+OFFSET}}~0x20
 \item 
@@ -191,7 +207,7 @@ void \mbox{\hyperlink{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f}{timer\+\_\+ena
 void \mbox{\hyperlink{timer_8h_a4784a158d5bf211d3f07cc83ca0b78c2}{timer\+\_\+disable\+\_\+interrupt}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
 \item 
 void \mbox{\hyperlink{timer_8h_a6226a8f2f8b305c2a319ade05a77886c}{timer\+\_\+clear\+\_\+interrupt\+\_\+flag}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
-\begin{DoxyCompactList}\small\item\em Clear timer update interrupt flag for supported timers. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_a45f9a07b1ec73b7c758005623d8ab0e5}{timer\+\_\+attach\+\_\+callback}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, void(\texorpdfstring{$\ast$}{*}callback)(void))
 \begin{DoxyCompactList}\small\item\em Attach a callback to the timer\textquotesingle{}s HAL interrupt table. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8h_a834d3bef7882671645ad5d3c58fa69bc}{timer\+\_\+detach\+\_\+callback}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
@@ -210,8 +226,14 @@ void \mbox{\hyperlink{timer_8h_aa6691f9947ff72bae0c9a47f5023cd39}{TIM12\+\_\+\+I
 \item 
 void \mbox{\hyperlink{timer_8h_a3b5738efe72c1bd7130276a8f59b8234}{timer\+\_\+set\+\_\+compare}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint8\+\_\+t channel, uint32\+\_\+t compare\+\_\+value)
 \begin{DoxyCompactList}\small\item\em Set the compare (CCR) register for a timer channel and configure CCMR. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_a043ef2140caa620a1ed1af968fff5b46}{timer\+\_\+get\+\_\+compare}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
+\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_a566a41b6f3c8e66b0736719528da6245}{timer\+\_\+get\+\_\+arr}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
+\item 
+void \mbox{\hyperlink{timer_8h_a0b6c91f4ad622097b4e2787abce9873e}{timer\+\_\+set\+\_\+arr}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel, uint32\+\_\+t arr)
+\item 
 void \mbox{\hyperlink{timer_8h_ab790fdb4ee5e3bfe9477a2bbfb89e13d}{timer\+\_\+enable\+\_\+channel}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
-\begin{DoxyCompactList}\small\item\em Enable output on the specified timer channel (CCxE). \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_a0d3035840fb20d5213a70d0e33994584}{timer\+\_\+disable\+\_\+channel}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
 \begin{DoxyCompactList}\small\item\em Disable output on the specified timer channel (CCxE = 0). \end{DoxyCompactList}\item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8h_a6b2fb6cbff774094130a964475db6b25}{timer\+\_\+get\+\_\+frequency}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
@@ -234,7 +256,7 @@ This header contains register offsets, bit definitions, Sys\+Tick control, timer
 \index{RCC\_APB1ENR@{RCC\_APB1ENR}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{RCC\_APB1ENR}{RCC\_APB1ENR}}
 {\footnotesize\ttfamily \label{timer_8h_ad4baa1f26b04719fe3d4e2f02d7dde40} 
-\#define RCC\+\_\+\+APB1\+ENR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))}
+\#define RCC\+\_\+\+APB1\+ENR~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))}
 
 \Hypertarget{timer_8h_ac6ad426a632607a5035fbf297e1edd8c}\index{timer.h@{timer.h}!RCC\_APB1ENR\_TIM2\_OFFSET@{RCC\_APB1ENR\_TIM2\_OFFSET}}
 \index{RCC\_APB1ENR\_TIM2\_OFFSET@{RCC\_APB1ENR\_TIM2\_OFFSET}!timer.h@{timer.h}}
@@ -264,7 +286,7 @@ This header contains register offsets, bit definitions, Sys\+Tick control, timer
 \index{RCC\_APB2ENR@{RCC\_APB2ENR}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{RCC\_APB2ENR}{RCC\_APB2ENR}}
 {\footnotesize\ttfamily \label{timer_8h_a6d4cd87f49d551c356fed82cbbddc5a4} 
-\#define RCC\+\_\+\+APB2\+ENR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x44))}
+\#define RCC\+\_\+\+APB2\+ENR~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{timer_8h_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x44))}
 
 \Hypertarget{timer_8h_a6fa81d5199e79496d25376d6782f2599}\index{timer.h@{timer.h}!RCC\_APB2ENR\_TIM10\_OFFSET@{RCC\_APB2ENR\_TIM10\_OFFSET}}
 \index{RCC\_APB2ENR\_TIM10\_OFFSET@{RCC\_APB2ENR\_TIM10\_OFFSET}!timer.h@{timer.h}}
@@ -300,13 +322,13 @@ This header contains register offsets, bit definitions, Sys\+Tick control, timer
 \index{SYST\_CALIB@{SYST\_CALIB}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{SYST\_CALIB}{SYST\_CALIB}}
 {\footnotesize\ttfamily \label{timer_8h_a2d37582dd39f59744e340cce09230250} 
-\#define SYST\+\_\+\+CALIB~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E01C)}
+\#define SYST\+\_\+\+CALIB~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E01C)}
 
 \Hypertarget{timer_8h_ab26b3fc75982181f81b185b206e897f6}\index{timer.h@{timer.h}!SYST\_CSR@{SYST\_CSR}}
 \index{SYST\_CSR@{SYST\_CSR}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{SYST\_CSR}{SYST\_CSR}}
 {\footnotesize\ttfamily \label{timer_8h_ab26b3fc75982181f81b185b206e897f6} 
-\#define SYST\+\_\+\+CSR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E010)}
+\#define SYST\+\_\+\+CSR~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E010)}
 
 \Hypertarget{timer_8h_a8042c451d1439fcf234bbfac884726ad}\index{timer.h@{timer.h}!SYST\_CSR\_CLKSOURCE\_BIT@{SYST\_CSR\_CLKSOURCE\_BIT}}
 \index{SYST\_CSR\_CLKSOURCE\_BIT@{SYST\_CSR\_CLKSOURCE\_BIT}!timer.h@{timer.h}}
@@ -330,13 +352,13 @@ This header contains register offsets, bit definitions, Sys\+Tick control, timer
 \index{SYST\_CVR@{SYST\_CVR}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{SYST\_CVR}{SYST\_CVR}}
 {\footnotesize\ttfamily \label{timer_8h_ae3dc4d2dbfdf38c593a5581415fecfed} 
-\#define SYST\+\_\+\+CVR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E018)}
+\#define SYST\+\_\+\+CVR~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E018)}
 
 \Hypertarget{timer_8h_a4e8efcc1f2b551dbf3cb0aae1231e380}\index{timer.h@{timer.h}!SYST\_RVR@{SYST\_RVR}}
 \index{SYST\_RVR@{SYST\_RVR}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{SYST\_RVR}{SYST\_RVR}}
 {\footnotesize\ttfamily \label{timer_8h_a4e8efcc1f2b551dbf3cb0aae1231e380} 
-\#define SYST\+\_\+\+RVR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E014)}
+\#define SYST\+\_\+\+RVR~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E014)}
 
 \Hypertarget{timer_8h_a3eff32f3801db31fb4b61d5618cad54a}\index{timer.h@{timer.h}!TIM10\_BASE@{TIM10\_BASE}}
 \index{TIM10\_BASE@{TIM10\_BASE}!timer.h@{timer.h}}
@@ -644,6 +666,24 @@ This header contains register offsets, bit definitions, Sys\+Tick control, timer
 {\footnotesize\ttfamily \label{timer_8h_a7db2e33b59690fc9503670e07e187e0f} 
 \#define TIMx\+\_\+\+CCR1\+\_\+\+OFFSET~0x34}
 
+\Hypertarget{timer_8h_ab16c518ae1295427da45d58e2ff4fa78}\index{timer.h@{timer.h}!TIMx\_CCR2\_OFFSET@{TIMx\_CCR2\_OFFSET}}
+\index{TIMx\_CCR2\_OFFSET@{TIMx\_CCR2\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCR2\_OFFSET}{TIMx\_CCR2\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_ab16c518ae1295427da45d58e2ff4fa78} 
+\#define TIMx\+\_\+\+CCR2\+\_\+\+OFFSET~0x38}
+
+\Hypertarget{timer_8h_a20fe8095c3094708c677ca302a441e1e}\index{timer.h@{timer.h}!TIMx\_CCR3\_OFFSET@{TIMx\_CCR3\_OFFSET}}
+\index{TIMx\_CCR3\_OFFSET@{TIMx\_CCR3\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCR3\_OFFSET}{TIMx\_CCR3\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_a20fe8095c3094708c677ca302a441e1e} 
+\#define TIMx\+\_\+\+CCR3\+\_\+\+OFFSET~0x3C}
+
+\Hypertarget{timer_8h_a4bc0002005eab5b83806c10d7e9ee3cb}\index{timer.h@{timer.h}!TIMx\_CCR4\_OFFSET@{TIMx\_CCR4\_OFFSET}}
+\index{TIMx\_CCR4\_OFFSET@{TIMx\_CCR4\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCR4\_OFFSET}{TIMx\_CCR4\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_a4bc0002005eab5b83806c10d7e9ee3cb} 
+\#define TIMx\+\_\+\+CCR4\+\_\+\+OFFSET~0x40}
+
 
 
 \label{doc-func-members}
@@ -859,18 +899,6 @@ Attach a callback to the timer\textquotesingle{}s HAL interrupt table.
 {\footnotesize\ttfamily \label{timer_8h_a6226a8f2f8b305c2a319ade05a77886c} 
 void timer\+\_\+clear\+\_\+interrupt\+\_\+flag (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
 
-
-
-Clear timer update interrupt flag for supported timers. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyNote}{Note}
-Currently supports TIM2-\/\+TIM5 and TIM9-\/\+TIM11 patterns used in this HAL. 
-\end{DoxyNote}
 \Hypertarget{timer_8h_a834d3bef7882671645ad5d3c58fa69bc}\index{timer.h@{timer.h}!timer\_detach\_callback@{timer\_detach\_callback}}
 \index{timer\_detach\_callback@{timer\_detach\_callback}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_detach\_callback()}{timer\_detach\_callback()}}
@@ -915,17 +943,6 @@ void timer\+\_\+disable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hy
 {\footnotesize\ttfamily \label{timer_8h_ab790fdb4ee5e3bfe9477a2bbfb89e13d} 
 void timer\+\_\+enable\+\_\+channel (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
 
-
-
-Enable output on the specified timer channel (CCxE). 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
-\hline
-{\em channel} & Channel number (1-\/4). \\
-\hline
-\end{DoxyParams}
 \Hypertarget{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f}\index{timer.h@{timer.h}!timer\_enable\_interrupt@{timer\_enable\_interrupt}}
 \index{timer\_enable\_interrupt@{timer\_enable\_interrupt}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_enable\_interrupt()}{timer\_enable\_interrupt()}}
@@ -944,6 +961,18 @@ Enable timer interrupts (NVIC + DIER UIE) for supported timers.
 \begin{DoxyNote}{Note}
 For TIM1 more complex options exist and are left TODO in the original. 
 \end{DoxyNote}
+\Hypertarget{timer_8h_a566a41b6f3c8e66b0736719528da6245}\index{timer.h@{timer.h}!timer\_get\_arr@{timer\_get\_arr}}
+\index{timer\_get\_arr@{timer\_get\_arr}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_get\_arr()}{timer\_get\_arr()}}
+{\footnotesize\ttfamily \label{timer_8h_a566a41b6f3c8e66b0736719528da6245} 
+uint32\+\_\+t timer\+\_\+get\+\_\+arr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a043ef2140caa620a1ed1af968fff5b46}\index{timer.h@{timer.h}!timer\_get\_compare@{timer\_get\_compare}}
+\index{timer\_get\_compare@{timer\_get\_compare}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_get\_compare()}{timer\_get\_compare()}}
+{\footnotesize\ttfamily \label{timer_8h_a043ef2140caa620a1ed1af968fff5b46} 
+uint32\+\_\+t timer\+\_\+get\+\_\+compare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
+
 \Hypertarget{timer_8h_a19aba4b4d8462e4f84b6eeabda21423c}\index{timer.h@{timer.h}!timer\_get\_count@{timer\_get\_count}}
 \index{timer\_get\_count@{timer\_get\_count}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_get\_count()}{timer\_get\_count()}}
@@ -1017,6 +1046,12 @@ Reset timer counter to zero.
 {\em timer} & Timer identifier. \\
 \hline
 \end{DoxyParams}
+\Hypertarget{timer_8h_a0b6c91f4ad622097b4e2787abce9873e}\index{timer.h@{timer.h}!timer\_set\_arr@{timer\_set\_arr}}
+\index{timer\_set\_arr@{timer\_set\_arr}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_set\_arr()}{timer\_set\_arr()}}
+{\footnotesize\ttfamily \label{timer_8h_a0b6c91f4ad622097b4e2787abce9873e} 
+void timer\+\_\+set\+\_\+arr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{, }\item[{uint32\+\_\+t}]{arr}{}\end{DoxyParamCaption})}
+
 \Hypertarget{timer_8h_a159fed92e0cdfaa14198b84dafe12f80}\index{timer.h@{timer.h}!timer\_set\_auto\_reload@{timer\_set\_auto\_reload}}
 \index{timer\_set\_auto\_reload@{timer\_set\_auto\_reload}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_set\_auto\_reload()}{timer\_set\_auto\_reload()}}

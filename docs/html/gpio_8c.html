@@ -118,20 +118,32 @@ Include dependency graph for gpio.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="gpio_8c__incl.png" border="0" usemap="#asrc_2core_2cortex-m4_2gpio_2gpio_8c" loading="lazy" alt=""/></div>
 <map name="asrc_2core_2cortex-m4_2gpio_2gpio_8c" id="asrc_2core_2cortex-m4_2gpio_2gpio_8c">
-<area shape="rect" title="Cortex&#45;M4 (STM32F4) GPIO HAL Implementation." alt="" coords="54,5,198,45"/>
-<area shape="rect" href="gpio_8h.html" title="GPIO HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="43,93,208,119"/>
-<area shape="poly" title=" " alt="" coords="128,46,128,79,123,79,123,46"/>
-<area shape="rect" href="types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="74,167,177,192"/>
-<area shape="poly" title=" " alt="" coords="128,119,128,153,123,153,123,119"/>
-<area shape="rect" title=" " alt="" coords="121,313,192,339"/>
-<area shape="poly" title=" " alt="" coords="86,195,54,207,25,223,15,232,10,242,9,253,13,264,32,284,56,299,82,309,108,316,107,321,81,315,54,304,29,288,9,267,3,253,5,241,11,229,22,219,51,202,84,190"/>
-<area shape="rect" title=" " alt="" coords="23,240,106,265"/>
-<area shape="poly" title=" " alt="" coords="118,194,85,231,81,228,114,191"/>
-<area shape="rect" href="gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="130,240,244,265"/>
-<area shape="poly" title=" " alt="" coords="138,191,170,228,166,231,134,194"/>
-<area shape="rect" href="clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="268,240,386,265"/>
-<area shape="poly" title=" " alt="" coords="159,190,282,233,281,238,157,195"/>
-<area shape="poly" title=" " alt="" coords="301,268,198,310,196,306,299,263"/>
+<area shape="rect" title="HAL GPIO driver implementation for STM32F4 series." alt="" coords="44,5,174,46"/>
+<area shape="rect" href="gpio_8h.html" title="Cortex&#45;M4 specific GPIO HAL interface." alt="" coords="36,183,183,208"/>
+<area shape="poly" title=" " alt="" coords="112,46,112,167,107,167,107,46"/>
+<area shape="rect" href="gpio__reg_8h.html" title="Cortex&#45;M4 GPIO register definitions and access macros." alt="" coords="278,94,415,135"/>
+<area shape="poly" title=" " alt="" coords="164,44,279,86,278,91,162,49"/>
+<area shape="rect" href="rcc__reg_8h.html" title=" " alt="" coords="169,330,300,371"/>
+<area shape="poly" title=" " alt="" coords="94,48,59,93,25,154,13,187,8,220,12,251,26,280,52,306,84,324,120,336,155,343,154,348,118,341,82,329,49,310,22,284,7,253,3,219,8,185,20,152,55,90,90,45"/>
+<area shape="rect" href="gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="36,256,159,282"/>
+<area shape="poly" title=" " alt="" coords="110,209,104,241,99,240,105,208"/>
+<area shape="rect" href="types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="300,183,393,208"/>
+<area shape="poly" title=" " alt="" coords="349,135,349,167,344,167,344,135"/>
+<area shape="rect" title=" " alt="" coords="348,419,412,444"/>
+<area shape="poly" title=" " alt="" coords="410,133,454,152,499,178,541,212,574,255,583,283,578,308,564,332,542,354,486,390,428,416,426,411,483,385,539,350,560,329,573,307,577,283,570,258,538,216,496,182,451,157,408,138"/>
+<area shape="poly" title=" " alt="" coords="305,211,155,254,153,249,304,206"/>
+<area shape="rect" href="clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="183,256,286,282"/>
+<area shape="poly" title=" " alt="" coords="329,211,268,250,265,245,326,207"/>
+<area shape="poly" title=" " alt="" coords="363,207,383,228,398,255,407,295,406,336,400,374,392,405,387,403,395,373,401,336,401,296,393,257,378,231,359,211"/>
+<area shape="rect" href="timer__types_8h.html" title=" " alt="" coords="459,256,559,282"/>
+<area shape="poly" title=" " alt="" coords="375,206,469,247,467,252,373,211"/>
+<area shape="rect" title=" " alt="" coords="309,256,384,282"/>
+<area shape="poly" title=" " alt="" coords="349,209,349,241,344,241,344,209"/>
+<area shape="poly" title=" " alt="" coords="237,282,237,315,232,315,232,282"/>
+<area shape="poly" title=" " alt="" coords="255,280,284,301,314,328,345,367,368,404,364,407,340,370,310,332,280,305,252,284"/>
+<area shape="rect" href="hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="163,419,306,444"/>
+<area shape="poly" title=" " alt="" coords="237,371,237,403,232,403,232,371"/>
+<area shape="poly" title=" " alt="" coords="272,369,346,409,343,413,270,374"/>
 </map>
 </div>
 </div><table class="memberdecls">
@@ -149,10 +161,14 @@ Functions</h2></td></tr>
 <tr class="memdesc:a4f525e1eaa75b82f304bc25cee240789"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable the RCC clock for the GPIO port of a given pin.  <br /></td></tr>
 <tr class="memitem:a07aab29e77970fa617d8ea0d1922e964" id="r_a07aab29e77970fa617d8ea0d1922e964"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a07aab29e77970fa617d8ea0d1922e964">hal_gpio_set_alternate_function</a> (<a class="el" href="gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6">hal_gpio_pin</a> pin, <a class="el" href="gpio__types_8h.html#a22b67ee171c3baed3b2d4c9eeb3c6c44">hal_gpio_alternate_function_t</a> alt_fn)</td></tr>
 <tr class="memdesc:a07aab29e77970fa617d8ea0d1922e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure the alternate function of a GPIO pin.  <br /></td></tr>
+<tr class="memitem:a926263a98f6084ec82b2546ddd47d413" id="r_a926263a98f6084ec82b2546ddd47d413"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a926263a98f6084ec82b2546ddd47d413">hal_gpio_set_output_type</a> (<a class="el" href="gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6">hal_gpio_pin</a> pin, <a class="el" href="gpio__types_8h.html#af1245830de642fd67cc728bc217b9efe">hal_gpio_output_type</a> otyper)</td></tr>
+<tr class="memdesc:a926263a98f6084ec82b2546ddd47d413"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the output type for a GPIO pin.  <br /></td></tr>
+<tr class="memitem:a02a45d51d8fcbaf0f4bbf08bd76ef7b5" id="r_a02a45d51d8fcbaf0f4bbf08bd76ef7b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a02a45d51d8fcbaf0f4bbf08bd76ef7b5">hal_gpio_set_output_speed</a> (<a class="el" href="gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6">hal_gpio_pin</a> pin, <a class="el" href="gpio__types_8h.html#a02f2d9f3bc1519f03c439c8d90dea49d">hal_gpio_output_speed</a> speed)</td></tr>
+<tr class="memdesc:a02a45d51d8fcbaf0f4bbf08bd76ef7b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the output speed for a GPIO pin.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>HAL GPIO driver implementation for STM32F4 series. </p>
-<p>This file contains the implementation of the high-level HAL functions declared in <span class="tt"><a class="el" href="gpio_8h.html" title="HAL interface for GPIO control on STM32F4 series.">gpio.h</a></span> for configuring and controlling GPIO pins.</p>
+<p>This file contains the implementation of the high-level HAL functions declared in <span class="tt"><a class="el" href="gpio_8h.html" title="Cortex-M4 specific GPIO HAL interface.">gpio.h</a></span> for configuring and controlling GPIO pins.</p>
 <p>The functions in this file handle:</p><ul>
 <li>Pin mode configuration</li>
 <li>Pull-up/pull-down settings</li>
@@ -177,6 +193,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Read the digital value from a GPIO pin. </p>
+<p>Read the digital state from a GPIO pin.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
@@ -207,12 +224,13 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Write a digital value to a GPIO pin. </p>
+<p>Write a digital state to a GPIO pin.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
     <tr><td class="paramname">state</td><td>Desired pin state (high or low). <div class="fragment"><div class="line"><span class="comment">// Example: Set PA5 high</span></div>
 <div class="line"><a class="code hl_function" href="gpio_8h.html#aa64ac2161a52147ab5e91fe399126638">hal_gpio_digitalwrite</a>(PA5, HAL_GPIO_HIGH);</div>
-<div class="ttc" id="agpio_8h_html_aa64ac2161a52147ab5e91fe399126638"><div class="ttname"><a href="gpio_8h.html#aa64ac2161a52147ab5e91fe399126638">hal_gpio_digitalwrite</a></div><div class="ttdeci">void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state)</div><div class="ttdoc">Write a digital value to a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:61</div></div>
+<div class="ttc" id="agpio_8h_html_aa64ac2161a52147ab5e91fe399126638"><div class="ttname"><a href="gpio_8h.html#aa64ac2161a52147ab5e91fe399126638">hal_gpio_digitalwrite</a></div><div class="ttdeci">void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state)</div><div class="ttdoc">Write a digital state to a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:61</div></div>
 </div><!-- fragment --> </td></tr>
   </table>
   </dd>
@@ -236,6 +254,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Enable the RCC clock for the GPIO port of a given pin. </p>
+<p>Enable the RCC clock for a specific GPIO pin's port.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
@@ -292,6 +311,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Configure the alternate function of a GPIO pin. </p>
+<p>Set the alternate function for a GPIO pin.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
@@ -301,8 +321,68 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function will internally set the pin mode to alternate function mode. <div class="fragment"><div class="line"><span class="comment">// Example: Set PA2 to USART2_TX alternate function</span></div>
 <div class="line"><a class="code hl_function" href="gpio_8h.html#a07aab29e77970fa617d8ea0d1922e964">hal_gpio_set_alternate_function</a>(PA2, HAL_GPIO_AF_USART2);</div>
-<div class="ttc" id="agpio_8h_html_a07aab29e77970fa617d8ea0d1922e964"><div class="ttname"><a href="gpio_8h.html#a07aab29e77970fa617d8ea0d1922e964">hal_gpio_set_alternate_function</a></div><div class="ttdeci">void hal_gpio_set_alternate_function(hal_gpio_pin pin, hal_gpio_alternate_function_t alt_fn)</div><div class="ttdoc">Configure the alternate function of a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:98</div></div>
+<div class="ttc" id="agpio_8h_html_a07aab29e77970fa617d8ea0d1922e964"><div class="ttname"><a href="gpio_8h.html#a07aab29e77970fa617d8ea0d1922e964">hal_gpio_set_alternate_function</a></div><div class="ttdeci">void hal_gpio_set_alternate_function(hal_gpio_pin pin, hal_gpio_alternate_function_t alt_fn)</div><div class="ttdoc">Set the alternate function for a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:98</div></div>
 </div><!-- fragment --> </dd></dl>
+
+</div>
+</div>
+<a id="a02a45d51d8fcbaf0f4bbf08bd76ef7b5" name="a02a45d51d8fcbaf0f4bbf08bd76ef7b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02a45d51d8fcbaf0f4bbf08bd76ef7b5">&#9670;&#160;</a></span>hal_gpio_set_output_speed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hal_gpio_set_output_speed </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6">hal_gpio_pin</a></td>          <td class="paramname"><span class="paramname"><em>pin</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="gpio__types_8h.html#a02f2d9f3bc1519f03c439c8d90dea49d">hal_gpio_output_speed</a></td>          <td class="paramname"><span class="paramname"><em>speed</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the output speed for a GPIO pin. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>The GPIO pin to configure. </td></tr>
+    <tr><td class="paramname">speed</td><td>The output speed (low, medium, high, very high). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a926263a98f6084ec82b2546ddd47d413" name="a926263a98f6084ec82b2546ddd47d413"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a926263a98f6084ec82b2546ddd47d413">&#9670;&#160;</a></span>hal_gpio_set_output_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void hal_gpio_set_output_type </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6">hal_gpio_pin</a></td>          <td class="paramname"><span class="paramname"><em>pin</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="gpio__types_8h.html#af1245830de642fd67cc728bc217b9efe">hal_gpio_output_type</a></td>          <td class="paramname"><span class="paramname"><em>otyper</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the output type for a GPIO pin. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>The GPIO pin to configure. </td></tr>
+    <tr><td class="paramname">otyper</td><td>The output type (push-pull or open-drain). </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -331,6 +411,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Configure the mode and pull-up/pull-down for a GPIO pin. </p>
+<p>Set the mode of a GPIO pin.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
@@ -341,7 +422,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function automatically enables the RCC clock for the GPIO port. <div class="fragment"><div class="line"><span class="comment">// Example: Configure PA5 as output with no pull-up/pull-down</span></div>
 <div class="line"><a class="code hl_function" href="gpio_8h.html#ab063b362fb73bcb899a122e5188e7e32">hal_gpio_setmode</a>(PA5, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_NO_PULL);</div>
-<div class="ttc" id="agpio_8h_html_ab063b362fb73bcb899a122e5188e7e32"><div class="ttname"><a href="gpio_8h.html#ab063b362fb73bcb899a122e5188e7e32">hal_gpio_setmode</a></div><div class="ttdeci">void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode, hal_gpio_pullup_pulldown pupd)</div><div class="ttdoc">Configure the mode and pull-up/pull-down for a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:31</div></div>
+<div class="ttc" id="agpio_8h_html_ab063b362fb73bcb899a122e5188e7e32"><div class="ttname"><a href="gpio_8h.html#ab063b362fb73bcb899a122e5188e7e32">hal_gpio_setmode</a></div><div class="ttdeci">void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode, hal_gpio_pullup_pulldown pupd)</div><div class="ttdoc">Set the mode of a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:31</div></div>
 </div><!-- fragment --> </dd></dl>
 
 </div>

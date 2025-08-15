@@ -33,9 +33,13 @@ void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode,
   hal_gpio_enable_rcc(pin); // Ensure GPIO port clock enabled
 
   // Set the mode bits for the pin
+  GPIO_GET_PORT(pin)->MODER &=
+      ~(0x3 << (GPIO_GET_PIN(pin) * 2)); // clear mode bits for moder
   GPIO_GET_PORT(pin)->MODER |= ((mode & 0x3) << (GPIO_GET_PIN(pin) * 2));
 
   // Configure pull-up/pull-down resistor
+  GPIO_GET_PORT(pin)->PUPDR &=
+      ~(0x3 << (GPIO_GET_PIN(pin) * 2)); // clear mode bits for pupdr
   GPIO_GET_PORT(pin)->PUPDR |= ((uint8_t)pupd & 0x3)
                                << (GPIO_GET_PIN(pin) * 2); // Set new pupd bits
 }

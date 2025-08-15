@@ -1,4 +1,5 @@
 set(AVAILABLE_SAMPLES 
+test_sample
 no_hal_blink 
 hal_blink
 hal_pupd
@@ -13,7 +14,8 @@ hal_clock
 no_hal_i2c
 hal_i2c
 )
-set(SAMPLE_DIRS 
+set(SAMPLE_DIRS
+00_test_sample
 01_no_hal_blink 
 01_hal_blink
 02_hal_pupd

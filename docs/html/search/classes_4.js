@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['rcc_5ftypedef_0',['RCC_Typedef',['../struct_r_c_c___typedef.html',1,'']]]
+  ['pointerpair_0',['PointerPair',['../struct_pointer_pair.html',1,'']]],
+  ['pwm_5fhandle_1',['PWM_Handle',['../struct_p_w_m___handle.html',1,'']]]
 ];

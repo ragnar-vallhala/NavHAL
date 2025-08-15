@@ -111,32 +111,41 @@ $(function() {
 <p>Cortex-M4 (STM32F4) Clock HAL Implementation.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="clock_8h_source.html">core/cortex-m4/clock.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="flash__reg_8h_source.html">core/cortex-m4/flash_reg.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcc__reg_8h_source.html">core/cortex-m4/rcc_reg.h</a>&quot;</code><br />
+<code>#include &lt;stdint.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for clock.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="clock_8c__incl.png" border="0" usemap="#asrc_2core_2cortex-m4_2clock_2clock_8c" loading="lazy" alt=""/></div>
 <map name="asrc_2core_2cortex-m4_2clock_2clock_8c" id="asrc_2core_2cortex-m4_2clock_2clock_8c">
-<area shape="rect" title="Cortex&#45;M4 (STM32F4) Clock HAL Implementation." alt="" coords="54,5,198,45"/>
-<area shape="rect" href="clock_8h.html" title="Clock HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="40,93,211,119"/>
-<area shape="poly" title=" " alt="" coords="128,46,128,79,123,79,123,46"/>
-<area shape="rect" href="types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="74,167,177,192"/>
-<area shape="poly" title=" " alt="" coords="128,119,128,153,123,153,123,119"/>
-<area shape="rect" title=" " alt="" coords="121,313,192,339"/>
-<area shape="poly" title=" " alt="" coords="86,195,54,207,25,223,15,232,10,242,9,253,13,264,32,284,56,299,82,309,108,316,107,321,81,315,54,304,29,288,9,267,3,253,5,241,11,229,22,219,51,202,84,190"/>
-<area shape="rect" title=" " alt="" coords="23,240,106,265"/>
-<area shape="poly" title=" " alt="" coords="118,194,85,231,81,228,114,191"/>
-<area shape="rect" href="gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="130,240,244,265"/>
-<area shape="poly" title=" " alt="" coords="138,191,170,228,166,231,134,194"/>
-<area shape="rect" href="clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="268,240,386,265"/>
-<area shape="poly" title=" " alt="" coords="159,190,282,233,281,238,157,195"/>
-<area shape="poly" title=" " alt="" coords="301,268,198,310,196,306,299,263"/>
+<area shape="rect" title="Cortex&#45;M4 (STM32F4) Clock HAL Implementation." alt="" coords="158,5,288,46"/>
+<area shape="rect" href="clock_8h.html" title="Cortex&#45;M4 specific clock control HAL interface." alt="" coords="89,102,243,127"/>
+<area shape="poly" title=" " alt="" coords="212,48,184,90,180,87,208,45"/>
+<area shape="rect" href="rcc__reg_8h.html" title=" " alt="" coords="23,256,154,297"/>
+<area shape="poly" title=" " alt="" coords="159,42,114,62,94,77,79,95,65,131,63,170,68,208,78,241,73,243,63,209,57,170,60,130,74,93,91,73,111,58,156,38"/>
+<area shape="rect" title=" " alt="" coords="172,345,237,371"/>
+<area shape="poly" title=" " alt="" coords="237,45,249,67,258,93,263,127,263,161,254,228,237,287,219,332,214,330,232,285,248,226,258,161,257,127,253,95,244,70,233,47"/>
+<area shape="rect" href="flash__reg_8h.html" title=" " alt="" coords="318,94,459,135"/>
+<area shape="poly" title=" " alt="" coords="262,44,339,84,337,89,259,49"/>
+<area shape="rect" href="clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="101,183,231,208"/>
+<area shape="poly" title=" " alt="" coords="168,128,168,167,163,167,163,128"/>
+<area shape="poly" title=" " alt="" coords="156,211,120,247,116,243,152,207"/>
+<area shape="poly" title=" " alt="" coords="171,208,201,329,195,330,166,209"/>
+<area shape="rect" href="hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="5,345,148,371"/>
+<area shape="poly" title=" " alt="" coords="88,298,83,330,78,329,83,297"/>
+<area shape="poly" title=" " alt="" coords="119,295,176,334,173,338,116,300"/>
 </map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a0968882ff01fef583e6a8b7a97be51ea" id="r_a0968882ff01fef583e6a8b7a97be51ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0968882ff01fef583e6a8b7a97be51ea">hal_clock_init</a> (<a class="el" href="structhal__clock__config__t.html">hal_clock_config_t</a> *<a class="el" href="05__hal__systick_2main_8c.html#a921c2505bac76424f5f96cc1e4f62986">cfg</a>, <a class="el" href="structhal__pll__config__t.html">hal_pll_config_t</a> *<a class="el" href="03__no__hal__uart__tx_2main_8c.html#adf1b524219e8781fa7542fa90dd09912">pll_cfg</a>)</td></tr>
-<tr class="memdesc:a0968882ff01fef583e6a8b7a97be51ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize system clocks based on the provided configuration.  <br /></td></tr>
+<tr class="memitem:ad1d19ef595b3a08cb3ba2484e8477275" id="r_ad1d19ef595b3a08cb3ba2484e8477275"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1d19ef595b3a08cb3ba2484e8477275">_toggle_hse_clock</a> (uint8_t state)</td></tr>
+<tr class="memdesc:ad1d19ef595b3a08cb3ba2484e8477275"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize system clocks based on the provided configuration.  <br /></td></tr>
+<tr class="memitem:ada138812dfee19ee5451814039c13cf1" id="r_ada138812dfee19ee5451814039c13cf1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada138812dfee19ee5451814039c13cf1">_toggle_hsi_clock</a> (uint8_t state)</td></tr>
+<tr class="memitem:ac1565e93ef8448d4bb517652e8b85e27" id="r_ac1565e93ef8448d4bb517652e8b85e27"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1565e93ef8448d4bb517652e8b85e27">_toggle_pll_clock</a> (uint8_t state)</td></tr>
+<tr class="memitem:a0968882ff01fef583e6a8b7a97be51ea" id="r_a0968882ff01fef583e6a8b7a97be51ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0968882ff01fef583e6a8b7a97be51ea">hal_clock_init</a> (<a class="el" href="structhal__clock__config__t.html">hal_clock_config_t</a> *<a class="el" href="samples_205__hal__systick_2main_8c.html#a921c2505bac76424f5f96cc1e4f62986">cfg</a>, <a class="el" href="structhal__pll__config__t.html">hal_pll_config_t</a> *<a class="el" href="samples_203__no__hal__uart__tx_2main_8c.html#adf1b524219e8781fa7542fa90dd09912">pll_cfg</a>)</td></tr>
+<tr class="memdesc:a0968882ff01fef583e6a8b7a97be51ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the system clock.  <br /></td></tr>
 <tr class="memitem:aded3b01c0942294bcdd69a84f76d9cf0" id="r_aded3b01c0942294bcdd69a84f76d9cf0"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aded3b01c0942294bcdd69a84f76d9cf0">hal_clock_get_sysclk</a> (void)</td></tr>
 <tr class="memdesc:aded3b01c0942294bcdd69a84f76d9cf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current system clock frequency in Hz.  <br /></td></tr>
 <tr class="memitem:ac405b089ad197ec8fcec53489064cb5f" id="r_ac405b089ad197ec8fcec53489064cb5f"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac405b089ad197ec8fcec53489064cb5f">hal_clock_get_ahbclk</a> (void)</td></tr>
@@ -153,6 +162,67 @@ Functions</h2></td></tr>
 <dl class="section author"><dt>Author</dt><dd>Ashutosh Vishwakarma </dd></dl>
 <dl class="section date"><dt>Date</dt><dd>2025-07-21 </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
+<a id="ad1d19ef595b3a08cb3ba2484e8477275" name="ad1d19ef595b3a08cb3ba2484e8477275"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1d19ef595b3a08cb3ba2484e8477275">&#9670;&#160;</a></span>_toggle_hse_clock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void _toggle_hse_clock </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>state</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize system clocks based on the provided configuration. </p>
+<p>Enables and waits for the selected clock source (HSI, HSE, or PLL). If PLL is selected, configures PLL parameters and switches system clock source to PLL output.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">cfg</td><td>Pointer to clock configuration structure specifying source. </td></tr>
+    <tr><td class="paramname">pll_cfg</td><td>Pointer to PLL configuration structure (used if source is PLL). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ada138812dfee19ee5451814039c13cf1" name="ada138812dfee19ee5451814039c13cf1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada138812dfee19ee5451814039c13cf1">&#9670;&#160;</a></span>_toggle_hsi_clock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void _toggle_hsi_clock </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>state</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac1565e93ef8448d4bb517652e8b85e27" name="ac1565e93ef8448d4bb517652e8b85e27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1565e93ef8448d4bb517652e8b85e27">&#9670;&#160;</a></span>_toggle_pll_clock()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void _toggle_pll_clock </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>state</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ac405b089ad197ec8fcec53489064cb5f" name="ac405b089ad197ec8fcec53489064cb5f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac405b089ad197ec8fcec53489064cb5f">&#9670;&#160;</a></span>hal_clock_get_ahbclk()</h2>
 
@@ -169,7 +239,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the current AHB clock frequency. </p>
-<p>Get the current AHB bus clock frequency in Hz.</p>
+<p>Get the AHB bus clock frequency.</p>
 <p>Calculated as SYSCLK divided by AHB prescaler.</p>
 <dl class="section return"><dt>Returns</dt><dd>AHB bus clock frequency in Hertz. </dd></dl>
 
@@ -191,7 +261,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the current APB1 clock frequency. </p>
-<p>Get the current APB1 bus clock frequency in Hz.</p>
+<p>Get the APB1 bus clock frequency.</p>
 <p>Calculated as SYSCLK divided by APB1 prescaler.</p>
 <dl class="section return"><dt>Returns</dt><dd>APB1 bus clock frequency in Hertz. </dd></dl>
 
@@ -213,7 +283,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the current APB2 clock frequency. </p>
-<p>Get the current APB2 bus clock frequency in Hz.</p>
+<p>Get the APB2 bus clock frequency.</p>
 <p>Calculated as SYSCLK divided by APB2 prescaler.</p>
 <dl class="section return"><dt>Returns</dt><dd>APB2 bus clock frequency in Hertz. </dd></dl>
 
@@ -235,7 +305,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the current system clock frequency in Hz. </p>
-<p>Get the current system clock frequency (SYSCLK) in Hz.</p>
+<p>Get the system clock frequency (SYSCLK).</p>
 <p>Detects the current SYSCLK source and calculates frequency based on configured clock source and PLL parameters.</p>
 <dl class="section return"><dt>Returns</dt><dd>SYSCLK frequency in Hertz. </dd></dl>
 
@@ -260,16 +330,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialize system clocks based on the provided configuration. </p>
-<p>Initialize system clock with given configuration.</p>
-<p>Enables and waits for the selected clock source (HSI, HSE, or PLL). If PLL is selected, configures PLL parameters and switches system clock source to PLL output.</p>
+<p>Initialize the system clock. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">cfg</td><td>Pointer to clock configuration structure specifying source. </td></tr>
-    <tr><td class="paramname">pll_cfg</td><td>Pointer to PLL configuration structure (used if source is PLL). </td></tr>
+    <tr><td class="paramname">cfg</td><td>Pointer to the main clock configuration structure. </td></tr>
+    <tr><td class="paramname">pll_cfg</td><td>Pointer to the PLL configuration structure.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>Note</dt><dd>This function must be called before using other peripheral clocks. </dd></dl>
 
 </div>
 </div>

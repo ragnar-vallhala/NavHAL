@@ -133,6 +133,7 @@ def main():
     p.add_argument("--window", "-w", type=int, default=200, help="Samples to keep in rolling window")
     p.add_argument("--test", action="store_true", help="Test mode: generate simulated data instead of reading serial")
     p.add_argument("--title", type=str, default="UART Live Plot", help="Plot title")
+    p.add_argument("--scatter", action="store_true", help="Use scatter plot instead of line plot")
     args = p.parse_args()
 
     if not args.test and args.port is None:
@@ -143,7 +144,6 @@ def main():
     xdata = deque([i for i in range(-args.window + 1, 1)], maxlen=args.window)
 
     def push_vals(vals):
-        # thread-safe-ish: matplotlib animation reads these but GIL protects simple ops
         for i, v in enumerate(vals):
             buffers[i].append(v)
 
@@ -153,10 +153,14 @@ def main():
     # Set up plot
     plt.style.use('default')
     fig, ax = plt.subplots()
-    lines = []
+    plots = []
     for ch in range(args.channels):
-        (ln,) = ax.plot(list(xdata), list(buffers[ch]), label=f"ch{ch}")
-        lines.append(ln)
+        if args.scatter:
+            sc = ax.scatter(list(xdata), list(buffers[ch]), label=f"ch{ch}", s=10)
+            plots.append(sc)
+        else:
+            (ln,) = ax.plot(list(xdata), list(buffers[ch]), label=f"ch{ch}")
+            plots.append(ln)
 
     ax.set_xlabel("Samples")
     ax.set_ylabel("Value")
@@ -165,14 +169,16 @@ def main():
         ax.legend(loc='upper right')
 
     def update(frame):
-        # update x & y for each line
-        # keep x consistent (0..window-1)
         xs = list(range(len(buffers[0])))
         for ch in range(args.channels):
-            lines[ch].set_data(xs, list(buffers[ch]))
+            if args.scatter:
+                # scatter expects Nx2 array for offsets
+                plots[ch].set_offsets(list(zip(xs, list(buffers[ch]))))
+            else:
+                plots[ch].set_data(xs, list(buffers[ch]))
         ax.relim()
         ax.autoscale_view()
-        return lines
+        return plots
 
     ani = animation.FuncAnimation(fig, update, interval=50, blit=False)
 
@@ -183,7 +189,6 @@ def main():
     finally:
         reader.stop()
         reader.join(timeout=1)
-
 
 if __name__ == "__main__":
     main()

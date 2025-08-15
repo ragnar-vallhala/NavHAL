@@ -107,38 +107,40 @@ $(function() {
   <div class="headertitle"><div class="title">pwm.h</div></div>
 </div><!--header-->
 <div class="contents">
-<a href="pwm_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef PWM_H</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define PWM_H</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="timer__types_8h.html">utils/timer_types.h</a>&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span></div>
-<div class="foldopen" id="foldopen00011" data-start="{" data-end="};">
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno"><a class="line" href="struct_p_w_m___handle.html">   11</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="struct_p_w_m___handle.html#ab376c08b715b06223a25c94dd2b8ea27">   12</a></span>  <a class="code hl_enumeration" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> <a class="code hl_variable" href="struct_p_w_m___handle.html#ab376c08b715b06223a25c94dd2b8ea27">timer</a>;   </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="struct_p_w_m___handle.html#a2194bd5279879eca3646ebca56d75031">   13</a></span>  uint32_t <a class="code hl_variable" href="struct_p_w_m___handle.html#a2194bd5279879eca3646ebca56d75031">channel</a>;    </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>} <a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a>;</div>
+<a href="pwm_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#ifndef PWM_H</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#define PWM_H</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;<a class="code" href="timer__types_8h.html">utils/timer_types.h</a>&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &lt;stdint.h&gt;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span></div>
+<div class="foldopen" id="foldopen00022" data-start="{" data-end="};">
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="struct_p_w_m___handle.html">   22</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="struct_p_w_m___handle.html#ab376c08b715b06223a25c94dd2b8ea27">   23</a></span>  <a class="code hl_enumeration" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> <a class="code hl_variable" href="struct_p_w_m___handle.html#ab376c08b715b06223a25c94dd2b8ea27">timer</a>;   </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno"><a class="line" href="struct_p_w_m___handle.html#a2194bd5279879eca3646ebca56d75031">   24</a></span>  uint32_t <a class="code hl_variable" href="struct_p_w_m___handle.html#a2194bd5279879eca3646ebca56d75031">channel</a>;    </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>} <a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a>;</div>
 </div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#aa24e135ac2eb5dcb30f5547c6aa2057b">hal_pwm_init</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm, uint32_t frequency, <span class="keywordtype">float</span> dutyCycle);</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span></div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#a5274ccc3d8dfacbbb93c5f94d1486db8">hal_pwm_start</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm);</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#a2783dd5ac1c5976af146fdc38806bd2c">hal_pwm_stop</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm);</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#a7c9a0371f4527a4c7c5af62884797ed6">hal_pwm_set_duty_cycle</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm, <span class="keywordtype">float</span> dutyCycle);</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#a6c16bb2afdf33e25b1419b8b670cd14e">hal_pwm_set_frequency</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm, uint32_t frequency);</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#endif </span><span class="comment">// !PWM_H</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span></div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#aa24e135ac2eb5dcb30f5547c6aa2057b">hal_pwm_init</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm, uint32_t frequency, <span class="keywordtype">float</span> dutyCycle);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#a5274ccc3d8dfacbbb93c5f94d1486db8">hal_pwm_start</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#a2783dd5ac1c5976af146fdc38806bd2c">hal_pwm_stop</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm);</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#a7c9a0371f4527a4c7c5af62884797ed6">hal_pwm_set_duty_cycle</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm, <span class="keywordtype">float</span> dutyCycle);</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="keywordtype">void</span> <a class="code hl_function" href="pwm_8h.html#a6c16bb2afdf33e25b1419b8b670cd14e">hal_pwm_set_frequency</a>(<a class="code hl_struct" href="struct_p_w_m___handle.html">PWM_Handle</a> *pwm, uint32_t frequency);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">#endif </span><span class="comment">// PWM_H</span></div>
 <div class="ttc" id="apwm_8h_html_a2783dd5ac1c5976af146fdc38806bd2c"><div class="ttname"><a href="pwm_8h.html#a2783dd5ac1c5976af146fdc38806bd2c">hal_pwm_stop</a></div><div class="ttdeci">void hal_pwm_stop(PWM_Handle *pwm)</div><div class="ttdoc">Stop PWM signal generation.</div><div class="ttdef"><b>Definition</b> pwm.c:54</div></div>
 <div class="ttc" id="apwm_8h_html_a5274ccc3d8dfacbbb93c5f94d1486db8"><div class="ttname"><a href="pwm_8h.html#a5274ccc3d8dfacbbb93c5f94d1486db8">hal_pwm_start</a></div><div class="ttdeci">void hal_pwm_start(PWM_Handle *pwm)</div><div class="ttdoc">Start PWM signal generation.</div><div class="ttdef"><b>Definition</b> pwm.c:43</div></div>
 <div class="ttc" id="apwm_8h_html_a6c16bb2afdf33e25b1419b8b670cd14e"><div class="ttname"><a href="pwm_8h.html#a6c16bb2afdf33e25b1419b8b670cd14e">hal_pwm_set_frequency</a></div><div class="ttdeci">void hal_pwm_set_frequency(PWM_Handle *pwm, uint32_t frequency)</div><div class="ttdoc">Set the PWM frequency.</div><div class="ttdef"><b>Definition</b> pwm.c:77</div></div>
 <div class="ttc" id="apwm_8h_html_a7c9a0371f4527a4c7c5af62884797ed6"><div class="ttname"><a href="pwm_8h.html#a7c9a0371f4527a4c7c5af62884797ed6">hal_pwm_set_duty_cycle</a></div><div class="ttdeci">void hal_pwm_set_duty_cycle(PWM_Handle *pwm, float dutyCycle)</div><div class="ttdoc">Set the PWM duty cycle.</div><div class="ttdef"><b>Definition</b> pwm.c:65</div></div>
 <div class="ttc" id="apwm_8h_html_aa24e135ac2eb5dcb30f5547c6aa2057b"><div class="ttname"><a href="pwm_8h.html#aa24e135ac2eb5dcb30f5547c6aa2057b">hal_pwm_init</a></div><div class="ttdeci">void hal_pwm_init(PWM_Handle *pwm, uint32_t frequency, float dutyCycle)</div><div class="ttdoc">Initialize a PWM handle with the specified frequency and duty cycle.</div><div class="ttdef"><b>Definition</b> pwm.c:21</div></div>
-<div class="ttc" id="astruct_p_w_m___handle_html"><div class="ttname"><a href="struct_p_w_m___handle.html">PWM_Handle</a></div><div class="ttdef"><b>Definition</b> pwm.h:11</div></div>
-<div class="ttc" id="astruct_p_w_m___handle_html_a2194bd5279879eca3646ebca56d75031"><div class="ttname"><a href="struct_p_w_m___handle.html#a2194bd5279879eca3646ebca56d75031">PWM_Handle::channel</a></div><div class="ttdeci">uint32_t channel</div><div class="ttdef"><b>Definition</b> pwm.h:13</div></div>
-<div class="ttc" id="astruct_p_w_m___handle_html_ab376c08b715b06223a25c94dd2b8ea27"><div class="ttname"><a href="struct_p_w_m___handle.html#ab376c08b715b06223a25c94dd2b8ea27">PWM_Handle::timer</a></div><div class="ttdeci">hal_timer_t timer</div><div class="ttdef"><b>Definition</b> pwm.h:12</div></div>
+<div class="ttc" id="astruct_p_w_m___handle_html"><div class="ttname"><a href="struct_p_w_m___handle.html">PWM_Handle</a></div><div class="ttdoc">PWM handle structure linking timer and channel.</div><div class="ttdef"><b>Definition</b> pwm.h:22</div></div>
+<div class="ttc" id="astruct_p_w_m___handle_html_a2194bd5279879eca3646ebca56d75031"><div class="ttname"><a href="struct_p_w_m___handle.html#a2194bd5279879eca3646ebca56d75031">PWM_Handle::channel</a></div><div class="ttdeci">uint32_t channel</div><div class="ttdef"><b>Definition</b> pwm.h:24</div></div>
+<div class="ttc" id="astruct_p_w_m___handle_html_ab376c08b715b06223a25c94dd2b8ea27"><div class="ttname"><a href="struct_p_w_m___handle.html#ab376c08b715b06223a25c94dd2b8ea27">PWM_Handle::timer</a></div><div class="ttdeci">hal_timer_t timer</div><div class="ttdef"><b>Definition</b> pwm.h:23</div></div>
 <div class="ttc" id="atimer__types_8h_html"><div class="ttname"><a href="timer__types_8h.html">timer_types.h</a></div></div>
 <div class="ttc" id="atimer__types_8h_html_a8bcc65cef9829505cbc2b3512bc017db"><div class="ttname"><a href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></div><div class="ttdeci">hal_timer_t</div><div class="ttdef"><b>Definition</b> timer_types.h:5</div></div>
 </div><!-- fragment --></div><!-- contents -->

@@ -2,27 +2,29 @@
 \hypertarget{pwm_8h_source}{}\label{pwm_8h_source}\index{include/core/cortex-\/m4/pwm.h@{include/core/cortex-\/m4/pwm.h}}
 \mbox{\hyperlink{pwm_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ PWM\_H}}
-\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ PWM\_H}}
-\DoxyCodeLine{00003\ }
-\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{timer__types_8h}{utils/timer\_types.h}}"{}}}
-\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
-\DoxyCodeLine{00006\ }
-\DoxyCodeLine{00011\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
-\DoxyCodeLine{00012\ \ \ \mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ \mbox{\hyperlink{struct_p_w_m___handle_ab376c08b715b06223a25c94dd2b8ea27}{timer}};\ \ \ }
-\DoxyCodeLine{00013\ \ \ uint32\_t\ \mbox{\hyperlink{struct_p_w_m___handle_a2194bd5279879eca3646ebca56d75031}{channel}};\ \ \ \ }
-\DoxyCodeLine{00014\ \}\ \mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}};}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#ifndef\ PWM\_H}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#define\ PWM\_H}}
 \DoxyCodeLine{00015\ }
-\DoxyCodeLine{00023\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_aa24e135ac2eb5dcb30f5547c6aa2057b}{hal\_pwm\_init}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm,\ uint32\_t\ frequency,\ \textcolor{keywordtype}{float}\ dutyCycle);}
-\DoxyCodeLine{00024\ }
-\DoxyCodeLine{00030\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_a5274ccc3d8dfacbbb93c5f94d1486db8}{hal\_pwm\_start}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm);}
-\DoxyCodeLine{00031\ }
-\DoxyCodeLine{00037\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_a2783dd5ac1c5976af146fdc38806bd2c}{hal\_pwm\_stop}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm);}
-\DoxyCodeLine{00038\ }
-\DoxyCodeLine{00045\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_a7c9a0371f4527a4c7c5af62884797ed6}{hal\_pwm\_set\_duty\_cycle}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm,\ \textcolor{keywordtype}{float}\ dutyCycle);}
-\DoxyCodeLine{00046\ }
-\DoxyCodeLine{00053\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_a6c16bb2afdf33e25b1419b8b670cd14e}{hal\_pwm\_set\_frequency}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm,\ uint32\_t\ frequency);}
-\DoxyCodeLine{00054\ }
-\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ !PWM\_H}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{timer__types_8h}{utils/timer\_types.h}}"{}}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00023\ \ \ \mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ \mbox{\hyperlink{struct_p_w_m___handle_ab376c08b715b06223a25c94dd2b8ea27}{timer}};\ \ \ }
+\DoxyCodeLine{00024\ \ \ uint32\_t\ \mbox{\hyperlink{struct_p_w_m___handle_a2194bd5279879eca3646ebca56d75031}{channel}};\ \ \ \ }
+\DoxyCodeLine{00025\ \}\ \mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}};}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00034\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_aa24e135ac2eb5dcb30f5547c6aa2057b}{hal\_pwm\_init}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm,\ uint32\_t\ frequency,\ \textcolor{keywordtype}{float}\ dutyCycle);}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00041\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_a5274ccc3d8dfacbbb93c5f94d1486db8}{hal\_pwm\_start}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm);}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00048\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_a2783dd5ac1c5976af146fdc38806bd2c}{hal\_pwm\_stop}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00056\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_a7c9a0371f4527a4c7c5af62884797ed6}{hal\_pwm\_set\_duty\_cycle}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm,\ \textcolor{keywordtype}{float}\ dutyCycle);}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00064\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{pwm_8h_a6c16bb2afdf33e25b1419b8b670cd14e}{hal\_pwm\_set\_frequency}}(\mbox{\hyperlink{struct_p_w_m___handle}{PWM\_Handle}}\ *pwm,\ uint32\_t\ frequency);}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ PWM\_H}}
 
 \end{DoxyCode}

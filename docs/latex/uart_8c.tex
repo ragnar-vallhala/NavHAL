@@ -6,573 +6,100 @@ UART initialization and I/O functions for STM32\+F4 UART1, UART2, and UART6.
 
 
 {\ttfamily \#include "{}core/cortex-\/m4/uart.\+h"{}}\newline
-{\ttfamily \#include "{}core/cortex-\/m4/gpio.\+h"{}}\newline
 {\ttfamily \#include "{}core/cortex-\/m4/clock.\+h"{}}\newline
-Include dependency graph for uart.\+c\+:
-% FIG 0
+{\ttfamily \#include "{}core/cortex-\/m4/gpio.\+h"{}}\newline
+Include dependency graph for uart.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{uart_8c__incl}
+\end{center}
+\end{figure}
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \mbox{\hyperlink{uart_8c_ad320bd1e821aac6c1b38c8bcb8003104}{uart\+\_\+init}} (uint32\+\_\+t baudrate, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
-\begin{DoxyCompactList}\small\item\em Initialize UART peripheral with specified baudrate. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a6f144300396d4d9afe21f41a72a99ab8}{uart\+\_\+write\+\_\+char}} (char c, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
-\begin{DoxyCompactList}\small\item\em Write a single character to UART. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a183ba35371040029a29a3cde221539fa}{uart\+\_\+write\+\_\+int}} (int32\+\_\+t num, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
-\begin{DoxyCompactList}\small\item\em Write an integer as ASCII characters to UART. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a662be19e5a7667eeae26bd36e869fd2d}{uart\+\_\+write\+\_\+float}} (float num, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
-\begin{DoxyCompactList}\small\item\em Write a floating-\/point number to UART as ASCII. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_ab0bd03dc5a6de94637fb1536e883c546}{uart\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
-\begin{DoxyCompactList}\small\item\em Write a null-\/terminated string to UART. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a3cc37d73aa435b454452d7a60a635e39}{uart1\+\_\+init}} (uint32\+\_\+t baudrate)
-\begin{DoxyCompactList}\small\item\em Initialize UART1 peripheral. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a7cd48d1d49f0dee1adff1be915793bb6}{uart6\+\_\+init}} (uint32\+\_\+t baudrate)
-\begin{DoxyCompactList}\small\item\em Initialize UART6 peripheral. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_af897c816fdda40f69b1f8377878db96a}{uart2\+\_\+init}} (uint32\+\_\+t baudrate)
-\begin{DoxyCompactList}\small\item\em Initialize UART2 peripheral. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_ace45b7a16f634d2de9a483acab46a7c8}{uart2\+\_\+write\+\_\+char}} (char c)
-\begin{DoxyCompactList}\small\item\em Write a character to UART2. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_aa8786e97a38fd49fd129cc704cb6fadd}{uart1\+\_\+write\+\_\+char}} (char c)
-\begin{DoxyCompactList}\small\item\em Write a character to UART1. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_ac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}} (char c)
-\begin{DoxyCompactList}\small\item\em Write a character to UART6. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_ac9e624e43c7053a70ed42b1c780ad792}{uart2\+\_\+write\+\_\+int}} (int32\+\_\+t num)
-\begin{DoxyCompactList}\small\item\em Write an integer to UART2 as ASCII. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a81b1a7af3a848606f23985f8d9a87708}{uart1\+\_\+write\+\_\+int}} (int32\+\_\+t num)
-\begin{DoxyCompactList}\small\item\em Write an integer to UART1 as ASCII. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a01667e67896e48e6cf21a05385566819}{uart6\+\_\+write\+\_\+int}} (int32\+\_\+t num)
-\begin{DoxyCompactList}\small\item\em Write an integer to UART6 as ASCII. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a3784763020352ac6913e355c4ac7a337}{uart2\+\_\+write\+\_\+float}} (float num)
-\begin{DoxyCompactList}\small\item\em Write a floating-\/point number to UART2. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a8595ce32dbc8da8200d337fca8d7930e}{uart1\+\_\+write\+\_\+float}} (float num)
-\begin{DoxyCompactList}\small\item\em Write a floating-\/point number to UART1. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a3a2f8786049010a947207fc47c7ad409}{uart6\+\_\+write\+\_\+float}} (float num)
-\begin{DoxyCompactList}\small\item\em Write a floating-\/point number to UART6. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_a55c46e6a48433287fdf5a9d1defd5f5c}{uart2\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
-\begin{DoxyCompactList}\small\item\em Write a null-\/terminated string to UART2. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_ac86a702823358a08deca96365ed41cae}{uart1\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
-\begin{DoxyCompactList}\small\item\em Write a null-\/terminated string to UART1. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{uart_8c_acd0a2ffc721c3e9af1501307d74f5173}{uart6\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
-\begin{DoxyCompactList}\small\item\em Write a null-\/terminated string to UART6. \end{DoxyCompactList}\item 
-char \mbox{\hyperlink{uart_8c_a86ffdb11e32f205ce3b1e9b0fb259c8e}{uart\+\_\+read\+\_\+char}} (\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
-\begin{DoxyCompactList}\small\item\em Read a single character from UART peripheral. \end{DoxyCompactList}\item 
-char \mbox{\hyperlink{uart_8c_a223b61a491de01b4b3ee16a1d15113d1}{uart1\+\_\+read\+\_\+char}} (void)
-\begin{DoxyCompactList}\small\item\em Read a single character from UART1. \end{DoxyCompactList}\item 
-char \mbox{\hyperlink{uart_8c_a894a9fccabee5ec32e916ba78998fad5}{uart2\+\_\+read\+\_\+char}} (void)
-\begin{DoxyCompactList}\small\item\em Read a single character from UART2. \end{DoxyCompactList}\item 
-char \mbox{\hyperlink{uart_8c_aa40d7d81e58a648bf5c64a4735bfb7f3}{uart6\+\_\+read\+\_\+char}} (void)
-\begin{DoxyCompactList}\small\item\em Read a single character from UART6. \end{DoxyCompactList}\item 
-int \mbox{\hyperlink{uart_8c_aa3a9166c481a902a7b2c291eb3127a78}{uart\+\_\+available}} (\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
-\begin{DoxyCompactList}\small\item\em Check if UART peripheral has data available to read. \end{DoxyCompactList}\item 
-int \mbox{\hyperlink{uart_8c_a242042066c0dcfee02c34f51ae65cc8a}{uart1\+\_\+available}} (void)
-\begin{DoxyCompactList}\small\item\em Check if UART1 has data available. \end{DoxyCompactList}\item 
-int \mbox{\hyperlink{uart_8c_ae67708662af5b29151196c9ba24cf20d}{uart2\+\_\+available}} (void)
-\begin{DoxyCompactList}\small\item\em Check if UART2 has data available. \end{DoxyCompactList}\item 
-int \mbox{\hyperlink{uart_8c_af49cf7ca045c2feb52c025951e6e50e4}{uart6\+\_\+available}} (void)
-\begin{DoxyCompactList}\small\item\em Check if UART6 has data available. \end{DoxyCompactList}\item 
-uint32\+\_\+t \mbox{\hyperlink{uart_8c_a5c510005052783f5cec97c0ac7731071}{uart2\+\_\+read\+\_\+until}} (char \texorpdfstring{$\ast$}{*}buffer, uint32\+\_\+t maxlen, char delimiter)
-\begin{DoxyCompactList}\small\item\em Read characters from UART2 into a buffer until delimiter or max length. \end{DoxyCompactList}\end{DoxyCompactItemize}
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gad320bd1e821aac6c1b38c8bcb8003104}{uart\+\_\+init}} (uint32\+\_\+t baudrate, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
+\begin{DoxyCompactList}\small\item\em Initialize the specified UART peripheral. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga6f144300396d4d9afe21f41a72a99ab8}{uart\+\_\+write\+\_\+char}} (char \mbox{\hyperlink{test__unity__parameterized_8c_a2fc627b56c26c54e1e919c187689f0de}{c}}, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
+\begin{DoxyCompactList}\small\item\em Transmit a single character via the specified UART. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga183ba35371040029a29a3cde221539fa}{uart\+\_\+write\+\_\+int}} (int32\+\_\+t num, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
+\begin{DoxyCompactList}\small\item\em Transmit a 32-\/bit signed integer via UART. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga662be19e5a7667eeae26bd36e869fd2d}{uart\+\_\+write\+\_\+float}} (float num, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
+\begin{DoxyCompactList}\small\item\em Transmit a floating-\/point number via UART. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gab0bd03dc5a6de94637fb1536e883c546}{uart\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
+\begin{DoxyCompactList}\small\item\em Transmit a null-\/terminated string via UART. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3cc37d73aa435b454452d7a60a635e39}{uart1\+\_\+init}} (uint32\+\_\+t baudrate)
+\begin{DoxyCompactList}\small\item\em Initialize USART1 peripheral. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga7cd48d1d49f0dee1adff1be915793bb6}{uart6\+\_\+init}} (uint32\+\_\+t baudrate)
+\begin{DoxyCompactList}\small\item\em Initialize USART6 peripheral. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaf897c816fdda40f69b1f8377878db96a}{uart2\+\_\+init}} (uint32\+\_\+t baudrate)
+\begin{DoxyCompactList}\small\item\em Initialize USART2 peripheral. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gace45b7a16f634d2de9a483acab46a7c8}{uart2\+\_\+write\+\_\+char}} (char \mbox{\hyperlink{test__unity__parameterized_8c_a2fc627b56c26c54e1e919c187689f0de}{c}})
+\begin{DoxyCompactList}\small\item\em Transmit a single character via USART2. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\+\_\+write\+\_\+char}} (char \mbox{\hyperlink{test__unity__parameterized_8c_a2fc627b56c26c54e1e919c187689f0de}{c}})
+\begin{DoxyCompactList}\small\item\em Transmit a single character via USART1. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}} (char \mbox{\hyperlink{test__unity__parameterized_8c_a2fc627b56c26c54e1e919c187689f0de}{c}})
+\begin{DoxyCompactList}\small\item\em Transmit a single character via USART6. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac9e624e43c7053a70ed42b1c780ad792}{uart2\+\_\+write\+\_\+int}} (int32\+\_\+t num)
+\begin{DoxyCompactList}\small\item\em Transmit a 32-\/bit signed integer via USART2. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga81b1a7af3a848606f23985f8d9a87708}{uart1\+\_\+write\+\_\+int}} (int32\+\_\+t num)
+\begin{DoxyCompactList}\small\item\em Transmit a 32-\/bit signed integer via USART1. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga01667e67896e48e6cf21a05385566819}{uart6\+\_\+write\+\_\+int}} (int32\+\_\+t num)
+\begin{DoxyCompactList}\small\item\em Transmit a 32-\/bit signed integer via USART6. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3784763020352ac6913e355c4ac7a337}{uart2\+\_\+write\+\_\+float}} (float num)
+\begin{DoxyCompactList}\small\item\em Transmit a floating-\/point number via USART2. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga8595ce32dbc8da8200d337fca8d7930e}{uart1\+\_\+write\+\_\+float}} (float num)
+\begin{DoxyCompactList}\small\item\em Transmit a floating-\/point number via USART1. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3a2f8786049010a947207fc47c7ad409}{uart6\+\_\+write\+\_\+float}} (float num)
+\begin{DoxyCompactList}\small\item\em Transmit a floating-\/point number via USART6. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga55c46e6a48433287fdf5a9d1defd5f5c}{uart2\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
+\begin{DoxyCompactList}\small\item\em Transmit a null-\/terminated string via USART2. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac86a702823358a08deca96365ed41cae}{uart1\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
+\begin{DoxyCompactList}\small\item\em Transmit a null-\/terminated string via USART1. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gacd0a2ffc721c3e9af1501307d74f5173}{uart6\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
+\begin{DoxyCompactList}\small\item\em Transmit a null-\/terminated string via USART6. \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga86ffdb11e32f205ce3b1e9b0fb259c8e}{uart\+\_\+read\+\_\+char}} (\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
+\begin{DoxyCompactList}\small\item\em Read a single character from the specified UART. \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga223b61a491de01b4b3ee16a1d15113d1}{uart1\+\_\+read\+\_\+char}} (void)
+\begin{DoxyCompactList}\small\item\em Read a single character from USART1. \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga894a9fccabee5ec32e916ba78998fad5}{uart2\+\_\+read\+\_\+char}} (void)
+\begin{DoxyCompactList}\small\item\em Read a single character from USART2. \end{DoxyCompactList}\item 
+char \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa40d7d81e58a648bf5c64a4735bfb7f3}{uart6\+\_\+read\+\_\+char}} (void)
+\begin{DoxyCompactList}\small\item\em Read a single character from USART6. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa3a9166c481a902a7b2c291eb3127a78}{uart\+\_\+available}} (\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
+\begin{DoxyCompactList}\small\item\em Check if data is available to read from specified UART. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga242042066c0dcfee02c34f51ae65cc8a}{uart1\+\_\+available}} (void)
+\begin{DoxyCompactList}\small\item\em Check if data is available to read from USART1. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{group___u_a_r_t___a_p_i_gae67708662af5b29151196c9ba24cf20d}{uart2\+\_\+available}} (void)
+\begin{DoxyCompactList}\small\item\em Check if data is available to read from USART2. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaf49cf7ca045c2feb52c025951e6e50e4}{uart6\+\_\+available}} (void)
+\begin{DoxyCompactList}\small\item\em Check if data is available to read from USART6. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga5c510005052783f5cec97c0ac7731071}{uart2\+\_\+read\+\_\+until}} (char \texorpdfstring{$\ast$}{*}buffer, uint32\+\_\+t maxlen, char delimiter)
+\begin{DoxyCompactList}\small\item\em Read characters from USART2 until delimiter or max length. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
 UART initialization and I/O functions for STM32\+F4 UART1, UART2, and UART6. 
 
-This file provides basic UART setup and read/write functionality for three UART peripherals. It supports initialization with baudrate, character, integer, float, and string transmission, as well as reading characters and checking availability. 
+This file provides the implementation of UART communication functions for STM32\+F401\+RE microcontroller. It supports USART1, USART2, and USART6 peripherals with the following features\+:
+\begin{DoxyItemize}
+\item Baud rate configuration
+\item Character, integer, float, and string transmission
+\item Character reception
+\item Data availability checking
+\item Blocking (polling) implementations
+\end{DoxyItemize}
 
-\label{doc-func-members}
-\Hypertarget{uart_8c_doc-func-members}
-\doxysubsection{Function Documentation}
-\Hypertarget{uart_8c_a242042066c0dcfee02c34f51ae65cc8a}\index{uart.c@{uart.c}!uart1\_available@{uart1\_available}}
-\index{uart1\_available@{uart1\_available}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart1\_available()}{uart1\_available()}}
-{\footnotesize\ttfamily \label{uart_8c_a242042066c0dcfee02c34f51ae65cc8a} 
-int uart1\+\_\+available (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+The implementation uses GPIO alternate functions for UART pins and provides both generic (UART instance parameter) and specific functions.
 
-
-
-Check if UART1 has data available. 
-
-\begin{DoxyReturn}{Returns}
-Non-\/zero if data ready, zero if none. 
-\end{DoxyReturn}
-\Hypertarget{uart_8c_a3cc37d73aa435b454452d7a60a635e39}\index{uart.c@{uart.c}!uart1\_init@{uart1\_init}}
-\index{uart1\_init@{uart1\_init}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart1\_init()}{uart1\_init()}}
-{\footnotesize\ttfamily \label{uart_8c_a3cc37d73aa435b454452d7a60a635e39} 
-void uart1\+\_\+init (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{baudrate}{}\end{DoxyParamCaption})}
-
-
-
-Initialize UART1 peripheral. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em baudrate} & Desired baudrate.\\
-\hline
-\end{DoxyParams}
 \begin{DoxyNote}{Note}
-Configures GPIO PA9 for alternate function AF7, enables USART1 clock, sets baudrate register, enables transmitter, and enables USART. 
+All functions are blocking and will wait for hardware operations to complete 
+
+Default configuration\+: 8 data bits, no parity, 1 stop bit
 \end{DoxyNote}
-\Hypertarget{uart_8c_a223b61a491de01b4b3ee16a1d15113d1}\index{uart.c@{uart.c}!uart1\_read\_char@{uart1\_read\_char}}
-\index{uart1\_read\_char@{uart1\_read\_char}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart1\_read\_char()}{uart1\_read\_char()}}
-{\footnotesize\ttfamily \label{uart_8c_a223b61a491de01b4b3ee16a1d15113d1} 
-char uart1\+\_\+read\+\_\+char (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
-
-
-
-Read a single character from UART1. 
-
-\begin{DoxyReturn}{Returns}
-Character read.
-\end{DoxyReturn}
-\begin{DoxyNote}{Note}
-Blocks until a character is available. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_aa8786e97a38fd49fd129cc704cb6fadd}\index{uart.c@{uart.c}!uart1\_write\_char@{uart1\_write\_char}}
-\index{uart1\_write\_char@{uart1\_write\_char}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart1\_write\_char()}{uart1\_write\_char()}}
-{\footnotesize\ttfamily \label{uart_8c_aa8786e97a38fd49fd129cc704cb6fadd} 
-void uart1\+\_\+write\+\_\+char (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption})}
-
-
-
-Write a character to UART1. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em c} & Character to send.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyNote}{Note}
-Waits until transmit data register is empty. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_a8595ce32dbc8da8200d337fca8d7930e}\index{uart.c@{uart.c}!uart1\_write\_float@{uart1\_write\_float}}
-\index{uart1\_write\_float@{uart1\_write\_float}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart1\_write\_float()}{uart1\_write\_float()}}
-{\footnotesize\ttfamily \label{uart_8c_a8595ce32dbc8da8200d337fca8d7930e} 
-void uart1\+\_\+write\+\_\+float (\begin{DoxyParamCaption}\item[{float}]{num}{}\end{DoxyParamCaption})}
-
-
-
-Write a floating-\/point number to UART1. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em num} & Float value to send. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_a81b1a7af3a848606f23985f8d9a87708}\index{uart.c@{uart.c}!uart1\_write\_int@{uart1\_write\_int}}
-\index{uart1\_write\_int@{uart1\_write\_int}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart1\_write\_int()}{uart1\_write\_int()}}
-{\footnotesize\ttfamily \label{uart_8c_a81b1a7af3a848606f23985f8d9a87708} 
-void uart1\+\_\+write\+\_\+int (\begin{DoxyParamCaption}\item[{int32\+\_\+t}]{num}{}\end{DoxyParamCaption})}
-
-
-
-Write an integer to UART1 as ASCII. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em num} & Integer to send. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_ac86a702823358a08deca96365ed41cae}\index{uart.c@{uart.c}!uart1\_write\_string@{uart1\_write\_string}}
-\index{uart1\_write\_string@{uart1\_write\_string}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart1\_write\_string()}{uart1\_write\_string()}}
-{\footnotesize\ttfamily \label{uart_8c_ac86a702823358a08deca96365ed41cae} 
-void uart1\+\_\+write\+\_\+string (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s}{}\end{DoxyParamCaption})}
-
-
-
-Write a null-\/terminated string to UART1. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em s} & Pointer to string to send. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_ae67708662af5b29151196c9ba24cf20d}\index{uart.c@{uart.c}!uart2\_available@{uart2\_available}}
-\index{uart2\_available@{uart2\_available}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart2\_available()}{uart2\_available()}}
-{\footnotesize\ttfamily \label{uart_8c_ae67708662af5b29151196c9ba24cf20d} 
-int uart2\+\_\+available (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
-
-
-
-Check if UART2 has data available. 
-
-\begin{DoxyReturn}{Returns}
-Non-\/zero if data ready, zero if none. 
-\end{DoxyReturn}
-\Hypertarget{uart_8c_af897c816fdda40f69b1f8377878db96a}\index{uart.c@{uart.c}!uart2\_init@{uart2\_init}}
-\index{uart2\_init@{uart2\_init}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart2\_init()}{uart2\_init()}}
-{\footnotesize\ttfamily \label{uart_8c_af897c816fdda40f69b1f8377878db96a} 
-void uart2\+\_\+init (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{baudrate}{}\end{DoxyParamCaption})}
-
-
-
-Initialize UART2 peripheral. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em baudrate} & Desired baudrate.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyNote}{Note}
-Configures GPIO PA2 and PA3 for alternate function AF7, enables USART2 clock, sets baudrate register, enables transmitter and receiver, and enables USART. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_a894a9fccabee5ec32e916ba78998fad5}\index{uart.c@{uart.c}!uart2\_read\_char@{uart2\_read\_char}}
-\index{uart2\_read\_char@{uart2\_read\_char}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart2\_read\_char()}{uart2\_read\_char()}}
-{\footnotesize\ttfamily \label{uart_8c_a894a9fccabee5ec32e916ba78998fad5} 
-char uart2\+\_\+read\+\_\+char (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
-
-
-
-Read a single character from UART2. 
-
-\begin{DoxyReturn}{Returns}
-Character read.
-\end{DoxyReturn}
-\begin{DoxyNote}{Note}
-Blocks until a character is available. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_a5c510005052783f5cec97c0ac7731071}\index{uart.c@{uart.c}!uart2\_read\_until@{uart2\_read\_until}}
-\index{uart2\_read\_until@{uart2\_read\_until}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart2\_read\_until()}{uart2\_read\_until()}}
-{\footnotesize\ttfamily \label{uart_8c_a5c510005052783f5cec97c0ac7731071} 
-uint32\+\_\+t uart2\+\_\+read\+\_\+until (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{buffer}{, }\item[{uint32\+\_\+t}]{maxlen}{, }\item[{char}]{delimiter}{}\end{DoxyParamCaption})}
-
-
-
-Read characters from UART2 into a buffer until delimiter or max length. 
-
-Read characters from UART2 until a delimiter or maximum length is reached.
-
-
-\begin{DoxyParams}{Parameters}
-{\em buffer} & Pointer to buffer to store received characters. \\
-\hline
-{\em maxlen} & Maximum buffer length (including null terminator). \\
-\hline
-{\em delimiter} & Character to stop reading at. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Number of characters read (excluding null terminator).
-\end{DoxyReturn}
-\begin{DoxyNote}{Note}
-Reads until delimiter is encountered or maxlen-\/1 characters are read. Null-\/terminates the buffer. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_ace45b7a16f634d2de9a483acab46a7c8}\index{uart.c@{uart.c}!uart2\_write\_char@{uart2\_write\_char}}
-\index{uart2\_write\_char@{uart2\_write\_char}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart2\_write\_char()}{uart2\_write\_char()}}
-{\footnotesize\ttfamily \label{uart_8c_ace45b7a16f634d2de9a483acab46a7c8} 
-void uart2\+\_\+write\+\_\+char (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption})}
-
-
-
-Write a character to UART2. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em c} & Character to send.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyNote}{Note}
-Waits until transmit data register is empty. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_a3784763020352ac6913e355c4ac7a337}\index{uart.c@{uart.c}!uart2\_write\_float@{uart2\_write\_float}}
-\index{uart2\_write\_float@{uart2\_write\_float}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart2\_write\_float()}{uart2\_write\_float()}}
-{\footnotesize\ttfamily \label{uart_8c_a3784763020352ac6913e355c4ac7a337} 
-void uart2\+\_\+write\+\_\+float (\begin{DoxyParamCaption}\item[{float}]{num}{}\end{DoxyParamCaption})}
-
-
-
-Write a floating-\/point number to UART2. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em num} & Float value to send.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyNote}{Note}
-Prints sign, integer part, decimal point, and 5 decimal digits of fraction. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_ac9e624e43c7053a70ed42b1c780ad792}\index{uart.c@{uart.c}!uart2\_write\_int@{uart2\_write\_int}}
-\index{uart2\_write\_int@{uart2\_write\_int}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart2\_write\_int()}{uart2\_write\_int()}}
-{\footnotesize\ttfamily \label{uart_8c_ac9e624e43c7053a70ed42b1c780ad792} 
-void uart2\+\_\+write\+\_\+int (\begin{DoxyParamCaption}\item[{int32\+\_\+t}]{num}{}\end{DoxyParamCaption})}
-
-
-
-Write an integer to UART2 as ASCII. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em num} & Integer to send. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_a55c46e6a48433287fdf5a9d1defd5f5c}\index{uart.c@{uart.c}!uart2\_write\_string@{uart2\_write\_string}}
-\index{uart2\_write\_string@{uart2\_write\_string}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart2\_write\_string()}{uart2\_write\_string()}}
-{\footnotesize\ttfamily \label{uart_8c_a55c46e6a48433287fdf5a9d1defd5f5c} 
-void uart2\+\_\+write\+\_\+string (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s}{}\end{DoxyParamCaption})}
-
-
-
-Write a null-\/terminated string to UART2. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em s} & Pointer to string to send. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_af49cf7ca045c2feb52c025951e6e50e4}\index{uart.c@{uart.c}!uart6\_available@{uart6\_available}}
-\index{uart6\_available@{uart6\_available}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart6\_available()}{uart6\_available()}}
-{\footnotesize\ttfamily \label{uart_8c_af49cf7ca045c2feb52c025951e6e50e4} 
-int uart6\+\_\+available (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
-
-
-
-Check if UART6 has data available. 
-
-\begin{DoxyReturn}{Returns}
-Non-\/zero if data ready, zero if none. 
-\end{DoxyReturn}
-\Hypertarget{uart_8c_a7cd48d1d49f0dee1adff1be915793bb6}\index{uart.c@{uart.c}!uart6\_init@{uart6\_init}}
-\index{uart6\_init@{uart6\_init}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart6\_init()}{uart6\_init()}}
-{\footnotesize\ttfamily \label{uart_8c_a7cd48d1d49f0dee1adff1be915793bb6} 
-void uart6\+\_\+init (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{baudrate}{}\end{DoxyParamCaption})}
-
-
-
-Initialize UART6 peripheral. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em baudrate} & Desired baudrate.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyNote}{Note}
-Configures GPIO PC6 for alternate function AF7, enables USART6 clock, sets baudrate register, enables transmitter, and enables USART. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_aa40d7d81e58a648bf5c64a4735bfb7f3}\index{uart.c@{uart.c}!uart6\_read\_char@{uart6\_read\_char}}
-\index{uart6\_read\_char@{uart6\_read\_char}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart6\_read\_char()}{uart6\_read\_char()}}
-{\footnotesize\ttfamily \label{uart_8c_aa40d7d81e58a648bf5c64a4735bfb7f3} 
-char uart6\+\_\+read\+\_\+char (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
-
-
-
-Read a single character from UART6. 
-
-\begin{DoxyReturn}{Returns}
-Character read.
-\end{DoxyReturn}
-\begin{DoxyNote}{Note}
-Blocks until a character is available. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_ac0de3d3f47debf2a24b349fa74b7a030}\index{uart.c@{uart.c}!uart6\_write\_char@{uart6\_write\_char}}
-\index{uart6\_write\_char@{uart6\_write\_char}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart6\_write\_char()}{uart6\_write\_char()}}
-{\footnotesize\ttfamily \label{uart_8c_ac0de3d3f47debf2a24b349fa74b7a030} 
-void uart6\+\_\+write\+\_\+char (\begin{DoxyParamCaption}\item[{char}]{c}{}\end{DoxyParamCaption})}
-
-
-
-Write a character to UART6. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em c} & Character to send.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyNote}{Note}
-Waits until transmit data register is empty. 
-\end{DoxyNote}
-\Hypertarget{uart_8c_a3a2f8786049010a947207fc47c7ad409}\index{uart.c@{uart.c}!uart6\_write\_float@{uart6\_write\_float}}
-\index{uart6\_write\_float@{uart6\_write\_float}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart6\_write\_float()}{uart6\_write\_float()}}
-{\footnotesize\ttfamily \label{uart_8c_a3a2f8786049010a947207fc47c7ad409} 
-void uart6\+\_\+write\+\_\+float (\begin{DoxyParamCaption}\item[{float}]{num}{}\end{DoxyParamCaption})}
-
-
-
-Write a floating-\/point number to UART6. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em num} & Float value to send. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_a01667e67896e48e6cf21a05385566819}\index{uart.c@{uart.c}!uart6\_write\_int@{uart6\_write\_int}}
-\index{uart6\_write\_int@{uart6\_write\_int}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart6\_write\_int()}{uart6\_write\_int()}}
-{\footnotesize\ttfamily \label{uart_8c_a01667e67896e48e6cf21a05385566819} 
-void uart6\+\_\+write\+\_\+int (\begin{DoxyParamCaption}\item[{int32\+\_\+t}]{num}{}\end{DoxyParamCaption})}
-
-
-
-Write an integer to UART6 as ASCII. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em num} & Integer to send. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_acd0a2ffc721c3e9af1501307d74f5173}\index{uart.c@{uart.c}!uart6\_write\_string@{uart6\_write\_string}}
-\index{uart6\_write\_string@{uart6\_write\_string}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart6\_write\_string()}{uart6\_write\_string()}}
-{\footnotesize\ttfamily \label{uart_8c_acd0a2ffc721c3e9af1501307d74f5173} 
-void uart6\+\_\+write\+\_\+string (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s}{}\end{DoxyParamCaption})}
-
-
-
-Write a null-\/terminated string to UART6. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em s} & Pointer to string to send. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_aa3a9166c481a902a7b2c291eb3127a78}\index{uart.c@{uart.c}!uart\_available@{uart\_available}}
-\index{uart\_available@{uart\_available}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart\_available()}{uart\_available()}}
-{\footnotesize\ttfamily \label{uart_8c_aa3a9166c481a902a7b2c291eb3127a78} 
-int uart\+\_\+available (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}}}]{uart}{}\end{DoxyParamCaption})}
-
-
-
-Check if UART peripheral has data available to read. 
-
-Check if data is available in the specified UART\textquotesingle{}s receive buffer.
-
-
-\begin{DoxyParams}{Parameters}
-{\em uart} & UART peripheral identifier. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Non-\/zero if data available, zero otherwise; -\/1 if invalid UART. 
-\end{DoxyReturn}
-\Hypertarget{uart_8c_ad320bd1e821aac6c1b38c8bcb8003104}\index{uart.c@{uart.c}!uart\_init@{uart\_init}}
-\index{uart\_init@{uart\_init}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart\_init()}{uart\_init()}}
-{\footnotesize\ttfamily \label{uart_8c_ad320bd1e821aac6c1b38c8bcb8003104} 
-void uart\+\_\+init (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{baudrate}{, }\item[{\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}}}]{uart}{}\end{DoxyParamCaption})}
-
-
-
-Initialize UART peripheral with specified baudrate. 
-
-Initialize the specified UART peripheral.
-
-
-\begin{DoxyParams}{Parameters}
-{\em baudrate} & Desired UART baudrate. \\
-\hline
-{\em uart} & UART peripheral identifier (UART1, UART2, UART6). \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_a86ffdb11e32f205ce3b1e9b0fb259c8e}\index{uart.c@{uart.c}!uart\_read\_char@{uart\_read\_char}}
-\index{uart\_read\_char@{uart\_read\_char}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart\_read\_char()}{uart\_read\_char()}}
-{\footnotesize\ttfamily \label{uart_8c_a86ffdb11e32f205ce3b1e9b0fb259c8e} 
-char uart\+\_\+read\+\_\+char (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}}}]{uart}{}\end{DoxyParamCaption})}
-
-
-
-Read a single character from UART peripheral. 
-
-Read a character from the specified UART.
-
-
-\begin{DoxyParams}{Parameters}
-{\em uart} & UART peripheral identifier. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Character read from UART data register. 
-\end{DoxyReturn}
-\Hypertarget{uart_8c_a6f144300396d4d9afe21f41a72a99ab8}\index{uart.c@{uart.c}!uart\_write\_char@{uart\_write\_char}}
-\index{uart\_write\_char@{uart\_write\_char}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart\_write\_char()}{uart\_write\_char()}}
-{\footnotesize\ttfamily \label{uart_8c_a6f144300396d4d9afe21f41a72a99ab8} 
-void uart\+\_\+write\+\_\+char (\begin{DoxyParamCaption}\item[{char}]{c}{, }\item[{\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}}}]{uart}{}\end{DoxyParamCaption})}
-
-
-
-Write a single character to UART. 
-
-Write a character to the specified UART.
-
-
-\begin{DoxyParams}{Parameters}
-{\em c} & Character to send. \\
-\hline
-{\em uart} & UART peripheral identifier. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_a662be19e5a7667eeae26bd36e869fd2d}\index{uart.c@{uart.c}!uart\_write\_float@{uart\_write\_float}}
-\index{uart\_write\_float@{uart\_write\_float}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart\_write\_float()}{uart\_write\_float()}}
-{\footnotesize\ttfamily \label{uart_8c_a662be19e5a7667eeae26bd36e869fd2d} 
-void uart\+\_\+write\+\_\+float (\begin{DoxyParamCaption}\item[{float}]{num}{, }\item[{\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}}}]{uart}{}\end{DoxyParamCaption})}
-
-
-
-Write a floating-\/point number to UART as ASCII. 
-
-Write a floating-\/point number to the specified UART.
-
-
-\begin{DoxyParams}{Parameters}
-{\em num} & Float value to send. \\
-\hline
-{\em uart} & UART peripheral identifier. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_a183ba35371040029a29a3cde221539fa}\index{uart.c@{uart.c}!uart\_write\_int@{uart\_write\_int}}
-\index{uart\_write\_int@{uart\_write\_int}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart\_write\_int()}{uart\_write\_int()}}
-{\footnotesize\ttfamily \label{uart_8c_a183ba35371040029a29a3cde221539fa} 
-void uart\+\_\+write\+\_\+int (\begin{DoxyParamCaption}\item[{int32\+\_\+t}]{num}{, }\item[{\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}}}]{uart}{}\end{DoxyParamCaption})}
-
-
-
-Write an integer as ASCII characters to UART. 
-
-Write an integer to the specified UART.
-
-
-\begin{DoxyParams}{Parameters}
-{\em num} & Integer to send. \\
-\hline
-{\em uart} & UART peripheral identifier. \\
-\hline
-\end{DoxyParams}
-\Hypertarget{uart_8c_ab0bd03dc5a6de94637fb1536e883c546}\index{uart.c@{uart.c}!uart\_write\_string@{uart\_write\_string}}
-\index{uart\_write\_string@{uart\_write\_string}!uart.c@{uart.c}}
-\doxysubsubsection{\texorpdfstring{uart\_write\_string()}{uart\_write\_string()}}
-{\footnotesize\ttfamily \label{uart_8c_ab0bd03dc5a6de94637fb1536e883c546} 
-void uart\+\_\+write\+\_\+string (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s}{, }\item[{\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}}}]{uart}{}\end{DoxyParamCaption})}
-
-
-
-Write a null-\/terminated string to UART. 
-
-Write a string to the specified UART.
-
-
-\begin{DoxyParams}{Parameters}
-{\em s} & Pointer to string to send. \\
-\hline
-{\em uart} & UART peripheral identifier. \\
-\hline
-\end{DoxyParams}
+\begin{DoxyAuthor}{Author}
+Ashutosh Vishwakarma 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2025-\/07-\/23 
+\end{DoxyDate}

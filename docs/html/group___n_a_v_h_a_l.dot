@@ -5,9 +5,7 @@ digraph "Core HAL"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir=LR;
-  Node2 [id="Node000002",label="Clock HAL",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___h_a_l___c_l_o_c_k.html",tooltip="Clock abstraction for multiple architectures."];
-  Node3 [id="Node000003",label="GPIO HAL",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___h_a_l___g_p_i_o.html",tooltip="GPIO abstraction for multiple architectures."];
+  Node2 [id="Node000002",label="GPIO HAL",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$group___h_a_l___g_p_i_o.html",tooltip="GPIO abstraction for multiple architectures."];
   Node1 [id="Node000001",label="Core HAL",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip="Top-level includes for the NavHAL framework."];
   Node1->Node2 [shape=plaintext, dir="back", style="solid"];
-  Node1->Node3 [shape=plaintext, dir="back", style="solid"];
 }

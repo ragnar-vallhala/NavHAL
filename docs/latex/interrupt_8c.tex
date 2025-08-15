@@ -3,8 +3,13 @@
 {\ttfamily \#include "{}core/cortex-\/m4/interrupt.\+h"{}}\newline
 {\ttfamily \#include "{}common/hal\+\_\+status.\+h"{}}\newline
 {\ttfamily \#include $<$stdint.\+h$>$}\newline
-Include dependency graph for interrupt.\+c\+:
-% FIG 0
+Include dependency graph for interrupt.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{interrupt_8c__incl}
+\end{center}
+\end{figure}
 \doxysubsubsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
@@ -13,15 +18,15 @@ Include dependency graph for interrupt.\+c\+:
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-int8\+\_\+t \mbox{\hyperlink{interrupt_8c_af5a39d871f4e853eeb1c18aec31bb9c2}{hal\+\_\+enable\+\_\+interrupt}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+int8\+\_\+t \mbox{\hyperlink{interrupt_8c_af5a39d871f4e853eeb1c18aec31bb9c2}{hal\+\_\+enable\+\_\+interrupt}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
 \begin{DoxyCompactList}\small\item\em Enable a specific interrupt. \end{DoxyCompactList}\item 
-int8\+\_\+t \mbox{\hyperlink{interrupt_8c_acee16c5665334d7c548ed969f3b2d874}{hal\+\_\+disable\+\_\+interrupt}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+int8\+\_\+t \mbox{\hyperlink{interrupt_8c_acee16c5665334d7c548ed969f3b2d874}{hal\+\_\+disable\+\_\+interrupt}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
 \begin{DoxyCompactList}\small\item\em Disable a specific interrupt. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{interrupt_8c_ae13d3a1cf10aecee622e6669d9621cca}{hal\+\_\+interrupt\+\_\+attach\+\_\+callback}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt, void(\texorpdfstring{$\ast$}{*}callback)(void))
-\begin{DoxyCompactList}\small\item\em Attach a callback function to an interrupt. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{interrupt_8c_ac066d5830d23093468acb3a714ead9c5}{hal\+\_\+interrupt\+\_\+detach\+\_\+callback}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
-\begin{DoxyCompactList}\small\item\em Detach a callback function from an interrupt. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{interrupt_8c_ae6e7c5068b926209dbd3e94d42ec3ea2}{hal\+\_\+handle\+\_\+interrupt}} (\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+void \mbox{\hyperlink{interrupt_8c_ae13d3a1cf10aecee622e6669d9621cca}{hal\+\_\+interrupt\+\_\+attach\+\_\+callback}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt, void(\texorpdfstring{$\ast$}{*}callback)(void))
+\begin{DoxyCompactList}\small\item\em Attach a callback function to a specific interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8c_ac066d5830d23093468acb3a714ead9c5}{hal\+\_\+interrupt\+\_\+detach\+\_\+callback}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Detach a callback function from a specific interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8c_ae6e7c5068b926209dbd3e94d42ec3ea2}{hal\+\_\+handle\+\_\+interrupt}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
 \begin{DoxyCompactList}\small\item\em Central interrupt handler function. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
@@ -43,7 +48,7 @@ void \mbox{\hyperlink{interrupt_8c_ae6e7c5068b926209dbd3e94d42ec3ea2}{hal\+\_\+h
 \index{hal\_disable\_interrupt@{hal\_disable\_interrupt}!interrupt.c@{interrupt.c}}
 \doxysubsubsection{\texorpdfstring{hal\_disable\_interrupt()}{hal\_disable\_interrupt()}}
 {\footnotesize\ttfamily \label{interrupt_8c_acee16c5665334d7c548ed969f3b2d874} 
-int8\+\_\+t hal\+\_\+disable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+int8\+\_\+t hal\+\_\+disable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
 
 
 
@@ -51,17 +56,17 @@ Disable a specific interrupt.
 
 
 \begin{DoxyParams}{Parameters}
-{\em interrupt} & IRQ number to disable. \\
+{\em interrupt} & IRQ number. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-0 on success, -\/1 on failure. 
+0 if successful, -\/1 if failed. 
 \end{DoxyReturn}
 \Hypertarget{interrupt_8c_af5a39d871f4e853eeb1c18aec31bb9c2}\index{interrupt.c@{interrupt.c}!hal\_enable\_interrupt@{hal\_enable\_interrupt}}
 \index{hal\_enable\_interrupt@{hal\_enable\_interrupt}!interrupt.c@{interrupt.c}}
 \doxysubsubsection{\texorpdfstring{hal\_enable\_interrupt()}{hal\_enable\_interrupt()}}
 {\footnotesize\ttfamily \label{interrupt_8c_af5a39d871f4e853eeb1c18aec31bb9c2} 
-int8\+\_\+t hal\+\_\+enable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+int8\+\_\+t hal\+\_\+enable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
 
 
 
@@ -69,17 +74,17 @@ Enable a specific interrupt.
 
 
 \begin{DoxyParams}{Parameters}
-{\em interrupt} & IRQ number to enable. \\
+{\em interrupt} & IRQ number. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-0 on success, -\/1 on failure. 
+0 if successful, -\/1 if failed. 
 \end{DoxyReturn}
 \Hypertarget{interrupt_8c_ae6e7c5068b926209dbd3e94d42ec3ea2}\index{interrupt.c@{interrupt.c}!hal\_handle\_interrupt@{hal\_handle\_interrupt}}
 \index{hal\_handle\_interrupt@{hal\_handle\_interrupt}!interrupt.c@{interrupt.c}}
 \doxysubsubsection{\texorpdfstring{hal\_handle\_interrupt()}{hal\_handle\_interrupt()}}
 {\footnotesize\ttfamily \label{interrupt_8c_ae6e7c5068b926209dbd3e94d42ec3ea2} 
-void hal\+\_\+handle\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+void hal\+\_\+handle\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
 
 
 
@@ -94,28 +99,28 @@ Central interrupt handler function.
 \index{hal\_interrupt\_attach\_callback@{hal\_interrupt\_attach\_callback}!interrupt.c@{interrupt.c}}
 \doxysubsubsection{\texorpdfstring{hal\_interrupt\_attach\_callback()}{hal\_interrupt\_attach\_callback()}}
 {\footnotesize\ttfamily \label{interrupt_8c_ae13d3a1cf10aecee622e6669d9621cca} 
-void hal\+\_\+interrupt\+\_\+attach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{callback~}{)(void)}\end{DoxyParamCaption})}
+void hal\+\_\+interrupt\+\_\+attach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{callback~}{)(void)}\end{DoxyParamCaption})}
 
 
 
-Attach a callback function to an interrupt. 
+Attach a callback function to a specific interrupt. 
 
 
 \begin{DoxyParams}{Parameters}
 {\em interrupt} & IRQ number. \\
 \hline
-{\em callback} & Pointer to the callback function. \\
+{\em callback} & Function pointer to be called when interrupt occurs. \\
 \hline
 \end{DoxyParams}
 \Hypertarget{interrupt_8c_ac066d5830d23093468acb3a714ead9c5}\index{interrupt.c@{interrupt.c}!hal\_interrupt\_detach\_callback@{hal\_interrupt\_detach\_callback}}
 \index{hal\_interrupt\_detach\_callback@{hal\_interrupt\_detach\_callback}!interrupt.c@{interrupt.c}}
 \doxysubsubsection{\texorpdfstring{hal\_interrupt\_detach\_callback()}{hal\_interrupt\_detach\_callback()}}
 {\footnotesize\ttfamily \label{interrupt_8c_ac066d5830d23093468acb3a714ead9c5} 
-void hal\+\_\+interrupt\+\_\+detach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+void hal\+\_\+interrupt\+\_\+detach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
 
 
 
-Detach a callback function from an interrupt. 
+Detach a callback function from a specific interrupt. 
 
 
 \begin{DoxyParams}{Parameters}

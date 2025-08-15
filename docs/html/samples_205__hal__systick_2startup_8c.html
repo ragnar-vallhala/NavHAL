@@ -112,6 +112,11 @@ $(function() {
 Include dependency graph for startup.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="samples_205__hal__systick_2startup_8c__incl.png" border="0" usemap="#asamples_205__hal__systick_2startup_8c" loading="lazy" alt=""/></div>
+<map name="asamples_205__hal__systick_2startup_8c" id="asamples_205__hal__systick_2startup_8c">
+<area shape="rect" title=" " alt="" coords="5,5,167,46"/>
+<area shape="rect" title=" " alt="" coords="54,94,118,120"/>
+<area shape="poly" title=" " alt="" coords="89,46,89,78,83,78,83,46"/>
+</map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
@@ -200,7 +205,81 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Main entry point. </p>
-<p>Initializes GPIOA pin 5 as output and toggles it in an infinite loop. Typically connected to an LED (e.g., onboard LED on Nucleo boards). </p>
+<p>Initializes GPIOA pin 5 as output and toggles it in an infinite loop. Typically connected to an LED (e.g., onboard LED on Nucleo boards).</p>
+<p>Main entry point.</p>
+<ul>
+<li>Initializes system clock using PLL.</li>
+<li>Configures SysTick timer.</li>
+<li>Initializes UART2 for console output.</li>
+<li>Configures multiple timers with interrupts and attaches callbacks.</li>
+<li>Enters infinite loop with optional debug prints. </li>
+</ul>
+<p>&lt; Initialize SysTick with 1 ms tick</p>
+<p>&lt; Initialize UART2 at 9600 baud</p>
+<p>&lt; Send string over UART2</p>
+<p>&lt; Wait for 1 second</p>
+<p>&lt; Buffer to hold timer count as string</p>
+<p>&lt; Initialize SysTick with 1 ms tick</p>
+<p>&lt; Initialize UART2 at 9600 baud</p>
+<p>&lt; Initialize TIM5 with auto-reload 1e9</p>
+<p>&lt; Convert timer value to string</p>
+<p>&lt; Print label</p>
+<p>&lt; Print TIM5 counter value</p>
+<p>&lt; Newline and carriage return</p>
+<p>&lt; Initialize system clock with PLL</p>
+<p>&lt; Initialize SysTick with 1 ms tick</p>
+<p>&lt; Initialize UART2 at 9600 baud</p>
+<p>Initialize TIM2, enable interrupt, attach callback</p>
+<p>Initialize TIM3, enable interrupt, attach callback</p>
+<p>Initialize TIM4, enable interrupt, attach callback</p>
+<p>Initialize TIM5, enable interrupt, attach callback</p>
+<p>Initialize TIM9, enable interrupt, attach callback</p>
+<p>Optional debug prints uart2_write("SysTicks: "); <a class="el" href="group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html#gaff2eef2dac8eee46420e54b78311428e">uart2_write(hal_get_tick())</a>; uart2_write(", Millis: "); <a class="el" href="group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html#gaff2eef2dac8eee46420e54b78311428e">uart2_write(timer_get_count(TIM5))</a>; uart2_write("\n\r");</p>
+<p>&lt; Optional 1-second delay</p>
+<p>&lt; Initialize SysTick with 40 µs tick</p>
+<p>&lt; Initialize UART2 at 9600 baud</p>
+<p>&lt; Configure PA05 as output</p>
+<p>&lt; Initialize TIM5 with prescaler 0 and auto-reload 1e9</p>
+<p>&lt; Set PA05 HIGH</p>
+<p>&lt; Delay 500 ms</p>
+<p>&lt; Set PA05 LOW</p>
+<p>&lt; Delay 500 ms</p>
+<p>&lt; Print label</p>
+<p>&lt; Print system millis</p>
+<p>&lt; Newline and carriage return</p>
+<p>&lt; Initialize SysTick with 40 µs tick</p>
+<p>&lt; Initialize UART2 at 9600 baud</p>
+<p>&lt; Set PB10 as alternate function</p>
+<p>&lt; AF1 for TIM2_CH3</p>
+<p>&lt; Initialize PWM handle on TIM2, channel 3</p>
+<p>&lt; Init PWM at 15 kHz, 10% duty cycle</p>
+<p>&lt; Start PWM output</p>
+<p>&lt; Variable for duty cycle update</p>
+<p>&lt; Update PWM duty cycle</p>
+<p>&lt; Increment duty cycle by 1%</p>
+<p>&lt; Reset to 0% after 100%</p>
+<p>&lt; Print current duty cycle over UART2</p>
+<p>&lt; Newline and carriage return</p>
+<p>&lt; Delay 10 ms</p>
+<p>&lt; Initialize system clock with PLL</p>
+<p>&lt; Initialize SysTick with 40 µs tick</p>
+<p>&lt; Initialize UART2 at 9600 baud</p>
+<p>&lt; Print SYSCLK label</p>
+<p>&lt; Print system clock</p>
+<p>&lt; Print APB1CLK label</p>
+<p>&lt; Print APB1 clock</p>
+<p>&lt; Print APB2CLK label</p>
+<p>&lt; Print APB2 clock</p>
+<p>&lt; Print AHBCLK label</p>
+<p>&lt; Print AHB clock</p>
+<p>&lt; Newline</p>
+<p>&lt; Wait 1 second</p>
+<p>&lt; Initialize SysTick for delays</p>
+<p>&lt; Initialize UART2 at 9600 baud</p>
+<p>&lt; Stop execution if I2C init fails</p>
+<p>&lt; Wait for conversion (~4.5 ms for temperature)</p>
+<p>&lt; Assumes uart2_write_int exists</p>
+<p>&lt; Wait 1 second before next measurement</p>
 
 </div>
 </div>

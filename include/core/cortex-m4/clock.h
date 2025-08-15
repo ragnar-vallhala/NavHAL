@@ -1,22 +1,17 @@
 /**
- * @file clock.h
- * @brief Clock HAL implementation for Cortex-M4 (STM32F401RE).
+ * @file core/cortex-m4/clock.h
+ * @brief Cortex-M4 specific clock control HAL interface.
  *
- * This header provides register definitions, configuration structures,
- * and function declarations to initialize and retrieve system and bus clocks
- * on Cortex-M4 microcontrollers, specifically STM32F401RE in this
- * implementation.
+ * @details
+ * This header defines the structures and functions to configure and query
+ * the system and peripheral clocks for Cortex-M4 microcontrollers.
+ * It includes PLL configuration, system clock initialization, and AHB/APB
+ * clock retrieval functions.
  *
- * It supports configuring the system clock source including HSI, HSE, and PLL,
- * PLL parameter setup, and clock prescaler controls for AHB and APB buses.
+ * The HAL provides a platform-independent abstraction while leveraging
+ * the Cortex-M4 specific hardware.
  *
- * @ingroup HAL_CLOCK
- *
- * @note This file is architecture-specific and included through the common
- * `hal_clock.h` dispatcher based on target definitions (e.g., `CORTEX_M4`).
- *
- * @author Ashutosh Vishwakarma
- * @date 2025-07-21
+ * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #ifndef CORTEX_M4_CLOCK_H
@@ -25,70 +20,55 @@
 #include "utils/clock_types.h"
 
 /**
- * @brief PLL configuration parameters.
+ * @brief PLL (Phase Locked Loop) configuration structure.
  *
- * Used to configure the PLL source and multiplication/division factors.
+ * @details
+ * This structure defines the parameters for configuring the PLL to generate
+ * the system clock from the selected input source.
  */
 typedef struct {
-  hal_clock_source_t input_src; ///< PLL input clock source (HSI or HSE)
-  uint8_t pll_m;  ///< PLL division factor for input clock (2 to 63)
-  uint16_t pll_n; ///< PLL multiplication factor for VCO (50 to 432)
-  uint8_t pll_p;  ///< PLL division factor for main system clock (2,4,6,8)
-  uint8_t pll_q;  ///< PLL division factor for USB clock (2 to 15)
+    hal_clock_source_t input_src; /**< Clock input source for PLL. */
+    uint8_t pll_m;                /**< Division factor for PLL input. */
+    uint16_t pll_n;               /**< Multiplication factor for PLL VCO. */
+    uint8_t pll_p;                /**< Division factor for main system clock. */
+    uint8_t pll_q;                /**< Division factor for peripheral clocks. */
 } hal_pll_config_t;
 
-/** @defgroup RCC_BASE RCC Peripheral Base and Register Offsets
- * @{
- */
-
-
-/** @} */
-
 /**
- * @brief Initialize system clock with given configuration.
+ * @brief Initialize the system clock.
  *
- * Configures the system clock source (HSI, HSE, PLL), PLL parameters,
- * flash latency, and bus prescalers (AHB, APB1, APB2).
+ * @param cfg Pointer to the main clock configuration structure.
+ * @param pll_cfg Pointer to the PLL configuration structure.
  *
- * @param cfg Pointer to clock configuration structure (source selection).
- * @param pll_cfg Pointer to PLL configuration structure if PLL is used.
+ * @note This function must be called before using other peripheral clocks.
  */
 void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg);
 
 /**
- * @brief Get the current system clock frequency (SYSCLK) in Hz.
+ * @brief Get the system clock frequency (SYSCLK).
  *
- * Reads RCC registers and calculates SYSCLK frequency based on
- * current clock source and PLL settings.
- *
- * @return System clock frequency in Hertz.
+ * @return System clock frequency in Hz.
  */
 uint32_t hal_clock_get_sysclk(void);
 
 /**
- * @brief Get the current AHB bus clock frequency in Hz.
+ * @brief Get the AHB bus clock frequency.
  *
- * Calculated from SYSCLK frequency divided by AHB prescaler.
- *
- * @return AHB bus clock frequency in Hertz.
+ * @return AHB clock frequency in Hz.
  */
 uint32_t hal_clock_get_ahbclk(void);
 
 /**
- * @brief Get the current APB1 bus clock frequency in Hz.
+ * @brief Get the APB1 bus clock frequency.
  *
- * Calculated from SYSCLK frequency divided by APB1 prescaler.
- *
- * @return APB1 bus clock frequency in Hertz.
+ * @return APB1 clock frequency in Hz.
  */
 uint32_t hal_clock_get_apb1clk(void);
 
 /**
- * @brief Get the current APB2 bus clock frequency in Hz.
+ * @brief Get the APB2 bus clock frequency.
  *
- * Calculated from SYSCLK frequency divided by APB2 prescaler.
- *
- * @return APB2 bus clock frequency in Hertz.
+ * @return APB2 clock frequency in Hz.
  */
 uint32_t hal_clock_get_apb2clk(void);
 

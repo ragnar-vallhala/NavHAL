@@ -1,76 +1,74 @@
+/**
+ * @file core/cortex-m4/gpio_reg.h
+ * @brief Cortex-M4 GPIO register definitions and access macros.
+ *
+ * @details
+ * This header defines the GPIO register structure and macros to access
+ * GPIO ports and pins on Cortex-M4 microcontrollers.
+ *
+ * Structures:
+ * - `GPIOx_Typedef` : Represents the memory-mapped GPIO registers for a port.
+ *
+ * Macros:
+ * - `GPIOA_BASE_ADDR` to `GPIOH_BASE_ADDR` : Base addresses of GPIO ports.
+ * - `GPIO_GET_PORT_NUMBER(n)` : Compute the port number from a pin number.
+ * - `GPIO_GET_PORT(n)` : Get a pointer to the GPIO port structure.
+ * - `GPIO_GET_PIN(n)` : Get the pin number within a port.
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
+ */
+
 #ifndef CORTEX_M4_GPIO_REG_H
 #define CORTEX_M4_GPIO_REG_H
-
-/**
- * @file gpio_reg.h
- * @brief Register map and base addresses for GPIO ports on STM32F4 series.
- * @details
- * This header defines the memory-mapped structure for GPIO port registers,
- * as well as macros for accessing GPIO ports and pins on STM32F4 microcontrollers.
- *
- * The GPIO ports are located at fixed base addresses in the AHB1 peripheral space.
- * Each port consists of control registers for mode, type, speed, pull-up/pull-down,
- * input/output data, bit set/reset, lock, and alternate functions.
- */
 
 #include "utils/types.h"
 #include <stdint.h>
 
 /**
- * @brief GPIO port register map structure.
- * @note Access via `GPIOx` pointers or macros such as `GPIO_GET_PORT(n)`.
+ * @brief GPIO port register structure.
+ *
+ * @details
+ * Represents all the standard registers for a GPIO port:
+ * - MODER   : Mode register
+ * - OTYPER  : Output type register
+ * - OSPEEDR : Output speed register
+ * - PUPDR   : Pull-up/Pull-down register
+ * - IDR     : Input data register
+ * - ODR     : Output data register
+ * - BSRR    : Bit set/reset register
+ * - LCKR    : Configuration lock register
+ * - AFRL    : Alternate function low register
+ * - AFRH    : Alternate function high register
  */
 typedef struct {
-  __IO uint32_t MODER;   /**< 0x00: GPIO port mode register. */
-  __IO uint32_t OTYPER;  /**< 0x04: GPIO port output type register. */
-  __IO uint32_t OSPEEDR; /**< 0x08: GPIO port output speed register. */
-  __IO uint32_t PUPDR;   /**< 0x0C: GPIO port pull-up/pull-down register. */
-  __IO uint32_t IDR;     /**< 0x10: GPIO port input data register. */
-  __IO uint32_t ODR;     /**< 0x14: GPIO port output data register. */
-  __IO uint32_t BSRR;    /**< 0x18: GPIO port bit set/reset register. */
-  __IO uint32_t LCKR;    /**< 0x1C: GPIO port configuration lock register. */
-  __IO uint32_t AFRL;    /**< 0x20: GPIO alternate function low register. */
-  __IO uint32_t AFRH;    /**< 0x24: GPIO alternate function high register. */
+    __IO uint32_t MODER;   /**< GPIO port mode register */
+    __IO uint32_t OTYPER;  /**< GPIO output type register */
+    __IO uint32_t OSPEEDR; /**< GPIO output speed register */
+    __IO uint32_t PUPDR;   /**< GPIO pull-up/pull-down register */
+    __IO uint32_t IDR;     /**< GPIO input data register */
+    __IO uint32_t ODR;     /**< GPIO output data register */
+    __IO uint32_t BSRR;    /**< GPIO bit set/reset register */
+    __IO uint32_t LCKR;    /**< GPIO configuration lock register */
+    __IO uint32_t AFRL;    /**< GPIO alternate function low register */
+    __IO uint32_t AFRH;    /**< GPIO alternate function high register */
 } GPIOx_Typedef;
 
-/** @brief Base address of GPIOA port registers. */
-#define GPIOA_BASE_ADDR 0x40020000
-/** @brief Base address of GPIOB port registers. */
-#define GPIOB_BASE_ADDR 0x40020400
-/** @brief Base address of GPIOC port registers. */
-#define GPIOC_BASE_ADDR 0x40020800
-/** @brief Base address of GPIOD port registers. */
-#define GPIOD_BASE_ADDR 0x40020C00
-/** @brief Base address of GPIOE port registers. */
-#define GPIOE_BASE_ADDR 0x40021000
-/** @brief Base address of GPIOH port registers. */
-#define GPIOH_BASE_ADDR 0x40021C00
+/** Base addresses for GPIO ports */
+#define GPIOA_BASE_ADDR 0x40020000 /**< GPIOA base address */
+#define GPIOB_BASE_ADDR 0x40020400 /**< GPIOB base address */
+#define GPIOC_BASE_ADDR 0x40020800 /**< GPIOC base address */
+#define GPIOD_BASE_ADDR 0x40020C00 /**< GPIOD base address */
+#define GPIOE_BASE_ADDR 0x40021000 /**< GPIOE base address */
+#define GPIOH_BASE_ADDR 0x40021C00 /**< GPIOH base address */
 
-/**
- * @brief Get GPIO port number from pin index.
- * @param n Pin index (0..127).
- * @return Port number (0 for GPIOA, 1 for GPIOB, etc.).
- * @note Special case: port 5 maps to port H (index 7).
- */
+/** Get port number from absolute pin number */
 #define GPIO_GET_PORT_NUMBER(n) (n / 16 == 5 ? 7 : n / 16)
 
-/**
- * @brief Get GPIO port structure pointer from pin index.
- * @param n Pin index (0..127).
- * @return Pointer to the corresponding `GPIOx_Typedef`.
- * @code
- * // Example: set pin 5 (PA5) high
- * GPIO_GET_PORT(5)->BSRR = (1 << GPIO_GET_PIN(5));
- * @endcode
- */
+/** Get pointer to GPIO port structure from absolute pin number */
 #define GPIO_GET_PORT(n) \
   ((GPIOx_Typedef *)(GPIOA_BASE_ADDR + ((GPIO_GET_PORT_NUMBER(n)) * 0x400)))
 
-/**
- * @brief Get pin number within its port.
- * @param n Pin index (0..127).
- * @return Pin number (0..15).
- */
+/** Get pin number within the port from absolute pin number */
 #define GPIO_GET_PIN(n) (n % 16)
 
 #endif // !CORTEX_M4_GPIO_REG_H

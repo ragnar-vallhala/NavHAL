@@ -24,6 +24,16 @@ var gpio__types_8h =
       [ "GPIO_AF", "gpio__types_8h.html#afff59088389c415758284fcfdef93fdaa4f337be62bffa181ae4561d17dfba4bc", null ],
       [ "GPIO_ANALOG", "gpio__types_8h.html#afff59088389c415758284fcfdef93fdaae8bd62cf000e751ffdce5a9de1c0dcc0", null ]
     ] ],
+    [ "hal_gpio_output_speed", "gpio__types_8h.html#a02f2d9f3bc1519f03c439c8d90dea49d", [
+      [ "GPIO_LOW_SPEED", "gpio__types_8h.html#a02f2d9f3bc1519f03c439c8d90dea49dadad1d99afc424c9903c2116308da5778", null ],
+      [ "GPIO_MEDIUM_SPEED", "gpio__types_8h.html#a02f2d9f3bc1519f03c439c8d90dea49da83efc1b373fff74ccc8ff155acb523bb", null ],
+      [ "GPIO_HIGH_SPEED", "gpio__types_8h.html#a02f2d9f3bc1519f03c439c8d90dea49dadb3d95caeba959c63a9709ca19a9cd04", null ],
+      [ "GPIO_VERY_HIGH_SPEED", "gpio__types_8h.html#a02f2d9f3bc1519f03c439c8d90dea49daf7087f6e3a0ec17c4e20a95a42e694f1", null ]
+    ] ],
+    [ "hal_gpio_output_type", "gpio__types_8h.html#af1245830de642fd67cc728bc217b9efe", [
+      [ "GPIO_PUSH_PULL", "gpio__types_8h.html#af1245830de642fd67cc728bc217b9efea2ede6e0f1b50e67e840a93701323c775", null ],
+      [ "GPIO_OPEN_DRAIN", "gpio__types_8h.html#af1245830de642fd67cc728bc217b9efea5b0c623028002305892a4558ef0a6222", null ]
+    ] ],
     [ "hal_gpio_pin", "gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6", [
       [ "GPIO_PA00", "gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6ac3208d956412c62807610e0c4c2debb9", null ],
       [ "GPIO_PA01", "gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6a09ed0583db7a55ff392d54183522c058", null ],

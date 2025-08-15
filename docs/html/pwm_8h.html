@@ -108,7 +108,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Handle structure for PWM (Pulse Width Modulation) configuration.  
+<p>HAL interface for PWM (Pulse Width Modulation) configuration and control.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="timer__types_8h_source.html">utils/timer_types.h</a>&quot;</code><br />
 <code>#include &lt;stdint.h&gt;</code><br />
@@ -116,11 +116,23 @@ $(function() {
 Include dependency graph for pwm.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="pwm_8h__incl.png" border="0" usemap="#ainclude_2core_2cortex-m4_2pwm_8h" loading="lazy" alt=""/></div>
+<map name="ainclude_2core_2cortex-m4_2pwm_8h" id="ainclude_2core_2cortex-m4_2pwm_8h">
+<area shape="rect" title="HAL interface for PWM (Pulse Width Modulation) configuration and control." alt="" coords="64,5,195,46"/>
+<area shape="rect" href="timer__types_8h.html" title=" " alt="" coords="5,94,134,120"/>
+<area shape="poly" title=" " alt="" coords="117,48,90,83,86,80,113,45"/>
+<area shape="rect" title=" " alt="" coords="157,94,222,120"/>
+<area shape="poly" title=" " alt="" coords="146,45,173,80,169,83,142,48"/>
+</map>
 </div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="pwm_8h__dep__incl.png" border="0" usemap="#ainclude_2core_2cortex-m4_2pwm_8hdep" loading="lazy" alt=""/></div>
+<map name="ainclude_2core_2cortex-m4_2pwm_8hdep" id="ainclude_2core_2cortex-m4_2pwm_8hdep">
+<area shape="rect" title="HAL interface for PWM (Pulse Width Modulation) configuration and control." alt="" coords="5,5,137,46"/>
+<area shape="rect" href="pwm_8c.html" title="PWM driver implementation for STM32F4 series (Cortex&#45;M4)." alt="" coords="6,94,136,135"/>
+<area shape="poly" title=" " alt="" coords="74,62,74,94,68,94,68,62"/>
+</map>
 </div>
 </div>
 <p><a href="pwm_8h_source.html">Go to the source code of this file.</a></p>
@@ -128,6 +140,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:PWM_5FHandle" id="r_PWM_5FHandle"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_p_w_m___handle.html">PWM_Handle</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">PWM handle structure linking timer and channel.  <a href="struct_p_w_m___handle.html#details">More...</a><br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -143,7 +156,12 @@ Functions</h2></td></tr>
 <tr class="memdesc:a6c16bb2afdf33e25b1419b8b670cd14e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the PWM frequency.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Handle structure for PWM (Pulse Width Modulation) configuration. </p>
+<div class="textblock"><p>HAL interface for PWM (Pulse Width Modulation) configuration and control. </p>
+<p>This header provides:</p><ul>
+<li>PWM handle structure linking hardware timers and channels.</li>
+<li>Functions to initialize, start, stop, and configure PWM signals.</li>
+</ul>
+<dl class="section copyright"><dt>Copyright</dt><dd>© NAVROBOTEC PVT. LTD. </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="aa24e135ac2eb5dcb30f5547c6aa2057b" name="aa24e135ac2eb5dcb30f5547c6aa2057b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa24e135ac2eb5dcb30f5547c6aa2057b">&#9670;&#160;</a></span>hal_pwm_init()</h2>

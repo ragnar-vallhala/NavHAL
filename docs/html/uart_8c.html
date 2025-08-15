@@ -111,855 +111,113 @@ $(function() {
 <p>UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="uart_8h_source.html">core/cortex-m4/uart.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="gpio_8h_source.html">core/cortex-m4/gpio.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="clock_8h_source.html">core/cortex-m4/clock.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="gpio_8h_source.html">core/cortex-m4/gpio.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for uart.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="uart_8c__incl.png" border="0" usemap="#asrc_2core_2cortex-m4_2uart_2uart_8c" loading="lazy" alt=""/></div>
 <map name="asrc_2core_2cortex-m4_2uart_2uart_8c" id="asrc_2core_2cortex-m4_2uart_2uart_8c">
-<area shape="rect" title="UART HAL implementation for Cortex&#45;M4 (STM32F401RE)" alt="" coords="203,5,347,45"/>
-<area shape="rect" href="uart_8h.html" title="UART HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="5,93,168,119"/>
-<area shape="poly" title=" " alt="" coords="231,48,128,90,126,85,229,43"/>
-<area shape="rect" href="gpio_8h.html" title="GPIO HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="192,93,357,119"/>
-<area shape="poly" title=" " alt="" coords="277,46,277,79,272,79,272,46"/>
-<area shape="rect" href="clock_8h.html" title="Clock HAL implementation for Cortex&#45;M4 (STM32F401RE)." alt="" coords="381,93,552,119"/>
-<area shape="poly" title=" " alt="" coords="322,43,427,86,425,91,320,48"/>
-<area shape="rect" href="types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="223,167,326,192"/>
-<area shape="poly" title=" " alt="" coords="118,116,232,159,230,164,116,121"/>
-<area shape="rect" title=" " alt="" coords="270,313,341,339"/>
-<area shape="poly" title=" " alt="" coords="235,195,203,207,174,223,164,232,159,242,158,253,162,264,181,284,205,299,231,309,257,316,256,321,229,315,203,304,178,288,158,267,152,253,153,241,160,229,171,219,200,202,233,190"/>
-<area shape="rect" title=" " alt="" coords="172,240,255,265"/>
-<area shape="poly" title=" " alt="" coords="267,194,234,231,230,228,263,191"/>
-<area shape="rect" href="gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="279,240,393,265"/>
-<area shape="poly" title=" " alt="" coords="287,191,319,228,315,231,283,194"/>
-<area shape="rect" href="clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="417,240,535,265"/>
-<area shape="poly" title=" " alt="" coords="308,190,431,233,430,238,306,195"/>
-<area shape="poly" title=" " alt="" coords="450,268,347,310,345,306,448,263"/>
-<area shape="poly" title=" " alt="" coords="277,119,277,153,272,153,272,119"/>
-<area shape="poly" title=" " alt="" coords="437,121,320,164,318,159,435,116"/>
+<area shape="rect" title="UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6." alt="" coords="173,5,303,46"/>
+<area shape="rect" href="uart_8h.html" title="UART driver interface for STM32F4 (Cortex&#45;M4)." alt="" coords="177,249,323,274"/>
+<area shape="poly" title=" " alt="" coords="242,46,251,233,246,233,236,47"/>
+<area shape="rect" href="clock_8h.html" title="Cortex&#45;M4 specific clock control HAL interface." alt="" coords="34,94,188,120"/>
+<area shape="poly" title=" " alt="" coords="208,49,145,88,142,83,205,44"/>
+<area shape="rect" href="gpio_8h.html" title="Cortex&#45;M4 specific GPIO HAL interface." alt="" coords="275,94,422,120"/>
+<area shape="poly" title=" " alt="" coords="267,44,321,82,318,87,264,49"/>
+<area shape="rect" href="hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="161,330,304,356"/>
+<area shape="poly" title=" " alt="" coords="250,275,241,315,236,314,245,274"/>
+<area shape="rect" title=" " alt="" coords="56,330,121,356"/>
+<area shape="poly" title=" " alt="" coords="226,277,128,325,126,321,224,273"/>
+<area shape="rect" href="clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="23,168,154,193"/>
+<area shape="poly" title=" " alt="" coords="110,121,100,153,95,152,105,119"/>
+<area shape="poly" title=" " alt="" coords="64,196,36,215,23,228,14,242,8,262,14,281,30,303,52,320,48,324,26,306,9,283,3,262,9,240,19,225,32,211,61,192"/>
+<area shape="rect" href="rcc__reg_8h.html" title=" " alt="" coords="23,241,154,282"/>
+<area shape="poly" title=" " alt="" coords="91,194,91,226,86,226,86,194"/>
+<area shape="poly" title=" " alt="" coords="126,280,198,320,196,324,123,285"/>
+<area shape="poly" title=" " alt="" coords="91,282,91,314,86,314,86,282"/>
+<area shape="rect" href="gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="287,168,410,193"/>
+<area shape="poly" title=" " alt="" coords="351,120,351,152,346,152,346,120"/>
 </map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad320bd1e821aac6c1b38c8bcb8003104" id="r_ad320bd1e821aac6c1b38c8bcb8003104"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad320bd1e821aac6c1b38c8bcb8003104">uart_init</a> (uint32_t baudrate, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:ad320bd1e821aac6c1b38c8bcb8003104"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize UART peripheral with specified baudrate.  <br /></td></tr>
-<tr class="memitem:a6f144300396d4d9afe21f41a72a99ab8" id="r_a6f144300396d4d9afe21f41a72a99ab8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f144300396d4d9afe21f41a72a99ab8">uart_write_char</a> (char c, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:a6f144300396d4d9afe21f41a72a99ab8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a single character to UART.  <br /></td></tr>
-<tr class="memitem:a183ba35371040029a29a3cde221539fa" id="r_a183ba35371040029a29a3cde221539fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a183ba35371040029a29a3cde221539fa">uart_write_int</a> (int32_t num, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:a183ba35371040029a29a3cde221539fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an integer as ASCII characters to UART.  <br /></td></tr>
-<tr class="memitem:a662be19e5a7667eeae26bd36e869fd2d" id="r_a662be19e5a7667eeae26bd36e869fd2d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a662be19e5a7667eeae26bd36e869fd2d">uart_write_float</a> (float num, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:a662be19e5a7667eeae26bd36e869fd2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a floating-point number to UART as ASCII.  <br /></td></tr>
-<tr class="memitem:ab0bd03dc5a6de94637fb1536e883c546" id="r_ab0bd03dc5a6de94637fb1536e883c546"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0bd03dc5a6de94637fb1536e883c546">uart_write_string</a> (const char *s, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:ab0bd03dc5a6de94637fb1536e883c546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a null-terminated string to UART.  <br /></td></tr>
-<tr class="memitem:a3cc37d73aa435b454452d7a60a635e39" id="r_a3cc37d73aa435b454452d7a60a635e39"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3cc37d73aa435b454452d7a60a635e39">uart1_init</a> (uint32_t baudrate)</td></tr>
-<tr class="memdesc:a3cc37d73aa435b454452d7a60a635e39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize UART1 peripheral.  <br /></td></tr>
-<tr class="memitem:a7cd48d1d49f0dee1adff1be915793bb6" id="r_a7cd48d1d49f0dee1adff1be915793bb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7cd48d1d49f0dee1adff1be915793bb6">uart6_init</a> (uint32_t baudrate)</td></tr>
-<tr class="memdesc:a7cd48d1d49f0dee1adff1be915793bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize UART6 peripheral.  <br /></td></tr>
-<tr class="memitem:af897c816fdda40f69b1f8377878db96a" id="r_af897c816fdda40f69b1f8377878db96a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af897c816fdda40f69b1f8377878db96a">uart2_init</a> (uint32_t baudrate)</td></tr>
-<tr class="memdesc:af897c816fdda40f69b1f8377878db96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize UART2 peripheral.  <br /></td></tr>
-<tr class="memitem:ace45b7a16f634d2de9a483acab46a7c8" id="r_ace45b7a16f634d2de9a483acab46a7c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ace45b7a16f634d2de9a483acab46a7c8">uart2_write_char</a> (char c)</td></tr>
-<tr class="memdesc:ace45b7a16f634d2de9a483acab46a7c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a character to UART2.  <br /></td></tr>
-<tr class="memitem:aa8786e97a38fd49fd129cc704cb6fadd" id="r_aa8786e97a38fd49fd129cc704cb6fadd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa8786e97a38fd49fd129cc704cb6fadd">uart1_write_char</a> (char c)</td></tr>
-<tr class="memdesc:aa8786e97a38fd49fd129cc704cb6fadd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a character to UART1.  <br /></td></tr>
-<tr class="memitem:ac0de3d3f47debf2a24b349fa74b7a030" id="r_ac0de3d3f47debf2a24b349fa74b7a030"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac0de3d3f47debf2a24b349fa74b7a030">uart6_write_char</a> (char c)</td></tr>
-<tr class="memdesc:ac0de3d3f47debf2a24b349fa74b7a030"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a character to UART6.  <br /></td></tr>
-<tr class="memitem:ac9e624e43c7053a70ed42b1c780ad792" id="r_ac9e624e43c7053a70ed42b1c780ad792"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a> (int32_t num)</td></tr>
-<tr class="memdesc:ac9e624e43c7053a70ed42b1c780ad792"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an integer to UART2 as ASCII.  <br /></td></tr>
-<tr class="memitem:a81b1a7af3a848606f23985f8d9a87708" id="r_a81b1a7af3a848606f23985f8d9a87708"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a> (int32_t num)</td></tr>
-<tr class="memdesc:a81b1a7af3a848606f23985f8d9a87708"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an integer to UART1 as ASCII.  <br /></td></tr>
-<tr class="memitem:a01667e67896e48e6cf21a05385566819" id="r_a01667e67896e48e6cf21a05385566819"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a01667e67896e48e6cf21a05385566819">uart6_write_int</a> (int32_t num)</td></tr>
-<tr class="memdesc:a01667e67896e48e6cf21a05385566819"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write an integer to UART6 as ASCII.  <br /></td></tr>
-<tr class="memitem:a3784763020352ac6913e355c4ac7a337" id="r_a3784763020352ac6913e355c4ac7a337"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3784763020352ac6913e355c4ac7a337">uart2_write_float</a> (float num)</td></tr>
-<tr class="memdesc:a3784763020352ac6913e355c4ac7a337"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a floating-point number to UART2.  <br /></td></tr>
-<tr class="memitem:a8595ce32dbc8da8200d337fca8d7930e" id="r_a8595ce32dbc8da8200d337fca8d7930e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8595ce32dbc8da8200d337fca8d7930e">uart1_write_float</a> (float num)</td></tr>
-<tr class="memdesc:a8595ce32dbc8da8200d337fca8d7930e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a floating-point number to UART1.  <br /></td></tr>
-<tr class="memitem:a3a2f8786049010a947207fc47c7ad409" id="r_a3a2f8786049010a947207fc47c7ad409"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a2f8786049010a947207fc47c7ad409">uart6_write_float</a> (float num)</td></tr>
-<tr class="memdesc:a3a2f8786049010a947207fc47c7ad409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a floating-point number to UART6.  <br /></td></tr>
-<tr class="memitem:a55c46e6a48433287fdf5a9d1defd5f5c" id="r_a55c46e6a48433287fdf5a9d1defd5f5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55c46e6a48433287fdf5a9d1defd5f5c">uart2_write_string</a> (const char *s)</td></tr>
-<tr class="memdesc:a55c46e6a48433287fdf5a9d1defd5f5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a null-terminated string to UART2.  <br /></td></tr>
-<tr class="memitem:ac86a702823358a08deca96365ed41cae" id="r_ac86a702823358a08deca96365ed41cae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac86a702823358a08deca96365ed41cae">uart1_write_string</a> (const char *s)</td></tr>
-<tr class="memdesc:ac86a702823358a08deca96365ed41cae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a null-terminated string to UART1.  <br /></td></tr>
-<tr class="memitem:acd0a2ffc721c3e9af1501307d74f5173" id="r_acd0a2ffc721c3e9af1501307d74f5173"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd0a2ffc721c3e9af1501307d74f5173">uart6_write_string</a> (const char *s)</td></tr>
-<tr class="memdesc:acd0a2ffc721c3e9af1501307d74f5173"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a null-terminated string to UART6.  <br /></td></tr>
-<tr class="memitem:a86ffdb11e32f205ce3b1e9b0fb259c8e" id="r_a86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86ffdb11e32f205ce3b1e9b0fb259c8e">uart_read_char</a> (<a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:a86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from UART peripheral.  <br /></td></tr>
-<tr class="memitem:a223b61a491de01b4b3ee16a1d15113d1" id="r_a223b61a491de01b4b3ee16a1d15113d1"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a223b61a491de01b4b3ee16a1d15113d1">uart1_read_char</a> (void)</td></tr>
-<tr class="memdesc:a223b61a491de01b4b3ee16a1d15113d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from UART1.  <br /></td></tr>
-<tr class="memitem:a894a9fccabee5ec32e916ba78998fad5" id="r_a894a9fccabee5ec32e916ba78998fad5"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a894a9fccabee5ec32e916ba78998fad5">uart2_read_char</a> (void)</td></tr>
-<tr class="memdesc:a894a9fccabee5ec32e916ba78998fad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from UART2.  <br /></td></tr>
-<tr class="memitem:aa40d7d81e58a648bf5c64a4735bfb7f3" id="r_aa40d7d81e58a648bf5c64a4735bfb7f3"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa40d7d81e58a648bf5c64a4735bfb7f3">uart6_read_char</a> (void)</td></tr>
-<tr class="memdesc:aa40d7d81e58a648bf5c64a4735bfb7f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from UART6.  <br /></td></tr>
-<tr class="memitem:aa3a9166c481a902a7b2c291eb3127a78" id="r_aa3a9166c481a902a7b2c291eb3127a78"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3a9166c481a902a7b2c291eb3127a78">uart_available</a> (<a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
-<tr class="memdesc:aa3a9166c481a902a7b2c291eb3127a78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if UART peripheral has data available to read.  <br /></td></tr>
-<tr class="memitem:a242042066c0dcfee02c34f51ae65cc8a" id="r_a242042066c0dcfee02c34f51ae65cc8a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a242042066c0dcfee02c34f51ae65cc8a">uart1_available</a> (void)</td></tr>
-<tr class="memdesc:a242042066c0dcfee02c34f51ae65cc8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if UART1 has data available.  <br /></td></tr>
-<tr class="memitem:ae67708662af5b29151196c9ba24cf20d" id="r_ae67708662af5b29151196c9ba24cf20d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae67708662af5b29151196c9ba24cf20d">uart2_available</a> (void)</td></tr>
-<tr class="memdesc:ae67708662af5b29151196c9ba24cf20d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if UART2 has data available.  <br /></td></tr>
-<tr class="memitem:af49cf7ca045c2feb52c025951e6e50e4" id="r_af49cf7ca045c2feb52c025951e6e50e4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af49cf7ca045c2feb52c025951e6e50e4">uart6_available</a> (void)</td></tr>
-<tr class="memdesc:af49cf7ca045c2feb52c025951e6e50e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if UART6 has data available.  <br /></td></tr>
-<tr class="memitem:a5c510005052783f5cec97c0ac7731071" id="r_a5c510005052783f5cec97c0ac7731071"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5c510005052783f5cec97c0ac7731071">uart2_read_until</a> (char *buffer, uint32_t maxlen, char delimiter)</td></tr>
-<tr class="memdesc:a5c510005052783f5cec97c0ac7731071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read characters from UART2 into a buffer until delimiter or max length.  <br /></td></tr>
+<tr class="memitem:gad320bd1e821aac6c1b38c8bcb8003104" id="r_gad320bd1e821aac6c1b38c8bcb8003104"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gad320bd1e821aac6c1b38c8bcb8003104">uart_init</a> (uint32_t baudrate, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:gad320bd1e821aac6c1b38c8bcb8003104"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the specified UART peripheral.  <br /></td></tr>
+<tr class="memitem:ga6f144300396d4d9afe21f41a72a99ab8" id="r_ga6f144300396d4d9afe21f41a72a99ab8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga6f144300396d4d9afe21f41a72a99ab8">uart_write_char</a> (char <a class="el" href="test__unity__parameterized_8c.html#a2fc627b56c26c54e1e919c187689f0de">c</a>, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:ga6f144300396d4d9afe21f41a72a99ab8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via the specified UART.  <br /></td></tr>
+<tr class="memitem:ga183ba35371040029a29a3cde221539fa" id="r_ga183ba35371040029a29a3cde221539fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga183ba35371040029a29a3cde221539fa">uart_write_int</a> (int32_t num, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:ga183ba35371040029a29a3cde221539fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via UART.  <br /></td></tr>
+<tr class="memitem:ga662be19e5a7667eeae26bd36e869fd2d" id="r_ga662be19e5a7667eeae26bd36e869fd2d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga662be19e5a7667eeae26bd36e869fd2d">uart_write_float</a> (float num, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:ga662be19e5a7667eeae26bd36e869fd2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via UART.  <br /></td></tr>
+<tr class="memitem:gab0bd03dc5a6de94637fb1536e883c546" id="r_gab0bd03dc5a6de94637fb1536e883c546"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gab0bd03dc5a6de94637fb1536e883c546">uart_write_string</a> (const char *s, <a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:gab0bd03dc5a6de94637fb1536e883c546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via UART.  <br /></td></tr>
+<tr class="memitem:ga3cc37d73aa435b454452d7a60a635e39" id="r_ga3cc37d73aa435b454452d7a60a635e39"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga3cc37d73aa435b454452d7a60a635e39">uart1_init</a> (uint32_t baudrate)</td></tr>
+<tr class="memdesc:ga3cc37d73aa435b454452d7a60a635e39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize USART1 peripheral.  <br /></td></tr>
+<tr class="memitem:ga7cd48d1d49f0dee1adff1be915793bb6" id="r_ga7cd48d1d49f0dee1adff1be915793bb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga7cd48d1d49f0dee1adff1be915793bb6">uart6_init</a> (uint32_t baudrate)</td></tr>
+<tr class="memdesc:ga7cd48d1d49f0dee1adff1be915793bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize USART6 peripheral.  <br /></td></tr>
+<tr class="memitem:gaf897c816fdda40f69b1f8377878db96a" id="r_gaf897c816fdda40f69b1f8377878db96a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaf897c816fdda40f69b1f8377878db96a">uart2_init</a> (uint32_t baudrate)</td></tr>
+<tr class="memdesc:gaf897c816fdda40f69b1f8377878db96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize USART2 peripheral.  <br /></td></tr>
+<tr class="memitem:gace45b7a16f634d2de9a483acab46a7c8" id="r_gace45b7a16f634d2de9a483acab46a7c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gace45b7a16f634d2de9a483acab46a7c8">uart2_write_char</a> (char <a class="el" href="test__unity__parameterized_8c.html#a2fc627b56c26c54e1e919c187689f0de">c</a>)</td></tr>
+<tr class="memdesc:gace45b7a16f634d2de9a483acab46a7c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via USART2.  <br /></td></tr>
+<tr class="memitem:gaa8786e97a38fd49fd129cc704cb6fadd" id="r_gaa8786e97a38fd49fd129cc704cb6fadd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaa8786e97a38fd49fd129cc704cb6fadd">uart1_write_char</a> (char <a class="el" href="test__unity__parameterized_8c.html#a2fc627b56c26c54e1e919c187689f0de">c</a>)</td></tr>
+<tr class="memdesc:gaa8786e97a38fd49fd129cc704cb6fadd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via USART1.  <br /></td></tr>
+<tr class="memitem:gac0de3d3f47debf2a24b349fa74b7a030" id="r_gac0de3d3f47debf2a24b349fa74b7a030"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gac0de3d3f47debf2a24b349fa74b7a030">uart6_write_char</a> (char <a class="el" href="test__unity__parameterized_8c.html#a2fc627b56c26c54e1e919c187689f0de">c</a>)</td></tr>
+<tr class="memdesc:gac0de3d3f47debf2a24b349fa74b7a030"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via USART6.  <br /></td></tr>
+<tr class="memitem:gac9e624e43c7053a70ed42b1c780ad792" id="r_gac9e624e43c7053a70ed42b1c780ad792"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a> (int32_t num)</td></tr>
+<tr class="memdesc:gac9e624e43c7053a70ed42b1c780ad792"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via USART2.  <br /></td></tr>
+<tr class="memitem:ga81b1a7af3a848606f23985f8d9a87708" id="r_ga81b1a7af3a848606f23985f8d9a87708"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga81b1a7af3a848606f23985f8d9a87708">uart1_write_int</a> (int32_t num)</td></tr>
+<tr class="memdesc:ga81b1a7af3a848606f23985f8d9a87708"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via USART1.  <br /></td></tr>
+<tr class="memitem:ga01667e67896e48e6cf21a05385566819" id="r_ga01667e67896e48e6cf21a05385566819"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga01667e67896e48e6cf21a05385566819">uart6_write_int</a> (int32_t num)</td></tr>
+<tr class="memdesc:ga01667e67896e48e6cf21a05385566819"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via USART6.  <br /></td></tr>
+<tr class="memitem:ga3784763020352ac6913e355c4ac7a337" id="r_ga3784763020352ac6913e355c4ac7a337"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga3784763020352ac6913e355c4ac7a337">uart2_write_float</a> (float num)</td></tr>
+<tr class="memdesc:ga3784763020352ac6913e355c4ac7a337"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via USART2.  <br /></td></tr>
+<tr class="memitem:ga8595ce32dbc8da8200d337fca8d7930e" id="r_ga8595ce32dbc8da8200d337fca8d7930e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga8595ce32dbc8da8200d337fca8d7930e">uart1_write_float</a> (float num)</td></tr>
+<tr class="memdesc:ga8595ce32dbc8da8200d337fca8d7930e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via USART1.  <br /></td></tr>
+<tr class="memitem:ga3a2f8786049010a947207fc47c7ad409" id="r_ga3a2f8786049010a947207fc47c7ad409"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga3a2f8786049010a947207fc47c7ad409">uart6_write_float</a> (float num)</td></tr>
+<tr class="memdesc:ga3a2f8786049010a947207fc47c7ad409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via USART6.  <br /></td></tr>
+<tr class="memitem:ga55c46e6a48433287fdf5a9d1defd5f5c" id="r_ga55c46e6a48433287fdf5a9d1defd5f5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga55c46e6a48433287fdf5a9d1defd5f5c">uart2_write_string</a> (const char *s)</td></tr>
+<tr class="memdesc:ga55c46e6a48433287fdf5a9d1defd5f5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via USART2.  <br /></td></tr>
+<tr class="memitem:gac86a702823358a08deca96365ed41cae" id="r_gac86a702823358a08deca96365ed41cae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gac86a702823358a08deca96365ed41cae">uart1_write_string</a> (const char *s)</td></tr>
+<tr class="memdesc:gac86a702823358a08deca96365ed41cae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via USART1.  <br /></td></tr>
+<tr class="memitem:gacd0a2ffc721c3e9af1501307d74f5173" id="r_gacd0a2ffc721c3e9af1501307d74f5173"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gacd0a2ffc721c3e9af1501307d74f5173">uart6_write_string</a> (const char *s)</td></tr>
+<tr class="memdesc:gacd0a2ffc721c3e9af1501307d74f5173"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via USART6.  <br /></td></tr>
+<tr class="memitem:ga86ffdb11e32f205ce3b1e9b0fb259c8e" id="r_ga86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga86ffdb11e32f205ce3b1e9b0fb259c8e">uart_read_char</a> (<a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:ga86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from the specified UART.  <br /></td></tr>
+<tr class="memitem:ga223b61a491de01b4b3ee16a1d15113d1" id="r_ga223b61a491de01b4b3ee16a1d15113d1"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga223b61a491de01b4b3ee16a1d15113d1">uart1_read_char</a> (void)</td></tr>
+<tr class="memdesc:ga223b61a491de01b4b3ee16a1d15113d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from USART1.  <br /></td></tr>
+<tr class="memitem:ga894a9fccabee5ec32e916ba78998fad5" id="r_ga894a9fccabee5ec32e916ba78998fad5"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga894a9fccabee5ec32e916ba78998fad5">uart2_read_char</a> (void)</td></tr>
+<tr class="memdesc:ga894a9fccabee5ec32e916ba78998fad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from USART2.  <br /></td></tr>
+<tr class="memitem:gaa40d7d81e58a648bf5c64a4735bfb7f3" id="r_gaa40d7d81e58a648bf5c64a4735bfb7f3"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaa40d7d81e58a648bf5c64a4735bfb7f3">uart6_read_char</a> (void)</td></tr>
+<tr class="memdesc:gaa40d7d81e58a648bf5c64a4735bfb7f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from USART6.  <br /></td></tr>
+<tr class="memitem:gaa3a9166c481a902a7b2c291eb3127a78" id="r_gaa3a9166c481a902a7b2c291eb3127a78"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaa3a9166c481a902a7b2c291eb3127a78">uart_available</a> (<a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
+<tr class="memdesc:gaa3a9166c481a902a7b2c291eb3127a78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from specified UART.  <br /></td></tr>
+<tr class="memitem:ga242042066c0dcfee02c34f51ae65cc8a" id="r_ga242042066c0dcfee02c34f51ae65cc8a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga242042066c0dcfee02c34f51ae65cc8a">uart1_available</a> (void)</td></tr>
+<tr class="memdesc:ga242042066c0dcfee02c34f51ae65cc8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from USART1.  <br /></td></tr>
+<tr class="memitem:gae67708662af5b29151196c9ba24cf20d" id="r_gae67708662af5b29151196c9ba24cf20d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gae67708662af5b29151196c9ba24cf20d">uart2_available</a> (void)</td></tr>
+<tr class="memdesc:gae67708662af5b29151196c9ba24cf20d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from USART2.  <br /></td></tr>
+<tr class="memitem:gaf49cf7ca045c2feb52c025951e6e50e4" id="r_gaf49cf7ca045c2feb52c025951e6e50e4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaf49cf7ca045c2feb52c025951e6e50e4">uart6_available</a> (void)</td></tr>
+<tr class="memdesc:gaf49cf7ca045c2feb52c025951e6e50e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from USART6.  <br /></td></tr>
+<tr class="memitem:ga5c510005052783f5cec97c0ac7731071" id="r_ga5c510005052783f5cec97c0ac7731071"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga5c510005052783f5cec97c0ac7731071">uart2_read_until</a> (char *buffer, uint32_t maxlen, char delimiter)</td></tr>
+<tr class="memdesc:ga5c510005052783f5cec97c0ac7731071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read characters from USART2 until delimiter or max length.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6. </p>
-<p>This file provides basic UART setup and read/write functionality for three UART peripherals. It supports initialization with baudrate, character, integer, float, and string transmission, as well as reading characters and checking availability. </p>
-</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a242042066c0dcfee02c34f51ae65cc8a" name="a242042066c0dcfee02c34f51ae65cc8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a242042066c0dcfee02c34f51ae65cc8a">&#9670;&#160;</a></span>uart1_available()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int uart1_available </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Check if UART1 has data available. </p>
-<dl class="section return"><dt>Returns</dt><dd>Non-zero if data ready, zero if none. </dd></dl>
-
-</div>
-</div>
-<a id="a3cc37d73aa435b454452d7a60a635e39" name="a3cc37d73aa435b454452d7a60a635e39"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3cc37d73aa435b454452d7a60a635e39">&#9670;&#160;</a></span>uart1_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart1_init </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>baudrate</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialize UART1 peripheral. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">baudrate</td><td>Desired baudrate.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Configures GPIO PA9 for alternate function AF7, enables USART1 clock, sets baudrate register, enables transmitter, and enables USART. </dd></dl>
-
-</div>
-</div>
-<a id="a223b61a491de01b4b3ee16a1d15113d1" name="a223b61a491de01b4b3ee16a1d15113d1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a223b61a491de01b4b3ee16a1d15113d1">&#9670;&#160;</a></span>uart1_read_char()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char uart1_read_char </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read a single character from UART1. </p>
-<dl class="section return"><dt>Returns</dt><dd>Character read.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Blocks until a character is available. </dd></dl>
-
-</div>
-</div>
-<a id="aa8786e97a38fd49fd129cc704cb6fadd" name="aa8786e97a38fd49fd129cc704cb6fadd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8786e97a38fd49fd129cc704cb6fadd">&#9670;&#160;</a></span>uart1_write_char()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart1_write_char </td>
-          <td>(</td>
-          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>c</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a character to UART1. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">c</td><td>Character to send.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Waits until transmit data register is empty. </dd></dl>
-
-</div>
-</div>
-<a id="a8595ce32dbc8da8200d337fca8d7930e" name="a8595ce32dbc8da8200d337fca8d7930e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8595ce32dbc8da8200d337fca8d7930e">&#9670;&#160;</a></span>uart1_write_float()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart1_write_float </td>
-          <td>(</td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a floating-point number to UART1. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num</td><td>Float value to send. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a81b1a7af3a848606f23985f8d9a87708" name="a81b1a7af3a848606f23985f8d9a87708"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a81b1a7af3a848606f23985f8d9a87708">&#9670;&#160;</a></span>uart1_write_int()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart1_write_int </td>
-          <td>(</td>
-          <td class="paramtype">int32_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write an integer to UART1 as ASCII. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num</td><td>Integer to send. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ac86a702823358a08deca96365ed41cae" name="ac86a702823358a08deca96365ed41cae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac86a702823358a08deca96365ed41cae">&#9670;&#160;</a></span>uart1_write_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart1_write_string </td>
-          <td>(</td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a null-terminated string to UART1. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">s</td><td>Pointer to string to send. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ae67708662af5b29151196c9ba24cf20d" name="ae67708662af5b29151196c9ba24cf20d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae67708662af5b29151196c9ba24cf20d">&#9670;&#160;</a></span>uart2_available()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int uart2_available </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Check if UART2 has data available. </p>
-<dl class="section return"><dt>Returns</dt><dd>Non-zero if data ready, zero if none. </dd></dl>
-
-</div>
-</div>
-<a id="af897c816fdda40f69b1f8377878db96a" name="af897c816fdda40f69b1f8377878db96a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af897c816fdda40f69b1f8377878db96a">&#9670;&#160;</a></span>uart2_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart2_init </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>baudrate</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialize UART2 peripheral. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">baudrate</td><td>Desired baudrate.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Configures GPIO PA2 and PA3 for alternate function AF7, enables USART2 clock, sets baudrate register, enables transmitter and receiver, and enables USART. </dd></dl>
-
-</div>
-</div>
-<a id="a894a9fccabee5ec32e916ba78998fad5" name="a894a9fccabee5ec32e916ba78998fad5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a894a9fccabee5ec32e916ba78998fad5">&#9670;&#160;</a></span>uart2_read_char()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char uart2_read_char </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read a single character from UART2. </p>
-<dl class="section return"><dt>Returns</dt><dd>Character read.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Blocks until a character is available. </dd></dl>
-
-</div>
-</div>
-<a id="a5c510005052783f5cec97c0ac7731071" name="a5c510005052783f5cec97c0ac7731071"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c510005052783f5cec97c0ac7731071">&#9670;&#160;</a></span>uart2_read_until()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t uart2_read_until </td>
-          <td>(</td>
-          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>buffer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>maxlen</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>delimiter</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read characters from UART2 into a buffer until delimiter or max length. </p>
-<p>Read characters from UART2 until a delimiter or maximum length is reached.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">buffer</td><td>Pointer to buffer to store received characters. </td></tr>
-    <tr><td class="paramname">maxlen</td><td>Maximum buffer length (including null terminator). </td></tr>
-    <tr><td class="paramname">delimiter</td><td>Character to stop reading at. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Number of characters read (excluding null terminator).</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Reads until delimiter is encountered or maxlen-1 characters are read. Null-terminates the buffer. </dd></dl>
-
-</div>
-</div>
-<a id="ace45b7a16f634d2de9a483acab46a7c8" name="ace45b7a16f634d2de9a483acab46a7c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace45b7a16f634d2de9a483acab46a7c8">&#9670;&#160;</a></span>uart2_write_char()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart2_write_char </td>
-          <td>(</td>
-          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>c</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a character to UART2. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">c</td><td>Character to send.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Waits until transmit data register is empty. </dd></dl>
-
-</div>
-</div>
-<a id="a3784763020352ac6913e355c4ac7a337" name="a3784763020352ac6913e355c4ac7a337"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3784763020352ac6913e355c4ac7a337">&#9670;&#160;</a></span>uart2_write_float()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart2_write_float </td>
-          <td>(</td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a floating-point number to UART2. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num</td><td>Float value to send.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Prints sign, integer part, decimal point, and 5 decimal digits of fraction. </dd></dl>
-
-</div>
-</div>
-<a id="ac9e624e43c7053a70ed42b1c780ad792" name="ac9e624e43c7053a70ed42b1c780ad792"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9e624e43c7053a70ed42b1c780ad792">&#9670;&#160;</a></span>uart2_write_int()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart2_write_int </td>
-          <td>(</td>
-          <td class="paramtype">int32_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write an integer to UART2 as ASCII. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num</td><td>Integer to send. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a55c46e6a48433287fdf5a9d1defd5f5c" name="a55c46e6a48433287fdf5a9d1defd5f5c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a55c46e6a48433287fdf5a9d1defd5f5c">&#9670;&#160;</a></span>uart2_write_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart2_write_string </td>
-          <td>(</td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a null-terminated string to UART2. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">s</td><td>Pointer to string to send. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="af49cf7ca045c2feb52c025951e6e50e4" name="af49cf7ca045c2feb52c025951e6e50e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af49cf7ca045c2feb52c025951e6e50e4">&#9670;&#160;</a></span>uart6_available()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int uart6_available </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Check if UART6 has data available. </p>
-<dl class="section return"><dt>Returns</dt><dd>Non-zero if data ready, zero if none. </dd></dl>
-
-</div>
-</div>
-<a id="a7cd48d1d49f0dee1adff1be915793bb6" name="a7cd48d1d49f0dee1adff1be915793bb6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7cd48d1d49f0dee1adff1be915793bb6">&#9670;&#160;</a></span>uart6_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart6_init </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>baudrate</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialize UART6 peripheral. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">baudrate</td><td>Desired baudrate.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Configures GPIO PC6 for alternate function AF7, enables USART6 clock, sets baudrate register, enables transmitter, and enables USART. </dd></dl>
-
-</div>
-</div>
-<a id="aa40d7d81e58a648bf5c64a4735bfb7f3" name="aa40d7d81e58a648bf5c64a4735bfb7f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa40d7d81e58a648bf5c64a4735bfb7f3">&#9670;&#160;</a></span>uart6_read_char()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char uart6_read_char </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read a single character from UART6. </p>
-<dl class="section return"><dt>Returns</dt><dd>Character read.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Blocks until a character is available. </dd></dl>
-
-</div>
-</div>
-<a id="ac0de3d3f47debf2a24b349fa74b7a030" name="ac0de3d3f47debf2a24b349fa74b7a030"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac0de3d3f47debf2a24b349fa74b7a030">&#9670;&#160;</a></span>uart6_write_char()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart6_write_char </td>
-          <td>(</td>
-          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>c</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a character to UART6. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">c</td><td>Character to send.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>Waits until transmit data register is empty. </dd></dl>
-
-</div>
-</div>
-<a id="a3a2f8786049010a947207fc47c7ad409" name="a3a2f8786049010a947207fc47c7ad409"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a2f8786049010a947207fc47c7ad409">&#9670;&#160;</a></span>uart6_write_float()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart6_write_float </td>
-          <td>(</td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a floating-point number to UART6. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num</td><td>Float value to send. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a01667e67896e48e6cf21a05385566819" name="a01667e67896e48e6cf21a05385566819"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01667e67896e48e6cf21a05385566819">&#9670;&#160;</a></span>uart6_write_int()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart6_write_int </td>
-          <td>(</td>
-          <td class="paramtype">int32_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write an integer to UART6 as ASCII. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num</td><td>Integer to send. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="acd0a2ffc721c3e9af1501307d74f5173" name="acd0a2ffc721c3e9af1501307d74f5173"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd0a2ffc721c3e9af1501307d74f5173">&#9670;&#160;</a></span>uart6_write_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart6_write_string </td>
-          <td>(</td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a null-terminated string to UART6. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">s</td><td>Pointer to string to send. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aa3a9166c481a902a7b2c291eb3127a78" name="aa3a9166c481a902a7b2c291eb3127a78"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3a9166c481a902a7b2c291eb3127a78">&#9670;&#160;</a></span>uart_available()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int uart_available </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Check if UART peripheral has data available to read. </p>
-<p>Check if data is available in the specified UART's receive buffer.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Non-zero if data available, zero otherwise; -1 if invalid UART. </dd></dl>
-
-</div>
-</div>
-<a id="ad320bd1e821aac6c1b38c8bcb8003104" name="ad320bd1e821aac6c1b38c8bcb8003104"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad320bd1e821aac6c1b38c8bcb8003104">&#9670;&#160;</a></span>uart_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart_init </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>baudrate</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialize UART peripheral with specified baudrate. </p>
-<p>Initialize the specified UART peripheral.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">baudrate</td><td>Desired UART baudrate. </td></tr>
-    <tr><td class="paramname">uart</td><td>UART peripheral identifier (UART1, UART2, UART6). </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a86ffdb11e32f205ce3b1e9b0fb259c8e" name="a86ffdb11e32f205ce3b1e9b0fb259c8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86ffdb11e32f205ce3b1e9b0fb259c8e">&#9670;&#160;</a></span>uart_read_char()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char uart_read_char </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read a single character from UART peripheral. </p>
-<p>Read a character from the specified UART.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Character read from UART data register. </dd></dl>
-
-</div>
-</div>
-<a id="a6f144300396d4d9afe21f41a72a99ab8" name="a6f144300396d4d9afe21f41a72a99ab8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6f144300396d4d9afe21f41a72a99ab8">&#9670;&#160;</a></span>uart_write_char()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart_write_char </td>
-          <td>(</td>
-          <td class="paramtype">char</td>          <td class="paramname"><span class="paramname"><em>c</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a single character to UART. </p>
-<p>Write a character to the specified UART.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">c</td><td>Character to send. </td></tr>
-    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a662be19e5a7667eeae26bd36e869fd2d" name="a662be19e5a7667eeae26bd36e869fd2d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a662be19e5a7667eeae26bd36e869fd2d">&#9670;&#160;</a></span>uart_write_float()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart_write_float </td>
-          <td>(</td>
-          <td class="paramtype">float</td>          <td class="paramname"><span class="paramname"><em>num</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a floating-point number to UART as ASCII. </p>
-<p>Write a floating-point number to the specified UART.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num</td><td>Float value to send. </td></tr>
-    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a183ba35371040029a29a3cde221539fa" name="a183ba35371040029a29a3cde221539fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a183ba35371040029a29a3cde221539fa">&#9670;&#160;</a></span>uart_write_int()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart_write_int </td>
-          <td>(</td>
-          <td class="paramtype">int32_t</td>          <td class="paramname"><span class="paramname"><em>num</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write an integer as ASCII characters to UART. </p>
-<p>Write an integer to the specified UART.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">num</td><td>Integer to send. </td></tr>
-    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ab0bd03dc5a6de94637fb1536e883c546" name="ab0bd03dc5a6de94637fb1536e883c546"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0bd03dc5a6de94637fb1536e883c546">&#9670;&#160;</a></span>uart_write_string()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void uart_write_string </td>
-          <td>(</td>
-          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>s</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="uart_8h.html#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a></td>          <td class="paramname"><span class="paramname"><em>uart</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Write a null-terminated string to UART. </p>
-<p>Write a string to the specified UART.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">s</td><td>Pointer to string to send. </td></tr>
-    <tr><td class="paramname">uart</td><td>UART peripheral identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-</div><!-- contents -->
+<p>This file provides the implementation of UART communication functions for STM32F401RE microcontroller. It supports USART1, USART2, and USART6 peripherals with the following features:</p><ul>
+<li>Baud rate configuration</li>
+<li>Character, integer, float, and string transmission</li>
+<li>Character reception</li>
+<li>Data availability checking</li>
+<li>Blocking (polling) implementations</li>
+</ul>
+<p>The implementation uses GPIO alternate functions for UART pins and provides both generic (UART instance parameter) and specific functions.</p>
+<dl class="section note"><dt>Note</dt><dd>All functions are blocking and will wait for hardware operations to complete </dd>
+<dd>
+Default configuration: 8 data bits, no parity, 1 stop bit</dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Ashutosh Vishwakarma </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>2025-07-23 </dd></dl>
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <div id="page-nav" class="page-nav-panel">
 <div id="page-nav-resize-handle"></div>

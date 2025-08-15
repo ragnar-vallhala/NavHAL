@@ -30,7 +30,6 @@ int main(void) {
 
   // Initialize I2C
   hal_i2c_status_t status = hal_i2c_init(I2C_BUS, &i2c_config);
-  status = hal_i2c_init(I2C_BUS, &i2c_config);
   if (status != HAL_I2C_OK) {
     uart2_write("HAL I2C init status: ");
     uart2_write(status);

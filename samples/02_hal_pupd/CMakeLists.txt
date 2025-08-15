@@ -15,7 +15,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 message(STATUS "Linker args ${CMAKE_EXE_LINKER_FLAGS}")
 
-add_executable(${SAMPLE} main.c startup.s)
+add_executable(${SAMPLE} main.c)
 
 # target_link_libraries(${SAMPLE} hal)
 
@@ -49,3 +49,4 @@ add_custom_command(
   POST_BUILD
   COMMAND ${CMAKE_BINARY_SIZE} $<TARGET_FILE:${SAMPLE}>
   COMMENT "Calculating size of elf file")
+

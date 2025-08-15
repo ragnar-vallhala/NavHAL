@@ -1,20 +1,14 @@
-#include <stdint.h>
-// #include <stdio.h>
 #define CORTEX_M4
 #include "navhal.h"
 
 
 
 // Delay function
-void delay(volatile uint32_t count)
-{
-    while (count--)
-        __asm__("nop");
-}
+
 
 int main(void)
 {
-
+    systick_init(1000);
     uart2_init(9600);
     
     
@@ -23,6 +17,6 @@ int main(void)
         // printf("Hello");
         uart2_write_string("Hello World\n");
         
-        delay(100000);
+        delay_ms(1000);
     }
 }

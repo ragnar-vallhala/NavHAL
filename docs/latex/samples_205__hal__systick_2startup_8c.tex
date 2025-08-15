@@ -1,0 +1,139 @@
+\doxysection{samples/05\+\_\+hal\+\_\+systick/startup.c File Reference}
+\hypertarget{samples_205__hal__systick_2startup_8c}{}\label{samples_205__hal__systick_2startup_8c}\index{samples/05\_hal\_systick/startup.c@{samples/05\_hal\_systick/startup.c}}
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for startup.\+c\+:
+% FIG 0
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_a0c9a16e7e880e73ecd32e1bacc6d668b}{WEAK\+\_\+\+ALIAS}}~\+\_\+\+\_\+attribute\+\_\+\+\_\+((weak, alias("{}Default\+\_\+\+Handler"{})))
+\begin{DoxyCompactList}\small\item\em Weak aliases for all interrupt handlers to Default\+\_\+\+Handler. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\begin{DoxyCompactList}\small\item\em Main entry point. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_a4e0c522c1bb26af24accaf20e6b87d12}{Default\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em Default handler used for all unimplemented interrupts. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_ae7ee340978f5c25f52f0cad1457c6616}{Reset\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em Reset handler called at MCU startup. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_a6ad7a5e3ee69cb6db6a6b9111ba898bc}{NMI\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em Vector table placed in .isr\+\_\+vector section. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_a1ecae4ad04c5b02e60d2db51706c2d75}{\+\_\+sidata}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_a61687bc10bffbfec9c6fd33bddff3094}{\+\_\+sdata}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_a1fc4a71c31f5b048d3b1b7b2d10684d1}{\+\_\+edata}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_adcc3ae1cacdf95ad88f01dd26f589175}{\+\_\+sbss}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_a580f44faf8ff886796f2114d0de12c77}{\+\_\+ebss}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{samples_205__hal__systick_2startup_8c_a69247aef56f755ef3b08265060dea50f}{\+\_\+estack}}
+\end{DoxyCompactItemize}
+
+
+\label{doc-define-members}
+\Hypertarget{samples_205__hal__systick_2startup_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{samples_205__hal__systick_2startup_8c_a0c9a16e7e880e73ecd32e1bacc6d668b}\index{startup.c@{startup.c}!WEAK\_ALIAS@{WEAK\_ALIAS}}
+\index{WEAK\_ALIAS@{WEAK\_ALIAS}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{WEAK\_ALIAS}{WEAK\_ALIAS}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a0c9a16e7e880e73ecd32e1bacc6d668b} 
+\#define WEAK\+\_\+\+ALIAS~\+\_\+\+\_\+attribute\+\_\+\+\_\+((weak, alias("{}Default\+\_\+\+Handler"{})))}
+
+
+
+Weak aliases for all interrupt handlers to Default\+\_\+\+Handler. 
+
+
+
+\label{doc-func-members}
+\Hypertarget{samples_205__hal__systick_2startup_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{samples_205__hal__systick_2startup_8c_a4e0c522c1bb26af24accaf20e6b87d12}\index{startup.c@{startup.c}!Default\_Handler@{Default\_Handler}}
+\index{Default\_Handler@{Default\_Handler}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{Default\_Handler()}{Default\_Handler()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a4e0c522c1bb26af24accaf20e6b87d12} 
+void Default\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Default handler used for all unimplemented interrupts. 
+
+\Hypertarget{samples_205__hal__systick_2startup_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{startup.c@{startup.c}!main@{main}}
+\index{main@{main}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [extern]}}
+
+
+
+Main entry point. 
+
+Initializes GPIOA pin 5 as output and toggles it in an infinite loop. Typically connected to an LED (e.\+g., onboard LED on Nucleo boards). \Hypertarget{samples_205__hal__systick_2startup_8c_a6ad7a5e3ee69cb6db6a6b9111ba898bc}\index{startup.c@{startup.c}!NMI\_Handler@{NMI\_Handler}}
+\index{NMI\_Handler@{NMI\_Handler}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{NMI\_Handler()}{NMI\_Handler()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a6ad7a5e3ee69cb6db6a6b9111ba898bc} 
+void NMI\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Vector table placed in .isr\+\_\+vector section. 
+
+\Hypertarget{samples_205__hal__systick_2startup_8c_ae7ee340978f5c25f52f0cad1457c6616}\index{startup.c@{startup.c}!Reset\_Handler@{Reset\_Handler}}
+\index{Reset\_Handler@{Reset\_Handler}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{Reset\_Handler()}{Reset\_Handler()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_ae7ee340978f5c25f52f0cad1457c6616} 
+void Reset\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Reset handler called at MCU startup. 
+
+Reset handler for Cortex-\/\+M4.
+
+Initializes the .data and .bss sections, enables interrupts, and calls the main application. 
+
+\label{doc-var-members}
+\Hypertarget{samples_205__hal__systick_2startup_8c_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{samples_205__hal__systick_2startup_8c_a580f44faf8ff886796f2114d0de12c77}\index{startup.c@{startup.c}!\_ebss@{\_ebss}}
+\index{\_ebss@{\_ebss}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{\_ebss}{\_ebss}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a580f44faf8ff886796f2114d0de12c77} 
+uint32\+\_\+t \+\_\+ebss\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{samples_205__hal__systick_2startup_8c_a1fc4a71c31f5b048d3b1b7b2d10684d1}\index{startup.c@{startup.c}!\_edata@{\_edata}}
+\index{\_edata@{\_edata}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{\_edata}{\_edata}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a1fc4a71c31f5b048d3b1b7b2d10684d1} 
+uint32\+\_\+t \+\_\+edata\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{samples_205__hal__systick_2startup_8c_a69247aef56f755ef3b08265060dea50f}\index{startup.c@{startup.c}!\_estack@{\_estack}}
+\index{\_estack@{\_estack}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{\_estack}{\_estack}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a69247aef56f755ef3b08265060dea50f} 
+uint32\+\_\+t \+\_\+estack\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{samples_205__hal__systick_2startup_8c_adcc3ae1cacdf95ad88f01dd26f589175}\index{startup.c@{startup.c}!\_sbss@{\_sbss}}
+\index{\_sbss@{\_sbss}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{\_sbss}{\_sbss}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_adcc3ae1cacdf95ad88f01dd26f589175} 
+uint32\+\_\+t \+\_\+sbss\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{samples_205__hal__systick_2startup_8c_a61687bc10bffbfec9c6fd33bddff3094}\index{startup.c@{startup.c}!\_sdata@{\_sdata}}
+\index{\_sdata@{\_sdata}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{\_sdata}{\_sdata}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a61687bc10bffbfec9c6fd33bddff3094} 
+uint32\+\_\+t \+\_\+sdata\hspace{0.3cm}{\ttfamily [extern]}}
+
+\Hypertarget{samples_205__hal__systick_2startup_8c_a1ecae4ad04c5b02e60d2db51706c2d75}\index{startup.c@{startup.c}!\_sidata@{\_sidata}}
+\index{\_sidata@{\_sidata}!startup.c@{startup.c}}
+\doxysubsubsection{\texorpdfstring{\_sidata}{\_sidata}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2startup_8c_a1ecae4ad04c5b02e60d2db51706c2d75} 
+uint32\+\_\+t \+\_\+sidata\hspace{0.3cm}{\ttfamily [extern]}}
+

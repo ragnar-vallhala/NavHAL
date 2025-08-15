@@ -5,10 +5,6 @@ set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_OSX_ARCHITECTURES "" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS_INIT "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_INIT "" CACHE STRING "" FORCE)
-# set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
-project(NavHAL C ASM )
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_COMPILE_COMMANDS_OUTPUT "${CMAKE_SOURCE_DIR}/compile_commands.json")
 
 # Toolchain settings
 set(TOOLCHAIN_PREFIX arm-none-eabi-)
@@ -18,6 +14,12 @@ set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
 set(CMAKE_BINARY_SIZE ${TOOLCHAIN_PREFIX}size)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+
+# set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
+project(NavHAL C ASM )
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_COMPILE_COMMANDS_OUTPUT "${CMAKE_SOURCE_DIR}/compile_commands.json")
+
 
 
 # Defaults

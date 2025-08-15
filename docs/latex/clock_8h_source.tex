@@ -1,0 +1,70 @@
+\doxysection{clock.\+h}
+\hypertarget{clock_8h_source}{}\label{clock_8h_source}\index{include/core/cortex-\/m4/clock.h@{include/core/cortex-\/m4/clock.h}}
+\mbox{\hyperlink{clock_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_CLOCK\_H}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_CLOCK\_H}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{types_8h}{utils/types.h}}"{}}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00031\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00032\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1}{hal\_clock\_source\_t}}\ \mbox{\hyperlink{structhal__pll__config__t_a3ee7a2ede1a550c1bcf2b3adf5e724ab}{input\_src}};\ }
+\DoxyCodeLine{00034\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structhal__pll__config__t_a43380a9555d4e3bd71a833efa85e6578}{pll\_m}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00035\ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structhal__pll__config__t_a6a146e1ca36b642d99aafb1830f955f6}{pll\_n}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00036\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structhal__pll__config__t_aa7554787c9621f7f2cb36f2bccacfb03}{pll\_p}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00037\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structhal__pll__config__t_a033cac8290c4fa3900b0e122cea19a45}{pll\_q}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00038\ \}\ \mbox{\hyperlink{structhal__pll__config__t}{hal\_pll\_config\_t}};}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ RCC\ 0x40023800UL\ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ RCC\_CR\_OFFSET\ 0x00\ \ \ \ \ \ }}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ RCC\_PLLCFGR\_OFFSET\ 0x04\ }}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ RCC\_CFGR\_OFFSET\ 0x08\ \ \ \ }}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ RCC\_CR\ register\ bit\ positions}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ RCC\_CR\_HSE\_ON\_BIT\ 16\ \ \ \ }}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#define\ RCC\_CR\_HSE\_READY\_BIT\ 17\ }}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#define\ RCC\_CR\_HSI\_ON\_BIT\ 0\ \ \ \ \ }}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#define\ RCC\_CR\_HSI\_READY\_BIT\ 1\ \ }}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#define\ RCC\_CR\_PLL\_ON\_BIT\ 24\ \ \ \ }}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ RCC\_CR\_PLL\_READY\_BIT\ 25\ }}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ RCC\_PLLCFGR\ register\ bit\ positions}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#define\ RCC\_PLLCFGR\_SRC\_BIT\ 22\ \ }}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ RCC\_PLLCFGR\_PLLM\_BIT\ 0\ \ }}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ RCC\_PLLCFGR\_PLLN\_BIT\ 6\ \ }}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ RCC\_PLLCFGR\_PLLP\_BIT\ 16\ }}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#define\ RCC\_PLLCFGR\_PLLQ\_BIT\ 24\ }}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \textcolor{comment}{//\ RCC\_CFGR\ register\ bit\ positions}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ RCC\_CFGR\_HPRE\_BIT\ 4\ \ \ }}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#define\ RCC\_CFGR\_PPRE1\_BIT\ 10\ }}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#define\ RCC\_CFGR\_PPRE2\_BIT\ 13\ }}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#define\ RCC\_CFGR\_SW\_BIT\ 0\ \ \ \ \ }}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ RCC\_CFGR\_SWS\_BIT\ 2\ \ \ \ }}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{comment}{//\ Prescaler\ values}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\#define\ RCC\_CFGR\_HPRE\_DIV1\ 0x0\ \ }}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#define\ RCC\_CFGR\_PPRE1\_DIV4\ 0x5\ }}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#define\ RCC\_CFGR\_PPRE2\_DIV2\ 0x4\ }}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{comment}{//\ Flash\ Interface\ Control}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#define\ FLASH\_INTERFACE\_REGISTER\ 0x40023C00\ }}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#define\ FLASH\_ACR\_LATENCY\_BIT\ 0\ \ \ \ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00090\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}{hal\_clock\_init}}(\mbox{\hyperlink{structhal__clock__config__t}{hal\_clock\_config\_t}}\ *\mbox{\hyperlink{05__hal__systick_2main_8c_a921c2505bac76424f5f96cc1e4f62986}{cfg}},\ \mbox{\hyperlink{structhal__pll__config__t}{hal\_pll\_config\_t}}\ *\mbox{\hyperlink{03__no__hal__uart__tx_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\_cfg}});}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00100\ uint32\_t\ \mbox{\hyperlink{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0}{hal\_clock\_get\_sysclk}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00109\ uint32\_t\ \mbox{\hyperlink{clock_8h_ac405b089ad197ec8fcec53489064cb5f}{hal\_clock\_get\_ahbclk}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00118\ uint32\_t\ \mbox{\hyperlink{clock_8h_a2b3d3447fb02cf495b0c6f28ad9a4ae8}{hal\_clock\_get\_apb1clk}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00127\ uint32\_t\ \mbox{\hyperlink{clock_8h_abe4fcf4dc3f2a13b1f2602c0348aeba5}{hal\_clock\_get\_apb2clk}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CORTEX\_M4\_CLOCK\_H}}
+
+\end{DoxyCode}

@@ -33,6 +33,12 @@
 .global Reset_Handler
 .global SysTick_Handler
 .global TIM5_IRQHandler
+.global TIM1BRK_TIM9_IRQHandler
+.global TIM2_IRQHandler 
+.global TIM3_IRQHandler 
+.global TIM4_IRQHandler 
+
+
 /**
  * @brief Vector Table
  * This section contains the vector table with the initial stack pointer

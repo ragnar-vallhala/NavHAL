@@ -1,0 +1,116 @@
+\doxysection{Type-\/\+Generic Write Macros}
+\hypertarget{group__UART__WRITE__MACROS}{}\label{group__UART__WRITE__MACROS}\index{Type-\/Generic Write Macros@{Type-\/Generic Write Macros}}
+
+
+Simplified macros to write different types to UART using {\ttfamily \+\_\+\+Generic}.  
+
+
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{group__UART__WRITE__MACROS_gaff2eef2dac8eee46420e54b78311428e}{uart2\+\_\+write}}(val)
+\item 
+\#define \mbox{\hyperlink{group__UART__WRITE__MACROS_gaaca3ea66e1779ff991e98e1366159cde}{uart1\+\_\+write}}(val)
+\item 
+\#define \mbox{\hyperlink{group__UART__WRITE__MACROS_gaf0d663a2d8b4067c6aba42304b09b875}{uart6\+\_\+write}}(val)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Simplified macros to write different types to UART using {\ttfamily \+\_\+\+Generic}. 
+
+These macros provide a type-\/safe interface that automatically selects the appropriate write function based on the argument type. Supports\+:
+\begin{DoxyItemize}
+\item All integer types (char, short, int, long)
+\item Floating point types (float, double)
+\item String types (char \texorpdfstring{$\ast$}{*}, const char \texorpdfstring{$\ast$}{*})
+\end{DoxyItemize}
+
+Example\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\mbox{\hyperlink{group__UART__WRITE__MACROS_gaff2eef2dac8eee46420e54b78311428e}{uart2\_write}}(42);\ \ \ \ \ \ \ \textcolor{comment}{//\ Calls\ uart2\_write\_int}}
+\DoxyCodeLine{\mbox{\hyperlink{group__UART__WRITE__MACROS_gaff2eef2dac8eee46420e54b78311428e}{uart2\_write}}(3.14f);\ \ \ \ \textcolor{comment}{//\ Calls\ uart2\_write\_float}}
+\DoxyCodeLine{\mbox{\hyperlink{group__UART__WRITE__MACROS_gaff2eef2dac8eee46420e54b78311428e}{uart2\_write}}(\textcolor{stringliteral}{"{}hello"{}});\ \ \textcolor{comment}{//\ Calls\ uart2\_write\_string}}
+
+\end{DoxyCode}
+ 
+
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{group__UART__WRITE__MACROS_gaaca3ea66e1779ff991e98e1366159cde}\label{group__UART__WRITE__MACROS_gaaca3ea66e1779ff991e98e1366159cde} 
+\index{Type-\/Generic Write Macros@{Type-\/Generic Write Macros}!uart1\_write@{uart1\_write}}
+\index{uart1\_write@{uart1\_write}!Type-\/Generic Write Macros@{Type-\/Generic Write Macros}}
+\doxysubsubsection{\texorpdfstring{uart1\_write}{uart1\_write}}
+{\footnotesize\ttfamily \#define uart1\+\_\+write(\begin{DoxyParamCaption}\item[{}]{val }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \_Generic((val),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keywordtype}{char}:\ \mbox{\hyperlink{group__UART__API_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\_write\_char}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ signed\ char:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ char:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ short:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ short:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ int:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ int:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ long:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ long:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ long\ long:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ long\ long:\ \mbox{\hyperlink{group__UART__API_ga81b1a7af3a848606f23985f8d9a87708}{uart1\_write\_int}},\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ float:\ \mbox{\hyperlink{group__UART__API_ga8595ce32dbc8da8200d337fca8d7930e}{uart1\_write\_float}},\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ double:\ \mbox{\hyperlink{group__UART__API_ga8595ce32dbc8da8200d337fca8d7930e}{uart1\_write\_float}},\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ const\ char\ *:\ \mbox{\hyperlink{group__UART__API_gac86a702823358a08deca96365ed41cae}{uart1\_write\_string}},\ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ char\ *:\ \mbox{\hyperlink{group__UART__API_gac86a702823358a08deca96365ed41cae}{uart1\_write\_string}})(val)}
+
+\end{DoxyCode}
+\Hypertarget{group__UART__WRITE__MACROS_gaff2eef2dac8eee46420e54b78311428e}\label{group__UART__WRITE__MACROS_gaff2eef2dac8eee46420e54b78311428e} 
+\index{Type-\/Generic Write Macros@{Type-\/Generic Write Macros}!uart2\_write@{uart2\_write}}
+\index{uart2\_write@{uart2\_write}!Type-\/Generic Write Macros@{Type-\/Generic Write Macros}}
+\doxysubsubsection{\texorpdfstring{uart2\_write}{uart2\_write}}
+{\footnotesize\ttfamily \#define uart2\+\_\+write(\begin{DoxyParamCaption}\item[{}]{val }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \_Generic((val),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keywordtype}{char}:\ \mbox{\hyperlink{group__UART__API_gace45b7a16f634d2de9a483acab46a7c8}{uart2\_write\_char}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ signed\ char:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ char:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ short:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ short:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ int:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ int:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ long:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ long:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ long\ long:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ long\ long:\ \mbox{\hyperlink{group__UART__API_gac9e624e43c7053a70ed42b1c780ad792}{uart2\_write\_int}},\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ float:\ \mbox{\hyperlink{group__UART__API_ga3784763020352ac6913e355c4ac7a337}{uart2\_write\_float}},\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ double:\ \mbox{\hyperlink{group__UART__API_ga3784763020352ac6913e355c4ac7a337}{uart2\_write\_float}},\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ const\ char\ *:\ \mbox{\hyperlink{group__UART__API_ga55c46e6a48433287fdf5a9d1defd5f5c}{uart2\_write\_string}},\ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ char\ *:\ \mbox{\hyperlink{group__UART__API_ga55c46e6a48433287fdf5a9d1defd5f5c}{uart2\_write\_string}})(val)}
+
+\end{DoxyCode}
+\Hypertarget{group__UART__WRITE__MACROS_gaf0d663a2d8b4067c6aba42304b09b875}\label{group__UART__WRITE__MACROS_gaf0d663a2d8b4067c6aba42304b09b875} 
+\index{Type-\/Generic Write Macros@{Type-\/Generic Write Macros}!uart6\_write@{uart6\_write}}
+\index{uart6\_write@{uart6\_write}!Type-\/Generic Write Macros@{Type-\/Generic Write Macros}}
+\doxysubsubsection{\texorpdfstring{uart6\_write}{uart6\_write}}
+{\footnotesize\ttfamily \#define uart6\+\_\+write(\begin{DoxyParamCaption}\item[{}]{val }\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ \ \ \ \_Generic((val),\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \textcolor{keywordtype}{char}:\ \mbox{\hyperlink{group__UART__API_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\_write\_char}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ signed\ char:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ char:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ short:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ short:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ int:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ int:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ long:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ long:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ long\ long:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ unsigned\ long\ long:\ \mbox{\hyperlink{group__UART__API_ga01667e67896e48e6cf21a05385566819}{uart6\_write\_int}},\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ float:\ \mbox{\hyperlink{group__UART__API_ga3a2f8786049010a947207fc47c7ad409}{uart6\_write\_float}},\ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ double:\ \mbox{\hyperlink{group__UART__API_ga3a2f8786049010a947207fc47c7ad409}{uart6\_write\_float}},\ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ const\ char\ *:\ \mbox{\hyperlink{group__UART__API_gacd0a2ffc721c3e9af1501307d74f5173}{uart6\_write\_string}},\ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ char\ *:\ \mbox{\hyperlink{group__UART__API_gacd0a2ffc721c3e9af1501307d74f5173}{uart6\_write\_string}})(val)}
+
+\end{DoxyCode}

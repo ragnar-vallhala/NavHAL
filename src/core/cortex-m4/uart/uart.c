@@ -1,6 +1,6 @@
 /**
  * @file uart.c
- * @brief UART HAL implementation for Cortex-M4 (STM32F401RE)
+ * @brief UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6.
  *
  * This file provides the implementation of UART communication functions
  * for STM32F401RE microcontroller. It supports USART1, USART2, and USART6

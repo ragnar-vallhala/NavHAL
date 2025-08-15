@@ -13,6 +13,7 @@
  * @date 2025-07-20
  */
 
+
 #ifndef NAVHAL_H
 #define NAVHAL_H
 
@@ -34,5 +35,9 @@
 /// Common UART HAL header (architecture-agnostic interface)
 #include "common/hal_timer.h"
 /** @} */ // end of NAVHAL
+
+#include "common/hal_pwm.h"
+
+#include "common/hal_12c.h"
 
 #endif // NAVHAL_H

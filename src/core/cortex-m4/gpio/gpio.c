@@ -1,40 +1,32 @@
-/**
- * @file gpio.c
- * @brief Cortex-M4 (STM32F4) GPIO HAL Implementation.
- *
- * This file provides the implementation of the GPIO Hardware Abstraction Layer
- * (HAL) for Cortex-M4 based STM32F4 microcontrollers, specifically the
- * STM32F401RE. It includes functions for configuring GPIO pins, reading and
- * writing digital states, and managing GPIO port clocks through the RCC.
- *
- * Key features:
- * - Configure GPIO pin modes (input, output, alternate function, analog)
- * - Configure pull-up and pull-down resistors
- * - Atomic digital write using BSRR register
- * - Read digital input pin states
- * - Automatic enabling of RCC clocks for GPIO ports
- *
- * The GPIO pins are encoded as port and pin numbers, supporting ports A–E and
- * H. The code handles port indexing and provides safety checks on invalid
- * ports.
- *
- * @author Ashutosh Vishwakarma
- * @date 2025-07-20
- */
-
 #include "core/cortex-m4/gpio.h"
 #include "core/cortex-m4/gpio_reg.h"
 #include "core/cortex-m4/rcc_reg.h"
 
 /**
- * @brief Set GPIO pin mode and pull-up/pull-down configuration.
+ * @file gpio.c
+ * @brief HAL GPIO driver implementation for STM32F4 series.
+ * @details
+ * This file contains the implementation of the high-level HAL functions
+ * declared in `gpio.h` for configuring and controlling GPIO pins.
  *
- * Enables GPIO port clock if not already enabled.
- * Configures mode bits and pull-up/pull-down bits in respective registers.
- *
- * @param pin GPIO pin to configure.
- * @param mode Mode to set (input, output, alt, analog).
+ * The functions in this file handle:
+ * - Pin mode configuration
+ * - Pull-up/pull-down settings
+ * - Digital read/write operations
+ * - RCC clock enabling for GPIO ports
+ * - Alternate function selection
+ */
+
+/**
+ * @brief Configure the mode and pull-up/pull-down for a GPIO pin.
+ * @param pin Pin identifier.
+ * @param mode GPIO mode (input, output, alternate function, analog).
  * @param pupd Pull-up/pull-down configuration.
+ * @note This function automatically enables the RCC clock for the GPIO port.
+ * @code
+ * // Example: Configure PA5 as output with no pull-up/pull-down
+ * hal_gpio_setmode(PA5, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_NO_PULL);
+ * @endcode
  */
 void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode,
                       hal_gpio_pullup_pulldown pupd) {
@@ -53,24 +45,22 @@ void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode,
 }
 
 /**
- * @brief Get the mode configuration of a GPIO pin.
- *
- * Reads the mode bits from the MODER register.
- *
- * @param pin GPIO pin to query.
- * @return Current mode setting of the pin.
+ * @brief Get the current mode of a GPIO pin.
+ * @param pin Pin identifier.
+ * @return The current GPIO mode of the pin.
  */
 hal_gpio_mode hal_gpio_getmode(hal_gpio_pin pin) {
   return ((GPIO_GET_PORT(pin)->MODER) >> (GPIO_GET_PIN(pin) * 2)) & 0x3;
 }
 
 /**
- * @brief Write a digital logic level to a GPIO pin.
- *
- * Uses atomic BSRR register to set/reset pin atomically.
- *
- * @param pin GPIO pin to write to.
- * @param state Logic level to set (HIGH or LOW).
+ * @brief Write a digital value to a GPIO pin.
+ * @param pin Pin identifier.
+ * @param state Desired pin state (high or low).
+ * @code
+ * // Example: Set PA5 high
+ * hal_gpio_digitalwrite(PA5, HAL_GPIO_HIGH);
+ * @endcode
  */
 void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state) {
   if (state)
@@ -80,24 +70,19 @@ void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state) {
 }
 
 /**
- * @brief Read the current digital logic level of a GPIO pin.
- *
- * Reads from the input data register (IDR).
- *
- * @param pin GPIO pin to read.
- * @return Current logic level (HIGH or LOW).
+ * @brief Read the digital value from a GPIO pin.
+ * @param pin Pin identifier.
+ * @return Current pin state (high or low).
  */
 hal_gpio_state hal_gpio_digitalread(hal_gpio_pin pin) {
   return (GPIO_GET_PORT(pin)->IDR >> GPIO_GET_PIN(pin)) & 0x1;
 }
 
 /**
- * @brief Enable the RCC clock for the GPIO port.
- *
- * Enables the clock for the GPIO port in the RCC AHB1 enable register.
- * Does nothing if already enabled.
- *
- * @param pin GPIO pin whose port clock to enable.
+ * @brief Enable the RCC clock for the GPIO port of a given pin.
+ * @param pin Pin identifier.
+ * @note This function is usually called automatically by other GPIO functions,
+ * but can be called manually if required.
  */
 void hal_gpio_enable_rcc(hal_gpio_pin pin) {
   if (!(RCC->AHB1ENR & (1 << GPIO_GET_PORT_NUMBER(pin))))
@@ -105,16 +90,14 @@ void hal_gpio_enable_rcc(hal_gpio_pin pin) {
 }
 
 /**
- * @brief Configure the alternate function for a GPIO pin.
- *
- * This function sets the alternate function for a given GPIO pin.
- * Alternate functions are used when the pin is to be controlled by
- * a peripheral (like UART, SPI, I2C, TIM, etc.) instead of used as
- * a regular input/output pin.
- *
- * @param pin     The GPIO pin to configure.
- * @param alt_fn  The alternate function number to assign (0–15 depending on MCU
- * support).
+ * @brief Configure the alternate function of a GPIO pin.
+ * @param pin Pin identifier.
+ * @param alt_fn Alternate function number/type.
+ * @note This function will internally set the pin mode to alternate function mode.
+ * @code
+ * // Example: Set PA2 to USART2_TX alternate function
+ * hal_gpio_set_alternate_function(PA2, HAL_GPIO_AF_USART2);
+ * @endcode
  */
 void hal_gpio_set_alternate_function(hal_gpio_pin pin,
                                      hal_gpio_alternate_function_t alt_fn) {

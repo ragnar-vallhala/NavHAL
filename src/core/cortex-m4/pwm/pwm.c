@@ -1,6 +1,18 @@
 /**
  * @file pwm.c
- * @brief PWM driver implementation for STM32F4 series (Cortex-M4).
+ * @brief PWM driver implementation for STM32F4 series (Cortex-M4)
+ * @details
+ * This file provides Pulse Width Modulation (PWM) functionality for STM32F4
+ * microcontrollers. It supports:
+ * - PWM generation on all timer channels
+ * - Configurable frequency and duty cycle
+ * - Automatic timer clock selection (APB1/APB2)
+ * - Runtime duty cycle adjustment
+ *
+ * The implementation uses the STM32 timer peripherals to generate precise
+ * PWM signals with minimal CPU overhead.
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #include "core/cortex-m4/pwm.h"
@@ -9,14 +21,19 @@
 #include <stdint.h>
 
 /**
- * @brief Initialize PWM with a specified frequency and duty cycle.
+ * @brief Initialize PWM with specified frequency and duty cycle
+ * @param[in,out] pwm Pointer to PWM handle structure
+ * @param[in] frequency Desired PWM frequency in Hz
+ * @param[in] dutyCycle Initial duty cycle (0.0 to 1.0)
  *
- * This function configures the timer to generate a PWM signal on the
- * specified channel with the given frequency and duty cycle.
+ * @details
+ * Configures the timer peripheral to generate PWM signals by:
+ * 1. Selecting the appropriate bus clock (APB1/APB2)
+ * 2. Calculating prescaler and auto-reload values
+ * 3. Setting the initial compare value for duty cycle
+ * 4. Initializing the timer peripheral
  *
- * @param pwm Pointer to the PWM handle structure.
- * @param frequency Desired PWM frequency in Hz.
- * @param dutyCycle Duty cycle as a fraction (0.0f - 1.0f).
+ * @note For advanced timers (TIM1, TIM9-TIM11), APB2 clock is used automatically
  */
 void hal_pwm_init(PWM_Handle *pwm, uint32_t frequency, float dutyCycle) {
 
@@ -36,18 +53,22 @@ void hal_pwm_init(PWM_Handle *pwm, uint32_t frequency, float dutyCycle) {
 }
 
 /**
- * @brief Start PWM output.
+ * @brief Start PWM output
+ * @param[in] pwm Pointer to initialized PWM handle structure
  *
- * @param pwm Pointer to the PWM handle structure.
+ * @details
+ * Enables the timer counter to start generating PWM signals on the
+ * configured channel. The output will appear on the corresponding GPIO pin.
  */
 void hal_pwm_start(PWM_Handle *pwm) { timer_start(pwm->timer); }
 
 /**
- * @brief Stop PWM output.
+ * @brief Stop PWM output
+ * @param[in] pwm Pointer to PWM handle structure
  *
- * This function disables the timer channel and stops the timer.
- *
- * @param pwm Pointer to the PWM handle structure.
+ * @details
+ * Disables the timer channel output and stops the timer counter.
+ * The PWM output pin will return to its idle state.
  */
 void hal_pwm_stop(PWM_Handle *pwm) {
   timer_disable_channel(pwm->timer, pwm->channel);
@@ -55,10 +76,16 @@ void hal_pwm_stop(PWM_Handle *pwm) {
 }
 
 /**
- * @brief Set PWM duty cycle.
+ * @brief Set PWM duty cycle
+ * @param[in,out] pwm Pointer to PWM handle structure
+ * @param[in] dutyCycle New duty cycle (0.0 to 1.0)
  *
- * @param pwm Pointer to the PWM handle structure.
- * @param dutyCycle New duty cycle as a fraction (0.0f - 1.0f).
+ * @details
+ * Updates the capture/compare register to change the PWM duty cycle
+ * while maintaining the current frequency. The change takes effect
+ * immediately on the output.
+ *
+ * @note Duty cycle is clamped to valid range (0.0-1.0)
  */
 void hal_pwm_set_duty_cycle(PWM_Handle *pwm, float dutyCycle) {
   uint32_t arr = timer_get_arr(pwm->timer, pwm->channel);
@@ -69,12 +96,12 @@ void hal_pwm_set_duty_cycle(PWM_Handle *pwm, float dutyCycle) {
 }
 
 /**
- * @brief Set PWM frequency.
+ * @brief Set PWM frequency (not implemented)
+ * @param[in,out] pwm Pointer to PWM handle structure
+ * @param[in] frequency Desired PWM frequency in Hz
  *
- * @note This function is not yet implemented.
- *
- * @param pwm Pointer to the PWM handle structure.
- * @param frequency Desired PWM frequency in Hz.
+ * @note This function is currently not implemented
+ * @todo Implement frequency change functionality
  */
 void hal_pwm_set_frequency(PWM_Handle *pwm, uint32_t frequency) {
   /* Timer_SetFrequency(&pwm->timer, frequency); */

@@ -104,5 +104,6 @@ var searchData=
   ['ipr_101',['IPR',['../struct_n_v_i_c___typedef.html#ae223e08fd3a28b86fde3b60f6e269fc9',1,'NVIC_Typedef']]],
   ['irqn_5ftype_102',['IRQn_Type',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8',1,'interrupt_reg.h']]],
   ['iser_103',['ISER',['../struct_n_v_i_c___typedef.html#a09849d33b73fba520f18d56fe21d0786',1,'NVIC_Typedef']]],
-  ['ispr_104',['ISPR',['../struct_n_v_i_c___typedef.html#a55d822d1ccab805896d820acdfc8ba96',1,'NVIC_Typedef']]]
+  ['ispr_104',['ISPR',['../struct_n_v_i_c___typedef.html#a55d822d1ccab805896d820acdfc8ba96',1,'NVIC_Typedef']]],
+  ['it_20supports_20usart1_20usart2_20and_20usart6_20peripherals_20with_3a_105',['It supports USART1, USART2, and USART6 peripherals with:',['../uart_8c.html#autotoc_md41',1,'']]]
 ];

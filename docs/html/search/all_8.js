@@ -83,5 +83,6 @@ var searchData=
   ['hardfault_5firqn_80',['HardFault_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8ab1a222a34a32f0ef5ac65e714efc1f85',1,'interrupt_reg.h']]],
   ['hardware_20abstraction_20layer_81',['Hardware Abstraction Layer',['../md__r_e_a_d_m_e.html',1,'NavHAL — NAVRobotec Hardware Abstraction Layer'],['../index.html#autotoc_md3',1,'NavHAL — NAVRobotec Hardware Abstraction Layer']]],
   ['hash_5frng_5firqn_82',['HASH_RNG_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a86a161642b54055f9bbea3937e6352de',1,'interrupt_reg.h']]],
-  ['hpre_5fdiv_83',['hpre_div',['../structhal__clock__config__t.html#af67318a6953fea2afc063629d20d4855',1,'hal_clock_config_t']]]
+  ['head_83',['HEAD',['../group___u_a_r_t___a_p_i.html#autotoc_md42',1,'&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD'],['../group___u_a_r_t___a_p_i.html#autotoc_md43',1,'&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD'],['../group___u_a_r_t___a_p_i.html#autotoc_md44',1,'&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD']]],
+  ['hpre_5fdiv_84',['hpre_div',['../structhal__clock__config__t.html#af67318a6953fea2afc063629d20d4855',1,'hal_clock_config_t']]]
 ];

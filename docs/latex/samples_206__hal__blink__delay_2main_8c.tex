@@ -1,0 +1,83 @@
+\doxysection{samples/06\+\_\+hal\+\_\+blink\+\_\+delay/main.c File Reference}
+\hypertarget{samples_206__hal__blink__delay_2main_8c}{}\label{samples_206__hal__blink__delay_2main_8c}\index{samples/06\_hal\_blink\_delay/main.c@{samples/06\_hal\_blink\_delay/main.c}}
+
+
+Blink LED on PA05 and print system millis over UART2.  
+
+
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{samples_206__hal__blink__delay_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{samples_206__hal__blink__delay_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{samples_206__hal__blink__delay_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Blink LED on PA05 and print system millis over UART2. 
+
+This example demonstrates\+:
+\begin{DoxyItemize}
+\item Initializing Sys\+Tick timer with 40 µs tick.
+\item Configuring GPIO PA05 as output for LED control.
+\item Initializing UART2 at 9600 baud for console output.
+\item Initializing TIM5 timer (prescaler 0, auto-\/reload 1e9).
+\item Toggling LED and printing system millis in an infinite loop.
+\end{DoxyItemize}
+
+© 2025 NAVROBOTEC PVT. LTD. All rights reserved. 
+
+\label{doc-define-members}
+\Hypertarget{samples_206__hal__blink__delay_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{samples_206__hal__blink__delay_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{samples_206__hal__blink__delay_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+
+
+\label{doc-func-members}
+\Hypertarget{samples_206__hal__blink__delay_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{samples_206__hal__blink__delay_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{samples_206__hal__blink__delay_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 40 µs tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Configure PA05 as output
+
+\texorpdfstring{$<$}{<} Initialize TIM5 with prescaler 0 and auto-\/reload 1e9
+
+\texorpdfstring{$<$}{<} Set PA05 HIGH
+
+\texorpdfstring{$<$}{<} Delay 500 ms
+
+\texorpdfstring{$<$}{<} Set PA05 LOW
+
+\texorpdfstring{$<$}{<} Delay 500 ms
+
+\texorpdfstring{$<$}{<} Print label
+
+\texorpdfstring{$<$}{<} Print system millis
+
+\texorpdfstring{$<$}{<} Newline and carriage return

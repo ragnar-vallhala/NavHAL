@@ -1,0 +1,155 @@
+\doxysection{samples/05\+\_\+hal\+\_\+systick/main.c File Reference}
+\hypertarget{samples_205__hal__systick_2main_8c}{}\label{samples_205__hal__systick_2main_8c}\index{samples/05\_hal\_systick/main.c@{samples/05\_hal\_systick/main.c}}
+
+
+Example\+: Multiple timers with callbacks and UART output.  
+
+
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{samples_205__hal__systick_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{samples_205__hal__systick_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2main_8c_aff3416b5ba14e4e47f02e7741f4ed8cd}{print2}} (void)
+\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2main_8c_a5640c62b08b55b26774cbe06a04ccadb}{print3}} (void)
+\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2main_8c_abdab22dd8ba95a44ab60f48700c45840}{print4}} (void)
+\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2main_8c_a96e70047d8ca0217694a3ded1d02da3f}{print5}} (void)
+\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2main_8c_ae675b36bf3f6e5222f7bfba2be7052c3}{print6}} (void)
+\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2main_8c_ac33643c04a66c710495fef1a7173c52b}{print7}} (void)
+\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2main_8c_a5a79a4e226ad469c3491092aa15d5a93}{print9}} (void)
+\item 
+void \mbox{\hyperlink{samples_205__hal__systick_2main_8c_ad8dca5da53fe82e817a394f63cb79593}{print12}} (void)
+\item 
+int \mbox{\hyperlink{samples_205__hal__systick_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \mbox{\hyperlink{samples_205__hal__systick_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\+\_\+cfg}}
+\item 
+\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \mbox{\hyperlink{samples_205__hal__systick_2main_8c_a921c2505bac76424f5f96cc1e4f62986}{cfg}} = \{.source = \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ab6e96fd0b556480b197d5dc539c3b504}{HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+HSI}}\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Example\+: Multiple timers with callbacks and UART output. 
+
+This example demonstrates\+:
+\begin{DoxyItemize}
+\item Configuring the system clock using HSI or PLL.
+\item Initializing Sys\+Tick timer with 1 ms tick.
+\item Initializing UART2 at 9600 baud for console output.
+\item Setting up TIM2, TIM3, TIM4, TIM5, and TIM9 timers with interrupts.
+\item Attaching callbacks to each timer to print messages via UART2.
+\end{DoxyItemize}
+
+© 2025 NAVROBOTEC PVT. LTD. All rights reserved. 
+
+\label{doc-define-members}
+\Hypertarget{samples_205__hal__systick_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{samples_205__hal__systick_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+
+
+\label{doc-func-members}
+\Hypertarget{samples_205__hal__systick_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{samples_205__hal__systick_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\texorpdfstring{$<$}{<} 1 ms tick
+
+\texorpdfstring{$<$}{<} UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} 1-\/second delay\Hypertarget{samples_205__hal__systick_2main_8c_ad8dca5da53fe82e817a394f63cb79593}\index{main.c@{main.c}!print12@{print12}}
+\index{print12@{print12}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print12()}{print12()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_ad8dca5da53fe82e817a394f63cb79593} 
+void print12 (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_205__hal__systick_2main_8c_aff3416b5ba14e4e47f02e7741f4ed8cd}\index{main.c@{main.c}!print2@{print2}}
+\index{print2@{print2}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print2()}{print2()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_aff3416b5ba14e4e47f02e7741f4ed8cd} 
+void print2 (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_205__hal__systick_2main_8c_a5640c62b08b55b26774cbe06a04ccadb}\index{main.c@{main.c}!print3@{print3}}
+\index{print3@{print3}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print3()}{print3()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_a5640c62b08b55b26774cbe06a04ccadb} 
+void print3 (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_205__hal__systick_2main_8c_abdab22dd8ba95a44ab60f48700c45840}\index{main.c@{main.c}!print4@{print4}}
+\index{print4@{print4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print4()}{print4()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_abdab22dd8ba95a44ab60f48700c45840} 
+void print4 (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_205__hal__systick_2main_8c_a96e70047d8ca0217694a3ded1d02da3f}\index{main.c@{main.c}!print5@{print5}}
+\index{print5@{print5}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print5()}{print5()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_a96e70047d8ca0217694a3ded1d02da3f} 
+void print5 (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_205__hal__systick_2main_8c_ae675b36bf3f6e5222f7bfba2be7052c3}\index{main.c@{main.c}!print6@{print6}}
+\index{print6@{print6}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print6()}{print6()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_ae675b36bf3f6e5222f7bfba2be7052c3} 
+void print6 (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_205__hal__systick_2main_8c_ac33643c04a66c710495fef1a7173c52b}\index{main.c@{main.c}!print7@{print7}}
+\index{print7@{print7}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print7()}{print7()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_ac33643c04a66c710495fef1a7173c52b} 
+void print7 (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_205__hal__systick_2main_8c_a5a79a4e226ad469c3491092aa15d5a93}\index{main.c@{main.c}!print9@{print9}}
+\index{print9@{print9}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print9()}{print9()}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_a5a79a4e226ad469c3491092aa15d5a93} 
+void print9 (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+\label{doc-var-members}
+\Hypertarget{samples_205__hal__systick_2main_8c_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{samples_205__hal__systick_2main_8c_a921c2505bac76424f5f96cc1e4f62986}\index{main.c@{main.c}!cfg@{cfg}}
+\index{cfg@{cfg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{cfg}{cfg}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_a921c2505bac76424f5f96cc1e4f62986} 
+\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} cfg = \{.source = \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ab6e96fd0b556480b197d5dc539c3b504}{HAL\+\_\+\+CLOCK\+\_\+\+SOURCE\+\_\+\+HSI}}\}}
+
+Use HSI as system clock \Hypertarget{samples_205__hal__systick_2main_8c_adf1b524219e8781fa7542fa90dd09912}\index{main.c@{main.c}!pll\_cfg@{pll\_cfg}}
+\index{pll\_cfg@{pll\_cfg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{pll\_cfg}{pll\_cfg}}
+{\footnotesize\ttfamily \label{samples_205__hal__systick_2main_8c_adf1b524219e8781fa7542fa90dd09912} 
+\mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} pll\+\_\+cfg}
+
+PLL config (unused if HSI) 

@@ -1,0 +1,9 @@
+<map id="include/core/cortex&#45;m4/i2c.h" name="include/core/cortex&#45;m4/i2c.h">
+<area shape="rect" id="Node000001" title="Cortex&#45;M4 I²C HAL interface." alt="" coords="124,5,255,46"/>
+<area shape="rect" id="Node000002" href="$gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="5,94,129,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,49,100,88,97,83,158,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="152,94,227,120"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,46,192,78,187,78,187,46"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="251,94,315,120"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="214,44,259,82,255,86,211,48"/>
+</map>

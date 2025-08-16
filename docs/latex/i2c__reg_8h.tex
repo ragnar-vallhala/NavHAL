@@ -1,0 +1,544 @@
+\doxysection{include/core/cortex-\/m4/i2c\+\_\+reg.h File Reference}
+\hypertarget{i2c__reg_8h}{}\label{i2c__reg_8h}\index{include/core/cortex-\/m4/i2c\_reg.h@{include/core/cortex-\/m4/i2c\_reg.h}}
+
+
+Cortex-\/\+M4 I²C peripheral register definitions and bit masks.  
+
+
+{\ttfamily \#include "{}utils/types.\+h"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for i2c\+\_\+reg.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{i2c__reg_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{i2c__reg_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_i2_c___reg___typedef}{I2\+C\+\_\+\+Reg\+\_\+\+Typedef}}
+\begin{DoxyCompactList}\small\item\em I²C peripheral register map. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a519f8372be8fbe83622ee0ec34a62870}{I2\+C\+\_\+\+BASE\+\_\+\+ADDR}}~0x40005400
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a1888997f2918b3c3743b3a04681e1056}{I2\+C\+\_\+\+GET\+\_\+\+BASE}}(n)
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a1fc9fda13cb8df08c483b20e92a4507f}{I2\+C\+\_\+\+APB1\+ENR\+\_\+\+MASK}}(n)
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a7954738eae12426137b23733f12c7c14}{I2\+C\+\_\+\+CR1\+\_\+\+PE\+\_\+\+Pos}}~0
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a3d849f9a2772fb0a0245678449645774}{I2\+C\+\_\+\+CR1\+\_\+\+PE\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a7954738eae12426137b23733f12c7c14}{I2\+C\+\_\+\+CR1\+\_\+\+PE\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a26478428c37301f88c8fe5a27ab7cff0}{I2\+C\+\_\+\+CR1\+\_\+\+START\+\_\+\+Pos}}~8
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a475abc5eb8c6c70569029205d8a3bd11}{I2\+C\+\_\+\+CR1\+\_\+\+START\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a26478428c37301f88c8fe5a27ab7cff0}{I2\+C\+\_\+\+CR1\+\_\+\+START\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a1acc4153373e71ad85766145727d751f}{I2\+C\+\_\+\+CR1\+\_\+\+STOP\+\_\+\+Pos}}~9
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a6ace25caad65eb00ca1eae8347ea40b9}{I2\+C\+\_\+\+CR1\+\_\+\+STOP\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a1acc4153373e71ad85766145727d751f}{I2\+C\+\_\+\+CR1\+\_\+\+STOP\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_ac4d488ef9214c8e156aa5789193b1af2}{I2\+C\+\_\+\+CR1\+\_\+\+ACK\+\_\+\+Pos}}~10
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a62c761dad8e442e7f494c2f7db77e32e}{I2\+C\+\_\+\+CR1\+\_\+\+ACK\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_ac4d488ef9214c8e156aa5789193b1af2}{I2\+C\+\_\+\+CR1\+\_\+\+ACK\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a1c8ebf2be75a57d79c3963cbb73299e5}{I2\+C\+\_\+\+CR1\+\_\+\+POS\+\_\+\+Pos}}~11
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a02da845cf27ef316e8918f04a4440d6a}{I2\+C\+\_\+\+CR1\+\_\+\+POS\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a1c8ebf2be75a57d79c3963cbb73299e5}{I2\+C\+\_\+\+CR1\+\_\+\+POS\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a5f26e1407449ae64fade6b92a5e85bc9}{I2\+C\+\_\+\+CR1\+\_\+\+SWRST\+\_\+\+Pos}}~15
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a3932b6abd5d1d7354651bf4370c546b7}{I2\+C\+\_\+\+CR1\+\_\+\+SWRST\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a5f26e1407449ae64fade6b92a5e85bc9}{I2\+C\+\_\+\+CR1\+\_\+\+SWRST\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_ae37aa57192c71b1b734815130eeee8cd}{I2\+C\+\_\+\+CR2\+\_\+\+FREQ\+\_\+\+Pos}}~0
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a0d801f8b8a5f697138f56b445fc739f7}{I2\+C\+\_\+\+CR2\+\_\+\+FREQ\+\_\+\+MASK}}~(0x3\+FU $<$$<$ \mbox{\hyperlink{i2c__reg_8h_ae37aa57192c71b1b734815130eeee8cd}{I2\+C\+\_\+\+CR2\+\_\+\+FREQ\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a1d664ebaabc46a45c4453e17e5132056}{I2\+C\+\_\+\+CR2\+\_\+\+ITERREN\+\_\+\+Pos}}~8
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a6f14ae48e4609c2b3645211234cba974}{I2\+C\+\_\+\+CR2\+\_\+\+ITERREN}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a1d664ebaabc46a45c4453e17e5132056}{I2\+C\+\_\+\+CR2\+\_\+\+ITERREN\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_ae6b73580546ba348cd434416f7729d65}{I2\+C\+\_\+\+CR2\+\_\+\+ITEVTEN\+\_\+\+Pos}}~9
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a3b1ebaf8173090ec469b055b98e585d2}{I2\+C\+\_\+\+CR2\+\_\+\+ITEVTEN}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_ae6b73580546ba348cd434416f7729d65}{I2\+C\+\_\+\+CR2\+\_\+\+ITEVTEN\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a1cf0976d8a817ec970a78137e6bac452}{I2\+C\+\_\+\+CR2\+\_\+\+ITBUFEN\+\_\+\+Pos}}~10
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a2efbe5d96ed0ce447a45a62e8317a68a}{I2\+C\+\_\+\+CR2\+\_\+\+ITBUFEN}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a1cf0976d8a817ec970a78137e6bac452}{I2\+C\+\_\+\+CR2\+\_\+\+ITBUFEN\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a67ed7d8c3e9dc642c2c70c834aeec6ea}{I2\+C\+\_\+\+SR1\+\_\+\+SB\+\_\+\+Pos}}~0
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_ae838b09694963d88acb48be8ac1d35b7}{I2\+C\+\_\+\+SR1\+\_\+\+SB\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a67ed7d8c3e9dc642c2c70c834aeec6ea}{I2\+C\+\_\+\+SR1\+\_\+\+SB\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a4662fc1d4534a406d3e4e417dcaa29c1}{I2\+C\+\_\+\+SR1\+\_\+\+ADDR\+\_\+\+Pos}}~1
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a570e3a0e09e5a7183d4d195635a429a8}{I2\+C\+\_\+\+SR1\+\_\+\+ADDR\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a4662fc1d4534a406d3e4e417dcaa29c1}{I2\+C\+\_\+\+SR1\+\_\+\+ADDR\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a3c662220a2fc8d437b929ac360b7b6d3}{I2\+C\+\_\+\+SR1\+\_\+\+BTF\+\_\+\+Pos}}~2
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a4487c3a750a952f694b09473b1d7235a}{I2\+C\+\_\+\+SR1\+\_\+\+BTF\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a3c662220a2fc8d437b929ac360b7b6d3}{I2\+C\+\_\+\+SR1\+\_\+\+BTF\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a508dc538aee33bf854cfbe3b7f4a7ba9}{I2\+C\+\_\+\+SR1\+\_\+\+STOPF\+\_\+\+Pos}}~4
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_aafcea4cdbe2f6da31566c897fa893a7c}{I2\+C\+\_\+\+SR1\+\_\+\+STOPF}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a508dc538aee33bf854cfbe3b7f4a7ba9}{I2\+C\+\_\+\+SR1\+\_\+\+STOPF\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a380b3695a5b03ae70e411ba048a04e49}{I2\+C\+\_\+\+SR1\+\_\+\+RXNE\+\_\+\+Pos}}~6
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a195cfb6bcc3f1b40330bbe3c6b207929}{I2\+C\+\_\+\+SR1\+\_\+\+RXNE\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a380b3695a5b03ae70e411ba048a04e49}{I2\+C\+\_\+\+SR1\+\_\+\+RXNE\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_abdceff8db6df40c017f96a5e606ea884}{I2\+C\+\_\+\+SR1\+\_\+\+TXE\+\_\+\+Pos}}~7
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a46cf04ad0c84b8a1517a53d1dfc86cc7}{I2\+C\+\_\+\+SR1\+\_\+\+TXE\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_abdceff8db6df40c017f96a5e606ea884}{I2\+C\+\_\+\+SR1\+\_\+\+TXE\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a0a1c615024c02d5ea5bcb3717ff6863d}{I2\+C\+\_\+\+SR1\+\_\+\+BERR\+\_\+\+Pos}}~8
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a1d12990c90ab0757dcfea150ea50b227}{I2\+C\+\_\+\+SR1\+\_\+\+BERR}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a0a1c615024c02d5ea5bcb3717ff6863d}{I2\+C\+\_\+\+SR1\+\_\+\+BERR\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_afab03fd640b6661848addb3cd9d38519}{I2\+C\+\_\+\+SR1\+\_\+\+ARLO\+\_\+\+Pos}}~9
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_acbc52f6ec6172c71d8b026a22c2f69d2}{I2\+C\+\_\+\+SR1\+\_\+\+ARLO}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_afab03fd640b6661848addb3cd9d38519}{I2\+C\+\_\+\+SR1\+\_\+\+ARLO\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_afb0a33028b96b10708bd881b21c17dae}{I2\+C\+\_\+\+SR1\+\_\+\+AF\+\_\+\+Pos}}~10
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a62aa2496d4b3955214a16a7bd998fd88}{I2\+C\+\_\+\+SR1\+\_\+\+AF}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_afb0a33028b96b10708bd881b21c17dae}{I2\+C\+\_\+\+SR1\+\_\+\+AF\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a628a0e0ea5fa7dd31b68d2bac80b8b20}{I2\+C\+\_\+\+SR1\+\_\+\+OVR\+\_\+\+Pos}}~11
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_ad42d2435d2e64bf710c701c9b17adfb4}{I2\+C\+\_\+\+SR1\+\_\+\+OVR}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a628a0e0ea5fa7dd31b68d2bac80b8b20}{I2\+C\+\_\+\+SR1\+\_\+\+OVR\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a80a7d5a7ab0b5eb4bbbcf59d64e9e58e}{I2\+C\+\_\+\+SR1\+\_\+\+TIMEOUT\+\_\+\+Pos}}~14
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_aef3a1e4921d7c509d1b639c67882c4c9}{I2\+C\+\_\+\+SR1\+\_\+\+TIMEOUT}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a80a7d5a7ab0b5eb4bbbcf59d64e9e58e}{I2\+C\+\_\+\+SR1\+\_\+\+TIMEOUT\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_ada5253dbcd3c7d67d0fad31d938f4b5b}{I2\+C\+\_\+\+SR2\+\_\+\+MSL\+\_\+\+Pos}}~0
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a75cc361adf0e72e33d6771ebfa17b52d}{I2\+C\+\_\+\+SR2\+\_\+\+MSL}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_ada5253dbcd3c7d67d0fad31d938f4b5b}{I2\+C\+\_\+\+SR2\+\_\+\+MSL\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_aa9b4a60a8e919cfe14e222976859b1cd}{I2\+C\+\_\+\+SR2\+\_\+\+BUSY\+\_\+\+Pos}}~1
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a3b1e75a82da73ae2873cff1cd27c3179}{I2\+C\+\_\+\+SR2\+\_\+\+BUSY}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_aa9b4a60a8e919cfe14e222976859b1cd}{I2\+C\+\_\+\+SR2\+\_\+\+BUSY\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a91e4b3f7e5bff2ea65eefeadbc0a2e2a}{I2\+C\+\_\+\+SR2\+\_\+\+TRA\+\_\+\+Pos}}~2
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a288b20416b42a79e591aa80d9a690fca}{I2\+C\+\_\+\+SR2\+\_\+\+TRA}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a91e4b3f7e5bff2ea65eefeadbc0a2e2a}{I2\+C\+\_\+\+SR2\+\_\+\+TRA\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a908f5b1edffdedba90f8bbb141eedb8a}{I2\+C\+\_\+\+CCR\+\_\+\+CCR\+\_\+\+Pos}}~0
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a81c71157ed1760923fc411d47ec5c5c7}{I2\+C\+\_\+\+CCR\+\_\+\+CCR\+\_\+\+MASK}}~(0x\+FFFU $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a908f5b1edffdedba90f8bbb141eedb8a}{I2\+C\+\_\+\+CCR\+\_\+\+CCR\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a152abc0c5a01abf887e702cbc9fe4f49}{I2\+C\+\_\+\+CCR\+\_\+\+DUTY\+\_\+\+Pos}}~14
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a851c8a6b598d54c1a805b1632a4078e5}{I2\+C\+\_\+\+CCR\+\_\+\+DUTY}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a152abc0c5a01abf887e702cbc9fe4f49}{I2\+C\+\_\+\+CCR\+\_\+\+DUTY\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a017a81aea2e87d24a49e078079d72313}{I2\+C\+\_\+\+CCR\+\_\+\+FS\+\_\+\+Pos}}~15
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_aa22ba8184a0a42476b5fa9c40706a4de}{I2\+C\+\_\+\+CCR\+\_\+\+FS\+\_\+\+MASK}}~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a017a81aea2e87d24a49e078079d72313}{I2\+C\+\_\+\+CCR\+\_\+\+FS\+\_\+\+Pos}})
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_afb08ecb9599f81e5112a25142cb0e98f}{I2\+C\+\_\+\+TRISE\+\_\+\+TRISE\+\_\+\+Pos}}~0
+\item 
+\#define \mbox{\hyperlink{i2c__reg_8h_a8a3152b3f16c453126cc1cef41b765fe}{I2\+C\+\_\+\+TRISE\+\_\+\+TRISE\+\_\+\+Msk}}~(0x3\+FU $<$$<$ \mbox{\hyperlink{i2c__reg_8h_afb08ecb9599f81e5112a25142cb0e98f}{I2\+C\+\_\+\+TRISE\+\_\+\+TRISE\+\_\+\+Pos}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Cortex-\/\+M4 I²C peripheral register definitions and bit masks. 
+
+This header defines the memory-\/mapped structure of I²C registers and related macros for accessing and configuring the I²C peripheral on Cortex-\/\+M4 microcontrollers.
+
+Structures\+:
+\begin{DoxyItemize}
+\item {\ttfamily \doxylink{struct_i2_c___reg___typedef}{I2\+C\+\_\+\+Reg\+\_\+\+Typedef}} \+: Represents the layout of I²C registers.
+\end{DoxyItemize}
+
+Macros\+:
+\begin{DoxyItemize}
+\item Base addresses and port access macros.
+\item Control (CR1, CR2), status (SR1, SR2), clock (CCR, TRISE), and filter (FLTR) bits.
+\end{DoxyItemize}
+
+These definitions allow the HAL and driver code to manipulate I²C hardware registers in a readable and maintainable way.
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{i2c__reg_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{i2c__reg_8h_a1fc9fda13cb8df08c483b20e92a4507f}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_APB1ENR\_MASK@{I2C\_APB1ENR\_MASK}}
+\index{I2C\_APB1ENR\_MASK@{I2C\_APB1ENR\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_APB1ENR\_MASK}{I2C\_APB1ENR\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a1fc9fda13cb8df08c483b20e92a4507f} 
+\#define I2\+C\+\_\+\+APB1\+ENR\+\_\+\+MASK(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(1\ <<\ (21\ +\ n))}
+
+\end{DoxyCode}
+Enable mask for APB1 peripheral clock \Hypertarget{i2c__reg_8h_a519f8372be8fbe83622ee0ec34a62870}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_BASE\_ADDR@{I2C\_BASE\_ADDR}}
+\index{I2C\_BASE\_ADDR@{I2C\_BASE\_ADDR}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_BASE\_ADDR}{I2C\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a519f8372be8fbe83622ee0ec34a62870} 
+\#define I2\+C\+\_\+\+BASE\+\_\+\+ADDR~0x40005400}
+
+Base address for I²C peripheral I²C base address \Hypertarget{i2c__reg_8h_a81c71157ed1760923fc411d47ec5c5c7}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CCR\_CCR\_MASK@{I2C\_CCR\_CCR\_MASK}}
+\index{I2C\_CCR\_CCR\_MASK@{I2C\_CCR\_CCR\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CCR\_CCR\_MASK}{I2C\_CCR\_CCR\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a81c71157ed1760923fc411d47ec5c5c7} 
+\#define I2\+C\+\_\+\+CCR\+\_\+\+CCR\+\_\+\+MASK~(0x\+FFFU $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a908f5b1edffdedba90f8bbb141eedb8a}{I2\+C\+\_\+\+CCR\+\_\+\+CCR\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a908f5b1edffdedba90f8bbb141eedb8a}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CCR\_CCR\_Pos@{I2C\_CCR\_CCR\_Pos}}
+\index{I2C\_CCR\_CCR\_Pos@{I2C\_CCR\_CCR\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CCR\_CCR\_Pos}{I2C\_CCR\_CCR\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a908f5b1edffdedba90f8bbb141eedb8a} 
+\#define I2\+C\+\_\+\+CCR\+\_\+\+CCR\+\_\+\+Pos~0}
+
+CCR register bit positions and masks \Hypertarget{i2c__reg_8h_a851c8a6b598d54c1a805b1632a4078e5}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CCR\_DUTY@{I2C\_CCR\_DUTY}}
+\index{I2C\_CCR\_DUTY@{I2C\_CCR\_DUTY}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CCR\_DUTY}{I2C\_CCR\_DUTY}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a851c8a6b598d54c1a805b1632a4078e5} 
+\#define I2\+C\+\_\+\+CCR\+\_\+\+DUTY~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a152abc0c5a01abf887e702cbc9fe4f49}{I2\+C\+\_\+\+CCR\+\_\+\+DUTY\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a152abc0c5a01abf887e702cbc9fe4f49}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CCR\_DUTY\_Pos@{I2C\_CCR\_DUTY\_Pos}}
+\index{I2C\_CCR\_DUTY\_Pos@{I2C\_CCR\_DUTY\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CCR\_DUTY\_Pos}{I2C\_CCR\_DUTY\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a152abc0c5a01abf887e702cbc9fe4f49} 
+\#define I2\+C\+\_\+\+CCR\+\_\+\+DUTY\+\_\+\+Pos~14}
+
+\Hypertarget{i2c__reg_8h_aa22ba8184a0a42476b5fa9c40706a4de}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CCR\_FS\_MASK@{I2C\_CCR\_FS\_MASK}}
+\index{I2C\_CCR\_FS\_MASK@{I2C\_CCR\_FS\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CCR\_FS\_MASK}{I2C\_CCR\_FS\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_aa22ba8184a0a42476b5fa9c40706a4de} 
+\#define I2\+C\+\_\+\+CCR\+\_\+\+FS\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a017a81aea2e87d24a49e078079d72313}{I2\+C\+\_\+\+CCR\+\_\+\+FS\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a017a81aea2e87d24a49e078079d72313}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CCR\_FS\_Pos@{I2C\_CCR\_FS\_Pos}}
+\index{I2C\_CCR\_FS\_Pos@{I2C\_CCR\_FS\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CCR\_FS\_Pos}{I2C\_CCR\_FS\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a017a81aea2e87d24a49e078079d72313} 
+\#define I2\+C\+\_\+\+CCR\+\_\+\+FS\+\_\+\+Pos~15}
+
+\Hypertarget{i2c__reg_8h_a62c761dad8e442e7f494c2f7db77e32e}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_ACK\_MASK@{I2C\_CR1\_ACK\_MASK}}
+\index{I2C\_CR1\_ACK\_MASK@{I2C\_CR1\_ACK\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_ACK\_MASK}{I2C\_CR1\_ACK\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a62c761dad8e442e7f494c2f7db77e32e} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+ACK\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_ac4d488ef9214c8e156aa5789193b1af2}{I2\+C\+\_\+\+CR1\+\_\+\+ACK\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_ac4d488ef9214c8e156aa5789193b1af2}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_ACK\_Pos@{I2C\_CR1\_ACK\_Pos}}
+\index{I2C\_CR1\_ACK\_Pos@{I2C\_CR1\_ACK\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_ACK\_Pos}{I2C\_CR1\_ACK\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_ac4d488ef9214c8e156aa5789193b1af2} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+ACK\+\_\+\+Pos~10}
+
+\Hypertarget{i2c__reg_8h_a3d849f9a2772fb0a0245678449645774}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_PE\_MASK@{I2C\_CR1\_PE\_MASK}}
+\index{I2C\_CR1\_PE\_MASK@{I2C\_CR1\_PE\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_PE\_MASK}{I2C\_CR1\_PE\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a3d849f9a2772fb0a0245678449645774} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+PE\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a7954738eae12426137b23733f12c7c14}{I2\+C\+\_\+\+CR1\+\_\+\+PE\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a7954738eae12426137b23733f12c7c14}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_PE\_Pos@{I2C\_CR1\_PE\_Pos}}
+\index{I2C\_CR1\_PE\_Pos@{I2C\_CR1\_PE\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_PE\_Pos}{I2C\_CR1\_PE\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a7954738eae12426137b23733f12c7c14} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+PE\+\_\+\+Pos~0}
+
+CR1 register bit positions and masks \Hypertarget{i2c__reg_8h_a02da845cf27ef316e8918f04a4440d6a}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_POS\_MASK@{I2C\_CR1\_POS\_MASK}}
+\index{I2C\_CR1\_POS\_MASK@{I2C\_CR1\_POS\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_POS\_MASK}{I2C\_CR1\_POS\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a02da845cf27ef316e8918f04a4440d6a} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+POS\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a1c8ebf2be75a57d79c3963cbb73299e5}{I2\+C\+\_\+\+CR1\+\_\+\+POS\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a1c8ebf2be75a57d79c3963cbb73299e5}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_POS\_Pos@{I2C\_CR1\_POS\_Pos}}
+\index{I2C\_CR1\_POS\_Pos@{I2C\_CR1\_POS\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_POS\_Pos}{I2C\_CR1\_POS\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a1c8ebf2be75a57d79c3963cbb73299e5} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+POS\+\_\+\+Pos~11}
+
+\Hypertarget{i2c__reg_8h_a475abc5eb8c6c70569029205d8a3bd11}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_START\_MASK@{I2C\_CR1\_START\_MASK}}
+\index{I2C\_CR1\_START\_MASK@{I2C\_CR1\_START\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_START\_MASK}{I2C\_CR1\_START\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a475abc5eb8c6c70569029205d8a3bd11} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+START\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a26478428c37301f88c8fe5a27ab7cff0}{I2\+C\+\_\+\+CR1\+\_\+\+START\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a26478428c37301f88c8fe5a27ab7cff0}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_START\_Pos@{I2C\_CR1\_START\_Pos}}
+\index{I2C\_CR1\_START\_Pos@{I2C\_CR1\_START\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_START\_Pos}{I2C\_CR1\_START\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a26478428c37301f88c8fe5a27ab7cff0} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+START\+\_\+\+Pos~8}
+
+\Hypertarget{i2c__reg_8h_a6ace25caad65eb00ca1eae8347ea40b9}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_STOP\_MASK@{I2C\_CR1\_STOP\_MASK}}
+\index{I2C\_CR1\_STOP\_MASK@{I2C\_CR1\_STOP\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_STOP\_MASK}{I2C\_CR1\_STOP\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a6ace25caad65eb00ca1eae8347ea40b9} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+STOP\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a1acc4153373e71ad85766145727d751f}{I2\+C\+\_\+\+CR1\+\_\+\+STOP\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a1acc4153373e71ad85766145727d751f}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_STOP\_Pos@{I2C\_CR1\_STOP\_Pos}}
+\index{I2C\_CR1\_STOP\_Pos@{I2C\_CR1\_STOP\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_STOP\_Pos}{I2C\_CR1\_STOP\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a1acc4153373e71ad85766145727d751f} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+STOP\+\_\+\+Pos~9}
+
+\Hypertarget{i2c__reg_8h_a3932b6abd5d1d7354651bf4370c546b7}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_SWRST\_MASK@{I2C\_CR1\_SWRST\_MASK}}
+\index{I2C\_CR1\_SWRST\_MASK@{I2C\_CR1\_SWRST\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_SWRST\_MASK}{I2C\_CR1\_SWRST\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a3932b6abd5d1d7354651bf4370c546b7} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+SWRST\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a5f26e1407449ae64fade6b92a5e85bc9}{I2\+C\+\_\+\+CR1\+\_\+\+SWRST\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a5f26e1407449ae64fade6b92a5e85bc9}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR1\_SWRST\_Pos@{I2C\_CR1\_SWRST\_Pos}}
+\index{I2C\_CR1\_SWRST\_Pos@{I2C\_CR1\_SWRST\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR1\_SWRST\_Pos}{I2C\_CR1\_SWRST\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a5f26e1407449ae64fade6b92a5e85bc9} 
+\#define I2\+C\+\_\+\+CR1\+\_\+\+SWRST\+\_\+\+Pos~15}
+
+\Hypertarget{i2c__reg_8h_a0d801f8b8a5f697138f56b445fc739f7}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR2\_FREQ\_MASK@{I2C\_CR2\_FREQ\_MASK}}
+\index{I2C\_CR2\_FREQ\_MASK@{I2C\_CR2\_FREQ\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR2\_FREQ\_MASK}{I2C\_CR2\_FREQ\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a0d801f8b8a5f697138f56b445fc739f7} 
+\#define I2\+C\+\_\+\+CR2\+\_\+\+FREQ\+\_\+\+MASK~(0x3\+FU $<$$<$ \mbox{\hyperlink{i2c__reg_8h_ae37aa57192c71b1b734815130eeee8cd}{I2\+C\+\_\+\+CR2\+\_\+\+FREQ\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_ae37aa57192c71b1b734815130eeee8cd}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR2\_FREQ\_Pos@{I2C\_CR2\_FREQ\_Pos}}
+\index{I2C\_CR2\_FREQ\_Pos@{I2C\_CR2\_FREQ\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR2\_FREQ\_Pos}{I2C\_CR2\_FREQ\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_ae37aa57192c71b1b734815130eeee8cd} 
+\#define I2\+C\+\_\+\+CR2\+\_\+\+FREQ\+\_\+\+Pos~0}
+
+CR2 register bit positions and masks \Hypertarget{i2c__reg_8h_a2efbe5d96ed0ce447a45a62e8317a68a}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR2\_ITBUFEN@{I2C\_CR2\_ITBUFEN}}
+\index{I2C\_CR2\_ITBUFEN@{I2C\_CR2\_ITBUFEN}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR2\_ITBUFEN}{I2C\_CR2\_ITBUFEN}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a2efbe5d96ed0ce447a45a62e8317a68a} 
+\#define I2\+C\+\_\+\+CR2\+\_\+\+ITBUFEN~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a1cf0976d8a817ec970a78137e6bac452}{I2\+C\+\_\+\+CR2\+\_\+\+ITBUFEN\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a1cf0976d8a817ec970a78137e6bac452}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR2\_ITBUFEN\_Pos@{I2C\_CR2\_ITBUFEN\_Pos}}
+\index{I2C\_CR2\_ITBUFEN\_Pos@{I2C\_CR2\_ITBUFEN\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR2\_ITBUFEN\_Pos}{I2C\_CR2\_ITBUFEN\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a1cf0976d8a817ec970a78137e6bac452} 
+\#define I2\+C\+\_\+\+CR2\+\_\+\+ITBUFEN\+\_\+\+Pos~10}
+
+\Hypertarget{i2c__reg_8h_a6f14ae48e4609c2b3645211234cba974}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR2\_ITERREN@{I2C\_CR2\_ITERREN}}
+\index{I2C\_CR2\_ITERREN@{I2C\_CR2\_ITERREN}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR2\_ITERREN}{I2C\_CR2\_ITERREN}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a6f14ae48e4609c2b3645211234cba974} 
+\#define I2\+C\+\_\+\+CR2\+\_\+\+ITERREN~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a1d664ebaabc46a45c4453e17e5132056}{I2\+C\+\_\+\+CR2\+\_\+\+ITERREN\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a1d664ebaabc46a45c4453e17e5132056}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR2\_ITERREN\_Pos@{I2C\_CR2\_ITERREN\_Pos}}
+\index{I2C\_CR2\_ITERREN\_Pos@{I2C\_CR2\_ITERREN\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR2\_ITERREN\_Pos}{I2C\_CR2\_ITERREN\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a1d664ebaabc46a45c4453e17e5132056} 
+\#define I2\+C\+\_\+\+CR2\+\_\+\+ITERREN\+\_\+\+Pos~8}
+
+\Hypertarget{i2c__reg_8h_a3b1ebaf8173090ec469b055b98e585d2}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR2\_ITEVTEN@{I2C\_CR2\_ITEVTEN}}
+\index{I2C\_CR2\_ITEVTEN@{I2C\_CR2\_ITEVTEN}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR2\_ITEVTEN}{I2C\_CR2\_ITEVTEN}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a3b1ebaf8173090ec469b055b98e585d2} 
+\#define I2\+C\+\_\+\+CR2\+\_\+\+ITEVTEN~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_ae6b73580546ba348cd434416f7729d65}{I2\+C\+\_\+\+CR2\+\_\+\+ITEVTEN\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_ae6b73580546ba348cd434416f7729d65}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_CR2\_ITEVTEN\_Pos@{I2C\_CR2\_ITEVTEN\_Pos}}
+\index{I2C\_CR2\_ITEVTEN\_Pos@{I2C\_CR2\_ITEVTEN\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_CR2\_ITEVTEN\_Pos}{I2C\_CR2\_ITEVTEN\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_ae6b73580546ba348cd434416f7729d65} 
+\#define I2\+C\+\_\+\+CR2\+\_\+\+ITEVTEN\+\_\+\+Pos~9}
+
+\Hypertarget{i2c__reg_8h_a1888997f2918b3c3743b3a04681e1056}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_GET\_BASE@{I2C\_GET\_BASE}}
+\index{I2C\_GET\_BASE@{I2C\_GET\_BASE}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_GET\_BASE}{I2C\_GET\_BASE}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a1888997f2918b3c3743b3a04681e1056} 
+\#define I2\+C\+\_\+\+GET\+\_\+\+BASE(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((\mbox{\hyperlink{struct_i2_c___reg___typedef}{I2C\_Reg\_Typedef}}\ *)(\mbox{\hyperlink{i2c__reg_8h_a519f8372be8fbe83622ee0ec34a62870}{I2C\_BASE\_ADDR}}\ +\ (0x400\ *\ n)))}
+
+\end{DoxyCode}
+Get pointer to I²C peripheral instance \Hypertarget{i2c__reg_8h_a570e3a0e09e5a7183d4d195635a429a8}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_ADDR\_MASK@{I2C\_SR1\_ADDR\_MASK}}
+\index{I2C\_SR1\_ADDR\_MASK@{I2C\_SR1\_ADDR\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_ADDR\_MASK}{I2C\_SR1\_ADDR\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a570e3a0e09e5a7183d4d195635a429a8} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+ADDR\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a4662fc1d4534a406d3e4e417dcaa29c1}{I2\+C\+\_\+\+SR1\+\_\+\+ADDR\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a4662fc1d4534a406d3e4e417dcaa29c1}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_ADDR\_Pos@{I2C\_SR1\_ADDR\_Pos}}
+\index{I2C\_SR1\_ADDR\_Pos@{I2C\_SR1\_ADDR\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_ADDR\_Pos}{I2C\_SR1\_ADDR\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a4662fc1d4534a406d3e4e417dcaa29c1} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+ADDR\+\_\+\+Pos~1}
+
+\Hypertarget{i2c__reg_8h_a62aa2496d4b3955214a16a7bd998fd88}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_AF@{I2C\_SR1\_AF}}
+\index{I2C\_SR1\_AF@{I2C\_SR1\_AF}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_AF}{I2C\_SR1\_AF}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a62aa2496d4b3955214a16a7bd998fd88} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+AF~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_afb0a33028b96b10708bd881b21c17dae}{I2\+C\+\_\+\+SR1\+\_\+\+AF\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_afb0a33028b96b10708bd881b21c17dae}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_AF\_Pos@{I2C\_SR1\_AF\_Pos}}
+\index{I2C\_SR1\_AF\_Pos@{I2C\_SR1\_AF\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_AF\_Pos}{I2C\_SR1\_AF\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_afb0a33028b96b10708bd881b21c17dae} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+AF\+\_\+\+Pos~10}
+
+\Hypertarget{i2c__reg_8h_acbc52f6ec6172c71d8b026a22c2f69d2}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_ARLO@{I2C\_SR1\_ARLO}}
+\index{I2C\_SR1\_ARLO@{I2C\_SR1\_ARLO}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_ARLO}{I2C\_SR1\_ARLO}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_acbc52f6ec6172c71d8b026a22c2f69d2} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+ARLO~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_afab03fd640b6661848addb3cd9d38519}{I2\+C\+\_\+\+SR1\+\_\+\+ARLO\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_afab03fd640b6661848addb3cd9d38519}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_ARLO\_Pos@{I2C\_SR1\_ARLO\_Pos}}
+\index{I2C\_SR1\_ARLO\_Pos@{I2C\_SR1\_ARLO\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_ARLO\_Pos}{I2C\_SR1\_ARLO\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_afab03fd640b6661848addb3cd9d38519} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+ARLO\+\_\+\+Pos~9}
+
+\Hypertarget{i2c__reg_8h_a1d12990c90ab0757dcfea150ea50b227}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_BERR@{I2C\_SR1\_BERR}}
+\index{I2C\_SR1\_BERR@{I2C\_SR1\_BERR}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_BERR}{I2C\_SR1\_BERR}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a1d12990c90ab0757dcfea150ea50b227} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+BERR~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a0a1c615024c02d5ea5bcb3717ff6863d}{I2\+C\+\_\+\+SR1\+\_\+\+BERR\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a0a1c615024c02d5ea5bcb3717ff6863d}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_BERR\_Pos@{I2C\_SR1\_BERR\_Pos}}
+\index{I2C\_SR1\_BERR\_Pos@{I2C\_SR1\_BERR\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_BERR\_Pos}{I2C\_SR1\_BERR\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a0a1c615024c02d5ea5bcb3717ff6863d} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+BERR\+\_\+\+Pos~8}
+
+\Hypertarget{i2c__reg_8h_a4487c3a750a952f694b09473b1d7235a}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_BTF\_MASK@{I2C\_SR1\_BTF\_MASK}}
+\index{I2C\_SR1\_BTF\_MASK@{I2C\_SR1\_BTF\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_BTF\_MASK}{I2C\_SR1\_BTF\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a4487c3a750a952f694b09473b1d7235a} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+BTF\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a3c662220a2fc8d437b929ac360b7b6d3}{I2\+C\+\_\+\+SR1\+\_\+\+BTF\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a3c662220a2fc8d437b929ac360b7b6d3}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_BTF\_Pos@{I2C\_SR1\_BTF\_Pos}}
+\index{I2C\_SR1\_BTF\_Pos@{I2C\_SR1\_BTF\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_BTF\_Pos}{I2C\_SR1\_BTF\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a3c662220a2fc8d437b929ac360b7b6d3} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+BTF\+\_\+\+Pos~2}
+
+\Hypertarget{i2c__reg_8h_ad42d2435d2e64bf710c701c9b17adfb4}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_OVR@{I2C\_SR1\_OVR}}
+\index{I2C\_SR1\_OVR@{I2C\_SR1\_OVR}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_OVR}{I2C\_SR1\_OVR}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_ad42d2435d2e64bf710c701c9b17adfb4} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+OVR~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a628a0e0ea5fa7dd31b68d2bac80b8b20}{I2\+C\+\_\+\+SR1\+\_\+\+OVR\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a628a0e0ea5fa7dd31b68d2bac80b8b20}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_OVR\_Pos@{I2C\_SR1\_OVR\_Pos}}
+\index{I2C\_SR1\_OVR\_Pos@{I2C\_SR1\_OVR\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_OVR\_Pos}{I2C\_SR1\_OVR\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a628a0e0ea5fa7dd31b68d2bac80b8b20} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+OVR\+\_\+\+Pos~11}
+
+\Hypertarget{i2c__reg_8h_a195cfb6bcc3f1b40330bbe3c6b207929}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_RXNE\_MASK@{I2C\_SR1\_RXNE\_MASK}}
+\index{I2C\_SR1\_RXNE\_MASK@{I2C\_SR1\_RXNE\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_RXNE\_MASK}{I2C\_SR1\_RXNE\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a195cfb6bcc3f1b40330bbe3c6b207929} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+RXNE\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a380b3695a5b03ae70e411ba048a04e49}{I2\+C\+\_\+\+SR1\+\_\+\+RXNE\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a380b3695a5b03ae70e411ba048a04e49}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_RXNE\_Pos@{I2C\_SR1\_RXNE\_Pos}}
+\index{I2C\_SR1\_RXNE\_Pos@{I2C\_SR1\_RXNE\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_RXNE\_Pos}{I2C\_SR1\_RXNE\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a380b3695a5b03ae70e411ba048a04e49} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+RXNE\+\_\+\+Pos~6}
+
+\Hypertarget{i2c__reg_8h_ae838b09694963d88acb48be8ac1d35b7}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_SB\_MASK@{I2C\_SR1\_SB\_MASK}}
+\index{I2C\_SR1\_SB\_MASK@{I2C\_SR1\_SB\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_SB\_MASK}{I2C\_SR1\_SB\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_ae838b09694963d88acb48be8ac1d35b7} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+SB\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a67ed7d8c3e9dc642c2c70c834aeec6ea}{I2\+C\+\_\+\+SR1\+\_\+\+SB\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a67ed7d8c3e9dc642c2c70c834aeec6ea}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_SB\_Pos@{I2C\_SR1\_SB\_Pos}}
+\index{I2C\_SR1\_SB\_Pos@{I2C\_SR1\_SB\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_SB\_Pos}{I2C\_SR1\_SB\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a67ed7d8c3e9dc642c2c70c834aeec6ea} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+SB\+\_\+\+Pos~0}
+
+SR1 register bit positions and masks \Hypertarget{i2c__reg_8h_aafcea4cdbe2f6da31566c897fa893a7c}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_STOPF@{I2C\_SR1\_STOPF}}
+\index{I2C\_SR1\_STOPF@{I2C\_SR1\_STOPF}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_STOPF}{I2C\_SR1\_STOPF}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_aafcea4cdbe2f6da31566c897fa893a7c} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+STOPF~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a508dc538aee33bf854cfbe3b7f4a7ba9}{I2\+C\+\_\+\+SR1\+\_\+\+STOPF\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a508dc538aee33bf854cfbe3b7f4a7ba9}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_STOPF\_Pos@{I2C\_SR1\_STOPF\_Pos}}
+\index{I2C\_SR1\_STOPF\_Pos@{I2C\_SR1\_STOPF\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_STOPF\_Pos}{I2C\_SR1\_STOPF\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a508dc538aee33bf854cfbe3b7f4a7ba9} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+STOPF\+\_\+\+Pos~4}
+
+\Hypertarget{i2c__reg_8h_aef3a1e4921d7c509d1b639c67882c4c9}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_TIMEOUT@{I2C\_SR1\_TIMEOUT}}
+\index{I2C\_SR1\_TIMEOUT@{I2C\_SR1\_TIMEOUT}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_TIMEOUT}{I2C\_SR1\_TIMEOUT}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_aef3a1e4921d7c509d1b639c67882c4c9} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+TIMEOUT~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a80a7d5a7ab0b5eb4bbbcf59d64e9e58e}{I2\+C\+\_\+\+SR1\+\_\+\+TIMEOUT\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a80a7d5a7ab0b5eb4bbbcf59d64e9e58e}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_TIMEOUT\_Pos@{I2C\_SR1\_TIMEOUT\_Pos}}
+\index{I2C\_SR1\_TIMEOUT\_Pos@{I2C\_SR1\_TIMEOUT\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_TIMEOUT\_Pos}{I2C\_SR1\_TIMEOUT\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a80a7d5a7ab0b5eb4bbbcf59d64e9e58e} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+TIMEOUT\+\_\+\+Pos~14}
+
+\Hypertarget{i2c__reg_8h_a46cf04ad0c84b8a1517a53d1dfc86cc7}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_TXE\_MASK@{I2C\_SR1\_TXE\_MASK}}
+\index{I2C\_SR1\_TXE\_MASK@{I2C\_SR1\_TXE\_MASK}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_TXE\_MASK}{I2C\_SR1\_TXE\_MASK}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a46cf04ad0c84b8a1517a53d1dfc86cc7} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+TXE\+\_\+\+MASK~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_abdceff8db6df40c017f96a5e606ea884}{I2\+C\+\_\+\+SR1\+\_\+\+TXE\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_abdceff8db6df40c017f96a5e606ea884}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR1\_TXE\_Pos@{I2C\_SR1\_TXE\_Pos}}
+\index{I2C\_SR1\_TXE\_Pos@{I2C\_SR1\_TXE\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR1\_TXE\_Pos}{I2C\_SR1\_TXE\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_abdceff8db6df40c017f96a5e606ea884} 
+\#define I2\+C\+\_\+\+SR1\+\_\+\+TXE\+\_\+\+Pos~7}
+
+\Hypertarget{i2c__reg_8h_a3b1e75a82da73ae2873cff1cd27c3179}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR2\_BUSY@{I2C\_SR2\_BUSY}}
+\index{I2C\_SR2\_BUSY@{I2C\_SR2\_BUSY}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR2\_BUSY}{I2C\_SR2\_BUSY}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a3b1e75a82da73ae2873cff1cd27c3179} 
+\#define I2\+C\+\_\+\+SR2\+\_\+\+BUSY~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_aa9b4a60a8e919cfe14e222976859b1cd}{I2\+C\+\_\+\+SR2\+\_\+\+BUSY\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_aa9b4a60a8e919cfe14e222976859b1cd}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR2\_BUSY\_Pos@{I2C\_SR2\_BUSY\_Pos}}
+\index{I2C\_SR2\_BUSY\_Pos@{I2C\_SR2\_BUSY\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR2\_BUSY\_Pos}{I2C\_SR2\_BUSY\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_aa9b4a60a8e919cfe14e222976859b1cd} 
+\#define I2\+C\+\_\+\+SR2\+\_\+\+BUSY\+\_\+\+Pos~1}
+
+\Hypertarget{i2c__reg_8h_a75cc361adf0e72e33d6771ebfa17b52d}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR2\_MSL@{I2C\_SR2\_MSL}}
+\index{I2C\_SR2\_MSL@{I2C\_SR2\_MSL}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR2\_MSL}{I2C\_SR2\_MSL}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a75cc361adf0e72e33d6771ebfa17b52d} 
+\#define I2\+C\+\_\+\+SR2\+\_\+\+MSL~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_ada5253dbcd3c7d67d0fad31d938f4b5b}{I2\+C\+\_\+\+SR2\+\_\+\+MSL\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_ada5253dbcd3c7d67d0fad31d938f4b5b}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR2\_MSL\_Pos@{I2C\_SR2\_MSL\_Pos}}
+\index{I2C\_SR2\_MSL\_Pos@{I2C\_SR2\_MSL\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR2\_MSL\_Pos}{I2C\_SR2\_MSL\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_ada5253dbcd3c7d67d0fad31d938f4b5b} 
+\#define I2\+C\+\_\+\+SR2\+\_\+\+MSL\+\_\+\+Pos~0}
+
+SR2 register bit positions \Hypertarget{i2c__reg_8h_a288b20416b42a79e591aa80d9a690fca}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR2\_TRA@{I2C\_SR2\_TRA}}
+\index{I2C\_SR2\_TRA@{I2C\_SR2\_TRA}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR2\_TRA}{I2C\_SR2\_TRA}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a288b20416b42a79e591aa80d9a690fca} 
+\#define I2\+C\+\_\+\+SR2\+\_\+\+TRA~(1U $<$$<$ \mbox{\hyperlink{i2c__reg_8h_a91e4b3f7e5bff2ea65eefeadbc0a2e2a}{I2\+C\+\_\+\+SR2\+\_\+\+TRA\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_a91e4b3f7e5bff2ea65eefeadbc0a2e2a}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_SR2\_TRA\_Pos@{I2C\_SR2\_TRA\_Pos}}
+\index{I2C\_SR2\_TRA\_Pos@{I2C\_SR2\_TRA\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_SR2\_TRA\_Pos}{I2C\_SR2\_TRA\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a91e4b3f7e5bff2ea65eefeadbc0a2e2a} 
+\#define I2\+C\+\_\+\+SR2\+\_\+\+TRA\+\_\+\+Pos~2}
+
+\Hypertarget{i2c__reg_8h_a8a3152b3f16c453126cc1cef41b765fe}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_TRISE\_TRISE\_Msk@{I2C\_TRISE\_TRISE\_Msk}}
+\index{I2C\_TRISE\_TRISE\_Msk@{I2C\_TRISE\_TRISE\_Msk}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_TRISE\_TRISE\_Msk}{I2C\_TRISE\_TRISE\_Msk}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_a8a3152b3f16c453126cc1cef41b765fe} 
+\#define I2\+C\+\_\+\+TRISE\+\_\+\+TRISE\+\_\+\+Msk~(0x3\+FU $<$$<$ \mbox{\hyperlink{i2c__reg_8h_afb08ecb9599f81e5112a25142cb0e98f}{I2\+C\+\_\+\+TRISE\+\_\+\+TRISE\+\_\+\+Pos}})}
+
+\Hypertarget{i2c__reg_8h_afb08ecb9599f81e5112a25142cb0e98f}\index{i2c\_reg.h@{i2c\_reg.h}!I2C\_TRISE\_TRISE\_Pos@{I2C\_TRISE\_TRISE\_Pos}}
+\index{I2C\_TRISE\_TRISE\_Pos@{I2C\_TRISE\_TRISE\_Pos}!i2c\_reg.h@{i2c\_reg.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_TRISE\_TRISE\_Pos}{I2C\_TRISE\_TRISE\_Pos}}
+{\footnotesize\ttfamily \label{i2c__reg_8h_afb08ecb9599f81e5112a25142cb0e98f} 
+\#define I2\+C\+\_\+\+TRISE\+\_\+\+TRISE\+\_\+\+Pos~0}
+
+TRISE register bit positions and masks 

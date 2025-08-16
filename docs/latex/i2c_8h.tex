@@ -1,0 +1,442 @@
+\doxysection{include/core/cortex-\/m4/i2c.h File Reference}
+\hypertarget{i2c_8h}{}\label{i2c_8h}\index{include/core/cortex-\/m4/i2c.h@{include/core/cortex-\/m4/i2c.h}}
+
+
+Cortex-\/\+M4 I²C HAL interface.  
+
+
+{\ttfamily \#include "{}utils/gpio\+\_\+types.\+h"{}}\newline
+{\ttfamily \#include $<$stdbool.\+h$>$}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for i2c.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=312pt]{i2c_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=179pt]{i2c_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structhal__i2c__config__t}{hal\+\_\+i2c\+\_\+config\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em I²C configuration structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{i2c_8h_aa226465ed17b185a4da45c4792d309a8}{I2\+C\+\_\+\+MASTER}}~0
+\item 
+\#define \mbox{\hyperlink{i2c_8h_a863e2980ec09fa238bd1d38d5cb944bf}{GPIO\+\_\+\+FUNC\+\_\+\+I2C}}~\mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44a951e795b4b99c2907dbbfeed2808ce0f}{GPIO\+\_\+\+AF04}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}} \{ \newline
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fa0b5a09d5026c207fa09191d2281c2185}{HAL\+\_\+\+I2\+C\+\_\+\+OK}} = 0
+, \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5facc459d65ab3dfdaa1181c860a95efd8b}{HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+TIMEOUT}}
+, \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fa5b18ca951e4c5df39dfd86a70792386e}{HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+BUS}}
+, \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fad31196dbd33e345b318b6e32a565f09b}{HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+NACK}}
+, \newline
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5faad325f75c3112ff63c411bf8aa8a1f7f}{HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+REINIT}}
+ \}
+\begin{DoxyCompactList}\small\item\em I²C operation status codes. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bc}{hal\+\_\+i2c\+\_\+bus\+\_\+t}} \{ \mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bcaeb0f494c71f34592c5a4500ee98ab4a2}{I2\+C1}} = 0
+, \mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bcae2cc6f0481e798aedb5fd5c6a2bfc01b}{I2\+C2}} = 1
+, \mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bca85b6fc15a9c27469c6bdcbf4bd2f1495}{I2\+C3}} = 2
+ \}
+\begin{DoxyCompactList}\small\item\em Supported I²C bus instances. \end{DoxyCompactList}\item 
+enum \mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6a}{hal\+\_\+i2c\+\_\+speed\+\_\+t}} \{ \mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6aa0980a31ea116d2c6c80103449e7d0e33}{STANDARD\+\_\+\+MODE}} = 0
+, \mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6aa2f30c794294ff2100f9de4335a50d37d}{FAST\+\_\+\+MODE}} = 1
+ \}
+\begin{DoxyCompactList}\small\item\em I²C speed modes. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}} \mbox{\hyperlink{i2c_8h_acd2b5ef5fcbc5e34b9400bdb4dcd5dc7}{hal\+\_\+i2c\+\_\+init}} (\mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bc}{hal\+\_\+i2c\+\_\+bus\+\_\+t}} bus, \mbox{\hyperlink{structhal__i2c__config__t}{hal\+\_\+i2c\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}config)
+\begin{DoxyCompactList}\small\item\em Initialize the I²C peripheral. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}} \mbox{\hyperlink{i2c_8h_a9fbeaa7d026a0fa1ba5cf26ce15ca80b}{hal\+\_\+i2c\+\_\+write}} (uint8\+\_\+t bus, uint8\+\_\+t dev\+\_\+addr, const uint8\+\_\+t \texorpdfstring{$\ast$}{*}data, uint16\+\_\+t len)
+\begin{DoxyCompactList}\small\item\em Write data to an I²C device. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}} \mbox{\hyperlink{i2c_8h_a5239a70a3e56991fe587508a1b312bf6}{hal\+\_\+i2c\+\_\+read}} (uint8\+\_\+t bus, uint8\+\_\+t dev\+\_\+addr, uint8\+\_\+t \texorpdfstring{$\ast$}{*}data, uint16\+\_\+t len)
+\begin{DoxyCompactList}\small\item\em Read data from an I²C device. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}} \mbox{\hyperlink{i2c_8h_a38fd14bc21911381784848fff2edaa51}{hal\+\_\+i2c\+\_\+write\+\_\+read}} (uint8\+\_\+t bus, uint8\+\_\+t dev\+\_\+addr, const uint8\+\_\+t \texorpdfstring{$\ast$}{*}tx\+\_\+data, uint16\+\_\+t tx\+\_\+len, uint8\+\_\+t \texorpdfstring{$\ast$}{*}rx\+\_\+data, uint16\+\_\+t rx\+\_\+len)
+\begin{DoxyCompactList}\small\item\em Write to a device register and read back data. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{i2c_8h_a4267eb88a34f4ca48a4c7f63faf290a9}{hal\+\_\+i2c\+\_\+get\+\_\+init\+\_\+status}} (void)
+\begin{DoxyCompactList}\small\item\em Get the initialization status of the I²C peripheral. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Cortex-\/\+M4 I²C HAL interface. 
+
+This header defines types, structures, and function prototypes for I²C communication on Cortex-\/\+M4 microcontrollers. It provides functions for initializing the I²C peripheral, reading/writing data, and performing combined write-\/read transactions.
+
+Supported features\+:
+\begin{DoxyItemize}
+\item Standard and Fast mode I²C communication.
+\item Master mode operations.
+\item Error handling with status codes.
+\end{DoxyItemize}
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{i2c_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{i2c_8h_a863e2980ec09fa238bd1d38d5cb944bf}\index{i2c.h@{i2c.h}!GPIO\_FUNC\_I2C@{GPIO\_FUNC\_I2C}}
+\index{GPIO\_FUNC\_I2C@{GPIO\_FUNC\_I2C}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{GPIO\_FUNC\_I2C}{GPIO\_FUNC\_I2C}}
+{\footnotesize\ttfamily \label{i2c_8h_a863e2980ec09fa238bd1d38d5cb944bf} 
+\#define GPIO\+\_\+\+FUNC\+\_\+\+I2C~\mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44a951e795b4b99c2907dbbfeed2808ce0f}{GPIO\+\_\+\+AF04}}}
+
+GPIO alternate function for I²C pins \Hypertarget{i2c_8h_aa226465ed17b185a4da45c4792d309a8}\index{i2c.h@{i2c.h}!I2C\_MASTER@{I2C\_MASTER}}
+\index{I2C\_MASTER@{I2C\_MASTER}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{I2C\_MASTER}{I2C\_MASTER}}
+{\footnotesize\ttfamily \label{i2c_8h_aa226465ed17b185a4da45c4792d309a8} 
+\#define I2\+C\+\_\+\+MASTER~0}
+
+Master mode identifier 
+
+\label{doc-enum-members}
+\Hypertarget{i2c_8h_doc-enum-members}
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{i2c_8h_ab22311de972331b2e40a81cc0541c3bc}\index{i2c.h@{i2c.h}!hal\_i2c\_bus\_t@{hal\_i2c\_bus\_t}}
+\index{hal\_i2c\_bus\_t@{hal\_i2c\_bus\_t}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{hal\_i2c\_bus\_t}{hal\_i2c\_bus\_t}}
+{\footnotesize\ttfamily \label{i2c_8h_ab22311de972331b2e40a81cc0541c3bc} 
+enum \mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bc}{hal\+\_\+i2c\+\_\+bus\+\_\+t}}}
+
+
+
+Supported I²C bus instances. 
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{I2C1@{I2C1}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!I2C1@{I2C1}}}\Hypertarget{i2c_8h_ab22311de972331b2e40a81cc0541c3bcaeb0f494c71f34592c5a4500ee98ab4a2}\label{i2c_8h_ab22311de972331b2e40a81cc0541c3bcaeb0f494c71f34592c5a4500ee98ab4a2} 
+I2\+C1&I²C bus 1 \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{I2C2@{I2C2}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!I2C2@{I2C2}}}\Hypertarget{i2c_8h_ab22311de972331b2e40a81cc0541c3bcae2cc6f0481e798aedb5fd5c6a2bfc01b}\label{i2c_8h_ab22311de972331b2e40a81cc0541c3bcae2cc6f0481e798aedb5fd5c6a2bfc01b} 
+I2\+C2&I²C bus 2 \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{I2C3@{I2C3}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!I2C3@{I2C3}}}\Hypertarget{i2c_8h_ab22311de972331b2e40a81cc0541c3bca85b6fc15a9c27469c6bdcbf4bd2f1495}\label{i2c_8h_ab22311de972331b2e40a81cc0541c3bca85b6fc15a9c27469c6bdcbf4bd2f1495} 
+I2\+C3&I²C bus 3 \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6a}\index{i2c.h@{i2c.h}!hal\_i2c\_speed\_t@{hal\_i2c\_speed\_t}}
+\index{hal\_i2c\_speed\_t@{hal\_i2c\_speed\_t}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{hal\_i2c\_speed\_t}{hal\_i2c\_speed\_t}}
+{\footnotesize\ttfamily \label{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6a} 
+enum \mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6a}{hal\+\_\+i2c\+\_\+speed\+\_\+t}}}
+
+
+
+I²C speed modes. 
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{STANDARD\_MODE@{STANDARD\_MODE}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!STANDARD\_MODE@{STANDARD\_MODE}}}\Hypertarget{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6aa0980a31ea116d2c6c80103449e7d0e33}\label{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6aa0980a31ea116d2c6c80103449e7d0e33} 
+STANDARD\+\_\+\+MODE&100 k\+Hz standard mode \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{FAST\_MODE@{FAST\_MODE}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!FAST\_MODE@{FAST\_MODE}}}\Hypertarget{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6aa2f30c794294ff2100f9de4335a50d37d}\label{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6aa2f30c794294ff2100f9de4335a50d37d} 
+FAST\+\_\+\+MODE&400 k\+Hz fast mode \\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}\index{i2c.h@{i2c.h}!hal\_i2c\_status\_t@{hal\_i2c\_status\_t}}
+\index{hal\_i2c\_status\_t@{hal\_i2c\_status\_t}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{hal\_i2c\_status\_t}{hal\_i2c\_status\_t}}
+{\footnotesize\ttfamily \label{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f} 
+enum \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}}}
+
+
+
+I²C operation status codes. 
+
+\begin{DoxyEnumFields}[2]{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HAL\_I2C\_OK@{HAL\_I2C\_OK}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!HAL\_I2C\_OK@{HAL\_I2C\_OK}}}\Hypertarget{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fa0b5a09d5026c207fa09191d2281c2185}\label{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fa0b5a09d5026c207fa09191d2281c2185} 
+HAL\+\_\+\+I2\+C\+\_\+\+OK&Operation successful \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HAL\_I2C\_ERR\_TIMEOUT@{HAL\_I2C\_ERR\_TIMEOUT}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!HAL\_I2C\_ERR\_TIMEOUT@{HAL\_I2C\_ERR\_TIMEOUT}}}\Hypertarget{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5facc459d65ab3dfdaa1181c860a95efd8b}\label{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5facc459d65ab3dfdaa1181c860a95efd8b} 
+HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+TIMEOUT&Timeout occurred \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HAL\_I2C\_ERR\_BUS@{HAL\_I2C\_ERR\_BUS}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!HAL\_I2C\_ERR\_BUS@{HAL\_I2C\_ERR\_BUS}}}\Hypertarget{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fa5b18ca951e4c5df39dfd86a70792386e}\label{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fa5b18ca951e4c5df39dfd86a70792386e} 
+HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+BUS&Bus error \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HAL\_I2C\_ERR\_NACK@{HAL\_I2C\_ERR\_NACK}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!HAL\_I2C\_ERR\_NACK@{HAL\_I2C\_ERR\_NACK}}}\Hypertarget{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fad31196dbd33e345b318b6e32a565f09b}\label{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fad31196dbd33e345b318b6e32a565f09b} 
+HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+NACK&NACK received \\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HAL\_I2C\_ERR\_REINIT@{HAL\_I2C\_ERR\_REINIT}!i2c.h@{i2c.h}}\index{i2c.h@{i2c.h}!HAL\_I2C\_ERR\_REINIT@{HAL\_I2C\_ERR\_REINIT}}}\Hypertarget{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5faad325f75c3112ff63c411bf8aa8a1f7f}\label{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5faad325f75c3112ff63c411bf8aa8a1f7f} 
+HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+REINIT&Reinitialization required \\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\label{doc-func-members}
+\Hypertarget{i2c_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{i2c_8h_a4267eb88a34f4ca48a4c7f63faf290a9}\index{i2c.h@{i2c.h}!hal\_i2c\_get\_init\_status@{hal\_i2c\_get\_init\_status}}
+\index{hal\_i2c\_get\_init\_status@{hal\_i2c\_get\_init\_status}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{hal\_i2c\_get\_init\_status()}{hal\_i2c\_get\_init\_status()}}
+{\footnotesize\ttfamily \label{i2c_8h_a4267eb88a34f4ca48a4c7f63faf290a9} 
+uint8\+\_\+t hal\+\_\+i2c\+\_\+get\+\_\+init\+\_\+status (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get the initialization status of the I²C peripheral. 
+
+\begin{DoxyReturn}{Returns}
+0 if not initialized, non-\/zero if initialized.
+\end{DoxyReturn}
+Get the initialization status of the I²C peripheral.
+
+\begin{DoxyReturn}{Returns}
+Bitmask indicating which I2C buses are initialized 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em Bit} & 0\+: I2\+C1 status \\
+\hline
+{\em Bit} & 1\+: I2\+C2 status \\
+\hline
+{\em Bit} & 2\+: I2\+C3 status \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{i2c_8h_acd2b5ef5fcbc5e34b9400bdb4dcd5dc7}\index{i2c.h@{i2c.h}!hal\_i2c\_init@{hal\_i2c\_init}}
+\index{hal\_i2c\_init@{hal\_i2c\_init}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{hal\_i2c\_init()}{hal\_i2c\_init()}}
+{\footnotesize\ttfamily \label{i2c_8h_acd2b5ef5fcbc5e34b9400bdb4dcd5dc7} 
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}} hal\+\_\+i2c\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bc}{hal\+\_\+i2c\+\_\+bus\+\_\+t}}}]{bus}{, }\item[{\mbox{\hyperlink{structhal__i2c__config__t}{hal\+\_\+i2c\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{config}{}\end{DoxyParamCaption})}
+
+
+
+Initialize the I²C peripheral. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bus} & The I²C bus instance to initialize. \\
+\hline
+{\em config} & Pointer to the configuration structure. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status code of the initialization operation.
+\end{DoxyReturn}
+Initialize the I²C peripheral.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em bus} & I2C bus identifier (I2\+C1, I2\+C2, I2\+C3) \\
+\hline
+\mbox{\texttt{in}}  & {\em config} & Pointer to configuration structure \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status of initialization 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em HAL\+\_\+\+I2\+C\+\_\+\+OK} & Initialization successful \\
+\hline
+{\em HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+REINIT} & Bus already initialized \\
+\hline
+{\em HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+BUS} & Unsupported mode (slave not implemented)\\
+\hline
+\end{DoxyRetVals}
+Configures the specified I2C bus with\+:
+\begin{DoxyItemize}
+\item Clock speed (standard/fast mode)
+\item APB1 clock prescaler
+\item Rise time calculation
+\item Peripheral enable
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+Automatically enables the required RCC clock for the I2C peripheral 
+\end{DoxyNote}
+\texorpdfstring{$<$}{<} I²C base address\Hypertarget{i2c_8h_a5239a70a3e56991fe587508a1b312bf6}\index{i2c.h@{i2c.h}!hal\_i2c\_read@{hal\_i2c\_read}}
+\index{hal\_i2c\_read@{hal\_i2c\_read}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{hal\_i2c\_read()}{hal\_i2c\_read()}}
+{\footnotesize\ttfamily \label{i2c_8h_a5239a70a3e56991fe587508a1b312bf6} 
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}} hal\+\_\+i2c\+\_\+read (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{bus}{, }\item[{uint8\+\_\+t}]{dev\+\_\+addr}{, }\item[{uint8\+\_\+t \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{uint16\+\_\+t}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Read data from an I²C device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bus} & The I²C bus instance. \\
+\hline
+{\em dev\+\_\+addr} & The 7-\/bit address of the target device. \\
+\hline
+{\em data} & Pointer to buffer for received data. \\
+\hline
+{\em len} & Number of bytes to read. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status code of the read operation.
+\end{DoxyReturn}
+Read data from an I²C device.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em bus} & I2C bus identifier \\
+\hline
+\mbox{\texttt{in}}  & {\em dev\+\_\+addr} & 7-\/bit device address \\
+\hline
+\mbox{\texttt{out}}  & {\em data} & Pointer to receive buffer \\
+\hline
+\mbox{\texttt{in}}  & {\em len} & Number of bytes to receive \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status of operation 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em HAL\+\_\+\+I2\+C\+\_\+\+OK} & Reception successful \\
+\hline
+{\em HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+TIMEOUT} & Bus timeout occurred \\
+\hline
+{\em HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+BUS} & Invalid parameters\\
+\hline
+\end{DoxyRetVals}
+Performs complete I2C read transaction\+:
+\begin{DoxyEnumerate}
+\item START condition
+\item Address + Read bit
+\item Data bytes with proper ACK/\+NACK
+\item STOP condition 
+\end{DoxyEnumerate}\texorpdfstring{$<$}{<} I²C base address\Hypertarget{i2c_8h_a9fbeaa7d026a0fa1ba5cf26ce15ca80b}\index{i2c.h@{i2c.h}!hal\_i2c\_write@{hal\_i2c\_write}}
+\index{hal\_i2c\_write@{hal\_i2c\_write}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{hal\_i2c\_write()}{hal\_i2c\_write()}}
+{\footnotesize\ttfamily \label{i2c_8h_a9fbeaa7d026a0fa1ba5cf26ce15ca80b} 
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}} hal\+\_\+i2c\+\_\+write (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{bus}{, }\item[{uint8\+\_\+t}]{dev\+\_\+addr}{, }\item[{const uint8\+\_\+t \texorpdfstring{$\ast$}{*}}]{data}{, }\item[{uint16\+\_\+t}]{len}{}\end{DoxyParamCaption})}
+
+
+
+Write data to an I²C device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bus} & The I²C bus instance. \\
+\hline
+{\em dev\+\_\+addr} & The 7-\/bit address of the target device. \\
+\hline
+{\em data} & Pointer to data buffer to transmit. \\
+\hline
+{\em len} & Number of bytes to transmit. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status code of the write operation.
+\end{DoxyReturn}
+Write data to an I²C device.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em bus} & I2C bus identifier \\
+\hline
+\mbox{\texttt{in}}  & {\em dev\+\_\+addr} & 7-\/bit device address \\
+\hline
+\mbox{\texttt{in}}  & {\em data} & Pointer to transmit buffer \\
+\hline
+\mbox{\texttt{in}}  & {\em len} & Number of bytes to transmit \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status of operation 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em HAL\+\_\+\+I2\+C\+\_\+\+OK} & Transmission successful \\
+\hline
+{\em HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+TIMEOUT} & Bus timeout occurred\\
+\hline
+\end{DoxyRetVals}
+Performs complete I2C write transaction\+:
+\begin{DoxyEnumerate}
+\item START condition
+\item Address + Write bit
+\item Data bytes
+\item STOP condition 
+\end{DoxyEnumerate}\Hypertarget{i2c_8h_a38fd14bc21911381784848fff2edaa51}\index{i2c.h@{i2c.h}!hal\_i2c\_write\_read@{hal\_i2c\_write\_read}}
+\index{hal\_i2c\_write\_read@{hal\_i2c\_write\_read}!i2c.h@{i2c.h}}
+\doxysubsubsection{\texorpdfstring{hal\_i2c\_write\_read()}{hal\_i2c\_write\_read()}}
+{\footnotesize\ttfamily \label{i2c_8h_a38fd14bc21911381784848fff2edaa51} 
+\mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\+\_\+i2c\+\_\+status\+\_\+t}} hal\+\_\+i2c\+\_\+write\+\_\+read (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{bus}{, }\item[{uint8\+\_\+t}]{dev\+\_\+addr}{, }\item[{const uint8\+\_\+t \texorpdfstring{$\ast$}{*}}]{tx\+\_\+data}{, }\item[{uint16\+\_\+t}]{tx\+\_\+len}{, }\item[{uint8\+\_\+t \texorpdfstring{$\ast$}{*}}]{rx\+\_\+data}{, }\item[{uint16\+\_\+t}]{rx\+\_\+len}{}\end{DoxyParamCaption})}
+
+
+
+Write to a device register and read back data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bus} & The I²C bus instance. \\
+\hline
+{\em dev\+\_\+addr} & The 7-\/bit address of the target device. \\
+\hline
+{\em tx\+\_\+data} & Pointer to data to write. \\
+\hline
+{\em tx\+\_\+len} & Number of bytes to write. \\
+\hline
+{\em rx\+\_\+data} & Pointer to buffer for received data. \\
+\hline
+{\em rx\+\_\+len} & Number of bytes to read. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status code of the write-\/read operation.
+\end{DoxyReturn}
+Write to a device register and read back data.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em bus} & I2C bus identifier \\
+\hline
+\mbox{\texttt{in}}  & {\em dev\+\_\+addr} & 7-\/bit device address \\
+\hline
+\mbox{\texttt{in}}  & {\em tx\+\_\+data} & Pointer to transmit buffer \\
+\hline
+\mbox{\texttt{in}}  & {\em tx\+\_\+len} & Number of bytes to transmit \\
+\hline
+\mbox{\texttt{out}}  & {\em rx\+\_\+data} & Pointer to receive buffer \\
+\hline
+\mbox{\texttt{in}}  & {\em rx\+\_\+len} & Number of bytes to receive \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status of operation 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em HAL\+\_\+\+I2\+C\+\_\+\+OK} & Operation successful \\
+\hline
+{\em HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+TIMEOUT} & Bus timeout occurred \\
+\hline
+{\em HAL\+\_\+\+I2\+C\+\_\+\+ERR\+\_\+\+BUS} & Invalid parameters\\
+\hline
+\end{DoxyRetVals}
+Performs combined I2C transaction\+:
+\begin{DoxyEnumerate}
+\item Write phase (registers/commands)
+\item Repeated START
+\item Read phase (data) Handles all ACK/\+NACK and STOP conditions automatically 
+\end{DoxyEnumerate}\texorpdfstring{$<$}{<} I²C base address

@@ -1,0 +1,135 @@
+\doxysection{samples/09\+\_\+hal\+\_\+clock/main.c File Reference}
+\hypertarget{samples_209__hal__clock_2main_8c}{}\label{samples_209__hal__clock_2main_8c}\index{samples/09\_hal\_clock/main.c@{samples/09\_hal\_clock/main.c}}
+
+
+Print system clock and bus clocks over UART2.  
+
+
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{samples_209__hal__clock_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{samples_209__hal__clock_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{samples_209__hal__clock_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \mbox{\hyperlink{samples_209__hal__clock_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\+\_\+cfg}}
+\begin{DoxyCompactList}\small\item\em PLL configuration\+: 8 MHz HSE -\/\texorpdfstring{$>$}{>} 168 MHz system clock. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \mbox{\hyperlink{samples_209__hal__clock_2main_8c_a921c2505bac76424f5f96cc1e4f62986}{cfg}}
+\begin{DoxyCompactList}\small\item\em System clock source configuration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Print system clock and bus clocks over UART2. 
+
+This example demonstrates\+:
+\begin{DoxyItemize}
+\item Initializing the PLL for system clock configuration.
+\item Initializing Sys\+Tick timer.
+\item Initializing UART2 at 9600 baud for console output.
+\item Printing SYSCLK, AHBCLK, APB1\+CLK, and APB2\+CLK periodically.
+\end{DoxyItemize}
+
+© 2025 NAVROBOTEC PVT. LTD. All rights reserved. 
+
+\label{doc-define-members}
+\Hypertarget{samples_209__hal__clock_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{samples_209__hal__clock_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{samples_209__hal__clock_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+
+
+\label{doc-func-members}
+\Hypertarget{samples_209__hal__clock_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{samples_209__hal__clock_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{samples_209__hal__clock_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\texorpdfstring{$<$}{<} Initialize system clock with PLL
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 40 µs tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Print SYSCLK label
+
+\texorpdfstring{$<$}{<} Print system clock
+
+\texorpdfstring{$<$}{<} Print APB1\+CLK label
+
+\texorpdfstring{$<$}{<} Print APB1 clock
+
+\texorpdfstring{$<$}{<} Print APB2\+CLK label
+
+\texorpdfstring{$<$}{<} Print APB2 clock
+
+\texorpdfstring{$<$}{<} Print AHBCLK label
+
+\texorpdfstring{$<$}{<} Print AHB clock
+
+\texorpdfstring{$<$}{<} Newline
+
+\texorpdfstring{$<$}{<} Wait 1 second
+
+\label{doc-var-members}
+\Hypertarget{samples_209__hal__clock_2main_8c_doc-var-members}
+\doxysubsection{Variable Documentation}
+\Hypertarget{samples_209__hal__clock_2main_8c_a921c2505bac76424f5f96cc1e4f62986}\index{main.c@{main.c}!cfg@{cfg}}
+\index{cfg@{cfg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{cfg}{cfg}}
+{\footnotesize\ttfamily \label{samples_209__hal__clock_2main_8c_a921c2505bac76424f5f96cc1e4f62986} 
+\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} cfg}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ .source\ =\ \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1ae661ab184a66fdc56b238f5f168c636c}{HAL\_CLOCK\_SOURCE\_PLL}}\ }
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+System clock source configuration. 
+
+\Hypertarget{samples_209__hal__clock_2main_8c_adf1b524219e8781fa7542fa90dd09912}\index{main.c@{main.c}!pll\_cfg@{pll\_cfg}}
+\index{pll\_cfg@{pll\_cfg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{pll\_cfg}{pll\_cfg}}
+{\footnotesize\ttfamily \label{samples_209__hal__clock_2main_8c_adf1b524219e8781fa7542fa90dd09912} 
+\mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} pll\+\_\+cfg}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ .input\_src\ =\ \mbox{\hyperlink{clock__types_8h_a5ea6776fc4182dcce8313aae7aefffe1a63fe55af719f040387f2cbd2728f64c9}{HAL\_CLOCK\_SOURCE\_HSE}},\ }
+\DoxyCodeLine{\ \ \ \ .pll\_m\ =\ 8,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\ \ \ \ .pll\_n\ =\ 168,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\ \ \ \ .pll\_p\ =\ 2,\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\ \ \ \ .pll\_q\ =\ 7\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+PLL configuration\+: 8 MHz HSE -\/\texorpdfstring{$>$}{>} 168 MHz system clock. 
+

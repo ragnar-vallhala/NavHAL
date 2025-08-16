@@ -14,5 +14,6 @@ var searchData=
   ['apb1rstr_11',['APB1RSTR',['../struct_r_c_c___typedef.html#a0175866f80a55c4678120926d9804f38',1,'RCC_Typedef']]],
   ['apb2enr_12',['APB2ENR',['../struct_r_c_c___typedef.html#a348acc9ed88ef69ff36c42e1ba8fa1c9',1,'RCC_Typedef']]],
   ['apb2lpenr_13',['APB2LPENR',['../struct_r_c_c___typedef.html#aa72120b95ee11ca0911f56e5d9526524',1,'RCC_Typedef']]],
-  ['apb2rstr_14',['APB2RSTR',['../struct_r_c_c___typedef.html#af4d2c9e99d1e704497107426d56bc16d',1,'RCC_Typedef']]]
+  ['apb2rstr_14',['APB2RSTR',['../struct_r_c_c___typedef.html#af4d2c9e99d1e704497107426d56bc16d',1,'RCC_Typedef']]],
+  ['arr_15',['ARR',['../struct_t_i_mx___reg___typedef.html#a593f73f910cfeb3a9bb4389b9bef763a',1,'TIMx_Reg_Typedef']]]
 ];

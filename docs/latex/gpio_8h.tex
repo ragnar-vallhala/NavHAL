@@ -6,18 +6,20 @@ Cortex-\/\+M4 specific GPIO HAL interface.
 
 
 {\ttfamily \#include "{}utils/gpio\+\_\+types.\+h"{}}\newline
-Include dependency graph for gpio.\+h\+:\nopagebreak
+Include dependency graph for gpio.\+h\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
 \includegraphics[width=179pt]{gpio_8h__incl}
 \end{center}
 \end{figure}
-This graph shows which files directly or indirectly include this file\+:\nopagebreak
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=294pt]{gpio_8h__dep__incl}
+\includegraphics[width=350pt]{gpio_8h__dep__incl}
 \end{center}
 \end{figure}
 \doxysubsubsection*{Functions}
@@ -76,13 +78,13 @@ Read the digital state from a GPIO pin.
 
 
 \begin{DoxyParams}{Parameters}
-{\em pin} & Pin identifier. \\
+{\em pin} & Pin identifier to read \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-Current pin state (high or low). 
+Current digital state of the pin (HIGH or LOW)
 \end{DoxyReturn}
-\texorpdfstring{$<$}{<} GPIOA base address\Hypertarget{gpio_8h_aa64ac2161a52147ab5e91fe399126638}\index{gpio.h@{gpio.h}!hal\_gpio\_digitalwrite@{hal\_gpio\_digitalwrite}}
+Reads the IDR register for the specified pin and returns the current input state. \texorpdfstring{$<$}{<} GPIOA base address\Hypertarget{gpio_8h_aa64ac2161a52147ab5e91fe399126638}\index{gpio.h@{gpio.h}!hal\_gpio\_digitalwrite@{hal\_gpio\_digitalwrite}}
 \index{hal\_gpio\_digitalwrite@{hal\_gpio\_digitalwrite}!gpio.h@{gpio.h}}
 \doxysubsubsection{\texorpdfstring{hal\_gpio\_digitalwrite()}{hal\_gpio\_digitalwrite()}}
 {\footnotesize\ttfamily \label{gpio_8h_aa64ac2161a52147ab5e91fe399126638} 
@@ -103,18 +105,20 @@ Write a digital state to a GPIO pin.
 
 
 \begin{DoxyParams}{Parameters}
-{\em pin} & Pin identifier. \\
+{\em pin} & Pin identifier to control \\
 \hline
-{\em state} & Desired pin state (high or low). 
-\begin{DoxyCode}{1}
+{\em state} & Desired output state (HIGH or LOW)\\
+\hline
+\end{DoxyParams}
+Uses the BSRR register for atomic set/reset operations to avoid read-\/modify-\/write sequences.
+
+
+\begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{comment}{//\ Example:\ Set\ PA5\ high}}
 \DoxyCodeLine{\mbox{\hyperlink{gpio_8h_aa64ac2161a52147ab5e91fe399126638}{hal\_gpio\_digitalwrite}}(PA5,\ HAL\_GPIO\_HIGH);}
 
 \end{DoxyCode}
- \\
-\hline
-\end{DoxyParams}
-\texorpdfstring{$<$}{<} GPIOA base address
+ \texorpdfstring{$<$}{<} GPIOA base address
 
 \texorpdfstring{$<$}{<} GPIOA base address\Hypertarget{gpio_8h_a4f525e1eaa75b82f304bc25cee240789}\index{gpio.h@{gpio.h}!hal\_gpio\_enable\_rcc@{hal\_gpio\_enable\_rcc}}
 \index{hal\_gpio\_enable\_rcc@{hal\_gpio\_enable\_rcc}!gpio.h@{gpio.h}}
@@ -135,13 +139,10 @@ Enable the RCC clock for a specific GPIO pin\textquotesingle{}s port.
 
 
 \begin{DoxyParams}{Parameters}
-{\em pin} & Pin identifier. \\
+{\em pin} & Pin identifier whose port clock should be enabled\\
 \hline
 \end{DoxyParams}
-\begin{DoxyNote}{Note}
-This function is usually called automatically by other GPIO functions, but can be called manually if required. 
-\end{DoxyNote}
-\Hypertarget{gpio_8h_af5915e39ede16cf7d68b4dc1ee02b78a}\index{gpio.h@{gpio.h}!hal\_gpio\_getmode@{hal\_gpio\_getmode}}
+Enables the AHB1 peripheral clock for the GPIO port containing the specified pin. This is automatically called by other GPIO functions when needed. \Hypertarget{gpio_8h_af5915e39ede16cf7d68b4dc1ee02b78a}\index{gpio.h@{gpio.h}!hal\_gpio\_getmode@{hal\_gpio\_getmode}}
 \index{hal\_gpio\_getmode@{hal\_gpio\_getmode}!gpio.h@{gpio.h}}
 \doxysubsubsection{\texorpdfstring{hal\_gpio\_getmode()}{hal\_gpio\_getmode()}}
 {\footnotesize\ttfamily \label{gpio_8h_af5915e39ede16cf7d68b4dc1ee02b78a} 
@@ -161,13 +162,13 @@ The current mode of the pin.
 \end{DoxyReturn}
 
 \begin{DoxyParams}{Parameters}
-{\em pin} & Pin identifier. \\
+{\em pin} & Pin identifier to query \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-The current GPIO mode of the pin. 
+Current GPIO mode of the specified pin
 \end{DoxyReturn}
-\texorpdfstring{$<$}{<} GPIOA base address\Hypertarget{gpio_8h_a07aab29e77970fa617d8ea0d1922e964}\index{gpio.h@{gpio.h}!hal\_gpio\_set\_alternate\_function@{hal\_gpio\_set\_alternate\_function}}
+Reads the MODER register for the specified pin and returns the current mode configuration. \texorpdfstring{$<$}{<} GPIOA base address\Hypertarget{gpio_8h_a07aab29e77970fa617d8ea0d1922e964}\index{gpio.h@{gpio.h}!hal\_gpio\_set\_alternate\_function@{hal\_gpio\_set\_alternate\_function}}
 \index{hal\_gpio\_set\_alternate\_function@{hal\_gpio\_set\_alternate\_function}!gpio.h@{gpio.h}}
 \doxysubsubsection{\texorpdfstring{hal\_gpio\_set\_alternate\_function()}{hal\_gpio\_set\_alternate\_function()}}
 {\footnotesize\ttfamily \label{gpio_8h_a07aab29e77970fa617d8ea0d1922e964} 
@@ -188,21 +189,20 @@ Set the alternate function for a GPIO pin.
 
 
 \begin{DoxyParams}{Parameters}
-{\em pin} & Pin identifier. \\
+{\em pin} & Pin identifier to configure \\
 \hline
-{\em alt\+\_\+fn} & Alternate function number/type. \\
+{\em alt\+\_\+fn} & Alternate function number/type to assign\\
 \hline
 \end{DoxyParams}
-\begin{DoxyNote}{Note}
-This function will internally set the pin mode to alternate function mode. 
+Configures the specified pin for alternate function mode and sets the appropriate alternate function selection in AFRL/\+AFRH. Automatically enables the GPIO port clock if needed.
+
+
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{comment}{//\ Example:\ Set\ PA2\ to\ USART2\_TX\ alternate\ function}}
 \DoxyCodeLine{\mbox{\hyperlink{gpio_8h_a07aab29e77970fa617d8ea0d1922e964}{hal\_gpio\_set\_alternate\_function}}(PA2,\ HAL\_GPIO\_AF\_USART2);}
 
 \end{DoxyCode}
- 
-\end{DoxyNote}
-\texorpdfstring{$<$}{<} GPIOA base address
+ \texorpdfstring{$<$}{<} GPIOA base address
 
 \texorpdfstring{$<$}{<} GPIOA base address
 
@@ -222,10 +222,19 @@ Set the output speed for a GPIO pin.
 \begin{DoxyParams}{Parameters}
 {\em pin} & The GPIO pin to configure. \\
 \hline
-{\em speed} & The output speed (low, medium, high, very high). \\
+{\em speed} & The output speed (low, medium, high, very high).\\
 \hline
 \end{DoxyParams}
-\texorpdfstring{$<$}{<} GPIOA base address
+Set the output speed for a GPIO pin.
+
+
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin identifier to configure \\
+\hline
+{\em speed} & Desired output speed (low/medium/high/very high)\\
+\hline
+\end{DoxyParams}
+Sets the output speed in the OSPEEDR register for the specified pin. Does not change the pin mode -\/ must be configured separately. \texorpdfstring{$<$}{<} GPIOA base address
 
 \texorpdfstring{$<$}{<} GPIOA base address\Hypertarget{gpio_8h_a926263a98f6084ec82b2546ddd47d413}\index{gpio.h@{gpio.h}!hal\_gpio\_set\_output\_type@{hal\_gpio\_set\_output\_type}}
 \index{hal\_gpio\_set\_output\_type@{hal\_gpio\_set\_output\_type}!gpio.h@{gpio.h}}
@@ -241,10 +250,19 @@ Set the output type for a GPIO pin.
 \begin{DoxyParams}{Parameters}
 {\em pin} & The GPIO pin to configure. \\
 \hline
-{\em otyper} & The output type (push-\/pull or open-\/drain). \\
+{\em otyper} & The output type (push-\/pull or open-\/drain).\\
 \hline
 \end{DoxyParams}
-\texorpdfstring{$<$}{<} GPIOA base address
+Set the output type for a GPIO pin.
+
+
+\begin{DoxyParams}{Parameters}
+{\em pin} & Pin identifier to configure \\
+\hline
+{\em otyper} & Output type (push-\/pull or open-\/drain)\\
+\hline
+\end{DoxyParams}
+Sets the output type in the OTYPER register for the specified pin. Does not change the pin mode -\/ must be configured separately. \texorpdfstring{$<$}{<} GPIOA base address
 
 \texorpdfstring{$<$}{<} GPIOA base address\Hypertarget{gpio_8h_ab063b362fb73bcb899a122e5188e7e32}\index{gpio.h@{gpio.h}!hal\_gpio\_setmode@{hal\_gpio\_setmode}}
 \index{hal\_gpio\_setmode@{hal\_gpio\_setmode}!gpio.h@{gpio.h}}
@@ -269,15 +287,22 @@ Set the mode of a GPIO pin.
 
 
 \begin{DoxyParams}{Parameters}
-{\em pin} & Pin identifier. \\
+{\em pin} & Pin identifier (e.\+g., PA5, PC13) \\
 \hline
-{\em mode} & GPIO mode (input, output, alternate function, analog). \\
+{\em mode} & Desired pin mode (input/output/alternate/analog) \\
 \hline
-{\em pupd} & Pull-\/up/pull-\/down configuration. \\
+{\em pupd} & Pull-\/up/pull-\/down configuration\\
 \hline
 \end{DoxyParams}
+This function\+:
+\begin{DoxyEnumerate}
+\item Enables the GPIO port clock via RCC
+\item Configures the pin mode in MODER register
+\item Sets pull-\/up/pull-\/down resistors in PUPDR register
+\end{DoxyEnumerate}
+
 \begin{DoxyNote}{Note}
-This function automatically enables the RCC clock for the GPIO port. 
+Automatically enables the GPIO port clock if not already enabled 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{comment}{//\ Example:\ Configure\ PA5\ as\ output\ with\ no\ pull-\/up/pull-\/down}}
 \DoxyCodeLine{\mbox{\hyperlink{gpio_8h_ab063b362fb73bcb899a122e5188e7e32}{hal\_gpio\_setmode}}(PA5,\ HAL\_GPIO\_MODE\_OUTPUT,\ HAL\_GPIO\_NO\_PULL);}

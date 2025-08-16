@@ -30,7 +30,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr id="projectrow">
-  <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td id="projectalign">
    <div id="projectname">NavHAL<span id="projectnumber">&#160;0.1.0</span>
    </div>
@@ -126,11 +125,13 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="gpio_8h__dep__incl.png" border="0" usemap="#ainclude_2core_2cortex-m4_2gpio_8hdep" loading="lazy" alt=""/></div>
 <map name="ainclude_2core_2cortex-m4_2gpio_8hdep" id="ainclude_2core_2cortex-m4_2gpio_8hdep">
-<area shape="rect" title="Cortex&#45;M4 specific GPIO HAL interface." alt="" coords="82,5,214,46"/>
+<area shape="rect" title="Cortex&#45;M4 specific GPIO HAL interface." alt="" coords="160,5,291,46"/>
 <area shape="rect" href="gpio_8c.html" title="HAL GPIO driver implementation for STM32F4 series." alt="" coords="5,94,136,135"/>
-<area shape="poly" title=" " alt="" coords="122,60,90,95,86,92,118,56"/>
-<area shape="rect" href="uart_8c.html" title="UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6." alt="" coords="160,94,290,135"/>
-<area shape="poly" title=" " alt="" coords="178,56,210,92,206,95,174,60"/>
+<area shape="poly" title=" " alt="" coords="178,56,107,96,104,91,176,51"/>
+<area shape="rect" href="uart_8c.html" title="UART driver implementation for STM32F4 series." alt="" coords="160,94,290,135"/>
+<area shape="poly" title=" " alt="" coords="228,62,228,94,222,94,222,62"/>
+<area shape="rect" href="test__gpio_8c.html" title="GPIO unit test implementation for NAVHAL." alt="" coords="314,102,432,127"/>
+<area shape="poly" title=" " alt="" coords="273,52,354,99,351,103,271,56"/>
 </map>
 </div>
 </div>
@@ -186,11 +187,12 @@ Functions</h2></td></tr>
 <p>Read the digital state from a GPIO pin.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
+    <tr><td class="paramname">pin</td><td>Pin identifier to read </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Current pin state (high or low). </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Current digital state of the pin (HIGH or LOW)</dd></dl>
+<p>Reads the IDR register for the specified pin and returns the current input state. </p>
 <p>&lt; GPIOA base address</p>
 
 </div>
@@ -225,15 +227,16 @@ Functions</h2></td></tr>
 <p>Write a digital state to a GPIO pin.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
-    <tr><td class="paramname">state</td><td>Desired pin state (high or low). <div class="fragment"><div class="line"><span class="comment">// Example: Set PA5 high</span></div>
-<div class="line"><a class="code hl_function" href="#aa64ac2161a52147ab5e91fe399126638">hal_gpio_digitalwrite</a>(PA5, HAL_GPIO_HIGH);</div>
-<div class="ttc" id="agpio_8h_html_aa64ac2161a52147ab5e91fe399126638"><div class="ttname"><a href="#aa64ac2161a52147ab5e91fe399126638">hal_gpio_digitalwrite</a></div><div class="ttdeci">void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state)</div><div class="ttdoc">Write a digital state to a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:65</div></div>
-</div><!-- fragment --> </td></tr>
+    <tr><td class="paramname">pin</td><td>Pin identifier to control </td></tr>
+    <tr><td class="paramname">state</td><td>Desired output state (HIGH or LOW)</td></tr>
   </table>
   </dd>
 </dl>
-<p>&lt; GPIOA base address</p>
+<p>Uses the BSRR register for atomic set/reset operations to avoid read-modify-write sequences.</p>
+<div class="fragment"><div class="line"><span class="comment">// Example: Set PA5 high</span></div>
+<div class="line"><a class="code hl_function" href="#aa64ac2161a52147ab5e91fe399126638">hal_gpio_digitalwrite</a>(PA5, HAL_GPIO_HIGH);</div>
+<div class="ttc" id="agpio_8h_html_aa64ac2161a52147ab5e91fe399126638"><div class="ttname"><a href="#aa64ac2161a52147ab5e91fe399126638">hal_gpio_digitalwrite</a></div><div class="ttdeci">void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state)</div><div class="ttdoc">Write a digital state to a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:84</div></div>
+</div><!-- fragment --> <p>&lt; GPIOA base address</p>
 <p>&lt; GPIOA base address</p>
 
 </div>
@@ -263,11 +266,11 @@ Functions</h2></td></tr>
 <p>Enable the RCC clock for a specific GPIO pin's port.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
+    <tr><td class="paramname">pin</td><td>Pin identifier whose port clock should be enabled</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>This function is usually called automatically by other GPIO functions, but can be called manually if required. </dd></dl>
+<p>Enables the AHB1 peripheral clock for the GPIO port containing the specified pin. This is automatically called by other GPIO functions when needed. </p>
 
 </div>
 </div>
@@ -296,11 +299,12 @@ Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>The current mode of the pin.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
+    <tr><td class="paramname">pin</td><td>Pin identifier to query </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The current GPIO mode of the pin. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Current GPIO mode of the specified pin</dd></dl>
+<p>Reads the MODER register for the specified pin and returns the current mode configuration. </p>
 <p>&lt; GPIOA base address</p>
 
 </div>
@@ -335,16 +339,16 @@ Functions</h2></td></tr>
 <p>Set the alternate function for a GPIO pin.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
-    <tr><td class="paramname">alt_fn</td><td>Alternate function number/type. </td></tr>
+    <tr><td class="paramname">pin</td><td>Pin identifier to configure </td></tr>
+    <tr><td class="paramname">alt_fn</td><td>Alternate function number/type to assign</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>This function will internally set the pin mode to alternate function mode. <div class="fragment"><div class="line"><span class="comment">// Example: Set PA2 to USART2_TX alternate function</span></div>
+<p>Configures the specified pin for alternate function mode and sets the appropriate alternate function selection in AFRL/AFRH. Automatically enables the GPIO port clock if needed.</p>
+<div class="fragment"><div class="line"><span class="comment">// Example: Set PA2 to USART2_TX alternate function</span></div>
 <div class="line"><a class="code hl_function" href="#a07aab29e77970fa617d8ea0d1922e964">hal_gpio_set_alternate_function</a>(PA2, HAL_GPIO_AF_USART2);</div>
-<div class="ttc" id="agpio_8h_html_a07aab29e77970fa617d8ea0d1922e964"><div class="ttname"><a href="#a07aab29e77970fa617d8ea0d1922e964">hal_gpio_set_alternate_function</a></div><div class="ttdeci">void hal_gpio_set_alternate_function(hal_gpio_pin pin, hal_gpio_alternate_function_t alt_fn)</div><div class="ttdoc">Set the alternate function for a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:102</div></div>
-</div><!-- fragment --> </dd></dl>
-<p>&lt; GPIOA base address</p>
+<div class="ttc" id="agpio_8h_html_a07aab29e77970fa617d8ea0d1922e964"><div class="ttname"><a href="#a07aab29e77970fa617d8ea0d1922e964">hal_gpio_set_alternate_function</a></div><div class="ttdeci">void hal_gpio_set_alternate_function(hal_gpio_pin pin, hal_gpio_alternate_function_t alt_fn)</div><div class="ttdoc">Set the alternate function for a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:133</div></div>
+</div><!-- fragment --> <p>&lt; GPIOA base address</p>
 <p>&lt; GPIOA base address</p>
 <p>&lt; GPIOA base address</p>
 <p>&lt; GPIOA base address</p>
@@ -374,10 +378,19 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>The GPIO pin to configure. </td></tr>
-    <tr><td class="paramname">speed</td><td>The output speed (low, medium, high, very high). </td></tr>
+    <tr><td class="paramname">speed</td><td>The output speed (low, medium, high, very high).</td></tr>
   </table>
   </dd>
 </dl>
+<p>Set the output speed for a GPIO pin.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>Pin identifier to configure </td></tr>
+    <tr><td class="paramname">speed</td><td>Desired output speed (low/medium/high/very high)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Sets the output speed in the OSPEEDR register for the specified pin. Does not change the pin mode - must be configured separately. </p>
 <p>&lt; GPIOA base address</p>
 <p>&lt; GPIOA base address</p>
 
@@ -406,10 +419,19 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pin</td><td>The GPIO pin to configure. </td></tr>
-    <tr><td class="paramname">otyper</td><td>The output type (push-pull or open-drain). </td></tr>
+    <tr><td class="paramname">otyper</td><td>The output type (push-pull or open-drain).</td></tr>
   </table>
   </dd>
 </dl>
+<p>Set the output type for a GPIO pin.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>Pin identifier to configure </td></tr>
+    <tr><td class="paramname">otyper</td><td>Output type (push-pull or open-drain)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Sets the output type in the OTYPER register for the specified pin. Does not change the pin mode - must be configured separately. </p>
 <p>&lt; GPIOA base address</p>
 <p>&lt; GPIOA base address</p>
 
@@ -451,15 +473,20 @@ Functions</h2></td></tr>
 <p>Set the mode of a GPIO pin.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pin</td><td>Pin identifier. </td></tr>
-    <tr><td class="paramname">mode</td><td>GPIO mode (input, output, alternate function, analog). </td></tr>
-    <tr><td class="paramname">pupd</td><td>Pull-up/pull-down configuration. </td></tr>
+    <tr><td class="paramname">pin</td><td>Pin identifier (e.g., PA5, PC13) </td></tr>
+    <tr><td class="paramname">mode</td><td>Desired pin mode (input/output/alternate/analog) </td></tr>
+    <tr><td class="paramname">pupd</td><td>Pull-up/pull-down configuration</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>This function automatically enables the RCC clock for the GPIO port. <div class="fragment"><div class="line"><span class="comment">// Example: Configure PA5 as output with no pull-up/pull-down</span></div>
+<p>This function:</p><ol type="1">
+<li>Enables the GPIO port clock via RCC</li>
+<li>Configures the pin mode in MODER register</li>
+<li>Sets pull-up/pull-down resistors in PUPDR register</li>
+</ol>
+<dl class="section note"><dt>Note</dt><dd>Automatically enables the GPIO port clock if not already enabled <div class="fragment"><div class="line"><span class="comment">// Example: Configure PA5 as output with no pull-up/pull-down</span></div>
 <div class="line"><a class="code hl_function" href="#ab063b362fb73bcb899a122e5188e7e32">hal_gpio_setmode</a>(PA5, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_NO_PULL);</div>
-<div class="ttc" id="agpio_8h_html_ab063b362fb73bcb899a122e5188e7e32"><div class="ttname"><a href="#ab063b362fb73bcb899a122e5188e7e32">hal_gpio_setmode</a></div><div class="ttdeci">void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode, hal_gpio_pullup_pulldown pupd)</div><div class="ttdoc">Set the mode of a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:31</div></div>
+<div class="ttc" id="agpio_8h_html_ab063b362fb73bcb899a122e5188e7e32"><div class="ttname"><a href="#ab063b362fb73bcb899a122e5188e7e32">hal_gpio_setmode</a></div><div class="ttdeci">void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode, hal_gpio_pullup_pulldown pupd)</div><div class="ttdoc">Set the mode of a GPIO pin.</div><div class="ttdef"><b>Definition</b> gpio.c:41</div></div>
 </div><!-- fragment --> </dd></dl>
 <p>&lt; GPIOA base address</p>
 <p>&lt; GPIOA base address</p>

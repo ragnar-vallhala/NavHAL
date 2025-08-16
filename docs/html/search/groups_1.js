@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['base_20addresses_20and_20registers_0',['UART Peripheral Base Addresses and Registers',['../group___u_a_r_t___r_e_g_i_s_t_e_r_s.html',1,'']]]
+  ['core_20hal_0',['Core HAL',['../group___n_a_v_h_a_l.html',1,'']]]
 ];

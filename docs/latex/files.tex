@@ -20,7 +20,9 @@ Here is a list of all files with brief descriptions\+:\begin{DoxyCompactList}
 \item\contentsline{section}{include/core/cortex-\/m4/\mbox{\hyperlink{pwm_8h}{pwm.\+h}} \\*HAL interface for PWM (Pulse Width Modulation) configuration and control }{\pageref{pwm_8h}}{}
 \item\contentsline{section}{include/core/cortex-\/m4/\mbox{\hyperlink{rcc__reg_8h}{rcc\+\_\+reg.\+h}} }{\pageref{rcc__reg_8h}}{}
 \item\contentsline{section}{include/core/cortex-\/m4/\mbox{\hyperlink{timer_8h}{timer.\+h}} \\*Timer and Sys\+Tick register defines and API for STM32\+F4 (Cortex-\/\+M4) }{\pageref{timer_8h}}{}
+\item\contentsline{section}{include/core/cortex-\/m4/\mbox{\hyperlink{timer__reg_8h}{timer\+\_\+reg.\+h}} }{\pageref{timer__reg_8h}}{}
 \item\contentsline{section}{include/core/cortex-\/m4/\mbox{\hyperlink{uart_8h}{uart.\+h}} \\*UART driver interface for STM32\+F4 (Cortex-\/\+M4) }{\pageref{uart_8h}}{}
+\item\contentsline{section}{include/core/cortex-\/m4/\mbox{\hyperlink{uart__reg_8h}{uart\+\_\+reg.\+h}} }{\pageref{uart__reg_8h}}{}
 \item\contentsline{section}{include/utils/\mbox{\hyperlink{bus__types_8h}{bus\+\_\+types.\+h}} }{\pageref{bus__types_8h}}{}
 \item\contentsline{section}{include/utils/\mbox{\hyperlink{clock__types_8h}{clock\+\_\+types.\+h}} \\*Clock HAL type definitions }{\pageref{clock__types_8h}}{}
 \item\contentsline{section}{include/utils/\mbox{\hyperlink{conversion_8h}{conversion.\+h}} \\*String to number conversion utilities interface }{\pageref{conversion_8h}}{}
@@ -49,16 +51,16 @@ Here is a list of all files with brief descriptions\+:\begin{DoxyCompactList}
 \item\contentsline{section}{src/\mbox{\hyperlink{conversion_8c}{conversion.\+c}} \\*String to number conversion implementation }{\pageref{conversion_8c}}{}
 \item\contentsline{section}{src/core/cortex-\/m4/clock/\mbox{\hyperlink{clock_8c}{clock.\+c}} \\*Cortex-\/\+M4 (STM32\+F4) Clock HAL Implementation }{\pageref{clock_8c}}{}
 \item\contentsline{section}{src/core/cortex-\/m4/gpio/\mbox{\hyperlink{gpio_8c}{gpio.\+c}} \\*HAL GPIO driver implementation for STM32\+F4 series }{\pageref{gpio_8c}}{}
-\item\contentsline{section}{src/core/cortex-\/m4/i2c/\mbox{\hyperlink{i2c_8c}{i2c.\+c}} }{\pageref{i2c_8c}}{}
-\item\contentsline{section}{src/core/cortex-\/m4/interrupt/\mbox{\hyperlink{interrupt_8c}{interrupt.\+c}} }{\pageref{interrupt_8c}}{}
+\item\contentsline{section}{src/core/cortex-\/m4/i2c/\mbox{\hyperlink{i2c_8c}{i2c.\+c}} \\*HAL I2C driver implementation for STM32\+F4 series }{\pageref{i2c_8c}}{}
+\item\contentsline{section}{src/core/cortex-\/m4/interrupt/\mbox{\hyperlink{interrupt_8c}{interrupt.\+c}} \\*Cortex-\/\+M4 Interrupt Controller HAL Implementation }{\pageref{interrupt_8c}}{}
 \item\contentsline{section}{src/core/cortex-\/m4/pwm/\mbox{\hyperlink{pwm_8c}{pwm.\+c}} \\*PWM driver implementation for STM32\+F4 series (Cortex-\/\+M4) }{\pageref{pwm_8c}}{}
 \item\contentsline{section}{src/core/cortex-\/m4/startup/\mbox{\hyperlink{src_2core_2cortex-m4_2startup_2startup_8s}{startup.\+s}} }{\pageref{src_2core_2cortex-m4_2startup_2startup_8s}}{}
 \item\contentsline{section}{src/core/cortex-\/m4/timer/\mbox{\hyperlink{timer_8c}{timer.\+c}} \\*Timer, Sys\+Tick and timer-\/peripheral helpers for STM32\+F4 (Cortex-\/\+M4) }{\pageref{timer_8c}}{}
-\item\contentsline{section}{src/core/cortex-\/m4/uart/\mbox{\hyperlink{uart_8c}{uart.\+c}} \\*UART initialization and I/O functions for STM32\+F4 UART1, UART2, and UART6 }{\pageref{uart_8c}}{}
-\item\contentsline{section}{tests/\mbox{\hyperlink{tests_2main_8c}{main.\+c}} }{\pageref{tests_2main_8c}}{}
-\item\contentsline{section}{tests/\mbox{\hyperlink{stubs_8c}{stubs.\+c}} }{\pageref{stubs_8c}}{}
-\item\contentsline{section}{tests/\mbox{\hyperlink{test__gpio_8c}{test\+\_\+gpio.\+c}} }{\pageref{test__gpio_8c}}{}
-\item\contentsline{section}{tests/\mbox{\hyperlink{test__gpio_8h}{test\+\_\+gpio.\+h}} }{\pageref{test__gpio_8h}}{}
-\item\contentsline{section}{tests/\mbox{\hyperlink{test__timer_8c}{test\+\_\+timer.\+c}} }{\pageref{test__timer_8c}}{}
-\item\contentsline{section}{tests/\mbox{\hyperlink{test__timer_8h}{test\+\_\+timer.\+h}} }{\pageref{test__timer_8h}}{}
+\item\contentsline{section}{src/core/cortex-\/m4/uart/\mbox{\hyperlink{uart_8c}{uart.\+c}} \\*UART driver implementation for STM32\+F4 series }{\pageref{uart_8c}}{}
+\item\contentsline{section}{tests/\mbox{\hyperlink{tests_2main_8c}{main.\+c}} \\*Unit test runner for NAVHAL Cortex-\/\+M4 hardware abstraction layer }{\pageref{tests_2main_8c}}{}
+\item\contentsline{section}{tests/\mbox{\hyperlink{stubs_8c}{stubs.\+c}} \\*System-\/level function implementations for Cortex-\/\+M4 }{\pageref{stubs_8c}}{}
+\item\contentsline{section}{tests/\mbox{\hyperlink{test__gpio_8c}{test\+\_\+gpio.\+c}} \\*GPIO unit test implementation for NAVHAL }{\pageref{test__gpio_8c}}{}
+\item\contentsline{section}{tests/\mbox{\hyperlink{test__gpio_8h}{test\+\_\+gpio.\+h}} \\*GPIO unit test declarations for NAVHAL }{\pageref{test__gpio_8h}}{}
+\item\contentsline{section}{tests/\mbox{\hyperlink{test__timer_8c}{test\+\_\+timer.\+c}} \\*Timer unit test implementation for NAVHAL }{\pageref{test__timer_8c}}{}
+\item\contentsline{section}{tests/\mbox{\hyperlink{test__timer_8h}{test\+\_\+timer.\+h}} \\*Timer unit test declarations for NAVHAL }{\pageref{test__timer_8h}}{}
 \end{DoxyCompactList}

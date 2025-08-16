@@ -1,0 +1,64 @@
+\doxysection{samples/02\+\_\+hal\+\_\+pupd/main.c File Reference}
+\hypertarget{samples_202__hal__pupd_2main_8c}{}\label{samples_202__hal__pupd_2main_8c}\index{samples/02\_hal\_pupd/main.c@{samples/02\_hal\_pupd/main.c}}
+
+
+Example application\+: Toggle LED on GPIO\+\_\+\+PA05 based on button input on GPIO\+\_\+\+PC13.  
+
+
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{samples_202__hal__pupd_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{samples_202__hal__pupd_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{samples_202__hal__pupd_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Example application\+: Toggle LED on GPIO\+\_\+\+PA05 based on button input on GPIO\+\_\+\+PC13. 
+
+
+\begin{DoxyItemize}
+\item Initializes Sys\+Tick timer with 1 ms tick.
+\item Configures GPIO\+\_\+\+PA05 as output (LED).
+\item Configures GPIO\+\_\+\+PC13 as input with pull-\/up (button).
+\item Turns on the LED when the button is pressed, off when released.
+\end{DoxyItemize}
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{samples_202__hal__pupd_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{samples_202__hal__pupd_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{samples_202__hal__pupd_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+
+
+\label{doc-func-members}
+\Hypertarget{samples_202__hal__pupd_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{samples_202__hal__pupd_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{samples_202__hal__pupd_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+

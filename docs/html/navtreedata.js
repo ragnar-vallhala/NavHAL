@@ -48,6 +48,7 @@ var NAVTREE =
       [ "Contact", "md__r_e_a_d_m_e.html#autotoc_md36", null ],
       [ "Contributors", "md__r_e_a_d_m_e.html#autotoc_md38", null ]
     ] ],
+    [ "Todo List", "todo.html", null ],
     [ "Topics", "topics.html", "topics" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -74,10 +75,10 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6a7ea01459a0b57e490ead62799f8a205c",
-"index.html#autotoc_md3",
-"samples_203__no__hal__uart__tx_2main_8c.html#a14fa11132ccf9aa0c8258e137b8db7fe",
-"test__timer_8h.html#a485d685f4ed1afcb26576659caada9db"
+"gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6a8a6902fbbaf8f0eb78f1b2bffa84bc6e",
+"interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a1b040a7f76278a73cf5ea4c51f1be047",
+"samples_207__hal__pwm_2main_8c.html#a840291bc02cba5474a4cb46a9b9566fe",
+"timer_8c.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

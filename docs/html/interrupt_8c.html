@@ -30,7 +30,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr id="projectrow">
-  <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td id="projectalign">
    <div id="projectname">NavHAL<span id="projectnumber">&#160;0.1.0</span>
    </div>
@@ -107,6 +106,9 @@ $(function() {
   <div class="headertitle"><div class="title">interrupt.c File Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Cortex-M4 Interrupt Controller HAL Implementation.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="interrupt_8h_source.html">core/cortex-m4/interrupt.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="hal__status_8h_source.html">common/hal_status.h</a>&quot;</code><br />
 <code>#include &lt;stdint.h&gt;</code><br />
@@ -115,7 +117,7 @@ Include dependency graph for interrupt.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="interrupt_8c__incl.png" border="0" usemap="#asrc_2core_2cortex-m4_2interrupt_2interrupt_8c" loading="lazy" alt=""/></div>
 <map name="asrc_2core_2cortex-m4_2interrupt_2interrupt_8c" id="asrc_2core_2cortex-m4_2interrupt_2interrupt_8c">
-<area shape="rect" title=" " alt="" coords="186,5,320,46"/>
+<area shape="rect" title="Cortex&#45;M4 Interrupt Controller HAL Implementation." alt="" coords="186,5,320,46"/>
 <area shape="rect" href="interrupt_8h.html" title="NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32F4." alt="" coords="45,94,216,120"/>
 <area shape="poly" title=" " alt="" coords="224,49,163,88,160,83,221,44"/>
 <area shape="rect" title=" " alt="" coords="176,256,240,282"/>
@@ -134,6 +136,7 @@ Include dependency graph for interrupt.c:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a010529b477db18b2a73db330b5f40cf9" id="r_a010529b477db18b2a73db330b5f40cf9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a010529b477db18b2a73db330b5f40cf9">MAX_IRQ</a>&#160;&#160;&#160;128</td></tr>
+<tr class="memdesc:a010529b477db18b2a73db330b5f40cf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum number of supported interrupts.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -142,13 +145,23 @@ Functions</h2></td></tr>
 <tr class="memitem:acee16c5665334d7c548ed969f3b2d874" id="r_acee16c5665334d7c548ed969f3b2d874"><td class="memItemLeft" align="right" valign="top">int8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acee16c5665334d7c548ed969f3b2d874">hal_disable_interrupt</a> (<a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
 <tr class="memdesc:acee16c5665334d7c548ed969f3b2d874"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable a specific interrupt.  <br /></td></tr>
 <tr class="memitem:ae13d3a1cf10aecee622e6669d9621cca" id="r_ae13d3a1cf10aecee622e6669d9621cca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae13d3a1cf10aecee622e6669d9621cca">hal_interrupt_attach_callback</a> (<a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt, void(*callback)(void))</td></tr>
-<tr class="memdesc:ae13d3a1cf10aecee622e6669d9621cca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach a callback function to a specific interrupt.  <br /></td></tr>
+<tr class="memdesc:ae13d3a1cf10aecee622e6669d9621cca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach a callback function to an interrupt.  <br /></td></tr>
 <tr class="memitem:ac066d5830d23093468acb3a714ead9c5" id="r_ac066d5830d23093468acb3a714ead9c5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac066d5830d23093468acb3a714ead9c5">hal_interrupt_detach_callback</a> (<a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
-<tr class="memdesc:ac066d5830d23093468acb3a714ead9c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detach a callback function from a specific interrupt.  <br /></td></tr>
+<tr class="memdesc:ac066d5830d23093468acb3a714ead9c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detach a callback function from an interrupt.  <br /></td></tr>
 <tr class="memitem:ae6e7c5068b926209dbd3e94d42ec3ea2" id="r_ae6e7c5068b926209dbd3e94d42ec3ea2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6e7c5068b926209dbd3e94d42ec3ea2">hal_handle_interrupt</a> (<a class="el" href="interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8">IRQn_Type</a> interrupt)</td></tr>
-<tr class="memdesc:ae6e7c5068b926209dbd3e94d42ec3ea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Central interrupt handler function.  <br /></td></tr>
+<tr class="memdesc:ae6e7c5068b926209dbd3e94d42ec3ea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle an interrupt by invoking its registered callback.  <br /></td></tr>
 </table>
-<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Cortex-M4 Interrupt Controller HAL Implementation. </p>
+<p>This file provides interrupt management functions for Cortex-M4 based microcontrollers, including:</p><ul>
+<li>Enabling/disabling individual interrupts</li>
+<li>Attaching/detaching interrupt callbacks</li>
+<li>Handling interrupt service routines</li>
+<li>Managing up to 128 interrupt sources</li>
+</ul>
+<p>The implementation uses the NVIC (Nested Vectored Interrupt Controller) and provides a simple callback mechanism for interrupt handling.</p>
+<dl class="section copyright"><dt>Copyright</dt><dd>© NAVROBOTEC PVT. LTD. </dd></dl>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a010529b477db18b2a73db330b5f40cf9" name="a010529b477db18b2a73db330b5f40cf9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a010529b477db18b2a73db330b5f40cf9">&#9670;&#160;</a></span>MAX_IRQ</h2>
 
@@ -160,6 +173,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Maximum number of supported interrupts. </p>
 
 </div>
 </div>
@@ -182,11 +197,19 @@ Functions</h2></td></tr>
 <p>Disable a specific interrupt. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to disable </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 if successful, -1 if failed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Status of operation </dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">SUCCESS</td><td>Interrupt disabled successfully </td></tr>
+    <tr><td class="paramname">FAILURE</td><td>Invalid interrupt number (Cortex-M internal interrupt)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Disables the specified interrupt in the NVIC by setting the corresponding bit in the ICER (Interrupt Clear Enable Register). </p>
 <p>&lt; Indicates failed operation.</p>
 <p>&lt; Indicates successful operation.</p>
 
@@ -210,11 +233,19 @@ Functions</h2></td></tr>
 <p>Enable a specific interrupt. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to enable </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 if successful, -1 if failed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Status of operation </dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">SUCCESS</td><td>Interrupt enabled successfully </td></tr>
+    <tr><td class="paramname">FAILURE</td><td>Invalid interrupt number (Cortex-M internal interrupt)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Enables the specified interrupt in the NVIC by setting the corresponding bit in the ISER (Interrupt Set Enable Register). </p>
 <p>&lt; Indicates failed operation.</p>
 <p>&lt; Indicates successful operation.</p>
 
@@ -235,13 +266,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Central interrupt handler function. </p>
+<p>Handle an interrupt by invoking its registered callback. </p>
+<p>Central interrupt handler function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt</td><td>IRQ number that occurred. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to handle</td></tr>
   </table>
   </dd>
 </dl>
+<p>This function should be called from the actual interrupt service routine (ISR) to invoke the user-registered callback function. It performs bounds checking and NULL pointer verification before invoking the callback. </p>
 
 </div>
 </div>
@@ -264,14 +297,17 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Attach a callback function to a specific interrupt. </p>
+<p>Attach a callback function to an interrupt. </p>
+<p>Attach a callback function to a specific interrupt.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>
-    <tr><td class="paramname">callback</td><td>Function pointer to be called when interrupt occurs. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to attach to </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">callback</td><td>Function pointer to be called when interrupt occurs</td></tr>
   </table>
   </dd>
 </dl>
+<p>Registers a callback function for the specified interrupt. The callback will be invoked when the interrupt occurs and is handled by <a class="el" href="interrupt_8h.html#ae6e7c5068b926209dbd3e94d42ec3ea2" title="Central interrupt handler function.">hal_handle_interrupt()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>The callback function should be short and non-blocking </dd></dl>
 
 </div>
 </div>
@@ -290,13 +326,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Detach a callback function from a specific interrupt. </p>
+<p>Detach a callback function from an interrupt. </p>
+<p>Detach a callback function from a specific interrupt.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to detach from</td></tr>
   </table>
   </dd>
 </dl>
+<p>Removes any previously registered callback for the specified interrupt. </p>
 
 </div>
 </div>

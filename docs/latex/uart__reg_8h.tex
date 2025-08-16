@@ -1,0 +1,157 @@
+\doxysection{include/core/cortex-\/m4/uart\+\_\+reg.h File Reference}
+\hypertarget{uart__reg_8h}{}\label{uart__reg_8h}\index{include/core/cortex-\/m4/uart\_reg.h@{include/core/cortex-\/m4/uart\_reg.h}}
+{\ttfamily \#include "{}common/hal\+\_\+types.\+h"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for uart\+\_\+reg.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{uart__reg_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=320pt]{uart__reg_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_u_a_r_tx___reg___typedef}{UARTx\+\_\+\+Reg\+\_\+\+Typedef}}
+\begin{DoxyCompactList}\small\item\em UART peripheral register map for STM32\+F4. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{uart__reg_8h_a86162ab3f740db9026c1320d46938b4d}{USART1\+\_\+\+BASE}}~0x40011000
+\item 
+\#define \mbox{\hyperlink{uart__reg_8h_ade83162a04bca0b15b39018a8e8ec090}{USART2\+\_\+\+BASE}}~0x40004400
+\item 
+\#define \mbox{\hyperlink{uart__reg_8h_ade4d3907fd0387ee832f426f52d568bb}{USART6\+\_\+\+BASE}}~0x40011400
+\item 
+\#define \mbox{\hyperlink{uart__reg_8h_aa532e8b96de42deb90c0a2ad93a94343}{GET\+\_\+\+USARTx\+\_\+\+BASE}}(n)
+\item 
+\#define \mbox{\hyperlink{uart__reg_8h_ab840af4f735ec36419d61c7db3cfa00d}{RCC\+\_\+\+APB1\+ENR\+\_\+\+USART2\+EN}}~(1 $<$$<$ 17)
+\item 
+\#define \mbox{\hyperlink{uart__reg_8h_a4666bb90842e8134b32e6a34a0f165f3}{RCC\+\_\+\+APB2\+ENR\+\_\+\+USART1\+EN}}~(1 $<$$<$ 4)
+\item 
+\#define \mbox{\hyperlink{uart__reg_8h_a0569d91f3b18ae130b7a09e0100c4459}{RCC\+\_\+\+APB2\+ENR\+\_\+\+USART6\+EN}}~(1 $<$$<$ 5)
+\item 
+\#define \mbox{\hyperlink{uart__reg_8h_a2bb650676aaae4a5203f372d497d5947}{USART\+\_\+\+CR1\+\_\+\+UE}}~(1 $<$$<$ 13)
+\begin{DoxyCompactList}\small\item\em USART Enable. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{uart__reg_8h_ade7f090b04fd78b755b43357ecaa9622}{USART\+\_\+\+CR1\+\_\+\+TE}}~(1 $<$$<$ 3)
+\begin{DoxyCompactList}\small\item\em Transmitter Enable. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{uart__reg_8h_ada0d5d407a22264de847bc1b40a17aeb}{USART\+\_\+\+CR1\+\_\+\+RE}}~(1 $<$$<$ 2)
+\begin{DoxyCompactList}\small\item\em Receiver Enable. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{uart__reg_8h_a65e9cddf0890113d405342f1d8b5b980}{USART\+\_\+\+SR\+\_\+\+TXE}}~(1 $<$$<$ 7)
+\begin{DoxyCompactList}\small\item\em Transmit Data Register Empty. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{uart__reg_8h_aa0c99e2bb265b3d58a91aca7a93f7836}{USART\+\_\+\+SR\+\_\+\+RXNE}}~(1 $<$$<$ 5)
+\begin{DoxyCompactList}\small\item\em Read Data Register Not Empty. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\label{doc-define-members}
+\Hypertarget{uart__reg_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{uart__reg_8h_aa532e8b96de42deb90c0a2ad93a94343}\index{uart\_reg.h@{uart\_reg.h}!GET\_USARTx\_BASE@{GET\_USARTx\_BASE}}
+\index{GET\_USARTx\_BASE@{GET\_USARTx\_BASE}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GET\_USARTx\_BASE}{GET\_USARTx\_BASE}}
+{\footnotesize\ttfamily \label{uart__reg_8h_aa532e8b96de42deb90c0a2ad93a94343} 
+\#define GET\+\_\+\+USARTx\+\_\+\+BASE(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ ((\mbox{\hyperlink{struct_u_a_r_tx___reg___typedef}{UARTx\_Reg\_Typedef}}\ *)(n\ ==\ 1\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ?\ (\mbox{\hyperlink{uart__reg_8h_a86162ab3f740db9026c1320d46938b4d}{USART1\_BASE}})\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ (n\ ==\ 2\ ?\ (\mbox{\hyperlink{uart__reg_8h_ade83162a04bca0b15b39018a8e8ec090}{USART2\_BASE}})\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ :\ (n\ ==\ 6\ ?\ (\mbox{\hyperlink{uart__reg_8h_ade4d3907fd0387ee832f426f52d568bb}{USART6\_BASE}})\ :\ (\mbox{\hyperlink{hal__types_8h_a070d2ce7b6bb7e5c05602aa8c308d0c4}{NULL}})))))}
+
+\end{DoxyCode}
+\Hypertarget{uart__reg_8h_ab840af4f735ec36419d61c7db3cfa00d}\index{uart\_reg.h@{uart\_reg.h}!RCC\_APB1ENR\_USART2EN@{RCC\_APB1ENR\_USART2EN}}
+\index{RCC\_APB1ENR\_USART2EN@{RCC\_APB1ENR\_USART2EN}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR\_USART2EN}{RCC\_APB1ENR\_USART2EN}}
+{\footnotesize\ttfamily \label{uart__reg_8h_ab840af4f735ec36419d61c7db3cfa00d} 
+\#define RCC\+\_\+\+APB1\+ENR\+\_\+\+USART2\+EN~(1 $<$$<$ 17)}
+
+\Hypertarget{uart__reg_8h_a4666bb90842e8134b32e6a34a0f165f3}\index{uart\_reg.h@{uart\_reg.h}!RCC\_APB2ENR\_USART1EN@{RCC\_APB2ENR\_USART1EN}}
+\index{RCC\_APB2ENR\_USART1EN@{RCC\_APB2ENR\_USART1EN}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB2ENR\_USART1EN}{RCC\_APB2ENR\_USART1EN}}
+{\footnotesize\ttfamily \label{uart__reg_8h_a4666bb90842e8134b32e6a34a0f165f3} 
+\#define RCC\+\_\+\+APB2\+ENR\+\_\+\+USART1\+EN~(1 $<$$<$ 4)}
+
+\Hypertarget{uart__reg_8h_a0569d91f3b18ae130b7a09e0100c4459}\index{uart\_reg.h@{uart\_reg.h}!RCC\_APB2ENR\_USART6EN@{RCC\_APB2ENR\_USART6EN}}
+\index{RCC\_APB2ENR\_USART6EN@{RCC\_APB2ENR\_USART6EN}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB2ENR\_USART6EN}{RCC\_APB2ENR\_USART6EN}}
+{\footnotesize\ttfamily \label{uart__reg_8h_a0569d91f3b18ae130b7a09e0100c4459} 
+\#define RCC\+\_\+\+APB2\+ENR\+\_\+\+USART6\+EN~(1 $<$$<$ 5)}
+
+\Hypertarget{uart__reg_8h_a86162ab3f740db9026c1320d46938b4d}\index{uart\_reg.h@{uart\_reg.h}!USART1\_BASE@{USART1\_BASE}}
+\index{USART1\_BASE@{USART1\_BASE}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{USART1\_BASE}{USART1\_BASE}}
+{\footnotesize\ttfamily \label{uart__reg_8h_a86162ab3f740db9026c1320d46938b4d} 
+\#define USART1\+\_\+\+BASE~0x40011000}
+
+\Hypertarget{uart__reg_8h_ade83162a04bca0b15b39018a8e8ec090}\index{uart\_reg.h@{uart\_reg.h}!USART2\_BASE@{USART2\_BASE}}
+\index{USART2\_BASE@{USART2\_BASE}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{USART2\_BASE}{USART2\_BASE}}
+{\footnotesize\ttfamily \label{uart__reg_8h_ade83162a04bca0b15b39018a8e8ec090} 
+\#define USART2\+\_\+\+BASE~0x40004400}
+
+\Hypertarget{uart__reg_8h_ade4d3907fd0387ee832f426f52d568bb}\index{uart\_reg.h@{uart\_reg.h}!USART6\_BASE@{USART6\_BASE}}
+\index{USART6\_BASE@{USART6\_BASE}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{USART6\_BASE}{USART6\_BASE}}
+{\footnotesize\ttfamily \label{uart__reg_8h_ade4d3907fd0387ee832f426f52d568bb} 
+\#define USART6\+\_\+\+BASE~0x40011400}
+
+\Hypertarget{uart__reg_8h_ada0d5d407a22264de847bc1b40a17aeb}\index{uart\_reg.h@{uart\_reg.h}!USART\_CR1\_RE@{USART\_CR1\_RE}}
+\index{USART\_CR1\_RE@{USART\_CR1\_RE}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{USART\_CR1\_RE}{USART\_CR1\_RE}}
+{\footnotesize\ttfamily \label{uart__reg_8h_ada0d5d407a22264de847bc1b40a17aeb} 
+\#define USART\+\_\+\+CR1\+\_\+\+RE~(1 $<$$<$ 2)}
+
+
+
+Receiver Enable. 
+
+\Hypertarget{uart__reg_8h_ade7f090b04fd78b755b43357ecaa9622}\index{uart\_reg.h@{uart\_reg.h}!USART\_CR1\_TE@{USART\_CR1\_TE}}
+\index{USART\_CR1\_TE@{USART\_CR1\_TE}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{USART\_CR1\_TE}{USART\_CR1\_TE}}
+{\footnotesize\ttfamily \label{uart__reg_8h_ade7f090b04fd78b755b43357ecaa9622} 
+\#define USART\+\_\+\+CR1\+\_\+\+TE~(1 $<$$<$ 3)}
+
+
+
+Transmitter Enable. 
+
+\Hypertarget{uart__reg_8h_a2bb650676aaae4a5203f372d497d5947}\index{uart\_reg.h@{uart\_reg.h}!USART\_CR1\_UE@{USART\_CR1\_UE}}
+\index{USART\_CR1\_UE@{USART\_CR1\_UE}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{USART\_CR1\_UE}{USART\_CR1\_UE}}
+{\footnotesize\ttfamily \label{uart__reg_8h_a2bb650676aaae4a5203f372d497d5947} 
+\#define USART\+\_\+\+CR1\+\_\+\+UE~(1 $<$$<$ 13)}
+
+
+
+USART Enable. 
+
+\Hypertarget{uart__reg_8h_aa0c99e2bb265b3d58a91aca7a93f7836}\index{uart\_reg.h@{uart\_reg.h}!USART\_SR\_RXNE@{USART\_SR\_RXNE}}
+\index{USART\_SR\_RXNE@{USART\_SR\_RXNE}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{USART\_SR\_RXNE}{USART\_SR\_RXNE}}
+{\footnotesize\ttfamily \label{uart__reg_8h_aa0c99e2bb265b3d58a91aca7a93f7836} 
+\#define USART\+\_\+\+SR\+\_\+\+RXNE~(1 $<$$<$ 5)}
+
+
+
+Read Data Register Not Empty. 
+
+\Hypertarget{uart__reg_8h_a65e9cddf0890113d405342f1d8b5b980}\index{uart\_reg.h@{uart\_reg.h}!USART\_SR\_TXE@{USART\_SR\_TXE}}
+\index{USART\_SR\_TXE@{USART\_SR\_TXE}!uart\_reg.h@{uart\_reg.h}}
+\doxysubsubsection{\texorpdfstring{USART\_SR\_TXE}{USART\_SR\_TXE}}
+{\footnotesize\ttfamily \label{uart__reg_8h_a65e9cddf0890113d405342f1d8b5b980} 
+\#define USART\+\_\+\+SR\+\_\+\+TXE~(1 $<$$<$ 7)}
+
+
+
+Transmit Data Register Empty. 
+

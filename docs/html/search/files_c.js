@@ -6,6 +6,7 @@ var searchData=
   ['test_5ftimer_2eh_3',['test_timer.h',['../test__timer_8h.html',1,'']]],
   ['timer_2ec_4',['timer.c',['../timer_8c.html',1,'']]],
   ['timer_2eh_5',['timer.h',['../timer_8h.html',1,'']]],
-  ['timer_5ftypes_2eh_6',['timer_types.h',['../timer__types_8h.html',1,'']]],
-  ['types_2eh_7',['types.h',['../types_8h.html',1,'']]]
+  ['timer_5freg_2eh_6',['timer_reg.h',['../timer__reg_8h.html',1,'']]],
+  ['timer_5ftypes_2eh_7',['timer_types.h',['../timer__types_8h.html',1,'']]],
+  ['types_2eh_8',['types.h',['../types_8h.html',1,'']]]
 ];

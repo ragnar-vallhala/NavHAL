@@ -1,0 +1,5 @@
+<map id="include/core/cortex&#45;m4/i2c.h" name="include/core/cortex&#45;m4/i2c.h">
+<area shape="rect" id="Node000001" title="Cortex&#45;M4 I²C HAL interface." alt="" coords="5,5,137,46"/>
+<area shape="rect" id="Node000002" href="$i2c_8c.html" title="HAL I2C driver implementation for STM32F4 series." alt="" coords="6,94,136,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,62,74,94,68,94,68,62"/>
+</map>

@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['—_20navrobotec_20hardware_20abstraction_20layer_0',['— NAVRobotec Hardware Abstraction Layer',['../md__r_e_a_d_m_e.html',1,'NavHAL — NAVRobotec Hardware Abstraction Layer'],['../index.html#autotoc_md3',1,'NavHAL — NAVRobotec Hardware Abstraction Layer']]]
+  ['wait_5fflag_0',['wait_flag',['../samples_210__no__hal__i2c_2main_8c.html#ab6f5daca5ad3a665d4c012f2db2db044',1,'main.c']]],
+  ['with_3a_1',['It supports USART1, USART2, and USART6 peripherals with:',['../uart_8c.html#autotoc_md41',1,'']]],
+  ['write_20macros_2',['Type-Generic Write Macros',['../group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html',1,'']]],
+  ['wwdg_5firqn_3',['WWDG_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a971089d7566ef902dfa0c80ac3a8fd52',1,'interrupt_reg.h']]]
 ];

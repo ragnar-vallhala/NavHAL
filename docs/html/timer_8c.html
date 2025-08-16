@@ -30,7 +30,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr id="projectrow">
-  <td id="projectlogo"><img alt="Logo" src="Logo.png"/></td>
   <td id="projectalign">
    <div id="projectname">NavHAL<span id="projectnumber">&#160;0.1.0</span>
    </div>
@@ -108,12 +107,13 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Timer, SysTick and timer-peripheral helpers for STM32F4 (Cortex-M4).  
+<p>Timer, SysTick and timer-peripheral helpers for STM32F4 (Cortex-M4)  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="timer_8h_source.html">core/cortex-m4/timer.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="clock_8h_source.html">core/cortex-m4/clock.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="interrupt_8h_source.html">core/cortex-m4/interrupt.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="uart_8h_source.html">core/cortex-m4/uart.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rcc__reg_8h_source.html">core/cortex-m4/rcc_reg.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="timer__reg_8h_source.html">core/cortex-m4/timer_reg.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="timer__types_8h_source.html">utils/timer_types.h</a>&quot;</code><br />
 <code>#include &lt;stdint.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -121,244 +121,76 @@ Include dependency graph for timer.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="timer_8c__incl.png" border="0" usemap="#asrc_2core_2cortex-m4_2timer_2timer_8c" loading="lazy" alt=""/></div>
 <map name="asrc_2core_2cortex-m4_2timer_2timer_8c" id="asrc_2core_2cortex-m4_2timer_2timer_8c">
-<area shape="rect" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)." alt="" coords="335,5,465,46"/>
-<area shape="rect" href="timer_8h.html" title="Timer and SysTick register defines and API for STM32F4 (Cortex&#45;M4)." alt="" coords="530,94,681,120"/>
-<area shape="poly" title=" " alt="" coords="452,44,561,86,559,91,450,49"/>
-<area shape="rect" href="timer__types_8h.html" title=" " alt="" coords="739,168,867,193"/>
-<area shape="poly" title=" " alt="" coords="466,31,576,51,636,68,695,92,743,122,782,155,779,159,740,126,692,96,635,74,574,56,465,36"/>
-<area shape="rect" title=" " alt="" coords="177,330,242,356"/>
-<area shape="poly" title=" " alt="" coords="335,31,257,41,169,64,125,81,84,105,48,134,18,169,9,194,12,217,26,239,47,260,105,296,164,323,162,327,102,301,44,264,22,243,7,219,4,193,14,166,44,130,81,100,123,77,167,59,256,36,334,26"/>
-<area shape="rect" href="clock_8h.html" title="Cortex&#45;M4 specific clock control HAL interface." alt="" coords="247,94,401,120"/>
-<area shape="poly" title=" " alt="" coords="383,48,348,84,344,81,379,45"/>
-<area shape="rect" href="interrupt_8h.html" title="NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32F4." alt="" coords="28,168,199,193"/>
-<area shape="poly" title=" " alt="" coords="344,49,291,70,236,96,185,128,141,160,138,156,182,124,233,92,288,65,342,44"/>
-<area shape="rect" href="uart_8h.html" title="UART driver interface for STM32F4 (Cortex&#45;M4)." alt="" coords="518,249,663,274"/>
-<area shape="poly" title=" " alt="" coords="418,45,574,235,569,238,414,48"/>
-<area shape="rect" href="hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="438,330,581,356"/>
-<area shape="poly" title=" " alt="" coords="620,118,647,149,675,190,685,214,690,238,688,261,678,283,662,302,642,316,597,334,595,329,639,311,658,298,674,281,683,260,685,238,680,215,670,193,642,152,616,122"/>
-<area shape="poly" title=" " alt="" coords="640,118,756,159,754,165,638,123"/>
-<area shape="poly" title=" " alt="" coords="580,123,478,172,415,206,354,244,328,263,303,284,243,324,240,319,300,280,325,259,351,239,413,201,476,167,577,118"/>
-<area shape="rect" href="clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="223,168,353,193"/>
-<area shape="poly" title=" " alt="" coords="321,121,303,155,299,153,316,119"/>
-<area shape="poly" title=" " alt="" coords="233,196,164,217,136,230,120,243,113,261,120,281,139,304,165,321,162,326,136,308,115,283,108,261,115,240,134,225,163,212,232,191"/>
-<area shape="rect" href="rcc__reg_8h.html" title=" " alt="" coords="364,241,495,282"/>
-<area shape="poly" title=" " alt="" coords="311,191,382,231,380,236,308,196"/>
-<area shape="poly" title=" " alt="" coords="451,281,488,317,484,321,447,284"/>
-<area shape="poly" title=" " alt="" coords="375,285,257,327,255,322,374,280"/>
-<area shape="poly" title=" " alt="" coords="111,195,101,235,101,259,108,281,119,295,132,307,164,325,162,330,129,311,115,299,103,283,95,260,95,235,106,193"/>
-<area shape="rect" href="interrupt__reg_8h.html" title="Cortex&#45;M4 NVIC (Nested Vector Interrupt Controller) register definitions." alt="" coords="130,241,289,282"/>
-<area shape="poly" title=" " alt="" coords="130,192,176,229,172,233,126,196"/>
-<area shape="poly" title=" " alt="" coords="285,280,449,323,448,328,284,285"/>
-<area shape="poly" title=" " alt="" coords="212,282,212,314,207,314,207,282"/>
-<area shape="poly" title=" " alt="" coords="580,277,535,321,531,317,577,273"/>
-<area shape="poly" title=" " alt="" coords="539,278,507,285,258,335,257,330,506,279,537,273"/>
+<area shape="rect" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)" alt="" coords="487,5,617,46"/>
+<area shape="rect" href="timer_8h.html" title="Timer and SysTick register defines and API for STM32F4 (Cortex&#45;M4)." alt="" coords="650,94,801,120"/>
+<area shape="poly" title=" " alt="" coords="596,44,686,85,684,90,594,49"/>
+<area shape="rect" href="timer__types_8h.html" title=" " alt="" coords="769,168,898,193"/>
+<area shape="poly" title=" " alt="" coords="618,33,731,56,782,72,815,92,825,106,831,121,837,152,831,153,826,123,820,108,812,96,780,77,730,61,617,39"/>
+<area shape="rect" title=" " alt="" coords="474,330,539,356"/>
+<area shape="poly" title=" " alt="" coords="577,45,604,72,630,107,649,149,653,171,652,194,645,242,637,262,622,284,590,311,554,329,552,324,587,306,618,280,633,259,640,240,647,193,648,171,644,150,625,110,599,75,573,48"/>
+<area shape="rect" href="clock_8h.html" title="Cortex&#45;M4 specific clock control HAL interface." alt="" coords="331,94,485,120"/>
+<area shape="poly" title=" " alt="" coords="517,49,445,88,442,84,515,44"/>
+<area shape="rect" href="rcc__reg_8h.html" title=" " alt="" coords="222,241,352,282"/>
+<area shape="poly" title=" " alt="" coords="487,31,445,37,400,49,357,68,321,96,301,125,290,159,286,194,286,226,280,226,281,194,285,158,296,123,317,92,355,63,399,44,444,32,486,26"/>
+<area shape="rect" href="interrupt_8h.html" title="NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32F4." alt="" coords="467,168,637,193"/>
+<area shape="poly" title=" " alt="" coords="555,46,555,152,549,152,549,46"/>
+<area shape="rect" href="timer__reg_8h.html" title=" " alt="" coords="5,241,147,282"/>
+<area shape="poly" title=" " alt="" coords="487,39,395,61,345,76,297,96,242,128,190,164,109,233,105,229,187,160,239,123,295,92,343,71,393,55,486,34"/>
+<area shape="rect" href="hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="165,330,307,356"/>
+<area shape="poly" title=" " alt="" coords="649,117,459,137,366,152,301,170,270,184,247,197,228,215,212,242,207,261,209,280,223,316,218,318,204,281,202,260,207,240,224,211,244,193,268,179,299,165,365,147,458,131,649,111"/>
+<area shape="poly" title=" " alt="" coords="745,118,804,156,801,161,742,122"/>
+<area shape="poly" title=" " alt="" coords="730,120,732,152,730,195,719,242,709,264,695,284,664,309,628,326,590,337,555,342,554,337,589,332,626,321,661,305,691,280,705,261,714,240,724,194,726,152,724,120"/>
+<area shape="rect" href="clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="312,168,442,193"/>
+<area shape="poly" title=" " alt="" coords="405,121,391,154,386,152,400,119"/>
+<area shape="poly" title=" " alt="" coords="382,193,393,234,403,258,417,280,440,303,467,320,464,324,437,307,413,284,398,261,388,236,377,194"/>
+<area shape="poly" title=" " alt="" coords="365,196,322,233,319,229,362,192"/>
+<area shape="poly" title=" " alt="" coords="276,284,254,318,250,315,272,281"/>
+<area shape="poly" title=" " alt="" coords="343,280,461,322,459,327,341,285"/>
+<area shape="poly" title=" " alt="" coords="567,192,583,210,598,232,606,257,605,271,601,283,580,308,554,326,551,321,577,304,596,281,600,270,601,258,593,235,579,213,563,196"/>
+<area shape="rect" href="interrupt__reg_8h.html" title="Cortex&#45;M4 NVIC (Nested Vector Interrupt Controller) register definitions." alt="" coords="427,241,586,282"/>
+<area shape="poly" title=" " alt="" coords="547,195,528,229,523,227,543,192"/>
+<area shape="poly" title=" " alt="" coords="440,285,293,328,292,323,438,280"/>
+<area shape="poly" title=" " alt="" coords="509,282,509,314,504,314,504,282"/>
+<area shape="poly" title=" " alt="" coords="117,280,199,320,197,325,115,285"/>
+<area shape="poly" title=" " alt="" coords="148,273,460,330,459,335,147,279"/>
 </map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a51591e1b5e966fd8031bed4ff27ba3b7" id="r_a51591e1b5e966fd8031bed4ff27ba3b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51591e1b5e966fd8031bed4ff27ba3b7">systick_init</a> (uint32_t tick_us)</td></tr>
-<tr class="memdesc:a51591e1b5e966fd8031bed4ff27ba3b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the SysTick timer to generate periodic ticks.  <br /></td></tr>
+<tr class="memitem:a9a217da81010df575208a46440a9825a" id="r_a9a217da81010df575208a46440a9825a"><td class="memItemLeft" align="right" valign="top">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD static volatile uint64_t systick_ticks=0;static volatile uint32_t tick_duration_us=1;static volatile uint32_t tick_reload_value=0;=======static volatile uint64_t systick_ticks=0;static volatile uint32_t tick_duration_us=1;static volatile uint32_t tick_reload_value=0;&gt; &gt; &gt; &gt; &gt; &gt; void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9a217da81010df575208a46440a9825a">systick_init</a> (uint32_t tick_us)</td></tr>
+<tr class="memdesc:a9a217da81010df575208a46440a9825a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the SysTick timer.  <br /></td></tr>
 <tr class="memitem:a025aed4c2e0c624b412158b404806a2a" id="r_a025aed4c2e0c624b412158b404806a2a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a025aed4c2e0c624b412158b404806a2a">delay_us</a> (uint64_t us)</td></tr>
-<tr class="memdesc:a025aed4c2e0c624b412158b404806a2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Busy-wait for the specified number of microseconds.  <br /></td></tr>
+<tr class="memdesc:a025aed4c2e0c624b412158b404806a2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Busy-wait delay in microseconds.  <br /></td></tr>
 <tr class="memitem:ab7cce8122024d7ba47bf10f434956de4" id="r_ab7cce8122024d7ba47bf10f434956de4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab7cce8122024d7ba47bf10f434956de4">delay_ms</a> (uint32_t ms)</td></tr>
-<tr class="memdesc:ab7cce8122024d7ba47bf10f434956de4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Busy-wait for the specified number of milliseconds.  <br /></td></tr>
+<tr class="memdesc:ab7cce8122024d7ba47bf10f434956de4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Busy-wait delay in milliseconds.  <br /></td></tr>
 <tr class="memitem:a8aea94afb2c6534c316c01aca84dacb3" id="r_a8aea94afb2c6534c316c01aca84dacb3"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8aea94afb2c6534c316c01aca84dacb3">hal_get_tick</a> (void)</td></tr>
-<tr class="memdesc:a8aea94afb2c6534c316c01aca84dacb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current system tick count.  <br /></td></tr>
+<tr class="memdesc:a8aea94afb2c6534c316c01aca84dacb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get current system tick count.  <br /></td></tr>
 <tr class="memitem:abb6898e3bf58a48224867791dbdefdf3" id="r_abb6898e3bf58a48224867791dbdefdf3"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abb6898e3bf58a48224867791dbdefdf3">hal_get_tick_duration_us</a> (void)</td></tr>
-<tr class="memdesc:abb6898e3bf58a48224867791dbdefdf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the configured tick duration in microseconds.  <br /></td></tr>
+<tr class="memdesc:abb6898e3bf58a48224867791dbdefdf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get configured tick duration.  <br /></td></tr>
 <tr class="memitem:a3dafc6a0248d43b6a4c076b7dbcfc23f" id="r_a3dafc6a0248d43b6a4c076b7dbcfc23f"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3dafc6a0248d43b6a4c076b7dbcfc23f">hal_get_tick_reload_value</a> (void)</td></tr>
-<tr class="memdesc:a3dafc6a0248d43b6a4c076b7dbcfc23f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the SysTick reload value (24-bit truncated).  <br /></td></tr>
+<tr class="memdesc:a3dafc6a0248d43b6a4c076b7dbcfc23f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get SysTick reload value.  <br /></td></tr>
 <tr class="memitem:a71ab66b2798cd4aafcfe0a24b9154594" id="r_a71ab66b2798cd4aafcfe0a24b9154594"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a71ab66b2798cd4aafcfe0a24b9154594">hal_get_millis</a> (void)</td></tr>
-<tr class="memdesc:a71ab66b2798cd4aafcfe0a24b9154594"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return system uptime in milliseconds.  <br /></td></tr>
+<tr class="memdesc:a71ab66b2798cd4aafcfe0a24b9154594"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get system uptime in milliseconds.  <br /></td></tr>
 <tr class="memitem:ade6c3437a366ce7aaf9617e69a848df9" id="r_ade6c3437a366ce7aaf9617e69a848df9"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade6c3437a366ce7aaf9617e69a848df9">hal_get_micros</a> (void)</td></tr>
-<tr class="memdesc:ade6c3437a366ce7aaf9617e69a848df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return system uptime in microseconds.  <br /></td></tr>
+<tr class="memdesc:ade6c3437a366ce7aaf9617e69a848df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get system uptime in microseconds.  <br /></td></tr>
 <tr class="memitem:ab5e09814056d617c521549e542639b7e" id="r_ab5e09814056d617c521549e542639b7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5e09814056d617c521549e542639b7e">SysTick_Handler</a> (void)</td></tr>
-<tr class="memdesc:ab5e09814056d617c521549e542639b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">SysTick interrupt handler increments the global tick counter.  <br /></td></tr>
-<tr class="memitem:abc8145e937804e47569fd42e517ea07f" id="r_abc8145e937804e47569fd42e517ea07f"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc8145e937804e47569fd42e517ea07f">_get_timer_base</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memitem:a0557e2509e8d503f00562e6af93cf71f" id="r_a0557e2509e8d503f00562e6af93cf71f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0557e2509e8d503f00562e6af93cf71f">_enable_timer_rcc</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memitem:a6e257043176b54c277ffc83a92e86ca9" id="r_a6e257043176b54c277ffc83a92e86ca9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6e257043176b54c277ffc83a92e86ca9">_timer_gp1_init</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t prescaler, uint32_t auto_reload)</td></tr>
-<tr class="memitem:a926a3dfa398a580ee4efcb77175340bd" id="r_a926a3dfa398a580ee4efcb77175340bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a926a3dfa398a580ee4efcb77175340bd">_timer_gp2_init</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t prescaler, uint32_t auto_reload)</td></tr>
-<tr class="memitem:ab62427e26c856611e3b78466fcbda650" id="r_ab62427e26c856611e3b78466fcbda650"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab62427e26c856611e3b78466fcbda650">_timer_adv_init</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t prescaler, uint32_t auto_reload)</td></tr>
+<tr class="memdesc:ab5e09814056d617c521549e542639b7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">SysTick interrupt handler.  <br /></td></tr>
 <tr class="memitem:adfbc1cc33f34b935f0b0ee61d2d3f6f8" id="r_adfbc1cc33f34b935f0b0ee61d2d3f6f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adfbc1cc33f34b935f0b0ee61d2d3f6f8">timer_init</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t prescaler, uint32_t auto_reload)</td></tr>
-<tr class="memdesc:adfbc1cc33f34b935f0b0ee61d2d3f6f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize a timer based on its type (advanced / gp1 / gp2).  <br /></td></tr>
-<tr class="memitem:a49fb0f6c6b9a4802601a452618672e52" id="r_a49fb0f6c6b9a4802601a452618672e52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a49fb0f6c6b9a4802601a452618672e52">timer_start</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memdesc:a49fb0f6c6b9a4802601a452618672e52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Start the specified timer.  <br /></td></tr>
-<tr class="memitem:a196e32e61e4a4d6cb50e46ebffb1e0b8" id="r_a196e32e61e4a4d6cb50e46ebffb1e0b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a196e32e61e4a4d6cb50e46ebffb1e0b8">timer_stop</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memdesc:a196e32e61e4a4d6cb50e46ebffb1e0b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stop the specified timer.  <br /></td></tr>
-<tr class="memitem:ab50e7d8e6b8713a9a96abc6dd3a9e932" id="r_ab50e7d8e6b8713a9a96abc6dd3a9e932"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab50e7d8e6b8713a9a96abc6dd3a9e932">timer_reset</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memdesc:ab50e7d8e6b8713a9a96abc6dd3a9e932"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset timer counter to zero.  <br /></td></tr>
-<tr class="memitem:a19aba4b4d8462e4f84b6eeabda21423c" id="r_a19aba4b4d8462e4f84b6eeabda21423c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19aba4b4d8462e4f84b6eeabda21423c">timer_get_count</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memdesc:a19aba4b4d8462e4f84b6eeabda21423c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current counter value for a timer.  <br /></td></tr>
-<tr class="memitem:a6b2fb6cbff774094130a964475db6b25" id="r_a6b2fb6cbff774094130a964475db6b25"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b2fb6cbff774094130a964475db6b25">timer_get_frequency</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memdesc:a6b2fb6cbff774094130a964475db6b25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the timer's current base frequency using PSC and ARR.  <br /></td></tr>
-<tr class="memitem:a0b6c91f4ad622097b4e2787abce9873e" id="r_a0b6c91f4ad622097b4e2787abce9873e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b6c91f4ad622097b4e2787abce9873e">timer_set_arr</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t channel, uint32_t arr)</td></tr>
-<tr class="memitem:a6226a8f2f8b305c2a319ade05a77886c" id="r_a6226a8f2f8b305c2a319ade05a77886c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6226a8f2f8b305c2a319ade05a77886c">timer_clear_interrupt_flag</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memitem:a69ed77607e30e5935ea2d6994e94be10" id="r_a69ed77607e30e5935ea2d6994e94be10"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69ed77607e30e5935ea2d6994e94be10">TIM2_IRQHandler</a> ()</td></tr>
-<tr class="memdesc:a69ed77607e30e5935ea2d6994e94be10"><td class="mdescLeft">&#160;</td><td class="mdescRight">IRQ handler wrapper for TIM2.  <br /></td></tr>
-<tr class="memitem:a2f59315000eb73fdeac2ab44fcd8b972" id="r_a2f59315000eb73fdeac2ab44fcd8b972"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f59315000eb73fdeac2ab44fcd8b972">TIM3_IRQHandler</a> ()</td></tr>
-<tr class="memdesc:a2f59315000eb73fdeac2ab44fcd8b972"><td class="mdescLeft">&#160;</td><td class="mdescRight">IRQ handler wrapper for TIM3.  <br /></td></tr>
-<tr class="memitem:a6e7703924e97aa04dbae6b88adcec3d1" id="r_a6e7703924e97aa04dbae6b88adcec3d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6e7703924e97aa04dbae6b88adcec3d1">TIM4_IRQHandler</a> ()</td></tr>
-<tr class="memdesc:a6e7703924e97aa04dbae6b88adcec3d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">IRQ handler wrapper for TIM4.  <br /></td></tr>
-<tr class="memitem:ad32ddc677f033b18b9b1a0a500c5b896" id="r_ad32ddc677f033b18b9b1a0a500c5b896"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad32ddc677f033b18b9b1a0a500c5b896">TIM5_IRQHandler</a> ()</td></tr>
-<tr class="memdesc:ad32ddc677f033b18b9b1a0a500c5b896"><td class="mdescLeft">&#160;</td><td class="mdescRight">IRQ handler wrapper for TIM5.  <br /></td></tr>
-<tr class="memitem:a5bc8c18b2c4395dd99ccd232c700fd48" id="r_a5bc8c18b2c4395dd99ccd232c700fd48"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5bc8c18b2c4395dd99ccd232c700fd48">TIM1BRK_TIM9_IRQHandler</a> ()</td></tr>
-<tr class="memdesc:a5bc8c18b2c4395dd99ccd232c700fd48"><td class="mdescLeft">&#160;</td><td class="mdescRight">IRQ handler for TIM1 BRK and TIM9 shared vector.  <br /></td></tr>
-<tr class="memitem:aabc6ed1735c011a91578c38f8b6d2e9b" id="r_aabc6ed1735c011a91578c38f8b6d2e9b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aabc6ed1735c011a91578c38f8b6d2e9b">_set_interrupt_enable_bit</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memitem:a4ee300cb9e4b9356f445bbc7d0d7549f" id="r_a4ee300cb9e4b9356f445bbc7d0d7549f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ee300cb9e4b9356f445bbc7d0d7549f">timer_enable_interrupt</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memdesc:a4ee300cb9e4b9356f445bbc7d0d7549f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable timer interrupts (NVIC + DIER UIE) for supported timers.  <br /></td></tr>
-<tr class="memitem:a45f9a07b1ec73b7c758005623d8ab0e5" id="r_a45f9a07b1ec73b7c758005623d8ab0e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45f9a07b1ec73b7c758005623d8ab0e5">timer_attach_callback</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, void(*callback)(void))</td></tr>
-<tr class="memdesc:a45f9a07b1ec73b7c758005623d8ab0e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Attach a callback to the timer's HAL interrupt table.  <br /></td></tr>
-<tr class="memitem:a834d3bef7882671645ad5d3c58fa69bc" id="r_a834d3bef7882671645ad5d3c58fa69bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a834d3bef7882671645ad5d3c58fa69bc">timer_detach_callback</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer)</td></tr>
-<tr class="memdesc:a834d3bef7882671645ad5d3c58fa69bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Detach a previously attached callback for the given timer.  <br /></td></tr>
-<tr class="memitem:a3b5738efe72c1bd7130276a8f59b8234" id="r_a3b5738efe72c1bd7130276a8f59b8234"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b5738efe72c1bd7130276a8f59b8234">timer_set_compare</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint8_t channel, uint32_t compare_value)</td></tr>
-<tr class="memdesc:a3b5738efe72c1bd7130276a8f59b8234"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the compare (CCR) register for a timer channel and configure CCMR.  <br /></td></tr>
-<tr class="memitem:a043ef2140caa620a1ed1af968fff5b46" id="r_a043ef2140caa620a1ed1af968fff5b46"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a043ef2140caa620a1ed1af968fff5b46">timer_get_compare</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t channel)</td></tr>
-<tr class="memitem:a566a41b6f3c8e66b0736719528da6245" id="r_a566a41b6f3c8e66b0736719528da6245"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a566a41b6f3c8e66b0736719528da6245">timer_get_arr</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t channel)</td></tr>
-<tr class="memitem:ab790fdb4ee5e3bfe9477a2bbfb89e13d" id="r_ab790fdb4ee5e3bfe9477a2bbfb89e13d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab790fdb4ee5e3bfe9477a2bbfb89e13d">timer_enable_channel</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t channel)</td></tr>
-<tr class="memitem:a0d3035840fb20d5213a70d0e33994584" id="r_a0d3035840fb20d5213a70d0e33994584"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d3035840fb20d5213a70d0e33994584">timer_disable_channel</a> (<a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a> timer, uint32_t channel)</td></tr>
-<tr class="memdesc:a0d3035840fb20d5213a70d0e33994584"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable output on the specified timer channel (CCxE = 0).  <br /></td></tr>
+<tr class="memdesc:adfbc1cc33f34b935f0b0ee61d2d3f6f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize timer based on type.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Timer, SysTick and timer-peripheral helpers for STM32F4 (Cortex-M4). </p>
+<div class="textblock"><p>Timer, SysTick and timer-peripheral helpers for STM32F4 (Cortex-M4) </p>
 <p>This translation unit implements:</p><ul>
-<li>SysTick initialization and a microsecond tick counter.</li>
-<li>Busy-wait delay helpers (<span class="tt">delay_us</span>, <span class="tt">delay_ms</span>).</li>
-<li>Timer peripheral base lookup, RCC enable, init/start/stop/reset.</li>
-<li>Timer interrupt control, attach/detach callbacks and IRQ handlers.</li>
-<li>Channel compare and PWM setup helpers.</li>
+<li>SysTick initialization and microsecond tick counter</li>
+<li>Busy-wait delay helpers (delay_us, delay_ms)</li>
+<li>Timer peripheral base lookup, RCC enable, init/start/stop/reset</li>
+<li>Timer interrupt control, attach/detach callbacks and IRQ handlers</li>
+<li>Channel compare and PWM setup helpers</li>
 </ul>
-<p>All logic is intentionally low-level (direct register access) and matches the STM32F4 register layout / behavior expected by the rest of the HAL. </p>
+<p>All logic uses direct register access matching the STM32F4 register layout.</p>
+<dl class="section copyright"><dt>Copyright</dt><dd>© NAVROBOTEC PVT. LTD. </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
-<a id="a0557e2509e8d503f00562e6af93cf71f" name="a0557e2509e8d503f00562e6af93cf71f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0557e2509e8d503f00562e6af93cf71f">&#9670;&#160;</a></span>_enable_timer_rcc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void _enable_timer_rcc </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="abc8145e937804e47569fd42e517ea07f" name="abc8145e937804e47569fd42e517ea07f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc8145e937804e47569fd42e517ea07f">&#9670;&#160;</a></span>_get_timer_base()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t _get_timer_base </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aabc6ed1735c011a91578c38f8b6d2e9b" name="aabc6ed1735c011a91578c38f8b6d2e9b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aabc6ed1735c011a91578c38f8b6d2e9b">&#9670;&#160;</a></span>_set_interrupt_enable_bit()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void _set_interrupt_enable_bit </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ab62427e26c856611e3b78466fcbda650" name="ab62427e26c856611e3b78466fcbda650"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab62427e26c856611e3b78466fcbda650">&#9670;&#160;</a></span>_timer_adv_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void _timer_adv_init </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>prescaler</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>auto_reload</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a6e257043176b54c277ffc83a92e86ca9" name="a6e257043176b54c277ffc83a92e86ca9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e257043176b54c277ffc83a92e86ca9">&#9670;&#160;</a></span>_timer_gp1_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void _timer_gp1_init </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>prescaler</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>auto_reload</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a926a3dfa398a580ee4efcb77175340bd" name="a926a3dfa398a580ee4efcb77175340bd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a926a3dfa398a580ee4efcb77175340bd">&#9670;&#160;</a></span>_timer_gp2_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void _timer_gp2_init </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>prescaler</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>auto_reload</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="ab7cce8122024d7ba47bf10f434956de4" name="ab7cce8122024d7ba47bf10f434956de4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab7cce8122024d7ba47bf10f434956de4">&#9670;&#160;</a></span>delay_ms()</h2>
 
@@ -374,10 +206,10 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Busy-wait for the specified number of milliseconds. </p>
+<p>Busy-wait delay in milliseconds. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">ms</td><td>Number of milliseconds to delay. </td></tr>
+    <tr><td class="paramname">ms</td><td>Number of milliseconds to delay </td></tr>
   </table>
   </dd>
 </dl>
@@ -399,14 +231,14 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Busy-wait for the specified number of microseconds. </p>
+<p>Busy-wait delay in microseconds. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">us</td><td>Number of microseconds to delay.</td></tr>
+    <tr><td class="paramname">us</td><td>Number of microseconds to delay </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>This is a blocking busy-wait that uses <a class="el" href="#a8aea94afb2c6534c316c01aca84dacb3" title="Return the current system tick count.">hal_get_tick()</a> and the configured tick duration. It will wait at least one tick if the requested delay is smaller than the tick duration. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Minimum delay is one tick period </dd></dl>
 
 </div>
 </div>
@@ -425,8 +257,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return system uptime in microseconds. </p>
-<dl class="section return"><dt>Returns</dt><dd>Microseconds since tick counter started. </dd></dl>
+<p>Get system uptime in microseconds. </p>
+<dl class="section return"><dt>Returns</dt><dd>Microseconds since startup </dd></dl>
 
 </div>
 </div>
@@ -445,8 +277,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return system uptime in milliseconds. </p>
-<dl class="section return"><dt>Returns</dt><dd>Milliseconds since tick counter started. </dd></dl>
+<p>Get system uptime in milliseconds. </p>
+<dl class="section return"><dt>Returns</dt><dd>Milliseconds since startup </dd></dl>
 
 </div>
 </div>
@@ -465,8 +297,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return the current system tick count. </p>
-<dl class="section return"><dt>Returns</dt><dd>Current tick count. </dd></dl>
+<p>Get current system tick count. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current tick count </dd></dl>
 
 </div>
 </div>
@@ -485,8 +317,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return the configured tick duration in microseconds. </p>
-<dl class="section return"><dt>Returns</dt><dd>Tick duration (us). </dd></dl>
+<p>Get configured tick duration. </p>
+<dl class="section return"><dt>Returns</dt><dd>Tick duration in microseconds </dd></dl>
 
 </div>
 </div>
@@ -505,8 +337,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Return the SysTick reload value (24-bit truncated). </p>
-<dl class="section return"><dt>Returns</dt><dd>Reload value currently configured in SYST_RVR. </dd></dl>
+<p>Get SysTick reload value. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current reload value (24-bit) </dd></dl>
 
 </div>
 </div>
@@ -525,19 +357,19 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>SysTick interrupt handler increments the global tick counter. </p>
-<dl class="section note"><dt>Note</dt><dd>This handler is intended to be wired into the vector table. </dd></dl>
+<p>SysTick interrupt handler. </p>
+<p>Increments the global tick counter </p>
 
 </div>
 </div>
-<a id="a51591e1b5e966fd8031bed4ff27ba3b7" name="a51591e1b5e966fd8031bed4ff27ba3b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51591e1b5e966fd8031bed4ff27ba3b7">&#9670;&#160;</a></span>systick_init()</h2>
+<a id="a9a217da81010df575208a46440a9825a" name="a9a217da81010df575208a46440a9825a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a217da81010df575208a46440a9825a">&#9670;&#160;</a></span>systick_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void systick_init </td>
+          <td class="memname">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD static volatile uint64_t systick_ticks=0; static volatile uint32_t tick_duration_us=1; static volatile uint32_t tick_reload_value=0;======= static volatile uint64_t systick_ticks=0; static volatile uint32_t tick_duration_us=1; static volatile uint32_t tick_reload_value=0; &gt; &gt; &gt; &gt; &gt; &gt; void systick_init </td>
           <td>(</td>
           <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>tick_us</em></span></td><td>)</td>
           <td></td>
@@ -545,355 +377,19 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialize the SysTick timer to generate periodic ticks. </p>
+<p>Initialize the SysTick timer. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">tick_us</td><td>Tick period in microseconds.</td></tr>
+    <tr><td class="paramname">tick_us</td><td>Tick period in microseconds</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>The SysTick reload is limited to 24 bits; this function clips the computed reload value to 24 bits. The function configures SysTick to use the selected clock source, enables the SysTick interrupt and starts the timer. </dd></dl>
-
-</div>
-</div>
-<a id="a5bc8c18b2c4395dd99ccd232c700fd48" name="a5bc8c18b2c4395dd99ccd232c700fd48"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5bc8c18b2c4395dd99ccd232c700fd48">&#9670;&#160;</a></span>TIM1BRK_TIM9_IRQHandler()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TIM1BRK_TIM9_IRQHandler </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>IRQ handler for TIM1 BRK and TIM9 shared vector. </p>
-<dl class="section note"><dt>Note</dt><dd>This function clears TIM9's flag and dispatches using the shared IRQn. </dd></dl>
-
-</div>
-</div>
-<a id="a69ed77607e30e5935ea2d6994e94be10" name="a69ed77607e30e5935ea2d6994e94be10"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69ed77607e30e5935ea2d6994e94be10">&#9670;&#160;</a></span>TIM2_IRQHandler()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TIM2_IRQHandler </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>IRQ handler wrapper for TIM2. </p>
-<p>Clears the flag and dispatches to the HAL interrupt handler table. </p>
-
-</div>
-</div>
-<a id="a2f59315000eb73fdeac2ab44fcd8b972" name="a2f59315000eb73fdeac2ab44fcd8b972"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f59315000eb73fdeac2ab44fcd8b972">&#9670;&#160;</a></span>TIM3_IRQHandler()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TIM3_IRQHandler </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>IRQ handler wrapper for TIM3. </p>
-
-</div>
-</div>
-<a id="a6e7703924e97aa04dbae6b88adcec3d1" name="a6e7703924e97aa04dbae6b88adcec3d1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e7703924e97aa04dbae6b88adcec3d1">&#9670;&#160;</a></span>TIM4_IRQHandler()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TIM4_IRQHandler </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>IRQ handler wrapper for TIM4. </p>
-
-</div>
-</div>
-<a id="ad32ddc677f033b18b9b1a0a500c5b896" name="ad32ddc677f033b18b9b1a0a500c5b896"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad32ddc677f033b18b9b1a0a500c5b896">&#9670;&#160;</a></span>TIM5_IRQHandler()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void TIM5_IRQHandler </td>
-          <td>(</td>
-          <td class="paramtype">void</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>IRQ handler wrapper for TIM5. </p>
-
-</div>
-</div>
-<a id="a45f9a07b1ec73b7c758005623d8ab0e5" name="a45f9a07b1ec73b7c758005623d8ab0e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45f9a07b1ec73b7c758005623d8ab0e5">&#9670;&#160;</a></span>timer_attach_callback()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_attach_callback </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">void(*</td>          <td class="paramname"><span class="paramname"><em>callback&#160;</em></span>)(void)&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Attach a callback to the timer's HAL interrupt table. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
-    <tr><td class="paramname">callback</td><td>Function pointer to call when the timer IRQ fires. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a6226a8f2f8b305c2a319ade05a77886c" name="a6226a8f2f8b305c2a319ade05a77886c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6226a8f2f8b305c2a319ade05a77886c">&#9670;&#160;</a></span>timer_clear_interrupt_flag()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_clear_interrupt_flag </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a834d3bef7882671645ad5d3c58fa69bc" name="a834d3bef7882671645ad5d3c58fa69bc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a834d3bef7882671645ad5d3c58fa69bc">&#9670;&#160;</a></span>timer_detach_callback()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_detach_callback </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Detach a previously attached callback for the given timer. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a0d3035840fb20d5213a70d0e33994584" name="a0d3035840fb20d5213a70d0e33994584"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d3035840fb20d5213a70d0e33994584">&#9670;&#160;</a></span>timer_disable_channel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_disable_channel </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Disable output on the specified timer channel (CCxE = 0). </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
-    <tr><td class="paramname">channel</td><td>Channel number (1-4). </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ab790fdb4ee5e3bfe9477a2bbfb89e13d" name="ab790fdb4ee5e3bfe9477a2bbfb89e13d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab790fdb4ee5e3bfe9477a2bbfb89e13d">&#9670;&#160;</a></span>timer_enable_channel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_enable_channel </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4ee300cb9e4b9356f445bbc7d0d7549f" name="a4ee300cb9e4b9356f445bbc7d0d7549f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ee300cb9e4b9356f445bbc7d0d7549f">&#9670;&#160;</a></span>timer_enable_interrupt()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_enable_interrupt </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Enable timer interrupts (NVIC + DIER UIE) for supported timers. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">timer</td><td>Timer identifier.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>For TIM1 more complex options exist and are left TODO in the original. </dd></dl>
-
-</div>
-</div>
-<a id="a566a41b6f3c8e66b0736719528da6245" name="a566a41b6f3c8e66b0736719528da6245"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a566a41b6f3c8e66b0736719528da6245">&#9670;&#160;</a></span>timer_get_arr()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t timer_get_arr </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a043ef2140caa620a1ed1af968fff5b46" name="a043ef2140caa620a1ed1af968fff5b46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a043ef2140caa620a1ed1af968fff5b46">&#9670;&#160;</a></span>timer_get_compare()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t timer_get_compare </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a19aba4b4d8462e4f84b6eeabda21423c" name="a19aba4b4d8462e4f84b6eeabda21423c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19aba4b4d8462e4f84b6eeabda21423c">&#9670;&#160;</a></span>timer_get_count()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t timer_get_count </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the current counter value for a timer. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Current counter value or 0 if invalid timer. </dd></dl>
-
-</div>
-</div>
-<a id="a6b2fb6cbff774094130a964475db6b25" name="a6b2fb6cbff774094130a964475db6b25"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b2fb6cbff774094130a964475db6b25">&#9670;&#160;</a></span>timer_get_frequency()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t timer_get_frequency </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Calculate the timer's current base frequency using PSC and ARR. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Timer frequency in Hz or 0 if invalid timer.</dd></dl>
-<dl class="section note"><dt>Note</dt><dd>This reads PSC and ARR directly from timer registers and uses the appropriate APB clock for the timer. </dd></dl>
+<p>Configures SysTick to:</p><ul>
+<li>Use processor clock (AHB)</li>
+<li>Generate interrupts at specified interval</li>
+<li>Start counting immediately <dl class="section note"><dt>Note</dt><dd>Reload value is limited to 24 bits </dd></dl>
+</li>
+</ul>
 
 </div>
 </div>
@@ -921,94 +417,98 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialize a timer based on its type (advanced / gp1 / gp2). </p>
+<p>Initialize timer based on type. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
-    <tr><td class="paramname">prescaler</td><td>Prescaler value. </td></tr>
-    <tr><td class="paramname">auto_reload</td><td>Auto-reload value. </td></tr>
+    <tr><td class="paramname">timer</td><td>Timer identifier </td></tr>
+    <tr><td class="paramname">prescaler</td><td>Prescaler value </td></tr>
+    <tr><td class="paramname">auto_reload</td><td>Auto-reload value </td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="ab50e7d8e6b8713a9a96abc6dd3a9e932" name="ab50e7d8e6b8713a9a96abc6dd3a9e932"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab50e7d8e6b8713a9a96abc6dd3a9e932">&#9670;&#160;</a></span>timer_reset()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_reset </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Reset timer counter to zero. </p>
+<p>Start timer counter </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Stop timer counter </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Set timer compare value for PWM </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier </td></tr>
+    <tr><td class="paramname">channel</td><td>Channel number (1-4) </td></tr>
+    <tr><td class="paramname">compare_value</td><td>CCR register value</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Configures PWM mode 1 and enables the channel output</p>
+<p>Enable timer channel output </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier </td></tr>
+    <tr><td class="paramname">channel</td><td>Channel number (1-4)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Reset timer counter to zero.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Get the current counter value for a timer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="a0b6c91f4ad622097b4e2787abce9873e" name="a0b6c91f4ad622097b4e2787abce9873e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b6c91f4ad622097b4e2787abce9873e">&#9670;&#160;</a></span>timer_set_arr()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_set_arr </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>arr</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3b5738efe72c1bd7130276a8f59b8234" name="a3b5738efe72c1bd7130276a8f59b8234"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b5738efe72c1bd7130276a8f59b8234">&#9670;&#160;</a></span>timer_set_compare()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_set_compare </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t</td>          <td class="paramname"><span class="paramname"><em>channel</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>compare_value</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Set the compare (CCR) register for a timer channel and configure CCMR. </p>
+<dl class="section return"><dt>Returns</dt><dd>Current counter value or 0 if invalid timer.</dd></dl>
+<p>Calculate the timer's current base frequency using PSC and ARR.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Timer frequency in Hz or 0 if invalid timer.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This reads PSC and ARR directly from timer registers and uses the appropriate APB clock for the timer.</dd></dl>
+<p>IRQ handler wrapper for TIM2.</p>
+<p>Clears the flag and dispatches to the HAL interrupt handler table.</p>
+<p>IRQ handler wrapper for TIM3.</p>
+<p>IRQ handler wrapper for TIM4.</p>
+<p>IRQ handler wrapper for TIM5.</p>
+<p>IRQ handler for TIM1 BRK and TIM9 shared vector.</p>
+<dl class="section note"><dt>Note</dt><dd>This function clears TIM9's flag and dispatches using the shared IRQn.</dd></dl>
+<p>Enable timer interrupts (NVIC + DIER UIE) for supported timers.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>For TIM1 more complex options exist and are left TODO in the original.</dd></dl>
+<p>Attach a callback to the timer's HAL interrupt table.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+    <tr><td class="paramname">callback</td><td>Function pointer to call when the timer IRQ fires.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Detach a previously attached callback for the given timer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timer</td><td>Timer identifier.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Set the compare (CCR) register for a timer channel and configure CCMR.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
@@ -1017,54 +517,11 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>This function sets PWM mode 1 and enables the channel after writing CCR. </dd></dl>
-
-</div>
-</div>
-<a id="a49fb0f6c6b9a4802601a452618672e52" name="a49fb0f6c6b9a4802601a452618672e52"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a49fb0f6c6b9a4802601a452618672e52">&#9670;&#160;</a></span>timer_start()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_start </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Start the specified timer. </p>
-<dl class="params"><dt>Parameters</dt><dd>
+<dl class="section note"><dt>Note</dt><dd>This function sets PWM mode 1 and enables the channel after writing CCR.</dd></dl>
+<p>Disable timer channel output </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a196e32e61e4a4d6cb50e46ebffb1e0b8" name="a196e32e61e4a4d6cb50e46ebffb1e0b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a196e32e61e4a4d6cb50e46ebffb1e0b8">&#9670;&#160;</a></span>timer_stop()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void timer_stop </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="timer__types_8h.html#a8bcc65cef9829505cbc2b3512bc017db">hal_timer_t</a></td>          <td class="paramname"><span class="paramname"><em>timer</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Stop the specified timer. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">timer</td><td>Timer identifier. </td></tr>
+    <tr><td class="paramname">timer</td><td>Timer identifier </td></tr>
+    <tr><td class="paramname">channel</td><td>Channel number (1-4)</td></tr>
   </table>
   </dd>
 </dl>

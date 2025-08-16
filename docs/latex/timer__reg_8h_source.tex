@@ -1,0 +1,114 @@
+\doxysection{timer\+\_\+reg.\+h}
+\hypertarget{timer__reg_8h_source}{}\label{timer__reg_8h_source}\index{include/core/cortex-\/m4/timer\_reg.h@{include/core/cortex-\/m4/timer\_reg.h}}
+\mbox{\hyperlink{timer__reg_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_TIMER\_REG\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_TIMER\_REG\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{hal__types_8h}{common/hal\_types.h}}"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00008\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a19374316b87e19757316da1366651d8a}{CR1}};\ }
+\DoxyCodeLine{00009\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a68d8ad677bf57eef5d11bedd41222d9d}{CR2}};\ }
+\DoxyCodeLine{00011\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a30232c279589bc9a0c4bd874c7621343}{SMCR}};\ \ }
+\DoxyCodeLine{00013\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_ac36d4f4713a76de2b6a1d6a2adbd1fe2}{DIER}};\ \ }
+\DoxyCodeLine{00014\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_abc4ad942448742ec5839c7147526f27a}{SR}};\ \ \ \ }
+\DoxyCodeLine{00015\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a70d681c6b2b8cbc8dd1a5d8262bbd8a0}{EGR}};\ \ \ }
+\DoxyCodeLine{00016\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a5f1c52ac67687e0fb97c5d563f854652}{CCMR1}};\ }
+\DoxyCodeLine{00018\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a16073da95b60b80acbfb71720485cddd}{CCMR2}};\ }
+\DoxyCodeLine{00020\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a3695d2304d560c3a01deac3186450aec}{CCER}};\ \ }
+\DoxyCodeLine{00022\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a70f0688ccb75095117b61e7f4af6f933}{CNT}};\ \ \ }
+\DoxyCodeLine{00024\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a1b699cd816c185574d94c15a3569349b}{PSC}};\ \ \ }
+\DoxyCodeLine{00025\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a593f73f910cfeb3a9bb4389b9bef763a}{ARR}};\ \ }
+\DoxyCodeLine{00027\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a563d756471c24ff38a02ce704fd68ca6}{RCR}};\ \ }
+\DoxyCodeLine{00029\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a0906b457ab8c316c12592988978bc89b}{CCR1}};\ }
+\DoxyCodeLine{00031\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_abd99a344187ff64452c4572da9671ba5}{CCR2}};\ }
+\DoxyCodeLine{00033\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a4c1aa3ba66c66bf6d655a9fb2a1ba255}{CCR3}};\ }
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a6bb1340b723b455ff5f4d296b691f4ca}{CCR4}};\ }
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_ab8093a7f8bacbbedac5fc46e93b92d61}{BDTR}};\ }
+\DoxyCodeLine{00039\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_abe5d6775ef93f64e26daabc993ad7979}{DCR}};\ }
+\DoxyCodeLine{00041\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a9db39fb61a8e2591c8dd1c8d878ae43d}{DMAR}};\ }
+\DoxyCodeLine{00043\ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef_a0f4521b6c8944768b9853e1f09e5eaa6}{OR}};\ \ \ }
+\DoxyCodeLine{00045\ \}\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}};}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#define\ TIM1\_BASE\_ADDR\ 0x40010000}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#define\ GPTIMx\_BASE\_ADDR\ 0x40000000}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ TIM9\_BASE\_ADDR\ 0x40014000}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{keyword}{static}\ \textcolor{keyword}{inline}\ \mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}}\ *GET\_TIMx\_BASE(uint8\_t\ n)\ \{}
+\DoxyCodeLine{00052\ \ \ \textcolor{keywordflow}{switch}\ (n)\ \{}
+\DoxyCodeLine{00053\ \ \ \textcolor{keywordflow}{case}\ 1:}
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}}\ *)\mbox{\hyperlink{timer__reg_8h_a90bb2970c379b8f8ed91d71b4da05e4c}{TIM1\_BASE\_ADDR}};}
+\DoxyCodeLine{00055\ \ \ \textcolor{keywordflow}{case}\ 2:}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}}\ *)(\mbox{\hyperlink{timer__reg_8h_a4c592ab6de0b1a120c7eda5d6f19c329}{GPTIMx\_BASE\_ADDR}}\ +\ 0x000);}
+\DoxyCodeLine{00057\ \ \ \textcolor{keywordflow}{case}\ 3:}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}}\ *)(\mbox{\hyperlink{timer__reg_8h_a4c592ab6de0b1a120c7eda5d6f19c329}{GPTIMx\_BASE\_ADDR}}\ +\ 0x400);}
+\DoxyCodeLine{00059\ \ \ \textcolor{keywordflow}{case}\ 4:}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}}\ *)(\mbox{\hyperlink{timer__reg_8h_a4c592ab6de0b1a120c7eda5d6f19c329}{GPTIMx\_BASE\_ADDR}}\ +\ 0x800);}
+\DoxyCodeLine{00061\ \ \ \textcolor{keywordflow}{case}\ 5:}
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}}\ *)(\mbox{\hyperlink{timer__reg_8h_a4c592ab6de0b1a120c7eda5d6f19c329}{GPTIMx\_BASE\_ADDR}}\ +\ 0xC00);}
+\DoxyCodeLine{00063\ \ \ \textcolor{keywordflow}{case}\ 9:}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}}\ *)\mbox{\hyperlink{timer__reg_8h_adf33e1fdb0e8830981f8722df1e59898}{TIM9\_BASE\_ADDR}};}
+\DoxyCodeLine{00065\ \ \ \textcolor{keywordflow}{case}\ 10:}
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}}\ *)(\mbox{\hyperlink{timer__reg_8h_adf33e1fdb0e8830981f8722df1e59898}{TIM9\_BASE\_ADDR}}\ +\ 0x400);}
+\DoxyCodeLine{00067\ \ \ \textcolor{keywordflow}{case}\ 11:}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordflow}{return}\ (\mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\_Reg\_Typedef}}\ *)(\mbox{\hyperlink{timer__reg_8h_adf33e1fdb0e8830981f8722df1e59898}{TIM9\_BASE\_ADDR}}\ +\ 0x800);}
+\DoxyCodeLine{00069\ \ \ \textcolor{keywordflow}{default}:}
+\DoxyCodeLine{00070\ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{hal__types_8h_a070d2ce7b6bb7e5c05602aa8c308d0c4}{NULL}};\ \textcolor{comment}{//\ unsupported\ timer}}
+\DoxyCodeLine{00071\ \ \ \}}
+\DoxyCodeLine{00072\ \}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \textcolor{comment}{//\ CR1}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#define\ TIMx\_CR1\_CEN\ 0x1}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \textcolor{comment}{//\ PSC}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#define\ TIMx\_PSC\_MASK\ 0xFFFF}}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{comment}{//\ ARR}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#define\ TIMx\_ARR\_MASK\ 0xFFFF}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\#define\ TIM2\_5\_ARR\_MASK\ 0xFFFFFFFF}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{comment}{//\ EGR}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#define\ TIMx\_EGR\_UG\ 0x1}}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{comment}{//\ CNT}}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\#define\ TIMx\_CNT\_MASK\ 0xFFFF}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#define\ TIM2\_5\_CNT\_MASK\ 0xFFFFFFFF}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \textcolor{comment}{//\ DIER}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\#define\ TIMx\_DIER\_UIE\ 0x1}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \textcolor{comment}{//\ SR}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\#define\ TIMx\_SR\_UIF\ 0x1}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \textcolor{comment}{//\ CCR}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\#define\ TIMx\_CCRy\_MASK\ 0xFFFF}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\#define\ TIM2\_5\_CCRy\_MASK\ 0xFFFFFFFF}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \textcolor{comment}{//\ CCER}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#define\ TIMx\_CCER\_CCxE\_MASK(n)\ (0x1\ <<\ (((n\ \%\ 4)\ -\/\ 1)\ *\ 4))}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00104\ \textcolor{comment}{//\ CCMRx}}
+\DoxyCodeLine{00105\ \textcolor{comment}{//\ Use\ channel\ 1,2\ with\ CCMR1\ and\ 3,4\ with\ CCMR2}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\#define\ TIMx\_CCMRy\_OCzPE\_Pos(ch)\ ((ch\ \%\ 2\ ==\ 1)\ ?\ 0x3\ :\ 0x11)}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\#define\ TIMx\_CCMRy\_OCzM\_Pos(ch)\ ((ch\ \%\ 2\ ==\ 1)\ ?\ 0x4\ :\ 0x12)}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\#define\ TIMx\_CCMRy\_OCzM\_MASK(ch)\ (0x7\ <<\ (TIMx\_CCMRy\_OCzM\_Pos(ch)))}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\#define\ TIMx\_CCMRy\_OCzM\_PWM\_MODE1\_MASK(ch)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\ \ (0x6\ <<\ TIMx\_CCMRy\_OCzM\_Pos(ch))\ }\textcolor{comment}{//\ In\ upcounting,\ channel\ 1\ is\ active\ as}}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ long\ as\ TIMx\_CNT<TIMx\_CCR1\ else}}
+\DoxyCodeLine{00113\ \textcolor{comment}{//\ inactive.\ In\ downcounting,\ channel\ 1\ is\ inactive\ (OC1REF=‘0)\ as\ long\ as}}
+\DoxyCodeLine{00114\ \textcolor{comment}{//\ TIMx\_CNT>TIMx\_CCR1\ else\ active\ (OC1REF=1)}}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\#define\ TIMx\_CCMRy\_OCxM\_PWM\_MODE2\_MASK(ch)\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\ \ (0x7\ <<\ TIMx\_CCMRy\_OCzM\_Pos(ch))\ }\textcolor{comment}{//\ In\ upcounting,\ channel\ 1\ is\ inactive\ as}}
+\DoxyCodeLine{00118\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ long\ as\ TIMx\_CNT<TIMx\_CCR1}}
+\DoxyCodeLine{00119\ \textcolor{comment}{//\ else\ active.\ In\ downcounting,\ channel\ 1\ is\ active\ as\ long\ as}}
+\DoxyCodeLine{00120\ \textcolor{comment}{//\ TIMx\_CNT>TIMx\_CCR1\ else\ inactive.}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\#define\ TIMx\_CCMRy\_OCxPE(ch)\ (0x1\ <<\ TIMx\_CCMRy\_OCzPE\_Pos(ch))}}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ !CORTEX\_M4\_TIMER\_REG\_H}}
+
+\end{DoxyCode}

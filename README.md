@@ -1,7 +1,7 @@
 
 # NavHAL — NAVRobotec Hardware Abstraction Layer
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE.md)
+
 [![Build Status](https://img.shields.io/github/actions/workflow/status/ragnar-vallhala/NavHAL/ci.yml?branch=main)](https://github.com/ragnar-vallhala/NavHAL/actions)
 [![Coverage](https://img.shields.io/codecov/c/github/ragnar-vallhala/NavHAL/main)](https://codecov.io/gh/ragnar-vallhala/NavHAL)
 [![Docs](https://img.shields.io/badge/docs-Doxygen-blue)](docs/html/index.html)

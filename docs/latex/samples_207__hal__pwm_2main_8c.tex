@@ -1,0 +1,92 @@
+\doxysection{samples/07\+\_\+hal\+\_\+pwm/main.c File Reference}
+\hypertarget{samples_207__hal__pwm_2main_8c}{}\label{samples_207__hal__pwm_2main_8c}\index{samples/07\_hal\_pwm/main.c@{samples/07\_hal\_pwm/main.c}}
+
+
+Example application\+: Generate PWM on PB10 using TIM2 and print duty cycle over UART2.  
+
+
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{samples_207__hal__pwm_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{samples_207__hal__pwm_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{samples_207__hal__pwm_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Example application\+: Generate PWM on PB10 using TIM2 and print duty cycle over UART2. 
+
+
+\begin{DoxyItemize}
+\item Initializes Sys\+Tick timer with 40 µs tick.
+\item Initializes UART2 at 9600 baud.
+\item Configures PB10 as alternate function (AF1) for TIM2\+\_\+\+CH3.
+\item Initializes TIM2 for PWM output using HAL PWM driver.
+\item Continuously ramps the duty cycle from 0\% to 100\% and prints it over UART2.
+\end{DoxyItemize}
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{samples_207__hal__pwm_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{samples_207__hal__pwm_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{samples_207__hal__pwm_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+
+
+\label{doc-func-members}
+\Hypertarget{samples_207__hal__pwm_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{samples_207__hal__pwm_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{samples_207__hal__pwm_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 40 µs tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Set PB10 as alternate function
+
+\texorpdfstring{$<$}{<} AF1 for TIM2\+\_\+\+CH3
+
+\texorpdfstring{$<$}{<} Initialize PWM handle on TIM2, channel 3
+
+\texorpdfstring{$<$}{<} Init PWM at 15 k\+Hz, 10\% duty cycle
+
+\texorpdfstring{$<$}{<} Start PWM output
+
+\texorpdfstring{$<$}{<} Variable for duty cycle update
+
+\texorpdfstring{$<$}{<} Update PWM duty cycle
+
+\texorpdfstring{$<$}{<} Increment duty cycle by 1\%
+
+\texorpdfstring{$<$}{<} Reset to 0\% after 100\%
+
+\texorpdfstring{$<$}{<} Print current duty cycle over UART2
+
+\texorpdfstring{$<$}{<} Newline and carriage return
+
+\texorpdfstring{$<$}{<} Delay 10 ms

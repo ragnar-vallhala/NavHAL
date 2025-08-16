@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['core_20hal_0',['Core HAL',['../group___n_a_v_h_a_l.html',1,'']]]
+  ['generic_20write_20macros_0',['Type-Generic Write Macros',['../group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html',1,'']]]
 ];

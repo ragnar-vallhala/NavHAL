@@ -2,13 +2,16 @@
 \hypertarget{uart_8c}{}\label{uart_8c}\index{src/core/cortex-\/m4/uart/uart.c@{src/core/cortex-\/m4/uart/uart.c}}
 
 
-UART initialization and I/O functions for STM32\+F4 UART1, UART2, and UART6.  
+UART driver implementation for STM32\+F4 series.  
 
 
 {\ttfamily \#include "{}core/cortex-\/m4/uart.\+h"{}}\newline
 {\ttfamily \#include "{}core/cortex-\/m4/clock.\+h"{}}\newline
 {\ttfamily \#include "{}core/cortex-\/m4/gpio.\+h"{}}\newline
-Include dependency graph for uart.\+c\+:\nopagebreak
+{\ttfamily \#include "{}core/cortex-\/m4/rcc\+\_\+reg.\+h"{}}\newline
+{\ttfamily \#include "{}core/cortex-\/m4/uart\+\_\+reg.\+h"{}}\newline
+Include dependency graph for uart.\+c\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -21,7 +24,7 @@ Include dependency graph for uart.\+c\+:\nopagebreak
 void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gad320bd1e821aac6c1b38c8bcb8003104}{uart\+\_\+init}} (uint32\+\_\+t baudrate, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
 \begin{DoxyCompactList}\small\item\em Initialize the specified UART peripheral. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga6f144300396d4d9afe21f41a72a99ab8}{uart\+\_\+write\+\_\+char}} (char c, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
-\begin{DoxyCompactList}\small\item\em Transmit a single character via the specified UART. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Transmit a single character via UART. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga183ba35371040029a29a3cde221539fa}{uart\+\_\+write\+\_\+int}} (int32\+\_\+t num, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
 \begin{DoxyCompactList}\small\item\em Transmit a 32-\/bit signed integer via UART. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga662be19e5a7667eeae26bd36e869fd2d}{uart\+\_\+write\+\_\+float}} (float num, \mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
@@ -38,27 +41,7 @@ void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gace45b7a16f634d2de9a483acab46a7c8
 \begin{DoxyCompactList}\small\item\em Transmit a single character via USART2. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\+\_\+write\+\_\+char}} (char c)
 \begin{DoxyCompactList}\small\item\em Transmit a single character via USART1. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}} (char c)
-\begin{DoxyCompactList}\small\item\em Transmit a single character via USART6. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac9e624e43c7053a70ed42b1c780ad792}{uart2\+\_\+write\+\_\+int}} (int32\+\_\+t num)
-\begin{DoxyCompactList}\small\item\em Transmit a 32-\/bit signed integer via USART2. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga81b1a7af3a848606f23985f8d9a87708}{uart1\+\_\+write\+\_\+int}} (int32\+\_\+t num)
-\begin{DoxyCompactList}\small\item\em Transmit a 32-\/bit signed integer via USART1. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga01667e67896e48e6cf21a05385566819}{uart6\+\_\+write\+\_\+int}} (int32\+\_\+t num)
-\begin{DoxyCompactList}\small\item\em Transmit a 32-\/bit signed integer via USART6. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3784763020352ac6913e355c4ac7a337}{uart2\+\_\+write\+\_\+float}} (float num)
-\begin{DoxyCompactList}\small\item\em Transmit a floating-\/point number via USART2. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga8595ce32dbc8da8200d337fca8d7930e}{uart1\+\_\+write\+\_\+float}} (float num)
-\begin{DoxyCompactList}\small\item\em Transmit a floating-\/point number via USART1. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3a2f8786049010a947207fc47c7ad409}{uart6\+\_\+write\+\_\+float}} (float num)
-\begin{DoxyCompactList}\small\item\em Transmit a floating-\/point number via USART6. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga55c46e6a48433287fdf5a9d1defd5f5c}{uart2\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
-\begin{DoxyCompactList}\small\item\em Transmit a null-\/terminated string via USART2. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac86a702823358a08deca96365ed41cae}{uart1\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
-\begin{DoxyCompactList}\small\item\em Transmit a null-\/terminated string via USART1. \end{DoxyCompactList}\item 
-void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gacd0a2ffc721c3e9af1501307d74f5173}{uart6\+\_\+write\+\_\+string}} (const char \texorpdfstring{$\ast$}{*}s)
-\begin{DoxyCompactList}\small\item\em Transmit a null-\/terminated string via USART6. \end{DoxyCompactList}\item 
-char \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga86ffdb11e32f205ce3b1e9b0fb259c8e}{uart\+\_\+read\+\_\+char}} (\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
+$<$$<$$<$$<$$<$$<$$<$ HEAD=======void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}}(char c) \{ \mbox{\hyperlink{struct_u_a_r_tx___reg___typedef}{UARTx\+\_\+\+Reg\+\_\+\+Typedef}} \texorpdfstring{$\ast$}{*}usart=\mbox{\hyperlink{uart__reg_8h_aa532e8b96de42deb90c0a2ad93a94343}{GET\+\_\+\+USARTx\+\_\+\+BASE}}(6);if(usart==\mbox{\hyperlink{hal__types_8h_a070d2ce7b6bb7e5c05602aa8c308d0c4}{NULL}}) return;while(!(usart-\/$>$SR \&\mbox{\hyperlink{uart__reg_8h_a65e9cddf0890113d405342f1d8b5b980}{USART\+\_\+\+SR\+\_\+\+TXE}})) ;usart-\/$>$DR=c;\} void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac9e624e43c7053a70ed42b1c780ad792}{uart2\+\_\+write\+\_\+int}}(int32\+\_\+t num) \{ char buf\mbox{[}12\mbox{]};int i=0;if(num==0) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gace45b7a16f634d2de9a483acab46a7c8}{uart2\+\_\+write\+\_\+char}}(\textquotesingle{}0\textquotesingle{});return;\} if(num$<$ 0) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gace45b7a16f634d2de9a483acab46a7c8}{uart2\+\_\+write\+\_\+char}}(\textquotesingle{}-\/\textquotesingle{});num=-\/num;\} while(num $>$ 0) \{ buf\mbox{[}i++\mbox{]}=\textquotesingle{}0\textquotesingle{}+(num \% 10);num/=10;\} while(i-\/-\/) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gace45b7a16f634d2de9a483acab46a7c8}{uart2\+\_\+write\+\_\+char}}(buf\mbox{[}i\mbox{]});\} \} void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga81b1a7af3a848606f23985f8d9a87708}{uart1\+\_\+write\+\_\+int}}(int32\+\_\+t num) \{ char buf\mbox{[}12\mbox{]};int i=0;if(num==0) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\+\_\+write\+\_\+char}}(\textquotesingle{}0\textquotesingle{});return;\} if(num$<$ 0) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\+\_\+write\+\_\+char}}(\textquotesingle{}-\/\textquotesingle{});num=-\/num;\} while(num $>$ 0) \{ buf\mbox{[}i++\mbox{]}=\textquotesingle{}0\textquotesingle{}+(num \% 10);num/=10;\} while(i-\/-\/) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\+\_\+write\+\_\+char}}(buf\mbox{[}i\mbox{]});\} \} void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga01667e67896e48e6cf21a05385566819}{uart6\+\_\+write\+\_\+int}}(int32\+\_\+t num) \{ char buf\mbox{[}12\mbox{]};int i=0;if(num==0) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}}(\textquotesingle{}0\textquotesingle{});return;\} if(num$<$ 0) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}}(\textquotesingle{}-\/\textquotesingle{});num=-\/num;\} while(num $>$ 0) \{ buf\mbox{[}i++\mbox{]}=\textquotesingle{}0\textquotesingle{}+(num \% 10);num/=10;\} while(i-\/-\/) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}}(buf\mbox{[}i\mbox{]});\} \} void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3784763020352ac6913e355c4ac7a337}{uart2\+\_\+write\+\_\+float}}(float num) \{ if(num$<$ 0) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gace45b7a16f634d2de9a483acab46a7c8}{uart2\+\_\+write\+\_\+char}}(\textquotesingle{}-\/\textquotesingle{});num=-\/num;\} int32\+\_\+t integer=(int32\+\_\+t) num;\mbox{\hyperlink{group___u_a_r_t___a_p_i_gac9e624e43c7053a70ed42b1c780ad792}{uart2\+\_\+write\+\_\+int}}(integer);\mbox{\hyperlink{group___u_a_r_t___a_p_i_gace45b7a16f634d2de9a483acab46a7c8}{uart2\+\_\+write\+\_\+char}}(\textquotesingle{}.\textquotesingle{});float floating=num -\/ integer;\mbox{\hyperlink{group___u_a_r_t___a_p_i_gac9e624e43c7053a70ed42b1c780ad792}{uart2\+\_\+write\+\_\+int}}((int32\+\_\+t)(floating \texorpdfstring{$\ast$}{*}100000+0.\+5f));\} void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga8595ce32dbc8da8200d337fca8d7930e}{uart1\+\_\+write\+\_\+float}}(float num) \{ if(num$<$ 0) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\+\_\+write\+\_\+char}}(\textquotesingle{}-\/\textquotesingle{});num=-\/num;\} int32\+\_\+t integer=(int32\+\_\+t) num;\mbox{\hyperlink{group___u_a_r_t___a_p_i_ga81b1a7af3a848606f23985f8d9a87708}{uart1\+\_\+write\+\_\+int}}(integer);\mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\+\_\+write\+\_\+char}}(\textquotesingle{}.\textquotesingle{});float floating=num -\/ integer;\mbox{\hyperlink{group___u_a_r_t___a_p_i_ga81b1a7af3a848606f23985f8d9a87708}{uart1\+\_\+write\+\_\+int}}((int32\+\_\+t)(floating \texorpdfstring{$\ast$}{*}100000+0.\+5f));\} void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga3a2f8786049010a947207fc47c7ad409}{uart6\+\_\+write\+\_\+float}}(float num) \{ if(num$<$ 0) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}}(\textquotesingle{}-\/\textquotesingle{});num=-\/num;\} int32\+\_\+t integer=(int32\+\_\+t) num;\mbox{\hyperlink{group___u_a_r_t___a_p_i_ga01667e67896e48e6cf21a05385566819}{uart6\+\_\+write\+\_\+int}}(integer);\mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}}(\textquotesingle{}.\textquotesingle{});float floating=num -\/ integer;\mbox{\hyperlink{group___u_a_r_t___a_p_i_ga01667e67896e48e6cf21a05385566819}{uart6\+\_\+write\+\_\+int}}((int32\+\_\+t)(floating \texorpdfstring{$\ast$}{*}100000+0.\+5f));\} void \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga55c46e6a48433287fdf5a9d1defd5f5c}{uart2\+\_\+write\+\_\+string}}(const char \texorpdfstring{$\ast$}{*}s) \{ while(\texorpdfstring{$\ast$}{*}s) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gace45b7a16f634d2de9a483acab46a7c8}{uart2\+\_\+write\+\_\+char}}(\texorpdfstring{$\ast$}{*}s++);\} \} void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac86a702823358a08deca96365ed41cae}{uart1\+\_\+write\+\_\+string}}(const char \texorpdfstring{$\ast$}{*}s) \{ while(\texorpdfstring{$\ast$}{*}s) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gaa8786e97a38fd49fd129cc704cb6fadd}{uart1\+\_\+write\+\_\+char}}(\texorpdfstring{$\ast$}{*}s++);\} \} void \mbox{\hyperlink{group___u_a_r_t___a_p_i_gacd0a2ffc721c3e9af1501307d74f5173}{uart6\+\_\+write\+\_\+string}}(const char \texorpdfstring{$\ast$}{*}s) \{ while(\texorpdfstring{$\ast$}{*}s) \{ \mbox{\hyperlink{group___u_a_r_t___a_p_i_gac0de3d3f47debf2a24b349fa74b7a030}{uart6\+\_\+write\+\_\+char}}(\texorpdfstring{$\ast$}{*}s++);\} \} $>$ $>$ $>$ $>$ $>$ $>$ $>$ char \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga86ffdb11e32f205ce3b1e9b0fb259c8e}{uart\+\_\+read\+\_\+char}} (\mbox{\hyperlink{uart_8h_a1eb2dbbb5cd864c8d0e19f71d7f168d1}{hal\+\_\+uart\+\_\+t}} uart)
 \begin{DoxyCompactList}\small\item\em Read a single character from the specified UART. \end{DoxyCompactList}\item 
 char \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga223b61a491de01b4b3ee16a1d15113d1}{uart1\+\_\+read\+\_\+char}} (void)
 \begin{DoxyCompactList}\small\item\em Read a single character from USART1. \end{DoxyCompactList}\item 
@@ -79,9 +62,28 @@ uint32\+\_\+t \mbox{\hyperlink{group___u_a_r_t___a_p_i_ga5c510005052783f5cec97c0
 
 
 \doxysubsection{Detailed Description}
-UART initialization and I/O functions for STM32\+F4 UART1, UART2, and UART6. 
+UART driver implementation for STM32\+F4 series. 
 
-This file provides the implementation of UART communication functions for STM32\+F401\+RE microcontroller. It supports USART1, USART2, and USART6 peripherals with the following features\+:
+\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<}\texorpdfstring{$<$}{<} HEAD
+
+This file provides UART communication functions for STM32\+F4 microcontrollers. \hypertarget{uart_8c_autotoc_md41}{}\doxysubsection{\texorpdfstring{It supports USART1, USART2, and USART6 peripherals with\+:}{It supports USART1, USART2, and USART6 peripherals with\+:}}\label{uart_8c_autotoc_md41}
+UART initialization and I/O functions for STM32\+F4 UART1, UART2, and UART6.
+
+This file provides the implementation of UART communication functions for STM32\+F401\+RE microcontroller. It supports USART1, USART2, and USART6 peripherals with the following features\+: \begin{quote}
+\begin{quote}
+\begin{quote}
+\begin{quote}
+\begin{quote}
+\begin{quote}
+\begin{quote}
+73eb6c283269d3698b418665a84bf3716bb15e61 \end{quote}
+\end{quote}
+\end{quote}
+\end{quote}
+\end{quote}
+\end{quote}
+\end{quote}
+
 \begin{DoxyItemize}
 \item Baud rate configuration
 \item Character, integer, float, and string transmission
@@ -95,11 +97,8 @@ The implementation uses GPIO alternate functions for UART pins and provides both
 \begin{DoxyNote}{Note}
 All functions are blocking and will wait for hardware operations to complete 
 
-Default configuration\+: 8 data bits, no parity, 1 stop bit
+Default configuration\+: 8 data bits, no parity, 1 stop bit 
 \end{DoxyNote}
-\begin{DoxyAuthor}{Author}
-Ashutosh Vishwakarma 
-\end{DoxyAuthor}
-\begin{DoxyDate}{Date}
-2025-\/07-\/23 
-\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}

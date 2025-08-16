@@ -1,6 +1,4 @@
-/build
-/docs
-.cache/
+build/
 *.elf
 *.bin
 *.json 

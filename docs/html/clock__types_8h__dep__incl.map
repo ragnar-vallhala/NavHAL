@@ -6,13 +6,13 @@
 <area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="576,49,708,98,706,103,574,54"/>
 <area shape="rect" id="Node000003" href="$clock_8c.html" title="Cortex&#45;M4 (STM32F4) Clock HAL Implementation." alt="" coords="5,183,136,223"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="275,142,135,185,134,180,273,137"/>
-<area shape="rect" id="Node000004" href="$i2c_8c.html" title=" " alt="" coords="392,271,522,312"/>
+<area shape="rect" id="Node000004" href="$i2c_8c.html" title="HAL I2C driver implementation for STM32F4 series." alt="" coords="392,271,522,312"/>
 <area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="274,141,237,157,207,176,198,187,193,198,194,209,201,222,212,232,230,242,279,258,392,280,391,285,278,263,228,246,209,236,196,225,189,211,188,197,194,184,204,172,234,152,272,136"/>
-<area shape="rect" id="Node000005" href="$pwm_8c.html" title="PWM driver implementation for STM32F4 series (Cortex&#45;M4)." alt="" coords="211,183,341,223"/>
+<area shape="rect" id="Node000005" href="$pwm_8c.html" title="PWM driver implementation for STM32F4 series (Cortex&#45;M4)" alt="" coords="211,183,341,223"/>
 <area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="327,148,295,184,291,180,323,145"/>
-<area shape="rect" id="Node000006" href="$timer_8c.html" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)." alt="" coords="365,183,496,223"/>
+<area shape="rect" id="Node000006" href="$timer_8c.html" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)" alt="" coords="365,183,496,223"/>
 <area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="383,145,415,180,411,184,379,148"/>
-<area shape="rect" id="Node000007" href="$uart_8c.html" title="UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6." alt="" coords="520,183,650,223"/>
+<area shape="rect" id="Node000007" href="$uart_8c.html" title="UART driver implementation for STM32F4 series." alt="" coords="520,183,650,223"/>
 <area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="421,138,533,180,531,185,419,143"/>
 <area shape="rect" id="Node000009" href="$gpio__reg_8h.html" title="Cortex&#45;M4 GPIO register definitions and access macros." alt="" coords="830,183,962,223"/>
 <area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="776,133,862,180,859,185,774,137"/>
@@ -20,7 +20,7 @@
 <area shape="poly" id="edge11_Node000008_Node000012" title=" " alt="" coords="742,143,742,183,737,183,737,143"/>
 <area shape="rect" id="Node000010" href="$gpio_8c.html" title="HAL GPIO driver implementation for STM32F4 series." alt="" coords="756,271,886,312"/>
 <area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="871,237,840,273,836,269,867,233"/>
-<area shape="rect" id="Node000011" href="$test__gpio_8c.html" title=" " alt="" coords="910,279,1028,304"/>
+<area shape="rect" id="Node000011" href="$test__gpio_8c.html" title="GPIO unit test implementation for NAVHAL." alt="" coords="910,279,1028,304"/>
 <area shape="poly" id="edge10_Node000009_Node000011" title=" " alt="" coords="924,234,961,277,957,280,920,237"/>
 <area shape="poly" id="edge12_Node000012_Node000004" title=" " alt="" coords="662,231,522,273,521,268,660,226"/>
 </map>

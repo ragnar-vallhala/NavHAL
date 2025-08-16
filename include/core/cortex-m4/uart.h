@@ -24,8 +24,7 @@
 
 #ifndef CORTEX_M4_UART_H
 #define CORTEX_M4_UART_H
-
-#include "common/hal_types.h"
+#include "core/cortex-m4/uart_reg.h"
 #include <stdint.h>
 /**
  * @brief UART identifier enumeration.
@@ -33,9 +32,9 @@
  * Identifies which UART peripheral to use for operations.
  */
 typedef enum {
-  UART1, ///< USART1 - APB2 peripheral, typically higher speed
-  UART2, ///< USART2 - APB1 peripheral
-  UART6  ///< USART6 - APB2 peripheral
+  UART1 = 1, ///< USART1 - APB2 peripheral, typically higher speed
+  UART2 = 2, ///< USART2 - APB1 peripheral
+  UART6 = 6  ///< USART6 - APB2 peripheral
 } hal_uart_t;
 
 /** @defgroup UART_WRITE_MACROS Type-Generic Write Macros
@@ -111,67 +110,6 @@ typedef enum {
       char *: uart6_write_string)(val)
 
 /** @} */ // end of UART_WRITE_MACROS
-
-/** @defgroup UART_REGISTERS UART Peripheral Base Addresses and Registers
- *  @brief Memory-mapped register definitions for UART peripherals.
- *
- *  Defines base addresses and register offsets for all supported UART
- * peripherals, along with relevant bit definitions for control and status
- * registers.
- *  @{
- */
-
-/* Peripheral memory map */
-#define PERIPH_BASE 0x40000000UL
-#define AHB1PERIPH_BASE (PERIPH_BASE + 0x00020000UL)
-#define APB1PERIPH_BASE (PERIPH_BASE + 0x00000000UL)
-#define APB2PERIPH_BASE (PERIPH_BASE + 0x7400)
-
-/* Clock control */
-#define RCC_BASE (AHB1PERIPH_BASE + 0x3800)
-
-/* UART base addresses */
-#define USART2_BASE (APB1PERIPH_BASE + 0x4400)
-#define USART1_BASE 0x40011000
-#define USART6_BASE 0x40011400
-
-/* Register definitions */
-#define RCC_APB1ENR (*(__IO uint32_t *)(RCC_BASE + 0x40))
-#define RCC_APB2ENR (*(__IO uint32_t *)(RCC_BASE + 0x44))
-
-/* USART2 registers */
-#define USART2_SR (*(__IO uint32_t *)(USART2_BASE + 0x00))
-#define USART2_DR (*(__IO uint32_t *)(USART2_BASE + 0x04))
-#define USART2_BRR (*(__IO uint32_t *)(USART2_BASE + 0x08))
-#define USART2_CR1 (*(__IO uint32_t *)(USART2_BASE + 0x0C))
-
-/* USART1 registers */
-#define USART1_SR (*(__IO uint32_t *)(USART1_BASE + 0x00))
-#define USART1_DR (*(__IO uint32_t *)(USART1_BASE + 0x04))
-#define USART1_BRR (*(__IO uint32_t *)(USART1_BASE + 0x08))
-#define USART1_CR1 (*(__IO uint32_t *)(USART1_BASE + 0x0C))
-
-/* USART6 registers */
-#define USART6_SR (*(__IO uint32_t *)(USART6_BASE + 0x00))
-#define USART6_DR (*(__IO uint32_t *)(USART6_BASE + 0x04))
-#define USART6_BRR (*(__IO uint32_t *)(USART6_BASE + 0x08))
-#define USART6_CR1 (*(__IO uint32_t *)(USART6_BASE + 0x0C))
-
-/* Clock enable bits */
-#define RCC_APB1ENR_USART2EN (1 << 17)
-#define RCC_APB2ENR_USART1EN (1 << 4)
-#define RCC_APB2ENR_USART6EN (1 << 5)
-
-/* Control register bits */
-#define USART_CR1_UE (1 << 13) ///< USART Enable
-#define USART_CR1_TE (1 << 3)  ///< Transmitter Enable
-#define USART_CR1_RE (1 << 2)  ///< Receiver Enable
-
-/* Status register bits */
-#define USART_SR_TXE (1 << 7)  ///< Transmit Data Register Empty
-#define USART_SR_RXNE (1 << 5) ///< Read Data Register Not Empty
-
-/** @} */ // end of UART_REGISTERS
 
 /** @defgroup UART_API UART HAL API
  *  @brief UART driver API functions.

@@ -1,0 +1,22 @@
+<map id="include/core/cortex&#45;m4/i2c_reg.h" name="include/core/cortex&#45;m4/i2c_reg.h">
+<area shape="rect" id="Node000001" title="Cortex&#45;M4 I²C peripheral register definitions and bit masks." alt="" coords="404,5,536,46"/>
+<area shape="rect" id="Node000002" href="$types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="330,94,423,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="448,48,404,86,401,82,445,44"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="184,330,249,356"/>
+<area shape="poly" id="edge11_Node000001_Node000006" title=" " alt="" coords="506,44,547,72,586,109,600,129,609,151,609,173,600,195,567,233,527,264,482,289,435,308,387,322,341,332,264,342,264,337,340,327,386,317,433,303,480,284,524,260,563,229,596,192,604,172,603,152,596,132,582,112,543,77,503,49"/>
+<area shape="rect" id="Node000003" href="$clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="91,168,193,193"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="337,123,197,165,196,160,336,118"/>
+<area shape="poly" id="edge10_Node000002_Node000006" title=" " alt="" coords="331,123,291,141,273,154,257,169,237,205,225,244,220,282,218,314,213,314,214,282,220,243,232,202,253,166,269,150,288,136,329,118"/>
+<area shape="rect" id="Node000007" href="$gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="268,168,363,193"/>
+<area shape="poly" id="edge7_Node000002_Node000007" title=" " alt="" coords="368,122,337,157,333,154,364,118"/>
+<area shape="rect" id="Node000008" href="$timer__types_8h.html" title=" " alt="" coords="386,168,487,193"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="388,118,419,154,415,157,384,122"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="511,168,586,193"/>
+<area shape="poly" id="edge9_Node000002_Node000009" title=" " alt="" coords="407,118,506,159,504,164,405,123"/>
+<area shape="rect" id="Node000004" href="$rcc__reg_8h.html" title=" " alt="" coords="11,241,142,282"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="134,195,104,231,100,228,130,192"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="150,193,207,315,202,317,145,195"/>
+<area shape="rect" id="Node000005" href="$hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="5,330,148,356"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="79,282,79,314,74,314,74,282"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="113,280,183,320,181,324,110,285"/>
+</map>

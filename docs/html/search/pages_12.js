@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['jan_202025_0',['Unity 2.6.1 (Jan 2025)',['../md_extern_2unity_2docs_2_unity_change_log.html#autotoc_md234',1,'']]],
-  ['january_202021_1',['Unity 2.5.2 (January 2021)',['../md_extern_2unity_2docs_2_unity_change_log.html#autotoc_md236',1,'']]]
+  ['—_20navrobotec_20hardware_20abstraction_20layer_0',['— NAVRobotec Hardware Abstraction Layer',['../md__r_e_a_d_m_e.html',1,'NavHAL — NAVRobotec Hardware Abstraction Layer'],['../index.html#autotoc_md3',1,'NavHAL — NAVRobotec Hardware Abstraction Layer']]]
 ];

@@ -1,0 +1,256 @@
+\doxysection{tests/test\+\_\+timer.c File Reference}
+\hypertarget{test__timer_8c}{}\label{test__timer_8c}\index{tests/test\_timer.c@{tests/test\_timer.c}}
+
+
+Timer unit test implementation for NAVHAL.  
+
+
+{\ttfamily \#include "{}core/cortex-\/m4/timer.\+h"{}}\newline
+{\ttfamily \#include "{}core/cortex-\/m4/timer\+\_\+reg.\+h"{}}\newline
+{\ttfamily \#include "{}unity.\+h"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for test\+\_\+timer.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{test__timer_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{test__timer_8c_aaeea30eacab8e375e8faf2eb8ca8bfb1}{TEST\+\_\+\+TIMER}}~\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017dba982d53e8998c00ab2bfaea0957b12e82}{TIM2}}
+\begin{DoxyCompactList}\small\item\em Timer peripheral used for all tests (TIM2) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{test__timer_8c_acf1d21abbec3ade72b9ff4648c48dca7}{TEST\+\_\+\+PSC}}~83
+\begin{DoxyCompactList}\small\item\em Test prescaler value. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{test__timer_8c_a10ba95705e9cdf3bde76473bbbba8639}{TEST\+\_\+\+ARR}}~999
+\begin{DoxyCompactList}\small\item\em Test auto-\/reload value. \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{test__timer_8c_ae6d0ebcb6ec804b17744c6456cf14a69}{TEST\+\_\+\+CHANNEL}}~1
+\begin{DoxyCompactList}\small\item\em Test channel number (Channel 1) \end{DoxyCompactList}\item 
+\#define \mbox{\hyperlink{test__timer_8c_a7b2ede9695549a83782f3963dd130f80}{TEST\+\_\+\+COMPARE\+\_\+\+VALUE}}~500
+\begin{DoxyCompactList}\small\item\em Test compare register value. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{test__timer_8c_a3be562baaa8b39cecebdcf28c206fa54}{test\+\_\+timer\+\_\+init\+\_\+sets\+\_\+prescaler\+\_\+and\+\_\+arr}} (void)
+\begin{DoxyCompactList}\small\item\em Test timer initialization. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__timer_8c_a33d3e3df5eded2d8b675594dd1af9173}{test\+\_\+timer\+\_\+start\+\_\+sets\+\_\+\+CEN\+\_\+bit}} (void)
+\begin{DoxyCompactList}\small\item\em Test timer start functionality. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__timer_8c_a7d914e3a43fe433380fdddfcb7da9fe9}{test\+\_\+timer\+\_\+stop\+\_\+clears\+\_\+\+CEN\+\_\+bit}} (void)
+\begin{DoxyCompactList}\small\item\em Test timer stop functionality. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__timer_8c_a00cc3fb693b2159596201099c2752ade}{test\+\_\+timer\+\_\+reset\+\_\+clears\+\_\+count}} (void)
+\begin{DoxyCompactList}\small\item\em Test timer counter reset. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__timer_8c_ac37fbae42d4495711f38e57c65499e61}{test\+\_\+timer\+\_\+set\+\_\+compare\+\_\+and\+\_\+get\+\_\+compare}} (void)
+\begin{DoxyCompactList}\small\item\em Test compare register operations. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__timer_8c_a485d685f4ed1afcb26576659caada9db}{test\+\_\+timer\+\_\+enable\+\_\+and\+\_\+disable\+\_\+channel}} (void)
+\begin{DoxyCompactList}\small\item\em Test channel enable/disable. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__timer_8c_a3710a87cea192bed4c7079fc96d76730}{test\+\_\+timer\+\_\+enable\+\_\+and\+\_\+disable\+\_\+interrupt}} (void)
+\begin{DoxyCompactList}\small\item\em Test interrupt enable. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__timer_8c_ae3217284cb96dabd232414dbd89bead8}{test\+\_\+timer\+\_\+clear\+\_\+interrupt\+\_\+flag\+\_\+clears\+\_\+\+UIF}} (void)
+\begin{DoxyCompactList}\small\item\em Test interrupt flag clearing. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__timer_8c_a5fa4a753af9868d99205ea868db22d19}{test\+\_\+timer\+\_\+get\+\_\+arr\+\_\+returns\+\_\+arr\+\_\+value}} (void)
+\begin{DoxyCompactList}\small\item\em Test auto-\/reload register access. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{test__timer_8c_a632f155e740b034288d80096e2a7af4e}{test\+\_\+timer\+\_\+get\+\_\+count\+\_\+returns\+\_\+count\+\_\+value}} (void)
+\begin{DoxyCompactList}\small\item\em Test counter value access. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Timer unit test implementation for NAVHAL. 
+
+This file implements the test cases for verifying Timer peripheral functionality in the NAVHAL hardware abstraction layer. It performs register-\/level verification of all timer operations using TIM2 as the test timer.
+
+Tests cover\+:
+\begin{DoxyItemize}
+\item Initialization (prescaler and auto-\/reload values)
+\item Start/stop control
+\item Counter operations
+\item Compare register functionality
+\item Channel enable/disable
+\item Interrupt control
+\item Register access functions
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+Uses Unity test framework for assertions 
+
+All tests use TIM2 as the test timer 
+\end{DoxyNote}
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{test__timer_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{test__timer_8c_a10ba95705e9cdf3bde76473bbbba8639}\index{test\_timer.c@{test\_timer.c}!TEST\_ARR@{TEST\_ARR}}
+\index{TEST\_ARR@{TEST\_ARR}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{TEST\_ARR}{TEST\_ARR}}
+{\footnotesize\ttfamily \label{test__timer_8c_a10ba95705e9cdf3bde76473bbbba8639} 
+\#define TEST\+\_\+\+ARR~999}
+
+
+
+Test auto-\/reload value. 
+
+\Hypertarget{test__timer_8c_ae6d0ebcb6ec804b17744c6456cf14a69}\index{test\_timer.c@{test\_timer.c}!TEST\_CHANNEL@{TEST\_CHANNEL}}
+\index{TEST\_CHANNEL@{TEST\_CHANNEL}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{TEST\_CHANNEL}{TEST\_CHANNEL}}
+{\footnotesize\ttfamily \label{test__timer_8c_ae6d0ebcb6ec804b17744c6456cf14a69} 
+\#define TEST\+\_\+\+CHANNEL~1}
+
+
+
+Test channel number (Channel 1) 
+
+\Hypertarget{test__timer_8c_a7b2ede9695549a83782f3963dd130f80}\index{test\_timer.c@{test\_timer.c}!TEST\_COMPARE\_VALUE@{TEST\_COMPARE\_VALUE}}
+\index{TEST\_COMPARE\_VALUE@{TEST\_COMPARE\_VALUE}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{TEST\_COMPARE\_VALUE}{TEST\_COMPARE\_VALUE}}
+{\footnotesize\ttfamily \label{test__timer_8c_a7b2ede9695549a83782f3963dd130f80} 
+\#define TEST\+\_\+\+COMPARE\+\_\+\+VALUE~500}
+
+
+
+Test compare register value. 
+
+\Hypertarget{test__timer_8c_acf1d21abbec3ade72b9ff4648c48dca7}\index{test\_timer.c@{test\_timer.c}!TEST\_PSC@{TEST\_PSC}}
+\index{TEST\_PSC@{TEST\_PSC}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{TEST\_PSC}{TEST\_PSC}}
+{\footnotesize\ttfamily \label{test__timer_8c_acf1d21abbec3ade72b9ff4648c48dca7} 
+\#define TEST\+\_\+\+PSC~83}
+
+
+
+Test prescaler value. 
+
+\Hypertarget{test__timer_8c_aaeea30eacab8e375e8faf2eb8ca8bfb1}\index{test\_timer.c@{test\_timer.c}!TEST\_TIMER@{TEST\_TIMER}}
+\index{TEST\_TIMER@{TEST\_TIMER}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{TEST\_TIMER}{TEST\_TIMER}}
+{\footnotesize\ttfamily \label{test__timer_8c_aaeea30eacab8e375e8faf2eb8ca8bfb1} 
+\#define TEST\+\_\+\+TIMER~\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017dba982d53e8998c00ab2bfaea0957b12e82}{TIM2}}}
+
+
+
+Timer peripheral used for all tests (TIM2) 
+
+
+
+\label{doc-func-members}
+\Hypertarget{test__timer_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{test__timer_8c_ae3217284cb96dabd232414dbd89bead8}\index{test\_timer.c@{test\_timer.c}!test\_timer\_clear\_interrupt\_flag\_clears\_UIF@{test\_timer\_clear\_interrupt\_flag\_clears\_UIF}}
+\index{test\_timer\_clear\_interrupt\_flag\_clears\_UIF@{test\_timer\_clear\_interrupt\_flag\_clears\_UIF}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_clear\_interrupt\_flag\_clears\_UIF()}{test\_timer\_clear\_interrupt\_flag\_clears\_UIF()}}
+{\footnotesize\ttfamily \label{test__timer_8c_ae3217284cb96dabd232414dbd89bead8} 
+void test\+\_\+timer\+\_\+clear\+\_\+interrupt\+\_\+flag\+\_\+clears\+\_\+\+UIF (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test interrupt flag clearing. 
+
+Verifies that \doxylink{timer_8h_a6226a8f2f8b305c2a319ade05a77886c}{timer\+\_\+clear\+\_\+interrupt\+\_\+flag()} clears the Update Interrupt Flag (UIF) in the SR register \Hypertarget{test__timer_8c_a485d685f4ed1afcb26576659caada9db}\index{test\_timer.c@{test\_timer.c}!test\_timer\_enable\_and\_disable\_channel@{test\_timer\_enable\_and\_disable\_channel}}
+\index{test\_timer\_enable\_and\_disable\_channel@{test\_timer\_enable\_and\_disable\_channel}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_enable\_and\_disable\_channel()}{test\_timer\_enable\_and\_disable\_channel()}}
+{\footnotesize\ttfamily \label{test__timer_8c_a485d685f4ed1afcb26576659caada9db} 
+void test\+\_\+timer\+\_\+enable\+\_\+and\+\_\+disable\+\_\+channel (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test channel enable/disable. 
+
+Verifies\+:
+\begin{DoxyEnumerate}
+\item \doxylink{timer_8h_a0d3035840fb20d5213a70d0e33994584}{timer\+\_\+disable\+\_\+channel()} clears the channel enable bit in CCER register
+\item \doxylink{timer_8h_ab790fdb4ee5e3bfe9477a2bbfb89e13d}{timer\+\_\+enable\+\_\+channel()} sets the channel enable bit in CCER register 
+\end{DoxyEnumerate}\Hypertarget{test__timer_8c_a3710a87cea192bed4c7079fc96d76730}\index{test\_timer.c@{test\_timer.c}!test\_timer\_enable\_and\_disable\_interrupt@{test\_timer\_enable\_and\_disable\_interrupt}}
+\index{test\_timer\_enable\_and\_disable\_interrupt@{test\_timer\_enable\_and\_disable\_interrupt}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_enable\_and\_disable\_interrupt()}{test\_timer\_enable\_and\_disable\_interrupt()}}
+{\footnotesize\ttfamily \label{test__timer_8c_a3710a87cea192bed4c7079fc96d76730} 
+void test\+\_\+timer\+\_\+enable\+\_\+and\+\_\+disable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test interrupt enable. 
+
+Test interrupt control.
+
+Verifies that \doxylink{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f}{timer\+\_\+enable\+\_\+interrupt()} sets the Update Interrupt Enable (UIE) bit in the DIER register \Hypertarget{test__timer_8c_a5fa4a753af9868d99205ea868db22d19}\index{test\_timer.c@{test\_timer.c}!test\_timer\_get\_arr\_returns\_arr\_value@{test\_timer\_get\_arr\_returns\_arr\_value}}
+\index{test\_timer\_get\_arr\_returns\_arr\_value@{test\_timer\_get\_arr\_returns\_arr\_value}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_get\_arr\_returns\_arr\_value()}{test\_timer\_get\_arr\_returns\_arr\_value()}}
+{\footnotesize\ttfamily \label{test__timer_8c_a5fa4a753af9868d99205ea868db22d19} 
+void test\+\_\+timer\+\_\+get\+\_\+arr\+\_\+returns\+\_\+arr\+\_\+value (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test auto-\/reload register access. 
+
+Verifies that \doxylink{timer_8h_a566a41b6f3c8e66b0736719528da6245}{timer\+\_\+get\+\_\+arr()} correctly returns the value from the ARR register \Hypertarget{test__timer_8c_a632f155e740b034288d80096e2a7af4e}\index{test\_timer.c@{test\_timer.c}!test\_timer\_get\_count\_returns\_count\_value@{test\_timer\_get\_count\_returns\_count\_value}}
+\index{test\_timer\_get\_count\_returns\_count\_value@{test\_timer\_get\_count\_returns\_count\_value}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_get\_count\_returns\_count\_value()}{test\_timer\_get\_count\_returns\_count\_value()}}
+{\footnotesize\ttfamily \label{test__timer_8c_a632f155e740b034288d80096e2a7af4e} 
+void test\+\_\+timer\+\_\+get\+\_\+count\+\_\+returns\+\_\+count\+\_\+value (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test counter value access. 
+
+Verifies that \doxylink{timer_8h_a19aba4b4d8462e4f84b6eeabda21423c}{timer\+\_\+get\+\_\+count()} correctly returns the current counter value from the CNT register \Hypertarget{test__timer_8c_a3be562baaa8b39cecebdcf28c206fa54}\index{test\_timer.c@{test\_timer.c}!test\_timer\_init\_sets\_prescaler\_and\_arr@{test\_timer\_init\_sets\_prescaler\_and\_arr}}
+\index{test\_timer\_init\_sets\_prescaler\_and\_arr@{test\_timer\_init\_sets\_prescaler\_and\_arr}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_init\_sets\_prescaler\_and\_arr()}{test\_timer\_init\_sets\_prescaler\_and\_arr()}}
+{\footnotesize\ttfamily \label{test__timer_8c_a3be562baaa8b39cecebdcf28c206fa54} 
+void test\+\_\+timer\+\_\+init\+\_\+sets\+\_\+prescaler\+\_\+and\+\_\+arr (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test timer initialization. 
+
+Verifies that \doxylink{timer_8h_adfbc1cc33f34b935f0b0ee61d2d3f6f8}{timer\+\_\+init()} correctly sets\+:
+\begin{DoxyEnumerate}
+\item The prescaler value in PSC register
+\item The auto-\/reload value in ARR register 
+\end{DoxyEnumerate}\Hypertarget{test__timer_8c_a00cc3fb693b2159596201099c2752ade}\index{test\_timer.c@{test\_timer.c}!test\_timer\_reset\_clears\_count@{test\_timer\_reset\_clears\_count}}
+\index{test\_timer\_reset\_clears\_count@{test\_timer\_reset\_clears\_count}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_reset\_clears\_count()}{test\_timer\_reset\_clears\_count()}}
+{\footnotesize\ttfamily \label{test__timer_8c_a00cc3fb693b2159596201099c2752ade} 
+void test\+\_\+timer\+\_\+reset\+\_\+clears\+\_\+count (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test timer counter reset. 
+
+Verifies that \doxylink{timer_8h_ab50e7d8e6b8713a9a96abc6dd3a9e932}{timer\+\_\+reset()} clears the counter value to zero by checking the CNT register \Hypertarget{test__timer_8c_ac37fbae42d4495711f38e57c65499e61}\index{test\_timer.c@{test\_timer.c}!test\_timer\_set\_compare\_and\_get\_compare@{test\_timer\_set\_compare\_and\_get\_compare}}
+\index{test\_timer\_set\_compare\_and\_get\_compare@{test\_timer\_set\_compare\_and\_get\_compare}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_set\_compare\_and\_get\_compare()}{test\_timer\_set\_compare\_and\_get\_compare()}}
+{\footnotesize\ttfamily \label{test__timer_8c_ac37fbae42d4495711f38e57c65499e61} 
+void test\+\_\+timer\+\_\+set\+\_\+compare\+\_\+and\+\_\+get\+\_\+compare (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test compare register operations. 
+
+Verifies\+:
+\begin{DoxyEnumerate}
+\item \doxylink{timer_8h_a3b5738efe72c1bd7130276a8f59b8234}{timer\+\_\+set\+\_\+compare()} correctly sets the compare value in CCR register
+\item \doxylink{timer_8h_a043ef2140caa620a1ed1af968fff5b46}{timer\+\_\+get\+\_\+compare()} correctly returns the compare value 
+\end{DoxyEnumerate}\Hypertarget{test__timer_8c_a33d3e3df5eded2d8b675594dd1af9173}\index{test\_timer.c@{test\_timer.c}!test\_timer\_start\_sets\_CEN\_bit@{test\_timer\_start\_sets\_CEN\_bit}}
+\index{test\_timer\_start\_sets\_CEN\_bit@{test\_timer\_start\_sets\_CEN\_bit}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_start\_sets\_CEN\_bit()}{test\_timer\_start\_sets\_CEN\_bit()}}
+{\footnotesize\ttfamily \label{test__timer_8c_a33d3e3df5eded2d8b675594dd1af9173} 
+void test\+\_\+timer\+\_\+start\+\_\+sets\+\_\+\+CEN\+\_\+bit (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test timer start functionality. 
+
+Verifies that \doxylink{timer_8h_a49fb0f6c6b9a4802601a452618672e52}{timer\+\_\+start()} sets the Counter ENable (CEN) bit in the CR1 register \Hypertarget{test__timer_8c_a7d914e3a43fe433380fdddfcb7da9fe9}\index{test\_timer.c@{test\_timer.c}!test\_timer\_stop\_clears\_CEN\_bit@{test\_timer\_stop\_clears\_CEN\_bit}}
+\index{test\_timer\_stop\_clears\_CEN\_bit@{test\_timer\_stop\_clears\_CEN\_bit}!test\_timer.c@{test\_timer.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer\_stop\_clears\_CEN\_bit()}{test\_timer\_stop\_clears\_CEN\_bit()}}
+{\footnotesize\ttfamily \label{test__timer_8c_a7d914e3a43fe433380fdddfcb7da9fe9} 
+void test\+\_\+timer\+\_\+stop\+\_\+clears\+\_\+\+CEN\+\_\+bit (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Test timer stop functionality. 
+
+Verifies that \doxylink{timer_8h_a196e32e61e4a4d6cb50e46ebffb1e0b8}{timer\+\_\+stop()} clears the Counter ENable (CEN) bit in the CR1 register 

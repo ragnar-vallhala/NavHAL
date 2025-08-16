@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['hal_0',['Core HAL',['../group___n_a_v_h_a_l.html',1,'']]],
-  ['hal_20api_1',['UART HAL API',['../group___u_a_r_t___a_p_i.html',1,'']]]
+  ['macros_0',['Type-Generic Write Macros',['../group___u_a_r_t___w_r_i_t_e___m_a_c_r_o_s.html',1,'']]]
 ];

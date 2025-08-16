@@ -1,45 +1,20 @@
-#define CORTEX_M4
-#include "navhal.h"
+#include "core/cortex-m4/uart.h"
 
-hal_pll_config_t pll_cfg;
+int main(void) {
+  // Initialize UART2 at 115200 baud
+  uart2_init(115200);
 
-hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI};
+  uart2_write_string("UART2 Echo Started...\r\n");
 
-void print2(void) { uart2_write("Hello World 2\n\r"); }
-void print3(void) { uart2_write("Hello World 3\n\r"); }
-void print4(void) { uart2_write("Hello World 4\n\r"); }
-void print5(void) { uart2_write("Hello World 5\n\r"); }
-void print6(void) { uart2_write("Hello World 6\n\r"); }
-void print7(void) { uart2_write("Hello World 7\n\r"); }
-void print9(void) { uart2_write("Hello World 9\n\r"); }
-// input clock = 16MHz
-// Prescaler = 500 so oFreq = 32KHz
-// Arr = 3200 so callbacks are called each sec
-int main() {
-  hal_clock_init(&cfg, &pll_cfg);
-  systick_init(1000);
-  uart2_init(9600);
+  while (1) {
+    // Wait for a character
+    char c = uart2_read_char();
 
-  timer_init(TIM2, 500, 32000);
-  timer_enable_interrupt(TIM2);
-  timer_attach_callback(TIM2, print2);
+    // Echo it back
+    if (c != '\r' && c != '\n')
+      c++;
+    uart2_write_char(c);
+  }
 
-  timer_init(TIM3, 500, 32000);
-  timer_enable_interrupt(TIM3);
-  timer_attach_callback(TIM3, print3);
-
-  timer_init(TIM4, 500, 32000);
-  timer_enable_interrupt(TIM4);
-  timer_attach_callback(TIM4, print4);
-
-  timer_init(TIM5, 500, 32000);
-  timer_enable_interrupt(TIM5);
-  timer_attach_callback(TIM5, print5);
-
-  timer_init(TIM9, 500, 32000);
-  timer_enable_interrupt(TIM9);
-  timer_attach_callback(TIM9, print9);
-
-  while (1)
-    ;
+  return 0; // Never reached
 }

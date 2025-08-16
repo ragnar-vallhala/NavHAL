@@ -1,0 +1,115 @@
+\doxysection{samples/11\+\_\+hal\+\_\+i2c/main.c File Reference}
+\hypertarget{samples_211__hal__i2c_2main_8c}{}\label{samples_211__hal__i2c_2main_8c}\index{samples/11\_hal\_i2c/main.c@{samples/11\_hal\_i2c/main.c}}
+
+
+Example\+: Read raw temperature from BMP180 over I2C and print via UART2.  
+
+
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{samples_211__hal__i2c_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{samples_211__hal__i2c_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\item 
+\#define \mbox{\hyperlink{samples_211__hal__i2c_2main_8c_ab1b70b364282ca8c5bd1d2226f745a16}{BMP180\+\_\+\+ADDR}}~0x77
+\item 
+\#define \mbox{\hyperlink{samples_211__hal__i2c_2main_8c_a1b04da0bf015bf9ef408eadedacbbd42}{BMP180\+\_\+\+REG\+\_\+\+CONTROL}}~0x\+F4
+\item 
+\#define \mbox{\hyperlink{samples_211__hal__i2c_2main_8c_a97b838d236e0d7d2daa9a280f0ce429a}{BMP180\+\_\+\+REG\+\_\+\+RESULT}}~0x\+F6
+\item 
+\#define \mbox{\hyperlink{samples_211__hal__i2c_2main_8c_ab2dc7b3f4eb884697aa98c97017d7991}{BMP180\+\_\+\+CMD\+\_\+\+TEMP}}~0x34
+\item 
+\#define \mbox{\hyperlink{samples_211__hal__i2c_2main_8c_a357ae664eb5f3c937443339e9b568c51}{I2\+C\+\_\+\+BUS}}~\mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bcaeb0f494c71f34592c5a4500ee98ab4a2}{I2\+C1}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{samples_211__hal__i2c_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Example\+: Read raw temperature from BMP180 over I2C and print via UART2. 
+
+
+\begin{DoxyItemize}
+\item Initializes Sys\+Tick for delay functions.
+\item Configures UART2 at 9600 baud for console output.
+\item Configures I2\+C1 and GPIO pins for BMP180 communication (PB8=SCL, PB9=SDA).
+\item Periodically starts a temperature measurement, reads the raw value, and prints it.
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+Delay between measurement and reading follows BMP180 datasheet (\texorpdfstring{$\sim$}{\string~}4.5 ms).
+\end{DoxyNote}
+© 2025 NAVROBOTEC PVT. LTD. All rights reserved. 
+
+\label{doc-define-members}
+\Hypertarget{samples_211__hal__i2c_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{samples_211__hal__i2c_2main_8c_ab1b70b364282ca8c5bd1d2226f745a16}\index{main.c@{main.c}!BMP180\_ADDR@{BMP180\_ADDR}}
+\index{BMP180\_ADDR@{BMP180\_ADDR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{BMP180\_ADDR}{BMP180\_ADDR}}
+{\footnotesize\ttfamily \label{samples_211__hal__i2c_2main_8c_ab1b70b364282ca8c5bd1d2226f745a16} 
+\#define BMP180\+\_\+\+ADDR~0x77}
+
+\Hypertarget{samples_211__hal__i2c_2main_8c_ab2dc7b3f4eb884697aa98c97017d7991}\index{main.c@{main.c}!BMP180\_CMD\_TEMP@{BMP180\_CMD\_TEMP}}
+\index{BMP180\_CMD\_TEMP@{BMP180\_CMD\_TEMP}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{BMP180\_CMD\_TEMP}{BMP180\_CMD\_TEMP}}
+{\footnotesize\ttfamily \label{samples_211__hal__i2c_2main_8c_ab2dc7b3f4eb884697aa98c97017d7991} 
+\#define BMP180\+\_\+\+CMD\+\_\+\+TEMP~0x34}
+
+\Hypertarget{samples_211__hal__i2c_2main_8c_a1b04da0bf015bf9ef408eadedacbbd42}\index{main.c@{main.c}!BMP180\_REG\_CONTROL@{BMP180\_REG\_CONTROL}}
+\index{BMP180\_REG\_CONTROL@{BMP180\_REG\_CONTROL}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{BMP180\_REG\_CONTROL}{BMP180\_REG\_CONTROL}}
+{\footnotesize\ttfamily \label{samples_211__hal__i2c_2main_8c_a1b04da0bf015bf9ef408eadedacbbd42} 
+\#define BMP180\+\_\+\+REG\+\_\+\+CONTROL~0x\+F4}
+
+\Hypertarget{samples_211__hal__i2c_2main_8c_a97b838d236e0d7d2daa9a280f0ce429a}\index{main.c@{main.c}!BMP180\_REG\_RESULT@{BMP180\_REG\_RESULT}}
+\index{BMP180\_REG\_RESULT@{BMP180\_REG\_RESULT}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{BMP180\_REG\_RESULT}{BMP180\_REG\_RESULT}}
+{\footnotesize\ttfamily \label{samples_211__hal__i2c_2main_8c_a97b838d236e0d7d2daa9a280f0ce429a} 
+\#define BMP180\+\_\+\+REG\+\_\+\+RESULT~0x\+F6}
+
+\Hypertarget{samples_211__hal__i2c_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{samples_211__hal__i2c_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+\Hypertarget{samples_211__hal__i2c_2main_8c_a357ae664eb5f3c937443339e9b568c51}\index{main.c@{main.c}!I2C\_BUS@{I2C\_BUS}}
+\index{I2C\_BUS@{I2C\_BUS}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C\_BUS}{I2C\_BUS}}
+{\footnotesize\ttfamily \label{samples_211__hal__i2c_2main_8c_a357ae664eb5f3c937443339e9b568c51} 
+\#define I2\+C\+\_\+\+BUS~\mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bcaeb0f494c71f34592c5a4500ee98ab4a2}{I2\+C1}}}
+
+
+
+\label{doc-func-members}
+\Hypertarget{samples_211__hal__i2c_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{samples_211__hal__i2c_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{samples_211__hal__i2c_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick for delays
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Stop execution if I2C init fails
+
+\texorpdfstring{$<$}{<} Wait for conversion (\texorpdfstring{$\sim$}{\string~}4.5 ms for temperature)
+
+\texorpdfstring{$<$}{<} Assumes uart2\+\_\+write\+\_\+int exists
+
+\texorpdfstring{$<$}{<} Wait 1 second before next measurement

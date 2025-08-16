@@ -1,0 +1,51 @@
+\doxysection{hal\+\_\+i2c\+\_\+config\+\_\+t Struct Reference}
+\hypertarget{structhal__i2c__config__t}{}\label{structhal__i2c__config__t}\index{hal\_i2c\_config\_t@{hal\_i2c\_config\_t}}
+
+
+I²C configuration structure.  
+
+
+
+
+{\ttfamily \#include $<$i2c.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6a}{hal\+\_\+i2c\+\_\+speed\+\_\+t}} \mbox{\hyperlink{structhal__i2c__config__t_a359734b893caac1c2a2f0ffccf20839e}{clock\+\_\+speed}}
+\item 
+uint8\+\_\+t \mbox{\hyperlink{structhal__i2c__config__t_a6b6198821b6ca87ef2a61ddf8666fd0d}{own\+\_\+address}}
+\item 
+bool \mbox{\hyperlink{structhal__i2c__config__t_af180fc245e4740e541053afe55a2cab3}{acknowledge}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+I²C configuration structure. 
+
+\label{doc-variable-members}
+\Hypertarget{structhal__i2c__config__t_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structhal__i2c__config__t_af180fc245e4740e541053afe55a2cab3}\index{hal\_i2c\_config\_t@{hal\_i2c\_config\_t}!acknowledge@{acknowledge}}
+\index{acknowledge@{acknowledge}!hal\_i2c\_config\_t@{hal\_i2c\_config\_t}}
+\doxysubsubsection{\texorpdfstring{acknowledge}{acknowledge}}
+{\footnotesize\ttfamily \label{structhal__i2c__config__t_af180fc245e4740e541053afe55a2cab3} 
+bool hal\+\_\+i2c\+\_\+config\+\_\+t\+::acknowledge}
+
+Enable/disable ACK \Hypertarget{structhal__i2c__config__t_a359734b893caac1c2a2f0ffccf20839e}\index{hal\_i2c\_config\_t@{hal\_i2c\_config\_t}!clock\_speed@{clock\_speed}}
+\index{clock\_speed@{clock\_speed}!hal\_i2c\_config\_t@{hal\_i2c\_config\_t}}
+\doxysubsubsection{\texorpdfstring{clock\_speed}{clock\_speed}}
+{\footnotesize\ttfamily \label{structhal__i2c__config__t_a359734b893caac1c2a2f0ffccf20839e} 
+\mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6a}{hal\+\_\+i2c\+\_\+speed\+\_\+t}} hal\+\_\+i2c\+\_\+config\+\_\+t\+::clock\+\_\+speed}
+
+Clock speed in Hz \Hypertarget{structhal__i2c__config__t_a6b6198821b6ca87ef2a61ddf8666fd0d}\index{hal\_i2c\_config\_t@{hal\_i2c\_config\_t}!own\_address@{own\_address}}
+\index{own\_address@{own\_address}!hal\_i2c\_config\_t@{hal\_i2c\_config\_t}}
+\doxysubsubsection{\texorpdfstring{own\_address}{own\_address}}
+{\footnotesize\ttfamily \label{structhal__i2c__config__t_a6b6198821b6ca87ef2a61ddf8666fd0d} 
+uint8\+\_\+t hal\+\_\+i2c\+\_\+config\+\_\+t\+::own\+\_\+address}
+
+7-\/bit device address (0 if master) 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/core/cortex-\/m4/\mbox{\hyperlink{i2c_8h}{i2c.\+h}}\end{DoxyCompactItemize}

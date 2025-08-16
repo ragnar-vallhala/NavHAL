@@ -1,0 +1,125 @@
+\doxysection{interrupt\+\_\+reg.\+h}
+\hypertarget{interrupt__reg_8h_source}{}\label{interrupt__reg_8h_source}\index{include/core/cortex-\/m4/interrupt\_reg.h@{include/core/cortex-\/m4/interrupt\_reg.h}}
+\mbox{\hyperlink{interrupt__reg_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_INTERRUPT\_REG\_H}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_INTERRUPT\_REG\_H}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{hal__types_8h}{common/hal\_types.h}}"{}}\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_n_v_i_c___typedef_a09849d33b73fba520f18d56fe21d0786}{ISER}}[8];\ \ \ \ \ \ \ }
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_n_v_i_c___typedef_afdda1255f5d3570c21c13b9efdbbcd06}{ICER}}[8];\ \ \ \ \ \ \ }
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_n_v_i_c___typedef_a55d822d1ccab805896d820acdfc8ba96}{ISPR}}[8];\ \ \ \ \ \ \ }
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_n_v_i_c___typedef_a4c482c7addc4e23eb7246450f476dbc1}{ICPR}}[8];\ \ \ \ \ \ \ }
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_n_v_i_c___typedef_ad93b4c2092bdd3c12b2d5e7a3474162a}{IABR}}[8];\ \ \ \ \ \ \ }
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_n_v_i_c___typedef_a591f32b9355f79f56f54402dc5e7581d}{RESERVED0}}[32];\ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint8\_t\ \mbox{\hyperlink{struct_n_v_i_c___typedef_ae223e08fd3a28b86fde3b60f6e269fc9}{IPR}}[60];\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00038\ \}\ \mbox{\hyperlink{struct_n_v_i_c___typedef}{NVIC\_Typedef}};}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ NVIC\_BASE\_ADDR\ 0xE000E100UL}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ NVIC\ ((NVIC\_Typedef\ *)NVIC\_BASE\_ADDR)}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00052\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00053\ \textcolor{comment}{\ \ \ \ /******\ Cortex-\/M4\ Processor\ Exceptions\ Numbers\ ******/}}
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ade177d9c70c89e084093024b932a4e30}{NonMaskableInt\_IRQn}}\ =\ -\/14,\ }
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab1a222a34a32f0ef5ac65e714efc1f85}{HardFault\_IRQn}}\ =\ -\/13,\ \ \ \ \ \ }
+\DoxyCodeLine{00056\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a33ff1cf7098de65d61b6354fee6cd5aa}{MemoryManagement\_IRQn}}\ =\ -\/12,\ }
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8693500eff174f16119e96234fee73af}{BusFault\_IRQn}}\ =\ -\/11,\ \ \ \ \ \ \ }
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6895237c9443601ac832efa635dd8bbf}{UsageFault\_IRQn}}\ =\ -\/10,\ \ \ \ \ }
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4ce820b3cc6cf3a796b41aadc0cf1237}{SVCall\_IRQn}}\ =\ -\/5,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00060\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8e033fcef7aed98a31c60a7de206722c}{DebugMonitor\_IRQn}}\ =\ -\/4,\ \ \ \ }
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a03c3cc89984928816d81793fc7bce4a2}{PendSV\_IRQn}}\ =\ -\/2,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6dbff8f8543325f3474cbae2446776e7}{SysTick\_IRQn}}\ =\ -\/1,\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \textcolor{comment}{\ \ \ \ /******\ STM32F4\ Specific\ Interrupt\ Numbers\ ******/}}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a971089d7566ef902dfa0c80ac3a8fd52}{WWDG\_IRQn}}\ =\ 0,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab0b51ffcc4dcf5661141b79c8e5bd924}{PVD\_IRQn}}\ =\ 1,\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac127cca7ae48bcf93924209f04e5e5a1}{TAMP\_STAMP\_IRQn}}\ =\ 2,\ \ \ \ \ }
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a173ccc3f31df1f7e43de2ddeab3d1777}{RTC\_WKUP\_IRQn}}\ =\ 3,\ \ \ \ \ \ \ }
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a91b73963ce243a1d031576d49e137fab}{FLASH\_IRQn}}\ =\ 4,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a5710b22392997bac63daa5c999730f77}{RCC\_IRQn}}\ =\ 5,\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00071\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab6aa6f87d26bbc6cf99b067b8d75c2f7}{EXTI0\_IRQn}}\ =\ 6,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00072\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae4badcdecdb94eb10129c4c0577c5e19}{EXTI1\_IRQn}}\ =\ 7,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00073\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a082cb3f7839069a0715fd76c7eacbbc9}{EXTI2\_IRQn}}\ =\ 8,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00074\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8add889c84ba5de466ced209069e05d602}{EXTI3\_IRQn}}\ =\ 9,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab70a40106ca4486770df5d2072d9ac0e}{EXTI4\_IRQn}}\ =\ 10,\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00076\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9ee33e72512c4cfb301b216f4fb9d68c}{DMA1\_Stream0\_IRQn}}\ =\ 11,\ \ }
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa45ca2c955060e2c2a7cbbe1d6753285}{DMA1\_Stream1\_IRQn}}\ =\ 12,\ \ }
+\DoxyCodeLine{00078\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0d9ec75e4478e70235b705d5a6b3efd8}{DMA1\_Stream2\_IRQn}}\ =\ 13,\ \ }
+\DoxyCodeLine{00079\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8af77770e080206a7558decf09344fb2e2}{DMA1\_Stream3\_IRQn}}\ =\ 14,\ \ }
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aee2aaf365c6c297a63cee41ecae2301a}{DMA1\_Stream4\_IRQn}}\ =\ 15,\ \ }
+\DoxyCodeLine{00081\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac92efa72399fe58fa615d8bf8fd64a4e}{DMA1\_Stream5\_IRQn}}\ =\ 16,\ \ }
+\DoxyCodeLine{00082\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aef5e2b68f62f6f1781fab894f0b8f486}{DMA1\_Stream6\_IRQn}}\ =\ 17,\ \ }
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4d69175258ae261dd545001e810421b3}{ADC\_IRQn}}\ =\ 18,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9ceb5175f7c10cf436955173c2246877}{CAN1\_TX\_IRQn}}\ =\ 19,\ \ \ \ \ \ \ }
+\DoxyCodeLine{00085\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab6bf73ac43a9856b3f2759a59f3d25b5}{CAN1\_RX0\_IRQn}}\ =\ 20,\ \ \ \ \ \ }
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8af71ef06c4f9ff0e1691c21ff3670acd4}{CAN1\_RX1\_IRQn}}\ =\ 21,\ \ \ \ \ \ }
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0f5f129d88a5606a378811e43039e274}{CAN1\_SCE\_IRQn}}\ =\ 22,\ \ \ \ \ \ }
+\DoxyCodeLine{00088\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa3aa50e0353871985facf62d055faa52}{EXTI9\_5\_IRQn}}\ =\ 23,\ \ \ \ \ \ \ }
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab35b4ce63cfb11453f84a3695c6df368}{TIM1\_BRK\_TIM9\_IRQn}}\ =\ 24,\ }
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa3879e49013035601e17f83a51e0829f}{TIM1\_UP\_TIM10\_IRQn}}\ =\ 25,\ }
+\DoxyCodeLine{00091\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab1a744bdceb8eface6ff57dd036e608e}{TIM1\_TRG\_COM\_TIM11\_IRQn}}\ =\ 26,\ }
+\DoxyCodeLine{00092\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8af312f0a21f600f9b286427e50c549ca9}{TIM1\_CC\_IRQn}}\ =\ 27,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00093\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3a4e2095a926e4095d3c846eb1c98afa}{TIM2\_IRQn}}\ =\ 28,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00094\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a985574288f66e2a00e97387424a9a2d8}{TIM3\_IRQn}}\ =\ 29,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a368b899ca740b9ae0d75841f3abf68c4}{TIM4\_IRQn}}\ =\ 30,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00096\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9852dbbe8c014e716ce7e03a7b809751}{I2C1\_EV\_IRQn}}\ =\ 31,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a2ec363869f4488782dc10a60abce3b34}{I2C1\_ER\_IRQn}}\ =\ 32,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3020193786527c47d2e4d8c92ceee804}{I2C2\_EV\_IRQn}}\ =\ 33,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a60c35f2d48d512bd6818bc9fef7053d7}{I2C2\_ER\_IRQn}}\ =\ 34,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00100\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aacdff1a9c42582ed663214cbe62c1174}{SPI1\_IRQn}}\ =\ 35,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00101\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a505fbd4ccf7c2a14c8b76dc9e58f7ede}{SPI2\_IRQn}}\ =\ 36,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ad97cb163e1f678367e37c50d54d161ab}{USART1\_IRQn}}\ =\ 37,\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00103\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3f9c48714d0e5baaba6613343f0da68e}{USART2\_IRQn}}\ =\ 38,\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8afb13802afc1f5fdf5c90e73ee99e5ff3}{USART3\_IRQn}}\ =\ 39,\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00105\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9fb0ad0c850234d1983fafdb17378e2f}{EXTI15\_10\_IRQn}}\ =\ 40,\ \ \ \ \ \ }
+\DoxyCodeLine{00106\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8afe09d6563a21a1540f658163a76a3b37}{RTC\_Alarm\_IRQn}}\ =\ 41,\ \ \ \ \ \ }
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa612f35c4440359c35acbaa3c1458c5f}{OTG\_FS\_WKUP\_IRQn}}\ =\ 42,\ \ \ \ }
+\DoxyCodeLine{00108\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3e01328006d19f7d32354271b9f61dce}{TIM8\_BRK\_TIM12\_IRQn}}\ =\ 43,\ }
+\DoxyCodeLine{00109\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa8d8f67a98f24de6f0b36ad6b1f29a7d}{TIM8\_UP\_TIM13\_IRQn}}\ =\ 44,\ \ }
+\DoxyCodeLine{00110\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae252b31c3a341acbe9a467e243137307}{TIM8\_TRG\_COM\_TIM14\_IRQn}}\ =\ 45,\ }
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a637750639eff4e2b4aae80ed6f3cf67f}{TIM8\_CC\_IRQn}}\ =\ 46,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00112\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aedaa9c14e7e5fa9c0dcbb0c2455546e8}{DMA1\_Stream7\_IRQn}}\ =\ 47,\ \ \ }
+\DoxyCodeLine{00113\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab58dc79a081058857f73965f5305479b}{FMC\_IRQn}}\ =\ 48,\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00114\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a16fe70a39348f3f27906dc268b5654e3}{SDIO\_IRQn}}\ =\ 49,\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aed2eb3f4bb721d55fcc1003125956645}{TIM5\_IRQn}}\ =\ 50,\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00116\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a4e9331739fb76a2ca7781fede070ae44}{SPI3\_IRQn}}\ =\ 51,\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00117\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aded5314b20c6e4e80cb6ab0668ffb8d5}{UART4\_IRQn}}\ =\ 52,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ac55a11a64aae7432544d0ab0d4f7de09}{UART5\_IRQn}}\ =\ 53,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a5f581e9aedfaccd9b1db9ec793804b45}{TIM6\_DAC\_IRQn}}\ =\ 54,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00120\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a53cadc1e164ec85d0ea4cd143608e8e1}{TIM7\_IRQn}}\ =\ 55,\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a1e5055722630fd4b12aff421964c2ebb}{DMA2\_Stream0\_IRQn}}\ =\ 56,\ \ \ \ }
+\DoxyCodeLine{00122\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a98abb3f02c1feb3831706bc1b82307cb}{DMA2\_Stream1\_IRQn}}\ =\ 57,\ \ \ \ }
+\DoxyCodeLine{00123\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8abf5e189f3ac7aad9f65e65ea5a0f3b36}{DMA2\_Stream2\_IRQn}}\ =\ 58,\ \ \ \ }
+\DoxyCodeLine{00124\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3ff8f3439f509e6e985eb960e63e1be4}{DMA2\_Stream3\_IRQn}}\ =\ 59,\ \ \ \ }
+\DoxyCodeLine{00125\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ae54eb8b30273b38a0576f75aba24eec0}{DMA2\_Stream4\_IRQn}}\ =\ 60,\ \ \ \ }
+\DoxyCodeLine{00126\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ad71328dd95461b7c55b568cf25966f6a}{ETH\_IRQn}}\ =\ 61,\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00127\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a0485578005e12c2e2c0fb253a844ec6f}{ETH\_WKUP\_IRQn}}\ =\ 62,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00128\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8af6b8fbc990ac71c8425647bb684788a4}{CAN2\_TX\_IRQn}}\ =\ 63,\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00129\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a851fd2f2ab1418710e7da80e1bdf348a}{CAN2\_RX0\_IRQn}}\ =\ 64,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00130\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ab5023ff845be31a488ab63a0b8cf2b7a}{CAN2\_RX1\_IRQn}}\ =\ 65,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00131\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a56c0b5758f26f31494e74aab9273f9fd}{CAN2\_SCE\_IRQn}}\ =\ 66,\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00132\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa60a30b7ef03446a46fd72e084911f7e}{OTG\_FS\_IRQn}}\ =\ 67,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00133\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a933d4686213973abc01845a3da1c8a03}{DMA2\_Stream5\_IRQn}}\ =\ 68,\ \ \ \ }
+\DoxyCodeLine{00134\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a21570761ad0b5ed751adc831691b7800}{DMA2\_Stream6\_IRQn}}\ =\ 69,\ \ \ \ }
+\DoxyCodeLine{00135\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a3d4cc0cd9b4d71e7ee002c4f8c1f8a77}{DMA2\_Stream7\_IRQn}}\ =\ 70,\ \ \ \ }
+\DoxyCodeLine{00136\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa92bcb2bc3a87be869f05c5b07f04b8c}{USART6\_IRQn}}\ =\ 71,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00137\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a8326db2d570cb865ffa1d49fa29d562a}{I2C3\_EV\_IRQn}}\ =\ 72,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00138\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a6e954232d164a6942ebc7a6bd6f7736e}{I2C3\_ER\_IRQn}}\ =\ 73,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00139\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a60b6cc4b6dbeca39e29a475d26c9e080}{OTG\_HS\_EP1\_OUT\_IRQn}}\ =\ 74,\ \ \ }
+\DoxyCodeLine{00140\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a1b040a7f76278a73cf5ea4c51f1be047}{OTG\_HS\_EP1\_IN\_IRQn}}\ =\ 75,\ \ \ \ }
+\DoxyCodeLine{00141\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a9e5c9d81dd3985a88094f8158c0f0267}{OTG\_HS\_WKUP\_IRQn}}\ =\ 76,\ \ \ \ \ \ }
+\DoxyCodeLine{00142\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aad2d5e47d27fe3a02f7059b20bb729c0}{OTG\_HS\_IRQn}}\ =\ 77,\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00143\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8ace3c0fc2c4d05a7c02e3c987da5bc8e8}{DCMI\_IRQn}}\ =\ 78,\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00144\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a70c9645bf48ca539510cc8f7d974f017}{CRYP\_IRQn}}\ =\ 79,\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8a86a161642b54055f9bbea3937e6352de}{HASH\_RNG\_IRQn}}\ =\ 80,\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00146\ \ \ \ \ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8aa6b8ff01b016a798c6e639728c179e4f}{FPU\_IRQn}}\ =\ 81\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00147\ \}\ \mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}};}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ !CORTEX\_M4\_INTERRUPT\_REG\_H}}
+
+\end{DoxyCode}

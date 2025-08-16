@@ -1,6 +1,7 @@
 /**
  * @file uart.c
- * @brief UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6.
+ * @brief UART initialization and I/O functions for STM32F4 UART1, UART2, and
+ * UART6.
  *
  * This file provides the implementation of UART communication functions
  * for STM32F401RE microcontroller. It supports USART1, USART2, and USART6
@@ -26,6 +27,8 @@
 #include "core/cortex-m4/uart.h"
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/gpio.h"
+#include "core/cortex-m4/rcc_reg.h"
+#include "core/cortex-m4/uart_reg.h"
 
 /**
  * @brief Initialize the specified UART peripheral
@@ -35,8 +38,7 @@
  * @param baudrate Desired communication speed in bits per second
  * @param uart     UART instance to initialize (UART1, UART2, or UART6)
  */
-void uart_init(uint32_t baudrate, hal_uart_t uart)
-{
+void uart_init(uint32_t baudrate, hal_uart_t uart) {
   if (uart == UART2)
     uart2_init(baudrate);
   else if (uart == UART1)
@@ -51,10 +53,8 @@ void uart_init(uint32_t baudrate, hal_uart_t uart)
  * @param c    Character to transmit
  * @param uart UART instance to use
  */
-void uart_write_char(char c, hal_uart_t uart)
-{
-  if (c == '\n')
-  {
+void uart_write_char(char c, hal_uart_t uart) {
+  if (c == '\n') {
     if (uart == UART2)
       uart2_write_char('\r');
     else if (uart == UART1)
@@ -78,8 +78,7 @@ void uart_write_char(char c, hal_uart_t uart)
  * @param num  Integer to transmit
  * @param uart UART instance to use
  */
-void uart_write_int(int32_t num, hal_uart_t uart)
-{
+void uart_write_int(int32_t num, hal_uart_t uart) {
   if (uart == UART2)
     uart2_write_int(num);
   else if (uart == UART1)
@@ -96,8 +95,7 @@ void uart_write_int(int32_t num, hal_uart_t uart)
  * @param num  Floating-point number to transmit
  * @param uart UART instance to use
  */
-void uart_write_float(float num, hal_uart_t uart)
-{
+void uart_write_float(float num, hal_uart_t uart) {
   if (uart == UART2)
     uart2_write_float(num);
   else if (uart == UART1)
@@ -112,8 +110,7 @@ void uart_write_float(float num, hal_uart_t uart)
  * @param s    Null-terminated string to transmit
  * @param uart UART instance to use
  */
-void uart_write_string(const char *s, hal_uart_t uart)
-{
+void uart_write_string(const char *s, hal_uart_t uart) {
   if (uart == UART2)
     uart2_write_string(s);
   else if (uart == UART1)
@@ -133,14 +130,16 @@ void uart_write_string(const char *s, hal_uart_t uart)
  *
  * @param baudrate Desired communication speed in bits per second
  */
-void uart1_init(uint32_t baudrate)
-{
+void uart1_init(uint32_t baudrate) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
+  if (usart == NULL)
+    return;
   hal_gpio_set_alternate_function(GPIO_PA09, GPIO_AF07);
-  RCC_APB2ENR |= RCC_APB2ENR_USART1EN; // Enable USART1 clock
-  USART1_BRR = (hal_clock_get_apb2clk() + (baudrate / 2)) /
+  RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+  usart->BRR = (hal_clock_get_apb2clk() + (baudrate / 2)) /
                baudrate;      // BRR calculation with rounding
-  USART1_CR1 = USART_CR1_TE;  // Enable transmitter
-  USART1_CR1 |= USART_CR1_UE; // Enable USART
+  usart->CR1 |= USART_CR1_TE; // Enable transmitter
+  usart->CR1 |= USART_CR1_UE; // Enable USART
 }
 
 /**
@@ -154,14 +153,16 @@ void uart1_init(uint32_t baudrate)
  *
  * @param baudrate Desired communication speed in bits per second
  */
-void uart6_init(uint32_t baudrate)
-{
+void uart6_init(uint32_t baudrate) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
+  if (usart == NULL)
+    return;
   hal_gpio_set_alternate_function(GPIO_PC06, GPIO_AF07);
-  RCC_APB2ENR |= RCC_APB2ENR_USART6EN; // Enable USART6 clock
-  USART6_BRR = (hal_clock_get_apb2clk() + (baudrate / 2)) /
+  RCC->APB2ENR |= RCC_APB2ENR_USART6EN; // Enable USART6 clock
+  usart->BRR = (hal_clock_get_apb2clk() + (baudrate / 2)) /
                baudrate;      // BRR calculation with rounding
-  USART6_CR1 = USART_CR1_TE;  // Enable transmitter
-  USART6_CR1 |= USART_CR1_UE; // Enable USART
+  usart->CR1 = USART_CR1_TE;  // Enable transmitter
+  usart->CR1 |= USART_CR1_UE; // Enable USART
 }
 
 /**
@@ -175,15 +176,17 @@ void uart6_init(uint32_t baudrate)
  *
  * @param baudrate Desired communication speed in bits per second
  */
-void uart2_init(uint32_t baudrate)
-{
+void uart2_init(uint32_t baudrate) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  if (usart == NULL)
+    return;
   hal_gpio_set_alternate_function(GPIO_PA02, GPIO_AF07); // TX
   hal_gpio_set_alternate_function(GPIO_PA03, GPIO_AF07); // RX
-  RCC_APB1ENR |= RCC_APB1ENR_USART2EN;                   // Enable USART2 clock
-  USART2_BRR = (hal_clock_get_apb1clk() + (baudrate / 2)) /
+  RCC->APB1ENR |= RCC_APB1ENR_USART2EN;                  // Enable USART2 clock
+  usart->BRR = (hal_clock_get_apb1clk() + (baudrate / 2)) /
                baudrate;                    // BRR calculation with rounding
-  USART2_CR1 = USART_CR1_TE | USART_CR1_RE; // Enable transmitter and receiver
-  USART2_CR1 |= USART_CR1_UE;               // Enable USART
+  usart->CR1 = USART_CR1_TE | USART_CR1_RE; // Enable transmitter and receiver
+  usart->CR1 |= USART_CR1_UE;               // Enable USART
 }
 
 /**
@@ -193,27 +196,26 @@ void uart2_init(uint32_t baudrate)
  *
  * @param c Character to transmit
  */
-void uart2_write_char(char c)
-{
-  while (!(USART2_SR & USART_SR_TXE))
+void uart2_write_char(char c) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  if (usart == NULL)
+    return;
+  while (!(usart->SR & USART_SR_TXE))
     ;            // Wait until TXE (Transmit Data Register Empty) flag is set
-  USART2_DR = c; // Write data to data register
-  while (!(USART2_SR & USART_SR_TXE))
-    ; // Wait until TXE (Transmit Data Register Empty) flag is set
-  if (c == '\n')
-    USART2_DR = '\r';
+  usart->DR = c; // Write data to data register
 }
-
 /**
  * @brief Transmit a single character via USART1
  *
  * @param c Character to transmit
  */
-void uart1_write_char(char c)
-{
-  while (!(USART1_SR & USART_SR_TXE))
+void uart1_write_char(char c) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
+  if (usart == NULL)
+    return;
+  while (!(usart->SR & USART_SR_TXE))
     ;
-  USART1_DR = c;
+  usart->DR = c;
 }
 
 /**
@@ -221,11 +223,13 @@ void uart1_write_char(char c)
  *
  * @param c Character to transmit
  */
-void uart6_write_char(char c)
-{
-  while (!(USART6_SR & USART_SR_TXE))
+void uart6_write_char(char c) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
+  if (usart == NULL)
+    return;
+  while (!(usart->SR & USART_SR_TXE))
     ;
-  USART6_DR = c;
+  usart->DR = c;
 }
 
 /**
@@ -236,31 +240,26 @@ void uart6_write_char(char c)
  *
  * @param num Integer to transmit
  */
-void uart2_write_int(int32_t num)
-{
+void uart2_write_int(int32_t num) {
   char buf[12]; // Buffer large enough for 32-bit int (-2147483648)
   int i = 0;
 
-  if (num == 0)
-  {
+  if (num == 0) {
     uart2_write_char('0');
     return;
   }
 
-  if (num < 0)
-  {
+  if (num < 0) {
     uart2_write_char('-');
     num = -num;
   }
 
-  while (num > 0)
-  {
+  while (num > 0) {
     buf[i++] = '0' + (num % 10);
     num /= 10;
   }
 
-  while (i--)
-  {
+  while (i--) {
     uart2_write_char(buf[i]); // Write digits in reverse order
   }
 }
@@ -270,31 +269,26 @@ void uart2_write_int(int32_t num)
  *
  * @param num Integer to transmit
  */
-void uart1_write_int(int32_t num)
-{
+void uart1_write_int(int32_t num) {
   char buf[12];
   int i = 0;
 
-  if (num == 0)
-  {
+  if (num == 0) {
     uart1_write_char('0');
     return;
   }
 
-  if (num < 0)
-  {
+  if (num < 0) {
     uart1_write_char('-');
     num = -num;
   }
 
-  while (num > 0)
-  {
+  while (num > 0) {
     buf[i++] = '0' + (num % 10);
     num /= 10;
   }
 
-  while (i--)
-  {
+  while (i--) {
     uart1_write_char(buf[i]);
   }
 }
@@ -304,31 +298,26 @@ void uart1_write_int(int32_t num)
  *
  * @param num Integer to transmit
  */
-void uart6_write_int(int32_t num)
-{
+void uart6_write_int(int32_t num) {
   char buf[12];
   int i = 0;
 
-  if (num == 0)
-  {
+  if (num == 0) {
     uart6_write_char('0');
     return;
   }
 
-  if (num < 0)
-  {
+  if (num < 0) {
     uart6_write_char('-');
     num = -num;
   }
 
-  while (num > 0)
-  {
+  while (num > 0) {
     buf[i++] = '0' + (num % 10);
     num /= 10;
   }
 
-  while (i--)
-  {
+  while (i--) {
     uart6_write_char(buf[i]);
   }
 }
@@ -341,10 +330,8 @@ void uart6_write_int(int32_t num)
  *
  * @param num Floating-point number to transmit
  */
-void uart2_write_float(float num)
-{
-  if (num < 0)
-  {
+void uart2_write_float(float num) {
+  if (num < 0) {
     uart2_write_char('-');
     num = -num;
   }
@@ -362,10 +349,8 @@ void uart2_write_float(float num)
  *
  * @param num Floating-point number to transmit
  */
-void uart1_write_float(float num)
-{
-  if (num < 0)
-  {
+void uart1_write_float(float num) {
+  if (num < 0) {
     uart1_write_char('-');
     num = -num;
   }
@@ -382,10 +367,8 @@ void uart1_write_float(float num)
  *
  * @param num Floating-point number to transmit
  */
-void uart6_write_float(float num)
-{
-  if (num < 0)
-  {
+void uart6_write_float(float num) {
+  if (num < 0) {
     uart6_write_char('-');
     num = -num;
   }
@@ -402,10 +385,8 @@ void uart6_write_float(float num)
  *
  * @param s Null-terminated string to transmit
  */
-void uart2_write_string(const char *s)
-{
-  while (*s)
-  {
+void uart2_write_string(const char *s) {
+  while (*s) {
     uart2_write_char(*s++);
   }
 }
@@ -415,10 +396,8 @@ void uart2_write_string(const char *s)
  *
  * @param s Null-terminated string to transmit
  */
-void uart1_write_string(const char *s)
-{
-  while (*s)
-  {
+void uart1_write_string(const char *s) {
+  while (*s) {
     uart1_write_char(*s++);
   }
 }
@@ -428,10 +407,8 @@ void uart1_write_string(const char *s)
  *
  * @param s Null-terminated string to transmit
  */
-void uart6_write_string(const char *s)
-{
-  while (*s)
-  {
+void uart6_write_string(const char *s) {
+  while (*s) {
     uart6_write_char(*s++);
   }
 }
@@ -444,8 +421,7 @@ void uart6_write_string(const char *s)
  * @param uart UART instance to read from
  * @return Received character
  */
-char uart_read_char(hal_uart_t uart)
-{
+char uart_read_char(hal_uart_t uart) {
   if (uart == UART1)
     return uart1_read_char();
   else if (uart == UART2)
@@ -460,11 +436,13 @@ char uart_read_char(hal_uart_t uart)
  *
  * @return Received character
  */
-char uart1_read_char(void)
-{
-  while (!(USART1_SR & USART_SR_RXNE))
+char uart1_read_char(void) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
+  if (usart == NULL)
+    return 0;
+  while (!(usart->SR & USART_SR_RXNE))
     ; // Wait until RXNE (Receive Data Register Not Empty) flag is set
-  return USART1_DR;
+  return usart->DR;
 }
 
 /**
@@ -472,11 +450,13 @@ char uart1_read_char(void)
  *
  * @return Received character
  */
-char uart2_read_char(void)
-{
-  while (!(USART2_SR & USART_SR_RXNE))
+char uart2_read_char(void) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  if (usart == NULL)
+    return 0;
+  while (!(usart->SR & USART_SR_RXNE))
     ;
-  return USART2_DR;
+  return usart->DR;
 }
 
 /**
@@ -484,11 +464,13 @@ char uart2_read_char(void)
  *
  * @return Received character
  */
-char uart6_read_char(void)
-{
-  while (!(USART6_SR & USART_SR_RXNE))
+char uart6_read_char(void) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
+  if (usart == NULL)
+    return 0;
+  while (!(usart->SR & USART_SR_RXNE))
     ;
-  return USART6_DR;
+  return usart->DR;
 }
 
 /**
@@ -497,8 +479,7 @@ char uart6_read_char(void)
  * @param uart UART instance to check
  * @return Non-zero if data is available, 0 otherwise
  */
-int uart_available(hal_uart_t uart)
-{
+int uart_available(hal_uart_t uart) {
   if (uart == UART1)
     return uart1_available();
   else if (uart == UART2)
@@ -513,21 +494,36 @@ int uart_available(hal_uart_t uart)
  *
  * @return Non-zero if data is available, 0 otherwise
  */
-int uart1_available(void) { return (USART1_SR & USART_SR_RXNE); }
+int uart1_available(void) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
+  if (usart == NULL)
+    return 0;
+  return (usart->SR & USART_SR_RXNE);
+}
 
 /**
  * @brief Check if data is available to read from USART2
  *
  * @return Non-zero if data is available, 0 otherwise
  */
-int uart2_available(void) { return (USART2_SR & USART_SR_RXNE); }
+int uart2_available(void) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  if (usart == NULL)
+    return 0;
+  return (usart->SR & USART_SR_RXNE);
+}
 
 /**
  * @brief Check if data is available to read from USART6
  *
  * @return Non-zero if data is available, 0 otherwise
  */
-int uart6_available(void) { return (USART6_SR & USART_SR_RXNE); }
+int uart6_available(void) {
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
+  if (usart == NULL)
+    return 0;
+  return (usart->SR & USART_SR_RXNE);
+}
 
 /**
  * @brief Read characters from USART2 until delimiter or max length
@@ -543,18 +539,15 @@ int uart6_available(void) { return (USART6_SR & USART_SR_RXNE); }
  * @param delimiter  Character that terminates the read
  * @return Number of characters read (excluding null terminator)
  */
-uint32_t uart2_read_until(char *buffer, uint32_t maxlen, char delimiter)
-{
+uint32_t uart2_read_until(char *buffer, uint32_t maxlen, char delimiter) {
   uint32_t i = 0;
 
-  while (i < maxlen - 1)
-  {
+  while (i < maxlen - 1) {
     while (!uart2_available())
       ; // Wait until a character is available
 
     char c = uart2_read_char();
-    if (c == delimiter)
-    {
+    if (c == delimiter) {
       break;
     }
 

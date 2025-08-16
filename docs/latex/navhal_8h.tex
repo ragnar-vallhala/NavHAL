@@ -1,0 +1,84 @@
+\doxysection{include/navhal.h File Reference}
+\hypertarget{navhal_8h}{}\label{navhal_8h}\index{include/navhal.h@{include/navhal.h}}
+
+
+Root header file for the Nav\+HAL project by Nav\+Robotec.  
+
+
+{\ttfamily \#include "{}common/hal\+\_\+gpio.\+h"{}}\newline
+{\ttfamily \#include "{}common/hal\+\_\+clock.\+h"{}}\newline
+{\ttfamily \#include "{}common/hal\+\_\+uart.\+h"{}}\newline
+{\ttfamily \#include "{}common/hal\+\_\+timer.\+h"{}}\newline
+{\ttfamily \#include "{}common/hal\+\_\+pwm.\+h"{}}\newline
+{\ttfamily \#include "{}common/hal\+\_\+12c.\+h"{}}\newline
+Include dependency graph for navhal.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{navhal_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{navhal_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{navhal_8h_a1a53b724b6de666faa8a9e0d06d1055f}{VERSION\+\_\+\+MAJOR}}~0
+\item 
+\#define \mbox{\hyperlink{navhal_8h_ae0cb52afb79b185b1bf82c7e235f682b}{VERSION\+\_\+\+MINOR}}~1
+\item 
+\#define \mbox{\hyperlink{navhal_8h_a901edadf17488bb6be1ac9a1e3cfea7a}{VERSION\+\_\+\+PATCH}}~0
+\item 
+\#define \mbox{\hyperlink{navhal_8h_a1c6d5de492ac61ad29aec7aa9a436bbf}{VERSION}}~"{}0.\+1.\+0"{}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Root header file for the Nav\+HAL project by Nav\+Robotec. 
+
+Nav\+HAL is the official hardware abstraction layer (HAL) developed by Nav\+Robotec. It provides a clean, modular, and extensible C interface to abstract peripheral control (such as GPIO, UART, timers) across multiple microcontroller architectures.
+
+Include this file in your application to access the full HAL API.
+
+\begin{DoxyAuthor}{Author}
+Ashutosh Vishwakarma 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2025-\/07-\/20 
+\end{DoxyDate}
+
+
+\label{doc-define-members}
+\Hypertarget{navhal_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{navhal_8h_a1c6d5de492ac61ad29aec7aa9a436bbf}\index{navhal.h@{navhal.h}!VERSION@{VERSION}}
+\index{VERSION@{VERSION}!navhal.h@{navhal.h}}
+\doxysubsubsection{\texorpdfstring{VERSION}{VERSION}}
+{\footnotesize\ttfamily \label{navhal_8h_a1c6d5de492ac61ad29aec7aa9a436bbf} 
+\#define VERSION~"{}0.\+1.\+0"{}}
+
+\Hypertarget{navhal_8h_a1a53b724b6de666faa8a9e0d06d1055f}\index{navhal.h@{navhal.h}!VERSION\_MAJOR@{VERSION\_MAJOR}}
+\index{VERSION\_MAJOR@{VERSION\_MAJOR}!navhal.h@{navhal.h}}
+\doxysubsubsection{\texorpdfstring{VERSION\_MAJOR}{VERSION\_MAJOR}}
+{\footnotesize\ttfamily \label{navhal_8h_a1a53b724b6de666faa8a9e0d06d1055f} 
+\#define VERSION\+\_\+\+MAJOR~0}
+
+\Hypertarget{navhal_8h_ae0cb52afb79b185b1bf82c7e235f682b}\index{navhal.h@{navhal.h}!VERSION\_MINOR@{VERSION\_MINOR}}
+\index{VERSION\_MINOR@{VERSION\_MINOR}!navhal.h@{navhal.h}}
+\doxysubsubsection{\texorpdfstring{VERSION\_MINOR}{VERSION\_MINOR}}
+{\footnotesize\ttfamily \label{navhal_8h_ae0cb52afb79b185b1bf82c7e235f682b} 
+\#define VERSION\+\_\+\+MINOR~1}
+
+\Hypertarget{navhal_8h_a901edadf17488bb6be1ac9a1e3cfea7a}\index{navhal.h@{navhal.h}!VERSION\_PATCH@{VERSION\_PATCH}}
+\index{VERSION\_PATCH@{VERSION\_PATCH}!navhal.h@{navhal.h}}
+\doxysubsubsection{\texorpdfstring{VERSION\_PATCH}{VERSION\_PATCH}}
+{\footnotesize\ttfamily \label{navhal_8h_a901edadf17488bb6be1ac9a1e3cfea7a} 
+\#define VERSION\+\_\+\+PATCH~0}
+

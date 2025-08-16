@@ -1,0 +1,32 @@
+\doxysection{gpio.\+h}
+\hypertarget{gpio_8h_source}{}\label{gpio_8h_source}\index{include/core/cortex-\/m4/gpio.h@{include/core/cortex-\/m4/gpio.h}}
+\mbox{\hyperlink{gpio_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_GPIO\_H}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_GPIO\_H}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gpio__types_8h}{utils/gpio\_types.h}}"{}}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00026\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gpio_8h_ab063b362fb73bcb899a122e5188e7e32}{hal\_gpio\_setmode}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin,\ \mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\_gpio\_mode}}\ mode,}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gpio__types_8h_ab08483829bc1df17783a8ad8cb49043e}{hal\_gpio\_pullup\_pulldown}}\ pupd);}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00035\ \mbox{\hyperlink{gpio__types_8h_afff59088389c415758284fcfdef93fda}{hal\_gpio\_mode}}\ \mbox{\hyperlink{gpio_8h_af5915e39ede16cf7d68b4dc1ee02b78a}{hal\_gpio\_getmode}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin);}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00043\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gpio_8h_aa64ac2161a52147ab5e91fe399126638}{hal\_gpio\_digitalwrite}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin,\ \mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\_gpio\_state}}\ state);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00051\ \mbox{\hyperlink{gpio__types_8h_addd0001118ca8b0d1bb783478de95f78}{hal\_gpio\_state}}\ \mbox{\hyperlink{gpio_8h_acce35517ec183c7df6a1f67737ecebf6}{hal\_gpio\_digitalread}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin);}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00058\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gpio_8h_a4f525e1eaa75b82f304bc25cee240789}{hal\_gpio\_enable\_rcc}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00066\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gpio_8h_a07aab29e77970fa617d8ea0d1922e964}{hal\_gpio\_set\_alternate\_function}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin,}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{gpio__types_8h_a22b67ee171c3baed3b2d4c9eeb3c6c44}{hal\_gpio\_alternate\_function\_t}}\ alt\_fn);}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00075\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gpio_8h_a926263a98f6084ec82b2546ddd47d413}{hal\_gpio\_set\_output\_type}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin,\ \mbox{\hyperlink{gpio__types_8h_af1245830de642fd67cc728bc217b9efe}{hal\_gpio\_output\_type}}\ otyper);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00083\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{gpio_8h_a02a45d51d8fcbaf0f4bbf08bd76ef7b5}{hal\_gpio\_set\_output\_speed}}(\mbox{\hyperlink{gpio__types_8h_a6222e804e6f2dd326ec84c1ba7ff04e6}{hal\_gpio\_pin}}\ pin,\ \mbox{\hyperlink{gpio__types_8h_a02f2d9f3bc1519f03c439c8d90dea49d}{hal\_gpio\_output\_speed}}\ speed);}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CORTEX\_M4\_GPIO\_H}}
+
+\end{DoxyCode}

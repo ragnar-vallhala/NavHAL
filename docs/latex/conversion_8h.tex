@@ -1,0 +1,163 @@
+\doxysection{include/utils/conversion.h File Reference}
+\hypertarget{conversion_8h}{}\label{conversion_8h}\index{include/utils/conversion.h@{include/utils/conversion.h}}
+
+
+String to number conversion utilities interface.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for conversion.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{conversion_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=206pt]{conversion_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int32\+\_\+t \mbox{\hyperlink{conversion_8h_a13c5c12f98c8a4c7fa6aacee4eca2cf5}{str\+\_\+to\+\_\+int}} (const char \texorpdfstring{$\ast$}{*}s)
+\begin{DoxyCompactList}\small\item\em Convert a string to a 32-\/bit signed integer. \end{DoxyCompactList}\item 
+float \mbox{\hyperlink{conversion_8h_a46c5e2aed53bc864ac60784d05d97d2b}{str\+\_\+to\+\_\+float}} (const char \texorpdfstring{$\ast$}{*}s)
+\begin{DoxyCompactList}\small\item\em Convert a string to a floating-\/point number. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+String to number conversion utilities interface. 
+
+This header declares functions for converting string representations of numbers to their corresponding integer and floating-\/point values. The implementations handle\+:
+\begin{DoxyItemize}
+\item Leading/trailing whitespace
+\item Optional sign indicators (+/-\/)
+\item Decimal points for floating-\/point numbers
+\item Partial number parsing (stops at first invalid character)
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+These functions do not handle scientific notation or hexadecimal formats 
+
+No overflow/underflow checking is performed
+\end{DoxyNote}
+\begin{DoxyAuthor}{Author}
+Ashutosh Vishwakarma 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+2025-\/07-\/23 
+\end{DoxyDate}
+
+
+\label{doc-func-members}
+\Hypertarget{conversion_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{conversion_8h_a46c5e2aed53bc864ac60784d05d97d2b}\index{conversion.h@{conversion.h}!str\_to\_float@{str\_to\_float}}
+\index{str\_to\_float@{str\_to\_float}!conversion.h@{conversion.h}}
+\doxysubsubsection{\texorpdfstring{str\_to\_float()}{str\_to\_float()}}
+{\footnotesize\ttfamily \label{conversion_8h_a46c5e2aed53bc864ac60784d05d97d2b} 
+float str\+\_\+to\+\_\+float (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Convert a string to a floating-\/point number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em s} & Null-\/terminated string to convert (may contain leading whitespace) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Converted floating-\/point value
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+Limited precision for fractional components 
+
+Stops parsing at first non-\/digit/non-\/dot character
+\end{DoxyWarning}
+Convert a string to a floating-\/point number.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em s} & Pointer to null-\/terminated input string \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Converted floating-\/point value
+\end{DoxyReturn}
+Parses the input string to construct a float value\+:
+\begin{DoxyEnumerate}
+\item Skips leading whitespace
+\item Processes optional sign
+\item Handles both integer and fractional parts
+\item Properly tracks decimal point position
+\item Stops at first invalid character
+\end{DoxyEnumerate}
+
+\begin{DoxyWarning}{Warning}
+Limited precision for fractional components 
+
+No overflow/underflow protection 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{float}\ val\ =\ \mbox{\hyperlink{conversion_8h_a46c5e2aed53bc864ac60784d05d97d2b}{str\_to\_float}}(\textcolor{stringliteral}{"{}\ 3.1415xyz"{}});\ \textcolor{comment}{//\ Returns\ 3.1415f}}
+
+\end{DoxyCode}
+ 
+\end{DoxyWarning}
+\Hypertarget{conversion_8h_a13c5c12f98c8a4c7fa6aacee4eca2cf5}\index{conversion.h@{conversion.h}!str\_to\_int@{str\_to\_int}}
+\index{str\_to\_int@{str\_to\_int}!conversion.h@{conversion.h}}
+\doxysubsubsection{\texorpdfstring{str\_to\_int()}{str\_to\_int()}}
+{\footnotesize\ttfamily \label{conversion_8h_a13c5c12f98c8a4c7fa6aacee4eca2cf5} 
+int32\+\_\+t str\+\_\+to\+\_\+int (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{s}{}\end{DoxyParamCaption})}
+
+
+
+Convert a string to a 32-\/bit signed integer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em s} & Null-\/terminated string to convert (may contain leading whitespace) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Converted 32-\/bit integer value
+\end{DoxyReturn}
+\begin{DoxyWarning}{Warning}
+Potential integer overflow with large numbers 
+
+Stops parsing at first non-\/digit character
+\end{DoxyWarning}
+Convert a string to a 32-\/bit signed integer.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em s} & Pointer to null-\/terminated input string \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Converted 32-\/bit integer value
+\end{DoxyReturn}
+Parses the input string character by character to construct the integer value\+:
+\begin{DoxyEnumerate}
+\item Skips any leading whitespace (spaces/tabs)
+\item Processes optional sign character (+/-\/)
+\item Converts subsequent digit characters to integer value
+\item Stops at first non-\/digit character
+\end{DoxyEnumerate}
+
+\begin{DoxyWarning}{Warning}
+Potential for overflow with large numbers 
+
+No error reporting for invalid inputs 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ val\ =\ \mbox{\hyperlink{conversion_8h_a13c5c12f98c8a4c7fa6aacee4eca2cf5}{str\_to\_int}}(\textcolor{stringliteral}{"{}\ -\/1234abc"{}});\ \textcolor{comment}{//\ Returns\ -\/1234}}
+
+\end{DoxyCode}
+ 
+\end{DoxyWarning}

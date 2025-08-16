@@ -1,0 +1,56 @@
+\doxysection{include/common/hal\+\_\+types.h File Reference}
+\hypertarget{hal__types_8h}{}\label{hal__types_8h}\index{include/common/hal\_types.h@{include/common/hal\_types.h}}
+
+
+Hardware Abstraction Layer (HAL) common type definitions.  
+
+
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hal__types_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}}~volatile
+\item 
+\#define \mbox{\hyperlink{hal__types_8h_a070d2ce7b6bb7e5c05602aa8c308d0c4}{NULL}}~0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Hardware Abstraction Layer (HAL) common type definitions. 
+
+This header file defines basic macros and types used throughout the HAL and low-\/level drivers\+:
+\begin{DoxyItemize}
+\item {\ttfamily \+\_\+\+\_\+\+IO} \+: Volatile qualifier for memory-\/mapped I/O registers.
+\item {\ttfamily NULL} \+: Null pointer definition for pointer initialization and checks.
+\end{DoxyItemize}
+
+These definitions help standardize low-\/level coding practices across different architectures and modules.
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{hal__types_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}\index{hal\_types.h@{hal\_types.h}!\_\_IO@{\_\_IO}}
+\index{\_\_IO@{\_\_IO}!hal\_types.h@{hal\_types.h}}
+\doxysubsubsection{\texorpdfstring{\_\_IO}{\_\_IO}}
+{\footnotesize\ttfamily \label{hal__types_8h_aec43007d9998a0a0e01faede4133d6be} 
+\#define \+\_\+\+\_\+\+IO~volatile}
+
+Defines volatile memory access for I/O registers. \Hypertarget{hal__types_8h_a070d2ce7b6bb7e5c05602aa8c308d0c4}\index{hal\_types.h@{hal\_types.h}!NULL@{NULL}}
+\index{NULL@{NULL}!hal\_types.h@{hal\_types.h}}
+\doxysubsubsection{\texorpdfstring{NULL}{NULL}}
+{\footnotesize\ttfamily \label{hal__types_8h_a070d2ce7b6bb7e5c05602aa8c308d0c4} 
+\#define NULL~0}
+
+Defines the null pointer constant. 

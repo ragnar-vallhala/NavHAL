@@ -1,0 +1,12 @@
+<map id="samples/00_test_sample/main.c" name="samples/00_test_sample/main.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="69,5,236,46"/>
+<area shape="rect" id="Node000002" href="$uart_8h.html" title="UART driver interface for STM32F4 (Cortex&#45;M4)." alt="" coords="80,94,225,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="155,46,155,78,150,78,150,46"/>
+<area shape="rect" id="Node000003" href="$uart__reg_8h.html" title=" " alt="" coords="33,168,168,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="147,122,124,156,119,153,142,119"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="172,256,237,282"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="161,119,182,167,202,240,196,242,177,169,156,121"/>
+<area shape="rect" id="Node000004" href="$hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="5,256,148,282"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="97,210,87,242,82,240,92,208"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="128,207,178,244,175,249,125,211"/>
+</map>

@@ -1,0 +1,87 @@
+\doxysection{NVIC\+\_\+\+Typedef Struct Reference}
+\hypertarget{struct_n_v_i_c___typedef}{}\label{struct_n_v_i_c___typedef}\index{NVIC\_Typedef@{NVIC\_Typedef}}
+
+
+NVIC register map.  
+
+
+
+
+{\ttfamily \#include $<$interrupt\+\_\+reg.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_n_v_i_c___typedef_a09849d33b73fba520f18d56fe21d0786}{ISER}} \mbox{[}8\mbox{]}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_n_v_i_c___typedef_afdda1255f5d3570c21c13b9efdbbcd06}{ICER}} \mbox{[}8\mbox{]}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_n_v_i_c___typedef_a55d822d1ccab805896d820acdfc8ba96}{ISPR}} \mbox{[}8\mbox{]}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_n_v_i_c___typedef_a4c482c7addc4e23eb7246450f476dbc1}{ICPR}} \mbox{[}8\mbox{]}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_n_v_i_c___typedef_ad93b4c2092bdd3c12b2d5e7a3474162a}{IABR}} \mbox{[}8\mbox{]}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_n_v_i_c___typedef_a591f32b9355f79f56f54402dc5e7581d}{RESERVED0}} \mbox{[}32\mbox{]}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint8\+\_\+t \mbox{\hyperlink{struct_n_v_i_c___typedef_ae223e08fd3a28b86fde3b60f6e269fc9}{IPR}} \mbox{[}60\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+NVIC register map. 
+
+\texorpdfstring{$<$}{<} For \+\_\+\+\_\+\+IO macro 
+
+Represents all NVIC registers including set/clear enable, set/clear pending, active bit registers, reserved space, and interrupt priority registers. 
+
+\label{doc-variable-members}
+\Hypertarget{struct_n_v_i_c___typedef_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_n_v_i_c___typedef_ad93b4c2092bdd3c12b2d5e7a3474162a}\index{NVIC\_Typedef@{NVIC\_Typedef}!IABR@{IABR}}
+\index{IABR@{IABR}!NVIC\_Typedef@{NVIC\_Typedef}}
+\doxysubsubsection{\texorpdfstring{IABR}{IABR}}
+{\footnotesize\ttfamily \label{struct_n_v_i_c___typedef_ad93b4c2092bdd3c12b2d5e7a3474162a} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t NVIC\+\_\+\+Typedef\+::\+IABR\mbox{[}8\mbox{]}}
+
+Interrupt Active Bit Registers (0x\+E000\+E300 -\/ 0x\+E000\+E31C) \Hypertarget{struct_n_v_i_c___typedef_afdda1255f5d3570c21c13b9efdbbcd06}\index{NVIC\_Typedef@{NVIC\_Typedef}!ICER@{ICER}}
+\index{ICER@{ICER}!NVIC\_Typedef@{NVIC\_Typedef}}
+\doxysubsubsection{\texorpdfstring{ICER}{ICER}}
+{\footnotesize\ttfamily \label{struct_n_v_i_c___typedef_afdda1255f5d3570c21c13b9efdbbcd06} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t NVIC\+\_\+\+Typedef\+::\+ICER\mbox{[}8\mbox{]}}
+
+Interrupt Clear-\/\+Enable Registers (0x\+E000\+E180 -\/ 0x\+E000\+E19C) \Hypertarget{struct_n_v_i_c___typedef_a4c482c7addc4e23eb7246450f476dbc1}\index{NVIC\_Typedef@{NVIC\_Typedef}!ICPR@{ICPR}}
+\index{ICPR@{ICPR}!NVIC\_Typedef@{NVIC\_Typedef}}
+\doxysubsubsection{\texorpdfstring{ICPR}{ICPR}}
+{\footnotesize\ttfamily \label{struct_n_v_i_c___typedef_a4c482c7addc4e23eb7246450f476dbc1} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t NVIC\+\_\+\+Typedef\+::\+ICPR\mbox{[}8\mbox{]}}
+
+Interrupt Clear-\/\+Pending Registers (0x\+E000\+E280 -\/ 0x\+E000\+E29C) \Hypertarget{struct_n_v_i_c___typedef_ae223e08fd3a28b86fde3b60f6e269fc9}\index{NVIC\_Typedef@{NVIC\_Typedef}!IPR@{IPR}}
+\index{IPR@{IPR}!NVIC\_Typedef@{NVIC\_Typedef}}
+\doxysubsubsection{\texorpdfstring{IPR}{IPR}}
+{\footnotesize\ttfamily \label{struct_n_v_i_c___typedef_ae223e08fd3a28b86fde3b60f6e269fc9} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint8\+\_\+t NVIC\+\_\+\+Typedef\+::\+IPR\mbox{[}60\mbox{]}}
+
+Interrupt Priority Registers (8-\/bit) (0x\+E000\+E400 -\/ 0x\+E000\+E4\+EC) \Hypertarget{struct_n_v_i_c___typedef_a09849d33b73fba520f18d56fe21d0786}\index{NVIC\_Typedef@{NVIC\_Typedef}!ISER@{ISER}}
+\index{ISER@{ISER}!NVIC\_Typedef@{NVIC\_Typedef}}
+\doxysubsubsection{\texorpdfstring{ISER}{ISER}}
+{\footnotesize\ttfamily \label{struct_n_v_i_c___typedef_a09849d33b73fba520f18d56fe21d0786} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t NVIC\+\_\+\+Typedef\+::\+ISER\mbox{[}8\mbox{]}}
+
+Interrupt Set-\/\+Enable Registers (0x\+E000\+E100 -\/ 0x\+E000\+E11C) \Hypertarget{struct_n_v_i_c___typedef_a55d822d1ccab805896d820acdfc8ba96}\index{NVIC\_Typedef@{NVIC\_Typedef}!ISPR@{ISPR}}
+\index{ISPR@{ISPR}!NVIC\_Typedef@{NVIC\_Typedef}}
+\doxysubsubsection{\texorpdfstring{ISPR}{ISPR}}
+{\footnotesize\ttfamily \label{struct_n_v_i_c___typedef_a55d822d1ccab805896d820acdfc8ba96} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t NVIC\+\_\+\+Typedef\+::\+ISPR\mbox{[}8\mbox{]}}
+
+Interrupt Set-\/\+Pending Registers (0x\+E000\+E200 -\/ 0x\+E000\+E21C) \Hypertarget{struct_n_v_i_c___typedef_a591f32b9355f79f56f54402dc5e7581d}\index{NVIC\_Typedef@{NVIC\_Typedef}!RESERVED0@{RESERVED0}}
+\index{RESERVED0@{RESERVED0}!NVIC\_Typedef@{NVIC\_Typedef}}
+\doxysubsubsection{\texorpdfstring{RESERVED0}{RESERVED0}}
+{\footnotesize\ttfamily \label{struct_n_v_i_c___typedef_a591f32b9355f79f56f54402dc5e7581d} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t NVIC\+\_\+\+Typedef\+::\+RESERVED0\mbox{[}32\mbox{]}}
+
+Reserved padding to 0x\+E000\+E400 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/core/cortex-\/m4/\mbox{\hyperlink{interrupt__reg_8h}{interrupt\+\_\+reg.\+h}}\end{DoxyCompactItemize}

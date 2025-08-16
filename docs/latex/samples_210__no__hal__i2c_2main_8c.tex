@@ -1,0 +1,324 @@
+\doxysection{samples/10\+\_\+no\+\_\+hal\+\_\+i2c/main.c File Reference}
+\hypertarget{samples_210__no__hal__i2c_2main_8c}{}\label{samples_210__no__hal__i2c_2main_8c}\index{samples/10\_no\_hal\_i2c/main.c@{samples/10\_no\_hal\_i2c/main.c}}
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{samples_210__no__hal__i2c_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}}~0x40000000\+UL
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}}~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00020000\+UL)
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}}~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00000000\+UL)
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}}~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x3800\+UL)
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}}~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x0400\+UL)
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}}~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}} + 0x5400\+UL)
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a305184464592fe039a4e47e9d88bdcc4}{RCC\+\_\+\+AHB1\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x30))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ad4baa1f26b04719fe3d4e2f02d7dde40}{RCC\+\_\+\+APB1\+ENR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_affac2caec05d40f61f7e4b3aef5ff2a4}{GPIOB\+\_\+\+MODER}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x00))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_aef9c290201f1348720bf7716e32b0ce4}{GPIOB\+\_\+\+OTYPER}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x04))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a909ebebbc8de2e518c95c538c38b6149}{GPIOB\+\_\+\+OSPEEDR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x08))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_aad6e9cd5fa8d64c77af952d14e456b3c}{GPIOB\+\_\+\+PUPDR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x0C))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a21a95808a795917e81ed46466865ace0}{GPIOB\+\_\+\+AFRH}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x24))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a64532b3cb1d370389ddc22ee0f3677bc}{I2\+C1\+\_\+\+CR1}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x00))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a83fcd4d673ac549bd410e3ef49ef1d7e}{I2\+C1\+\_\+\+CR2}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x04))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a7b5e5096a80e0b9cc4fb2eaa0e50cc30}{I2\+C1\+\_\+\+OAR1}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x08))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ae9d45cba078c17c937f9fbf3eaa3e762}{I2\+C1\+\_\+\+DR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x10))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_aa8345463eb1d0075a7e52a5b5627a29c}{I2\+C1\+\_\+\+SR1}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x14))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a737e98b2ed556825c5a2d8a40cb8df61}{I2\+C1\+\_\+\+SR2}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x18))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a53b3a2028f89192de338269ac9914cee}{I2\+C1\+\_\+\+CCR}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x1C))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a16d4a2829b42406e571316f3cbcc28fe}{I2\+C1\+\_\+\+TRISE}}~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x20))
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ab1b70b364282ca8c5bd1d2226f745a16}{BMP180\+\_\+\+ADDR}}~0x77
+\item 
+\#define \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a45ba202b05caf39795aeca91b0ae547e}{TIMEOUT}}~1000000
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ab6f5daca5ad3a665d4c012f2db2db044}{wait\+\_\+flag}} (volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*}reg, uint32\+\_\+t mask)
+\item 
+void \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a347e5e194a85bf7a07ce1afb340b32e8}{uart2\+\_\+write\+\_\+hex}} (uint8\+\_\+t val)
+\item 
+void \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ae9bbfa2cc6dc4f93a26d61b95f6399b6}{uart2\+\_\+write\+\_\+uint16}} (uint16\+\_\+t val)
+\item 
+void \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a2f02f20c4160b3c21987d94ab555f352}{i2c1\+\_\+init}} (void)
+\item 
+void \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a6a16a8dfbfea3c8021ba83ae6d145efb}{i2c1\+\_\+start}} (void)
+\item 
+void \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_aeb29c7755e26e61eaff4e2537d6d8f60}{i2c1\+\_\+stop}} (void)
+\item 
+void \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a9466614bfe5ce8fba2c70a27767d02d7}{i2c1\+\_\+write\+\_\+addr}} (uint8\+\_\+t addr)
+\item 
+void \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a4c5f323ed19516bd5918f108691c4187}{i2c1\+\_\+write\+\_\+data}} (uint8\+\_\+t data)
+\item 
+uint8\+\_\+t \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a46fd396b53927047bd3fbead80089f5e}{i2c1\+\_\+read\+\_\+data\+\_\+nack}} (void)
+\item 
+uint8\+\_\+t \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a9bcaa076c05a5cf1f9700731d3596ea7}{bmp180\+\_\+read\+\_\+reg}} (uint8\+\_\+t reg)
+\item 
+uint16\+\_\+t \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a03e75545c87782a68f83d1d0db4309d9}{bmp180\+\_\+read\+\_\+u16}} (uint8\+\_\+t reg)
+\item 
+void \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a1c6b122eadff92fc1890f169a1576192}{bmp180\+\_\+write\+\_\+reg}} (uint8\+\_\+t reg, uint8\+\_\+t value)
+\item 
+int \mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\label{doc-define-members}
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}\index{main.c@{main.c}!AHB1PERIPH\_BASE@{AHB1PERIPH\_BASE}}
+\index{AHB1PERIPH\_BASE@{AHB1PERIPH\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{AHB1PERIPH\_BASE}{AHB1PERIPH\_BASE}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a811a9a4ca17f0a50354a9169541d56c4} 
+\#define AHB1\+PERIPH\+\_\+\+BASE~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00020000\+UL)}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb}\index{main.c@{main.c}!APB1PERIPH\_BASE@{APB1PERIPH\_BASE}}
+\index{APB1PERIPH\_BASE@{APB1PERIPH\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{APB1PERIPH\_BASE}{APB1PERIPH\_BASE}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb} 
+\#define APB1\+PERIPH\+\_\+\+BASE~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a9171f49478fa86d932f89e78e73b88b0}{PERIPH\+\_\+\+BASE}} + 0x00000000\+UL)}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_ab1b70b364282ca8c5bd1d2226f745a16}\index{main.c@{main.c}!BMP180\_ADDR@{BMP180\_ADDR}}
+\index{BMP180\_ADDR@{BMP180\_ADDR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{BMP180\_ADDR}{BMP180\_ADDR}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_ab1b70b364282ca8c5bd1d2226f745a16} 
+\#define BMP180\+\_\+\+ADDR~0x77}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a21a95808a795917e81ed46466865ace0}\index{main.c@{main.c}!GPIOB\_AFRH@{GPIOB\_AFRH}}
+\index{GPIOB\_AFRH@{GPIOB\_AFRH}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOB\_AFRH}{GPIOB\_AFRH}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a21a95808a795917e81ed46466865ace0} 
+\#define GPIOB\+\_\+\+AFRH~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x24))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}\index{main.c@{main.c}!GPIOB\_BASE@{GPIOB\_BASE}}
+\index{GPIOB\_BASE@{GPIOB\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOB\_BASE}{GPIOB\_BASE}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68} 
+\#define GPIOB\+\_\+\+BASE~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x0400\+UL)}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_affac2caec05d40f61f7e4b3aef5ff2a4}\index{main.c@{main.c}!GPIOB\_MODER@{GPIOB\_MODER}}
+\index{GPIOB\_MODER@{GPIOB\_MODER}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOB\_MODER}{GPIOB\_MODER}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_affac2caec05d40f61f7e4b3aef5ff2a4} 
+\#define GPIOB\+\_\+\+MODER~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x00))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a909ebebbc8de2e518c95c538c38b6149}\index{main.c@{main.c}!GPIOB\_OSPEEDR@{GPIOB\_OSPEEDR}}
+\index{GPIOB\_OSPEEDR@{GPIOB\_OSPEEDR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOB\_OSPEEDR}{GPIOB\_OSPEEDR}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a909ebebbc8de2e518c95c538c38b6149} 
+\#define GPIOB\+\_\+\+OSPEEDR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x08))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_aef9c290201f1348720bf7716e32b0ce4}\index{main.c@{main.c}!GPIOB\_OTYPER@{GPIOB\_OTYPER}}
+\index{GPIOB\_OTYPER@{GPIOB\_OTYPER}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOB\_OTYPER}{GPIOB\_OTYPER}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_aef9c290201f1348720bf7716e32b0ce4} 
+\#define GPIOB\+\_\+\+OTYPER~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x04))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_aad6e9cd5fa8d64c77af952d14e456b3c}\index{main.c@{main.c}!GPIOB\_PUPDR@{GPIOB\_PUPDR}}
+\index{GPIOB\_PUPDR@{GPIOB\_PUPDR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{GPIOB\_PUPDR}{GPIOB\_PUPDR}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_aad6e9cd5fa8d64c77af952d14e456b3c} 
+\#define GPIOB\+\_\+\+PUPDR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_ac944a89eb789000ece920c0f89cb6a68}{GPIOB\+\_\+\+BASE}} + 0x0C))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}\index{main.c@{main.c}!I2C1\_BASE@{I2C1\_BASE}}
+\index{I2C1\_BASE@{I2C1\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C1\_BASE}{I2C1\_BASE}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3} 
+\#define I2\+C1\+\_\+\+BASE~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a45666d911f39addd4c8c0a0ac3388cfb}{APB1\+PERIPH\+\_\+\+BASE}} + 0x5400\+UL)}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a53b3a2028f89192de338269ac9914cee}\index{main.c@{main.c}!I2C1\_CCR@{I2C1\_CCR}}
+\index{I2C1\_CCR@{I2C1\_CCR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C1\_CCR}{I2C1\_CCR}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a53b3a2028f89192de338269ac9914cee} 
+\#define I2\+C1\+\_\+\+CCR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x1C))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a64532b3cb1d370389ddc22ee0f3677bc}\index{main.c@{main.c}!I2C1\_CR1@{I2C1\_CR1}}
+\index{I2C1\_CR1@{I2C1\_CR1}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C1\_CR1}{I2C1\_CR1}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a64532b3cb1d370389ddc22ee0f3677bc} 
+\#define I2\+C1\+\_\+\+CR1~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x00))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a83fcd4d673ac549bd410e3ef49ef1d7e}\index{main.c@{main.c}!I2C1\_CR2@{I2C1\_CR2}}
+\index{I2C1\_CR2@{I2C1\_CR2}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C1\_CR2}{I2C1\_CR2}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a83fcd4d673ac549bd410e3ef49ef1d7e} 
+\#define I2\+C1\+\_\+\+CR2~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x04))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_ae9d45cba078c17c937f9fbf3eaa3e762}\index{main.c@{main.c}!I2C1\_DR@{I2C1\_DR}}
+\index{I2C1\_DR@{I2C1\_DR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C1\_DR}{I2C1\_DR}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_ae9d45cba078c17c937f9fbf3eaa3e762} 
+\#define I2\+C1\+\_\+\+DR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x10))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a7b5e5096a80e0b9cc4fb2eaa0e50cc30}\index{main.c@{main.c}!I2C1\_OAR1@{I2C1\_OAR1}}
+\index{I2C1\_OAR1@{I2C1\_OAR1}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C1\_OAR1}{I2C1\_OAR1}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a7b5e5096a80e0b9cc4fb2eaa0e50cc30} 
+\#define I2\+C1\+\_\+\+OAR1~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x08))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_aa8345463eb1d0075a7e52a5b5627a29c}\index{main.c@{main.c}!I2C1\_SR1@{I2C1\_SR1}}
+\index{I2C1\_SR1@{I2C1\_SR1}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C1\_SR1}{I2C1\_SR1}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_aa8345463eb1d0075a7e52a5b5627a29c} 
+\#define I2\+C1\+\_\+\+SR1~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x14))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a737e98b2ed556825c5a2d8a40cb8df61}\index{main.c@{main.c}!I2C1\_SR2@{I2C1\_SR2}}
+\index{I2C1\_SR2@{I2C1\_SR2}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C1\_SR2}{I2C1\_SR2}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a737e98b2ed556825c5a2d8a40cb8df61} 
+\#define I2\+C1\+\_\+\+SR2~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x18))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a16d4a2829b42406e571316f3cbcc28fe}\index{main.c@{main.c}!I2C1\_TRISE@{I2C1\_TRISE}}
+\index{I2C1\_TRISE@{I2C1\_TRISE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{I2C1\_TRISE}{I2C1\_TRISE}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a16d4a2829b42406e571316f3cbcc28fe} 
+\#define I2\+C1\+\_\+\+TRISE~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_210__no__hal__i2c_2main_8c_acd72dbffb1738ca87c838545c4eb85a3}{I2\+C1\+\_\+\+BASE}} + 0x20))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a9171f49478fa86d932f89e78e73b88b0}\index{main.c@{main.c}!PERIPH\_BASE@{PERIPH\_BASE}}
+\index{PERIPH\_BASE@{PERIPH\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{PERIPH\_BASE}{PERIPH\_BASE}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a9171f49478fa86d932f89e78e73b88b0} 
+\#define PERIPH\+\_\+\+BASE~0x40000000\+UL}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a305184464592fe039a4e47e9d88bdcc4}\index{main.c@{main.c}!RCC\_AHB1ENR@{RCC\_AHB1ENR}}
+\index{RCC\_AHB1ENR@{RCC\_AHB1ENR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_AHB1ENR}{RCC\_AHB1ENR}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a305184464592fe039a4e47e9d88bdcc4} 
+\#define RCC\+\_\+\+AHB1\+ENR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x30))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_ad4baa1f26b04719fe3d4e2f02d7dde40}\index{main.c@{main.c}!RCC\_APB1ENR@{RCC\_APB1ENR}}
+\index{RCC\_APB1ENR@{RCC\_APB1ENR}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR}{RCC\_APB1ENR}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_ad4baa1f26b04719fe3d4e2f02d7dde40} 
+\#define RCC\+\_\+\+APB1\+ENR~(\texorpdfstring{$\ast$}{*}(volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*})(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a0e681b03f364532055d88f63fec0d99d}{RCC\+\_\+\+BASE}} + 0x40))}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a0e681b03f364532055d88f63fec0d99d}\index{main.c@{main.c}!RCC\_BASE@{RCC\_BASE}}
+\index{RCC\_BASE@{RCC\_BASE}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{RCC\_BASE}{RCC\_BASE}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a0e681b03f364532055d88f63fec0d99d} 
+\#define RCC\+\_\+\+BASE~(\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_a811a9a4ca17f0a50354a9169541d56c4}{AHB1\+PERIPH\+\_\+\+BASE}} + 0x3800\+UL)}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a45ba202b05caf39795aeca91b0ae547e}\index{main.c@{main.c}!TIMEOUT@{TIMEOUT}}
+\index{TIMEOUT@{TIMEOUT}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{TIMEOUT}{TIMEOUT}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a45ba202b05caf39795aeca91b0ae547e} 
+\#define TIMEOUT~1000000}
+
+
+
+\label{doc-func-members}
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a9bcaa076c05a5cf1f9700731d3596ea7}\index{main.c@{main.c}!bmp180\_read\_reg@{bmp180\_read\_reg}}
+\index{bmp180\_read\_reg@{bmp180\_read\_reg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{bmp180\_read\_reg()}{bmp180\_read\_reg()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a9bcaa076c05a5cf1f9700731d3596ea7} 
+uint8\+\_\+t bmp180\+\_\+read\+\_\+reg (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{reg}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a03e75545c87782a68f83d1d0db4309d9}\index{main.c@{main.c}!bmp180\_read\_u16@{bmp180\_read\_u16}}
+\index{bmp180\_read\_u16@{bmp180\_read\_u16}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{bmp180\_read\_u16()}{bmp180\_read\_u16()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a03e75545c87782a68f83d1d0db4309d9} 
+uint16\+\_\+t bmp180\+\_\+read\+\_\+u16 (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{reg}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a1c6b122eadff92fc1890f169a1576192}\index{main.c@{main.c}!bmp180\_write\_reg@{bmp180\_write\_reg}}
+\index{bmp180\_write\_reg@{bmp180\_write\_reg}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{bmp180\_write\_reg()}{bmp180\_write\_reg()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a1c6b122eadff92fc1890f169a1576192} 
+void bmp180\+\_\+write\+\_\+reg (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{reg}{, }\item[{uint8\+\_\+t}]{value}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a2f02f20c4160b3c21987d94ab555f352}\index{main.c@{main.c}!i2c1\_init@{i2c1\_init}}
+\index{i2c1\_init@{i2c1\_init}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{i2c1\_init()}{i2c1\_init()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a2f02f20c4160b3c21987d94ab555f352} 
+void i2c1\+\_\+init (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a46fd396b53927047bd3fbead80089f5e}\index{main.c@{main.c}!i2c1\_read\_data\_nack@{i2c1\_read\_data\_nack}}
+\index{i2c1\_read\_data\_nack@{i2c1\_read\_data\_nack}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{i2c1\_read\_data\_nack()}{i2c1\_read\_data\_nack()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a46fd396b53927047bd3fbead80089f5e} 
+uint8\+\_\+t i2c1\+\_\+read\+\_\+data\+\_\+nack (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a6a16a8dfbfea3c8021ba83ae6d145efb}\index{main.c@{main.c}!i2c1\_start@{i2c1\_start}}
+\index{i2c1\_start@{i2c1\_start}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{i2c1\_start()}{i2c1\_start()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a6a16a8dfbfea3c8021ba83ae6d145efb} 
+void i2c1\+\_\+start (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_aeb29c7755e26e61eaff4e2537d6d8f60}\index{main.c@{main.c}!i2c1\_stop@{i2c1\_stop}}
+\index{i2c1\_stop@{i2c1\_stop}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{i2c1\_stop()}{i2c1\_stop()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_aeb29c7755e26e61eaff4e2537d6d8f60} 
+void i2c1\+\_\+stop (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a9466614bfe5ce8fba2c70a27767d02d7}\index{main.c@{main.c}!i2c1\_write\_addr@{i2c1\_write\_addr}}
+\index{i2c1\_write\_addr@{i2c1\_write\_addr}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{i2c1\_write\_addr()}{i2c1\_write\_addr()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a9466614bfe5ce8fba2c70a27767d02d7} 
+void i2c1\+\_\+write\+\_\+addr (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{addr}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a4c5f323ed19516bd5918f108691c4187}\index{main.c@{main.c}!i2c1\_write\_data@{i2c1\_write\_data}}
+\index{i2c1\_write\_data@{i2c1\_write\_data}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{i2c1\_write\_data()}{i2c1\_write\_data()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a4c5f323ed19516bd5918f108691c4187} 
+void i2c1\+\_\+write\+\_\+data (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{data}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_a347e5e194a85bf7a07ce1afb340b32e8}\index{main.c@{main.c}!uart2\_write\_hex@{uart2\_write\_hex}}
+\index{uart2\_write\_hex@{uart2\_write\_hex}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{uart2\_write\_hex()}{uart2\_write\_hex()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_a347e5e194a85bf7a07ce1afb340b32e8} 
+void uart2\+\_\+write\+\_\+hex (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{val}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_ae9bbfa2cc6dc4f93a26d61b95f6399b6}\index{main.c@{main.c}!uart2\_write\_uint16@{uart2\_write\_uint16}}
+\index{uart2\_write\_uint16@{uart2\_write\_uint16}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{uart2\_write\_uint16()}{uart2\_write\_uint16()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_ae9bbfa2cc6dc4f93a26d61b95f6399b6} 
+void uart2\+\_\+write\+\_\+uint16 (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{val}{}\end{DoxyParamCaption})}
+
+\Hypertarget{samples_210__no__hal__i2c_2main_8c_ab6f5daca5ad3a665d4c012f2db2db044}\index{main.c@{main.c}!wait\_flag@{wait\_flag}}
+\index{wait\_flag@{wait\_flag}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{wait\_flag()}{wait\_flag()}}
+{\footnotesize\ttfamily \label{samples_210__no__hal__i2c_2main_8c_ab6f5daca5ad3a665d4c012f2db2db044} 
+int wait\+\_\+flag (\begin{DoxyParamCaption}\item[{volatile uint32\+\_\+t \texorpdfstring{$\ast$}{*}}]{reg}{, }\item[{uint32\+\_\+t}]{mask}{}\end{DoxyParamCaption})}
+

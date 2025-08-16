@@ -1,0 +1,93 @@
+\doxysection{timer.\+h}
+\hypertarget{timer_8h_source}{}\label{timer_8h_source}\index{include/core/cortex-\/m4/timer.h@{include/core/cortex-\/m4/timer.h}}
+\mbox{\hyperlink{timer_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_TIMER\_H}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_TIMER\_H}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{hal__types_8h}{common/hal\_types.h}}"{}}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{timer__types_8h}{utils/timer\_types.h}}"{}}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{comment}{//\ APB1}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ RCC\_APB1ENR\_TIM2\_OFFSET\ 0}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ RCC\_APB1ENR\_TIM3\_OFFSET\ 1}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ RCC\_APB1ENR\_TIM4\_OFFSET\ 2}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ RCC\_APB1ENR\_TIM5\_OFFSET\ 3}}
+\DoxyCodeLine{00022\ \textcolor{comment}{//\ APB2}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ RCC\_APB2ENR\_TIM1\_OFFSET\ 0}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ RCC\_APB2ENR\_TIM9\_OFFSET\ 16}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ RCC\_APB2ENR\_TIM10\_OFFSET\ 17}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#define\ RCC\_APB2ENR\_TIM11\_OFFSET\ 18}}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \textcolor{comment}{//\ SysTick\ Control\ and\ Status\ Register}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ SYST\_CSR\ (*(\_\_IO\ uint32\_t\ *)0xE000E010)}}
+\DoxyCodeLine{00030\ \textcolor{comment}{//\ SysTick\ Reload\ Value\ Register}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#define\ SYST\_RVR\ (*(\_\_IO\ uint32\_t\ *)0xE000E014)}}
+\DoxyCodeLine{00032\ \textcolor{comment}{//\ SysTick\ Current\ Value\ Register}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ SYST\_CVR\ (*(\_\_IO\ uint32\_t\ *)0xE000E018)}}
+\DoxyCodeLine{00034\ \textcolor{comment}{//\ SysTick\ Calibration\ Register}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#define\ SYST\_CALIB\ (*(\_\_IO\ uint32\_t\ *)0xE000E01C)}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#define\ SYST\_CSR\_EN\_BIT\ 0}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ SYST\_CSR\_TICKINT\_BIT\ 1}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ SYST\_CSR\_CLKSOURCE\_BIT\ 2}}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{comment}{//\ SysTick\ Timer\ Functions}}
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ TIM5\ is\ used\ for\ systick}}
+\DoxyCodeLine{00042\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a51591e1b5e966fd8031bed4ff27ba3b7}{systick\_init}}(uint32\_t\ tick\_us);}
+\DoxyCodeLine{00043\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_ab7cce8122024d7ba47bf10f434956de4}{delay\_ms}}(uint32\_t\ ms);}
+\DoxyCodeLine{00044\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a025aed4c2e0c624b412158b404806a2a}{delay\_us}}(uint64\_t\ us);}
+\DoxyCodeLine{00045\ uint64\_t\ \mbox{\hyperlink{timer_8h_a8aea94afb2c6534c316c01aca84dacb3}{hal\_get\_tick}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00046\ uint32\_t\ \mbox{\hyperlink{timer_8h_abb6898e3bf58a48224867791dbdefdf3}{hal\_get\_tick\_duration\_us}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00047\ uint32\_t\ \mbox{\hyperlink{timer_8h_a3dafc6a0248d43b6a4c076b7dbcfc23f}{hal\_get\_tick\_reload\_value}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00048\ uint32\_t\ \mbox{\hyperlink{timer_8h_a71ab66b2798cd4aafcfe0a24b9154594}{hal\_get\_millis}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00049\ uint32\_t\ \mbox{\hyperlink{timer_8h_ade6c3437a366ce7aaf9617e69a848df9}{hal\_get\_micros}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00050\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_ab5e09814056d617c521549e542639b7e}{SysTick\_Handler}}(\textcolor{keywordtype}{void});\ \textcolor{comment}{//\ ISR\ for\ systick\ interrupts}}
+\DoxyCodeLine{00051\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_abd90df18c8f6730a6ba675cf639247a4}{hal\_systick\_set\_callback}}(\textcolor{keywordtype}{void}\ (*cb)(\textcolor{keywordtype}{void}));}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ General\ Purpose\ Timer\ (TIMx)\ Initialization\ \&\ Control}}
+\DoxyCodeLine{00054\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_adfbc1cc33f34b935f0b0ee61d2d3f6f8}{timer\_init}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,\ uint32\_t\ prescaler,\ uint32\_t\ auto\_reload);}
+\DoxyCodeLine{00055\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a49fb0f6c6b9a4802601a452618672e52}{timer\_start}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer);}
+\DoxyCodeLine{00056\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a196e32e61e4a4d6cb50e46ebffb1e0b8}{timer\_stop}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer);}
+\DoxyCodeLine{00057\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_ab50e7d8e6b8713a9a96abc6dd3a9e932}{timer\_reset}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer);}
+\DoxyCodeLine{00058\ uint32\_t\ \mbox{\hyperlink{timer_8h_a19aba4b4d8462e4f84b6eeabda21423c}{timer\_get\_count}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{comment}{//\ Timer\ Interrupt\ Management}}
+\DoxyCodeLine{00061\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f}{timer\_enable\_interrupt}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer);}
+\DoxyCodeLine{00062\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a4784a158d5bf211d3f07cc83ca0b78c2}{timer\_disable\_interrupt}}(}
+\DoxyCodeLine{00063\ \ \ \ \ \mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer);\ \textcolor{comment}{//\ [TODO]Add\ support\ for\ all\ timers}}
+\DoxyCodeLine{00064\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a6226a8f2f8b305c2a319ade05a77886c}{timer\_clear\_interrupt\_flag}}(}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer);\ \textcolor{comment}{//\ [TODO]Add\ support\ for\ all\ timers}}
+\DoxyCodeLine{00066\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a45f9a07b1ec73b7c758005623d8ab0e5}{timer\_attach\_callback}}(}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,}
+\DoxyCodeLine{00068\ \ \ \ \ \textcolor{keywordtype}{void}\ (*callback)(\textcolor{keywordtype}{void}));\ \textcolor{comment}{//[TODO]\ Add\ support\ for\ all\ timers}}
+\DoxyCodeLine{00069\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a834d3bef7882671645ad5d3c58fa69bc}{timer\_detach\_callback}}(}
+\DoxyCodeLine{00070\ \ \ \ \ \mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer);\ \textcolor{comment}{//\ [TODO]\ Add\ support\ for\ all\ timers}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \textcolor{comment}{//\ Timer\ IRQ\ Handlers}}
+\DoxyCodeLine{00073\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a38ad4725462bdc5e86c4ead4f04b9fc2}{TIM2\_IRQHandler}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00074\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_ac8e51d2183b5230cbd5481f8867adce9}{TIM3\_IRQHandler}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00075\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a7133f3f78767503641d307386e68bd28}{TIM4\_IRQHandler}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00076\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a5e66446caf21dd90191dc07a13ce2378}{TIM5\_IRQHandler}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00077\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a903756e157645ae9961b3e937c593c34}{TIM9\_IRQHandler}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00078\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_aa6691f9947ff72bae0c9a47f5023cd39}{TIM12\_IRQHandler}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{comment}{//\ PWM\ and\ Output\ Compare\ (Future\ Stage)}}
+\DoxyCodeLine{00081\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a3b5738efe72c1bd7130276a8f59b8234}{timer\_set\_compare}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,\ uint8\_t\ channel,}
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint32\_t\ compare\_value);}
+\DoxyCodeLine{00083\ uint32\_t\ \mbox{\hyperlink{timer_8h_a043ef2140caa620a1ed1af968fff5b46}{timer\_get\_compare}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,\ uint32\_t\ channel);}
+\DoxyCodeLine{00084\ uint32\_t\ \mbox{\hyperlink{timer_8h_a566a41b6f3c8e66b0736719528da6245}{timer\_get\_arr}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,\ uint32\_t\ channel);}
+\DoxyCodeLine{00085\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a0b6c91f4ad622097b4e2787abce9873e}{timer\_set\_arr}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,\ uint32\_t\ channel,\ uint32\_t\ arr);}
+\DoxyCodeLine{00086\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_ab790fdb4ee5e3bfe9477a2bbfb89e13d}{timer\_enable\_channel}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,\ uint32\_t\ channel);}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a0d3035840fb20d5213a70d0e33994584}{timer\_disable\_channel}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,\ uint32\_t\ channel);}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \textcolor{comment}{//\ Utility\ Functions}}
+\DoxyCodeLine{00091\ uint32\_t\ \mbox{\hyperlink{timer_8h_a6b2fb6cbff774094130a964475db6b25}{timer\_get\_frequency}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer);}
+\DoxyCodeLine{00092\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_ad6a8de2e162397553b3421265987fb7b}{timer\_set\_prescaler}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,\ uint32\_t\ prescaler);}
+\DoxyCodeLine{00093\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{timer_8h_a159fed92e0cdfaa14198b84dafe12f80}{timer\_set\_auto\_reload}}(\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\_timer\_t}}\ timer,\ uint32\_t\ arr);}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ !CORTEX\_M4\_TIMER\_H}}
+
+\end{DoxyCode}

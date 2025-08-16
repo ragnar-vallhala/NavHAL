@@ -1,0 +1,10 @@
+<map id="include/core/cortex&#45;m4/uart.h" name="include/core/cortex&#45;m4/uart.h">
+<area shape="rect" id="Node000001" title="UART driver interface for STM32F4 (Cortex&#45;M4)." alt="" coords="87,5,218,46"/>
+<area shape="rect" id="Node000002" href="$uart__reg_8h.html" title=" " alt="" coords="33,94,168,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,48,122,82,118,79,138,45"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="172,183,237,208"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="163,45,182,93,201,167,196,168,177,95,158,47"/>
+<area shape="rect" id="Node000003" href="$hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="5,183,148,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="97,136,87,168,82,167,92,134"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="128,133,178,171,175,175,125,137"/>
+</map>

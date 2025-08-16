@@ -1,0 +1,236 @@
+\doxysection{include/core/cortex-\/m4/timer\+\_\+reg.h File Reference}
+\hypertarget{timer__reg_8h}{}\label{timer__reg_8h}\index{include/core/cortex-\/m4/timer\_reg.h@{include/core/cortex-\/m4/timer\_reg.h}}
+{\ttfamily \#include "{}common/hal\+\_\+types.\+h"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for timer\+\_\+reg.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{timer__reg_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{timer__reg_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_t_i_mx___reg___typedef}{TIMx\+\_\+\+Reg\+\_\+\+Typedef}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a90bb2970c379b8f8ed91d71b4da05e4c}{TIM1\+\_\+\+BASE\+\_\+\+ADDR}}~0x40010000
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a4c592ab6de0b1a120c7eda5d6f19c329}{GPTIMx\+\_\+\+BASE\+\_\+\+ADDR}}~0x40000000
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_adf33e1fdb0e8830981f8722df1e59898}{TIM9\+\_\+\+BASE\+\_\+\+ADDR}}~0x40014000
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a67d9355b161d76a88889b948885ede35}{TIMx\+\_\+\+CR1\+\_\+\+CEN}}~0x1
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_af4e80bab2afc5a60d82a736d66ebe118}{TIMx\+\_\+\+PSC\+\_\+\+MASK}}~0x\+FFFF
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a17ba201881130b4092e81f556ce5dd64}{TIMx\+\_\+\+ARR\+\_\+\+MASK}}~0x\+FFFF
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_ac62590166816bb32161a86981ae55e66}{TIM2\+\_\+5\+\_\+\+ARR\+\_\+\+MASK}}~0x\+FFFFFFFF
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a4b48e640cd08015fa7424c7495d050d6}{TIMx\+\_\+\+EGR\+\_\+\+UG}}~0x1
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a71c72a27aa7549efef97f9dd4a4fc9e5}{TIMx\+\_\+\+CNT\+\_\+\+MASK}}~0x\+FFFF
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_aa4791cc123e8f2c062caa3bfd0d35f8f}{TIM2\+\_\+5\+\_\+\+CNT\+\_\+\+MASK}}~0x\+FFFFFFFF
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a214137f0ad8a5241853e8d2a667829b4}{TIMx\+\_\+\+DIER\+\_\+\+UIE}}~0x1
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a16ca93d100f94d586bfbd008c2413ef2}{TIMx\+\_\+\+SR\+\_\+\+UIF}}~0x1
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_af3902c1a756af254d31a29880722644a}{TIMx\+\_\+\+CCRy\+\_\+\+MASK}}~0x\+FFFF
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_ab85dae876f601b68c8117ddf2ec23bf5}{TIM2\+\_\+5\+\_\+\+CCRy\+\_\+\+MASK}}~0x\+FFFFFFFF
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_ac92189d173995ca6e09184c50dd5325c}{TIMx\+\_\+\+CCER\+\_\+\+CCx\+E\+\_\+\+MASK}}(n)
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_afbc4fa9d3eeb627c08d86f86a26c6e70}{TIMx\+\_\+\+CCMRy\+\_\+\+OCz\+PE\+\_\+\+Pos}}(ch)
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a5c5da166bed4aca7ec044b7ca4afd4fb}{TIMx\+\_\+\+CCMRy\+\_\+\+OCz\+M\+\_\+\+Pos}}(ch)
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a8a4026355dacb129ba30102fdbb161fe}{TIMx\+\_\+\+CCMRy\+\_\+\+OCz\+M\+\_\+\+MASK}}(ch)
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a398e9226492089b58d6e24561beafc8c}{TIMx\+\_\+\+CCMRy\+\_\+\+OCz\+M\+\_\+\+PWM\+\_\+\+MODE1\+\_\+\+MASK}}(ch)
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a71e672738521e672f220d0e663d6d707}{TIMx\+\_\+\+CCMRy\+\_\+\+OCx\+M\+\_\+\+PWM\+\_\+\+MODE2\+\_\+\+MASK}}(ch)
+\item 
+\#define \mbox{\hyperlink{timer__reg_8h_a96a4f06bbcb8bf030a60eb3a4e26e4b3}{TIMx\+\_\+\+CCMRy\+\_\+\+OCx\+PE}}(ch)
+\end{DoxyCompactItemize}
+
+
+\label{doc-define-members}
+\Hypertarget{timer__reg_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{timer__reg_8h_a4c592ab6de0b1a120c7eda5d6f19c329}\index{timer\_reg.h@{timer\_reg.h}!GPTIMx\_BASE\_ADDR@{GPTIMx\_BASE\_ADDR}}
+\index{GPTIMx\_BASE\_ADDR@{GPTIMx\_BASE\_ADDR}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPTIMx\_BASE\_ADDR}{GPTIMx\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a4c592ab6de0b1a120c7eda5d6f19c329} 
+\#define GPTIMx\+\_\+\+BASE\+\_\+\+ADDR~0x40000000}
+
+\Hypertarget{timer__reg_8h_a90bb2970c379b8f8ed91d71b4da05e4c}\index{timer\_reg.h@{timer\_reg.h}!TIM1\_BASE\_ADDR@{TIM1\_BASE\_ADDR}}
+\index{TIM1\_BASE\_ADDR@{TIM1\_BASE\_ADDR}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIM1\_BASE\_ADDR}{TIM1\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a90bb2970c379b8f8ed91d71b4da05e4c} 
+\#define TIM1\+\_\+\+BASE\+\_\+\+ADDR~0x40010000}
+
+\Hypertarget{timer__reg_8h_ac62590166816bb32161a86981ae55e66}\index{timer\_reg.h@{timer\_reg.h}!TIM2\_5\_ARR\_MASK@{TIM2\_5\_ARR\_MASK}}
+\index{TIM2\_5\_ARR\_MASK@{TIM2\_5\_ARR\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIM2\_5\_ARR\_MASK}{TIM2\_5\_ARR\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_ac62590166816bb32161a86981ae55e66} 
+\#define TIM2\+\_\+5\+\_\+\+ARR\+\_\+\+MASK~0x\+FFFFFFFF}
+
+\Hypertarget{timer__reg_8h_ab85dae876f601b68c8117ddf2ec23bf5}\index{timer\_reg.h@{timer\_reg.h}!TIM2\_5\_CCRy\_MASK@{TIM2\_5\_CCRy\_MASK}}
+\index{TIM2\_5\_CCRy\_MASK@{TIM2\_5\_CCRy\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIM2\_5\_CCRy\_MASK}{TIM2\_5\_CCRy\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_ab85dae876f601b68c8117ddf2ec23bf5} 
+\#define TIM2\+\_\+5\+\_\+\+CCRy\+\_\+\+MASK~0x\+FFFFFFFF}
+
+\Hypertarget{timer__reg_8h_aa4791cc123e8f2c062caa3bfd0d35f8f}\index{timer\_reg.h@{timer\_reg.h}!TIM2\_5\_CNT\_MASK@{TIM2\_5\_CNT\_MASK}}
+\index{TIM2\_5\_CNT\_MASK@{TIM2\_5\_CNT\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIM2\_5\_CNT\_MASK}{TIM2\_5\_CNT\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_aa4791cc123e8f2c062caa3bfd0d35f8f} 
+\#define TIM2\+\_\+5\+\_\+\+CNT\+\_\+\+MASK~0x\+FFFFFFFF}
+
+\Hypertarget{timer__reg_8h_adf33e1fdb0e8830981f8722df1e59898}\index{timer\_reg.h@{timer\_reg.h}!TIM9\_BASE\_ADDR@{TIM9\_BASE\_ADDR}}
+\index{TIM9\_BASE\_ADDR@{TIM9\_BASE\_ADDR}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIM9\_BASE\_ADDR}{TIM9\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{timer__reg_8h_adf33e1fdb0e8830981f8722df1e59898} 
+\#define TIM9\+\_\+\+BASE\+\_\+\+ADDR~0x40014000}
+
+\Hypertarget{timer__reg_8h_a17ba201881130b4092e81f556ce5dd64}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_ARR\_MASK@{TIMx\_ARR\_MASK}}
+\index{TIMx\_ARR\_MASK@{TIMx\_ARR\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_ARR\_MASK}{TIMx\_ARR\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a17ba201881130b4092e81f556ce5dd64} 
+\#define TIMx\+\_\+\+ARR\+\_\+\+MASK~0x\+FFFF}
+
+\Hypertarget{timer__reg_8h_ac92189d173995ca6e09184c50dd5325c}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CCER\_CCxE\_MASK@{TIMx\_CCER\_CCxE\_MASK}}
+\index{TIMx\_CCER\_CCxE\_MASK@{TIMx\_CCER\_CCxE\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCER\_CCxE\_MASK}{TIMx\_CCER\_CCxE\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_ac92189d173995ca6e09184c50dd5325c} 
+\#define TIMx\+\_\+\+CCER\+\_\+\+CCx\+E\+\_\+\+MASK(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(0x1\ <<\ (((n\ \%\ 4)\ -\/\ 1)\ *\ 4))}
+
+\end{DoxyCode}
+\Hypertarget{timer__reg_8h_a71e672738521e672f220d0e663d6d707}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CCMRy\_OCxM\_PWM\_MODE2\_MASK@{TIMx\_CCMRy\_OCxM\_PWM\_MODE2\_MASK}}
+\index{TIMx\_CCMRy\_OCxM\_PWM\_MODE2\_MASK@{TIMx\_CCMRy\_OCxM\_PWM\_MODE2\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCMRy\_OCxM\_PWM\_MODE2\_MASK}{TIMx\_CCMRy\_OCxM\_PWM\_MODE2\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a71e672738521e672f220d0e663d6d707} 
+\#define TIMx\+\_\+\+CCMRy\+\_\+\+OCx\+M\+\_\+\+PWM\+\_\+\+MODE2\+\_\+\+MASK(\begin{DoxyParamCaption}\item[{}]{ch}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ (0x7\ <<\ \mbox{\hyperlink{timer__reg_8h_a5c5da166bed4aca7ec044b7ca4afd4fb}{TIMx\_CCMRy\_OCzM\_Pos}}(ch))}
+
+\end{DoxyCode}
+\Hypertarget{timer__reg_8h_a96a4f06bbcb8bf030a60eb3a4e26e4b3}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CCMRy\_OCxPE@{TIMx\_CCMRy\_OCxPE}}
+\index{TIMx\_CCMRy\_OCxPE@{TIMx\_CCMRy\_OCxPE}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCMRy\_OCxPE}{TIMx\_CCMRy\_OCxPE}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a96a4f06bbcb8bf030a60eb3a4e26e4b3} 
+\#define TIMx\+\_\+\+CCMRy\+\_\+\+OCx\+PE(\begin{DoxyParamCaption}\item[{}]{ch}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(0x1\ <<\ \mbox{\hyperlink{timer__reg_8h_afbc4fa9d3eeb627c08d86f86a26c6e70}{TIMx\_CCMRy\_OCzPE\_Pos}}(ch))}
+
+\end{DoxyCode}
+\Hypertarget{timer__reg_8h_a8a4026355dacb129ba30102fdbb161fe}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CCMRy\_OCzM\_MASK@{TIMx\_CCMRy\_OCzM\_MASK}}
+\index{TIMx\_CCMRy\_OCzM\_MASK@{TIMx\_CCMRy\_OCzM\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCMRy\_OCzM\_MASK}{TIMx\_CCMRy\_OCzM\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a8a4026355dacb129ba30102fdbb161fe} 
+\#define TIMx\+\_\+\+CCMRy\+\_\+\+OCz\+M\+\_\+\+MASK(\begin{DoxyParamCaption}\item[{}]{ch}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(0x7\ <<\ (\mbox{\hyperlink{timer__reg_8h_a5c5da166bed4aca7ec044b7ca4afd4fb}{TIMx\_CCMRy\_OCzM\_Pos}}(ch)))}
+
+\end{DoxyCode}
+\Hypertarget{timer__reg_8h_a5c5da166bed4aca7ec044b7ca4afd4fb}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CCMRy\_OCzM\_Pos@{TIMx\_CCMRy\_OCzM\_Pos}}
+\index{TIMx\_CCMRy\_OCzM\_Pos@{TIMx\_CCMRy\_OCzM\_Pos}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCMRy\_OCzM\_Pos}{TIMx\_CCMRy\_OCzM\_Pos}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a5c5da166bed4aca7ec044b7ca4afd4fb} 
+\#define TIMx\+\_\+\+CCMRy\+\_\+\+OCz\+M\+\_\+\+Pos(\begin{DoxyParamCaption}\item[{}]{ch}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((ch\ \%\ 2\ ==\ 1)\ ?\ 0x4\ :\ 0x12)}
+
+\end{DoxyCode}
+\Hypertarget{timer__reg_8h_a398e9226492089b58d6e24561beafc8c}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CCMRy\_OCzM\_PWM\_MODE1\_MASK@{TIMx\_CCMRy\_OCzM\_PWM\_MODE1\_MASK}}
+\index{TIMx\_CCMRy\_OCzM\_PWM\_MODE1\_MASK@{TIMx\_CCMRy\_OCzM\_PWM\_MODE1\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCMRy\_OCzM\_PWM\_MODE1\_MASK}{TIMx\_CCMRy\_OCzM\_PWM\_MODE1\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a398e9226492089b58d6e24561beafc8c} 
+\#define TIMx\+\_\+\+CCMRy\+\_\+\+OCz\+M\+\_\+\+PWM\+\_\+\+MODE1\+\_\+\+MASK(\begin{DoxyParamCaption}\item[{}]{ch}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ (0x6\ <<\ \mbox{\hyperlink{timer__reg_8h_a5c5da166bed4aca7ec044b7ca4afd4fb}{TIMx\_CCMRy\_OCzM\_Pos}}(ch))}
+
+\end{DoxyCode}
+\Hypertarget{timer__reg_8h_afbc4fa9d3eeb627c08d86f86a26c6e70}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CCMRy\_OCzPE\_Pos@{TIMx\_CCMRy\_OCzPE\_Pos}}
+\index{TIMx\_CCMRy\_OCzPE\_Pos@{TIMx\_CCMRy\_OCzPE\_Pos}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCMRy\_OCzPE\_Pos}{TIMx\_CCMRy\_OCzPE\_Pos}}
+{\footnotesize\ttfamily \label{timer__reg_8h_afbc4fa9d3eeb627c08d86f86a26c6e70} 
+\#define TIMx\+\_\+\+CCMRy\+\_\+\+OCz\+PE\+\_\+\+Pos(\begin{DoxyParamCaption}\item[{}]{ch}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{((ch\ \%\ 2\ ==\ 1)\ ?\ 0x3\ :\ 0x11)}
+
+\end{DoxyCode}
+\Hypertarget{timer__reg_8h_af3902c1a756af254d31a29880722644a}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CCRy\_MASK@{TIMx\_CCRy\_MASK}}
+\index{TIMx\_CCRy\_MASK@{TIMx\_CCRy\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CCRy\_MASK}{TIMx\_CCRy\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_af3902c1a756af254d31a29880722644a} 
+\#define TIMx\+\_\+\+CCRy\+\_\+\+MASK~0x\+FFFF}
+
+\Hypertarget{timer__reg_8h_a71c72a27aa7549efef97f9dd4a4fc9e5}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CNT\_MASK@{TIMx\_CNT\_MASK}}
+\index{TIMx\_CNT\_MASK@{TIMx\_CNT\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CNT\_MASK}{TIMx\_CNT\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a71c72a27aa7549efef97f9dd4a4fc9e5} 
+\#define TIMx\+\_\+\+CNT\+\_\+\+MASK~0x\+FFFF}
+
+\Hypertarget{timer__reg_8h_a67d9355b161d76a88889b948885ede35}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_CR1\_CEN@{TIMx\_CR1\_CEN}}
+\index{TIMx\_CR1\_CEN@{TIMx\_CR1\_CEN}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_CR1\_CEN}{TIMx\_CR1\_CEN}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a67d9355b161d76a88889b948885ede35} 
+\#define TIMx\+\_\+\+CR1\+\_\+\+CEN~0x1}
+
+\Hypertarget{timer__reg_8h_a214137f0ad8a5241853e8d2a667829b4}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_DIER\_UIE@{TIMx\_DIER\_UIE}}
+\index{TIMx\_DIER\_UIE@{TIMx\_DIER\_UIE}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_DIER\_UIE}{TIMx\_DIER\_UIE}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a214137f0ad8a5241853e8d2a667829b4} 
+\#define TIMx\+\_\+\+DIER\+\_\+\+UIE~0x1}
+
+\Hypertarget{timer__reg_8h_a4b48e640cd08015fa7424c7495d050d6}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_EGR\_UG@{TIMx\_EGR\_UG}}
+\index{TIMx\_EGR\_UG@{TIMx\_EGR\_UG}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_EGR\_UG}{TIMx\_EGR\_UG}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a4b48e640cd08015fa7424c7495d050d6} 
+\#define TIMx\+\_\+\+EGR\+\_\+\+UG~0x1}
+
+\Hypertarget{timer__reg_8h_af4e80bab2afc5a60d82a736d66ebe118}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_PSC\_MASK@{TIMx\_PSC\_MASK}}
+\index{TIMx\_PSC\_MASK@{TIMx\_PSC\_MASK}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_PSC\_MASK}{TIMx\_PSC\_MASK}}
+{\footnotesize\ttfamily \label{timer__reg_8h_af4e80bab2afc5a60d82a736d66ebe118} 
+\#define TIMx\+\_\+\+PSC\+\_\+\+MASK~0x\+FFFF}
+
+\Hypertarget{timer__reg_8h_a16ca93d100f94d586bfbd008c2413ef2}\index{timer\_reg.h@{timer\_reg.h}!TIMx\_SR\_UIF@{TIMx\_SR\_UIF}}
+\index{TIMx\_SR\_UIF@{TIMx\_SR\_UIF}!timer\_reg.h@{timer\_reg.h}}
+\doxysubsubsection{\texorpdfstring{TIMx\_SR\_UIF}{TIMx\_SR\_UIF}}
+{\footnotesize\ttfamily \label{timer__reg_8h_a16ca93d100f94d586bfbd008c2413ef2} 
+\#define TIMx\+\_\+\+SR\+\_\+\+UIF~0x1}
+

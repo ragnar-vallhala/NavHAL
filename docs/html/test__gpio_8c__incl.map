@@ -1,0 +1,30 @@
+<map id="tests/test_gpio.c" name="tests/test_gpio.c">
+<area shape="rect" id="Node000001" title="GPIO unit test implementation for NAVHAL." alt="" coords="505,5,624,31"/>
+<area shape="rect" id="Node000002" href="$gpio_8h.html" title="Cortex&#45;M4 specific GPIO HAL interface." alt="" coords="36,168,183,193"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="531,34,159,165,158,159,529,29"/>
+<area shape="rect" id="Node000004" href="$gpio__reg_8h.html" title="Cortex&#45;M4 GPIO register definitions and access macros." alt="" coords="444,79,580,120"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="559,33,536,67,531,65,554,30"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="260,404,324,429"/>
+<area shape="poly" id="edge16_Node000001_Node000009" title=" " alt="" coords="574,30,602,92,615,135,620,179,620,256,618,278,612,298,589,333,555,360,514,380,468,395,422,405,340,416,340,410,421,400,467,390,512,375,552,355,585,329,607,296,613,277,615,255,615,179,610,136,597,94,569,33"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="655,86,714,112"/>
+<area shape="poly" id="edge15_Node000001_Node000012" title=" " alt="" coords="584,29,655,76,652,80,581,34"/>
+<area shape="rect" id="Node000003" href="$gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="5,241,129,267"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="105,195,84,229,80,226,100,192"/>
+<area shape="rect" id="Node000005" href="$types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="292,168,384,193"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="470,123,379,163,377,159,468,118"/>
+<area shape="poly" id="edge14_Node000004_Node000009" title=" " alt="" coords="526,119,540,149,552,187,555,229,552,249,544,268,525,296,502,320,448,359,391,387,340,405,339,400,389,382,445,354,498,316,521,292,539,266,547,248,550,228,547,188,535,151,521,121"/>
+<area shape="poly" id="edge10_Node000005_Node000003" title=" " alt="" coords="292,196,129,239,127,234,291,191"/>
+<area shape="rect" id="Node000006" href="$clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="153,241,256,267"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="316,196,242,236,239,231,314,192"/>
+<area shape="poly" id="edge13_Node000005_Node000009" title=" " alt="" coords="335,195,320,242,306,322,297,389,292,388,300,321,315,241,330,193"/>
+<area shape="rect" id="Node000010" href="$timer__types_8h.html" title=" " alt="" coords="330,241,430,267"/>
+<area shape="poly" id="edge11_Node000005_Node000010" title=" " alt="" coords="347,192,368,226,363,229,342,195"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="455,241,530,267"/>
+<area shape="poly" id="edge12_Node000005_Node000011" title=" " alt="" coords="365,191,453,232,451,237,363,196"/>
+<area shape="rect" id="Node000007" href="$rcc__reg_8h.html" title=" " alt="" coords="74,315,204,356"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="196,269,167,305,163,301,192,266"/>
+<area shape="poly" id="edge9_Node000006_Node000009" title=" " alt="" coords="213,266,281,389,276,391,209,269"/>
+<area shape="rect" id="Node000008" href="$hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="68,404,210,429"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="142,356,142,388,136,388,136,356"/>
+<area shape="poly" id="edge8_Node000007_Node000009" title=" " alt="" coords="179,354,257,394,255,399,176,359"/>
+</map>

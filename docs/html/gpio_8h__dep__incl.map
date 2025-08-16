@@ -1,0 +1,9 @@
+<map id="include/core/cortex&#45;m4/gpio.h" name="include/core/cortex&#45;m4/gpio.h">
+<area shape="rect" id="Node000001" title="Cortex&#45;M4 specific GPIO HAL interface." alt="" coords="160,5,291,46"/>
+<area shape="rect" id="Node000002" href="$gpio_8c.html" title="HAL GPIO driver implementation for STM32F4 series." alt="" coords="5,94,136,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,56,107,96,104,91,176,51"/>
+<area shape="rect" id="Node000003" href="$uart_8c.html" title="UART driver implementation for STM32F4 series." alt="" coords="160,94,290,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="228,62,228,94,222,94,222,62"/>
+<area shape="rect" id="Node000004" href="$test__gpio_8c.html" title="GPIO unit test implementation for NAVHAL." alt="" coords="314,102,432,127"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="273,52,354,99,351,103,271,56"/>
+</map>

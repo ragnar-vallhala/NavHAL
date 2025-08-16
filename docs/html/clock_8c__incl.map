@@ -1,0 +1,18 @@
+<map id="src/core/cortex&#45;m4/clock/clock.c" name="src/core/cortex&#45;m4/clock/clock.c">
+<area shape="rect" id="Node000001" title="Cortex&#45;M4 (STM32F4) Clock HAL Implementation." alt="" coords="158,5,288,46"/>
+<area shape="rect" id="Node000002" href="$clock_8h.html" title="Cortex&#45;M4 specific clock control HAL interface." alt="" coords="89,102,243,127"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,48,184,90,180,87,208,45"/>
+<area shape="rect" id="Node000004" href="$rcc__reg_8h.html" title=" " alt="" coords="23,256,154,297"/>
+<area shape="poly" id="edge8_Node000001_Node000004" title=" " alt="" coords="159,42,114,62,94,77,79,95,65,131,63,170,68,208,78,241,73,243,63,209,57,170,60,130,74,93,91,73,111,58,156,38"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="172,345,237,371"/>
+<area shape="poly" id="edge9_Node000001_Node000006" title=" " alt="" coords="237,45,249,67,258,93,263,127,263,161,254,228,237,287,219,332,214,330,232,285,248,226,258,161,257,127,253,95,244,70,233,47"/>
+<area shape="rect" id="Node000007" href="$flash__reg_8h.html" title=" " alt="" coords="318,94,459,135"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="262,44,339,84,337,89,259,49"/>
+<area shape="rect" id="Node000003" href="$clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="101,183,231,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="168,128,168,167,163,167,163,128"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="156,211,120,247,116,243,152,207"/>
+<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="171,208,201,329,195,330,166,209"/>
+<area shape="rect" id="Node000005" href="$hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="5,345,148,371"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="88,298,83,330,78,329,83,297"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="119,295,176,334,173,338,116,300"/>
+</map>

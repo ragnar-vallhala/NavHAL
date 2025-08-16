@@ -1,0 +1,659 @@
+\doxysection{include/core/cortex-\/m4/timer.h File Reference}
+\hypertarget{timer_8h}{}\label{timer_8h}\index{include/core/cortex-\/m4/timer.h@{include/core/cortex-\/m4/timer.h}}
+
+
+Timer and Sys\+Tick register defines and API for STM32\+F4 (Cortex-\/\+M4).  
+
+
+{\ttfamily \#include "{}common/hal\+\_\+types.\+h"{}}\newline
+{\ttfamily \#include "{}utils/timer\+\_\+types.\+h"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for timer.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{timer_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{timer_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{timer_8h_ac6ad426a632607a5035fbf297e1edd8c}{RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM2\+\_\+\+OFFSET}}~0
+\item 
+\#define \mbox{\hyperlink{timer_8h_ac42c8f91496bf2a8e9a88fb2ac287a08}{RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM3\+\_\+\+OFFSET}}~1
+\item 
+\#define \mbox{\hyperlink{timer_8h_a704446fa460a3d0b4a137c90dc7fc13b}{RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM4\+\_\+\+OFFSET}}~2
+\item 
+\#define \mbox{\hyperlink{timer_8h_a5e45f1a2a23f0a3c18bec520c2712b3c}{RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM5\+\_\+\+OFFSET}}~3
+\item 
+\#define \mbox{\hyperlink{timer_8h_a083808714d9ba08f1bf3b3d4459c27d3}{RCC\+\_\+\+APB2\+ENR\+\_\+\+TIM1\+\_\+\+OFFSET}}~0
+\item 
+\#define \mbox{\hyperlink{timer_8h_a4189ed137e08bb5d3804a2f01d8788d8}{RCC\+\_\+\+APB2\+ENR\+\_\+\+TIM9\+\_\+\+OFFSET}}~16
+\item 
+\#define \mbox{\hyperlink{timer_8h_a6fa81d5199e79496d25376d6782f2599}{RCC\+\_\+\+APB2\+ENR\+\_\+\+TIM10\+\_\+\+OFFSET}}~17
+\item 
+\#define \mbox{\hyperlink{timer_8h_a779ccbeca0130ee97bdb4ff121ebf9c2}{RCC\+\_\+\+APB2\+ENR\+\_\+\+TIM11\+\_\+\+OFFSET}}~18
+\item 
+\#define \mbox{\hyperlink{timer_8h_ab26b3fc75982181f81b185b206e897f6}{SYST\+\_\+\+CSR}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E010)
+\item 
+\#define \mbox{\hyperlink{timer_8h_a4e8efcc1f2b551dbf3cb0aae1231e380}{SYST\+\_\+\+RVR}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E014)
+\item 
+\#define \mbox{\hyperlink{timer_8h_ae3dc4d2dbfdf38c593a5581415fecfed}{SYST\+\_\+\+CVR}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E018)
+\item 
+\#define \mbox{\hyperlink{timer_8h_a2d37582dd39f59744e340cce09230250}{SYST\+\_\+\+CALIB}}~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E01C)
+\item 
+\#define \mbox{\hyperlink{timer_8h_a697f471baebab2b1bad6d79624763849}{SYST\+\_\+\+CSR\+\_\+\+EN\+\_\+\+BIT}}~0
+\item 
+\#define \mbox{\hyperlink{timer_8h_a29275d55dd1d5dfc200a76ee9d861b97}{SYST\+\_\+\+CSR\+\_\+\+TICKINT\+\_\+\+BIT}}~1
+\item 
+\#define \mbox{\hyperlink{timer_8h_a8042c451d1439fcf234bbfac884726ad}{SYST\+\_\+\+CSR\+\_\+\+CLKSOURCE\+\_\+\+BIT}}~2
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{timer_8h_a51591e1b5e966fd8031bed4ff27ba3b7}{systick\+\_\+init}} (uint32\+\_\+t tick\+\_\+us)
+\begin{DoxyCompactList}\small\item\em Initialize the Sys\+Tick timer. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{timer_8h_ab7cce8122024d7ba47bf10f434956de4}{delay\+\_\+ms}} (uint32\+\_\+t ms)
+\begin{DoxyCompactList}\small\item\em Busy-\/wait delay in milliseconds. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{timer_8h_a025aed4c2e0c624b412158b404806a2a}{delay\+\_\+us}} (uint64\+\_\+t us)
+\begin{DoxyCompactList}\small\item\em Busy-\/wait delay in microseconds. \end{DoxyCompactList}\item 
+uint64\+\_\+t \mbox{\hyperlink{timer_8h_a8aea94afb2c6534c316c01aca84dacb3}{hal\+\_\+get\+\_\+tick}} (void)
+\begin{DoxyCompactList}\small\item\em Get current system tick count. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_abb6898e3bf58a48224867791dbdefdf3}{hal\+\_\+get\+\_\+tick\+\_\+duration\+\_\+us}} (void)
+\begin{DoxyCompactList}\small\item\em Get configured tick duration. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_a3dafc6a0248d43b6a4c076b7dbcfc23f}{hal\+\_\+get\+\_\+tick\+\_\+reload\+\_\+value}} (void)
+\begin{DoxyCompactList}\small\item\em Get Sys\+Tick reload value. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_a71ab66b2798cd4aafcfe0a24b9154594}{hal\+\_\+get\+\_\+millis}} (void)
+\begin{DoxyCompactList}\small\item\em Get system uptime in milliseconds. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_ade6c3437a366ce7aaf9617e69a848df9}{hal\+\_\+get\+\_\+micros}} (void)
+\begin{DoxyCompactList}\small\item\em Get system uptime in microseconds. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{timer_8h_ab5e09814056d617c521549e542639b7e}{Sys\+Tick\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em Sys\+Tick interrupt handler. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{timer_8h_abd90df18c8f6730a6ba675cf639247a4}{hal\+\_\+systick\+\_\+set\+\_\+callback}} (void(\texorpdfstring{$\ast$}{*}cb)(void))
+\item 
+void \mbox{\hyperlink{timer_8h_adfbc1cc33f34b935f0b0ee61d2d3f6f8}{timer\+\_\+init}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t prescaler, uint32\+\_\+t auto\+\_\+reload)
+\begin{DoxyCompactList}\small\item\em Initialize timer based on type. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{timer_8h_a49fb0f6c6b9a4802601a452618672e52}{timer\+\_\+start}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
+\item 
+void \mbox{\hyperlink{timer_8h_a196e32e61e4a4d6cb50e46ebffb1e0b8}{timer\+\_\+stop}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
+\item 
+void \mbox{\hyperlink{timer_8h_ab50e7d8e6b8713a9a96abc6dd3a9e932}{timer\+\_\+reset}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
+\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_a19aba4b4d8462e4f84b6eeabda21423c}{timer\+\_\+get\+\_\+count}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
+\item 
+void \mbox{\hyperlink{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f}{timer\+\_\+enable\+\_\+interrupt}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
+\item 
+void \mbox{\hyperlink{timer_8h_a4784a158d5bf211d3f07cc83ca0b78c2}{timer\+\_\+disable\+\_\+interrupt}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
+\item 
+void \mbox{\hyperlink{timer_8h_a6226a8f2f8b305c2a319ade05a77886c}{timer\+\_\+clear\+\_\+interrupt\+\_\+flag}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
+\item 
+void \mbox{\hyperlink{timer_8h_a45f9a07b1ec73b7c758005623d8ab0e5}{timer\+\_\+attach\+\_\+callback}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, void(\texorpdfstring{$\ast$}{*}callback)(void))
+\item 
+void \mbox{\hyperlink{timer_8h_a834d3bef7882671645ad5d3c58fa69bc}{timer\+\_\+detach\+\_\+callback}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
+\item 
+void \mbox{\hyperlink{timer_8h_a38ad4725462bdc5e86c4ead4f04b9fc2}{TIM2\+\_\+\+IRQHandler}} (void)
+\item 
+void \mbox{\hyperlink{timer_8h_ac8e51d2183b5230cbd5481f8867adce9}{TIM3\+\_\+\+IRQHandler}} (void)
+\item 
+void \mbox{\hyperlink{timer_8h_a7133f3f78767503641d307386e68bd28}{TIM4\+\_\+\+IRQHandler}} (void)
+\item 
+void \mbox{\hyperlink{timer_8h_a5e66446caf21dd90191dc07a13ce2378}{TIM5\+\_\+\+IRQHandler}} (void)
+\item 
+void \mbox{\hyperlink{timer_8h_a903756e157645ae9961b3e937c593c34}{TIM9\+\_\+\+IRQHandler}} (void)
+\item 
+void \mbox{\hyperlink{timer_8h_aa6691f9947ff72bae0c9a47f5023cd39}{TIM12\+\_\+\+IRQHandler}} (void)
+\item 
+void \mbox{\hyperlink{timer_8h_a3b5738efe72c1bd7130276a8f59b8234}{timer\+\_\+set\+\_\+compare}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint8\+\_\+t channel, uint32\+\_\+t compare\+\_\+value)
+\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_a043ef2140caa620a1ed1af968fff5b46}{timer\+\_\+get\+\_\+compare}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
+\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_a566a41b6f3c8e66b0736719528da6245}{timer\+\_\+get\+\_\+arr}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
+\item 
+void \mbox{\hyperlink{timer_8h_a0b6c91f4ad622097b4e2787abce9873e}{timer\+\_\+set\+\_\+arr}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel, uint32\+\_\+t arr)
+\item 
+void \mbox{\hyperlink{timer_8h_ab790fdb4ee5e3bfe9477a2bbfb89e13d}{timer\+\_\+enable\+\_\+channel}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
+\item 
+void \mbox{\hyperlink{timer_8h_a0d3035840fb20d5213a70d0e33994584}{timer\+\_\+disable\+\_\+channel}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
+\item 
+uint32\+\_\+t \mbox{\hyperlink{timer_8h_a6b2fb6cbff774094130a964475db6b25}{timer\+\_\+get\+\_\+frequency}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
+\item 
+void \mbox{\hyperlink{timer_8h_ad6a8de2e162397553b3421265987fb7b}{timer\+\_\+set\+\_\+prescaler}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t prescaler)
+\item 
+void \mbox{\hyperlink{timer_8h_a159fed92e0cdfaa14198b84dafe12f80}{timer\+\_\+set\+\_\+auto\+\_\+reload}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t arr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Timer and Sys\+Tick register defines and API for STM32\+F4 (Cortex-\/\+M4). 
+
+This header contains register offsets, bit definitions, Sys\+Tick control, timer base addresses, and the public timer/\+Sys\+Tick API used by the HAL. All defines and function prototypes are intended for the STM32\+F4 series on a Cortex-\/\+M4 core. 
+
+\label{doc-define-members}
+\Hypertarget{timer_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{timer_8h_ac6ad426a632607a5035fbf297e1edd8c}\index{timer.h@{timer.h}!RCC\_APB1ENR\_TIM2\_OFFSET@{RCC\_APB1ENR\_TIM2\_OFFSET}}
+\index{RCC\_APB1ENR\_TIM2\_OFFSET@{RCC\_APB1ENR\_TIM2\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR\_TIM2\_OFFSET}{RCC\_APB1ENR\_TIM2\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_ac6ad426a632607a5035fbf297e1edd8c} 
+\#define RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM2\+\_\+\+OFFSET~0}
+
+\Hypertarget{timer_8h_ac42c8f91496bf2a8e9a88fb2ac287a08}\index{timer.h@{timer.h}!RCC\_APB1ENR\_TIM3\_OFFSET@{RCC\_APB1ENR\_TIM3\_OFFSET}}
+\index{RCC\_APB1ENR\_TIM3\_OFFSET@{RCC\_APB1ENR\_TIM3\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR\_TIM3\_OFFSET}{RCC\_APB1ENR\_TIM3\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_ac42c8f91496bf2a8e9a88fb2ac287a08} 
+\#define RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM3\+\_\+\+OFFSET~1}
+
+\Hypertarget{timer_8h_a704446fa460a3d0b4a137c90dc7fc13b}\index{timer.h@{timer.h}!RCC\_APB1ENR\_TIM4\_OFFSET@{RCC\_APB1ENR\_TIM4\_OFFSET}}
+\index{RCC\_APB1ENR\_TIM4\_OFFSET@{RCC\_APB1ENR\_TIM4\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR\_TIM4\_OFFSET}{RCC\_APB1ENR\_TIM4\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_a704446fa460a3d0b4a137c90dc7fc13b} 
+\#define RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM4\+\_\+\+OFFSET~2}
+
+\Hypertarget{timer_8h_a5e45f1a2a23f0a3c18bec520c2712b3c}\index{timer.h@{timer.h}!RCC\_APB1ENR\_TIM5\_OFFSET@{RCC\_APB1ENR\_TIM5\_OFFSET}}
+\index{RCC\_APB1ENR\_TIM5\_OFFSET@{RCC\_APB1ENR\_TIM5\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB1ENR\_TIM5\_OFFSET}{RCC\_APB1ENR\_TIM5\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_a5e45f1a2a23f0a3c18bec520c2712b3c} 
+\#define RCC\+\_\+\+APB1\+ENR\+\_\+\+TIM5\+\_\+\+OFFSET~3}
+
+\Hypertarget{timer_8h_a6fa81d5199e79496d25376d6782f2599}\index{timer.h@{timer.h}!RCC\_APB2ENR\_TIM10\_OFFSET@{RCC\_APB2ENR\_TIM10\_OFFSET}}
+\index{RCC\_APB2ENR\_TIM10\_OFFSET@{RCC\_APB2ENR\_TIM10\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB2ENR\_TIM10\_OFFSET}{RCC\_APB2ENR\_TIM10\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_a6fa81d5199e79496d25376d6782f2599} 
+\#define RCC\+\_\+\+APB2\+ENR\+\_\+\+TIM10\+\_\+\+OFFSET~17}
+
+\Hypertarget{timer_8h_a779ccbeca0130ee97bdb4ff121ebf9c2}\index{timer.h@{timer.h}!RCC\_APB2ENR\_TIM11\_OFFSET@{RCC\_APB2ENR\_TIM11\_OFFSET}}
+\index{RCC\_APB2ENR\_TIM11\_OFFSET@{RCC\_APB2ENR\_TIM11\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB2ENR\_TIM11\_OFFSET}{RCC\_APB2ENR\_TIM11\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_a779ccbeca0130ee97bdb4ff121ebf9c2} 
+\#define RCC\+\_\+\+APB2\+ENR\+\_\+\+TIM11\+\_\+\+OFFSET~18}
+
+\Hypertarget{timer_8h_a083808714d9ba08f1bf3b3d4459c27d3}\index{timer.h@{timer.h}!RCC\_APB2ENR\_TIM1\_OFFSET@{RCC\_APB2ENR\_TIM1\_OFFSET}}
+\index{RCC\_APB2ENR\_TIM1\_OFFSET@{RCC\_APB2ENR\_TIM1\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB2ENR\_TIM1\_OFFSET}{RCC\_APB2ENR\_TIM1\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_a083808714d9ba08f1bf3b3d4459c27d3} 
+\#define RCC\+\_\+\+APB2\+ENR\+\_\+\+TIM1\+\_\+\+OFFSET~0}
+
+\Hypertarget{timer_8h_a4189ed137e08bb5d3804a2f01d8788d8}\index{timer.h@{timer.h}!RCC\_APB2ENR\_TIM9\_OFFSET@{RCC\_APB2ENR\_TIM9\_OFFSET}}
+\index{RCC\_APB2ENR\_TIM9\_OFFSET@{RCC\_APB2ENR\_TIM9\_OFFSET}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{RCC\_APB2ENR\_TIM9\_OFFSET}{RCC\_APB2ENR\_TIM9\_OFFSET}}
+{\footnotesize\ttfamily \label{timer_8h_a4189ed137e08bb5d3804a2f01d8788d8} 
+\#define RCC\+\_\+\+APB2\+ENR\+\_\+\+TIM9\+\_\+\+OFFSET~16}
+
+\Hypertarget{timer_8h_a2d37582dd39f59744e340cce09230250}\index{timer.h@{timer.h}!SYST\_CALIB@{SYST\_CALIB}}
+\index{SYST\_CALIB@{SYST\_CALIB}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{SYST\_CALIB}{SYST\_CALIB}}
+{\footnotesize\ttfamily \label{timer_8h_a2d37582dd39f59744e340cce09230250} 
+\#define SYST\+\_\+\+CALIB~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E01C)}
+
+\Hypertarget{timer_8h_ab26b3fc75982181f81b185b206e897f6}\index{timer.h@{timer.h}!SYST\_CSR@{SYST\_CSR}}
+\index{SYST\_CSR@{SYST\_CSR}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{SYST\_CSR}{SYST\_CSR}}
+{\footnotesize\ttfamily \label{timer_8h_ab26b3fc75982181f81b185b206e897f6} 
+\#define SYST\+\_\+\+CSR~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E010)}
+
+\Hypertarget{timer_8h_a8042c451d1439fcf234bbfac884726ad}\index{timer.h@{timer.h}!SYST\_CSR\_CLKSOURCE\_BIT@{SYST\_CSR\_CLKSOURCE\_BIT}}
+\index{SYST\_CSR\_CLKSOURCE\_BIT@{SYST\_CSR\_CLKSOURCE\_BIT}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{SYST\_CSR\_CLKSOURCE\_BIT}{SYST\_CSR\_CLKSOURCE\_BIT}}
+{\footnotesize\ttfamily \label{timer_8h_a8042c451d1439fcf234bbfac884726ad} 
+\#define SYST\+\_\+\+CSR\+\_\+\+CLKSOURCE\+\_\+\+BIT~2}
+
+\Hypertarget{timer_8h_a697f471baebab2b1bad6d79624763849}\index{timer.h@{timer.h}!SYST\_CSR\_EN\_BIT@{SYST\_CSR\_EN\_BIT}}
+\index{SYST\_CSR\_EN\_BIT@{SYST\_CSR\_EN\_BIT}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{SYST\_CSR\_EN\_BIT}{SYST\_CSR\_EN\_BIT}}
+{\footnotesize\ttfamily \label{timer_8h_a697f471baebab2b1bad6d79624763849} 
+\#define SYST\+\_\+\+CSR\+\_\+\+EN\+\_\+\+BIT~0}
+
+\Hypertarget{timer_8h_a29275d55dd1d5dfc200a76ee9d861b97}\index{timer.h@{timer.h}!SYST\_CSR\_TICKINT\_BIT@{SYST\_CSR\_TICKINT\_BIT}}
+\index{SYST\_CSR\_TICKINT\_BIT@{SYST\_CSR\_TICKINT\_BIT}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{SYST\_CSR\_TICKINT\_BIT}{SYST\_CSR\_TICKINT\_BIT}}
+{\footnotesize\ttfamily \label{timer_8h_a29275d55dd1d5dfc200a76ee9d861b97} 
+\#define SYST\+\_\+\+CSR\+\_\+\+TICKINT\+\_\+\+BIT~1}
+
+\Hypertarget{timer_8h_ae3dc4d2dbfdf38c593a5581415fecfed}\index{timer.h@{timer.h}!SYST\_CVR@{SYST\_CVR}}
+\index{SYST\_CVR@{SYST\_CVR}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{SYST\_CVR}{SYST\_CVR}}
+{\footnotesize\ttfamily \label{timer_8h_ae3dc4d2dbfdf38c593a5581415fecfed} 
+\#define SYST\+\_\+\+CVR~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E018)}
+
+\Hypertarget{timer_8h_a4e8efcc1f2b551dbf3cb0aae1231e380}\index{timer.h@{timer.h}!SYST\_RVR@{SYST\_RVR}}
+\index{SYST\_RVR@{SYST\_RVR}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{SYST\_RVR}{SYST\_RVR}}
+{\footnotesize\ttfamily \label{timer_8h_a4e8efcc1f2b551dbf3cb0aae1231e380} 
+\#define SYST\+\_\+\+RVR~(\texorpdfstring{$\ast$}{*}(\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \texorpdfstring{$\ast$}{*})0x\+E000\+E014)}
+
+
+
+\label{doc-func-members}
+\Hypertarget{timer_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{timer_8h_ab7cce8122024d7ba47bf10f434956de4}\index{timer.h@{timer.h}!delay\_ms@{delay\_ms}}
+\index{delay\_ms@{delay\_ms}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{delay\_ms()}{delay\_ms()}}
+{\footnotesize\ttfamily \label{timer_8h_ab7cce8122024d7ba47bf10f434956de4} 
+void delay\+\_\+ms (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{ms}{}\end{DoxyParamCaption})}
+
+
+
+Busy-\/wait delay in milliseconds. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em ms} & Number of milliseconds to delay \\
+\hline
+\end{DoxyParams}
+\Hypertarget{timer_8h_a025aed4c2e0c624b412158b404806a2a}\index{timer.h@{timer.h}!delay\_us@{delay\_us}}
+\index{delay\_us@{delay\_us}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{delay\_us()}{delay\_us()}}
+{\footnotesize\ttfamily \label{timer_8h_a025aed4c2e0c624b412158b404806a2a} 
+void delay\+\_\+us (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{us}{}\end{DoxyParamCaption})}
+
+
+
+Busy-\/wait delay in microseconds. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em us} & Number of microseconds to delay \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Minimum delay is one tick period 
+\end{DoxyNote}
+\Hypertarget{timer_8h_ade6c3437a366ce7aaf9617e69a848df9}\index{timer.h@{timer.h}!hal\_get\_micros@{hal\_get\_micros}}
+\index{hal\_get\_micros@{hal\_get\_micros}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{hal\_get\_micros()}{hal\_get\_micros()}}
+{\footnotesize\ttfamily \label{timer_8h_ade6c3437a366ce7aaf9617e69a848df9} 
+uint32\+\_\+t hal\+\_\+get\+\_\+micros (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get system uptime in microseconds. 
+
+\begin{DoxyReturn}{Returns}
+Microseconds since startup 
+\end{DoxyReturn}
+\Hypertarget{timer_8h_a71ab66b2798cd4aafcfe0a24b9154594}\index{timer.h@{timer.h}!hal\_get\_millis@{hal\_get\_millis}}
+\index{hal\_get\_millis@{hal\_get\_millis}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{hal\_get\_millis()}{hal\_get\_millis()}}
+{\footnotesize\ttfamily \label{timer_8h_a71ab66b2798cd4aafcfe0a24b9154594} 
+uint32\+\_\+t hal\+\_\+get\+\_\+millis (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get system uptime in milliseconds. 
+
+\begin{DoxyReturn}{Returns}
+Milliseconds since startup 
+\end{DoxyReturn}
+\Hypertarget{timer_8h_a8aea94afb2c6534c316c01aca84dacb3}\index{timer.h@{timer.h}!hal\_get\_tick@{hal\_get\_tick}}
+\index{hal\_get\_tick@{hal\_get\_tick}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{hal\_get\_tick()}{hal\_get\_tick()}}
+{\footnotesize\ttfamily \label{timer_8h_a8aea94afb2c6534c316c01aca84dacb3} 
+uint64\+\_\+t hal\+\_\+get\+\_\+tick (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get current system tick count. 
+
+\begin{DoxyReturn}{Returns}
+Current tick count 
+\end{DoxyReturn}
+\Hypertarget{timer_8h_abb6898e3bf58a48224867791dbdefdf3}\index{timer.h@{timer.h}!hal\_get\_tick\_duration\_us@{hal\_get\_tick\_duration\_us}}
+\index{hal\_get\_tick\_duration\_us@{hal\_get\_tick\_duration\_us}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{hal\_get\_tick\_duration\_us()}{hal\_get\_tick\_duration\_us()}}
+{\footnotesize\ttfamily \label{timer_8h_abb6898e3bf58a48224867791dbdefdf3} 
+uint32\+\_\+t hal\+\_\+get\+\_\+tick\+\_\+duration\+\_\+us (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get configured tick duration. 
+
+\begin{DoxyReturn}{Returns}
+Tick duration in microseconds 
+\end{DoxyReturn}
+\Hypertarget{timer_8h_a3dafc6a0248d43b6a4c076b7dbcfc23f}\index{timer.h@{timer.h}!hal\_get\_tick\_reload\_value@{hal\_get\_tick\_reload\_value}}
+\index{hal\_get\_tick\_reload\_value@{hal\_get\_tick\_reload\_value}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{hal\_get\_tick\_reload\_value()}{hal\_get\_tick\_reload\_value()}}
+{\footnotesize\ttfamily \label{timer_8h_a3dafc6a0248d43b6a4c076b7dbcfc23f} 
+uint32\+\_\+t hal\+\_\+get\+\_\+tick\+\_\+reload\+\_\+value (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get Sys\+Tick reload value. 
+
+\begin{DoxyReturn}{Returns}
+Current reload value (24-\/bit) 
+\end{DoxyReturn}
+\Hypertarget{timer_8h_abd90df18c8f6730a6ba675cf639247a4}\index{timer.h@{timer.h}!hal\_systick\_set\_callback@{hal\_systick\_set\_callback}}
+\index{hal\_systick\_set\_callback@{hal\_systick\_set\_callback}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{hal\_systick\_set\_callback()}{hal\_systick\_set\_callback()}}
+{\footnotesize\ttfamily \label{timer_8h_abd90df18c8f6730a6ba675cf639247a4} 
+void hal\+\_\+systick\+\_\+set\+\_\+callback (\begin{DoxyParamCaption}\item[{void(\texorpdfstring{$\ast$}{*}}]{cb~}{)(void)}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_ab5e09814056d617c521549e542639b7e}\index{timer.h@{timer.h}!SysTick\_Handler@{SysTick\_Handler}}
+\index{SysTick\_Handler@{SysTick\_Handler}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{SysTick\_Handler()}{SysTick\_Handler()}}
+{\footnotesize\ttfamily \label{timer_8h_ab5e09814056d617c521549e542639b7e} 
+void Sys\+Tick\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Sys\+Tick interrupt handler. 
+
+Increments the global tick counter \Hypertarget{timer_8h_a51591e1b5e966fd8031bed4ff27ba3b7}\index{timer.h@{timer.h}!systick\_init@{systick\_init}}
+\index{systick\_init@{systick\_init}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{systick\_init()}{systick\_init()}}
+{\footnotesize\ttfamily \label{timer_8h_a51591e1b5e966fd8031bed4ff27ba3b7} 
+void systick\+\_\+init (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{tick\+\_\+us}{}\end{DoxyParamCaption})}
+
+
+
+Initialize the Sys\+Tick timer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tick\+\_\+us} & Tick period in microseconds\\
+\hline
+\end{DoxyParams}
+Configures Sys\+Tick to\+:
+\begin{DoxyItemize}
+\item Use processor clock (AHB)
+\item Generate interrupts at specified interval
+\item Start counting immediately \begin{DoxyNote}{Note}
+Reload value is limited to 24 bits 
+\end{DoxyNote}
+
+\end{DoxyItemize}\Hypertarget{timer_8h_aa6691f9947ff72bae0c9a47f5023cd39}\index{timer.h@{timer.h}!TIM12\_IRQHandler@{TIM12\_IRQHandler}}
+\index{TIM12\_IRQHandler@{TIM12\_IRQHandler}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{TIM12\_IRQHandler()}{TIM12\_IRQHandler()}}
+{\footnotesize\ttfamily \label{timer_8h_aa6691f9947ff72bae0c9a47f5023cd39} 
+void TIM12\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a38ad4725462bdc5e86c4ead4f04b9fc2}\index{timer.h@{timer.h}!TIM2\_IRQHandler@{TIM2\_IRQHandler}}
+\index{TIM2\_IRQHandler@{TIM2\_IRQHandler}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{TIM2\_IRQHandler()}{TIM2\_IRQHandler()}}
+{\footnotesize\ttfamily \label{timer_8h_a38ad4725462bdc5e86c4ead4f04b9fc2} 
+void TIM2\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_ac8e51d2183b5230cbd5481f8867adce9}\index{timer.h@{timer.h}!TIM3\_IRQHandler@{TIM3\_IRQHandler}}
+\index{TIM3\_IRQHandler@{TIM3\_IRQHandler}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{TIM3\_IRQHandler()}{TIM3\_IRQHandler()}}
+{\footnotesize\ttfamily \label{timer_8h_ac8e51d2183b5230cbd5481f8867adce9} 
+void TIM3\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a7133f3f78767503641d307386e68bd28}\index{timer.h@{timer.h}!TIM4\_IRQHandler@{TIM4\_IRQHandler}}
+\index{TIM4\_IRQHandler@{TIM4\_IRQHandler}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{TIM4\_IRQHandler()}{TIM4\_IRQHandler()}}
+{\footnotesize\ttfamily \label{timer_8h_a7133f3f78767503641d307386e68bd28} 
+void TIM4\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a5e66446caf21dd90191dc07a13ce2378}\index{timer.h@{timer.h}!TIM5\_IRQHandler@{TIM5\_IRQHandler}}
+\index{TIM5\_IRQHandler@{TIM5\_IRQHandler}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{TIM5\_IRQHandler()}{TIM5\_IRQHandler()}}
+{\footnotesize\ttfamily \label{timer_8h_a5e66446caf21dd90191dc07a13ce2378} 
+void TIM5\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a903756e157645ae9961b3e937c593c34}\index{timer.h@{timer.h}!TIM9\_IRQHandler@{TIM9\_IRQHandler}}
+\index{TIM9\_IRQHandler@{TIM9\_IRQHandler}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{TIM9\_IRQHandler()}{TIM9\_IRQHandler()}}
+{\footnotesize\ttfamily \label{timer_8h_a903756e157645ae9961b3e937c593c34} 
+void TIM9\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a45f9a07b1ec73b7c758005623d8ab0e5}\index{timer.h@{timer.h}!timer\_attach\_callback@{timer\_attach\_callback}}
+\index{timer\_attach\_callback@{timer\_attach\_callback}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_attach\_callback()}{timer\_attach\_callback()}}
+{\footnotesize\ttfamily \label{timer_8h_a45f9a07b1ec73b7c758005623d8ab0e5} 
+void timer\+\_\+attach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{callback~}{)(void)}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a6226a8f2f8b305c2a319ade05a77886c}\index{timer.h@{timer.h}!timer\_clear\_interrupt\_flag@{timer\_clear\_interrupt\_flag}}
+\index{timer\_clear\_interrupt\_flag@{timer\_clear\_interrupt\_flag}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_clear\_interrupt\_flag()}{timer\_clear\_interrupt\_flag()}}
+{\footnotesize\ttfamily \label{timer_8h_a6226a8f2f8b305c2a319ade05a77886c} 
+void timer\+\_\+clear\+\_\+interrupt\+\_\+flag (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a834d3bef7882671645ad5d3c58fa69bc}\index{timer.h@{timer.h}!timer\_detach\_callback@{timer\_detach\_callback}}
+\index{timer\_detach\_callback@{timer\_detach\_callback}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_detach\_callback()}{timer\_detach\_callback()}}
+{\footnotesize\ttfamily \label{timer_8h_a834d3bef7882671645ad5d3c58fa69bc} 
+void timer\+\_\+detach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a0d3035840fb20d5213a70d0e33994584}\index{timer.h@{timer.h}!timer\_disable\_channel@{timer\_disable\_channel}}
+\index{timer\_disable\_channel@{timer\_disable\_channel}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_disable\_channel()}{timer\_disable\_channel()}}
+{\footnotesize\ttfamily \label{timer_8h_a0d3035840fb20d5213a70d0e33994584} 
+void timer\+\_\+disable\+\_\+channel (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a4784a158d5bf211d3f07cc83ca0b78c2}\index{timer.h@{timer.h}!timer\_disable\_interrupt@{timer\_disable\_interrupt}}
+\index{timer\_disable\_interrupt@{timer\_disable\_interrupt}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_disable\_interrupt()}{timer\_disable\_interrupt()}}
+{\footnotesize\ttfamily \label{timer_8h_a4784a158d5bf211d3f07cc83ca0b78c2} 
+void timer\+\_\+disable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_ab790fdb4ee5e3bfe9477a2bbfb89e13d}\index{timer.h@{timer.h}!timer\_enable\_channel@{timer\_enable\_channel}}
+\index{timer\_enable\_channel@{timer\_enable\_channel}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_enable\_channel()}{timer\_enable\_channel()}}
+{\footnotesize\ttfamily \label{timer_8h_ab790fdb4ee5e3bfe9477a2bbfb89e13d} 
+void timer\+\_\+enable\+\_\+channel (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f}\index{timer.h@{timer.h}!timer\_enable\_interrupt@{timer\_enable\_interrupt}}
+\index{timer\_enable\_interrupt@{timer\_enable\_interrupt}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_enable\_interrupt()}{timer\_enable\_interrupt()}}
+{\footnotesize\ttfamily \label{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f} 
+void timer\+\_\+enable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a566a41b6f3c8e66b0736719528da6245}\index{timer.h@{timer.h}!timer\_get\_arr@{timer\_get\_arr}}
+\index{timer\_get\_arr@{timer\_get\_arr}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_get\_arr()}{timer\_get\_arr()}}
+{\footnotesize\ttfamily \label{timer_8h_a566a41b6f3c8e66b0736719528da6245} 
+uint32\+\_\+t timer\+\_\+get\+\_\+arr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a043ef2140caa620a1ed1af968fff5b46}\index{timer.h@{timer.h}!timer\_get\_compare@{timer\_get\_compare}}
+\index{timer\_get\_compare@{timer\_get\_compare}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_get\_compare()}{timer\_get\_compare()}}
+{\footnotesize\ttfamily \label{timer_8h_a043ef2140caa620a1ed1af968fff5b46} 
+uint32\+\_\+t timer\+\_\+get\+\_\+compare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a19aba4b4d8462e4f84b6eeabda21423c}\index{timer.h@{timer.h}!timer\_get\_count@{timer\_get\_count}}
+\index{timer\_get\_count@{timer\_get\_count}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_get\_count()}{timer\_get\_count()}}
+{\footnotesize\ttfamily \label{timer_8h_a19aba4b4d8462e4f84b6eeabda21423c} 
+uint32\+\_\+t timer\+\_\+get\+\_\+count (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a6b2fb6cbff774094130a964475db6b25}\index{timer.h@{timer.h}!timer\_get\_frequency@{timer\_get\_frequency}}
+\index{timer\_get\_frequency@{timer\_get\_frequency}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_get\_frequency()}{timer\_get\_frequency()}}
+{\footnotesize\ttfamily \label{timer_8h_a6b2fb6cbff774094130a964475db6b25} 
+uint32\+\_\+t timer\+\_\+get\+\_\+frequency (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_adfbc1cc33f34b935f0b0ee61d2d3f6f8}\index{timer.h@{timer.h}!timer\_init@{timer\_init}}
+\index{timer\_init@{timer\_init}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_init()}{timer\_init()}}
+{\footnotesize\ttfamily \label{timer_8h_adfbc1cc33f34b935f0b0ee61d2d3f6f8} 
+void timer\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{prescaler}{, }\item[{uint32\+\_\+t}]{auto\+\_\+reload}{}\end{DoxyParamCaption})}
+
+
+
+Initialize timer based on type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier \\
+\hline
+{\em prescaler} & Prescaler value \\
+\hline
+{\em auto\+\_\+reload} & Auto-\/reload value \\
+\hline
+\end{DoxyParams}
+Start timer counter 
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier\\
+\hline
+\end{DoxyParams}
+Stop timer counter 
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier\\
+\hline
+\end{DoxyParams}
+Set timer compare value for PWM 
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier \\
+\hline
+{\em channel} & Channel number (1-\/4) \\
+\hline
+{\em compare\+\_\+value} & CCR register value\\
+\hline
+\end{DoxyParams}
+Configures PWM mode 1 and enables the channel output
+
+Enable timer channel output 
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier \\
+\hline
+{\em channel} & Channel number (1-\/4)\\
+\hline
+\end{DoxyParams}
+Reset timer counter to zero.
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier.\\
+\hline
+\end{DoxyParams}
+Get the current counter value for a timer.
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Current counter value or 0 if invalid timer.
+\end{DoxyReturn}
+Calculate the timer\textquotesingle{}s current base frequency using PSC and ARR.
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Timer frequency in Hz or 0 if invalid timer.
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+This reads PSC and ARR directly from timer registers and uses the appropriate APB clock for the timer.
+\end{DoxyNote}
+IRQ handler wrapper for TIM2.
+
+Clears the flag and dispatches to the HAL interrupt handler table.
+
+IRQ handler wrapper for TIM3.
+
+IRQ handler wrapper for TIM4.
+
+IRQ handler wrapper for TIM5.
+
+IRQ handler for TIM1 BRK and TIM9 shared vector.
+
+\begin{DoxyNote}{Note}
+This function clears TIM9\textquotesingle{}s flag and dispatches using the shared IRQn.
+\end{DoxyNote}
+
+
+Enable timer interrupts (NVIC + DIER UIE) for supported timers.
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+For TIM1 more complex options exist and are left TODO in the original.
+\end{DoxyNote}
+Attach a callback to the timer\textquotesingle{}s HAL interrupt table.
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier. \\
+\hline
+{\em callback} & Function pointer to call when the timer IRQ fires.\\
+\hline
+\end{DoxyParams}
+Detach a previously attached callback for the given timer.
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier.\\
+\hline
+\end{DoxyParams}
+Set the compare (CCR) register for a timer channel and configure CCMR.
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier. \\
+\hline
+{\em channel} & Channel number (1-\/4). \\
+\hline
+{\em compare\+\_\+value} & Value to write into CCRx.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This function sets PWM mode 1 and enables the channel after writing CCR.
+\end{DoxyNote}
+Disable timer channel output 
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier \\
+\hline
+{\em channel} & Channel number (1-\/4)\\
+\hline
+\end{DoxyParams}
+\Hypertarget{timer_8h_ab50e7d8e6b8713a9a96abc6dd3a9e932}\index{timer.h@{timer.h}!timer\_reset@{timer\_reset}}
+\index{timer\_reset@{timer\_reset}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_reset()}{timer\_reset()}}
+{\footnotesize\ttfamily \label{timer_8h_ab50e7d8e6b8713a9a96abc6dd3a9e932} 
+void timer\+\_\+reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a0b6c91f4ad622097b4e2787abce9873e}\index{timer.h@{timer.h}!timer\_set\_arr@{timer\_set\_arr}}
+\index{timer\_set\_arr@{timer\_set\_arr}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_set\_arr()}{timer\_set\_arr()}}
+{\footnotesize\ttfamily \label{timer_8h_a0b6c91f4ad622097b4e2787abce9873e} 
+void timer\+\_\+set\+\_\+arr (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{, }\item[{uint32\+\_\+t}]{arr}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a159fed92e0cdfaa14198b84dafe12f80}\index{timer.h@{timer.h}!timer\_set\_auto\_reload@{timer\_set\_auto\_reload}}
+\index{timer\_set\_auto\_reload@{timer\_set\_auto\_reload}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_set\_auto\_reload()}{timer\_set\_auto\_reload()}}
+{\footnotesize\ttfamily \label{timer_8h_a159fed92e0cdfaa14198b84dafe12f80} 
+void timer\+\_\+set\+\_\+auto\+\_\+reload (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{arr}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a3b5738efe72c1bd7130276a8f59b8234}\index{timer.h@{timer.h}!timer\_set\_compare@{timer\_set\_compare}}
+\index{timer\_set\_compare@{timer\_set\_compare}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_set\_compare()}{timer\_set\_compare()}}
+{\footnotesize\ttfamily \label{timer_8h_a3b5738efe72c1bd7130276a8f59b8234} 
+void timer\+\_\+set\+\_\+compare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint8\+\_\+t}]{channel}{, }\item[{uint32\+\_\+t}]{compare\+\_\+value}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_ad6a8de2e162397553b3421265987fb7b}\index{timer.h@{timer.h}!timer\_set\_prescaler@{timer\_set\_prescaler}}
+\index{timer\_set\_prescaler@{timer\_set\_prescaler}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_set\_prescaler()}{timer\_set\_prescaler()}}
+{\footnotesize\ttfamily \label{timer_8h_ad6a8de2e162397553b3421265987fb7b} 
+void timer\+\_\+set\+\_\+prescaler (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{prescaler}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a49fb0f6c6b9a4802601a452618672e52}\index{timer.h@{timer.h}!timer\_start@{timer\_start}}
+\index{timer\_start@{timer\_start}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_start()}{timer\_start()}}
+{\footnotesize\ttfamily \label{timer_8h_a49fb0f6c6b9a4802601a452618672e52} 
+void timer\+\_\+start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
+
+\Hypertarget{timer_8h_a196e32e61e4a4d6cb50e46ebffb1e0b8}\index{timer.h@{timer.h}!timer\_stop@{timer\_stop}}
+\index{timer\_stop@{timer\_stop}!timer.h@{timer.h}}
+\doxysubsubsection{\texorpdfstring{timer\_stop()}{timer\_stop()}}
+{\footnotesize\ttfamily \label{timer_8h_a196e32e61e4a4d6cb50e46ebffb1e0b8} 
+void timer\+\_\+stop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
+

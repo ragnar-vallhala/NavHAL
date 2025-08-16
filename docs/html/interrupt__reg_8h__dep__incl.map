@@ -1,0 +1,9 @@
+<map id="include/core/cortex&#45;m4/interrupt_reg.h" name="include/core/cortex&#45;m4/interrupt_reg.h">
+<area shape="rect" id="Node000001" title="Cortex&#45;M4 NVIC (Nested Vector Interrupt Controller) register definitions." alt="" coords="84,5,216,46"/>
+<area shape="rect" id="Node000002" href="$interrupt_8h.html" title="NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32F4." alt="" coords="84,94,216,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,62,152,94,147,94,147,62"/>
+<area shape="rect" id="Node000003" href="$interrupt_8c.html" title="Cortex&#45;M4 Interrupt Controller HAL Implementation." alt="" coords="5,183,140,223"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="124,148,92,184,88,180,120,145"/>
+<area shape="rect" id="Node000004" href="$timer_8c.html" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)" alt="" coords="163,183,294,223"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="180,145,213,180,209,184,176,148"/>
+</map>

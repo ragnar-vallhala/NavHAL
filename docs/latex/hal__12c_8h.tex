@@ -1,0 +1,27 @@
+\doxysection{include/common/hal\+\_\+12c.h File Reference}
+\hypertarget{hal__12c_8h}{}\label{hal__12c_8h}\index{include/common/hal\_12c.h@{include/common/hal\_12c.h}}
+
+
+Hardware Abstraction Layer (HAL) interface for I2C communication.  
+
+
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hal__12c_8h__dep__incl}
+\end{center}
+\end{figure}
+
+
+\doxysubsection{Detailed Description}
+Hardware Abstraction Layer (HAL) interface for I2C communication. 
+
+This header file provides the interface for including the appropriate I2C driver implementation based on the target architecture. For Cortex-\/\+M4 targets, it includes the {\ttfamily \doxylink{i2c_8h}{core/cortex-\/m4/i2c.\+h}} header.
+
+The HAL layer allows higher-\/level code to remain platform-\/independent by abstracting hardware-\/specific implementations.
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}

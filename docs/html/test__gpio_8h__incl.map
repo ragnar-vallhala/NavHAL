@@ -1,0 +1,7 @@
+<map id="tests/test_gpio.h" name="tests/test_gpio.h">
+<area shape="rect" id="Node000001" title="GPIO unit test declarations for NAVHAL." alt="" coords="18,5,136,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,64,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,33,52,67,47,64,68,30"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="88,79,152,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="86,30,107,64,103,67,82,33"/>
+</map>

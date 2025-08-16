@@ -1,0 +1,59 @@
+\doxysection{i2c.\+h}
+\hypertarget{i2c_8h_source}{}\label{i2c_8h_source}\index{include/core/cortex-\/m4/i2c.h@{include/core/cortex-\/m4/i2c.h}}
+\mbox{\hyperlink{i2c_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_I2C\_H}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_I2C\_H}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gpio__types_8h}{utils/gpio\_types.h}}"{}}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ <stdbool.h>}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00029\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fa0b5a09d5026c207fa09191d2281c2185}{HAL\_I2C\_OK}}\ =\ 0,\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5facc459d65ab3dfdaa1181c860a95efd8b}{HAL\_I2C\_ERR\_TIMEOUT}},\ \ \ \ \ }
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fa5b18ca951e4c5df39dfd86a70792386e}{HAL\_I2C\_ERR\_BUS}},\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5fad31196dbd33e345b318b6e32a565f09b}{HAL\_I2C\_ERR\_NACK}},\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5faad325f75c3112ff63c411bf8aa8a1f7f}{HAL\_I2C\_ERR\_REINIT}}\ \ \ \ \ \ \ }
+\DoxyCodeLine{00035\ \}\ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\_i2c\_status\_t}};}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00040\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bcaeb0f494c71f34592c5a4500ee98ab4a2}{I2C1}}\ =\ 0,\ }
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bcae2cc6f0481e798aedb5fd5c6a2bfc01b}{I2C2}}\ =\ 1,\ }
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bca85b6fc15a9c27469c6bdcbf4bd2f1495}{I2C3}}\ =\ 2\ \ }
+\DoxyCodeLine{00044\ \}\ \mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bc}{hal\_i2c\_bus\_t}};}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00049\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{enum}\ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6aa0980a31ea116d2c6c80103449e7d0e33}{STANDARD\_MODE}}\ =\ 0,\ }
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6aa2f30c794294ff2100f9de4335a50d37d}{FAST\_MODE}}\ =\ 1\ \ \ \ \ \ }
+\DoxyCodeLine{00052\ \}\ \mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6a}{hal\_i2c\_speed\_t}};}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ I2C\_MASTER\ 0}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ GPIO\_FUNC\_I2C\ GPIO\_AF04}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00063\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{i2c_8h_a5cc987dd67468d485cc8887d64b2ac6a}{hal\_i2c\_speed\_t}}\ \mbox{\hyperlink{structhal__i2c__config__t_a359734b893caac1c2a2f0ffccf20839e}{clock\_speed}};\ }
+\DoxyCodeLine{00065\ \ \ \ \ uint8\_t\ \mbox{\hyperlink{structhal__i2c__config__t_a6b6198821b6ca87ef2a61ddf8666fd0d}{own\_address}};\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structhal__i2c__config__t_af180fc245e4740e541053afe55a2cab3}{acknowledge}};\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00067\ \}\ \mbox{\hyperlink{structhal__i2c__config__t}{hal\_i2c\_config\_t}};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00076\ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\_i2c\_status\_t}}\ \mbox{\hyperlink{i2c_8h_acd2b5ef5fcbc5e34b9400bdb4dcd5dc7}{hal\_i2c\_init}}(\mbox{\hyperlink{i2c_8h_ab22311de972331b2e40a81cc0541c3bc}{hal\_i2c\_bus\_t}}\ bus,\ \mbox{\hyperlink{structhal__i2c__config__t}{hal\_i2c\_config\_t}}\ *config);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00087\ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\_i2c\_status\_t}}\ \mbox{\hyperlink{i2c_8h_a9fbeaa7d026a0fa1ba5cf26ce15ca80b}{hal\_i2c\_write}}(uint8\_t\ bus,\ uint8\_t\ dev\_addr,}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ *data,\ uint16\_t\ len);}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00099\ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\_i2c\_status\_t}}\ \mbox{\hyperlink{i2c_8h_a5239a70a3e56991fe587508a1b312bf6}{hal\_i2c\_read}}(uint8\_t\ bus,\ uint8\_t\ dev\_addr,\ uint8\_t\ *data,}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint16\_t\ len);}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00113\ \mbox{\hyperlink{i2c_8h_ad3ddfb889b2b8f2c4fc497e5fa0b0e5f}{hal\_i2c\_status\_t}}\ \mbox{\hyperlink{i2c_8h_a38fd14bc21911381784848fff2edaa51}{hal\_i2c\_write\_read}}(uint8\_t\ bus,\ uint8\_t\ dev\_addr,}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ uint8\_t\ *tx\_data,\ uint16\_t\ tx\_len,}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ uint8\_t\ *rx\_data,\ uint16\_t\ rx\_len);}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00122\ uint8\_t\ \mbox{\hyperlink{i2c_8h_a4267eb88a34f4ca48a4c7f63faf290a9}{hal\_i2c\_get\_init\_status}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ !CORTEX\_M4\_I2C\_H}}
+
+\end{DoxyCode}

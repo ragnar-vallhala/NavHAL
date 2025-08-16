@@ -1,0 +1,75 @@
+\doxysection{samples/04\+\_\+hal\+\_\+timer/main.c File Reference}
+\hypertarget{samples_204__hal__timer_2main_8c}{}\label{samples_204__hal__timer_2main_8c}\index{samples/04\_hal\_timer/main.c@{samples/04\_hal\_timer/main.c}}
+
+
+Example application\+: Print Timer5 count over UART2 continuously.  
+
+
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{samples_204__hal__timer_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{samples_204__hal__timer_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{samples_204__hal__timer_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Example application\+: Print Timer5 count over UART2 continuously. 
+
+
+\begin{DoxyItemize}
+\item Initializes Sys\+Tick with 1 ms tick.
+\item Initializes UART2 at 9600 baud.
+\item Initializes TIM5 timer.
+\item Continuously prints the TIM5 count via UART2.
+\end{DoxyItemize}
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{samples_204__hal__timer_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{samples_204__hal__timer_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{samples_204__hal__timer_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+
+
+\label{doc-func-members}
+\Hypertarget{samples_204__hal__timer_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{samples_204__hal__timer_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{samples_204__hal__timer_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+\texorpdfstring{$<$}{<} Initialize Sys\+Tick with 1 ms tick
+
+\texorpdfstring{$<$}{<} Initialize UART2 at 9600 baud
+
+\texorpdfstring{$<$}{<} Initialize TIM5 with auto-\/reload 1e9
+
+\texorpdfstring{$<$}{<} Print label
+
+\texorpdfstring{$<$}{<} Convert timer value to string
+
+\texorpdfstring{$<$}{<} Newline and carriage return

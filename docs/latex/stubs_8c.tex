@@ -1,0 +1,114 @@
+\doxysection{tests/stubs.c File Reference}
+\hypertarget{stubs_8c}{}\label{stubs_8c}\index{tests/stubs.c@{tests/stubs.c}}
+
+
+System-\/level function implementations for Cortex-\/\+M4.  
+
+
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+Include dependency graph for stubs.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{stubs_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{stubs_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{stubs_8c_a07036e93939040c563e862a6a31b65bc}{putchar}} (int ch)
+\begin{DoxyCompactList}\small\item\em Write a character to the standard output. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{stubs_8c_a8dec7c95227ff149687066cf04029191}{abort}} (void)
+\begin{DoxyCompactList}\small\item\em Abnormal program termination. \end{DoxyCompactList}\item 
+void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{stubs_8c_a092d3e39059684623e921a69e58ef5c4}{memcpy}} (void \texorpdfstring{$\ast$}{*}dest, const void \texorpdfstring{$\ast$}{*}src, unsigned int n)
+\begin{DoxyCompactList}\small\item\em Copy memory area. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+System-\/level function implementations for Cortex-\/\+M4. 
+
+This file provides minimal implementations of standard library functions required for the NAVHAL framework. It includes\+:
+\begin{DoxyItemize}
+\item Character output (putchar)
+\item Program termination (abort)
+\item Memory operations (memcpy)
+\end{DoxyItemize}
+
+These implementations are optimized for embedded use and avoid dependencies on the standard C library.
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{stubs_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{stubs_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{stubs.c@{stubs.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!stubs.c@{stubs.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{stubs_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+
+
+\label{doc-func-members}
+\Hypertarget{stubs_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{stubs_8c_a8dec7c95227ff149687066cf04029191}\index{stubs.c@{stubs.c}!abort@{abort}}
+\index{abort@{abort}!stubs.c@{stubs.c}}
+\doxysubsubsection{\texorpdfstring{abort()}{abort()}}
+{\footnotesize\ttfamily \label{stubs_8c_a8dec7c95227ff149687066cf04029191} 
+void abort (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Abnormal program termination. 
+
+Implements the standard \doxylink{stubs_8c_a8dec7c95227ff149687066cf04029191}{abort()} function by entering an infinite loop. This is the default behavior for unrecoverable errors in the embedded environment. \Hypertarget{stubs_8c_a092d3e39059684623e921a69e58ef5c4}\index{stubs.c@{stubs.c}!memcpy@{memcpy}}
+\index{memcpy@{memcpy}!stubs.c@{stubs.c}}
+\doxysubsubsection{\texorpdfstring{memcpy()}{memcpy()}}
+{\footnotesize\ttfamily \label{stubs_8c_a092d3e39059684623e921a69e58ef5c4} 
+void \texorpdfstring{$\ast$}{*} memcpy (\begin{DoxyParamCaption}\item[{void \texorpdfstring{$\ast$}{*}}]{dest}{, }\item[{const void \texorpdfstring{$\ast$}{*}}]{src}{, }\item[{unsigned int}]{n}{}\end{DoxyParamCaption})}
+
+
+
+Copy memory area. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{out}}  & {\em dest} & Pointer to destination memory \\
+\hline
+\mbox{\texttt{in}}  & {\em src} & Pointer to source memory \\
+\hline
+\mbox{\texttt{in}}  & {\em n} & Number of bytes to copy \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Pointer to destination memory
+\end{DoxyReturn}
+Implements the standard \doxylink{stubs_8c_a092d3e39059684623e921a69e58ef5c4}{memcpy()} function with byte-\/by-\/byte copy. This is a minimal implementation without alignment optimizations. \Hypertarget{stubs_8c_a07036e93939040c563e862a6a31b65bc}\index{stubs.c@{stubs.c}!putchar@{putchar}}
+\index{putchar@{putchar}!stubs.c@{stubs.c}}
+\doxysubsubsection{\texorpdfstring{putchar()}{putchar()}}
+{\footnotesize\ttfamily \label{stubs_8c_a07036e93939040c563e862a6a31b65bc} 
+int putchar (\begin{DoxyParamCaption}\item[{int}]{ch}{}\end{DoxyParamCaption})}
+
+
+
+Write a character to the standard output. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em ch} & Character to output \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The character written
+\end{DoxyReturn}
+Implements the standard \doxylink{stubs_8c_a07036e93939040c563e862a6a31b65bc}{putchar()} function by redirecting output to UART2. This enables printf() functionality when using the standard library. 

@@ -1,0 +1,158 @@
+\doxysection{tests/main.c File Reference}
+\hypertarget{tests_2main_8c}{}\label{tests_2main_8c}\index{tests/main.c@{tests/main.c}}
+
+
+Unit test runner for NAVHAL Cortex-\/\+M4 hardware abstraction layer.  
+
+
+{\ttfamily \#include "{}navhal.\+h"{}}\newline
+{\ttfamily \#include "{}test\+\_\+gpio.\+h"{}}\newline
+{\ttfamily \#include "{}test\+\_\+timer.\+h"{}}\newline
+{\ttfamily \#include "{}unity.\+h"{}}\newline
+Include dependency graph for main.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tests_2main_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{tests_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}{CORTEX\+\_\+\+M4}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{tests_2main_8c_a95c834d6178047ce9e1bce7cbfea2836}{set\+Up}} (void)
+\begin{DoxyCompactList}\small\item\em Unity test framework setup function. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{tests_2main_8c_a9909011e5fea0c018842eec4d93d0662}{tear\+Down}} (void)
+\begin{DoxyCompactList}\small\item\em Unity test framework teardown function. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{tests_2main_8c_a5f05e632d27f4a50751da0b75766f93c}{test\+\_\+gpio}} (void)
+\begin{DoxyCompactList}\small\item\em Run all GPIO tests. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{tests_2main_8c_a13cdfce05823f42882406dd9ca67b351}{test\+\_\+timer}} (void)
+\begin{DoxyCompactList}\small\item\em Run all Timer tests. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{tests_2main_8c_af9c3d38cfc4049700bece93aab05b08d}{print\+\_\+startup\+\_\+message}} (void)
+\begin{DoxyCompactList}\small\item\em Print startup banner to UART. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{tests_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\begin{DoxyCompactList}\small\item\em Main test runner function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Unit test runner for NAVHAL Cortex-\/\+M4 hardware abstraction layer. 
+
+This file implements the main test runner for the NAVHAL unit tests. It includes\+:
+\begin{DoxyItemize}
+\item Test setup/teardown functions
+\item Individual test suite runners (GPIO, Timer)
+\item Test result reporting
+\item ANSI terminal control for output formatting
+\end{DoxyItemize}
+
+Tests are implemented using the Unity test framework and output results via UART2 at 9600 baud.
+
+\begin{DoxyNote}{Note}
+Requires UART2 to be properly configured before running 
+\end{DoxyNote}
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{tests_2main_8c_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{tests_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460}\index{main.c@{main.c}!CORTEX\_M4@{CORTEX\_M4}}
+\index{CORTEX\_M4@{CORTEX\_M4}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{CORTEX\_M4}{CORTEX\_M4}}
+{\footnotesize\ttfamily \label{tests_2main_8c_a96aff19a3c64fdb17b0c2f69bdaad460} 
+\#define CORTEX\+\_\+\+M4}
+
+
+
+\label{doc-func-members}
+\Hypertarget{tests_2main_8c_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{tests_2main_8c_a840291bc02cba5474a4cb46a9b9566fe}\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily \label{tests_2main_8c_a840291bc02cba5474a4cb46a9b9566fe} 
+int main (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Main test runner function. 
+
+\begin{DoxyReturn}{Returns}
+Total number of failed tests
+\end{DoxyReturn}
+Initializes UART2, prints startup message, runs all test suites, and reports final results \Hypertarget{tests_2main_8c_af9c3d38cfc4049700bece93aab05b08d}\index{main.c@{main.c}!print\_startup\_message@{print\_startup\_message}}
+\index{print\_startup\_message@{print\_startup\_message}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{print\_startup\_message()}{print\_startup\_message()}}
+{\footnotesize\ttfamily \label{tests_2main_8c_af9c3d38cfc4049700bece93aab05b08d} 
+void print\+\_\+startup\+\_\+message (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Print startup banner to UART. 
+
+Clears terminal screen and prints formatted startup message using ANSI escape sequences \Hypertarget{tests_2main_8c_a95c834d6178047ce9e1bce7cbfea2836}\index{main.c@{main.c}!setUp@{setUp}}
+\index{setUp@{setUp}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{setUp()}{setUp()}}
+{\footnotesize\ttfamily \label{tests_2main_8c_a95c834d6178047ce9e1bce7cbfea2836} 
+void set\+Up (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Unity test framework setup function. 
+
+Empty implementation since no special setup is required \Hypertarget{tests_2main_8c_a9909011e5fea0c018842eec4d93d0662}\index{main.c@{main.c}!tearDown@{tearDown}}
+\index{tearDown@{tearDown}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{tearDown()}{tearDown()}}
+{\footnotesize\ttfamily \label{tests_2main_8c_a9909011e5fea0c018842eec4d93d0662} 
+void tear\+Down (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Unity test framework teardown function. 
+
+Empty implementation since no special cleanup is required \Hypertarget{tests_2main_8c_a5f05e632d27f4a50751da0b75766f93c}\index{main.c@{main.c}!test\_gpio@{test\_gpio}}
+\index{test\_gpio@{test\_gpio}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{test\_gpio()}{test\_gpio()}}
+{\footnotesize\ttfamily \label{tests_2main_8c_a5f05e632d27f4a50751da0b75766f93c} 
+int test\+\_\+gpio (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Run all GPIO tests. 
+
+\begin{DoxyReturn}{Returns}
+Number of failed tests
+\end{DoxyReturn}
+Executes the following test cases\+:
+\begin{DoxyItemize}
+\item GPIO mode setting/reading
+\item Digital write operations
+\item Alternate function configuration 
+\end{DoxyItemize}\Hypertarget{tests_2main_8c_a13cdfce05823f42882406dd9ca67b351}\index{main.c@{main.c}!test\_timer@{test\_timer}}
+\index{test\_timer@{test\_timer}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{test\_timer()}{test\_timer()}}
+{\footnotesize\ttfamily \label{tests_2main_8c_a13cdfce05823f42882406dd9ca67b351} 
+int test\+\_\+timer (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Run all Timer tests. 
+
+\begin{DoxyReturn}{Returns}
+Number of failed tests
+\end{DoxyReturn}
+Executes the following test cases\+:
+\begin{DoxyItemize}
+\item Timer initialization
+\item Start/stop functionality
+\item Counter operations
+\item Compare register functionality
+\item Channel enable/disable 
+\end{DoxyItemize}

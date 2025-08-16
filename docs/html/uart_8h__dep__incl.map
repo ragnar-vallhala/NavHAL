@@ -1,0 +1,7 @@
+<map id="include/core/cortex&#45;m4/uart.h" name="include/core/cortex&#45;m4/uart.h">
+<area shape="rect" id="Node000001" title="UART driver interface for STM32F4 (Cortex&#45;M4)." alt="" coords="108,5,240,46"/>
+<area shape="rect" id="Node000002" href="$samples_200__test__sample_2main_8c.html" title=" " alt="" coords="5,94,172,135"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,59,110,95,106,92,142,55"/>
+<area shape="rect" id="Node000003" href="$uart_8c.html" title="UART driver implementation for STM32F4 series." alt="" coords="195,94,326,135"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="206,55,243,92,239,95,202,59"/>
+</map>

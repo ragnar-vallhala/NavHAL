@@ -1,0 +1,85 @@
+\doxysection{UARTx\+\_\+\+Reg\+\_\+\+Typedef Struct Reference}
+\hypertarget{struct_u_a_r_tx___reg___typedef}{}\label{struct_u_a_r_tx___reg___typedef}\index{UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}}
+
+
+UART peripheral register map for STM32\+F4.  
+
+
+
+
+{\ttfamily \#include $<$uart\+\_\+reg.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_u_a_r_tx___reg___typedef_a9e58910299eaecb2200bd7c2b102dcfe}{SR}}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_u_a_r_tx___reg___typedef_ad528d2c4fa88f23ef5dcc3f679390260}{DR}}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_u_a_r_tx___reg___typedef_a933665a0a013b4c7c8d914431e5da538}{BRR}}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_u_a_r_tx___reg___typedef_ac8dd815fbb8d17c6d7f6e3299da0150f}{CR1}}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_u_a_r_tx___reg___typedef_ace07d566cb4e6f72519780d0fc7f35e5}{CR2}}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_u_a_r_tx___reg___typedef_a6958d0d1e937eb5ad108644fdf094955}{CR3}}
+\item 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t \mbox{\hyperlink{struct_u_a_r_tx___reg___typedef_a7cb6a51f135d4c56b7e25b18b64d4225}{GTPR}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+UART peripheral register map for STM32\+F4. 
+
+This structure provides direct access to the memory-\/mapped UART registers. Each member corresponds to a specific UART register and its offset. All registers are marked as {\ttfamily \+\_\+\+\_\+\+IO} for volatile read/write access. 
+
+\label{doc-variable-members}
+\Hypertarget{struct_u_a_r_tx___reg___typedef_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_u_a_r_tx___reg___typedef_a933665a0a013b4c7c8d914431e5da538}\index{UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}!BRR@{BRR}}
+\index{BRR@{BRR}!UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}}
+\doxysubsubsection{\texorpdfstring{BRR}{BRR}}
+{\footnotesize\ttfamily \label{struct_u_a_r_tx___reg___typedef_a933665a0a013b4c7c8d914431e5da538} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t UARTx\+\_\+\+Reg\+\_\+\+Typedef\+::\+BRR}
+
+0x08\+: Baud Rate Register Configures UART baud rate based on peripheral clock. \Hypertarget{struct_u_a_r_tx___reg___typedef_ac8dd815fbb8d17c6d7f6e3299da0150f}\index{UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}!CR1@{CR1}}
+\index{CR1@{CR1}!UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}}
+\doxysubsubsection{\texorpdfstring{CR1}{CR1}}
+{\footnotesize\ttfamily \label{struct_u_a_r_tx___reg___typedef_ac8dd815fbb8d17c6d7f6e3299da0150f} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t UARTx\+\_\+\+Reg\+\_\+\+Typedef\+::\+CR1}
+
+0x0C\+: Control Register 1 Enables UART, configures word length, parity, etc. \Hypertarget{struct_u_a_r_tx___reg___typedef_ace07d566cb4e6f72519780d0fc7f35e5}\index{UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}!CR2@{CR2}}
+\index{CR2@{CR2}!UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}}
+\doxysubsubsection{\texorpdfstring{CR2}{CR2}}
+{\footnotesize\ttfamily \label{struct_u_a_r_tx___reg___typedef_ace07d566cb4e6f72519780d0fc7f35e5} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t UARTx\+\_\+\+Reg\+\_\+\+Typedef\+::\+CR2}
+
+0x10\+: Control Register 2 Configures stop bits, clock enable for synchronous mode. \Hypertarget{struct_u_a_r_tx___reg___typedef_a6958d0d1e937eb5ad108644fdf094955}\index{UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}!CR3@{CR3}}
+\index{CR3@{CR3}!UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}}
+\doxysubsubsection{\texorpdfstring{CR3}{CR3}}
+{\footnotesize\ttfamily \label{struct_u_a_r_tx___reg___typedef_a6958d0d1e937eb5ad108644fdf094955} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t UARTx\+\_\+\+Reg\+\_\+\+Typedef\+::\+CR3}
+
+0x14\+: Control Register 3 Enables DMA, error interrupts, smart card mode, etc. \Hypertarget{struct_u_a_r_tx___reg___typedef_ad528d2c4fa88f23ef5dcc3f679390260}\index{UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}!DR@{DR}}
+\index{DR@{DR}!UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}}
+\doxysubsubsection{\texorpdfstring{DR}{DR}}
+{\footnotesize\ttfamily \label{struct_u_a_r_tx___reg___typedef_ad528d2c4fa88f23ef5dcc3f679390260} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t UARTx\+\_\+\+Reg\+\_\+\+Typedef\+::\+DR}
+
+0x04\+: Data Register Write to transmit data, read to receive data. \Hypertarget{struct_u_a_r_tx___reg___typedef_a7cb6a51f135d4c56b7e25b18b64d4225}\index{UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}!GTPR@{GTPR}}
+\index{GTPR@{GTPR}!UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}}
+\doxysubsubsection{\texorpdfstring{GTPR}{GTPR}}
+{\footnotesize\ttfamily \label{struct_u_a_r_tx___reg___typedef_a7cb6a51f135d4c56b7e25b18b64d4225} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t UARTx\+\_\+\+Reg\+\_\+\+Typedef\+::\+GTPR}
+
+0x18\+: Guard Time and Prescaler Register Used for smart card mode timing and prescaler. \Hypertarget{struct_u_a_r_tx___reg___typedef_a9e58910299eaecb2200bd7c2b102dcfe}\index{UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}!SR@{SR}}
+\index{SR@{SR}!UARTx\_Reg\_Typedef@{UARTx\_Reg\_Typedef}}
+\doxysubsubsection{\texorpdfstring{SR}{SR}}
+{\footnotesize\ttfamily \label{struct_u_a_r_tx___reg___typedef_a9e58910299eaecb2200bd7c2b102dcfe} 
+\mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\+\_\+\+\_\+\+IO}} uint32\+\_\+t UARTx\+\_\+\+Reg\+\_\+\+Typedef\+::\+SR}
+
+0x00\+: Status Register Contains flags like TXE, RXNE, TC, etc. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/core/cortex-\/m4/\mbox{\hyperlink{uart__reg_8h}{uart\+\_\+reg.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,17 @@
+<map id="tests/stubs.c" name="tests/stubs.c">
+<area shape="rect" id="Node000001" title="System&#45;level function implementations for Cortex&#45;M4." alt="" coords="426,5,524,31"/>
+<area shape="rect" id="Node000002" href="$navhal_8h.html" title="Root header file for the NavHAL project by NavRobotec." alt="" coords="440,79,510,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="478,31,478,63,472,63,472,31"/>
+<area shape="rect" id="Node000003" href="$hal__gpio_8h.html" title="Hardware Abstraction Layer (HAL) interface for General Purpose Input/Output (GPIO)." alt="" coords="5,153,140,178"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="440,102,155,152,154,147,439,97"/>
+<area shape="rect" id="Node000004" href="$hal__clock_8h.html" title="Hardware Abstraction Layer (HAL) interface for clock management." alt="" coords="163,153,304,178"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="440,106,290,150,288,145,439,101"/>
+<area shape="rect" id="Node000005" href="$hal__uart_8h.html" title="Hardware Abstraction Layer (HAL) interface for UART communication." alt="" coords="329,153,461,178"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="463,107,421,144,418,140,460,103"/>
+<area shape="rect" id="Node000006" href="$hal__timer_8h.html" title="Hardware Abstraction Layer (HAL) interface for timer peripherals." alt="" coords="486,153,624,178"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="491,103,532,140,529,144,487,107"/>
+<area shape="rect" id="Node000007" href="$hal__pwm_8h.html" title="Hardware Abstraction Layer (HAL) interface for Pulse Width Modulation (PWM)." alt="" coords="649,153,787,178"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="512,101,663,145,661,150,510,106"/>
+<area shape="rect" id="Node000008" href="$hal__12c_8h.html" title="Hardware Abstraction Layer (HAL) interface for I2C communication." alt="" coords="811,153,942,178"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="511,97,796,147,795,153,510,102"/>
+</map>

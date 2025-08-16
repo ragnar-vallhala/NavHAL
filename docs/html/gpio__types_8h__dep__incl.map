@@ -1,0 +1,24 @@
+<map id="include/utils/gpio_types.h" name="include/utils/gpio_types.h">
+<area shape="rect" id="Node000001" title="GPIO pin definitions and related types for NavHAL." alt="" coords="339,5,458,46"/>
+<area shape="rect" id="Node000002" href="$gpio_8h.html" title="Cortex&#45;M4 specific GPIO HAL interface." alt="" coords="152,183,283,223"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="363,58,319,96,236,184,232,180,315,92,360,54"/>
+<area shape="rect" id="Node000006" href="$i2c_8h.html" title="Cortex&#45;M4 I²C HAL interface." alt="" coords="541,94,672,135"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="461,50,560,91,558,96,459,55"/>
+<area shape="rect" id="Node000008" href="$types_8h.html" title="Centralized type definitions include for NavHAL." alt="" coords="330,102,467,127"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="401,62,401,101,396,101,396,62"/>
+<area shape="rect" id="Node000003" href="$gpio_8c.html" title="HAL GPIO driver implementation for STM32F4 series." alt="" coords="160,271,290,312"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="223,239,226,271,221,271,218,239"/>
+<area shape="rect" id="Node000004" href="$uart_8c.html" title="UART driver implementation for STM32F4 series." alt="" coords="5,271,136,312"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="172,234,105,273,102,269,170,229"/>
+<area shape="rect" id="Node000005" href="$test__gpio_8c.html" title="GPIO unit test implementation for NAVHAL." alt="" coords="314,279,432,304"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="267,229,353,276,350,281,264,233"/>
+<area shape="rect" id="Node000007" href="$i2c_8c.html" title="HAL I2C driver implementation for STM32F4 series." alt="" coords="516,271,646,312"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="612,150,613,186,609,224,593,272,588,270,604,223,607,186,607,150"/>
+<area shape="rect" id="Node000009" href="$gpio__reg_8h.html" title="Cortex&#45;M4 GPIO register definitions and access macros." alt="" coords="308,183,439,223"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="393,143,381,183,376,182,388,141"/>
+<area shape="rect" id="Node000010" href="$i2c__reg_8h.html" title="Cortex&#45;M4 I²C peripheral register definitions and bit masks." alt="" coords="464,183,595,223"/>
+<area shape="poly" id="edge11_Node000008_Node000010" title=" " alt="" coords="430,133,501,180,498,184,427,138"/>
+<area shape="poly" id="edge9_Node000009_Node000003" title=" " alt="" coords="328,234,260,273,257,269,325,229"/>
+<area shape="poly" id="edge10_Node000009_Node000005" title=" " alt="" coords="376,239,376,279,370,279,370,239"/>
+<area shape="poly" id="edge12_Node000010_Node000007" title=" " alt="" coords="551,235,572,270,567,272,546,238"/>
+</map>

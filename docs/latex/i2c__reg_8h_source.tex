@@ -1,0 +1,96 @@
+\doxysection{i2c\+\_\+reg.\+h}
+\hypertarget{i2c__reg_8h_source}{}\label{i2c__reg_8h_source}\index{include/core/cortex-\/m4/i2c\_reg.h@{include/core/cortex-\/m4/i2c\_reg.h}}
+\mbox{\hyperlink{i2c__reg_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_I2C\_REG\_H}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_I2C\_REG\_H}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{types_8h}{utils/types.h}}"{}}\ }
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00035\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_ac2d65c8da772e8954ba0ed15fef9517e}{CR1}};\ \ \ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_a7279959df84d7be127ea3c85625c4ab5}{CR2}};\ \ \ }
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_ad2c86f9413e6f0aa8a161d18fc00575c}{OAR1}};\ \ }
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_a10e757284ba7e452ca2d45ec2bfb3690}{OAR2}};\ \ }
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_a7f9469450c43cc545d809b20378beb10}{DR}};\ \ \ \ }
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_abaebef5d62d155ec6e1c8a9b15c1371f}{SR1}};\ \ \ }
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_a108804e51033adc02c331835d444d8a8}{SR2}};\ \ \ }
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_a09ae9e9b751171a5356a53382bf4655d}{CCR}};\ \ \ }
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_a461da97583c8ad62b688afcc3dfde6c1}{TRISE}};\ }
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_i2_c___reg___typedef_af95b4bc715d837baa0a87f412640c389}{FLTR}};\ \ }
+\DoxyCodeLine{00046\ \}\ \mbox{\hyperlink{struct_i2_c___reg___typedef}{I2C\_Reg\_Typedef}};}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ I2C\_BASE\_ADDR\ 0x40005400\ }\textcolor{preprocessor}{}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#define\ I2C\_GET\_BASE(n)\ ((I2C\_Reg\_Typedef\ *)(I2C\_BASE\_ADDR\ +\ (0x400\ *\ n)))}}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ I2C\_APB1ENR\_MASK(n)\ (1\ <<\ (21\ +\ n))}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_PE\_Pos\ \ \ \ \ 0}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_PE\_MASK\ \ \ \ (1U\ <<\ I2C\_CR1\_PE\_Pos)}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_START\_Pos\ \ 8}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_START\_MASK\ (1U\ <<\ I2C\_CR1\_START\_Pos)}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_STOP\_Pos\ \ \ 9}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_STOP\_MASK\ \ (1U\ <<\ I2C\_CR1\_STOP\_Pos)}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_ACK\_Pos\ \ \ \ 10}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_ACK\_MASK\ \ \ (1U\ <<\ I2C\_CR1\_ACK\_Pos)}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_POS\_Pos\ \ \ \ 11}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_POS\_MASK\ \ \ (1U\ <<\ I2C\_CR1\_POS\_Pos)}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_SWRST\_Pos\ \ 15}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#define\ I2C\_CR1\_SWRST\_MASK\ (1U\ <<\ I2C\_CR1\_SWRST\_Pos)}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#define\ I2C\_CR2\_FREQ\_Pos\ \ \ \ 0}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#define\ I2C\_CR2\_FREQ\_MASK\ \ \ (0x3FU\ <<\ I2C\_CR2\_FREQ\_Pos)}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#define\ I2C\_CR2\_ITERREN\_Pos\ 8}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#define\ I2C\_CR2\_ITERREN\ \ \ \ \ (1U\ <<\ I2C\_CR2\_ITERREN\_Pos)}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#define\ I2C\_CR2\_ITEVTEN\_Pos\ 9}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#define\ I2C\_CR2\_ITEVTEN\ \ \ \ \ (1U\ <<\ I2C\_CR2\_ITEVTEN\_Pos)}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#define\ I2C\_CR2\_ITBUFEN\_Pos\ 10}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#define\ I2C\_CR2\_ITBUFEN\ \ \ \ \ (1U\ <<\ I2C\_CR2\_ITBUFEN\_Pos)}}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_SB\_Pos\ \ \ \ \ \ 0}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_SB\_MASK\ \ \ \ \ (1U\ <<\ I2C\_SR1\_SB\_Pos)}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_ADDR\_Pos\ \ \ \ 1}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_ADDR\_MASK\ \ \ (1U\ <<\ I2C\_SR1\_ADDR\_Pos)}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_BTF\_Pos\ \ \ \ \ 2}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_BTF\_MASK\ \ \ \ (1U\ <<\ I2C\_SR1\_BTF\_Pos)}}
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_STOPF\_Pos\ \ \ 4}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_STOPF\ \ \ \ \ \ \ (1U\ <<\ I2C\_SR1\_STOPF\_Pos)}}
+\DoxyCodeLine{00090\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_RXNE\_Pos\ \ \ \ 6}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_RXNE\_MASK\ \ \ (1U\ <<\ I2C\_SR1\_RXNE\_Pos)}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_TXE\_Pos\ \ \ \ \ 7}}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_TXE\_MASK\ \ \ \ (1U\ <<\ I2C\_SR1\_TXE\_Pos)}}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_BERR\_Pos\ \ \ \ 8}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_BERR\ \ \ \ \ \ \ \ (1U\ <<\ I2C\_SR1\_BERR\_Pos)}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_ARLO\_Pos\ \ \ \ 9}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_ARLO\ \ \ \ \ \ \ \ (1U\ <<\ I2C\_SR1\_ARLO\_Pos)}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_AF\_Pos\ \ \ \ \ \ 10}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_AF\ \ \ \ \ \ \ \ \ \ (1U\ <<\ I2C\_SR1\_AF\_Pos)}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_OVR\_Pos\ \ \ \ \ 11}}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_OVR\ \ \ \ \ \ \ \ \ (1U\ <<\ I2C\_SR1\_OVR\_Pos)}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_TIMEOUT\_Pos\ 14}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#define\ I2C\_SR1\_TIMEOUT\ \ \ \ \ (1U\ <<\ I2C\_SR1\_TIMEOUT\_Pos)}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\#define\ I2C\_SR2\_MSL\_Pos\ 0}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\#define\ I2C\_SR2\_MSL\ \ \ \ \ (1U\ <<\ I2C\_SR2\_MSL\_Pos)}}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\#define\ I2C\_SR2\_BUSY\_Pos\ 1}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\#define\ I2C\_SR2\_BUSY\ \ \ \ \ (1U\ <<\ I2C\_SR2\_BUSY\_Pos)}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\#define\ I2C\_SR2\_TRA\_Pos\ 2}}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\#define\ I2C\_SR2\_TRA\ \ \ \ \ \ (1U\ <<\ I2C\_SR2\_TRA\_Pos)}}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\#define\ I2C\_CCR\_CCR\_Pos\ \ 0}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\#define\ I2C\_CCR\_CCR\_MASK\ (0xFFFU\ <<\ I2C\_CCR\_CCR\_Pos)}}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\#define\ I2C\_CCR\_DUTY\_Pos\ 14}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\#define\ I2C\_CCR\_DUTY\ \ \ \ \ (1U\ <<\ I2C\_CCR\_DUTY\_Pos)}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\#define\ I2C\_CCR\_FS\_Pos\ \ \ 15}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\#define\ I2C\_CCR\_FS\_MASK\ \ (1U\ <<\ I2C\_CCR\_FS\_Pos)}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00122\ \textcolor{preprocessor}{\#define\ I2C\_TRISE\_TRISE\_Pos\ 0}}
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\#define\ I2C\_TRISE\_TRISE\_Msk\ (0x3FU\ <<\ I2C\_TRISE\_TRISE\_Pos)}}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CORTEX\_M4\_I2C\_REG\_H}}
+
+\end{DoxyCode}

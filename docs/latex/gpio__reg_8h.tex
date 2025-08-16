@@ -1,0 +1,149 @@
+\doxysection{include/core/cortex-\/m4/gpio\+\_\+reg.h File Reference}
+\hypertarget{gpio__reg_8h}{}\label{gpio__reg_8h}\index{include/core/cortex-\/m4/gpio\_reg.h@{include/core/cortex-\/m4/gpio\_reg.h}}
+
+
+Cortex-\/\+M4 GPIO register definitions and access macros.  
+
+
+{\ttfamily \#include "{}utils/types.\+h"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for gpio\+\_\+reg.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{gpio__reg_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=284pt]{gpio__reg_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_g_p_i_ox___typedef}{GPIOx\+\_\+\+Typedef}}
+\begin{DoxyCompactList}\small\item\em GPIO port register structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{gpio__reg_8h_a312c4a0ecb7f7df814b6dc660acff0e1}{GPIOA\+\_\+\+BASE\+\_\+\+ADDR}}~0x40020000
+\item 
+\#define \mbox{\hyperlink{gpio__reg_8h_a93393583ac13481b25732f754b300efd}{GPIOB\+\_\+\+BASE\+\_\+\+ADDR}}~0x40020400
+\item 
+\#define \mbox{\hyperlink{gpio__reg_8h_a92e9aec75c825d01a0d4c5ebe9a09e38}{GPIOC\+\_\+\+BASE\+\_\+\+ADDR}}~0x40020800
+\item 
+\#define \mbox{\hyperlink{gpio__reg_8h_a5542cfab7e2101bae98b650d19a19e90}{GPIOD\+\_\+\+BASE\+\_\+\+ADDR}}~0x40020\+C00
+\item 
+\#define \mbox{\hyperlink{gpio__reg_8h_a223cb9c5def01f7315fbf6fa5322bc9b}{GPIOE\+\_\+\+BASE\+\_\+\+ADDR}}~0x40021000
+\item 
+\#define \mbox{\hyperlink{gpio__reg_8h_a03ec8a869ee6f256c882978a71fa5ffa}{GPIOH\+\_\+\+BASE\+\_\+\+ADDR}}~0x40021\+C00
+\item 
+\#define \mbox{\hyperlink{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab}{GPIO\+\_\+\+GET\+\_\+\+PORT\+\_\+\+NUMBER}}(n)
+\item 
+\#define \mbox{\hyperlink{gpio__reg_8h_a00d2d6c40a947794f1c27e984b84f1db}{GPIO\+\_\+\+GET\+\_\+\+PORT}}(n)
+\item 
+\#define \mbox{\hyperlink{gpio__reg_8h_a3c789f3a6c3190c9c8cc399c6cf2ee29}{GPIO\+\_\+\+GET\+\_\+\+PIN}}(n)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Cortex-\/\+M4 GPIO register definitions and access macros. 
+
+This header defines the GPIO register structure and macros to access GPIO ports and pins on Cortex-\/\+M4 microcontrollers.
+
+Structures\+:
+\begin{DoxyItemize}
+\item {\ttfamily \doxylink{struct_g_p_i_ox___typedef}{GPIOx\+\_\+\+Typedef}} \+: Represents the memory-\/mapped GPIO registers for a port.
+\end{DoxyItemize}
+
+Macros\+:
+\begin{DoxyItemize}
+\item {\ttfamily GPIOA\+\_\+\+BASE\+\_\+\+ADDR} to {\ttfamily GPIOH\+\_\+\+BASE\+\_\+\+ADDR} \+: Base addresses of GPIO ports.
+\item {\ttfamily \doxylink{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab}{GPIO\+\_\+\+GET\+\_\+\+PORT\+\_\+\+NUMBER(n)}} \+: Compute the port number from a pin number.
+\item {\ttfamily \doxylink{gpio__reg_8h_a00d2d6c40a947794f1c27e984b84f1db}{GPIO\+\_\+\+GET\+\_\+\+PORT(n)}} \+: Get a pointer to the GPIO port structure.
+\item {\ttfamily \doxylink{gpio__reg_8h_a3c789f3a6c3190c9c8cc399c6cf2ee29}{GPIO\+\_\+\+GET\+\_\+\+PIN(n)}} \+: Get the pin number within a port.
+\end{DoxyItemize}
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-define-members}
+\Hypertarget{gpio__reg_8h_doc-define-members}
+\doxysubsection{Macro Definition Documentation}
+\Hypertarget{gpio__reg_8h_a3c789f3a6c3190c9c8cc399c6cf2ee29}\index{gpio\_reg.h@{gpio\_reg.h}!GPIO\_GET\_PIN@{GPIO\_GET\_PIN}}
+\index{GPIO\_GET\_PIN@{GPIO\_GET\_PIN}!gpio\_reg.h@{gpio\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPIO\_GET\_PIN}{GPIO\_GET\_PIN}}
+{\footnotesize\ttfamily \label{gpio__reg_8h_a3c789f3a6c3190c9c8cc399c6cf2ee29} 
+\#define GPIO\+\_\+\+GET\+\_\+\+PIN(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(n\ \%\ 16)}
+
+\end{DoxyCode}
+Get pin number within the port from absolute pin number \Hypertarget{gpio__reg_8h_a00d2d6c40a947794f1c27e984b84f1db}\index{gpio\_reg.h@{gpio\_reg.h}!GPIO\_GET\_PORT@{GPIO\_GET\_PORT}}
+\index{GPIO\_GET\_PORT@{GPIO\_GET\_PORT}!gpio\_reg.h@{gpio\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPIO\_GET\_PORT}{GPIO\_GET\_PORT}}
+{\footnotesize\ttfamily \label{gpio__reg_8h_a00d2d6c40a947794f1c27e984b84f1db} 
+\#define GPIO\+\_\+\+GET\+\_\+\+PORT(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\ \ ((\mbox{\hyperlink{struct_g_p_i_ox___typedef}{GPIOx\_Typedef}}\ *)(\mbox{\hyperlink{gpio__reg_8h_a312c4a0ecb7f7df814b6dc660acff0e1}{GPIOA\_BASE\_ADDR}}\ +\ ((\mbox{\hyperlink{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab}{GPIO\_GET\_PORT\_NUMBER}}(n))\ *\ 0x400)))}
+
+\end{DoxyCode}
+Get pointer to GPIO port structure from absolute pin number \Hypertarget{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab}\index{gpio\_reg.h@{gpio\_reg.h}!GPIO\_GET\_PORT\_NUMBER@{GPIO\_GET\_PORT\_NUMBER}}
+\index{GPIO\_GET\_PORT\_NUMBER@{GPIO\_GET\_PORT\_NUMBER}!gpio\_reg.h@{gpio\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPIO\_GET\_PORT\_NUMBER}{GPIO\_GET\_PORT\_NUMBER}}
+{\footnotesize\ttfamily \label{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab} 
+\#define GPIO\+\_\+\+GET\+\_\+\+PORT\+\_\+\+NUMBER(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
+
+{\bfseries Value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{(n\ /\ 16\ ==\ 5\ ?\ 7\ :\ n\ /\ 16)}
+
+\end{DoxyCode}
+Get port number from absolute pin number \Hypertarget{gpio__reg_8h_a312c4a0ecb7f7df814b6dc660acff0e1}\index{gpio\_reg.h@{gpio\_reg.h}!GPIOA\_BASE\_ADDR@{GPIOA\_BASE\_ADDR}}
+\index{GPIOA\_BASE\_ADDR@{GPIOA\_BASE\_ADDR}!gpio\_reg.h@{gpio\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPIOA\_BASE\_ADDR}{GPIOA\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{gpio__reg_8h_a312c4a0ecb7f7df814b6dc660acff0e1} 
+\#define GPIOA\+\_\+\+BASE\+\_\+\+ADDR~0x40020000}
+
+Base addresses for GPIO ports GPIOA base address \Hypertarget{gpio__reg_8h_a93393583ac13481b25732f754b300efd}\index{gpio\_reg.h@{gpio\_reg.h}!GPIOB\_BASE\_ADDR@{GPIOB\_BASE\_ADDR}}
+\index{GPIOB\_BASE\_ADDR@{GPIOB\_BASE\_ADDR}!gpio\_reg.h@{gpio\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPIOB\_BASE\_ADDR}{GPIOB\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{gpio__reg_8h_a93393583ac13481b25732f754b300efd} 
+\#define GPIOB\+\_\+\+BASE\+\_\+\+ADDR~0x40020400}
+
+GPIOB base address \Hypertarget{gpio__reg_8h_a92e9aec75c825d01a0d4c5ebe9a09e38}\index{gpio\_reg.h@{gpio\_reg.h}!GPIOC\_BASE\_ADDR@{GPIOC\_BASE\_ADDR}}
+\index{GPIOC\_BASE\_ADDR@{GPIOC\_BASE\_ADDR}!gpio\_reg.h@{gpio\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPIOC\_BASE\_ADDR}{GPIOC\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{gpio__reg_8h_a92e9aec75c825d01a0d4c5ebe9a09e38} 
+\#define GPIOC\+\_\+\+BASE\+\_\+\+ADDR~0x40020800}
+
+GPIOC base address \Hypertarget{gpio__reg_8h_a5542cfab7e2101bae98b650d19a19e90}\index{gpio\_reg.h@{gpio\_reg.h}!GPIOD\_BASE\_ADDR@{GPIOD\_BASE\_ADDR}}
+\index{GPIOD\_BASE\_ADDR@{GPIOD\_BASE\_ADDR}!gpio\_reg.h@{gpio\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPIOD\_BASE\_ADDR}{GPIOD\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{gpio__reg_8h_a5542cfab7e2101bae98b650d19a19e90} 
+\#define GPIOD\+\_\+\+BASE\+\_\+\+ADDR~0x40020\+C00}
+
+GPIOD base address \Hypertarget{gpio__reg_8h_a223cb9c5def01f7315fbf6fa5322bc9b}\index{gpio\_reg.h@{gpio\_reg.h}!GPIOE\_BASE\_ADDR@{GPIOE\_BASE\_ADDR}}
+\index{GPIOE\_BASE\_ADDR@{GPIOE\_BASE\_ADDR}!gpio\_reg.h@{gpio\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPIOE\_BASE\_ADDR}{GPIOE\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{gpio__reg_8h_a223cb9c5def01f7315fbf6fa5322bc9b} 
+\#define GPIOE\+\_\+\+BASE\+\_\+\+ADDR~0x40021000}
+
+GPIOE base address \Hypertarget{gpio__reg_8h_a03ec8a869ee6f256c882978a71fa5ffa}\index{gpio\_reg.h@{gpio\_reg.h}!GPIOH\_BASE\_ADDR@{GPIOH\_BASE\_ADDR}}
+\index{GPIOH\_BASE\_ADDR@{GPIOH\_BASE\_ADDR}!gpio\_reg.h@{gpio\_reg.h}}
+\doxysubsubsection{\texorpdfstring{GPIOH\_BASE\_ADDR}{GPIOH\_BASE\_ADDR}}
+{\footnotesize\ttfamily \label{gpio__reg_8h_a03ec8a869ee6f256c882978a71fa5ffa} 
+\#define GPIOH\+\_\+\+BASE\+\_\+\+ADDR~0x40021\+C00}
+
+GPIOH base address 

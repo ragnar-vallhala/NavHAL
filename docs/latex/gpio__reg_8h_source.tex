@@ -1,0 +1,42 @@
+\doxysection{gpio\+\_\+reg.\+h}
+\hypertarget{gpio__reg_8h_source}{}\label{gpio__reg_8h_source}\index{include/core/cortex-\/m4/gpio\_reg.h@{include/core/cortex-\/m4/gpio\_reg.h}}
+\mbox{\hyperlink{gpio__reg_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_GPIO\_REG\_H}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_GPIO\_REG\_H}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{types_8h}{utils/types.h}}"{}}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00043\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_a84dfec618662640d1b2a0b753d8573d3}{MODER}};\ \ \ }
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_add5137ca8dc2dc83b41b59deb023f639}{OTYPER}};\ \ }
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_a734224257fbdbfd43d6893ff0c5afa70}{OSPEEDR}};\ }
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_ad78a8cf1f74e7271c60ae90170221515}{PUPDR}};\ \ \ }
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_a0ba84f9febf53e3468cb0eba33db377a}{IDR}};\ \ \ \ \ }
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_a5724a706bc67650021444d46b4d5b85f}{ODR}};\ \ \ \ \ }
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_a48dda1051812c935245d81518364774a}{BSRR}};\ \ \ \ }
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_acc2e9854fd2af3a1496987c2f190e1cc}{LCKR}};\ \ \ \ }
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_a7165acc83576817a8d766b3dde66c8fb}{AFRL}};\ \ \ \ }
+\DoxyCodeLine{00053\ \ \ \ \ \mbox{\hyperlink{hal__types_8h_aec43007d9998a0a0e01faede4133d6be}{\_\_IO}}\ uint32\_t\ \mbox{\hyperlink{struct_g_p_i_ox___typedef_acf55cb0791a67a709673e4d36acc305c}{AFRH}};\ \ \ \ }
+\DoxyCodeLine{00054\ \}\ \mbox{\hyperlink{struct_g_p_i_ox___typedef}{GPIOx\_Typedef}};}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#define\ GPIOA\_BASE\_ADDR\ 0x40020000\ }\textcolor{preprocessor}{}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ GPIOB\_BASE\_ADDR\ 0x40020400\ }\textcolor{preprocessor}{}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ GPIOC\_BASE\_ADDR\ 0x40020800\ }\textcolor{preprocessor}{}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ GPIOD\_BASE\_ADDR\ 0x40020C00\ }\textcolor{preprocessor}{}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#define\ GPIOE\_BASE\_ADDR\ 0x40021000\ }\textcolor{preprocessor}{}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#define\ GPIOH\_BASE\_ADDR\ 0x40021C00\ }\textcolor{preprocessor}{}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#define\ GPIO\_GET\_PORT\_NUMBER(n)\ (n\ /\ 16\ ==\ 5\ ?\ 7\ :\ n\ /\ 16)}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ GPIO\_GET\_PORT(n)\ \(\backslash\)}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\ \ ((GPIOx\_Typedef\ *)(GPIOA\_BASE\_ADDR\ +\ ((GPIO\_GET\_PORT\_NUMBER(n))\ *\ 0x400)))}}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#define\ GPIO\_GET\_PIN(n)\ (n\ \%\ 16)}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ !CORTEX\_M4\_GPIO\_REG\_H}}
+
+\end{DoxyCode}

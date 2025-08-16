@@ -1,5 +1,4 @@
 build/
-docs/
 *.elf
 *.bin
 *.json 

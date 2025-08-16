@@ -1,0 +1,39 @@
+\doxysection{interrupt.\+h}
+\hypertarget{interrupt_8h_source}{}\label{interrupt_8h_source}\index{include/core/cortex-\/m4/interrupt.h@{include/core/cortex-\/m4/interrupt.h}}
+\mbox{\hyperlink{interrupt_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#ifndef\ CORTEX\_M4\_INTERRUPT\_H}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ CORTEX\_M4\_INTERRUPT\_H}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{interrupt__reg_8h}{core/cortex-\/m4/interrupt\_reg.h}}"{}}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00029\ int8\_t\ \mbox{\hyperlink{interrupt_8h_af5a39d871f4e853eeb1c18aec31bb9c2}{hal\_enable\_interrupt}}(\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}}\ interrupt);}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00036\ int8\_t\ \mbox{\hyperlink{interrupt_8h_acee16c5665334d7c548ed969f3b2d874}{hal\_disable\_interrupt}}(\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}}\ interrupt);}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00043\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{interrupt_8h_a258112bcdeb4fada66d8adc357c6eb5d}{hal\_clear\_interrupt\_flag}}(\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}}\ interrupt);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00050\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca}{hal\_interrupt\_attach\_callback}}(\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}}\ interrupt,\ \textcolor{keywordtype}{void}\ (*callback)(\textcolor{keywordtype}{void}));}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00056\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{interrupt_8h_ac066d5830d23093468acb3a714ead9c5}{hal\_interrupt\_detach\_callback}}(\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}}\ interrupt);}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00062\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{interrupt_8h_ae6e7c5068b926209dbd3e94d42ec3ea2}{hal\_handle\_interrupt}}(\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}}\ interrupt);}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00070\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{interrupt_8h_ad1fc0820aaa8ab23baa842489b92285f}{hal\_set\_interrupt\_priority}}(\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}}\ interrupt,\ uint8\_t\ priority);}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00078\ uint8\_t\ \mbox{\hyperlink{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369}{hal\_get\_interrupt\_priority}}(\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}}\ interrupt);}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00086\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb}{hal\_is\_interrupt\_pending}}(\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\_Type}}\ interrupt);}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00093\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5}{hal\_enable\_global\_interrupts}}(uint32\_t\ state);}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00100\ uint32\_t\ \mbox{\hyperlink{interrupt_8h_a598755bfca19d040a2e7f9daf5e5f373}{hal\_disable\_global\_interrupts}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00106\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{interrupt_8h_abadf71a2fdecd688f09853aadde4837e}{hal\_clear\_all\_pending\_interrupts}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{//\ CORTEX\_M4\_INTERRUPT\_H}}
+
+\end{DoxyCode}

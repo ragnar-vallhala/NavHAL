@@ -1,0 +1,181 @@
+\doxysection{include/core/cortex-\/m4/clock.h File Reference}
+\hypertarget{clock_8h}{}\label{clock_8h}\index{include/core/cortex-\/m4/clock.h@{include/core/cortex-\/m4/clock.h}}
+
+
+Cortex-\/\+M4 specific clock control HAL interface.  
+
+
+{\ttfamily \#include "{}utils/clock\+\_\+types.\+h"{}}\newline
+Include dependency graph for clock.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{clock_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{clock_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}}
+\begin{DoxyCompactList}\small\item\em PLL (Phase Locked Loop) configuration structure. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}{hal\+\_\+clock\+\_\+init}} (\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{samples_205__hal__systick_2main_8c_a921c2505bac76424f5f96cc1e4f62986}{cfg}}, \mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\+\_\+cfg}})
+\begin{DoxyCompactList}\small\item\em Initialize the system clock. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0}{hal\+\_\+clock\+\_\+get\+\_\+sysclk}} (void)
+\begin{DoxyCompactList}\small\item\em Get the system clock frequency (SYSCLK). \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{clock_8h_ac405b089ad197ec8fcec53489064cb5f}{hal\+\_\+clock\+\_\+get\+\_\+ahbclk}} (void)
+\begin{DoxyCompactList}\small\item\em Get the AHB bus clock frequency. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{clock_8h_a2b3d3447fb02cf495b0c6f28ad9a4ae8}{hal\+\_\+clock\+\_\+get\+\_\+apb1clk}} (void)
+\begin{DoxyCompactList}\small\item\em Get the APB1 bus clock frequency. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{clock_8h_abe4fcf4dc3f2a13b1f2602c0348aeba5}{hal\+\_\+clock\+\_\+get\+\_\+apb2clk}} (void)
+\begin{DoxyCompactList}\small\item\em Get the APB2 bus clock frequency. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Cortex-\/\+M4 specific clock control HAL interface. 
+
+This header defines the structures and functions to configure and query the system and peripheral clocks for Cortex-\/\+M4 microcontrollers. It includes PLL configuration, system clock initialization, and AHB/\+APB clock retrieval functions.
+
+The HAL provides a platform-\/independent abstraction while leveraging the Cortex-\/\+M4 specific hardware.
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-func-members}
+\Hypertarget{clock_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{clock_8h_ac405b089ad197ec8fcec53489064cb5f}\index{clock.h@{clock.h}!hal\_clock\_get\_ahbclk@{hal\_clock\_get\_ahbclk}}
+\index{hal\_clock\_get\_ahbclk@{hal\_clock\_get\_ahbclk}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_get\_ahbclk()}{hal\_clock\_get\_ahbclk()}}
+{\footnotesize\ttfamily \label{clock_8h_ac405b089ad197ec8fcec53489064cb5f} 
+uint32\+\_\+t hal\+\_\+clock\+\_\+get\+\_\+ahbclk (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get the AHB bus clock frequency. 
+
+\begin{DoxyReturn}{Returns}
+AHB clock frequency in Hz.
+\end{DoxyReturn}
+Get the AHB bus clock frequency.
+
+\begin{DoxyReturn}{Returns}
+AHB clock frequency in Hz 
+\end{DoxyReturn}
+\Hypertarget{clock_8h_a2b3d3447fb02cf495b0c6f28ad9a4ae8}\index{clock.h@{clock.h}!hal\_clock\_get\_apb1clk@{hal\_clock\_get\_apb1clk}}
+\index{hal\_clock\_get\_apb1clk@{hal\_clock\_get\_apb1clk}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_get\_apb1clk()}{hal\_clock\_get\_apb1clk()}}
+{\footnotesize\ttfamily \label{clock_8h_a2b3d3447fb02cf495b0c6f28ad9a4ae8} 
+uint32\+\_\+t hal\+\_\+clock\+\_\+get\+\_\+apb1clk (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get the APB1 bus clock frequency. 
+
+\begin{DoxyReturn}{Returns}
+APB1 clock frequency in Hz.
+\end{DoxyReturn}
+Get the APB1 bus clock frequency.
+
+\begin{DoxyReturn}{Returns}
+APB1 clock frequency in Hz 
+\end{DoxyReturn}
+\Hypertarget{clock_8h_abe4fcf4dc3f2a13b1f2602c0348aeba5}\index{clock.h@{clock.h}!hal\_clock\_get\_apb2clk@{hal\_clock\_get\_apb2clk}}
+\index{hal\_clock\_get\_apb2clk@{hal\_clock\_get\_apb2clk}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_get\_apb2clk()}{hal\_clock\_get\_apb2clk()}}
+{\footnotesize\ttfamily \label{clock_8h_abe4fcf4dc3f2a13b1f2602c0348aeba5} 
+uint32\+\_\+t hal\+\_\+clock\+\_\+get\+\_\+apb2clk (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get the APB2 bus clock frequency. 
+
+\begin{DoxyReturn}{Returns}
+APB2 clock frequency in Hz.
+\end{DoxyReturn}
+Get the APB2 bus clock frequency.
+
+\begin{DoxyReturn}{Returns}
+APB2 clock frequency in Hz 
+\end{DoxyReturn}
+\Hypertarget{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0}\index{clock.h@{clock.h}!hal\_clock\_get\_sysclk@{hal\_clock\_get\_sysclk}}
+\index{hal\_clock\_get\_sysclk@{hal\_clock\_get\_sysclk}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_get\_sysclk()}{hal\_clock\_get\_sysclk()}}
+{\footnotesize\ttfamily \label{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0} 
+uint32\+\_\+t hal\+\_\+clock\+\_\+get\+\_\+sysclk (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Get the system clock frequency (SYSCLK). 
+
+\begin{DoxyReturn}{Returns}
+System clock frequency in Hz.
+\end{DoxyReturn}
+Get the system clock frequency (SYSCLK).
+
+\begin{DoxyReturn}{Returns}
+SYSCLK frequency in Hz
+\end{DoxyReturn}
+Determines SYSCLK frequency based on current clock source\+:
+\begin{DoxyItemize}
+\item HSI\+: Fixed 16 MHz
+\item HSE\+: Fixed 8 MHz
+\item PLL\+: Calculated from PLL configuration registers 
+\end{DoxyItemize}\Hypertarget{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}\index{clock.h@{clock.h}!hal\_clock\_init@{hal\_clock\_init}}
+\index{hal\_clock\_init@{hal\_clock\_init}!clock.h@{clock.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clock\_init()}{hal\_clock\_init()}}
+{\footnotesize\ttfamily \label{clock_8h_a0968882ff01fef583e6a8b7a97be51ea} 
+void hal\+\_\+clock\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{cfg}{, }\item[{\mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}}]{pll\+\_\+cfg}{}\end{DoxyParamCaption})}
+
+
+
+Initialize the system clock. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cfg} & Pointer to the main clock configuration structure. \\
+\hline
+{\em pll\+\_\+cfg} & Pointer to the PLL configuration structure.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This function must be called before using other peripheral clocks.
+\end{DoxyNote}
+Initialize the system clock.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em cfg} & Pointer to clock configuration structure \\
+\hline
+\mbox{\texttt{in}}  & {\em pll\+\_\+cfg} & Pointer to PLL configuration structure (required if using PLL)\\
+\hline
+\end{DoxyParams}
+Configures the complete clock tree including\+:
+\begin{DoxyItemize}
+\item Clock source selection (HSI/\+HSE/\+PLL)
+\item PLL configuration (when used)
+\item Flash latency settings
+\item AHB/\+APB prescalers
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+This function will block until clock switches are complete 
+\end{DoxyNote}
+\texorpdfstring{$<$}{<} Flash Interface base address
+
+\texorpdfstring{$<$}{<} Flash ACR Latency bit position
+
+\texorpdfstring{$<$}{<} Flash ACR Latency bit position

@@ -1,0 +1,121 @@
+\doxysection{GPIOx\+\_\+\+Typedef Struct Reference}
+\hypertarget{struct_g_p_i_ox___typedef}{}\label{struct_g_p_i_ox___typedef}\index{GPIOx\_Typedef@{GPIOx\_Typedef}}
+
+
+GPIO port register structure.  
+
+
+
+
+{\ttfamily \#include $<$gpio\+\_\+reg.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_a84dfec618662640d1b2a0b753d8573d3}{MODER}}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_add5137ca8dc2dc83b41b59deb023f639}{OTYPER}}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_a734224257fbdbfd43d6893ff0c5afa70}{OSPEEDR}}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_ad78a8cf1f74e7271c60ae90170221515}{PUPDR}}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_a0ba84f9febf53e3468cb0eba33db377a}{IDR}}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_a5724a706bc67650021444d46b4d5b85f}{ODR}}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_a48dda1051812c935245d81518364774a}{BSRR}}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_acc2e9854fd2af3a1496987c2f190e1cc}{LCKR}}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_a7165acc83576817a8d766b3dde66c8fb}{AFRL}}
+\item 
+volatile uint32\+\_\+t \mbox{\hyperlink{struct_g_p_i_ox___typedef_acf55cb0791a67a709673e4d36acc305c}{AFRH}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+GPIO port register structure. 
+
+Represents all the standard registers for a GPIO port\+:
+\begin{DoxyItemize}
+\item MODER \+: Mode register
+\item OTYPER \+: Output type register
+\item OSPEEDR \+: Output speed register
+\item PUPDR \+: Pull-\/up/\+Pull-\/down register
+\item IDR \+: Input data register
+\item ODR \+: Output data register
+\item BSRR \+: Bit set/reset register
+\item LCKR \+: Configuration lock register
+\item AFRL \+: Alternate function low register
+\item AFRH \+: Alternate function high register 
+\end{DoxyItemize}
+
+\label{doc-variable-members}
+\Hypertarget{struct_g_p_i_ox___typedef_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_g_p_i_ox___typedef_acf55cb0791a67a709673e4d36acc305c}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!AFRH@{AFRH}}
+\index{AFRH@{AFRH}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{AFRH}{AFRH}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_acf55cb0791a67a709673e4d36acc305c} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+AFRH}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO alternate function high register \Hypertarget{struct_g_p_i_ox___typedef_a7165acc83576817a8d766b3dde66c8fb}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!AFRL@{AFRL}}
+\index{AFRL@{AFRL}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{AFRL}{AFRL}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_a7165acc83576817a8d766b3dde66c8fb} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+AFRL}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO alternate function low register \Hypertarget{struct_g_p_i_ox___typedef_a48dda1051812c935245d81518364774a}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!BSRR@{BSRR}}
+\index{BSRR@{BSRR}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{BSRR}{BSRR}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_a48dda1051812c935245d81518364774a} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+BSRR}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO bit set/reset register \Hypertarget{struct_g_p_i_ox___typedef_a0ba84f9febf53e3468cb0eba33db377a}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!IDR@{IDR}}
+\index{IDR@{IDR}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{IDR}{IDR}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_a0ba84f9febf53e3468cb0eba33db377a} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+IDR}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO input data register \Hypertarget{struct_g_p_i_ox___typedef_acc2e9854fd2af3a1496987c2f190e1cc}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!LCKR@{LCKR}}
+\index{LCKR@{LCKR}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{LCKR}{LCKR}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_acc2e9854fd2af3a1496987c2f190e1cc} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+LCKR}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO configuration lock register \Hypertarget{struct_g_p_i_ox___typedef_a84dfec618662640d1b2a0b753d8573d3}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!MODER@{MODER}}
+\index{MODER@{MODER}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{MODER}{MODER}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_a84dfec618662640d1b2a0b753d8573d3} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+MODER}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO port mode register \Hypertarget{struct_g_p_i_ox___typedef_a5724a706bc67650021444d46b4d5b85f}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!ODR@{ODR}}
+\index{ODR@{ODR}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{ODR}{ODR}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_a5724a706bc67650021444d46b4d5b85f} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+ODR}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO output data register \Hypertarget{struct_g_p_i_ox___typedef_a734224257fbdbfd43d6893ff0c5afa70}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!OSPEEDR@{OSPEEDR}}
+\index{OSPEEDR@{OSPEEDR}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{OSPEEDR}{OSPEEDR}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_a734224257fbdbfd43d6893ff0c5afa70} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+OSPEEDR}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO output speed register \Hypertarget{struct_g_p_i_ox___typedef_add5137ca8dc2dc83b41b59deb023f639}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!OTYPER@{OTYPER}}
+\index{OTYPER@{OTYPER}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{OTYPER}{OTYPER}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_add5137ca8dc2dc83b41b59deb023f639} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+OTYPER}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO output type register \Hypertarget{struct_g_p_i_ox___typedef_ad78a8cf1f74e7271c60ae90170221515}\index{GPIOx\_Typedef@{GPIOx\_Typedef}!PUPDR@{PUPDR}}
+\index{PUPDR@{PUPDR}!GPIOx\_Typedef@{GPIOx\_Typedef}}
+\doxysubsubsection{\texorpdfstring{PUPDR}{PUPDR}}
+{\footnotesize\ttfamily \label{struct_g_p_i_ox___typedef_ad78a8cf1f74e7271c60ae90170221515} 
+volatile uint32\+\_\+t GPIOx\+\_\+\+Typedef\+::\+PUPDR}
+
+\texorpdfstring{$<$}{<} Defines volatile memory access for I/O registers. GPIO pull-\/up/pull-\/down register 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/core/cortex-\/m4/\mbox{\hyperlink{gpio__reg_8h}{gpio\+\_\+reg.\+h}}\end{DoxyCompactItemize}

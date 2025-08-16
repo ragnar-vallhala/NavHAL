@@ -1,0 +1,19 @@
+<map id="include/utils/types.h" name="include/utils/types.h">
+<area shape="rect" id="Node000001" title="Centralized type definitions include for NavHAL." alt="" coords="258,5,396,31"/>
+<area shape="rect" id="Node000002" href="$clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="103,79,205,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="299,34,198,75,196,70,297,29"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="172,241,237,267"/>
+<area shape="poly" id="edge9_Node000001_Node000005" title=" " alt="" coords="314,33,291,54,269,80,249,118,233,158,213,227,208,226,228,156,244,116,265,78,287,50,310,29"/>
+<area shape="rect" id="Node000006" href="$gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="280,79,375,105"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="330,31,330,63,324,63,324,31"/>
+<area shape="rect" id="Node000007" href="$timer__types_8h.html" title=" " alt="" coords="398,79,499,105"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="349,29,416,68,413,73,346,34"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="523,79,598,105"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="368,29,509,72,508,77,366,34"/>
+<area shape="rect" id="Node000003" href="$rcc__reg_8h.html" title=" " alt="" coords="23,153,154,193"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="146,107,116,143,112,139,142,103"/>
+<area shape="poly" id="edge5_Node000002_Node000005" title=" " alt="" coords="160,104,199,225,193,227,155,106"/>
+<area shape="rect" id="Node000004" href="$hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="5,241,148,267"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="88,194,83,226,78,225,83,193"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="119,192,176,230,173,235,116,196"/>
+</map>

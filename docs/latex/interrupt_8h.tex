@@ -1,0 +1,346 @@
+\doxysection{include/core/cortex-\/m4/interrupt.h File Reference}
+\hypertarget{interrupt_8h}{}\label{interrupt_8h}\index{include/core/cortex-\/m4/interrupt.h@{include/core/cortex-\/m4/interrupt.h}}
+
+
+NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32\+F4.  
+
+
+{\ttfamily \#include "{}core/cortex-\/m4/interrupt\+\_\+reg.\+h"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+Include dependency graph for interrupt.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=254pt]{interrupt_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=296pt]{interrupt_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int8\+\_\+t \mbox{\hyperlink{interrupt_8h_af5a39d871f4e853eeb1c18aec31bb9c2}{hal\+\_\+enable\+\_\+interrupt}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Enable a specific interrupt. \end{DoxyCompactList}\item 
+int8\+\_\+t \mbox{\hyperlink{interrupt_8h_acee16c5665334d7c548ed969f3b2d874}{hal\+\_\+disable\+\_\+interrupt}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Disable a specific interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_a258112bcdeb4fada66d8adc357c6eb5d}{hal\+\_\+clear\+\_\+interrupt\+\_\+flag}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Clear the pending flag of a specific interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca}{hal\+\_\+interrupt\+\_\+attach\+\_\+callback}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt, void(\texorpdfstring{$\ast$}{*}callback)(void))
+\begin{DoxyCompactList}\small\item\em Attach a callback function to a specific interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_ac066d5830d23093468acb3a714ead9c5}{hal\+\_\+interrupt\+\_\+detach\+\_\+callback}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Detach a callback function from a specific interrupt. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_ae6e7c5068b926209dbd3e94d42ec3ea2}{hal\+\_\+handle\+\_\+interrupt}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Central interrupt handler function. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_ad1fc0820aaa8ab23baa842489b92285f}{hal\+\_\+set\+\_\+interrupt\+\_\+priority}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt, uint8\+\_\+t priority)
+\begin{DoxyCompactList}\small\item\em Set priority for a specific interrupt. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369}{hal\+\_\+get\+\_\+interrupt\+\_\+priority}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Get priority for a specific interrupt. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb}{hal\+\_\+is\+\_\+interrupt\+\_\+pending}} (\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}} interrupt)
+\begin{DoxyCompactList}\small\item\em Check if a specific interrupt is pending. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5}{hal\+\_\+enable\+\_\+global\+\_\+interrupts}} (uint32\+\_\+t state)
+\begin{DoxyCompactList}\small\item\em Enable global interrupts. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{interrupt_8h_a598755bfca19d040a2e7f9daf5e5f373}{hal\+\_\+disable\+\_\+global\+\_\+interrupts}} (void)
+\begin{DoxyCompactList}\small\item\em Disable global interrupts. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{interrupt_8h_abadf71a2fdecd688f09853aadde4837e}{hal\+\_\+clear\+\_\+all\+\_\+pending\+\_\+interrupts}} (void)
+\begin{DoxyCompactList}\small\item\em Clear all pending interrupts. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32\+F4. 
+
+This header provides\+:
+\begin{DoxyItemize}
+\item NVIC register mapping for the Cortex-\/\+M4 interrupt controller.
+\item Enumeration of all Cortex-\/\+M4 and STM32\+F4-\/specific IRQ numbers.
+\item HAL functions to enable/disable interrupts, set priorities, attach/detach callbacks, and query pending/active interrupt status.
+\end{DoxyItemize}
+
+The definitions are tailored for the STM32\+F4 series but are based on the ARM Cortex-\/\+M4 NVIC architecture. All register mappings match the reference manual.
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
+
+
+\label{doc-func-members}
+\Hypertarget{interrupt_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{interrupt_8h_abadf71a2fdecd688f09853aadde4837e}\index{interrupt.h@{interrupt.h}!hal\_clear\_all\_pending\_interrupts@{hal\_clear\_all\_pending\_interrupts}}
+\index{hal\_clear\_all\_pending\_interrupts@{hal\_clear\_all\_pending\_interrupts}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clear\_all\_pending\_interrupts()}{hal\_clear\_all\_pending\_interrupts()}}
+{\footnotesize\ttfamily \label{interrupt_8h_abadf71a2fdecd688f09853aadde4837e} 
+void hal\+\_\+clear\+\_\+all\+\_\+pending\+\_\+interrupts (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Clear all pending interrupts. 
+
+\begin{DoxyNote}{Note}
+Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_a258112bcdeb4fada66d8adc357c6eb5d}\index{interrupt.h@{interrupt.h}!hal\_clear\_interrupt\_flag@{hal\_clear\_interrupt\_flag}}
+\index{hal\_clear\_interrupt\_flag@{hal\_clear\_interrupt\_flag}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_clear\_interrupt\_flag()}{hal\_clear\_interrupt\_flag()}}
+{\footnotesize\ttfamily \label{interrupt_8h_a258112bcdeb4fada66d8adc357c6eb5d} 
+void hal\+\_\+clear\+\_\+interrupt\+\_\+flag (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Clear the pending flag of a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Implementation pending, platform-\/specific. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_a598755bfca19d040a2e7f9daf5e5f373}\index{interrupt.h@{interrupt.h}!hal\_disable\_global\_interrupts@{hal\_disable\_global\_interrupts}}
+\index{hal\_disable\_global\_interrupts@{hal\_disable\_global\_interrupts}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_disable\_global\_interrupts()}{hal\_disable\_global\_interrupts()}}
+{\footnotesize\ttfamily \label{interrupt_8h_a598755bfca19d040a2e7f9daf5e5f373} 
+uint32\+\_\+t hal\+\_\+disable\+\_\+global\+\_\+interrupts (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
+
+
+
+Disable global interrupts. 
+
+\begin{DoxyReturn}{Returns}
+Previous interrupt state. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_acee16c5665334d7c548ed969f3b2d874}\index{interrupt.h@{interrupt.h}!hal\_disable\_interrupt@{hal\_disable\_interrupt}}
+\index{hal\_disable\_interrupt@{hal\_disable\_interrupt}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_disable\_interrupt()}{hal\_disable\_interrupt()}}
+{\footnotesize\ttfamily \label{interrupt_8h_acee16c5665334d7c548ed969f3b2d874} 
+int8\+\_\+t hal\+\_\+disable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Disable a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if successful, -\/1 if failed.
+\end{DoxyReturn}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to disable \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status of operation 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em SUCCESS} & Interrupt disabled successfully \\
+\hline
+{\em FAILURE} & Invalid interrupt number (Cortex-\/M internal interrupt)\\
+\hline
+\end{DoxyRetVals}
+Disables the specified interrupt in the NVIC by setting the corresponding bit in the ICER (Interrupt Clear Enable Register). \texorpdfstring{$<$}{<} Indicates failed operation.
+
+\texorpdfstring{$<$}{<} Indicates successful operation.\Hypertarget{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5}\index{interrupt.h@{interrupt.h}!hal\_enable\_global\_interrupts@{hal\_enable\_global\_interrupts}}
+\index{hal\_enable\_global\_interrupts@{hal\_enable\_global\_interrupts}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_enable\_global\_interrupts()}{hal\_enable\_global\_interrupts()}}
+{\footnotesize\ttfamily \label{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5} 
+void hal\+\_\+enable\+\_\+global\+\_\+interrupts (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{state}{}\end{DoxyParamCaption})}
+
+
+
+Enable global interrupts. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em state} & Optional state flag. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_af5a39d871f4e853eeb1c18aec31bb9c2}\index{interrupt.h@{interrupt.h}!hal\_enable\_interrupt@{hal\_enable\_interrupt}}
+\index{hal\_enable\_interrupt@{hal\_enable\_interrupt}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_enable\_interrupt()}{hal\_enable\_interrupt()}}
+{\footnotesize\ttfamily \label{interrupt_8h_af5a39d871f4e853eeb1c18aec31bb9c2} 
+int8\+\_\+t hal\+\_\+enable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Enable a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if successful, -\/1 if failed.
+\end{DoxyReturn}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to enable \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status of operation 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em SUCCESS} & Interrupt enabled successfully \\
+\hline
+{\em FAILURE} & Invalid interrupt number (Cortex-\/M internal interrupt)\\
+\hline
+\end{DoxyRetVals}
+Enables the specified interrupt in the NVIC by setting the corresponding bit in the ISER (Interrupt Set Enable Register). \texorpdfstring{$<$}{<} Indicates failed operation.
+
+\texorpdfstring{$<$}{<} Indicates successful operation.\Hypertarget{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369}\index{interrupt.h@{interrupt.h}!hal\_get\_interrupt\_priority@{hal\_get\_interrupt\_priority}}
+\index{hal\_get\_interrupt\_priority@{hal\_get\_interrupt\_priority}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_get\_interrupt\_priority()}{hal\_get\_interrupt\_priority()}}
+{\footnotesize\ttfamily \label{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369} 
+uint8\+\_\+t hal\+\_\+get\+\_\+interrupt\+\_\+priority (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Get priority for a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Priority value. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_ae6e7c5068b926209dbd3e94d42ec3ea2}\index{interrupt.h@{interrupt.h}!hal\_handle\_interrupt@{hal\_handle\_interrupt}}
+\index{hal\_handle\_interrupt@{hal\_handle\_interrupt}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_handle\_interrupt()}{hal\_handle\_interrupt()}}
+{\footnotesize\ttfamily \label{interrupt_8h_ae6e7c5068b926209dbd3e94d42ec3ea2} 
+void hal\+\_\+handle\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Central interrupt handler function. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number that occurred.\\
+\hline
+\end{DoxyParams}
+Central interrupt handler function.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to handle\\
+\hline
+\end{DoxyParams}
+This function should be called from the actual interrupt service routine (ISR) to invoke the user-\/registered callback function. It performs bounds checking and NULL pointer verification before invoking the callback. \Hypertarget{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca}\index{interrupt.h@{interrupt.h}!hal\_interrupt\_attach\_callback@{hal\_interrupt\_attach\_callback}}
+\index{hal\_interrupt\_attach\_callback@{hal\_interrupt\_attach\_callback}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_interrupt\_attach\_callback()}{hal\_interrupt\_attach\_callback()}}
+{\footnotesize\ttfamily \label{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca} 
+void hal\+\_\+interrupt\+\_\+attach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{callback~}{)(void)}\end{DoxyParamCaption})}
+
+
+
+Attach a callback function to a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+{\em callback} & Function pointer to be called when interrupt occurs.\\
+\hline
+\end{DoxyParams}
+Attach a callback function to a specific interrupt.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to attach to \\
+\hline
+\mbox{\texttt{in}}  & {\em callback} & Function pointer to be called when interrupt occurs\\
+\hline
+\end{DoxyParams}
+Registers a callback function for the specified interrupt. The callback will be invoked when the interrupt occurs and is handled by \doxylink{interrupt_8h_ae6e7c5068b926209dbd3e94d42ec3ea2}{hal\+\_\+handle\+\_\+interrupt()}.
+
+\begin{DoxyNote}{Note}
+The callback function should be short and non-\/blocking 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_ac066d5830d23093468acb3a714ead9c5}\index{interrupt.h@{interrupt.h}!hal\_interrupt\_detach\_callback@{hal\_interrupt\_detach\_callback}}
+\index{hal\_interrupt\_detach\_callback@{hal\_interrupt\_detach\_callback}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_interrupt\_detach\_callback()}{hal\_interrupt\_detach\_callback()}}
+{\footnotesize\ttfamily \label{interrupt_8h_ac066d5830d23093468acb3a714ead9c5} 
+void hal\+\_\+interrupt\+\_\+detach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Detach a callback function from a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number.\\
+\hline
+\end{DoxyParams}
+Detach a callback function from a specific interrupt.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to detach from\\
+\hline
+\end{DoxyParams}
+Removes any previously registered callback for the specified interrupt. \Hypertarget{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb}\index{interrupt.h@{interrupt.h}!hal\_is\_interrupt\_pending@{hal\_is\_interrupt\_pending}}
+\index{hal\_is\_interrupt\_pending@{hal\_is\_interrupt\_pending}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_is\_interrupt\_pending()}{hal\_is\_interrupt\_pending()}}
+{\footnotesize\ttfamily \label{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb} 
+int hal\+\_\+is\+\_\+interrupt\+\_\+pending (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{}\end{DoxyParamCaption})}
+
+
+
+Check if a specific interrupt is pending. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if pending, 0 if not. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Implementation pending. 
+\end{DoxyNote}
+\Hypertarget{interrupt_8h_ad1fc0820aaa8ab23baa842489b92285f}\index{interrupt.h@{interrupt.h}!hal\_set\_interrupt\_priority@{hal\_set\_interrupt\_priority}}
+\index{hal\_set\_interrupt\_priority@{hal\_set\_interrupt\_priority}!interrupt.h@{interrupt.h}}
+\doxysubsubsection{\texorpdfstring{hal\_set\_interrupt\_priority()}{hal\_set\_interrupt\_priority()}}
+{\footnotesize\ttfamily \label{interrupt_8h_ad1fc0820aaa8ab23baa842489b92285f} 
+void hal\+\_\+set\+\_\+interrupt\+\_\+priority (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interrupt__reg_8h_a7e1129cd8a196f4284d41db3e82ad5c8}{IRQn\+\_\+\+Type}}}]{interrupt}{, }\item[{uint8\+\_\+t}]{priority}{}\end{DoxyParamCaption})}
+
+
+
+Set priority for a specific interrupt. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em interrupt} & IRQ number. \\
+\hline
+{\em priority} & Priority value. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Implementation pending. 
+\end{DoxyNote}

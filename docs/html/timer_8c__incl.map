@@ -1,0 +1,34 @@
+<map id="src/core/cortex&#45;m4/timer/timer.c" name="src/core/cortex&#45;m4/timer/timer.c">
+<area shape="rect" id="Node000001" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)" alt="" coords="487,5,617,46"/>
+<area shape="rect" id="Node000002" href="$timer_8h.html" title="Timer and SysTick register defines and API for STM32F4 (Cortex&#45;M4)." alt="" coords="650,94,801,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="596,44,686,85,684,90,594,49"/>
+<area shape="rect" id="Node000004" href="$timer__types_8h.html" title=" " alt="" coords="769,168,898,193"/>
+<area shape="poly" id="edge20_Node000001_Node000004" title=" " alt="" coords="618,33,731,56,782,72,815,92,825,106,831,121,837,152,831,153,826,123,820,108,812,96,780,77,730,61,617,39"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="474,330,539,356"/>
+<area shape="poly" id="edge21_Node000001_Node000005" title=" " alt="" coords="577,45,604,72,630,107,649,149,653,171,652,194,645,242,637,262,622,284,590,311,554,329,552,324,587,306,618,280,633,259,640,240,647,193,648,171,644,150,625,110,599,75,573,48"/>
+<area shape="rect" id="Node000006" href="$clock_8h.html" title="Cortex&#45;M4 specific clock control HAL interface." alt="" coords="331,94,485,120"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="517,49,445,88,442,84,515,44"/>
+<area shape="rect" id="Node000008" href="$rcc__reg_8h.html" title=" " alt="" coords="222,241,352,282"/>
+<area shape="poly" id="edge16_Node000001_Node000008" title=" " alt="" coords="487,31,445,37,400,49,357,68,321,96,301,125,290,159,286,194,286,226,280,226,281,194,285,158,296,123,317,92,355,63,399,44,444,32,486,26"/>
+<area shape="rect" id="Node000009" href="$interrupt_8h.html" title="NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32F4." alt="" coords="467,168,637,193"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="555,46,555,152,549,152,549,46"/>
+<area shape="rect" id="Node000011" href="$timer__reg_8h.html" title=" " alt="" coords="5,241,147,282"/>
+<area shape="poly" id="edge17_Node000001_Node000011" title=" " alt="" coords="487,39,395,61,345,76,297,96,242,128,190,164,109,233,105,229,187,160,239,123,295,92,343,71,393,55,486,34"/>
+<area shape="rect" id="Node000003" href="$hal__types_8h.html" title="Hardware Abstraction Layer (HAL) common type definitions." alt="" coords="165,330,307,356"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="649,117,459,137,366,152,301,170,270,184,247,197,228,215,212,242,207,261,209,280,223,316,218,318,204,281,202,260,207,240,224,211,244,193,268,179,299,165,365,147,458,131,649,111"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="745,118,804,156,801,161,742,122"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="730,120,732,152,730,195,719,242,709,264,695,284,664,309,628,326,590,337,555,342,554,337,589,332,626,321,661,305,691,280,705,261,714,240,724,194,726,152,724,120"/>
+<area shape="rect" id="Node000007" href="$clock__types_8h.html" title="Clock HAL type definitions." alt="" coords="312,168,442,193"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="405,121,391,154,386,152,400,119"/>
+<area shape="poly" id="edge10_Node000007_Node000005" title=" " alt="" coords="382,193,393,234,403,258,417,280,440,303,467,320,464,324,437,307,413,284,398,261,388,236,377,194"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="365,196,322,233,319,229,362,192"/>
+<area shape="poly" id="edge8_Node000008_Node000003" title=" " alt="" coords="276,284,254,318,250,315,272,281"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="343,280,461,322,459,327,341,285"/>
+<area shape="poly" id="edge15_Node000009_Node000005" title=" " alt="" coords="567,192,583,210,598,232,606,257,605,271,601,283,580,308,554,326,551,321,577,304,596,281,600,270,601,258,593,235,579,213,563,196"/>
+<area shape="rect" id="Node000010" href="$interrupt__reg_8h.html" title="Cortex&#45;M4 NVIC (Nested Vector Interrupt Controller) register definitions." alt="" coords="427,241,586,282"/>
+<area shape="poly" id="edge12_Node000009_Node000010" title=" " alt="" coords="547,195,528,229,523,227,543,192"/>
+<area shape="poly" id="edge13_Node000010_Node000003" title=" " alt="" coords="440,285,293,328,292,323,438,280"/>
+<area shape="poly" id="edge14_Node000010_Node000005" title=" " alt="" coords="509,282,509,314,504,314,504,282"/>
+<area shape="poly" id="edge18_Node000011_Node000003" title=" " alt="" coords="117,280,199,320,197,325,115,285"/>
+<area shape="poly" id="edge19_Node000011_Node000005" title=" " alt="" coords="148,273,460,330,459,335,147,279"/>
+</map>

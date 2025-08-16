@@ -1,19 +1,19 @@
 \chapter{Nav\+HAL — NAVRobotec Hardware Abstraction Layer }
 \hypertarget{md__r_e_a_d_m_e}{}\label{md__r_e_a_d_m_e}\index{NavHAL — NAVRobotec Hardware Abstraction Layer@{NavHAL — NAVRobotec Hardware Abstraction Layer}}
-\label{md__r_e_a_d_m_e_autotoc_md383}%
-\Hypertarget{md__r_e_a_d_m_e_autotoc_md383}%
+\label{md__r_e_a_d_m_e_autotoc_md14}%
+\Hypertarget{md__r_e_a_d_m_e_autotoc_md14}%
 
 
-\mbox{[}\mbox{]}(LICENSE) \href{https://github.com/ragnar-vallhala/NavHAL/actions}{\texttt{}} \href{https://codecov.io/gh/ragnar-vallhala/NavHAL}{\texttt{}} \href{docs/html/index.html}{\texttt{}} \href{https://github.com/ragnar-vallhala/NavHAL/stargazers}{\texttt{}} \href{https://github.com/ragnar-vallhala/NavHAL/issues}{\texttt{}}
+\doxysectlink{md__l_i_c_e_n_s_e}{}{0} \href{https://github.com/ragnar-vallhala/NavHAL/actions}{\texttt{}} \href{https://codecov.io/gh/ragnar-vallhala/NavHAL}{\texttt{}} \href{docs/html/index.html}{\texttt{}} \href{https://github.com/ragnar-vallhala/NavHAL/stargazers}{\texttt{}} \href{https://github.com/ragnar-vallhala/NavHAL/issues}{\texttt{}} \mbox{[}\mbox{]}
 
 \DoxyHorRuler{0}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md385}{}\doxysection{\texorpdfstring{Overview}{Overview}}\label{md__r_e_a_d_m_e_autotoc_md385}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md16}{}\doxysection{\texorpdfstring{Overview}{Overview}}\label{md__r_e_a_d_m_e_autotoc_md16}
 {\bfseries{Nav\+HAL}} is a professional, cross-\/platform hardware abstraction layer (HAL) written in C, designed for embedded systems across multiple architectures. It is architecture-\/agnostic by design, enabling scalable and portable embedded software development. Future extensions will provide C++ wrappers and RTOS integration to deliver a clean, modular, and extensible interface suitable for modern embedded projects.
 
 Nav\+HAL is developed and maintained by {\bfseries{NAVRobotec}}, a company dedicated to innovative and robust embedded solutions.
 
 \DoxyHorRuler{0}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md387}{}\doxysection{\texorpdfstring{Key Features}{Key Features}}\label{md__r_e_a_d_m_e_autotoc_md387}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md18}{}\doxysection{\texorpdfstring{Key Features}{Key Features}}\label{md__r_e_a_d_m_e_autotoc_md18}
 
 \begin{DoxyItemize}
 \item Architecture-\/independent HAL supporting multiple MCU families (ARM, AVR, RISC-\/V, etc.)
@@ -25,14 +25,14 @@ Nav\+HAL is developed and maintained by {\bfseries{NAVRobotec}}, a company dedic
 \end{DoxyItemize}
 
 \DoxyHorRuler{0}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md389}{}\doxysection{\texorpdfstring{Project Brief}{Project Brief}}\label{md__r_e_a_d_m_e_autotoc_md389}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md20}{}\doxysection{\texorpdfstring{Project Brief}{Project Brief}}\label{md__r_e_a_d_m_e_autotoc_md20}
 \begin{quote}
 {\itshape A cross-\/platform hardware abstraction layer for embedded systems, enabling scalable and architecture-\/agnostic development.} \end{quote}
 
 
 \DoxyHorRuler{0}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md391}{}\doxysection{\texorpdfstring{Getting Started}{Getting Started}}\label{md__r_e_a_d_m_e_autotoc_md391}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md392}{}\doxysubsection{\texorpdfstring{Prerequisites}{Prerequisites}}\label{md__r_e_a_d_m_e_autotoc_md392}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md22}{}\doxysection{\texorpdfstring{Getting Started}{Getting Started}}\label{md__r_e_a_d_m_e_autotoc_md22}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md23}{}\doxysubsection{\texorpdfstring{Prerequisites}{Prerequisites}}\label{md__r_e_a_d_m_e_autotoc_md23}
 
 \begin{DoxyItemize}
 \item ARM GCC Toolchain ({\ttfamily arm-\/none-\/eabi-\/gcc}) or other toolchains depending on target architecture
@@ -40,7 +40,7 @@ Nav\+HAL is developed and maintained by {\bfseries{NAVRobotec}}, a company dedic
 \item Ninja or Make build system
 \item Flashing tools (e.\+g., {\ttfamily st-\/flash} for STM32 boards)
 \item Doxygen (for generating documentation)
-\end{DoxyItemize}\hypertarget{md__r_e_a_d_m_e_autotoc_md393}{}\doxysubsection{\texorpdfstring{Building a Sample}{Building a Sample}}\label{md__r_e_a_d_m_e_autotoc_md393}
+\end{DoxyItemize}\hypertarget{md__r_e_a_d_m_e_autotoc_md24}{}\doxysubsection{\texorpdfstring{Building a Sample}{Building a Sample}}\label{md__r_e_a_d_m_e_autotoc_md24}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\#\ =====BUILD\ NO\ HAL\ VERSION=====}
@@ -61,7 +61,29 @@ Nav\+HAL is developed and maintained by {\bfseries{NAVRobotec}}, a company dedic
 \DoxyCodeLine{cmake\ -\/-\/build\ .}
 
 \end{DoxyCode}
- \hypertarget{md__r_e_a_d_m_e_autotoc_md394}{}\doxysubsection{\texorpdfstring{Flashing Firmware}{Flashing Firmware}}\label{md__r_e_a_d_m_e_autotoc_md394}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md25}{}\doxysubsection{\texorpdfstring{Building Tests}{Building Tests}}\label{md__r_e_a_d_m_e_autotoc_md25}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#=====BUILD\ TEST\ (example:\ clock\_test)=====}
+\DoxyCodeLine{}
+\DoxyCodeLine{mkdir\ build\ \&\&\ cd\ build}
+\DoxyCodeLine{cmake\ ..\ -\/DTEST=clock\_test\ -\/DSTANDALONE=ON}
+\DoxyCodeLine{cmake\ -\/-\/build\ .}
+
+\end{DoxyCode}
+
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\#\ =====BUILD\ ANOTHER\ TEST\ (example:\ systick\_test)=====}
+\DoxyCodeLine{}
+\DoxyCodeLine{mkdir\ build\ \&\&\ cd\ build}
+\DoxyCodeLine{cmake\ ..\ -\/DTEST=systick\_test\ -\/DSTANDALONE=OFF}
+\DoxyCodeLine{cmake\ -\/-\/build\ .}
+\DoxyCodeLine{ctest\ -\/-\/output-\/on-\/failure}
+
+\end{DoxyCode}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md26}{}\doxysubsection{\texorpdfstring{Flashing Firmware}{Flashing Firmware}}\label{md__r_e_a_d_m_e_autotoc_md26}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{cmake\ -\/-\/build\ .\ -\/-\/target\ flash}
@@ -70,7 +92,7 @@ Nav\+HAL is developed and maintained by {\bfseries{NAVRobotec}}, a company dedic
 
 
 \DoxyHorRuler{0}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md396}{}\doxysection{\texorpdfstring{Documentation}{Documentation}}\label{md__r_e_a_d_m_e_autotoc_md396}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md28}{}\doxysection{\texorpdfstring{Documentation}{Documentation}}\label{md__r_e_a_d_m_e_autotoc_md28}
 Generate API documentation using\+:
 
 
@@ -83,7 +105,7 @@ Generate API documentation using\+:
 Documentation will be available in {\ttfamily docs/html}.
 
 \DoxyHorRuler{0}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md398}{}\doxysection{\texorpdfstring{Project Structure}{Project Structure}}\label{md__r_e_a_d_m_e_autotoc_md398}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md30}{}\doxysection{\texorpdfstring{Project Structure}{Project Structure}}\label{md__r_e_a_d_m_e_autotoc_md30}
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{/}
@@ -101,20 +123,26 @@ Documentation will be available in {\ttfamily docs/html}.
 
 
 \DoxyHorRuler{0}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md400}{}\doxysection{\texorpdfstring{Contributing}{Contributing}}\label{md__r_e_a_d_m_e_autotoc_md400}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md32}{}\doxysection{\texorpdfstring{Contributing}{Contributing}}\label{md__r_e_a_d_m_e_autotoc_md32}
 Contributions, bug reports, and feature requests are welcome. Please follow the coding style and submit pull requests.
 
 \DoxyHorRuler{0}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md402}{}\doxysection{\texorpdfstring{License}{License}}\label{md__r_e_a_d_m_e_autotoc_md402}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md34}{}\doxysection{\texorpdfstring{License}{License}}\label{md__r_e_a_d_m_e_autotoc_md34}
 MIT License — see \mbox{[}LICENSE\mbox{]}(LICENSE) for details.
 
 \DoxyHorRuler{0}
-\hypertarget{md__r_e_a_d_m_e_autotoc_md404}{}\doxysection{\texorpdfstring{Contact}{Contact}}\label{md__r_e_a_d_m_e_autotoc_md404}
+\hypertarget{md__r_e_a_d_m_e_autotoc_md36}{}\doxysection{\texorpdfstring{Contact}{Contact}}\label{md__r_e_a_d_m_e_autotoc_md36}
 NAVRobotec — Man Meets Machine
 
 Email\+: \href{mailto:support@navrobotec.com}{\texttt{support@navrobotec.\+com}}
 
 Website\+: \href{https://navrobotec.com}{\texttt{https\+://navrobotec.\+com}}
+
+\DoxyHorRuler{0}
+ \hypertarget{md__r_e_a_d_m_e_autotoc_md38}{}\doxysection{\texorpdfstring{Contributors}{Contributors}}\label{md__r_e_a_d_m_e_autotoc_md38}
+Special thanks to our contributors who made this possible\+:
+
+ \href{https://github.com/ragnar-vallhala}{\texttt{ }} \href{https://github.com/nipunsingh27}{\texttt{ }} 
 
 \DoxyHorRuler{0}
 

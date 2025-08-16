@@ -107,14 +107,17 @@ $(function() {
   <div class="headertitle"><div class="title">NavHAL Documentation </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>NavHAL is a hardware abstraction layer for embedded systems, offering clean interfaces for GPIO, UART, and more.</p>
+<div class="textblock"><h1 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
+NavHAL — NAVRobotec Hardware Abstraction Layer</h1>
+<p><a class="el" href="md__l_i_c_e_n_s_e.html"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/ragnar-vallhala/NavHAL/actions"><img src="https://img.shields.io/github/actions/workflow/status/ragnar-vallhala/NavHAL/ci.yml?branch=main" alt="Build Status" class="inline"/></a> <a href="https://codecov.io/gh/ragnar-vallhala/NavHAL"><img src="https://img.shields.io/codecov/c/github/ragnar-vallhala/NavHAL/main" alt="Coverage" class="inline"/></a> <a href="docs/html/index.html"><img src="https://img.shields.io/badge/docs-Doxygen-blue" alt="Docs" class="inline"/></a> <a href="https://github.com/ragnar-vallhala/NavHAL/stargazers"><img src="https://img.shields.io/github/stars/ragnar-vallhala/NavHAL" alt="Stars" class="inline"/></a> <a href="https://github.com/ragnar-vallhala/NavHAL/issues"><img src="https://img.shields.io/github/issues/ragnar-vallhala/NavHAL" alt="Issues" class="inline"/></a> [<img src="https://img.shields.io/github/contributors/ragnar-vallhala/NavHAL" alt="GitHub contributors" class="inline"/>]</p>
+<p>NavHAL is a hardware abstraction layer for embedded systems, offering clean interfaces for GPIO, UART, and more.</p>
 <ul>
 <li>Easy to port</li>
 <li>Minimal dependencies</li>
 <li>Lightweight and architecture-agnostic</li>
 <li>C++ wrapper layer and RTOS integration planned</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md376"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
 Getting Started</h2>
 <ol type="1">
 <li>Clone the repository: <div class="fragment"><div class="line">git clone https://github.com/ragnar-vallhala/NavHAL.git</div>
@@ -130,12 +133,26 @@ Getting Started</h2>
 <div class="line">cmake .. -DSAMPLE=hal_blink -DSTANDALONE=OFF</div>
 <div class="line">cmake --build .</div>
 </div><!-- fragment --></li>
+<li>Building Tests</li>
+</ol>
+<div class="fragment"><div class="line">#=====BUILD TEST (example: clock_test)=====</div>
+<div class="line"> </div>
+<div class="line">mkdir build &amp;&amp; cd build</div>
+<div class="line">cmake .. -DTEST=clock_test -DSTANDALONE=ON</div>
+<div class="line">cmake --build .</div>
+</div><!-- fragment --><div class="fragment"><div class="line"># =====BUILD ANOTHER TEST (example: systick_test)=====</div>
+<div class="line"> </div>
+<div class="line">mkdir build &amp;&amp; cd build</div>
+<div class="line">cmake .. -DTEST=systick_test -DSTANDALONE=OFF</div>
+<div class="line">cmake --build .</div>
+<div class="line">ctest --output-on-failure</div>
+</div><!-- fragment --><ol type="1">
 <li>Flash to your board: <div class="fragment"><div class="line">cmake --build . --target flash</div>
 </div><!-- fragment --></li>
 </ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md377"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
 Supported Platforms:</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md378"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
 Microcontrollers:</h3>
 <ul>
 <li>STM32 (HAL &amp; LL)</li>
@@ -143,7 +160,7 @@ Microcontrollers:</h3>
 <li>AVR ATmega series(planned)</li>
 <li>ESP32 (planned)</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md379"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
 Architectures:</h3>
 <ul>
 <li>ARM Cortex-M</li>
@@ -151,21 +168,26 @@ Architectures:</h3>
 <li>RISC-V (planned)</li>
 <li>Other 32-bit/8-bit MCUs (planned)</li>
 </ul>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md380"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
 Operating Modes:</h3>
 <p>Bare-metal and RTOS-integrated environments</p>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md381"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
 Supported Toolchains:</h3>
 <ul>
 <li>GCC ARM</li>
 <li>CMAKE-based builds</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md382"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
 Contribution &amp; support</h2>
 <div class="fragment"><div class="line">Contributions are welcome! Submit pull request, open issues, or suggest features.</div>
 <div class="line"> </div>
 <div class="line">Join discussions on GitHub or contact via email.</div>
-</div><!-- fragment --><p>GitHub Pages: <a href="https://ragnar-vallhala.github.io/NavHAL/">https://ragnar-vallhala.github.io/NavHAL/</a> </p>
+</div><!-- fragment --> <hr  />
+ <h2 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
+Contributors</h2>
+<p>Special thanks to our contributors who made this possible:</p>
+<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;"> <a href="https://github.com/ragnar-vallhala" title="ragnar-vallhala" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;"><img src="https://avatars.githubusercontent.com/ragnar-vallhala?s=128" alt="ragnar-vallhala" style="width:64px;height:64px;border-radius:50%;display:block;object-fit:cover;border:2px solid #e6e6e6;" class="inline"/> </a> <a href="https://github.com/nipunsingh27" title="nipunsingh27" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;"><img src="https://avatars.githubusercontent.com/nipunsingh27?s=128" alt="nipunsingh27" style="width:64px;height:64px;border-radius:50%;display:block;object-fit:cover;border:2px solid #e6e6e6;" class="inline"/> </a> </div><hr  />
+<p>GitHub Link: <a href="https://ragnar-vallhala.github.io/NavHAL/">https://ragnar-vallhala.github.io/NavHAL/</a> </p>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->

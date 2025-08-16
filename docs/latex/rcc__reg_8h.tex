@@ -70,7 +70,7 @@ struct \mbox{\hyperlink{struct_r_c_c___typedef}{RCC\+\_\+\+Typedef}}
 \item 
 \#define \mbox{\hyperlink{rcc__reg_8h_adcb77e8c1a7ee0821208f581819c8a73}{RCC\+\_\+\+PLLCFGR\+\_\+\+PLLM}}(m)
 \item 
-\#define \mbox{\hyperlink{rcc__reg_8h_a420b14def2992599aceb5d9c75db171b}{RCC\+\_\+\+PLLCFGR\+\_\+\+PLLN}}(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}})
+\#define \mbox{\hyperlink{rcc__reg_8h_a420b14def2992599aceb5d9c75db171b}{RCC\+\_\+\+PLLCFGR\+\_\+\+PLLN}}(n)
 \item 
 \#define \mbox{\hyperlink{rcc__reg_8h_ac976691e230082474046372ff1e6461b}{RCC\+\_\+\+PLLCFGR\+\_\+\+PLLP}}(p)
 \item 
@@ -92,11 +92,11 @@ struct \mbox{\hyperlink{struct_r_c_c___typedef}{RCC\+\_\+\+Typedef}}
 \item 
 \#define \mbox{\hyperlink{rcc__reg_8h_a41aef118b0611444caa87df8ea302dc2}{RCC\+\_\+\+CFGR\+\_\+\+PPRE2\+\_\+\+MASK}}~(0x7 $<$$<$ \mbox{\hyperlink{rcc__reg_8h_a9dec67e76675eb509510cc920261991c}{RCC\+\_\+\+CFGR\+\_\+\+PPRE2\+\_\+\+BIT}})
 \item 
-\#define \mbox{\hyperlink{rcc__reg_8h_ad7586b7cd60d1f0fde9ce6f44e0102e3}{RCC\+\_\+\+CFGR\+\_\+\+HPRE\+\_\+\+DIV}}(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}})
+\#define \mbox{\hyperlink{rcc__reg_8h_ad7586b7cd60d1f0fde9ce6f44e0102e3}{RCC\+\_\+\+CFGR\+\_\+\+HPRE\+\_\+\+DIV}}(n)
 \item 
-\#define \mbox{\hyperlink{rcc__reg_8h_a2a5771124ffecceed3d7eb175c596f3f}{RCC\+\_\+\+CFGR\+\_\+\+PPRE1\+\_\+\+DIV}}(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}})
+\#define \mbox{\hyperlink{rcc__reg_8h_a2a5771124ffecceed3d7eb175c596f3f}{RCC\+\_\+\+CFGR\+\_\+\+PPRE1\+\_\+\+DIV}}(n)
 \item 
-\#define \mbox{\hyperlink{rcc__reg_8h_a799e515a2b5f88930fa4bdeec66d5a70}{RCC\+\_\+\+CFGR\+\_\+\+PPRE2\+\_\+\+DIV}}(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}})
+\#define \mbox{\hyperlink{rcc__reg_8h_a799e515a2b5f88930fa4bdeec66d5a70}{RCC\+\_\+\+CFGR\+\_\+\+PPRE2\+\_\+\+DIV}}(n)
 \item 
 \#define \mbox{\hyperlink{rcc__reg_8h_a2b7d7f29b09a49c31404fc0d44645c84}{RCC\+\_\+\+CFGR\+\_\+\+HPRE\+\_\+\+DIV1}}~0x0
 \item 
@@ -165,11 +165,11 @@ AHB prescaler bits \Hypertarget{rcc__reg_8h_ad7586b7cd60d1f0fde9ce6f44e0102e3}\i
 \index{RCC\_CFGR\_HPRE\_DIV@{RCC\_CFGR\_HPRE\_DIV}!rcc\_reg.h@{rcc\_reg.h}}
 \doxysubsubsection{\texorpdfstring{RCC\_CFGR\_HPRE\_DIV}{RCC\_CFGR\_HPRE\_DIV}}
 {\footnotesize\ttfamily \label{rcc__reg_8h_ad7586b7cd60d1f0fde9ce6f44e0102e3} 
-\#define RCC\+\_\+\+CFGR\+\_\+\+HPRE\+\_\+\+DIV(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}}{}\end{DoxyParamCaption})}
+\#define RCC\+\_\+\+CFGR\+\_\+\+HPRE\+\_\+\+DIV(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
 
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}\ <<\ \mbox{\hyperlink{rcc__reg_8h_a4c292f9dbb00877a04481fc6838d0356}{RCC\_CFGR\_HPRE\_BIT}})}
+\DoxyCodeLine{(n\ <<\ \mbox{\hyperlink{rcc__reg_8h_a4c292f9dbb00877a04481fc6838d0356}{RCC\_CFGR\_HPRE\_BIT}})}
 
 \end{DoxyCode}
 Set AHB prescaler \Hypertarget{rcc__reg_8h_a2b7d7f29b09a49c31404fc0d44645c84}\index{rcc\_reg.h@{rcc\_reg.h}!RCC\_CFGR\_HPRE\_DIV1@{RCC\_CFGR\_HPRE\_DIV1}}
@@ -194,11 +194,11 @@ APB1 prescaler bits \Hypertarget{rcc__reg_8h_a2a5771124ffecceed3d7eb175c596f3f}\
 \index{RCC\_CFGR\_PPRE1\_DIV@{RCC\_CFGR\_PPRE1\_DIV}!rcc\_reg.h@{rcc\_reg.h}}
 \doxysubsubsection{\texorpdfstring{RCC\_CFGR\_PPRE1\_DIV}{RCC\_CFGR\_PPRE1\_DIV}}
 {\footnotesize\ttfamily \label{rcc__reg_8h_a2a5771124ffecceed3d7eb175c596f3f} 
-\#define RCC\+\_\+\+CFGR\+\_\+\+PPRE1\+\_\+\+DIV(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}}{}\end{DoxyParamCaption})}
+\#define RCC\+\_\+\+CFGR\+\_\+\+PPRE1\+\_\+\+DIV(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
 
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}\ <<\ \mbox{\hyperlink{rcc__reg_8h_a8db4c40c95df72a7303256eab04dbe11}{RCC\_CFGR\_PPRE1\_BIT}})}
+\DoxyCodeLine{(n\ <<\ \mbox{\hyperlink{rcc__reg_8h_a8db4c40c95df72a7303256eab04dbe11}{RCC\_CFGR\_PPRE1\_BIT}})}
 
 \end{DoxyCode}
 Set APB1 prescaler \Hypertarget{rcc__reg_8h_a0e340725f46e9462d9b02a079b9fa8ae}\index{rcc\_reg.h@{rcc\_reg.h}!RCC\_CFGR\_PPRE1\_DIV4@{RCC\_CFGR\_PPRE1\_DIV4}}
@@ -223,11 +223,11 @@ APB2 prescaler bits \Hypertarget{rcc__reg_8h_a799e515a2b5f88930fa4bdeec66d5a70}\
 \index{RCC\_CFGR\_PPRE2\_DIV@{RCC\_CFGR\_PPRE2\_DIV}!rcc\_reg.h@{rcc\_reg.h}}
 \doxysubsubsection{\texorpdfstring{RCC\_CFGR\_PPRE2\_DIV}{RCC\_CFGR\_PPRE2\_DIV}}
 {\footnotesize\ttfamily \label{rcc__reg_8h_a799e515a2b5f88930fa4bdeec66d5a70} 
-\#define RCC\+\_\+\+CFGR\+\_\+\+PPRE2\+\_\+\+DIV(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}}{}\end{DoxyParamCaption})}
+\#define RCC\+\_\+\+CFGR\+\_\+\+PPRE2\+\_\+\+DIV(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
 
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}\ <<\ \mbox{\hyperlink{rcc__reg_8h_a9dec67e76675eb509510cc920261991c}{RCC\_CFGR\_PPRE2\_BIT}})}
+\DoxyCodeLine{(n\ <<\ \mbox{\hyperlink{rcc__reg_8h_a9dec67e76675eb509510cc920261991c}{RCC\_CFGR\_PPRE2\_BIT}})}
 
 \end{DoxyCode}
 Set APB2 prescaler \Hypertarget{rcc__reg_8h_a99d9c91eaad122460d324a71cc939d1b}\index{rcc\_reg.h@{rcc\_reg.h}!RCC\_CFGR\_PPRE2\_DIV2@{RCC\_CFGR\_PPRE2\_DIV2}}
@@ -367,11 +367,11 @@ PLLM bits \Hypertarget{rcc__reg_8h_a420b14def2992599aceb5d9c75db171b}\index{rcc\
 \index{RCC\_PLLCFGR\_PLLN@{RCC\_PLLCFGR\_PLLN}!rcc\_reg.h@{rcc\_reg.h}}
 \doxysubsubsection{\texorpdfstring{RCC\_PLLCFGR\_PLLN}{RCC\_PLLCFGR\_PLLN}}
 {\footnotesize\ttfamily \label{rcc__reg_8h_a420b14def2992599aceb5d9c75db171b} 
-\#define RCC\+\_\+\+PLLCFGR\+\_\+\+PLLN(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}}{}\end{DoxyParamCaption})}
+\#define RCC\+\_\+\+PLLCFGR\+\_\+\+PLLN(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
 
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{(((\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}})\ \&\ 0x1FF)\ <<\ \mbox{\hyperlink{rcc__reg_8h_a54c5b68aa65e2586877090bdb45a79ab}{RCC\_PLLCFGR\_PLLN\_BIT}})}
+\DoxyCodeLine{(((n)\ \&\ 0x1FF)\ <<\ \mbox{\hyperlink{rcc__reg_8h_a54c5b68aa65e2586877090bdb45a79ab}{RCC\_PLLCFGR\_PLLN\_BIT}})}
 
 \end{DoxyCode}
 Set PLLN \Hypertarget{rcc__reg_8h_a54c5b68aa65e2586877090bdb45a79ab}\index{rcc\_reg.h@{rcc\_reg.h}!RCC\_PLLCFGR\_PLLN\_BIT@{RCC\_PLLCFGR\_PLLN\_BIT}}

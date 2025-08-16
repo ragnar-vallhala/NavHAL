@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['0_20mar_202024_0',['Unity 2.6.0 (Mar 2024)',['../md_extern_2unity_2docs_2_unity_change_log.html#autotoc_md235',1,'']]],
-  ['0_20october_202016_1',['Unity 2.4.0 (October, 2016)',['../md_extern_2unity_2docs_2_unity_change_log.html#autotoc_md242',1,'']]],
-  ['0_20october_202019_2',['Unity 2.5.0 (October 2019)',['../md_extern_2unity_2docs_2_unity_change_log.html#autotoc_md238',1,'']]]
+  ['a_20sample_0',['Building a Sample',['../md__r_e_a_d_m_e.html#autotoc_md24',1,'']]],
+  ['abstraction_20layer_1',['Abstraction Layer',['../md__r_e_a_d_m_e.html',1,'NavHAL — NAVRobotec Hardware Abstraction Layer'],['../index.html#autotoc_md3',1,'NavHAL — NAVRobotec Hardware Abstraction Layer']]],
+  ['additional_20terms_2',['Additional Terms',['../md__l_i_c_e_n_s_e.html#autotoc_md1',1,'']]],
+  ['architectures_3a_3',['Architectures:',['../index.html#autotoc_md7',1,'']]]
 ];

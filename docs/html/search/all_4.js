@@ -1,8 +1,27 @@
 var searchData=
 [
-  ['4_200_20october_202016_0',['Unity 2.4.0 (October, 2016)',['../md_extern_2unity_2docs_2_unity_change_log.html#autotoc_md242',1,'']]],
-  ['4_201_20april_202017_1',['Unity 2.4.1 (April 2017)',['../md_extern_2unity_2docs_2_unity_change_log.html#autotoc_md241',1,'']]],
-  ['4_202_20september_202017_2',['Unity 2.4.2 (September 2017)',['../md_extern_2unity_2docs_2_unity_change_log.html#autotoc_md240',1,'']]],
-  ['4_203_20november_202017_3',['Unity 2.4.3 (November 2017)',['../md_extern_2unity_2docs_2_unity_change_log.html#autotoc_md239',1,'']]],
-  ['4_20permanent_20ban_4',['4. Permanent Ban',['../md_extern_2unity_2docs_2_c_o_d_e___o_f___c_o_n_d_u_c_t.html#autotoc_md10',1,'']]]
+  ['dckcfgr_0',['DCKCFGR',['../struct_r_c_c___typedef.html#a861c92b99345ad1fa89bf536760e8fec',1,'RCC_Typedef']]],
+  ['dcmi_5firqn_1',['DCMI_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8ace3c0fc2c4d05a7c02e3c987da5bc8e8',1,'interrupt_reg.h']]],
+  ['debugmonitor_5firqn_2',['DebugMonitor_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a8e033fcef7aed98a31c60a7de206722c',1,'interrupt_reg.h']]],
+  ['delay_3',['delay',['../samples_201__no__hal__blink_2main_8c.html#a341d33c536d663703208ab568f7d1e0e',1,'delay(void):&#160;main.c'],['../samples_203__no__hal__uart__tx_2main_8c.html#a7b7c9f8b5da59962d0a309f028efedaa',1,'delay(volatile uint32_t count):&#160;main.c'],['../samples_208__no__hal__pwm_2main_8c.html#abb9ee10191569258e0f22bdd0a95ba62',1,'delay():&#160;main.c']]],
+  ['delay_5fms_4',['delay_ms',['../timer_8h.html#ab7cce8122024d7ba47bf10f434956de4',1,'delay_ms(uint32_t ms):&#160;timer.c'],['../timer_8c.html#ab7cce8122024d7ba47bf10f434956de4',1,'delay_ms(uint32_t ms):&#160;timer.c']]],
+  ['delay_5fus_5',['delay_us',['../timer_8h.html#a025aed4c2e0c624b412158b404806a2a',1,'delay_us(uint64_t us):&#160;timer.c'],['../timer_8c.html#a025aed4c2e0c624b412158b404806a2a',1,'delay_us(uint64_t us):&#160;timer.c']]],
+  ['dma1_5fstream0_5firqn_6',['DMA1_Stream0_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a9ee33e72512c4cfb301b216f4fb9d68c',1,'interrupt_reg.h']]],
+  ['dma1_5fstream1_5firqn_7',['DMA1_Stream1_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8aa45ca2c955060e2c2a7cbbe1d6753285',1,'interrupt_reg.h']]],
+  ['dma1_5fstream2_5firqn_8',['DMA1_Stream2_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a0d9ec75e4478e70235b705d5a6b3efd8',1,'interrupt_reg.h']]],
+  ['dma1_5fstream3_5firqn_9',['DMA1_Stream3_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8af77770e080206a7558decf09344fb2e2',1,'interrupt_reg.h']]],
+  ['dma1_5fstream4_5firqn_10',['DMA1_Stream4_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8aee2aaf365c6c297a63cee41ecae2301a',1,'interrupt_reg.h']]],
+  ['dma1_5fstream5_5firqn_11',['DMA1_Stream5_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8ac92efa72399fe58fa615d8bf8fd64a4e',1,'interrupt_reg.h']]],
+  ['dma1_5fstream6_5firqn_12',['DMA1_Stream6_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8aef5e2b68f62f6f1781fab894f0b8f486',1,'interrupt_reg.h']]],
+  ['dma1_5fstream7_5firqn_13',['DMA1_Stream7_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8aedaa9c14e7e5fa9c0dcbb0c2455546e8',1,'interrupt_reg.h']]],
+  ['dma2_5fstream0_5firqn_14',['DMA2_Stream0_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a1e5055722630fd4b12aff421964c2ebb',1,'interrupt_reg.h']]],
+  ['dma2_5fstream1_5firqn_15',['DMA2_Stream1_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a98abb3f02c1feb3831706bc1b82307cb',1,'interrupt_reg.h']]],
+  ['dma2_5fstream2_5firqn_16',['DMA2_Stream2_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8abf5e189f3ac7aad9f65e65ea5a0f3b36',1,'interrupt_reg.h']]],
+  ['dma2_5fstream3_5firqn_17',['DMA2_Stream3_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a3ff8f3439f509e6e985eb960e63e1be4',1,'interrupt_reg.h']]],
+  ['dma2_5fstream4_5firqn_18',['DMA2_Stream4_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8ae54eb8b30273b38a0576f75aba24eec0',1,'interrupt_reg.h']]],
+  ['dma2_5fstream5_5firqn_19',['DMA2_Stream5_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a933d4686213973abc01845a3da1c8a03',1,'interrupt_reg.h']]],
+  ['dma2_5fstream6_5firqn_20',['DMA2_Stream6_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a21570761ad0b5ed751adc831691b7800',1,'interrupt_reg.h']]],
+  ['dma2_5fstream7_5firqn_21',['DMA2_Stream7_IRQn',['../interrupt__reg_8h.html#a7e1129cd8a196f4284d41db3e82ad5c8a3d4cc0cd9b4d71e7ee002c4f8c1f8a77',1,'interrupt_reg.h']]],
+  ['documentation_22',['Documentation',['../md__r_e_a_d_m_e.html#autotoc_md28',1,'Documentation'],['../index.html',1,'NavHAL Documentation']]],
+  ['dr_23',['DR',['../struct_i2_c___reg___typedef.html#a7f9469450c43cc545d809b20378beb10',1,'I2C_Reg_Typedef']]]
 ];

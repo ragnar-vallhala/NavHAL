@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hpre_5fdiv_0',['hpre_div',['../structhal__clock__config__t.html#af67318a6953fea2afc063629d20d4855',1,'hal_clock_config_t']]]
+  ['lckr_0',['LCKR',['../struct_g_p_i_ox___typedef.html#acc2e9854fd2af3a1496987c2f190e1cc',1,'GPIOx_Typedef']]]
 ];

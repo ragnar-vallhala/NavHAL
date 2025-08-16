@@ -107,15 +107,15 @@ $(function() {
   <div class="headertitle"><div class="title">NavHAL — NAVRobotec Hardware Abstraction Layer </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md383"></a></p>
-<p>[<img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" style="pointer-events: none;" class="inline"/>](LICENSE) <a href="https://github.com/ragnar-vallhala/NavHAL/actions"><img src="https://img.shields.io/github/actions/workflow/status/ragnar-vallhala/NavHAL/ci.yml?branch=main" alt="Build Status" class="inline"/></a> <a href="https://codecov.io/gh/ragnar-vallhala/NavHAL"><img src="https://img.shields.io/codecov/c/github/ragnar-vallhala/NavHAL/main" alt="Coverage" class="inline"/></a> <a href="docs/html/index.html"><img src="https://img.shields.io/badge/docs-Doxygen-blue" alt="Docs" class="inline"/></a> <a href="https://github.com/ragnar-vallhala/NavHAL/stargazers"><img src="https://img.shields.io/github/stars/ragnar-vallhala/NavHAL" alt="Stars" class="inline"/></a> <a href="https://github.com/ragnar-vallhala/NavHAL/issues"><img src="https://img.shields.io/github/issues/ragnar-vallhala/NavHAL" alt="Issues" class="inline"/></a></p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md14"></a></p>
+<p><a class="el" href="md__l_i_c_e_n_s_e.html"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/ragnar-vallhala/NavHAL/actions"><img src="https://img.shields.io/github/actions/workflow/status/ragnar-vallhala/NavHAL/ci.yml?branch=main" alt="Build Status" class="inline"/></a> <a href="https://codecov.io/gh/ragnar-vallhala/NavHAL"><img src="https://img.shields.io/codecov/c/github/ragnar-vallhala/NavHAL/main" alt="Coverage" class="inline"/></a> <a href="docs/html/index.html"><img src="https://img.shields.io/badge/docs-Doxygen-blue" alt="Docs" class="inline"/></a> <a href="https://github.com/ragnar-vallhala/NavHAL/stargazers"><img src="https://img.shields.io/github/stars/ragnar-vallhala/NavHAL" alt="Stars" class="inline"/></a> <a href="https://github.com/ragnar-vallhala/NavHAL/issues"><img src="https://img.shields.io/github/issues/ragnar-vallhala/NavHAL" alt="Issues" class="inline"/></a> [<img src="https://img.shields.io/github/contributors/ragnar-vallhala/NavHAL" alt="GitHub contributors" class="inline"/>]</p>
 <hr  />
-<h1 class="doxsection"><a class="anchor" id="autotoc_md385"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
 Overview</h1>
 <p><b>NavHAL</b> is a professional, cross-platform hardware abstraction layer (HAL) written in C, designed for embedded systems across multiple architectures. It is architecture-agnostic by design, enabling scalable and portable embedded software development. Future extensions will provide C++ wrappers and RTOS integration to deliver a clean, modular, and extensible interface suitable for modern embedded projects.</p>
 <p>NavHAL is developed and maintained by <b>NAVRobotec</b>, a company dedicated to innovative and robust embedded solutions.</p>
 <hr  />
-<h1 class="doxsection"><a class="anchor" id="autotoc_md387"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
 Key Features</h1>
 <ul>
 <li>Architecture-independent HAL supporting multiple MCU families (ARM, AVR, RISC-V, etc.)</li>
@@ -126,15 +126,15 @@ Key Features</h1>
 <li>Professional-grade tooling with CMake build system and Doxygen documentation</li>
 </ul>
 <hr  />
-<h1 class="doxsection"><a class="anchor" id="autotoc_md389"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
 Project Brief</h1>
 <blockquote class="doxtable">
 <p><em>A cross-platform hardware abstraction layer for embedded systems, enabling scalable and architecture-agnostic development.</em> </p>
 </blockquote>
 <hr  />
-<h1 class="doxsection"><a class="anchor" id="autotoc_md391"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
 Getting Started</h1>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md392"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
 Prerequisites</h2>
 <ul>
 <li>ARM GCC Toolchain (<span class="tt">arm-none-eabi-gcc</span>) or other toolchains depending on target architecture</li>
@@ -143,7 +143,7 @@ Prerequisites</h2>
 <li>Flashing tools (e.g., <span class="tt">st-flash</span> for STM32 boards)</li>
 <li>Doxygen (for generating documentation)</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md393"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
 Building a Sample</h2>
 <div class="fragment"><div class="line"># =====BUILD NO HAL VERSION=====</div>
 <div class="line"> </div>
@@ -155,17 +155,30 @@ Building a Sample</h2>
 <div class="line">mkdir build &amp;&amp; cd build</div>
 <div class="line">cmake .. -DSAMPLE=hal_blink -DSTANDALONE=OFF</div>
 <div class="line">cmake --build .</div>
-</div><!-- fragment --> <h2 class="doxsection"><a class="anchor" id="autotoc_md394"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
+Building Tests</h2>
+<div class="fragment"><div class="line">#=====BUILD TEST (example: clock_test)=====</div>
+<div class="line"> </div>
+<div class="line">mkdir build &amp;&amp; cd build</div>
+<div class="line">cmake .. -DTEST=clock_test -DSTANDALONE=ON</div>
+<div class="line">cmake --build .</div>
+</div><!-- fragment --><div class="fragment"><div class="line"># =====BUILD ANOTHER TEST (example: systick_test)=====</div>
+<div class="line"> </div>
+<div class="line">mkdir build &amp;&amp; cd build</div>
+<div class="line">cmake .. -DTEST=systick_test -DSTANDALONE=OFF</div>
+<div class="line">cmake --build .</div>
+<div class="line">ctest --output-on-failure</div>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md26"></a>
 Flashing Firmware</h2>
 <div class="fragment"><div class="line">cmake --build . --target flash</div>
 </div><!-- fragment --><hr  />
-<h1 class="doxsection"><a class="anchor" id="autotoc_md396"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md28"></a>
 Documentation</h1>
 <p>Generate API documentation using:</p>
 <div class="fragment"><div class="line">cmake --build . --target doc</div>
 </div><!-- fragment --><p>Documentation will be available in <span class="tt">docs/html</span>.</p>
 <hr  />
-<h1 class="doxsection"><a class="anchor" id="autotoc_md398"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md30"></a>
 Project Structure</h1>
 <div class="fragment"><div class="line">/</div>
 <div class="line">├── samples/               # Example samples</div>
@@ -178,20 +191,24 @@ Project Structure</h1>
 <div class="line">├── Doxyfile               # Doxygen config</div>
 <div class="line">└── README.md              # This file</div>
 </div><!-- fragment --><hr  />
-<h1 class="doxsection"><a class="anchor" id="autotoc_md400"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md32"></a>
 Contributing</h1>
 <p>Contributions, bug reports, and feature requests are welcome. Please follow the coding style and submit pull requests.</p>
 <hr  />
-<h1 class="doxsection"><a class="anchor" id="autotoc_md402"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md34"></a>
 License</h1>
 <p>MIT License — see [LICENSE](LICENSE) for details.</p>
 <hr  />
-<h1 class="doxsection"><a class="anchor" id="autotoc_md404"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md36"></a>
 Contact</h1>
 <p>NAVRobotec — Man Meets Machine</p>
 <p>Email: <a href="#" onclick="location.href='mai'+'lto:'+'sup'+'po'+'rt@'+'na'+'vro'+'bo'+'tec'+'.c'+'om'; return false;">support@navrobotec.com</a></p>
 <p>Website: <a href="https://navrobotec.com">https://navrobotec.com</a></p>
 <hr  />
+ <h1 class="doxsection"><a class="anchor" id="autotoc_md38"></a>
+Contributors</h1>
+<p>Special thanks to our contributors who made this possible:</p>
+<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;"> <a href="https://github.com/ragnar-vallhala" title="ragnar-vallhala" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;"><img src="https://avatars.githubusercontent.com/ragnar-vallhala?s=128" alt="ragnar-vallhala" style="width:64px;height:64px;border-radius:50%;display:block;object-fit:cover;border:2px solid #e6e6e6;" class="inline"/> </a> <a href="https://github.com/nipunsingh27" title="nipunsingh27" target="_blank" rel="noopener noreferrer" style="display:inline-block;text-decoration:none;"><img src="https://avatars.githubusercontent.com/nipunsingh27?s=128" alt="nipunsingh27" style="width:64px;height:64px;border-radius:50%;display:block;object-fit:cover;border:2px solid #e6e6e6;" class="inline"/> </a> </div><hr  />
 <p>Thank you for exploring NavHAL — the future of portable embedded hardware abstraction! </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

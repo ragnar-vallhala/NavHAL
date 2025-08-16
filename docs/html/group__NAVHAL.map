@@ -1,5 +1,0 @@
-<map id="Core HAL" name="Core HAL">
-<area shape="rect" id="Node000002" href="$group__HAL__CLOCK.html" title="Clock abstraction for multiple architectures." alt="" coords="136,5,224,31"/>
-<area shape="rect" id="Node000003" href="$group__HAL__GPIO.html" title="GPIO abstraction for multiple architectures." alt="" coords="138,55,222,80"/>
-<area shape="rect" id="Node000001" title="Top&#45;level includes for the NavHAL framework." alt="" coords="5,31,88,56"/>
-</map>

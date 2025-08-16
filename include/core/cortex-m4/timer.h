@@ -14,76 +14,16 @@
 #include "utils/timer_types.h"
 #include <stdint.h>
 
-#define RCC_BASE 0x40023800
-
-#define RCC_APB1ENR (*(__IO uint32_t *)(RCC_BASE + 0x40))
+// APB1
 #define RCC_APB1ENR_TIM2_OFFSET 0
 #define RCC_APB1ENR_TIM3_OFFSET 1
 #define RCC_APB1ENR_TIM4_OFFSET 2
 #define RCC_APB1ENR_TIM5_OFFSET 3
-
-#define RCC_APB2ENR (*(__IO uint32_t *)(RCC_BASE + 0x44))
+// APB2
 #define RCC_APB2ENR_TIM1_OFFSET 0
 #define RCC_APB2ENR_TIM9_OFFSET 16
 #define RCC_APB2ENR_TIM10_OFFSET 17
 #define RCC_APB2ENR_TIM11_OFFSET 18
-
-#define TIM1_BASE 0x40010000
-#define TIM2_BASE 0x40000000
-#define TIM3_BASE 0x40000400
-#define TIM4_BASE 0x40000800
-#define TIM5_BASE 0x40000C00
-#define TIM9_BASE 0x40014000
-#define TIM10_BASE 0x40014400
-#define TIM11_BASE 0x40014800
-
-// Advance Timer 1
-// Labled as ADV
-#define TIM_ADV_CR1_OFFSET 0x00
-#define TIM_ADV_CR1_CEN_BIT 0x00
-#define TIM_ADV_PSC_OFFSET                                                     \
-  0x28 // Timer tick = ABP1_CLK/(prescaler+1), Use only lower 16 bits, upper
-       // bits are reserved
-#define TIM_ADV_ARR_OFFSET                                                     \
-  0x2C // Upper 16 bits are only available for TIM2 and TIM5, reserved for rest
-#define TIM_ADV_EGR_OFFSET 0x14 // Event generator
-#define TIM_ADV_EGR_UG_BIT 0x00 // Reinitialize the timer
-#define TIM_ADV_CNT_OFFSET 0X24
-#define TIM_ADV_DIER_OFFSET 0X0C  // DMA and Interrupt register
-#define TIM_ADV_DIER_UIE_BIT 0x00 // Update Interrupt enable bit
-
-// GP Timer 2-5 on APB1
-// Labled as GP1
-#define TIM_GP1_CR1_OFFSET 0x00
-#define TIM_GP1_CR1_CEN_BIT 0x00
-#define TIM_GP1_PSC_OFFSET                                                     \
-  0x28 // Timer tick = ABP1_CLK/(prescaler+1), Use only lower 16 bits, upper
-       // bits are reserved
-#define TIM_GP1_ARR_OFFSET                                                     \
-  0x2C // Upper 16 bits are only available for TIM2 and TIM5, reserved for rest
-#define TIM_GP1_EGR_OFFSET 0x14 // Event generator
-#define TIM_GP1_EGR_UG_BIT 0x00 // Reinitialize the timer
-#define TIM_GP1_CNT_OFFSET 0X24
-#define TIM_GP1_DIER_OFFSET 0X0C  // DMA and Interrupt register
-#define TIM_GP1_DIER_UIE_BIT 0x00 // Update Interrupt enable bit
-#define TIM_GP1_SR_OFFSET 0x10    // Update Interrupt enable bit
-#define TIM_GP1_SR_UIF_BIT 0x00   // Update Interrupt enable bit
-
-// GP Timer 9-11 on APB1
-// Labled as GP2
-#define TIM_GP2_CR1_OFFSET 0x00
-#define TIM_GP2_CR1_CEN_BIT 0x00
-#define TIM_GP2_PSC_OFFSET                                                     \
-  0x28 // Timer tick = ABP2_CLK/(prescaler+1), Use only lower 16 bits, upper
-       // bits are reserved
-#define TIM_GP2_ARR_OFFSET 0x2C // only lower 16 bits availabnle
-#define TIM_GP2_EGR_OFFSET 0x14 // Event generator
-#define TIM_GP2_EGR_UG_BIT 0x0  // Reinitialize the timer
-#define TIM_GP2_CNT_OFFSET 0X24
-#define TIM_GP2_DIER_OFFSET 0X0C  // DMA and Interrupt register
-#define TIM_GP2_DIER_UIE_BIT 0x00 // Update Interrupt enable bit
-#define TIM_GP2_SR_OFFSET 0x10    // Update Interrupt enable bit
-#define TIM_GP2_SR_UIF_BIT 0x00   // Update Interrupt enable bit
 
 // SysTick Control and Status Register
 #define SYST_CSR (*(__IO uint32_t *)0xE000E010)
@@ -96,30 +36,6 @@
 #define SYST_CSR_EN_BIT 0
 #define SYST_CSR_TICKINT_BIT 1
 #define SYST_CSR_CLKSOURCE_BIT 2
-
-#define TIMx_CCR1_OFFSET 0x34
-#define TIMx_CCR2_OFFSET 0x38
-#define TIMx_CCR3_OFFSET 0x3C
-#define TIMx_CCR4_OFFSET 0x40
-#define TIMx_CCER_OFFSET 0x20
-#define TIMx_CCER_CC1E_BIT 0
-#define TIMx_CCER_CC2E_BIT 4
-#define TIMx_CCER_CC3E_BIT 8
-#define TIMx_CCER_CC4E_BIT 12
-#define TIMx_CCMR1_OFFSET 0x18
-#define TIMx_CCMR2_OFFSET 0x1c
-#define TIMx_CCMR1_OC1M_BIT 4
-
-#define TIMx_CCMR1_OC1M_PWM_MODE1                                              \
-  0x6 // In upcounting, channel 1 is active as long as TIMx_CNT<TIMx_CCR1 else
-      // inactive. In downcounting, channel 1 is inactive (OC1REF=‘0) as long as
-      // TIMx_CNT>TIMx_CCR1 else active (OC1REF=1)
-
-#define TIMx_CCMR1_OC1M_PWM_MODE2                                              \
-  0x07 // In upcounting, channel 1 is inactive as long as TIMx_CNT<TIMx_CCR1
-       // else active. In downcounting, channel 1 is active as long as
-       // TIMx_CNT>TIMx_CCR1 else inactive.
-#define TIMx_CCMR1_OC1PE_BIT 3
 
 // SysTick Timer Functions
 // TIM5 is used for systick

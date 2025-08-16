@@ -1,5 +1,0 @@
-<map id="include/core/cortex&#45;m4/gpio.h" name="include/core/cortex&#45;m4/gpio.h">
-<area shape="rect" id="Node000001" title="Cortex&#45;M4 specific GPIO HAL interface." alt="" coords="5,5,137,46"/>
-<area shape="rect" id="Node000002" href="$gpio__types_8h.html" title="GPIO pin definitions and related types for NavHAL." alt="" coords="9,94,133,120"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,46,74,78,68,78,68,46"/>
-</map>

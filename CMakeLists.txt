@@ -138,7 +138,7 @@ if(TEST)
   file(GLOB_RECURSE HAL_SRC ${SRC_CORE}/*.c )
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR)
-  add_executable(tests ${TEST_SRC} ${UNITY_SRC})
+  add_executable(tests ${TEST_SRC} ${UNITY_SRC} ${CMAKE_SOURCE_DIR}/src/core/cortex-m4/startup/startup.s)
   target_link_libraries(tests PRIVATE c gcc)
   set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/tests/linker.ld -nostdlib")
   target_compile_options(tests PRIVATE -march=armv7e-m -fno-exceptions 

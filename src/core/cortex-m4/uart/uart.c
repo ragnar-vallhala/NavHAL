@@ -200,7 +200,7 @@ void uart2_write_char(char c) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return;
-#ifndef TEST_ENABLED
+#ifdef TEST
   if (c == '\n') {
     while (!(usart->SR & USART_SR_TXE))
       ;

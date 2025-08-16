@@ -107,6 +107,9 @@ $(function() {
   <div class="headertitle"><div class="title">test_gpio.c File Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>GPIO unit test implementation for NAVHAL.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="gpio__reg_8h_source.html">core/cortex-m4/gpio_reg.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="navhal_8h_source.html">navhal.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="unity_8h_source.html">unity.h</a>&quot;</code><br />
@@ -116,7 +119,7 @@ Include dependency graph for test_gpio.c:</div>
 <div class="dyncontent">
 <div class="center"><img src="test__gpio_8c__incl.png" border="0" usemap="#atests_2test__gpio_8c" loading="lazy" alt=""/></div>
 <map name="atests_2test__gpio_8c" id="atests_2test__gpio_8c">
-<area shape="rect" title=" " alt="" coords="828,5,946,31"/>
+<area shape="rect" title="GPIO unit test implementation for NAVHAL." alt="" coords="828,5,946,31"/>
 <area shape="rect" href="gpio__reg_8h.html" title="Cortex&#45;M4 GPIO register definitions and access macros." alt="" coords="500,79,637,120"/>
 <area shape="poly" title=" " alt="" coords="839,34,652,80,651,75,837,29"/>
 <area shape="rect" title=" " alt="" coords="394,404,458,429"/>
@@ -176,17 +179,37 @@ Macros</h2></td></tr>
 <tr class="memitem:a96aff19a3c64fdb17b0c2f69bdaad460" id="r_a96aff19a3c64fdb17b0c2f69bdaad460"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96aff19a3c64fdb17b0c2f69bdaad460">CORTEX_M4</a></td></tr>
 <tr class="memitem:afab1f0c73cf3fdda9fa140cfa7c04a3d" id="r_afab1f0c73cf3fdda9fa140cfa7c04a3d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afab1f0c73cf3fdda9fa140cfa7c04a3d">UNITY_OUTPUT_COLOR</a></td></tr>
 <tr class="memitem:a419ab99c97e9144fee4f06e785a7e5e5" id="r_a419ab99c97e9144fee4f06e785a7e5e5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a419ab99c97e9144fee4f06e785a7e5e5">TEST_PIN</a>&#160;&#160;&#160;<a class="el" href="gpio__types_8h.html#a6222e804e6f2dd326ec84c1ba7ff04e6a8a6902fbbaf8f0eb78f1b2bffa84bc6e">GPIO_PC09</a></td></tr>
+<tr class="memdesc:a419ab99c97e9144fee4f06e785a7e5e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test pin used for all GPIO tests (Port C, Pin 9)  <br /></td></tr>
 <tr class="memitem:ace305a8fa6135cc7c971242bd1871f12" id="r_ace305a8fa6135cc7c971242bd1871f12"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ace305a8fa6135cc7c971242bd1871f12">TEST_AF</a>&#160;&#160;&#160;<a class="el" href="gpio__types_8h.html#a22b67ee171c3baed3b2d4c9eeb3c6c44a9181312b0d34a94f2105025c7cc2d7c1">GPIO_AF07</a></td></tr>
+<tr class="memdesc:ace305a8fa6135cc7c971242bd1871f12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Alternate function used for testing (AF7)  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a4e47f410d193d505207771bb06849b51" id="r_a4e47f410d193d505207771bb06849b51"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e47f410d193d505207771bb06849b51">test_hal_gpio_setmode</a> (void)</td></tr>
+<tr class="memdesc:a4e47f410d193d505207771bb06849b51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test GPIO mode configuration.  <br /></td></tr>
 <tr class="memitem:a7cda3f7a0ebad471c005fc76b632ce15" id="r_a7cda3f7a0ebad471c005fc76b632ce15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7cda3f7a0ebad471c005fc76b632ce15">test_hal_gpio_getmode</a> (void)</td></tr>
+<tr class="memdesc:a7cda3f7a0ebad471c005fc76b632ce15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test GPIO mode reading.  <br /></td></tr>
 <tr class="memitem:a9ea8485c4c361c83f6181ab1daf993e9" id="r_a9ea8485c4c361c83f6181ab1daf993e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9ea8485c4c361c83f6181ab1daf993e9">test_hal_gpio_digitalwrite_sets_pin_high</a> (void)</td></tr>
+<tr class="memdesc:a9ea8485c4c361c83f6181ab1daf993e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test digital write (high) operation.  <br /></td></tr>
 <tr class="memitem:a4da2ffea6b748bfe8c603859e96e1d2a" id="r_a4da2ffea6b748bfe8c603859e96e1d2a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4da2ffea6b748bfe8c603859e96e1d2a">test_hal_gpio_digitalwrite_sets_pin_low</a> (void)</td></tr>
+<tr class="memdesc:a4da2ffea6b748bfe8c603859e96e1d2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test digital write (low) operation.  <br /></td></tr>
 <tr class="memitem:a196e6d3eb8908c99f605c38857b10068" id="r_a196e6d3eb8908c99f605c38857b10068"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a196e6d3eb8908c99f605c38857b10068">test_gpio_set_alternate_function</a> (void)</td></tr>
+<tr class="memdesc:a196e6d3eb8908c99f605c38857b10068"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test alternate function configuration.  <br /></td></tr>
 </table>
-<a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>GPIO unit test implementation for NAVHAL. </p>
+<p>This file implements the test cases for verifying GPIO functionality in the NAVHAL hardware abstraction layer. It tests both the high-level HAL interface and the underlying register-level configurations.</p>
+<p>Tests cover:</p><ul>
+<li>Mode configuration (input/output/alternate)</li>
+<li>Digital write operations (high/low)</li>
+<li>Alternate function setup</li>
+<li>Register-level verification of all operations</li>
+</ul>
+<dl class="section note"><dt>Note</dt><dd>Uses Unity test framework for assertions </dd>
+<dd>
+Tests use PC9 (TEST_PIN) as the test pin with AF7 (TEST_AF) for AF tests </dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>© NAVROBOTEC PVT. LTD. </dd></dl>
+</div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a96aff19a3c64fdb17b0c2f69bdaad460" name="a96aff19a3c64fdb17b0c2f69bdaad460"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a96aff19a3c64fdb17b0c2f69bdaad460">&#9670;&#160;</a></span>CORTEX_M4</h2>
 
@@ -213,6 +236,8 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Alternate function used for testing (AF7) </p>
+
 </div>
 </div>
 <a id="a419ab99c97e9144fee4f06e785a7e5e5" name="a419ab99c97e9144fee4f06e785a7e5e5"></a>
@@ -226,6 +251,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Test pin used for all GPIO tests (Port C, Pin 9) </p>
 
 </div>
 </div>
@@ -259,6 +286,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Test alternate function configuration. </p>
+<p>Verifies that <a class="el" href="gpio_8h.html#a07aab29e77970fa617d8ea0d1922e964" title="Set the alternate function for a GPIO pin.">hal_gpio_set_alternate_function()</a>:</p><ol type="1">
+<li>Correctly sets the alternate function number</li>
+<li>Handles both AFRL (pins 0-7) and AFRH (pins 8-15) registers</li>
+</ol>
+<p>Test sequence:</p><ol type="1">
+<li>Configure pin for alternate function</li>
+<li>Verify correct AF number in appropriate register (AFRL/AFRH) </li>
+</ol>
+
 </div>
 </div>
 <a id="a9ea8485c4c361c83f6181ab1daf993e9" name="a9ea8485c4c361c83f6181ab1daf993e9"></a>
@@ -275,6 +312,18 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Test digital write (high) operation. </p>
+<p>Test digital write high.</p>
+<p>Verifies that <a class="el" href="gpio_8h.html#aa64ac2161a52147ab5e91fe399126638" title="Write a digital state to a GPIO pin.">hal_gpio_digitalwrite()</a> with GPIO_HIGH:</p><ol type="1">
+<li>Sets the correct bit in the ODR register</li>
+<li>Actually drives the pin high</li>
+</ol>
+<p>Test sequence:</p><ol type="1">
+<li>Configure pin as output</li>
+<li>Write high</li>
+<li>Verify ODR register state </li>
+</ol>
 
 </div>
 </div>
@@ -293,6 +342,18 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Test digital write (low) operation. </p>
+<p>Test digital write low.</p>
+<p>Verifies that <a class="el" href="gpio_8h.html#aa64ac2161a52147ab5e91fe399126638" title="Write a digital state to a GPIO pin.">hal_gpio_digitalwrite()</a> with GPIO_LOW:</p><ol type="1">
+<li>Clears the correct bit in the ODR register</li>
+<li>Actually drives the pin low</li>
+</ol>
+<p>Test sequence:</p><ol type="1">
+<li>Configure pin as output</li>
+<li>Write low</li>
+<li>Verify ODR register state </li>
+</ol>
+
 </div>
 </div>
 <a id="a7cda3f7a0ebad471c005fc76b632ce15" name="a7cda3f7a0ebad471c005fc76b632ce15"></a>
@@ -310,6 +371,16 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>Test GPIO mode reading. </p>
+<p>Verifies that <a class="el" href="gpio_8h.html#af5915e39ede16cf7d68b4dc1ee02b78a" title="Get the current mode of a GPIO pin.">hal_gpio_getmode()</a> correctly returns:</p><ol type="1">
+<li>The current pin mode configuration</li>
+<li>Matches the actual hardware register state</li>
+</ol>
+<p>Test sequence:</p><ol type="1">
+<li>Configure pin as output</li>
+<li>Compare getmode() return value with direct register read </li>
+</ol>
+
 </div>
 </div>
 <a id="a4e47f410d193d505207771bb06849b51" name="a4e47f410d193d505207771bb06849b51"></a>
@@ -326,6 +397,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Test GPIO mode configuration. </p>
+<p>Verifies that <a class="el" href="gpio_8h.html#ab063b362fb73bcb899a122e5188e7e32" title="Set the mode of a GPIO pin.">hal_gpio_setmode()</a> correctly configures:</p><ol type="1">
+<li>The pin mode in the MODER register</li>
+<li>The pull-up/pull-down settings</li>
+</ol>
+<p>Test sequence:</p><ol type="1">
+<li>Configure pin as output with no pull-up/pull-down</li>
+<li>Verify MODER register bits are set correctly </li>
+</ol>
 
 </div>
 </div>

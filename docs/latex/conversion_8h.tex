@@ -81,6 +81,14 @@ Stops parsing at first non-\/digit/non-\/dot character
 \end{DoxyWarning}
 Convert a string to a floating-\/point number.
 
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em s} & Pointer to null-\/terminated input string \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Converted floating-\/point value
+\end{DoxyReturn}
 Parses the input string to construct a float value\+:
 \begin{DoxyEnumerate}
 \item Skips leading whitespace
@@ -90,25 +98,17 @@ Parses the input string to construct a float value\+:
 \item Stops at first invalid character
 \end{DoxyEnumerate}
 
-
-\begin{DoxyParams}{Parameters}
-{\em s} & Pointer to null-\/terminated input string \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Converted floating-\/point value
-\end{DoxyReturn}
 \begin{DoxyWarning}{Warning}
 Limited precision for fractional components 
 
-No overflow/underflow protection
-\end{DoxyWarning}
-Example usage\+: 
+No overflow/underflow protection 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{keywordtype}{float}\ val\ =\ \mbox{\hyperlink{conversion_8h_a46c5e2aed53bc864ac60784d05d97d2b}{str\_to\_float}}(\textcolor{stringliteral}{"{}\ 3.1415xyz"{}});\ \textcolor{comment}{//\ Returns\ 3.1415f}}
 
 \end{DoxyCode}
- \Hypertarget{conversion_8h_a13c5c12f98c8a4c7fa6aacee4eca2cf5}\index{conversion.h@{conversion.h}!str\_to\_int@{str\_to\_int}}
+ 
+\end{DoxyWarning}
+\Hypertarget{conversion_8h_a13c5c12f98c8a4c7fa6aacee4eca2cf5}\index{conversion.h@{conversion.h}!str\_to\_int@{str\_to\_int}}
 \index{str\_to\_int@{str\_to\_int}!conversion.h@{conversion.h}}
 \doxysubsubsection{\texorpdfstring{str\_to\_int()}{str\_to\_int()}}
 {\footnotesize\ttfamily \label{conversion_8h_a13c5c12f98c8a4c7fa6aacee4eca2cf5} 
@@ -133,6 +133,14 @@ Stops parsing at first non-\/digit character
 \end{DoxyWarning}
 Convert a string to a 32-\/bit signed integer.
 
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em s} & Pointer to null-\/terminated input string \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Converted 32-\/bit integer value
+\end{DoxyReturn}
 Parses the input string character by character to construct the integer value\+:
 \begin{DoxyEnumerate}
 \item Skips any leading whitespace (spaces/tabs)
@@ -141,22 +149,13 @@ Parses the input string character by character to construct the integer value\+:
 \item Stops at first non-\/digit character
 \end{DoxyEnumerate}
 
-
-\begin{DoxyParams}{Parameters}
-{\em s} & Pointer to null-\/terminated input string \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Converted 32-\/bit integer value
-\end{DoxyReturn}
 \begin{DoxyWarning}{Warning}
 Potential for overflow with large numbers 
 
-No error reporting for invalid inputs
-\end{DoxyWarning}
-Example usage\+: 
+No error reporting for invalid inputs 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{keywordtype}{int}\ val\ =\ \mbox{\hyperlink{conversion_8h_a13c5c12f98c8a4c7fa6aacee4eca2cf5}{str\_to\_int}}(\textcolor{stringliteral}{"{}\ -\/1234abc"{}});\ \textcolor{comment}{//\ Returns\ -\/1234}}
 
 \end{DoxyCode}
  
+\end{DoxyWarning}

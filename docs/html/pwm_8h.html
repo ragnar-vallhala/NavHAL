@@ -130,7 +130,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="center"><img src="pwm_8h__dep__incl.png" border="0" usemap="#ainclude_2core_2cortex-m4_2pwm_8hdep" loading="lazy" alt=""/></div>
 <map name="ainclude_2core_2cortex-m4_2pwm_8hdep" id="ainclude_2core_2cortex-m4_2pwm_8hdep">
 <area shape="rect" title="HAL interface for PWM (Pulse Width Modulation) configuration and control." alt="" coords="5,5,137,46"/>
-<area shape="rect" href="pwm_8c.html" title="PWM driver implementation for STM32F4 series (Cortex&#45;M4)." alt="" coords="6,94,136,135"/>
+<area shape="rect" href="pwm_8c.html" title="PWM driver implementation for STM32F4 series (Cortex&#45;M4)" alt="" coords="6,94,136,135"/>
 <area shape="poly" title=" " alt="" coords="74,62,74,94,68,94,68,62"/>
 </map>
 </div>
@@ -197,15 +197,21 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <p>Initialize a PWM handle with the specified frequency and duty cycle.</p>
-<p>This function configures the timer to generate a PWM signal on the specified channel with the given frequency and duty cycle.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pwm</td><td>Pointer to the PWM handle structure. </td></tr>
-    <tr><td class="paramname">frequency</td><td>Desired PWM frequency in Hz. </td></tr>
-    <tr><td class="paramname">dutyCycle</td><td>Duty cycle as a fraction (0.0f - 1.0f). </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">pwm</td><td>Pointer to PWM handle structure </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">frequency</td><td>Desired PWM frequency in Hz </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dutyCycle</td><td>Initial duty cycle (0.0 to 1.0)</td></tr>
   </table>
   </dd>
 </dl>
+<p>Configures the timer peripheral to generate PWM signals by:</p><ol type="1">
+<li>Selecting the appropriate bus clock (APB1/APB2)</li>
+<li>Calculating prescaler and auto-reload values</li>
+<li>Setting the initial compare value for duty cycle</li>
+<li>Initializing the timer peripheral</li>
+</ol>
+<dl class="section note"><dt>Note</dt><dd>For advanced timers (TIM1, TIM9-TIM11), APB2 clock is used automatically </dd></dl>
 
 </div>
 </div>
@@ -239,11 +245,13 @@ Functions</h2></td></tr>
 <p>Set the PWM duty cycle.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pwm</td><td>Pointer to the PWM handle structure. </td></tr>
-    <tr><td class="paramname">dutyCycle</td><td>New duty cycle as a fraction (0.0f - 1.0f). </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">pwm</td><td>Pointer to PWM handle structure </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dutyCycle</td><td>New duty cycle (0.0 to 1.0)</td></tr>
   </table>
   </dd>
 </dl>
+<p>Updates the capture/compare register to change the PWM duty cycle while maintaining the current frequency. The change takes effect immediately on the output.</p>
+<dl class="section note"><dt>Note</dt><dd>Duty cycle is clamped to valid range (0.0-1.0) </dd></dl>
 
 </div>
 </div>
@@ -275,14 +283,15 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <p>Set the PWM frequency.</p>
-<dl class="section note"><dt>Note</dt><dd>This function is not yet implemented.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pwm</td><td>Pointer to the PWM handle structure. </td></tr>
-    <tr><td class="paramname">frequency</td><td>Desired PWM frequency in Hz. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">pwm</td><td>Pointer to PWM handle structure </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">frequency</td><td>Desired PWM frequency in Hz</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>Note</dt><dd>This function is currently not implemented </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo</a></b></dt><dd>Implement frequency change functionality </dd></dl>
 
 </div>
 </div>
@@ -311,10 +320,11 @@ Functions</h2></td></tr>
 <p>Start PWM signal generation.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pwm</td><td>Pointer to the PWM handle structure. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pwm</td><td>Pointer to initialized PWM handle structure</td></tr>
   </table>
   </dd>
 </dl>
+<p>Enables the timer counter to start generating PWM signals on the configured channel. The output will appear on the corresponding GPIO pin. </p>
 
 </div>
 </div>
@@ -341,13 +351,13 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <p>Stop PWM signal generation.</p>
-<p>This function disables the timer channel and stops the timer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pwm</td><td>Pointer to the PWM handle structure. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pwm</td><td>Pointer to PWM handle structure</td></tr>
   </table>
   </dd>
 </dl>
+<p>Disables the timer channel output and stops the timer counter. The PWM output pin will return to its idle state. </p>
 
 </div>
 </div>

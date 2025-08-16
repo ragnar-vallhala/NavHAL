@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['null_0',['NULL',['../hal__types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4',1,'hal_types.h']]],
-  ['nvic_1',['NVIC',['../interrupt__reg_8h.html#ac8e97e8ce56ae9f57da1363a937f8a17',1,'interrupt_reg.h']]],
-  ['nvic_5fbase_5faddr_2',['NVIC_BASE_ADDR',['../interrupt__reg_8h.html#a425ec323753362f97c4b9ad5d31ad2c9',1,'interrupt_reg.h']]]
+  ['malloc_0',['malloc',['../unity__memory_8h.html#acf143577800376dd931c059ecc61ba06',1,'unity_memory.h']]],
+  ['malloc_5fdont_5ffail_1',['MALLOC_DONT_FAIL',['../unity__memory_8c.html#a3f1b1eff9064dbe426821f93e435fee5',1,'unity_memory.c']]],
+  ['max_5firq_2',['MAX_IRQ',['../interrupt_8c.html#a010529b477db18b2a73db330b5f40cf9',1,'interrupt.c']]]
 ];

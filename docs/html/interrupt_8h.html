@@ -133,9 +133,9 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="center"><img src="interrupt_8h__dep__incl.png" border="0" usemap="#ainclude_2core_2cortex-m4_2interrupt_8hdep" loading="lazy" alt=""/></div>
 <map name="ainclude_2core_2cortex-m4_2interrupt_8hdep" id="ainclude_2core_2cortex-m4_2interrupt_8hdep">
 <area shape="rect" title="NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32F4." alt="" coords="84,5,216,46"/>
-<area shape="rect" href="interrupt_8c.html" title=" " alt="" coords="5,94,140,135"/>
+<area shape="rect" href="interrupt_8c.html" title="Cortex&#45;M4 Interrupt Controller HAL Implementation." alt="" coords="5,94,140,135"/>
 <area shape="poly" title=" " alt="" coords="124,60,92,95,88,92,120,56"/>
-<area shape="rect" href="timer_8c.html" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)." alt="" coords="163,94,294,135"/>
+<area shape="rect" href="timer_8c.html" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)" alt="" coords="163,94,294,135"/>
 <area shape="poly" title=" " alt="" coords="180,56,213,92,209,95,176,60"/>
 </map>
 </div>
@@ -268,7 +268,22 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 if successful, -1 if failed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if successful, -1 if failed.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to disable </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Status of operation </dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">SUCCESS</td><td>Interrupt disabled successfully </td></tr>
+    <tr><td class="paramname">FAILURE</td><td>Invalid interrupt number (Cortex-M internal interrupt)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Disables the specified interrupt in the NVIC by setting the corresponding bit in the ICER (Interrupt Clear Enable Register). </p>
 
 </div>
 </div>
@@ -320,7 +335,22 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>0 if successful, -1 if failed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>0 if successful, -1 if failed.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to enable </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Status of operation </dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">SUCCESS</td><td>Interrupt enabled successfully </td></tr>
+    <tr><td class="paramname">FAILURE</td><td>Invalid interrupt number (Cortex-M internal interrupt)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Enables the specified interrupt in the NVIC by setting the corresponding bit in the ISER (Interrupt Set Enable Register). </p>
 
 </div>
 </div>
@@ -369,10 +399,18 @@ Functions</h2></td></tr>
 <p>Central interrupt handler function. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt</td><td>IRQ number that occurred. </td></tr>
+    <tr><td class="paramname">interrupt</td><td>IRQ number that occurred.</td></tr>
   </table>
   </dd>
 </dl>
+<p>Central interrupt handler function.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to handle</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This function should be called from the actual interrupt service routine (ISR) to invoke the user-registered callback function. It performs bounds checking and NULL pointer verification before invoking the callback. </p>
 
 </div>
 </div>
@@ -399,10 +437,20 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>
-    <tr><td class="paramname">callback</td><td>Function pointer to be called when interrupt occurs. </td></tr>
+    <tr><td class="paramname">callback</td><td>Function pointer to be called when interrupt occurs.</td></tr>
   </table>
   </dd>
 </dl>
+<p>Attach a callback function to a specific interrupt.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to attach to </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">callback</td><td>Function pointer to be called when interrupt occurs</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Registers a callback function for the specified interrupt. The callback will be invoked when the interrupt occurs and is handled by <a class="el" href="#ae6e7c5068b926209dbd3e94d42ec3ea2" title="Central interrupt handler function.">hal_handle_interrupt()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>The callback function should be short and non-blocking </dd></dl>
 
 </div>
 </div>
@@ -424,10 +472,18 @@ Functions</h2></td></tr>
 <p>Detach a callback function from a specific interrupt. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt</td><td>IRQ number. </td></tr>
+    <tr><td class="paramname">interrupt</td><td>IRQ number.</td></tr>
   </table>
   </dd>
 </dl>
+<p>Detach a callback function from a specific interrupt.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">interrupt</td><td>Interrupt number to detach from</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Removes any previously registered callback for the specified interrupt. </p>
 
 </div>
 </div>

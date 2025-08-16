@@ -133,19 +133,18 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>String to number conversion implementation. </p>
-<p>This file provides the implementation for converting string representations of numbers to their corresponding integer and floating-point values. The functions handle various formats including:</p><ul>
+<p>This file provides functions for converting string representations of numbers to their corresponding integer and floating-point values. The implementation handles:</p><ul>
 <li>Leading/trailing whitespace</li>
-<li>Optional sign indicators</li>
+<li>Optional sign indicators (+/-)</li>
 <li>Decimal points for floating numbers</li>
-<li>Partial number parsing</li>
+<li>Partial number parsing (stops at first invalid character)</li>
 </ul>
 <dl class="section note"><dt>Note</dt><dd>These are blocking implementations that parse until first invalid character </dd>
 <dd>
 No overflow/underflow checking is performed </dd>
 <dd>
-Does not support scientific notation or hexadecimal formats</dd></dl>
-<dl class="section author"><dt>Author</dt><dd>Ashutosh Vishwakarma </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>2025-07-23 </dd></dl>
+Does not support scientific notation or hexadecimal formats </dd></dl>
+<dl class="section copyright"><dt>Copyright</dt><dd>© NAVROBOTEC PVT. LTD. </dd></dl>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Function Documentation</h2>
 <a id="a46c5e2aed53bc864ac60784d05d97d2b" name="a46c5e2aed53bc864ac60784d05d97d2b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a46c5e2aed53bc864ac60784d05d97d2b">&#9670;&#160;</a></span>str_to_float()</h2>
@@ -164,6 +163,13 @@ Does not support scientific notation or hexadecimal formats</dd></dl>
 
 <p>Convert string to floating-point number. </p>
 <p>Convert a string to a floating-point number.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>Pointer to null-terminated input string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Converted floating-point value</dd></dl>
 <p>Parses the input string to construct a float value:</p><ol type="1">
 <li>Skips leading whitespace</li>
 <li>Processes optional sign</li>
@@ -171,19 +177,12 @@ Does not support scientific notation or hexadecimal formats</dd></dl>
 <li>Properly tracks decimal point position</li>
 <li>Stops at first invalid character</li>
 </ol>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">s</td><td>Pointer to null-terminated input string </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Converted floating-point value</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Limited precision for fractional components </dd>
 <dd>
-No overflow/underflow protection</dd></dl>
-<p>Example usage: </p><div class="fragment"><div class="line"><span class="keywordtype">float</span> val = <a class="code hl_function" href="conversion_8h.html#a46c5e2aed53bc864ac60784d05d97d2b">str_to_float</a>(<span class="stringliteral">&quot; 3.1415xyz&quot;</span>); <span class="comment">// Returns 3.1415f</span></div>
-<div class="ttc" id="aconversion_8h_html_a46c5e2aed53bc864ac60784d05d97d2b"><div class="ttname"><a href="conversion_8h.html#a46c5e2aed53bc864ac60784d05d97d2b">str_to_float</a></div><div class="ttdeci">float str_to_float(const char *s)</div><div class="ttdoc">Convert a string to a floating-point number.</div><div class="ttdef"><b>Definition</b> conversion.c:96</div></div>
-</div><!-- fragment --> 
+No overflow/underflow protection <div class="fragment"><div class="line"><span class="keywordtype">float</span> val = <a class="code hl_function" href="conversion_8h.html#a46c5e2aed53bc864ac60784d05d97d2b">str_to_float</a>(<span class="stringliteral">&quot; 3.1415xyz&quot;</span>); <span class="comment">// Returns 3.1415f</span></div>
+<div class="ttc" id="aconversion_8h_html_a46c5e2aed53bc864ac60784d05d97d2b"><div class="ttname"><a href="conversion_8h.html#a46c5e2aed53bc864ac60784d05d97d2b">str_to_float</a></div><div class="ttdeci">float str_to_float(const char *s)</div><div class="ttdoc">Convert a string to a floating-point number.</div><div class="ttdef"><b>Definition</b> conversion.c:87</div></div>
+</div><!-- fragment --> </dd></dl>
+
 </div>
 </div>
 <a id="a13c5c12f98c8a4c7fa6aacee4eca2cf5" name="a13c5c12f98c8a4c7fa6aacee4eca2cf5"></a>
@@ -203,25 +202,25 @@ No overflow/underflow protection</dd></dl>
 
 <p>Convert string to 32-bit signed integer. </p>
 <p>Convert a string to a 32-bit signed integer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>Pointer to null-terminated input string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Converted 32-bit integer value</dd></dl>
 <p>Parses the input string character by character to construct the integer value:</p><ol type="1">
 <li>Skips any leading whitespace (spaces/tabs)</li>
 <li>Processes optional sign character (+/-)</li>
 <li>Converts subsequent digit characters to integer value</li>
 <li>Stops at first non-digit character</li>
 </ol>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">s</td><td>Pointer to null-terminated input string </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Converted 32-bit integer value</dd></dl>
 <dl class="section warning"><dt>Warning</dt><dd>Potential for overflow with large numbers </dd>
 <dd>
-No error reporting for invalid inputs</dd></dl>
-<p>Example usage: </p><div class="fragment"><div class="line"><span class="keywordtype">int</span> val = <a class="code hl_function" href="conversion_8h.html#a13c5c12f98c8a4c7fa6aacee4eca2cf5">str_to_int</a>(<span class="stringliteral">&quot; -1234abc&quot;</span>); <span class="comment">// Returns -1234</span></div>
-<div class="ttc" id="aconversion_8h_html_a13c5c12f98c8a4c7fa6aacee4eca2cf5"><div class="ttname"><a href="conversion_8h.html#a13c5c12f98c8a4c7fa6aacee4eca2cf5">str_to_int</a></div><div class="ttdeci">int32_t str_to_int(const char *s)</div><div class="ttdoc">Convert a string to a 32-bit signed integer.</div><div class="ttdef"><b>Definition</b> conversion.c:44</div></div>
-</div><!-- fragment --> 
+No error reporting for invalid inputs <div class="fragment"><div class="line"><span class="keywordtype">int</span> val = <a class="code hl_function" href="conversion_8h.html#a13c5c12f98c8a4c7fa6aacee4eca2cf5">str_to_int</a>(<span class="stringliteral">&quot; -1234abc&quot;</span>); <span class="comment">// Returns -1234</span></div>
+<div class="ttc" id="aconversion_8h_html_a13c5c12f98c8a4c7fa6aacee4eca2cf5"><div class="ttname"><a href="conversion_8h.html#a13c5c12f98c8a4c7fa6aacee4eca2cf5">str_to_int</a></div><div class="ttdeci">int32_t str_to_int(const char *s)</div><div class="ttdoc">Convert a string to a 32-bit signed integer.</div><div class="ttdef"><b>Definition</b> conversion.c:38</div></div>
+</div><!-- fragment --> </dd></dl>
+
 </div>
 </div>
 </div><!-- contents -->

@@ -129,13 +129,11 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="uart_8h__dep__incl.png" border="0" usemap="#ainclude_2core_2cortex-m4_2uart_8hdep" loading="lazy" alt=""/></div>
 <map name="ainclude_2core_2cortex-m4_2uart_8hdep" id="ainclude_2core_2cortex-m4_2uart_8hdep">
-<area shape="rect" title="UART driver interface for STM32F4 (Cortex&#45;M4)." alt="" coords="160,5,291,46"/>
-<area shape="rect" href="timer_8c.html" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)." alt="" coords="5,94,136,135"/>
-<area shape="poly" title=" " alt="" coords="178,56,107,96,104,91,176,51"/>
-<area shape="rect" href="uart_8c.html" title="UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6." alt="" coords="160,94,290,135"/>
-<area shape="poly" title=" " alt="" coords="228,62,228,94,222,94,222,62"/>
-<area shape="rect" href="tests_2main_8c.html" title=" " alt="" coords="314,102,408,127"/>
-<area shape="poly" title=" " alt="" coords="270,52,344,99,341,103,267,57"/>
+<area shape="rect" title="UART driver interface for STM32F4 (Cortex&#45;M4)." alt="" coords="82,5,214,46"/>
+<area shape="rect" href="timer_8c.html" title="Timer, SysTick and timer&#45;peripheral helpers for STM32F4 (Cortex&#45;M4)" alt="" coords="5,94,136,135"/>
+<area shape="poly" title=" " alt="" coords="122,60,90,95,86,92,118,56"/>
+<area shape="rect" href="uart_8c.html" title="UART driver implementation for STM32F4 series." alt="" coords="160,94,290,135"/>
+<area shape="poly" title=" " alt="" coords="178,56,210,92,206,95,174,60"/>
 </map>
 </div>
 </div>
@@ -215,39 +213,25 @@ Functions</h2></td></tr>
 <tr class="memitem:gaf897c816fdda40f69b1f8377878db96a" id="r_gaf897c816fdda40f69b1f8377878db96a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaf897c816fdda40f69b1f8377878db96a">uart2_init</a> (uint32_t baudrate)</td></tr>
 <tr class="memdesc:gaf897c816fdda40f69b1f8377878db96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize USART2 peripheral.  <br /></td></tr>
 <tr class="memitem:gace45b7a16f634d2de9a483acab46a7c8" id="r_gace45b7a16f634d2de9a483acab46a7c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gace45b7a16f634d2de9a483acab46a7c8">uart2_write_char</a> (char <a class="el" href="test__unity__parameterized_8c.html#a2fc627b56c26c54e1e919c187689f0de">c</a>)</td></tr>
-<tr class="memdesc:gace45b7a16f634d2de9a483acab46a7c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via USART2.  <br /></td></tr>
 <tr class="memitem:gac9e624e43c7053a70ed42b1c780ad792" id="r_gac9e624e43c7053a70ed42b1c780ad792"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gac9e624e43c7053a70ed42b1c780ad792">uart2_write_int</a> (int32_t num)</td></tr>
-<tr class="memdesc:gac9e624e43c7053a70ed42b1c780ad792"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via USART2.  <br /></td></tr>
 <tr class="memitem:ga3784763020352ac6913e355c4ac7a337" id="r_ga3784763020352ac6913e355c4ac7a337"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga3784763020352ac6913e355c4ac7a337">uart2_write_float</a> (float num)</td></tr>
-<tr class="memdesc:ga3784763020352ac6913e355c4ac7a337"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via USART2.  <br /></td></tr>
 <tr class="memitem:ga55c46e6a48433287fdf5a9d1defd5f5c" id="r_ga55c46e6a48433287fdf5a9d1defd5f5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga55c46e6a48433287fdf5a9d1defd5f5c">uart2_write_string</a> (const char *s)</td></tr>
-<tr class="memdesc:ga55c46e6a48433287fdf5a9d1defd5f5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via USART2.  <br /></td></tr>
 <tr class="memitem:ga7cd48d1d49f0dee1adff1be915793bb6" id="r_ga7cd48d1d49f0dee1adff1be915793bb6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga7cd48d1d49f0dee1adff1be915793bb6">uart6_init</a> (uint32_t baudrate)</td></tr>
 <tr class="memdesc:ga7cd48d1d49f0dee1adff1be915793bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize USART6 peripheral.  <br /></td></tr>
 <tr class="memitem:gac0de3d3f47debf2a24b349fa74b7a030" id="r_gac0de3d3f47debf2a24b349fa74b7a030"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gac0de3d3f47debf2a24b349fa74b7a030">uart6_write_char</a> (char <a class="el" href="test__unity__parameterized_8c.html#a2fc627b56c26c54e1e919c187689f0de">c</a>)</td></tr>
-<tr class="memdesc:gac0de3d3f47debf2a24b349fa74b7a030"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a single character via USART6.  <br /></td></tr>
 <tr class="memitem:ga01667e67896e48e6cf21a05385566819" id="r_ga01667e67896e48e6cf21a05385566819"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga01667e67896e48e6cf21a05385566819">uart6_write_int</a> (int32_t num)</td></tr>
-<tr class="memdesc:ga01667e67896e48e6cf21a05385566819"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a 32-bit signed integer via USART6.  <br /></td></tr>
 <tr class="memitem:ga3a2f8786049010a947207fc47c7ad409" id="r_ga3a2f8786049010a947207fc47c7ad409"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga3a2f8786049010a947207fc47c7ad409">uart6_write_float</a> (float num)</td></tr>
-<tr class="memdesc:ga3a2f8786049010a947207fc47c7ad409"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a floating-point number via USART6.  <br /></td></tr>
 <tr class="memitem:gacd0a2ffc721c3e9af1501307d74f5173" id="r_gacd0a2ffc721c3e9af1501307d74f5173"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gacd0a2ffc721c3e9af1501307d74f5173">uart6_write_string</a> (const char *s)</td></tr>
-<tr class="memdesc:gacd0a2ffc721c3e9af1501307d74f5173"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transmit a null-terminated string via USART6.  <br /></td></tr>
 <tr class="memitem:ga86ffdb11e32f205ce3b1e9b0fb259c8e" id="r_ga86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga86ffdb11e32f205ce3b1e9b0fb259c8e">uart_read_char</a> (<a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
 <tr class="memdesc:ga86ffdb11e32f205ce3b1e9b0fb259c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from the specified UART.  <br /></td></tr>
 <tr class="memitem:gaa3a9166c481a902a7b2c291eb3127a78" id="r_gaa3a9166c481a902a7b2c291eb3127a78"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaa3a9166c481a902a7b2c291eb3127a78">uart_available</a> (<a class="el" href="#a1eb2dbbb5cd864c8d0e19f71d7f168d1">hal_uart_t</a> uart)</td></tr>
 <tr class="memdesc:gaa3a9166c481a902a7b2c291eb3127a78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read.  <br /></td></tr>
 <tr class="memitem:ga242042066c0dcfee02c34f51ae65cc8a" id="r_ga242042066c0dcfee02c34f51ae65cc8a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga242042066c0dcfee02c34f51ae65cc8a">uart1_available</a> (void)</td></tr>
-<tr class="memdesc:ga242042066c0dcfee02c34f51ae65cc8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from USART1.  <br /></td></tr>
 <tr class="memitem:ga223b61a491de01b4b3ee16a1d15113d1" id="r_ga223b61a491de01b4b3ee16a1d15113d1"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga223b61a491de01b4b3ee16a1d15113d1">uart1_read_char</a> (void)</td></tr>
-<tr class="memdesc:ga223b61a491de01b4b3ee16a1d15113d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from USART1.  <br /></td></tr>
 <tr class="memitem:gae67708662af5b29151196c9ba24cf20d" id="r_gae67708662af5b29151196c9ba24cf20d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gae67708662af5b29151196c9ba24cf20d">uart2_available</a> (void)</td></tr>
-<tr class="memdesc:gae67708662af5b29151196c9ba24cf20d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from USART2.  <br /></td></tr>
 <tr class="memitem:ga894a9fccabee5ec32e916ba78998fad5" id="r_ga894a9fccabee5ec32e916ba78998fad5"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga894a9fccabee5ec32e916ba78998fad5">uart2_read_char</a> (void)</td></tr>
-<tr class="memdesc:ga894a9fccabee5ec32e916ba78998fad5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from USART2.  <br /></td></tr>
 <tr class="memitem:gaf49cf7ca045c2feb52c025951e6e50e4" id="r_gaf49cf7ca045c2feb52c025951e6e50e4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaf49cf7ca045c2feb52c025951e6e50e4">uart6_available</a> (void)</td></tr>
-<tr class="memdesc:gaf49cf7ca045c2feb52c025951e6e50e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if data is available to read from USART6.  <br /></td></tr>
 <tr class="memitem:gaa40d7d81e58a648bf5c64a4735bfb7f3" id="r_gaa40d7d81e58a648bf5c64a4735bfb7f3"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#gaa40d7d81e58a648bf5c64a4735bfb7f3">uart6_read_char</a> (void)</td></tr>
-<tr class="memdesc:gaa40d7d81e58a648bf5c64a4735bfb7f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read a single character from USART6.  <br /></td></tr>
 <tr class="memitem:ga5c510005052783f5cec97c0ac7731071" id="r_ga5c510005052783f5cec97c0ac7731071"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___u_a_r_t___a_p_i.html#ga5c510005052783f5cec97c0ac7731071">uart2_read_until</a> (char *buffer, uint32_t maxlen, char delimiter)</td></tr>
 <tr class="memdesc:ga5c510005052783f5cec97c0ac7731071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read characters into a buffer until a delimiter is found or max length is reached.  <br /></td></tr>
 </table>

@@ -28,7 +28,7 @@ struct \mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-void \mbox{\hyperlink{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}{hal\+\_\+clock\+\_\+init}} (\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{samples_205__hal__systick_2main_8c_a921c2505bac76424f5f96cc1e4f62986}{cfg}}, \mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{samples_203__no__hal__uart__tx_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\+\_\+cfg}})
+void \mbox{\hyperlink{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}{hal\+\_\+clock\+\_\+init}} (\mbox{\hyperlink{structhal__clock__config__t}{hal\+\_\+clock\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{samples_200__test__sample_2main_8c_a921c2505bac76424f5f96cc1e4f62986}{cfg}}, \mbox{\hyperlink{structhal__pll__config__t}{hal\+\_\+pll\+\_\+config\+\_\+t}} \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{samples_200__test__sample_2main_8c_adf1b524219e8781fa7542fa90dd09912}{pll\+\_\+cfg}})
 \begin{DoxyCompactList}\small\item\em Initialize the system clock. \end{DoxyCompactList}\item 
 uint32\+\_\+t \mbox{\hyperlink{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0}{hal\+\_\+clock\+\_\+get\+\_\+sysclk}} (void)
 \begin{DoxyCompactList}\small\item\em Get the system clock frequency (SYSCLK). \end{DoxyCompactList}\item 
@@ -70,10 +70,8 @@ AHB clock frequency in Hz.
 \end{DoxyReturn}
 Get the AHB bus clock frequency.
 
-Calculated as SYSCLK divided by AHB prescaler.
-
 \begin{DoxyReturn}{Returns}
-AHB bus clock frequency in Hertz. 
+AHB clock frequency in Hz 
 \end{DoxyReturn}
 \Hypertarget{clock_8h_a2b3d3447fb02cf495b0c6f28ad9a4ae8}\index{clock.h@{clock.h}!hal\_clock\_get\_apb1clk@{hal\_clock\_get\_apb1clk}}
 \index{hal\_clock\_get\_apb1clk@{hal\_clock\_get\_apb1clk}!clock.h@{clock.h}}
@@ -90,10 +88,8 @@ APB1 clock frequency in Hz.
 \end{DoxyReturn}
 Get the APB1 bus clock frequency.
 
-Calculated as SYSCLK divided by APB1 prescaler.
-
 \begin{DoxyReturn}{Returns}
-APB1 bus clock frequency in Hertz. 
+APB1 clock frequency in Hz 
 \end{DoxyReturn}
 \Hypertarget{clock_8h_abe4fcf4dc3f2a13b1f2602c0348aeba5}\index{clock.h@{clock.h}!hal\_clock\_get\_apb2clk@{hal\_clock\_get\_apb2clk}}
 \index{hal\_clock\_get\_apb2clk@{hal\_clock\_get\_apb2clk}!clock.h@{clock.h}}
@@ -110,10 +106,8 @@ APB2 clock frequency in Hz.
 \end{DoxyReturn}
 Get the APB2 bus clock frequency.
 
-Calculated as SYSCLK divided by APB2 prescaler.
-
 \begin{DoxyReturn}{Returns}
-APB2 bus clock frequency in Hertz. 
+APB2 clock frequency in Hz 
 \end{DoxyReturn}
 \Hypertarget{clock_8h_aded3b01c0942294bcdd69a84f76d9cf0}\index{clock.h@{clock.h}!hal\_clock\_get\_sysclk@{hal\_clock\_get\_sysclk}}
 \index{hal\_clock\_get\_sysclk@{hal\_clock\_get\_sysclk}!clock.h@{clock.h}}
@@ -130,12 +124,15 @@ System clock frequency in Hz.
 \end{DoxyReturn}
 Get the system clock frequency (SYSCLK).
 
-Detects the current SYSCLK source and calculates frequency based on configured clock source and PLL parameters.
-
 \begin{DoxyReturn}{Returns}
-SYSCLK frequency in Hertz. 
+SYSCLK frequency in Hz
 \end{DoxyReturn}
-\Hypertarget{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}\index{clock.h@{clock.h}!hal\_clock\_init@{hal\_clock\_init}}
+Determines SYSCLK frequency based on current clock source\+:
+\begin{DoxyItemize}
+\item HSI\+: Fixed 16 MHz
+\item HSE\+: Fixed 8 MHz
+\item PLL\+: Calculated from PLL configuration registers 
+\end{DoxyItemize}\Hypertarget{clock_8h_a0968882ff01fef583e6a8b7a97be51ea}\index{clock.h@{clock.h}!hal\_clock\_init@{hal\_clock\_init}}
 \index{hal\_clock\_init@{hal\_clock\_init}!clock.h@{clock.h}}
 \doxysubsubsection{\texorpdfstring{hal\_clock\_init()}{hal\_clock\_init()}}
 {\footnotesize\ttfamily \label{clock_8h_a0968882ff01fef583e6a8b7a97be51ea} 
@@ -153,5 +150,25 @@ Initialize the system clock.
 \hline
 \end{DoxyParams}
 \begin{DoxyNote}{Note}
-This function must be called before using other peripheral clocks. 
+This function must be called before using other peripheral clocks.
+\end{DoxyNote}
+Initialize the system clock.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em cfg} & Pointer to clock configuration structure \\
+\hline
+\mbox{\texttt{in}}  & {\em pll\+\_\+cfg} & Pointer to PLL configuration structure (required if using PLL)\\
+\hline
+\end{DoxyParams}
+Configures the complete clock tree including\+:
+\begin{DoxyItemize}
+\item Clock source selection (HSI/\+HSE/\+PLL)
+\item PLL configuration (when used)
+\item Flash latency settings
+\item AHB/\+APB prescalers
+\end{DoxyItemize}
+
+\begin{DoxyNote}{Note}
+This function will block until clock switches are complete 
 \end{DoxyNote}

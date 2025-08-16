@@ -133,9 +133,24 @@ Disable a specific interrupt.
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-0 if successful, -\/1 if failed. 
+0 if successful, -\/1 if failed.
 \end{DoxyReturn}
-\Hypertarget{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5}\index{interrupt.h@{interrupt.h}!hal\_enable\_global\_interrupts@{hal\_enable\_global\_interrupts}}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to disable \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status of operation 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em SUCCESS} & Interrupt disabled successfully \\
+\hline
+{\em FAILURE} & Invalid interrupt number (Cortex-\/M internal interrupt)\\
+\hline
+\end{DoxyRetVals}
+Disables the specified interrupt in the NVIC by setting the corresponding bit in the ICER (Interrupt Clear Enable Register). \Hypertarget{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5}\index{interrupt.h@{interrupt.h}!hal\_enable\_global\_interrupts@{hal\_enable\_global\_interrupts}}
 \index{hal\_enable\_global\_interrupts@{hal\_enable\_global\_interrupts}!interrupt.h@{interrupt.h}}
 \doxysubsubsection{\texorpdfstring{hal\_enable\_global\_interrupts()}{hal\_enable\_global\_interrupts()}}
 {\footnotesize\ttfamily \label{interrupt_8h_a1e6aa01ec4a4fc2f997c323d60cbc3d5} 
@@ -169,9 +184,24 @@ Enable a specific interrupt.
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-0 if successful, -\/1 if failed. 
+0 if successful, -\/1 if failed.
 \end{DoxyReturn}
-\Hypertarget{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369}\index{interrupt.h@{interrupt.h}!hal\_get\_interrupt\_priority@{hal\_get\_interrupt\_priority}}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to enable \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Status of operation 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em SUCCESS} & Interrupt enabled successfully \\
+\hline
+{\em FAILURE} & Invalid interrupt number (Cortex-\/M internal interrupt)\\
+\hline
+\end{DoxyRetVals}
+Enables the specified interrupt in the NVIC by setting the corresponding bit in the ISER (Interrupt Set Enable Register). \Hypertarget{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369}\index{interrupt.h@{interrupt.h}!hal\_get\_interrupt\_priority@{hal\_get\_interrupt\_priority}}
 \index{hal\_get\_interrupt\_priority@{hal\_get\_interrupt\_priority}!interrupt.h@{interrupt.h}}
 \doxysubsubsection{\texorpdfstring{hal\_get\_interrupt\_priority()}{hal\_get\_interrupt\_priority()}}
 {\footnotesize\ttfamily \label{interrupt_8h_aa90aea69c0edbe48b5e72c208dfff369} 
@@ -204,10 +234,17 @@ Central interrupt handler function.
 
 
 \begin{DoxyParams}{Parameters}
-{\em interrupt} & IRQ number that occurred. \\
+{\em interrupt} & IRQ number that occurred.\\
 \hline
 \end{DoxyParams}
-\Hypertarget{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca}\index{interrupt.h@{interrupt.h}!hal\_interrupt\_attach\_callback@{hal\_interrupt\_attach\_callback}}
+Central interrupt handler function.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to handle\\
+\hline
+\end{DoxyParams}
+This function should be called from the actual interrupt service routine (ISR) to invoke the user-\/registered callback function. It performs bounds checking and NULL pointer verification before invoking the callback. \Hypertarget{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca}\index{interrupt.h@{interrupt.h}!hal\_interrupt\_attach\_callback@{hal\_interrupt\_attach\_callback}}
 \index{hal\_interrupt\_attach\_callback@{hal\_interrupt\_attach\_callback}!interrupt.h@{interrupt.h}}
 \doxysubsubsection{\texorpdfstring{hal\_interrupt\_attach\_callback()}{hal\_interrupt\_attach\_callback()}}
 {\footnotesize\ttfamily \label{interrupt_8h_ae13d3a1cf10aecee622e6669d9621cca} 
@@ -221,9 +258,23 @@ Attach a callback function to a specific interrupt.
 \begin{DoxyParams}{Parameters}
 {\em interrupt} & IRQ number. \\
 \hline
-{\em callback} & Function pointer to be called when interrupt occurs. \\
+{\em callback} & Function pointer to be called when interrupt occurs.\\
 \hline
 \end{DoxyParams}
+Attach a callback function to a specific interrupt.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to attach to \\
+\hline
+\mbox{\texttt{in}}  & {\em callback} & Function pointer to be called when interrupt occurs\\
+\hline
+\end{DoxyParams}
+Registers a callback function for the specified interrupt. The callback will be invoked when the interrupt occurs and is handled by \doxylink{interrupt_8h_ae6e7c5068b926209dbd3e94d42ec3ea2}{hal\+\_\+handle\+\_\+interrupt()}.
+
+\begin{DoxyNote}{Note}
+The callback function should be short and non-\/blocking 
+\end{DoxyNote}
 \Hypertarget{interrupt_8h_ac066d5830d23093468acb3a714ead9c5}\index{interrupt.h@{interrupt.h}!hal\_interrupt\_detach\_callback@{hal\_interrupt\_detach\_callback}}
 \index{hal\_interrupt\_detach\_callback@{hal\_interrupt\_detach\_callback}!interrupt.h@{interrupt.h}}
 \doxysubsubsection{\texorpdfstring{hal\_interrupt\_detach\_callback()}{hal\_interrupt\_detach\_callback()}}
@@ -236,10 +287,17 @@ Detach a callback function from a specific interrupt.
 
 
 \begin{DoxyParams}{Parameters}
-{\em interrupt} & IRQ number. \\
+{\em interrupt} & IRQ number.\\
 \hline
 \end{DoxyParams}
-\Hypertarget{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb}\index{interrupt.h@{interrupt.h}!hal\_is\_interrupt\_pending@{hal\_is\_interrupt\_pending}}
+Detach a callback function from a specific interrupt.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em interrupt} & Interrupt number to detach from\\
+\hline
+\end{DoxyParams}
+Removes any previously registered callback for the specified interrupt. \Hypertarget{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb}\index{interrupt.h@{interrupt.h}!hal\_is\_interrupt\_pending@{hal\_is\_interrupt\_pending}}
 \index{hal\_is\_interrupt\_pending@{hal\_is\_interrupt\_pending}!interrupt.h@{interrupt.h}}
 \doxysubsubsection{\texorpdfstring{hal\_is\_interrupt\_pending()}{hal\_is\_interrupt\_pending()}}
 {\footnotesize\ttfamily \label{interrupt_8h_a405b5ed33b944c1de2292baa055ffbeb} 

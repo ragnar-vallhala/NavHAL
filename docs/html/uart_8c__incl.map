@@ -1,5 +1,5 @@
 <map id="src/core/cortex&#45;m4/uart/uart.c" name="src/core/cortex&#45;m4/uart/uart.c">
-<area shape="rect" id="Node000001" title="UART initialization and I/O functions for STM32F4 UART1, UART2, and UART6." alt="" coords="173,5,303,46"/>
+<area shape="rect" id="Node000001" title="UART driver implementation for STM32F4 series." alt="" coords="173,5,303,46"/>
 <area shape="rect" id="Node000002" href="$uart_8h.html" title="UART driver interface for STM32F4 (Cortex&#45;M4)." alt="" coords="177,249,323,274"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="242,46,251,233,246,233,236,47"/>
 <area shape="rect" id="Node000005" href="$clock_8h.html" title="Cortex&#45;M4 specific clock control HAL interface." alt="" coords="34,94,188,120"/>

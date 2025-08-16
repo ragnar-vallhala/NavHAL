@@ -2,7 +2,7 @@
 \hypertarget{pwm_8c}{}\label{pwm_8c}\index{src/core/cortex-\/m4/pwm/pwm.c@{src/core/cortex-\/m4/pwm/pwm.c}}
 
 
-PWM driver implementation for STM32\+F4 series (Cortex-\/\+M4).  
+PWM driver implementation for STM32\+F4 series (Cortex-\/\+M4)  
 
 
 {\ttfamily \#include "{}core/cortex-\/m4/pwm.\+h"{}}\newline
@@ -20,7 +20,7 @@ Include dependency graph for pwm.\+c\+:\nopagebreak
 \begin{DoxyCompactItemize}
 \item 
 void \mbox{\hyperlink{pwm_8c_aa24e135ac2eb5dcb30f5547c6aa2057b}{hal\+\_\+pwm\+\_\+init}} (\mbox{\hyperlink{struct_p_w_m___handle}{PWM\+\_\+\+Handle}} \texorpdfstring{$\ast$}{*}pwm, uint32\+\_\+t frequency, float duty\+Cycle)
-\begin{DoxyCompactList}\small\item\em Initialize PWM with a specified frequency and duty cycle. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Initialize PWM with specified frequency and duty cycle. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{pwm_8c_a5274ccc3d8dfacbbb93c5f94d1486db8}{hal\+\_\+pwm\+\_\+start}} (\mbox{\hyperlink{struct_p_w_m___handle}{PWM\+\_\+\+Handle}} \texorpdfstring{$\ast$}{*}pwm)
 \begin{DoxyCompactList}\small\item\em Start PWM output. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{pwm_8c_a2783dd5ac1c5976af146fdc38806bd2c}{hal\+\_\+pwm\+\_\+stop}} (\mbox{\hyperlink{struct_p_w_m___handle}{PWM\+\_\+\+Handle}} \texorpdfstring{$\ast$}{*}pwm)
@@ -28,12 +28,25 @@ void \mbox{\hyperlink{pwm_8c_a2783dd5ac1c5976af146fdc38806bd2c}{hal\+\_\+pwm\+\_
 void \mbox{\hyperlink{pwm_8c_a7c9a0371f4527a4c7c5af62884797ed6}{hal\+\_\+pwm\+\_\+set\+\_\+duty\+\_\+cycle}} (\mbox{\hyperlink{struct_p_w_m___handle}{PWM\+\_\+\+Handle}} \texorpdfstring{$\ast$}{*}pwm, float duty\+Cycle)
 \begin{DoxyCompactList}\small\item\em Set PWM duty cycle. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{pwm_8c_a6c16bb2afdf33e25b1419b8b670cd14e}{hal\+\_\+pwm\+\_\+set\+\_\+frequency}} (\mbox{\hyperlink{struct_p_w_m___handle}{PWM\+\_\+\+Handle}} \texorpdfstring{$\ast$}{*}pwm, uint32\+\_\+t frequency)
-\begin{DoxyCompactList}\small\item\em Set PWM frequency. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Set PWM frequency (not implemented) \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
-PWM driver implementation for STM32\+F4 series (Cortex-\/\+M4). 
+PWM driver implementation for STM32\+F4 series (Cortex-\/\+M4) 
 
+This file provides Pulse Width Modulation (PWM) functionality for STM32\+F4 microcontrollers. It supports\+:
+\begin{DoxyItemize}
+\item PWM generation on all timer channels
+\item Configurable frequency and duty cycle
+\item Automatic timer clock selection (APB1/\+APB2)
+\item Runtime duty cycle adjustment
+\end{DoxyItemize}
+
+The implementation uses the STM32 timer peripherals to generate precise PWM signals with minimal CPU overhead.
+
+\begin{DoxyCopyright}{Copyright}
+© NAVROBOTEC PVT. LTD. 
+\end{DoxyCopyright}
 
 
 \label{doc-func-members}
@@ -47,21 +60,30 @@ void hal\+\_\+pwm\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{str
 
 
 
-Initialize PWM with a specified frequency and duty cycle. 
+Initialize PWM with specified frequency and duty cycle. 
 
 Initialize a PWM handle with the specified frequency and duty cycle.
 
-This function configures the timer to generate a PWM signal on the specified channel with the given frequency and duty cycle.
 
-
-\begin{DoxyParams}{Parameters}
-{\em pwm} & Pointer to the PWM handle structure. \\
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in,out}}  & {\em pwm} & Pointer to PWM handle structure \\
 \hline
-{\em frequency} & Desired PWM frequency in Hz. \\
+\mbox{\texttt{in}}  & {\em frequency} & Desired PWM frequency in Hz \\
 \hline
-{\em duty\+Cycle} & Duty cycle as a fraction (0.\+0f -\/ 1.\+0f). \\
+\mbox{\texttt{in}}  & {\em duty\+Cycle} & Initial duty cycle (0.\+0 to 1.\+0)\\
 \hline
 \end{DoxyParams}
+Configures the timer peripheral to generate PWM signals by\+:
+\begin{DoxyEnumerate}
+\item Selecting the appropriate bus clock (APB1/\+APB2)
+\item Calculating prescaler and auto-\/reload values
+\item Setting the initial compare value for duty cycle
+\item Initializing the timer peripheral
+\end{DoxyEnumerate}
+
+\begin{DoxyNote}{Note}
+For advanced timers (TIM1, TIM9-\/\+TIM11), APB2 clock is used automatically 
+\end{DoxyNote}
 \Hypertarget{pwm_8c_a7c9a0371f4527a4c7c5af62884797ed6}\index{pwm.c@{pwm.c}!hal\_pwm\_set\_duty\_cycle@{hal\_pwm\_set\_duty\_cycle}}
 \index{hal\_pwm\_set\_duty\_cycle@{hal\_pwm\_set\_duty\_cycle}!pwm.c@{pwm.c}}
 \doxysubsubsection{\texorpdfstring{hal\_pwm\_set\_duty\_cycle()}{hal\_pwm\_set\_duty\_cycle()}}
@@ -75,12 +97,17 @@ Set PWM duty cycle.
 Set the PWM duty cycle.
 
 
-\begin{DoxyParams}{Parameters}
-{\em pwm} & Pointer to the PWM handle structure. \\
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in,out}}  & {\em pwm} & Pointer to PWM handle structure \\
 \hline
-{\em duty\+Cycle} & New duty cycle as a fraction (0.\+0f -\/ 1.\+0f). \\
+\mbox{\texttt{in}}  & {\em duty\+Cycle} & New duty cycle (0.\+0 to 1.\+0)\\
 \hline
 \end{DoxyParams}
+Updates the capture/compare register to change the PWM duty cycle while maintaining the current frequency. The change takes effect immediately on the output.
+
+\begin{DoxyNote}{Note}
+Duty cycle is clamped to valid range (0.\+0-\/1.\+0) 
+\end{DoxyNote}
 \Hypertarget{pwm_8c_a6c16bb2afdf33e25b1419b8b670cd14e}\index{pwm.c@{pwm.c}!hal\_pwm\_set\_frequency@{hal\_pwm\_set\_frequency}}
 \index{hal\_pwm\_set\_frequency@{hal\_pwm\_set\_frequency}!pwm.c@{pwm.c}}
 \doxysubsubsection{\texorpdfstring{hal\_pwm\_set\_frequency()}{hal\_pwm\_set\_frequency()}}
@@ -89,20 +116,22 @@ void hal\+\_\+pwm\+\_\+set\+\_\+frequency (\begin{DoxyParamCaption}\item[{\mbox{
 
 
 
-Set PWM frequency. 
+Set PWM frequency (not implemented) 
 
 Set the PWM frequency.
 
-\begin{DoxyNote}{Note}
-This function is not yet implemented.
-\end{DoxyNote}
 
-\begin{DoxyParams}{Parameters}
-{\em pwm} & Pointer to the PWM handle structure. \\
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in,out}}  & {\em pwm} & Pointer to PWM handle structure \\
 \hline
-{\em frequency} & Desired PWM frequency in Hz. \\
+\mbox{\texttt{in}}  & {\em frequency} & Desired PWM frequency in Hz\\
 \hline
 \end{DoxyParams}
+\begin{DoxyNote}{Note}
+This function is currently not implemented 
+\end{DoxyNote}
+\begin{DoxyRefDesc}{Todo}
+\item[\mbox{\hyperlink{todo__todo000001}{Todo}}]Implement frequency change functionality \end{DoxyRefDesc}
 \Hypertarget{pwm_8c_a5274ccc3d8dfacbbb93c5f94d1486db8}\index{pwm.c@{pwm.c}!hal\_pwm\_start@{hal\_pwm\_start}}
 \index{hal\_pwm\_start@{hal\_pwm\_start}!pwm.c@{pwm.c}}
 \doxysubsubsection{\texorpdfstring{hal\_pwm\_start()}{hal\_pwm\_start()}}
@@ -116,11 +145,11 @@ Start PWM output.
 Start PWM signal generation.
 
 
-\begin{DoxyParams}{Parameters}
-{\em pwm} & Pointer to the PWM handle structure. \\
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em pwm} & Pointer to initialized PWM handle structure\\
 \hline
 \end{DoxyParams}
-\Hypertarget{pwm_8c_a2783dd5ac1c5976af146fdc38806bd2c}\index{pwm.c@{pwm.c}!hal\_pwm\_stop@{hal\_pwm\_stop}}
+Enables the timer counter to start generating PWM signals on the configured channel. The output will appear on the corresponding GPIO pin. \Hypertarget{pwm_8c_a2783dd5ac1c5976af146fdc38806bd2c}\index{pwm.c@{pwm.c}!hal\_pwm\_stop@{hal\_pwm\_stop}}
 \index{hal\_pwm\_stop@{hal\_pwm\_stop}!pwm.c@{pwm.c}}
 \doxysubsubsection{\texorpdfstring{hal\_pwm\_stop()}{hal\_pwm\_stop()}}
 {\footnotesize\ttfamily \label{pwm_8c_a2783dd5ac1c5976af146fdc38806bd2c} 
@@ -132,10 +161,9 @@ Stop PWM output.
 
 Stop PWM signal generation.
 
-This function disables the timer channel and stops the timer.
 
-
-\begin{DoxyParams}{Parameters}
-{\em pwm} & Pointer to the PWM handle structure. \\
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{in}}  & {\em pwm} & Pointer to PWM handle structure\\
 \hline
 \end{DoxyParams}
+Disables the timer channel output and stops the timer counter. The PWM output pin will return to its idle state. 

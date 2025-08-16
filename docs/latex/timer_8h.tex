@@ -15,7 +15,8 @@ Include dependency graph for timer.\+h\+:\nopagebreak
 \includegraphics[width=350pt]{timer_8h__incl}
 \end{center}
 \end{figure}
-This graph shows which files directly or indirectly include this file\+:\nopagebreak
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -173,59 +174,59 @@ This graph shows which files directly or indirectly include this file\+:\nopageb
 \begin{DoxyCompactItemize}
 \item 
 void \mbox{\hyperlink{timer_8h_a51591e1b5e966fd8031bed4ff27ba3b7}{systick\+\_\+init}} (uint32\+\_\+t tick\+\_\+us)
-\begin{DoxyCompactList}\small\item\em Initialize the Sys\+Tick timer to generate periodic ticks. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Initialize the Sys\+Tick timer. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8h_ab7cce8122024d7ba47bf10f434956de4}{delay\+\_\+ms}} (uint32\+\_\+t ms)
-\begin{DoxyCompactList}\small\item\em Busy-\/wait for the specified number of milliseconds. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Busy-\/wait delay in milliseconds. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8h_a025aed4c2e0c624b412158b404806a2a}{delay\+\_\+us}} (uint64\+\_\+t us)
-\begin{DoxyCompactList}\small\item\em Busy-\/wait for the specified number of microseconds. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Busy-\/wait delay in microseconds. \end{DoxyCompactList}\item 
 uint64\+\_\+t \mbox{\hyperlink{timer_8h_a8aea94afb2c6534c316c01aca84dacb3}{hal\+\_\+get\+\_\+tick}} (void)
-\begin{DoxyCompactList}\small\item\em Return the current system tick count. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Get current system tick count. \end{DoxyCompactList}\item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8h_abb6898e3bf58a48224867791dbdefdf3}{hal\+\_\+get\+\_\+tick\+\_\+duration\+\_\+us}} (void)
-\begin{DoxyCompactList}\small\item\em Return the configured tick duration in microseconds. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Get configured tick duration. \end{DoxyCompactList}\item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8h_a3dafc6a0248d43b6a4c076b7dbcfc23f}{hal\+\_\+get\+\_\+tick\+\_\+reload\+\_\+value}} (void)
-\begin{DoxyCompactList}\small\item\em Return the Sys\+Tick reload value (24-\/bit truncated). \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Get Sys\+Tick reload value. \end{DoxyCompactList}\item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8h_a71ab66b2798cd4aafcfe0a24b9154594}{hal\+\_\+get\+\_\+millis}} (void)
-\begin{DoxyCompactList}\small\item\em Return system uptime in milliseconds. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Get system uptime in milliseconds. \end{DoxyCompactList}\item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8h_ade6c3437a366ce7aaf9617e69a848df9}{hal\+\_\+get\+\_\+micros}} (void)
-\begin{DoxyCompactList}\small\item\em Return system uptime in microseconds. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Get system uptime in microseconds. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8h_ab5e09814056d617c521549e542639b7e}{Sys\+Tick\+\_\+\+Handler}} (void)
-\begin{DoxyCompactList}\small\item\em Sys\+Tick interrupt handler increments the global tick counter. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Sys\+Tick interrupt handler. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8h_abd90df18c8f6730a6ba675cf639247a4}{hal\+\_\+systick\+\_\+set\+\_\+callback}} (void(\texorpdfstring{$\ast$}{*}cb)(void))
 \item 
 void \mbox{\hyperlink{timer_8h_adfbc1cc33f34b935f0b0ee61d2d3f6f8}{timer\+\_\+init}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t prescaler, uint32\+\_\+t auto\+\_\+reload)
-\begin{DoxyCompactList}\small\item\em Initialize a timer based on its type (advanced / gp1 / gp2). \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Initialize timer based on type. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8h_a49fb0f6c6b9a4802601a452618672e52}{timer\+\_\+start}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
-\begin{DoxyCompactList}\small\item\em Start the specified timer. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Start timer counter. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8h_a196e32e61e4a4d6cb50e46ebffb1e0b8}{timer\+\_\+stop}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
-\begin{DoxyCompactList}\small\item\em Stop the specified timer. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Stop timer counter. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8h_ab50e7d8e6b8713a9a96abc6dd3a9e932}{timer\+\_\+reset}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
-\begin{DoxyCompactList}\small\item\em Reset timer counter to zero. \end{DoxyCompactList}\item 
+\item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8h_a19aba4b4d8462e4f84b6eeabda21423c}{timer\+\_\+get\+\_\+count}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
-\begin{DoxyCompactList}\small\item\em Get the current counter value for a timer. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f}{timer\+\_\+enable\+\_\+interrupt}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
-\begin{DoxyCompactList}\small\item\em Enable timer interrupts (NVIC + DIER UIE) for supported timers. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_a4784a158d5bf211d3f07cc83ca0b78c2}{timer\+\_\+disable\+\_\+interrupt}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
 \item 
 void \mbox{\hyperlink{timer_8h_a6226a8f2f8b305c2a319ade05a77886c}{timer\+\_\+clear\+\_\+interrupt\+\_\+flag}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
 \item 
 void \mbox{\hyperlink{timer_8h_a45f9a07b1ec73b7c758005623d8ab0e5}{timer\+\_\+attach\+\_\+callback}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, void(\texorpdfstring{$\ast$}{*}callback)(void))
-\begin{DoxyCompactList}\small\item\em Attach a callback to the timer\textquotesingle{}s HAL interrupt table. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_a834d3bef7882671645ad5d3c58fa69bc}{timer\+\_\+detach\+\_\+callback}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
-\begin{DoxyCompactList}\small\item\em Detach a previously attached callback for the given timer. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_a38ad4725462bdc5e86c4ead4f04b9fc2}{TIM2\+\_\+\+IRQHandler}} (void)
-\begin{DoxyCompactList}\small\item\em IRQ handler wrapper for TIM2. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_ac8e51d2183b5230cbd5481f8867adce9}{TIM3\+\_\+\+IRQHandler}} (void)
-\begin{DoxyCompactList}\small\item\em IRQ handler wrapper for TIM3. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_a7133f3f78767503641d307386e68bd28}{TIM4\+\_\+\+IRQHandler}} (void)
-\begin{DoxyCompactList}\small\item\em IRQ handler wrapper for TIM4. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_a5e66446caf21dd90191dc07a13ce2378}{TIM5\+\_\+\+IRQHandler}} (void)
-\begin{DoxyCompactList}\small\item\em IRQ handler wrapper for TIM5. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_a903756e157645ae9961b3e937c593c34}{TIM9\+\_\+\+IRQHandler}} (void)
 \item 
 void \mbox{\hyperlink{timer_8h_aa6691f9947ff72bae0c9a47f5023cd39}{TIM12\+\_\+\+IRQHandler}} (void)
 \item 
 void \mbox{\hyperlink{timer_8h_a3b5738efe72c1bd7130276a8f59b8234}{timer\+\_\+set\+\_\+compare}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint8\+\_\+t channel, uint32\+\_\+t compare\+\_\+value)
-\begin{DoxyCompactList}\small\item\em Set the compare (CCR) register for a timer channel and configure CCMR. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Set timer compare value for PWM. \end{DoxyCompactList}\item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8h_a043ef2140caa620a1ed1af968fff5b46}{timer\+\_\+get\+\_\+compare}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
 \item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8h_a566a41b6f3c8e66b0736719528da6245}{timer\+\_\+get\+\_\+arr}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
@@ -233,11 +234,11 @@ uint32\+\_\+t \mbox{\hyperlink{timer_8h_a566a41b6f3c8e66b0736719528da6245}{timer
 void \mbox{\hyperlink{timer_8h_a0b6c91f4ad622097b4e2787abce9873e}{timer\+\_\+set\+\_\+arr}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel, uint32\+\_\+t arr)
 \item 
 void \mbox{\hyperlink{timer_8h_ab790fdb4ee5e3bfe9477a2bbfb89e13d}{timer\+\_\+enable\+\_\+channel}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
-\item 
+\begin{DoxyCompactList}\small\item\em Enable timer channel output. \end{DoxyCompactList}\item 
 void \mbox{\hyperlink{timer_8h_a0d3035840fb20d5213a70d0e33994584}{timer\+\_\+disable\+\_\+channel}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t channel)
-\begin{DoxyCompactList}\small\item\em Disable output on the specified timer channel (CCxE = 0). \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Disable timer channel output. \end{DoxyCompactList}\item 
 uint32\+\_\+t \mbox{\hyperlink{timer_8h_a6b2fb6cbff774094130a964475db6b25}{timer\+\_\+get\+\_\+frequency}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer)
-\begin{DoxyCompactList}\small\item\em Calculate the timer\textquotesingle{}s current base frequency using PSC and ARR. \end{DoxyCompactList}\item 
+\item 
 void \mbox{\hyperlink{timer_8h_ad6a8de2e162397553b3421265987fb7b}{timer\+\_\+set\+\_\+prescaler}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t prescaler)
 \item 
 void \mbox{\hyperlink{timer_8h_a159fed92e0cdfaa14198b84dafe12f80}{timer\+\_\+set\+\_\+auto\+\_\+reload}} (\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}} timer, uint32\+\_\+t arr)
@@ -697,11 +698,11 @@ void delay\+\_\+ms (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{ms}{}\end{Dox
 
 
 
-Busy-\/wait for the specified number of milliseconds. 
+Busy-\/wait delay in milliseconds. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em ms} & Number of milliseconds to delay. \\
+{\em ms} & Number of milliseconds to delay \\
 \hline
 \end{DoxyParams}
 \Hypertarget{timer_8h_a025aed4c2e0c624b412158b404806a2a}\index{timer.h@{timer.h}!delay\_us@{delay\_us}}
@@ -712,15 +713,15 @@ void delay\+\_\+us (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{us}{}\end{Dox
 
 
 
-Busy-\/wait for the specified number of microseconds. 
+Busy-\/wait delay in microseconds. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em us} & Number of microseconds to delay.\\
+{\em us} & Number of microseconds to delay \\
 \hline
 \end{DoxyParams}
 \begin{DoxyNote}{Note}
-This is a blocking busy-\/wait that uses \doxylink{timer_8c_a8aea94afb2c6534c316c01aca84dacb3}{hal\+\_\+get\+\_\+tick()} and the configured tick duration. It will wait at least one tick if the requested delay is smaller than the tick duration. 
+Minimum delay is one tick period 
 \end{DoxyNote}
 \Hypertarget{timer_8h_ade6c3437a366ce7aaf9617e69a848df9}\index{timer.h@{timer.h}!hal\_get\_micros@{hal\_get\_micros}}
 \index{hal\_get\_micros@{hal\_get\_micros}!timer.h@{timer.h}}
@@ -730,10 +731,10 @@ uint32\+\_\+t hal\+\_\+get\+\_\+micros (\begin{DoxyParamCaption}\item[{void}]{}{
 
 
 
-Return system uptime in microseconds. 
+Get system uptime in microseconds. 
 
 \begin{DoxyReturn}{Returns}
-Microseconds since tick counter started. 
+Microseconds since startup 
 \end{DoxyReturn}
 \Hypertarget{timer_8h_a71ab66b2798cd4aafcfe0a24b9154594}\index{timer.h@{timer.h}!hal\_get\_millis@{hal\_get\_millis}}
 \index{hal\_get\_millis@{hal\_get\_millis}!timer.h@{timer.h}}
@@ -743,10 +744,10 @@ uint32\+\_\+t hal\+\_\+get\+\_\+millis (\begin{DoxyParamCaption}\item[{void}]{}{
 
 
 
-Return system uptime in milliseconds. 
+Get system uptime in milliseconds. 
 
 \begin{DoxyReturn}{Returns}
-Milliseconds since tick counter started. 
+Milliseconds since startup 
 \end{DoxyReturn}
 \Hypertarget{timer_8h_a8aea94afb2c6534c316c01aca84dacb3}\index{timer.h@{timer.h}!hal\_get\_tick@{hal\_get\_tick}}
 \index{hal\_get\_tick@{hal\_get\_tick}!timer.h@{timer.h}}
@@ -756,10 +757,10 @@ uint64\+\_\+t hal\+\_\+get\+\_\+tick (\begin{DoxyParamCaption}\item[{void}]{}{}\
 
 
 
-Return the current system tick count. 
+Get current system tick count. 
 
 \begin{DoxyReturn}{Returns}
-Current tick count. 
+Current tick count 
 \end{DoxyReturn}
 \Hypertarget{timer_8h_abb6898e3bf58a48224867791dbdefdf3}\index{timer.h@{timer.h}!hal\_get\_tick\_duration\_us@{hal\_get\_tick\_duration\_us}}
 \index{hal\_get\_tick\_duration\_us@{hal\_get\_tick\_duration\_us}!timer.h@{timer.h}}
@@ -769,10 +770,10 @@ uint32\+\_\+t hal\+\_\+get\+\_\+tick\+\_\+duration\+\_\+us (\begin{DoxyParamCapt
 
 
 
-Return the configured tick duration in microseconds. 
+Get configured tick duration. 
 
 \begin{DoxyReturn}{Returns}
-Tick duration (us). 
+Tick duration in microseconds 
 \end{DoxyReturn}
 \Hypertarget{timer_8h_a3dafc6a0248d43b6a4c076b7dbcfc23f}\index{timer.h@{timer.h}!hal\_get\_tick\_reload\_value@{hal\_get\_tick\_reload\_value}}
 \index{hal\_get\_tick\_reload\_value@{hal\_get\_tick\_reload\_value}!timer.h@{timer.h}}
@@ -782,10 +783,10 @@ uint32\+\_\+t hal\+\_\+get\+\_\+tick\+\_\+reload\+\_\+value (\begin{DoxyParamCap
 
 
 
-Return the Sys\+Tick reload value (24-\/bit truncated). 
+Get Sys\+Tick reload value. 
 
 \begin{DoxyReturn}{Returns}
-Reload value currently configured in SYST\+\_\+\+RVR. 
+Current reload value (24-\/bit) 
 \end{DoxyReturn}
 \Hypertarget{timer_8h_abd90df18c8f6730a6ba675cf639247a4}\index{timer.h@{timer.h}!hal\_systick\_set\_callback@{hal\_systick\_set\_callback}}
 \index{hal\_systick\_set\_callback@{hal\_systick\_set\_callback}!timer.h@{timer.h}}
@@ -801,12 +802,9 @@ void Sys\+Tick\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{Dox
 
 
 
-Sys\+Tick interrupt handler increments the global tick counter. 
+Sys\+Tick interrupt handler. 
 
-\begin{DoxyNote}{Note}
-This handler is intended to be wired into the vector table. 
-\end{DoxyNote}
-\Hypertarget{timer_8h_a51591e1b5e966fd8031bed4ff27ba3b7}\index{timer.h@{timer.h}!systick\_init@{systick\_init}}
+Increments the global tick counter \Hypertarget{timer_8h_a51591e1b5e966fd8031bed4ff27ba3b7}\index{timer.h@{timer.h}!systick\_init@{systick\_init}}
 \index{systick\_init@{systick\_init}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{systick\_init()}{systick\_init()}}
 {\footnotesize\ttfamily \label{timer_8h_a51591e1b5e966fd8031bed4ff27ba3b7} 
@@ -814,17 +812,22 @@ void systick\+\_\+init (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{tick\+\_\
 
 
 
-Initialize the Sys\+Tick timer to generate periodic ticks. 
+Initialize the Sys\+Tick timer. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em tick\+\_\+us} & Tick period in microseconds.\\
+{\em tick\+\_\+us} & Tick period in microseconds\\
 \hline
 \end{DoxyParams}
-\begin{DoxyNote}{Note}
-The Sys\+Tick reload is limited to 24 bits; this function clips the computed reload value to 24 bits. The function configures Sys\+Tick to use the selected clock source, enables the Sys\+Tick interrupt and starts the timer. 
+Configures Sys\+Tick to\+:
+\begin{DoxyItemize}
+\item Use processor clock (AHB)
+\item Generate interrupts at specified interval
+\item Start counting immediately \begin{DoxyNote}{Note}
+Reload value is limited to 24 bits 
 \end{DoxyNote}
-\Hypertarget{timer_8h_aa6691f9947ff72bae0c9a47f5023cd39}\index{timer.h@{timer.h}!TIM12\_IRQHandler@{TIM12\_IRQHandler}}
+
+\end{DoxyItemize}\Hypertarget{timer_8h_aa6691f9947ff72bae0c9a47f5023cd39}\index{timer.h@{timer.h}!TIM12\_IRQHandler@{TIM12\_IRQHandler}}
 \index{TIM12\_IRQHandler@{TIM12\_IRQHandler}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{TIM12\_IRQHandler()}{TIM12\_IRQHandler()}}
 {\footnotesize\ttfamily \label{timer_8h_aa6691f9947ff72bae0c9a47f5023cd39} 
@@ -836,19 +839,11 @@ void TIM12\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{Doxy
 {\footnotesize\ttfamily \label{timer_8h_a38ad4725462bdc5e86c4ead4f04b9fc2} 
 void TIM2\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
 
-
-
-IRQ handler wrapper for TIM2. 
-
-Clears the flag and dispatches to the HAL interrupt handler table. \Hypertarget{timer_8h_ac8e51d2183b5230cbd5481f8867adce9}\index{timer.h@{timer.h}!TIM3\_IRQHandler@{TIM3\_IRQHandler}}
+\Hypertarget{timer_8h_ac8e51d2183b5230cbd5481f8867adce9}\index{timer.h@{timer.h}!TIM3\_IRQHandler@{TIM3\_IRQHandler}}
 \index{TIM3\_IRQHandler@{TIM3\_IRQHandler}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{TIM3\_IRQHandler()}{TIM3\_IRQHandler()}}
 {\footnotesize\ttfamily \label{timer_8h_ac8e51d2183b5230cbd5481f8867adce9} 
 void TIM3\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
-
-
-
-IRQ handler wrapper for TIM3. 
 
 \Hypertarget{timer_8h_a7133f3f78767503641d307386e68bd28}\index{timer.h@{timer.h}!TIM4\_IRQHandler@{TIM4\_IRQHandler}}
 \index{TIM4\_IRQHandler@{TIM4\_IRQHandler}!timer.h@{timer.h}}
@@ -856,19 +851,11 @@ IRQ handler wrapper for TIM3.
 {\footnotesize\ttfamily \label{timer_8h_a7133f3f78767503641d307386e68bd28} 
 void TIM4\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
 
-
-
-IRQ handler wrapper for TIM4. 
-
 \Hypertarget{timer_8h_a5e66446caf21dd90191dc07a13ce2378}\index{timer.h@{timer.h}!TIM5\_IRQHandler@{TIM5\_IRQHandler}}
 \index{TIM5\_IRQHandler@{TIM5\_IRQHandler}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{TIM5\_IRQHandler()}{TIM5\_IRQHandler()}}
 {\footnotesize\ttfamily \label{timer_8h_a5e66446caf21dd90191dc07a13ce2378} 
 void TIM5\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyParamCaption})}
-
-
-
-IRQ handler wrapper for TIM5. 
 
 \Hypertarget{timer_8h_a903756e157645ae9961b3e937c593c34}\index{timer.h@{timer.h}!TIM9\_IRQHandler@{TIM9\_IRQHandler}}
 \index{TIM9\_IRQHandler@{TIM9\_IRQHandler}!timer.h@{timer.h}}
@@ -882,17 +869,6 @@ void TIM9\+\_\+\+IRQHandler (\begin{DoxyParamCaption}\item[{void}]{}{}\end{DoxyP
 {\footnotesize\ttfamily \label{timer_8h_a45f9a07b1ec73b7c758005623d8ab0e5} 
 void timer\+\_\+attach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{void(\texorpdfstring{$\ast$}{*}}]{callback~}{)(void)}\end{DoxyParamCaption})}
 
-
-
-Attach a callback to the timer\textquotesingle{}s HAL interrupt table. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
-\hline
-{\em callback} & Function pointer to call when the timer IRQ fires. \\
-\hline
-\end{DoxyParams}
 \Hypertarget{timer_8h_a6226a8f2f8b305c2a319ade05a77886c}\index{timer.h@{timer.h}!timer\_clear\_interrupt\_flag@{timer\_clear\_interrupt\_flag}}
 \index{timer\_clear\_interrupt\_flag@{timer\_clear\_interrupt\_flag}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_clear\_interrupt\_flag()}{timer\_clear\_interrupt\_flag()}}
@@ -905,15 +881,6 @@ void timer\+\_\+clear\+\_\+interrupt\+\_\+flag (\begin{DoxyParamCaption}\item[{\
 {\footnotesize\ttfamily \label{timer_8h_a834d3bef7882671645ad5d3c58fa69bc} 
 void timer\+\_\+detach\+\_\+callback (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
 
-
-
-Detach a previously attached callback for the given timer. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
-\hline
-\end{DoxyParams}
 \Hypertarget{timer_8h_a0d3035840fb20d5213a70d0e33994584}\index{timer.h@{timer.h}!timer\_disable\_channel@{timer\_disable\_channel}}
 \index{timer\_disable\_channel@{timer\_disable\_channel}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_disable\_channel()}{timer\_disable\_channel()}}
@@ -922,13 +889,13 @@ void timer\+\_\+disable\+\_\+channel (\begin{DoxyParamCaption}\item[{\mbox{\hype
 
 
 
-Disable output on the specified timer channel (CCxE = 0). 
+Disable timer channel output. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
+{\em timer} & Timer identifier \\
 \hline
-{\em channel} & Channel number (1-\/4). \\
+{\em channel} & Channel number (1-\/4) \\
 \hline
 \end{DoxyParams}
 \Hypertarget{timer_8h_a4784a158d5bf211d3f07cc83ca0b78c2}\index{timer.h@{timer.h}!timer\_disable\_interrupt@{timer\_disable\_interrupt}}
@@ -943,24 +910,23 @@ void timer\+\_\+disable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hy
 {\footnotesize\ttfamily \label{timer_8h_ab790fdb4ee5e3bfe9477a2bbfb89e13d} 
 void timer\+\_\+enable\+\_\+channel (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{, }\item[{uint32\+\_\+t}]{channel}{}\end{DoxyParamCaption})}
 
+
+
+Enable timer channel output. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em timer} & Timer identifier \\
+\hline
+{\em channel} & Channel number (1-\/4) \\
+\hline
+\end{DoxyParams}
 \Hypertarget{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f}\index{timer.h@{timer.h}!timer\_enable\_interrupt@{timer\_enable\_interrupt}}
 \index{timer\_enable\_interrupt@{timer\_enable\_interrupt}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_enable\_interrupt()}{timer\_enable\_interrupt()}}
 {\footnotesize\ttfamily \label{timer_8h_a4ee300cb9e4b9356f445bbc7d0d7549f} 
 void timer\+\_\+enable\+\_\+interrupt (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
 
-
-
-Enable timer interrupts (NVIC + DIER UIE) for supported timers. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier.\\
-\hline
-\end{DoxyParams}
-\begin{DoxyNote}{Note}
-For TIM1 more complex options exist and are left TODO in the original. 
-\end{DoxyNote}
 \Hypertarget{timer_8h_a566a41b6f3c8e66b0736719528da6245}\index{timer.h@{timer.h}!timer\_get\_arr@{timer\_get\_arr}}
 \index{timer\_get\_arr@{timer\_get\_arr}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_get\_arr()}{timer\_get\_arr()}}
@@ -979,39 +945,12 @@ uint32\+\_\+t timer\+\_\+get\+\_\+compare (\begin{DoxyParamCaption}\item[{\mbox{
 {\footnotesize\ttfamily \label{timer_8h_a19aba4b4d8462e4f84b6eeabda21423c} 
 uint32\+\_\+t timer\+\_\+get\+\_\+count (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
 
-
-
-Get the current counter value for a timer. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Current counter value or 0 if invalid timer. 
-\end{DoxyReturn}
 \Hypertarget{timer_8h_a6b2fb6cbff774094130a964475db6b25}\index{timer.h@{timer.h}!timer\_get\_frequency@{timer\_get\_frequency}}
 \index{timer\_get\_frequency@{timer\_get\_frequency}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_get\_frequency()}{timer\_get\_frequency()}}
 {\footnotesize\ttfamily \label{timer_8h_a6b2fb6cbff774094130a964475db6b25} 
 uint32\+\_\+t timer\+\_\+get\+\_\+frequency (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
 
-
-
-Calculate the timer\textquotesingle{}s current base frequency using PSC and ARR. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
-\hline
-\end{DoxyParams}
-\begin{DoxyReturn}{Returns}
-Timer frequency in Hz or 0 if invalid timer.
-\end{DoxyReturn}
-\begin{DoxyNote}{Note}
-This reads PSC and ARR directly from timer registers and uses the appropriate APB clock for the timer. 
-\end{DoxyNote}
 \Hypertarget{timer_8h_adfbc1cc33f34b935f0b0ee61d2d3f6f8}\index{timer.h@{timer.h}!timer\_init@{timer\_init}}
 \index{timer\_init@{timer\_init}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_init()}{timer\_init()}}
@@ -1020,15 +959,15 @@ void timer\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__typ
 
 
 
-Initialize a timer based on its type (advanced / gp1 / gp2). 
+Initialize timer based on type. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
+{\em timer} & Timer identifier \\
 \hline
-{\em prescaler} & Prescaler value. \\
+{\em prescaler} & Prescaler value \\
 \hline
-{\em auto\+\_\+reload} & Auto-\/reload value. \\
+{\em auto\+\_\+reload} & Auto-\/reload value \\
 \hline
 \end{DoxyParams}
 \Hypertarget{timer_8h_ab50e7d8e6b8713a9a96abc6dd3a9e932}\index{timer.h@{timer.h}!timer\_reset@{timer\_reset}}
@@ -1037,15 +976,6 @@ Initialize a timer based on its type (advanced / gp1 / gp2).
 {\footnotesize\ttfamily \label{timer_8h_ab50e7d8e6b8713a9a96abc6dd3a9e932} 
 void timer\+\_\+reset (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__types_8h_a8bcc65cef9829505cbc2b3512bc017db}{hal\+\_\+timer\+\_\+t}}}]{timer}{}\end{DoxyParamCaption})}
 
-
-
-Reset timer counter to zero. 
-
-
-\begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
-\hline
-\end{DoxyParams}
 \Hypertarget{timer_8h_a0b6c91f4ad622097b4e2787abce9873e}\index{timer.h@{timer.h}!timer\_set\_arr@{timer\_set\_arr}}
 \index{timer\_set\_arr@{timer\_set\_arr}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_set\_arr()}{timer\_set\_arr()}}
@@ -1066,21 +996,18 @@ void timer\+\_\+set\+\_\+compare (\begin{DoxyParamCaption}\item[{\mbox{\hyperlin
 
 
 
-Set the compare (CCR) register for a timer channel and configure CCMR. 
+Set timer compare value for PWM. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
+{\em timer} & Timer identifier \\
 \hline
-{\em channel} & Channel number (1-\/4). \\
+{\em channel} & Channel number (1-\/4) \\
 \hline
-{\em compare\+\_\+value} & Value to write into CCRx.\\
+{\em compare\+\_\+value} & CCR register value\\
 \hline
 \end{DoxyParams}
-\begin{DoxyNote}{Note}
-This function sets PWM mode 1 and enables the channel after writing CCR. 
-\end{DoxyNote}
-\Hypertarget{timer_8h_ad6a8de2e162397553b3421265987fb7b}\index{timer.h@{timer.h}!timer\_set\_prescaler@{timer\_set\_prescaler}}
+Configures PWM mode 1 and enables the channel output \Hypertarget{timer_8h_ad6a8de2e162397553b3421265987fb7b}\index{timer.h@{timer.h}!timer\_set\_prescaler@{timer\_set\_prescaler}}
 \index{timer\_set\_prescaler@{timer\_set\_prescaler}!timer.h@{timer.h}}
 \doxysubsubsection{\texorpdfstring{timer\_set\_prescaler()}{timer\_set\_prescaler()}}
 {\footnotesize\ttfamily \label{timer_8h_ad6a8de2e162397553b3421265987fb7b} 
@@ -1094,11 +1021,11 @@ void timer\+\_\+start (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__ty
 
 
 
-Start the specified timer. 
+Start timer counter. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
+{\em timer} & Timer identifier \\
 \hline
 \end{DoxyParams}
 \Hypertarget{timer_8h_a196e32e61e4a4d6cb50e46ebffb1e0b8}\index{timer.h@{timer.h}!timer\_stop@{timer\_stop}}
@@ -1109,10 +1036,10 @@ void timer\+\_\+stop (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{timer__typ
 
 
 
-Stop the specified timer. 
+Stop timer counter. 
 
 
 \begin{DoxyParams}{Parameters}
-{\em timer} & Timer identifier. \\
+{\em timer} & Timer identifier \\
 \hline
 \end{DoxyParams}

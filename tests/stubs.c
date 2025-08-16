@@ -2,6 +2,8 @@
 #include "navhal.h"
 
 int putchar(int ch) {
+  if (ch == '\n')
+    uart2_write_char('\r');
   uart2_write_char(ch);
   return ch;
 }

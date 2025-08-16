@@ -1,6 +1,5 @@
 #ifndef TEST_GPIO_H
 #define TEST_GPIO_H
-
 #include "unity.h"
 #include <stdint.h>
 

@@ -1,7 +1,6 @@
 #define CORTEX_M4
+#include "core/cortex-m4/gpio.h"
 #include "core/cortex-m4/gpio_reg.h"
-#include "navhal.h"
-#define UNITY_OUTPUT_COLOR
 #include "unity.h"
 #include <stdint.h>
 

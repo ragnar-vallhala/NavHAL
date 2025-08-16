@@ -200,6 +200,12 @@ void uart2_write_char(char c) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return;
+  if (c == '\n') {
+    while (!(usart->SR & USART_SR_TXE))
+      ;
+    usart->DR = '\r';
+  }
+
   while (!(usart->SR & USART_SR_TXE))
     ;            // Wait until TXE (Transmit Data Register Empty) flag is set
   usart->DR = c; // Write data to data register

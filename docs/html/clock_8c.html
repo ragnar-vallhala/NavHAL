@@ -144,7 +144,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:ad1d19ef595b3a08cb3ba2484e8477275"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize system clocks based on the provided configuration.  <br /></td></tr>
 <tr class="memitem:ada138812dfee19ee5451814039c13cf1" id="r_ada138812dfee19ee5451814039c13cf1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada138812dfee19ee5451814039c13cf1">_toggle_hsi_clock</a> (uint8_t state)</td></tr>
 <tr class="memitem:ac1565e93ef8448d4bb517652e8b85e27" id="r_ac1565e93ef8448d4bb517652e8b85e27"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1565e93ef8448d4bb517652e8b85e27">_toggle_pll_clock</a> (uint8_t state)</td></tr>
-<tr class="memitem:a0968882ff01fef583e6a8b7a97be51ea" id="r_a0968882ff01fef583e6a8b7a97be51ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0968882ff01fef583e6a8b7a97be51ea">hal_clock_init</a> (<a class="el" href="structhal__clock__config__t.html">hal_clock_config_t</a> *<a class="el" href="samples_205__hal__systick_2main_8c.html#a921c2505bac76424f5f96cc1e4f62986">cfg</a>, <a class="el" href="structhal__pll__config__t.html">hal_pll_config_t</a> *<a class="el" href="samples_203__no__hal__uart__tx_2main_8c.html#adf1b524219e8781fa7542fa90dd09912">pll_cfg</a>)</td></tr>
+<tr class="memitem:a0968882ff01fef583e6a8b7a97be51ea" id="r_a0968882ff01fef583e6a8b7a97be51ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0968882ff01fef583e6a8b7a97be51ea">hal_clock_init</a> (<a class="el" href="structhal__clock__config__t.html">hal_clock_config_t</a> *<a class="el" href="samples_200__test__sample_2main_8c.html#a921c2505bac76424f5f96cc1e4f62986">cfg</a>, <a class="el" href="structhal__pll__config__t.html">hal_pll_config_t</a> *<a class="el" href="samples_200__test__sample_2main_8c.html#adf1b524219e8781fa7542fa90dd09912">pll_cfg</a>)</td></tr>
 <tr class="memdesc:a0968882ff01fef583e6a8b7a97be51ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the system clock.  <br /></td></tr>
 <tr class="memitem:aded3b01c0942294bcdd69a84f76d9cf0" id="r_aded3b01c0942294bcdd69a84f76d9cf0"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aded3b01c0942294bcdd69a84f76d9cf0">hal_clock_get_sysclk</a> (void)</td></tr>
 <tr class="memdesc:aded3b01c0942294bcdd69a84f76d9cf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current system clock frequency in Hz.  <br /></td></tr>
@@ -339,6 +339,9 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function must be called before using other peripheral clocks. </dd></dl>
+<p>&lt; Flash Interface base address</p>
+<p>&lt; Flash ACR Latency bit position</p>
+<p>&lt; Flash ACR Latency bit position</p>
 
 </div>
 </div>

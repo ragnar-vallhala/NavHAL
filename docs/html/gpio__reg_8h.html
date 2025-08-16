@@ -167,9 +167,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a5542cfab7e2101bae98b650d19a19e90" id="r_a5542cfab7e2101bae98b650d19a19e90"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5542cfab7e2101bae98b650d19a19e90">GPIOD_BASE_ADDR</a>&#160;&#160;&#160;0x40020C00</td></tr>
 <tr class="memitem:a223cb9c5def01f7315fbf6fa5322bc9b" id="r_a223cb9c5def01f7315fbf6fa5322bc9b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a223cb9c5def01f7315fbf6fa5322bc9b">GPIOE_BASE_ADDR</a>&#160;&#160;&#160;0x40021000</td></tr>
 <tr class="memitem:a03ec8a869ee6f256c882978a71fa5ffa" id="r_a03ec8a869ee6f256c882978a71fa5ffa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a03ec8a869ee6f256c882978a71fa5ffa">GPIOH_BASE_ADDR</a>&#160;&#160;&#160;0x40021C00</td></tr>
-<tr class="memitem:a2f48db2915042d2e1e819453ff05c0ab" id="r_a2f48db2915042d2e1e819453ff05c0ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a>(<a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a>)</td></tr>
-<tr class="memitem:a00d2d6c40a947794f1c27e984b84f1db" id="r_a00d2d6c40a947794f1c27e984b84f1db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a00d2d6c40a947794f1c27e984b84f1db">GPIO_GET_PORT</a>(<a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a>)</td></tr>
-<tr class="memitem:a3c789f3a6c3190c9c8cc399c6cf2ee29" id="r_a3c789f3a6c3190c9c8cc399c6cf2ee29"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c789f3a6c3190c9c8cc399c6cf2ee29">GPIO_GET_PIN</a>(<a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a>)</td></tr>
+<tr class="memitem:a2f48db2915042d2e1e819453ff05c0ab" id="r_a2f48db2915042d2e1e819453ff05c0ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a>(n)</td></tr>
+<tr class="memitem:a00d2d6c40a947794f1c27e984b84f1db" id="r_a00d2d6c40a947794f1c27e984b84f1db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a00d2d6c40a947794f1c27e984b84f1db">GPIO_GET_PORT</a>(n)</td></tr>
+<tr class="memitem:a3c789f3a6c3190c9c8cc399c6cf2ee29" id="r_a3c789f3a6c3190c9c8cc399c6cf2ee29"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c789f3a6c3190c9c8cc399c6cf2ee29">GPIO_GET_PIN</a>(n)</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Cortex-M4 GPIO register definitions and access macros. </p>
@@ -194,13 +194,12 @@ Macros</h2></td></tr>
         <tr>
           <td class="memname">#define GPIO_GET_PIN</td>
           <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em><a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a></em></span></td><td>)</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>n</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_variable" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a> % 16)</div>
-<div class="ttc" id="atest__unity__parameterized_8c_html_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67"><div class="ttname"><a href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a></div><div class="ttdeci">float n</div><div class="ttdef"><b>Definition</b> test_unity_parameterized.c:278</div></div>
+<b>Value:</b><div class="fragment"><div class="line">(n % 16)</div>
 </div><!-- fragment --><p>Get pin number within the port from absolute pin number </p>
 
 </div>
@@ -214,12 +213,12 @@ Macros</h2></td></tr>
         <tr>
           <td class="memname">#define GPIO_GET_PORT</td>
           <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em><a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a></em></span></td><td>)</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>n</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  ((<a class="code hl_struct" href="struct_g_p_i_ox___typedef.html">GPIOx_Typedef</a> *)(<a class="code hl_define" href="#a312c4a0ecb7f7df814b6dc660acff0e1">GPIOA_BASE_ADDR</a> + ((<a class="code hl_define" href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a>(<a class="code hl_variable" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a>)) * 0x400)))</div>
+<b>Value:</b><div class="fragment"><div class="line">  ((<a class="code hl_struct" href="struct_g_p_i_ox___typedef.html">GPIOx_Typedef</a> *)(<a class="code hl_define" href="#a312c4a0ecb7f7df814b6dc660acff0e1">GPIOA_BASE_ADDR</a> + ((<a class="code hl_define" href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a>(n)) * 0x400)))</div>
 <div class="ttc" id="agpio__reg_8h_html_a2f48db2915042d2e1e819453ff05c0ab"><div class="ttname"><a href="#a2f48db2915042d2e1e819453ff05c0ab">GPIO_GET_PORT_NUMBER</a></div><div class="ttdeci">#define GPIO_GET_PORT_NUMBER(n)</div><div class="ttdef"><b>Definition</b> gpio_reg.h:65</div></div>
 <div class="ttc" id="agpio__reg_8h_html_a312c4a0ecb7f7df814b6dc660acff0e1"><div class="ttname"><a href="#a312c4a0ecb7f7df814b6dc660acff0e1">GPIOA_BASE_ADDR</a></div><div class="ttdeci">#define GPIOA_BASE_ADDR</div><div class="ttdef"><b>Definition</b> gpio_reg.h:57</div></div>
 <div class="ttc" id="astruct_g_p_i_ox___typedef_html"><div class="ttname"><a href="struct_g_p_i_ox___typedef.html">GPIOx_Typedef</a></div><div class="ttdoc">GPIO port register structure.</div><div class="ttdef"><b>Definition</b> gpio_reg.h:43</div></div>
@@ -236,12 +235,12 @@ Macros</h2></td></tr>
         <tr>
           <td class="memname">#define GPIO_GET_PORT_NUMBER</td>
           <td>(</td>
-          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em><a class="el" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a></em></span></td><td>)</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>n</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">(<a class="code hl_variable" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a> / 16 == 5 ? 7 : <a class="code hl_variable" href="test__unity__parameterized_8c.html#a7f72c6c4ce2ae87fa6fe5f6f22cd9d67">n</a> / 16)</div>
+<b>Value:</b><div class="fragment"><div class="line">(n / 16 == 5 ? 7 : n / 16)</div>
 </div><!-- fragment --><p>Get port number from absolute pin number </p>
 
 </div>

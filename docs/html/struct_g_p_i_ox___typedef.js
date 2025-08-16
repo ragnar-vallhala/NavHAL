@@ -1,13 +1,13 @@
 var struct_g_p_i_ox___typedef =
 [
-    [ "AFRH", "struct_g_p_i_ox___typedef.html#aa9911a1622a94b30a946d8151eb48814", null ],
-    [ "AFRL", "struct_g_p_i_ox___typedef.html#acb16e5952e9343f915e85fc174101ceb", null ],
-    [ "BSRR", "struct_g_p_i_ox___typedef.html#a47be4fe7be8bc014dc740f417257358b", null ],
-    [ "IDR", "struct_g_p_i_ox___typedef.html#a257cc4d21387707849212c21389a58b0", null ],
-    [ "LCKR", "struct_g_p_i_ox___typedef.html#a3f4905fd9be2af9f6d64ec288dd8f7fe", null ],
-    [ "MODER", "struct_g_p_i_ox___typedef.html#a15a61b51bcc485c805b4e549827a4506", null ],
-    [ "ODR", "struct_g_p_i_ox___typedef.html#a7449495a3b1df57d4cd7cddf5843a8d7", null ],
-    [ "OSPEEDR", "struct_g_p_i_ox___typedef.html#a0aa6efaf408e109eca499c9f6b4b22b9", null ],
-    [ "OTYPER", "struct_g_p_i_ox___typedef.html#ab3baf26d204736b654cee8de467165cf", null ],
-    [ "PUPDR", "struct_g_p_i_ox___typedef.html#a695d9fad25e3e6aa03340d0c87be1060", null ]
+    [ "AFRH", "struct_g_p_i_ox___typedef.html#acf55cb0791a67a709673e4d36acc305c", null ],
+    [ "AFRL", "struct_g_p_i_ox___typedef.html#a7165acc83576817a8d766b3dde66c8fb", null ],
+    [ "BSRR", "struct_g_p_i_ox___typedef.html#a48dda1051812c935245d81518364774a", null ],
+    [ "IDR", "struct_g_p_i_ox___typedef.html#a0ba84f9febf53e3468cb0eba33db377a", null ],
+    [ "LCKR", "struct_g_p_i_ox___typedef.html#acc2e9854fd2af3a1496987c2f190e1cc", null ],
+    [ "MODER", "struct_g_p_i_ox___typedef.html#a84dfec618662640d1b2a0b753d8573d3", null ],
+    [ "ODR", "struct_g_p_i_ox___typedef.html#a5724a706bc67650021444d46b4d5b85f", null ],
+    [ "OSPEEDR", "struct_g_p_i_ox___typedef.html#a734224257fbdbfd43d6893ff0c5afa70", null ],
+    [ "OTYPER", "struct_g_p_i_ox___typedef.html#add5137ca8dc2dc83b41b59deb023f639", null ],
+    [ "PUPDR", "struct_g_p_i_ox___typedef.html#ad78a8cf1f74e7271c60ae90170221515", null ]
 ];

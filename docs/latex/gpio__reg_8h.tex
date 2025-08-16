@@ -41,11 +41,11 @@ struct \mbox{\hyperlink{struct_g_p_i_ox___typedef}{GPIOx\+\_\+\+Typedef}}
 \item 
 \#define \mbox{\hyperlink{gpio__reg_8h_a03ec8a869ee6f256c882978a71fa5ffa}{GPIOH\+\_\+\+BASE\+\_\+\+ADDR}}~0x40021\+C00
 \item 
-\#define \mbox{\hyperlink{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab}{GPIO\+\_\+\+GET\+\_\+\+PORT\+\_\+\+NUMBER}}(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}})
+\#define \mbox{\hyperlink{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab}{GPIO\+\_\+\+GET\+\_\+\+PORT\+\_\+\+NUMBER}}(n)
 \item 
-\#define \mbox{\hyperlink{gpio__reg_8h_a00d2d6c40a947794f1c27e984b84f1db}{GPIO\+\_\+\+GET\+\_\+\+PORT}}(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}})
+\#define \mbox{\hyperlink{gpio__reg_8h_a00d2d6c40a947794f1c27e984b84f1db}{GPIO\+\_\+\+GET\+\_\+\+PORT}}(n)
 \item 
-\#define \mbox{\hyperlink{gpio__reg_8h_a3c789f3a6c3190c9c8cc399c6cf2ee29}{GPIO\+\_\+\+GET\+\_\+\+PIN}}(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}})
+\#define \mbox{\hyperlink{gpio__reg_8h_a3c789f3a6c3190c9c8cc399c6cf2ee29}{GPIO\+\_\+\+GET\+\_\+\+PIN}}(n)
 \end{DoxyCompactItemize}
 
 
@@ -79,33 +79,33 @@ Macros\+:
 \index{GPIO\_GET\_PIN@{GPIO\_GET\_PIN}!gpio\_reg.h@{gpio\_reg.h}}
 \doxysubsubsection{\texorpdfstring{GPIO\_GET\_PIN}{GPIO\_GET\_PIN}}
 {\footnotesize\ttfamily \label{gpio__reg_8h_a3c789f3a6c3190c9c8cc399c6cf2ee29} 
-\#define GPIO\+\_\+\+GET\+\_\+\+PIN(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}}{}\end{DoxyParamCaption})}
+\#define GPIO\+\_\+\+GET\+\_\+\+PIN(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
 
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}\ \%\ 16)}
+\DoxyCodeLine{(n\ \%\ 16)}
 
 \end{DoxyCode}
 Get pin number within the port from absolute pin number \Hypertarget{gpio__reg_8h_a00d2d6c40a947794f1c27e984b84f1db}\index{gpio\_reg.h@{gpio\_reg.h}!GPIO\_GET\_PORT@{GPIO\_GET\_PORT}}
 \index{GPIO\_GET\_PORT@{GPIO\_GET\_PORT}!gpio\_reg.h@{gpio\_reg.h}}
 \doxysubsubsection{\texorpdfstring{GPIO\_GET\_PORT}{GPIO\_GET\_PORT}}
 {\footnotesize\ttfamily \label{gpio__reg_8h_a00d2d6c40a947794f1c27e984b84f1db} 
-\#define GPIO\+\_\+\+GET\+\_\+\+PORT(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}}{}\end{DoxyParamCaption})}
+\#define GPIO\+\_\+\+GET\+\_\+\+PORT(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
 
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{\ \ ((\mbox{\hyperlink{struct_g_p_i_ox___typedef}{GPIOx\_Typedef}}\ *)(\mbox{\hyperlink{gpio__reg_8h_a312c4a0ecb7f7df814b6dc660acff0e1}{GPIOA\_BASE\_ADDR}}\ +\ ((\mbox{\hyperlink{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab}{GPIO\_GET\_PORT\_NUMBER}}(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}))\ *\ 0x400)))}
+\DoxyCodeLine{\ \ ((\mbox{\hyperlink{struct_g_p_i_ox___typedef}{GPIOx\_Typedef}}\ *)(\mbox{\hyperlink{gpio__reg_8h_a312c4a0ecb7f7df814b6dc660acff0e1}{GPIOA\_BASE\_ADDR}}\ +\ ((\mbox{\hyperlink{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab}{GPIO\_GET\_PORT\_NUMBER}}(n))\ *\ 0x400)))}
 
 \end{DoxyCode}
 Get pointer to GPIO port structure from absolute pin number \Hypertarget{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab}\index{gpio\_reg.h@{gpio\_reg.h}!GPIO\_GET\_PORT\_NUMBER@{GPIO\_GET\_PORT\_NUMBER}}
 \index{GPIO\_GET\_PORT\_NUMBER@{GPIO\_GET\_PORT\_NUMBER}!gpio\_reg.h@{gpio\_reg.h}}
 \doxysubsubsection{\texorpdfstring{GPIO\_GET\_PORT\_NUMBER}{GPIO\_GET\_PORT\_NUMBER}}
 {\footnotesize\ttfamily \label{gpio__reg_8h_a2f48db2915042d2e1e819453ff05c0ab} 
-\#define GPIO\+\_\+\+GET\+\_\+\+PORT\+\_\+\+NUMBER(\begin{DoxyParamCaption}\item[{}]{\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}}{}\end{DoxyParamCaption})}
+\#define GPIO\+\_\+\+GET\+\_\+\+PORT\+\_\+\+NUMBER(\begin{DoxyParamCaption}\item[{}]{n}{}\end{DoxyParamCaption})}
 
 {\bfseries Value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{(\mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}\ /\ 16\ ==\ 5\ ?\ 7\ :\ \mbox{\hyperlink{test__unity__parameterized_8c_a7f72c6c4ce2ae87fa6fe5f6f22cd9d67}{n}}\ /\ 16)}
+\DoxyCodeLine{(n\ /\ 16\ ==\ 5\ ?\ 7\ :\ n\ /\ 16)}
 
 \end{DoxyCode}
 Get port number from absolute pin number \Hypertarget{gpio__reg_8h_a312c4a0ecb7f7df814b6dc660acff0e1}\index{gpio\_reg.h@{gpio\_reg.h}!GPIOA\_BASE\_ADDR@{GPIOA\_BASE\_ADDR}}

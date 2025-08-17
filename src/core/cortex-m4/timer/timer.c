@@ -295,7 +295,7 @@ void timer_clear_interrupt_flag(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return;
-  tim->SR |= TIMx_SR_UIF;
+  tim->SR &= ~TIMx_SR_UIF;
 }
 
 /**

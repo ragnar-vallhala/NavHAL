@@ -96,9 +96,9 @@ void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg) {
 
   (RCC->CFGR) |= (RCC_CFGR_HPRE_DIV1 << RCC_CFGR_HPRE_BIT); // AHB prescaler = 1
   (RCC->CFGR) |=
-      (RCC_CFGR_PPRE1_DIV4 << RCC_CFGR_PPRE1_BIT); // APB1 prescaler = 4
+      (RCC_CFGR_PPRE_DIV4 << RCC_CFGR_PPRE1_BIT); // APB1 prescaler = 4
   (RCC->CFGR) |=
-      (RCC_CFGR_PPRE2_DIV2 << RCC_CFGR_PPRE2_BIT); // APB2 prescaler = 2
+      (RCC_CFGR_PPRE_DIV2 << RCC_CFGR_PPRE2_BIT); // APB2 prescaler = 2
 
   // Switch system clock source
   if (cfg->source == HAL_CLOCK_SOURCE_HSI) {

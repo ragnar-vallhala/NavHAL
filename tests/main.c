@@ -1,9 +1,10 @@
 #define CORTEX_M4
 #include "core/cortex-m4/uart.h"
 #include "navhal.h"
-#include "test_clock.h" // ⬅️ added
+#include "test_clock.h"
 #include "test_gpio.h"
 #include "test_timer.h"
+#include "test_pwm.h"   // ⬅️ added
 #include "unity.h"
 
 void setUp(void) {}
@@ -28,37 +29,17 @@ int test_timer(void) {
   uart2_write("\n=========== TIMER TEST START ===========\n");
   UNITY_BEGIN();
 
-  // Timer initialization tests
   RUN_TEST(test_timer_init_sets_prescaler_and_arr);
-
-  // Timer start / stop
   RUN_TEST(test_timer_start_sets_CEN_bit);
   RUN_TEST(test_timer_stop_clears_CEN_bit);
-
-  // Timer reset
   RUN_TEST(test_timer_reset_clears_count);
-
-  // Compare / CCR tests
   RUN_TEST(test_timer_set_compare_and_get_compare);
-
-  // Channel enable / disable
   RUN_TEST(test_timer_enable_and_disable_channel);
-
-  // Timer interrupt tests (commented because it hangs UART)
-  // RUN_TEST(test_timer_enable_and_disable_interrupt);
-
+  // RUN_TEST(test_timer_enable_and_disable_interrupt); // hangs UART
   RUN_TEST(test_timer_clear_interrupt_flag_clears_UIF);
-
-  // ARR set / get tests
   RUN_TEST(test_timer_set_arr_and_get_arr);
-
-  // Timer counter tests
   RUN_TEST(test_timer_get_count_returns_correct_value);
-
-  // Tick / SysTick tests
   RUN_TEST(test_systick_tick_increments);
-
-  // Frequency calculation test
   RUN_TEST(test_timer_get_frequency_returns_correct_value);
 
   uart2_write("=========== TIMER TEST END ===========\n");
@@ -70,22 +51,35 @@ int test_clock(void) {
   uart2_write("\n=========== CLOCK TEST START ===========\n");
   UNITY_BEGIN();
 
-  // Clock initialization
   RUN_TEST(test_hal_clock_init_hsi);
   RUN_TEST(test_hal_clock_init_hse);
   RUN_TEST(test_hal_clock_init_pll);
 
-  // SYSCLK tests
   RUN_TEST(test_hal_clock_get_sysclk_returns_correct_value_hsi);
   RUN_TEST(test_hal_clock_get_sysclk_returns_correct_value_hse);
   RUN_TEST(test_hal_clock_get_sysclk_returns_correct_value_pll);
 
-  // AHB / APB tests
   RUN_TEST(test_hal_clock_get_ahbclk_returns_correct_value);
   RUN_TEST(test_hal_clock_get_apb1clk_returns_correct_value);
   RUN_TEST(test_hal_clock_get_apb2clk_returns_correct_value);
 
   uart2_write("=========== CLOCK TEST END ===========\n");
+  total_test_count += Unity.NumberOfTests;
+  return UNITY_END();
+}
+
+// -------------------- PWM --------------------
+int test_pwm(void) {
+  uart2_write("\n=========== PWM TEST START ===========\n");
+  UNITY_BEGIN();
+
+  RUN_TEST(test_hal_pwm_init_apb1);
+  RUN_TEST(test_hal_pwm_init_apb2);
+  RUN_TEST(test_hal_pwm_start_sets_counter_enable);
+  RUN_TEST(test_hal_pwm_stop_clears_counter_enable);
+  RUN_TEST(test_hal_pwm_set_duty_cycle_updates_ccr);
+
+  uart2_write("=========== PWM TEST END ===========\n");
   total_test_count += Unity.NumberOfTests;
   return UNITY_END();
 }
@@ -119,6 +113,7 @@ int main(void) {
   failed += test_gpio();
   failed += test_timer();
   failed += test_clock();
+  failed += test_pwm();   // ⬅️ run PWM tests
 
   uart2_write("\n\n=========== FINAL RESULTS ===========\n\n");
   uart2_write(total_test_count);
@@ -128,3 +123,4 @@ int main(void) {
 
   return failed;
 }
+

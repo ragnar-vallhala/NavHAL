@@ -53,6 +53,7 @@ static volatile uint32_t tick_reload_value = 0; // ticks relaod value
  */
 void systick_init(uint32_t tick_us) {
   // systick interrupt is not under the NVIC
+  systick_ticks = 0;
   tick_duration_us = tick_us;
   uint32_t ahbclk = hal_clock_get_ahbclk();
   uint64_t reload_value = (((uint64_t)ahbclk * tick_us) / 1000000ULL) - 1;

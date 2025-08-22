@@ -132,7 +132,7 @@ add_custom_target(copy_compile_commands ALL
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-
+set(STARTUP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/core/${CMAKE_SYSTEM_PROCESSOR}/startup/startup.s PARENT_SCOPE)
 # Tests
 if(TEST)
   message("Tests enabled")

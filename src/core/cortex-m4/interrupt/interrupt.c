@@ -46,3 +46,8 @@ void hal_handle_interrupt(IRQn_Type interrupt) {
   if (irq_callbacks[(uint32_t)interrupt])
     irq_callbacks[(uint32_t)interrupt]();
 }
+
+// weak symbols
+#ifndef SUBMODULE
+__attribute__((weak)) void PendSV_Handler(void) {}
+#endif

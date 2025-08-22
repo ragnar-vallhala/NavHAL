@@ -32,6 +32,7 @@
 .global _estack
 .global Reset_Handler
 .global SysTick_Handler
+.global PendSV_Handler
 .global TIM5_IRQHandler
 .global TIM1BRK_TIM9_IRQHandler
 .global TIM2_IRQHandler 
@@ -59,7 +60,7 @@
     .word  Reset_Handler            /* 12. SVCall Handler */
     .word  Reset_Handler            /* 13. Debug Monitor Handler */
     .word  0                        /* 14. Reserved */
-    .word  Reset_Handler            /* 15. PendSV Handler */
+    .word  PendSV_Handler            /* 15. PendSV Handler */
     .word  SysTick_Handler          /* 16. SysTick Handler */
 
     /* External Interrupts (IRQn) */

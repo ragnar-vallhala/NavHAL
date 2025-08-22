@@ -19,6 +19,8 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 # extern/NavHAL/CMakeLists.txt
 if(NOT DEFINED CMAKE_PROJECT_NAME)
     project(NavHAL C ASM)
+else()
+  add_compile_definitions(SUBMODULE)
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

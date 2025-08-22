@@ -53,6 +53,7 @@ static volatile uint32_t tick_reload_value = 0; // ticks relaod value
  */
 void systick_init(uint32_t tick_us) {
   // systick interrupt is not under the NVIC
+  systick_ticks = 0;
   tick_duration_us = tick_us;
   uint32_t ahbclk = hal_clock_get_ahbclk();
   uint64_t reload_value = (((uint64_t)ahbclk * tick_us) / 1000000ULL) - 1;
@@ -295,7 +296,7 @@ void timer_clear_interrupt_flag(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return;
-  tim->SR |= TIMx_SR_UIF;
+  tim->SR &= ~TIMx_SR_UIF;
 }
 
 /**

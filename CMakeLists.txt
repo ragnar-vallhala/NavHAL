@@ -16,7 +16,11 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
 # set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
-project(NavHAL C ASM )
+# extern/NavHAL/CMakeLists.txt
+if(NOT DEFINED CMAKE_PROJECT_NAME)
+    project(NavHAL C ASM)
+endif()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_COMPILE_COMMANDS_OUTPUT "${CMAKE_SOURCE_DIR}/compile_commands.json")
 
@@ -46,11 +50,11 @@ message(STATUS "Building for vendor: ${VENDOR}")
 message(STATUS "Building for processor: ${CMAKE_SYSTEM_PROCESSOR}")
 
 # Paths
-set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
-set(SRC_BOARD ${CMAKE_SOURCE_DIR}/src/board/${BOARD})
-set(SRC_CORE ${CMAKE_SOURCE_DIR}/src/core)
-set(SRC_VENDOR ${CMAKE_SOURCE_DIR}/src/vendor/${VENDOR})
-set(DIR_SAMPLES ${CMAKE_SOURCE_DIR}/samples)
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(SRC_BOARD ${CMAKE_CURRENT_SOURCE_DIR}/src/board/${BOARD})
+set(SRC_CORE ${CMAKE_CURRENT_SOURCE_DIR}/src/core)
+set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
+set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
 # Compiler Flags [UPDATE] thumb mode is on for now, can be removed later and
 # choosen dynamically
 set(CMAKE_C_FLAGS
@@ -86,12 +90,12 @@ if(SAMPLE AND NOT STANDALONE)
   # add_subdirectory(${SRC_BOARD})
   add_subdirectory(${SRC_CORE})
   # add_subdirectory(${SRC_VENDOR})
-  add_subdirectory(${CMAKE_SOURCE_DIR}/samples)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/samples)
   # Sources
   set(SOURCES ${CORE_SOURCES} ${BOARD_SOURCES} ${VENDOR_SOURCES})
 elseif(SAMPLE AND STANDALONE)
   message(STATUS "Sample selected: ${SAMPLE} (standalone)")
-  add_subdirectory(${CMAKE_SOURCE_DIR}/samples)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/samples)
 else()
   message(STATUS "No SAMPLE defined. Building HAL only.")
   # add_subdirectory(${SRC_BOARD})
@@ -128,19 +132,19 @@ add_custom_target(copy_compile_commands ALL
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-
+set(STARTUP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/core/${CMAKE_SYSTEM_PROCESSOR}/startup/startup.s PARENT_SCOPE)
 # Tests
 if(TEST)
   message("Tests enabled")
-  include_directories(${CMAKE_SOURCE_DIR}/extern/unity/src ${CMAKE_SOURCE_DIR}/include)
-  file(GLOB TEST_SRC ${CMAKE_SOURCE_DIR}/tests/*.c)
-  file(GLOB UNITY_SRC ${CMAKE_SOURCE_DIR}/extern/unity/src/*.c)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extern/unity/src ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
+  file(GLOB UNITY_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/unity/src/*.c)
   file(GLOB_RECURSE HAL_SRC ${SRC_CORE}/*.c )
   message("Files: ${HAL_SRC}")
-  add_compile_definitions(UNITY_OUTPUT_COLOR)
-  add_executable(tests ${TEST_SRC} ${UNITY_SRC} ${CMAKE_SOURCE_DIR}/src/core/cortex-m4/startup/startup.s)
+  add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
+  add_executable(tests ${TEST_SRC} ${UNITY_SRC} ${CMAKE_CURRENT_SOURCE_DIR}/src/core/cortex-m4/startup/startup.s)
   target_link_libraries(tests PRIVATE c gcc)
-  set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/tests/linker.ld -nostdlib")
+  set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib")
   target_compile_options(tests PRIVATE -march=armv7e-m -fno-exceptions 
   -fno-unwind-tables
   -fno-asynchronous-unwind-tables

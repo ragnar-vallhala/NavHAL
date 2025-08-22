@@ -1,1 +1,1 @@
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/core/${CMAKE_SYSTEM_PROCESSOR})
+add_subdirectory(${CMAKE_SYSTEM_PROCESSOR})

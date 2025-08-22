@@ -22,7 +22,7 @@
  */
 
 .syntax unified
-.cpu cortex-m3
+.cpu cortex-m4
 .thumb
 
 
@@ -164,7 +164,7 @@ Reset_Handler:
 
 copy_data:
     cmp r1, r2            // while (r1 < r2)
-    bcc copy
+    bcs copy
     b init_bss            // done copying, proceed to zero .bss
 
 copy:
@@ -179,7 +179,7 @@ init_bss:
 
 zero_bss:
     cmp r0, r1            // while (r0 < r1)
-    bcc zero
+    bcs zero
     b call_main
 
 zero:

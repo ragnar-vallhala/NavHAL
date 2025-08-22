@@ -142,9 +142,6 @@ typedef enum {
 #define RCC_CFGR_PPRE1_DIV(n) (n << RCC_CFGR_PPRE1_BIT) /**< Set APB1 prescaler */
 #define RCC_CFGR_PPRE2_DIV(n) (n << RCC_CFGR_PPRE2_BIT) /**< Set APB2 prescaler */
 
-/* Common predefined prescaler values */
-#define RCC_CFGR_HPRE_DIV1 0x0  /**< AHB clock not divided */
-#define RCC_CFGR_PPRE1_DIV4 0x5 /**< APB1 clock = HCLK / 4 */
-#define RCC_CFGR_PPRE2_DIV2 0x4 /**< APB2 clock = HCLK / 2 */
+
 
 #endif // !CORTEX_M4_RCC_REG_H

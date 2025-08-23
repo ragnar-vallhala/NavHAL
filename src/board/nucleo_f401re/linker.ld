@@ -33,9 +33,11 @@ SECTIONS {
     _sbss = .;
     *(.bss*)
     *(COMMON)
+    . = ALIGN(8);
     _ebss = .;
+    _heap_start = .;
   } > RAM
-
+  _heap_end   = ORIGIN(RAM) + LENGTH(RAM);
   _sidata = LOADADDR(.data);
   _estack = ORIGIN(RAM) + LENGTH(RAM);
 }

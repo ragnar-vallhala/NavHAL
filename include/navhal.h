@@ -44,4 +44,6 @@
 
 #include "common/hal_12c.h"
 
+#include "common/hal_interrupt.h"
+
 #endif // NAVHAL_H

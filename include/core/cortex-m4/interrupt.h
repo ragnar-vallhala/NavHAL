@@ -105,4 +105,5 @@ uint32_t hal_disable_global_interrupts(void);
  */
 void hal_clear_all_pending_interrupts(void);
 
+
 #endif // CORTEX_M4_INTERRUPT_H

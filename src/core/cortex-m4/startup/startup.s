@@ -34,6 +34,7 @@
 .global SysTick_Handler
 .global HardFault_Handler
 .global PendSV_Handler
+.global SVCall_Handler
 .global TIM5_IRQHandler
 .global TIM1BRK_TIM9_IRQHandler
 .global TIM2_IRQHandler 
@@ -58,7 +59,7 @@
     .word  0                        /* 9. Reserved */
     .word  0                        /* 10. Reserved */
     .word  0                        /* 11. Reserved */
-    .word  Reset_Handler            /* 12. SVCall Handler */
+    .word  SVCall_Handler            /* 12. SVCall Handler */
     .word  Reset_Handler            /* 13. Debug Monitor Handler */
     .word  0                        /* 14. Reserved */
     .word  PendSV_Handler            /* 15. PendSV Handler */

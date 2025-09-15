@@ -80,10 +80,11 @@ int main(void) {
         // Combine MSB and LSB
         int16_t temp_raw = (rx_buf[0] << 8) | rx_buf[1];
 
+        uart2_write(">Temp:"); /**< Assumes uart2_write_int exists */
         // Print raw temperature value
         uart2_write_int(temp_raw); /**< Assumes uart2_write_int exists */
         uart2_write("\r\n");
 
-        delay_ms(1000); /**< Wait 1 second before next measurement */
+        delay_ms(100); /**< Wait 1 second before next measurement */
     }
 }

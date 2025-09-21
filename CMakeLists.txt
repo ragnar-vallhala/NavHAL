@@ -33,7 +33,7 @@ set(CMAKE_SYSTEM_PROCESSOR
     cortex-m4
     CACHE STRING "Target processor" FORCE) # Processor on board
 set(BOARD
-    nucleo_f401re
+    nucleo_f767zi
     CACHE STRING "Target board")
 set(VENDOR
     stm32

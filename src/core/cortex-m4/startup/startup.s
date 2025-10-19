@@ -181,13 +181,10 @@ init_bss:
     ldr r1, =_ebss        // r1 = end of .bss
 
 zero_bss:
-    cmp r0, r1            // while (r0 < r1)
-    bcs zero
-    b call_main
-
-zero:
+    cmp r0, r1
+    bcs call_main    // done, go to main
     movs r2, #0
-    str r2, [r0], #4      // store 0 to [r0], increment r0
+    str r2, [r0], #4
     b zero_bss
 
     // Call main function

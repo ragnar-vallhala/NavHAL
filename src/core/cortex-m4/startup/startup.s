@@ -166,13 +166,10 @@ Reset_Handler:
     ldr r2, =_edata       // r2 = end of .data in RAM
 
 copy_data:
-    cmp r1, r2            // while (r1 < r2)
-    bcs copy
-    b init_bss            // done copying, proceed to zero .bss
-
-copy:
-    ldr r3, [r0], #4      // load word from r0 into r3, increment r0
-    str r3, [r1], #4      // store r3 to r1, increment r1
+    cmp r1, r2         // compare dest < end
+    bcs init_bss       // if dest >= end, done
+    ldr r3, [r0], #4   // load from Flash
+    str r3, [r1], #4   // store to RAM
     b copy_data
 
     // Zero initialize the .bss section (uninitialized data)
@@ -181,13 +178,10 @@ init_bss:
     ldr r1, =_ebss        // r1 = end of .bss
 
 zero_bss:
-    cmp r0, r1            // while (r0 < r1)
-    bcs zero
-    b call_main
-
-zero:
+    cmp r0, r1
+    bcs call_main    // done, go to main
     movs r2, #0
-    str r2, [r0], #4      // store 0 to [r0], increment r0
+    str r2, [r0], #4
     b zero_bss
 
     // Call main function

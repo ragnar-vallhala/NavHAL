@@ -27,14 +27,18 @@ SECTIONS {
     *(.data*)
     . = ALIGN(4);
     _edata = .;
+    *(.init*)
+    *(.fini*)
   } > RAM
 
   .bss : {
     _sbss = .;
+    __bss_start__ = .;
     *(.bss*)
     *(COMMON)
     . = ALIGN(8);
     _ebss = .;
+    __bss_end__ = .;
     _heap_start = .;
   } > RAM
   _heap_end   = ORIGIN(RAM) + LENGTH(RAM);

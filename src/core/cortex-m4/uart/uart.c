@@ -270,6 +270,37 @@ void uart2_write_int(int32_t num) {
     uart2_write_char(buf[i]); // Write digits in reverse order
   }
 }
+/**
+ * @brief Transmit a 32-bit unsigned integer via USART2
+ *
+ * Converts integer to string representation and transmits it
+ * 
+ *
+ * @param num Integer to transmit
+ */
+void uart2_write_uint(uint32_t num) {
+  char buf[12]; // Buffer large enough for 32-bit int (-2147483648)
+  int i = 0;
+
+  if (num == 0) {
+    uart2_write_char('0');
+    return;
+  }
+
+  if (num < 0) {
+    uart2_write_char('-');
+    num = -num;
+  }
+
+  while (num > 0) {
+    buf[i++] = '0' + (num % 10);
+    num /= 10;
+  }
+
+  while (i--) {
+    uart2_write_char(buf[i]); // Write digits in reverse order
+  }
+}
 
 /**
  * @brief Transmit a 32-bit signed integer via USART1

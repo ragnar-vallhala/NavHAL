@@ -59,15 +59,15 @@ typedef enum {
   _Generic((val),                                                              \
       char: uart2_write_char,                                                  \
       signed char: uart2_write_int,                                            \
-      unsigned char: uart2_write_int,                                          \
+      unsigned char: uart2_write_uint,                                          \
       short: uart2_write_int,                                                  \
-      unsigned short: uart2_write_int,                                         \
+      unsigned short: uart2_write_uint,                                         \
       int: uart2_write_int,                                                    \
-      unsigned int: uart2_write_int,                                           \
+      unsigned int: uart2_write_uint,                                           \
       long: uart2_write_int,                                                   \
-      unsigned long: uart2_write_int,                                          \
+      unsigned long: uart2_write_uint,                                          \
       long long: uart2_write_int,                                              \
-      unsigned long long: uart2_write_int,                                     \
+      unsigned long long: uart2_write_uint,                                     \
       float: uart2_write_float,                                                \
       double: uart2_write_float,                                               \
       const char *: uart2_write_string,                                        \
@@ -77,15 +77,15 @@ typedef enum {
   _Generic((val),                                                              \
       char: uart1_write_char,                                                  \
       signed char: uart1_write_int,                                            \
-      unsigned char: uart1_write_int,                                          \
+      unsigned char: uart1_write_uint,                                          \
       short: uart1_write_int,                                                  \
-      unsigned short: uart1_write_int,                                         \
+      unsigned short: uart1_write_uint,                                         \
       int: uart1_write_int,                                                    \
-      unsigned int: uart1_write_int,                                           \
+      unsigned int: uart1_write_uint,                                           \
       long: uart1_write_int,                                                   \
-      unsigned long: uart1_write_int,                                          \
+      unsigned long: uart1_write_uint,                                          \
       long long: uart1_write_int,                                              \
-      unsigned long long: uart1_write_int,                                     \
+      unsigned long long: uart1_write_uint,                                     \
       float: uart1_write_float,                                                \
       double: uart1_write_float,                                               \
       const char *: uart1_write_string,                                        \
@@ -95,15 +95,15 @@ typedef enum {
   _Generic((val),                                                              \
       char: uart6_write_char,                                                  \
       signed char: uart6_write_int,                                            \
-      unsigned char: uart6_write_int,                                          \
+      unsigned char: uart6_write_uint,                                          \
       short: uart6_write_int,                                                  \
-      unsigned short: uart6_write_int,                                         \
+      unsigned short: uart6_write_uint,                                         \
       int: uart6_write_int,                                                    \
-      unsigned int: uart6_write_int,                                           \
+      unsigned int: uart6_write_uint,                                           \
       long: uart6_write_int,                                                   \
-      unsigned long: uart6_write_int,                                          \
+      unsigned long: uart6_write_uint,                                          \
       long long: uart6_write_int,                                              \
-      unsigned long long: uart6_write_int,                                     \
+      unsigned long long: uart6_write_uint,                                     \
       float: uart6_write_float,                                                \
       double: uart6_write_float,                                               \
       const char *: uart6_write_string,                                        \
@@ -151,6 +151,7 @@ void uart_write_char(char c, hal_uart_t uart);
  */
 void uart_write_int(int32_t num, hal_uart_t uart);
 
+
 /**
  * @brief Transmit a floating-point number via UART.
  *
@@ -190,6 +191,7 @@ void uart1_write_char(char c);
  * @brief Transmit a 32-bit signed integer via USART1.
  */
 void uart1_write_int(int32_t num);
+void uart1_write_uint(uint32_t num);
 
 /**
  * @brief Transmit a floating-point number via USART1.
@@ -209,6 +211,7 @@ void uart1_write_string(const char *s);
 void uart2_init(uint32_t baudrate);
 void uart2_write_char(char c);
 void uart2_write_int(int32_t num);
+void uart2_write_uint(uint32_t num);
 void uart2_write_float(float num);
 void uart2_write_string(const char *s);
 
@@ -220,6 +223,7 @@ void uart2_write_string(const char *s);
 void uart6_init(uint32_t baudrate);
 void uart6_write_char(char c);
 void uart6_write_int(int32_t num);
+void uart6_write_uint(uint32_t num);
 void uart6_write_float(float num);
 void uart6_write_string(const char *s);
 

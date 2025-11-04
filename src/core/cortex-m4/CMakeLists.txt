@@ -10,6 +10,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/startup/startup.s
 ${CMAKE_CURRENT_SOURCE_DIR}/interrupt/interrupt.c
 ${CMAKE_CURRENT_SOURCE_DIR}/pwm/pwm.c
 ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c
+${CMAKE_CURRENT_SOURCE_DIR}/flash/flash.c
 )
 
-target_link_libraries(hal gcc)
+target_link_libraries(hal gcc common)

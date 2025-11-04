@@ -13,6 +13,8 @@ no_hal_pwm
 hal_clock
 no_hal_i2c
 hal_i2c
+no_hal_flash
+hal_flash
 )
 set(SAMPLE_DIRS
 00_test_sample
@@ -29,6 +31,8 @@ set(SAMPLE_DIRS
 09_hal_clock
 10_no_hal_i2c
 11_hal_i2c
+12_no_hal_flash
+13_hal_flash
 
 )
 

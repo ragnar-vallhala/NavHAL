@@ -46,4 +46,6 @@
 
 #include "common/hal_interrupt.h"
 
+#include "common/hal_flash.h"
+
 #endif // NAVHAL_H

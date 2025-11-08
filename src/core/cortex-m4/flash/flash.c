@@ -90,14 +90,14 @@ static uint8_t _flash_calculate_crc_(const uint8_t *value, uint8_t size)
 }
 uint8_t *_flash_find_next_free(void)
 {
-    uint8_t *ptr = (volatile uint8_t *)FLASH_STORAGE_START;
+    uint8_t *ptr = (volatile uint8_t *)FLASH_PRIMARY_STORAGE_START;
     FlashRecord_t *rec = (FlashRecord_t *)ptr;
-    while (rec->magic == FLASH_MAGIC_NUMBER && ptr < FLASH_STORAGE_END)
+    while (rec->magic == FLASH_MAGIC_NUMBER && ptr < FLASH_PRIMARY_STORAGE_END)
     {
         ptr = ptr + rec->size + sizeof(FlashRecord_t);
         rec = (FlashRecord_t *)ptr;
     }
-    if (ptr >= FLASH_STORAGE_END)
+    if (ptr >= FLASH_PRIMARY_STORAGE_END)
         return NULL;
     return ptr;
 }
@@ -105,9 +105,9 @@ uint8_t *_flash_find_next_free(void)
 FlashRecord_t *_flash_find_first_valid_entry_(uint8_t key)
 {
 
-    FlashRecord_t *rec = (volatile FlashRecord_t *)FLASH_STORAGE_START;
+    FlashRecord_t *rec = (volatile FlashRecord_t *)FLASH_PRIMARY_STORAGE_START;
     int i = 0;
-    while (rec < FLASH_STORAGE_END && rec->magic == FLASH_MAGIC_NUMBER)
+    while (rec < FLASH_PRIMARY_STORAGE_END && rec->magic == FLASH_MAGIC_NUMBER)
     {
         if (rec->key == key && rec->status == FLASH_VALID)
             return rec;
@@ -170,11 +170,83 @@ FlashStatus_t _flash_read_data_(uint32_t addr, uint8_t *data, uint8_t size)
     return FLASH_OK;
 }
 
+FlashStatus_t _flash_shift_sector_primary_to_secondary_(void)
+{
+    uint8_t *ptr_primary = (uint8_t *)FLASH_PRIMARY_STORAGE_START;
+    uint8_t *ptr_secondary = (uint8_t *)FLASH_SECONDARY_STORAGE_START;
+    FlashRecord_t *rec_primary = (FlashRecord_t *)ptr_primary;
+    while (rec_primary->magic == FLASH_MAGIC_NUMBER && ptr_primary < FLASH_PRIMARY_STORAGE_END)
+    {
+        if (rec_primary->status != FLASH_VALID)
+        {
+            uint8_t total_size = sizeof(FlashRecord_t) + rec_primary->size;
+            ptr_primary += total_size;
+            rec_primary = (FlashRecord_t *)ptr_primary;
+            continue;
+        }
+        uint8_t total_size = sizeof(FlashRecord_t) + rec_primary->size;
+        FlashStatus_t status = _flash_write_data_((uint32_t)ptr_secondary, ptr_primary, total_size);
+        if (status != FLASH_OK)
+            return status;
+        ptr_primary += total_size;
+        ptr_secondary += total_size;
+        rec_primary = (FlashRecord_t *)ptr_primary;
+    }
+
+    return FLASH_OK;
+}
+
+FlashStatus_t _flash_shift_sector_secondary_to_primary_(void)
+{
+    uint8_t *ptr_primary = (uint8_t *)FLASH_PRIMARY_STORAGE_START;
+    uint8_t *ptr_secondary = (uint8_t *)FLASH_SECONDARY_STORAGE_START;
+    FlashRecord_t *rec_secondary = (FlashRecord_t *)ptr_secondary;
+    while (rec_secondary->magic == FLASH_MAGIC_NUMBER && ptr_secondary < FLASH_SECONDARY_STORAGE_END)
+    {
+        uint8_t total_size = sizeof(FlashRecord_t) + rec_secondary->size;
+        FlashStatus_t status = _flash_write_data_((uint32_t)ptr_primary, ptr_secondary, total_size);
+        if (status != FLASH_OK)
+            return status;
+        ptr_primary += total_size;
+        ptr_secondary += total_size;
+        rec_secondary = (FlashRecord_t *)ptr_secondary;
+    }
+    return FLASH_OK;
+}
+
+FlashStatus_t _flash_compact_storage_(void)
+{
+    uart2_write("Compacting flash storage...\n");
+    FlashStatus_t status;
+    status = _flash_shift_sector_primary_to_secondary_();
+    if (status != FLASH_OK)
+        return status;
+    uart2_write("Erasing primary sector...\n");
+    _flash_erase_sector_(PRIMARY_FLASH_SECTOR);
+    status = _flash_shift_sector_secondary_to_primary_();
+    if (status != FLASH_OK)
+        return status;
+    uart2_write("Erasing secondary sector...\n");
+    _flash_erase_sector_(SECONDARY_FLASH_SECTOR);
+    return FLASH_OK;
+}
+
 FlashStatus_t save_data_to_flash(uint8_t key, const uint8_t *value, uint8_t size)
 {
-    uint8_t *ptr = _flash_find_next_free();
-    if (ptr == NULL || size == 0)
+    if (size == 0)
         return FLASH_ERR_NOT_FOUND;
+
+    uint8_t *ptr = _flash_find_next_free();
+    if (ptr == NULL)
+    {
+        FlashStatus_t status = _flash_compact_storage_();
+        if (status != FLASH_OK)
+            return status;
+        ptr = _flash_find_next_free();
+        if (ptr == NULL)
+            return FLASH_ERR_WRITE;
+    }
+
     FlashRecord_t *last_rec = _flash_find_first_valid_entry_(key);
     if (last_rec != NULL)
     {

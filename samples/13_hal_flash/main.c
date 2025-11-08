@@ -8,9 +8,7 @@ int main(void)
 {
     systick_init(1000); /**< Initialize SysTick for delays */
     uart2_init(9600);   /**< Initialize UART2 at 9600 baud */
-
-    _flash_erase_sector_(5); /**< Erase flash memory block 5 */
-
+    uart2_write("HAL Flash Sample Application\n");
     rec.crc = 123;
     save_data_to_flash(1, &rec, sizeof(FlashRecord_t));
     uint8_t size = sizeof(FlashRecord_t);
@@ -43,5 +41,9 @@ int main(void)
     uart2_write(buff.size);
     uart2_write(" | Status: ");
     uart2_write(buff.status);
+    uart2_write(" \n");
+
+    uart2_write("Next free address: ");
+    uart2_write((uint32_t)_flash_find_next_free());
     uart2_write(" \n");
 }

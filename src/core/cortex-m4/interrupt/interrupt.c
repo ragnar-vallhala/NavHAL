@@ -13,7 +13,7 @@ int8_t hal_enable_interrupt(IRQn_Type interrupt)
   uint32_t reg_idx = irq_num / 32;
   uint32_t bit_pos = irq_num % 32;
 
-  NVIC->ISER[reg_idx] |= (1 << bit_pos);
+  NVIC->ISER[reg_idx] |= (1U << bit_pos);
   return SUCCESS;
 }
 
@@ -137,9 +137,20 @@ uint8_t hal_get_interrupt_priority(IRQn_Type interrupt)
     return value >> 4; // return normalized 0-15
   }
 }
+
+
 // weak symbols
 #ifndef SUBMODULE
 __attribute__((weak)) void PendSV_Handler(void) {}
 __attribute__((weak)) void HardFault_Handler(void) {}
 __attribute__((weak)) void SVCall_Handler(void) {}
+__attribute__((weak)) void Default_Handler(void) {}
+
+#else
+void Default_Handler(void) {}
 #endif
+#include "core/cortex-m4/uart.h"
+void USART2_IRQHandler(void)
+{
+  hal_handle_interrupt(USART2_IRQn);
+}

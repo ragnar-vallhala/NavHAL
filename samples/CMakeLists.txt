@@ -15,6 +15,7 @@ no_hal_i2c
 hal_i2c
 no_hal_flash
 hal_flash
+hal_uart_int
 )
 set(SAMPLE_DIRS
 00_test_sample
@@ -33,6 +34,7 @@ set(SAMPLE_DIRS
 11_hal_i2c
 12_no_hal_flash
 13_hal_flash
+14_hal_uart_int
 
 )
 

@@ -4,6 +4,7 @@
 #include "utils/util.h"
 #include <stddef.h>
 #include "core/cortex-m4/uart.h"
+#include "common/hal_types.h"
 
 // Interal function signatures
 static void _flash_wait_(void)
@@ -26,7 +27,7 @@ static void _flash_lock_(void)
     FLASH_CR |= FLASH_CR_LOCK;
 }
 
-void _flash_erase_sector_(uint8_t sector)
+void _flash_erase_sector_(byte sector)
 {
     _flash_unlock_();
     _flash_wait_();
@@ -77,55 +78,54 @@ uint16_t _flash_read_half_word_(uint32_t addr)
 {
     return *(volatile uint16_t *)addr;
 }
-static uint8_t _flash_calculate_crc_(const uint8_t *value, uint8_t size)
+static byte _flash_calculate_crc_(const byte *value, byte size)
 {
     if (size == 0)
         return 0;
-    uint8_t crc = value[0];
+    byte crc = value[0];
     for (int i = 1; i < size; i++)
     {
         crc ^= value[i];
     }
     return crc;
 }
-uint8_t *_flash_find_next_free(void)
+__IO byte *_flash_find_next_free(void)
 {
-    uint8_t *ptr = (volatile uint8_t *)FLASH_PRIMARY_STORAGE_START;
+    __IO byte *ptr = (__IO byte *)FLASH_PRIMARY_STORAGE_START;
     FlashRecord_t *rec = (FlashRecord_t *)ptr;
-    while (rec->magic == FLASH_MAGIC_NUMBER && ptr < FLASH_PRIMARY_STORAGE_END)
+    while (rec->magic == FLASH_MAGIC_NUMBER && (uint32_t)ptr < FLASH_PRIMARY_STORAGE_END)
     {
         ptr = ptr + rec->size + sizeof(FlashRecord_t);
         rec = (FlashRecord_t *)ptr;
     }
-    if (ptr >= FLASH_PRIMARY_STORAGE_END)
+    if ((uint32_t)ptr >= FLASH_PRIMARY_STORAGE_END)
         return NULL;
     return ptr;
 }
 
-FlashRecord_t *_flash_find_first_valid_entry_(uint8_t key)
+__IO FlashRecord_t *_flash_find_first_valid_entry_(byte key)
 {
 
-    FlashRecord_t *rec = (volatile FlashRecord_t *)FLASH_PRIMARY_STORAGE_START;
-    int i = 0;
-    while (rec < FLASH_PRIMARY_STORAGE_END && rec->magic == FLASH_MAGIC_NUMBER)
+    __IO FlashRecord_t *rec = (__IO FlashRecord_t *)FLASH_PRIMARY_STORAGE_START;
+    while ((uint32_t)rec < FLASH_PRIMARY_STORAGE_END && rec->magic == FLASH_MAGIC_NUMBER)
     {
         if (rec->key == key && rec->status == FLASH_VALID)
             return rec;
-        uint8_t *byte_addr = (uint8_t *)rec;
+        byte *byte_addr = (byte *)rec;
         byte_addr = byte_addr + rec->size + sizeof(FlashRecord_t);
         rec = (FlashRecord_t *)byte_addr;
     }
     return NULL;
 }
-FlashStatus_t _flash_write_data_(uint32_t addr, uint8_t *data, uint8_t size)
+FlashStatus_t _flash_write_data_(uint32_t addr, const byte *data, byte size)
 {
     if (size == 0)
         return FLASH_ERR_WRITE;
 
-    uint8_t padded_size = (size % 2 == 0) ? size : size + 1;
+    byte padded_size = (size % 2 == 0) ? size : size + 1;
     uint16_t half_word = 0;
 
-    for (uint8_t i = 0; i < padded_size; i += 2)
+    for (byte i = 0; i < padded_size; i += 2)
     {
         if (i + 1 < size)
         {
@@ -144,14 +144,14 @@ FlashStatus_t _flash_write_data_(uint32_t addr, uint8_t *data, uint8_t size)
     return FLASH_OK;
 }
 
-FlashStatus_t _flash_read_data_(uint32_t addr, uint8_t *data, uint8_t size)
+FlashStatus_t _flash_read_data_(uint32_t addr, byte *data, byte size)
 {
     if (size == 0)
         return FLASH_ERR_NOT_FOUND;
 
-    uint8_t padded_size = (size % 2 == 0) ? size : size + 1;
+    byte padded_size = (size % 2 == 0) ? size : size + 1;
     uint16_t half_word = 0;
-    for (uint8_t i = 0; i < padded_size; i += 2)
+    for (byte i = 0; i < padded_size; i += 2)
     {
         half_word = _flash_read_half_word_(addr);
         if (i + 1 < size)
@@ -172,19 +172,19 @@ FlashStatus_t _flash_read_data_(uint32_t addr, uint8_t *data, uint8_t size)
 
 FlashStatus_t _flash_shift_sector_primary_to_secondary_(void)
 {
-    uint8_t *ptr_primary = (uint8_t *)FLASH_PRIMARY_STORAGE_START;
-    uint8_t *ptr_secondary = (uint8_t *)FLASH_SECONDARY_STORAGE_START;
+    byte *ptr_primary = (byte *)FLASH_PRIMARY_STORAGE_START;
+    byte *ptr_secondary = (byte *)FLASH_SECONDARY_STORAGE_START;
     FlashRecord_t *rec_primary = (FlashRecord_t *)ptr_primary;
-    while (rec_primary->magic == FLASH_MAGIC_NUMBER && ptr_primary < FLASH_PRIMARY_STORAGE_END)
+    while (rec_primary->magic == FLASH_MAGIC_NUMBER && (uint32_t)ptr_primary < FLASH_PRIMARY_STORAGE_END)
     {
         if (rec_primary->status != FLASH_VALID)
         {
-            uint8_t total_size = sizeof(FlashRecord_t) + rec_primary->size;
+            byte total_size = sizeof(FlashRecord_t) + rec_primary->size;
             ptr_primary += total_size;
             rec_primary = (FlashRecord_t *)ptr_primary;
             continue;
         }
-        uint8_t total_size = sizeof(FlashRecord_t) + rec_primary->size;
+        byte total_size = sizeof(FlashRecord_t) + rec_primary->size;
         FlashStatus_t status = _flash_write_data_((uint32_t)ptr_secondary, ptr_primary, total_size);
         if (status != FLASH_OK)
             return status;
@@ -198,12 +198,12 @@ FlashStatus_t _flash_shift_sector_primary_to_secondary_(void)
 
 FlashStatus_t _flash_shift_sector_secondary_to_primary_(void)
 {
-    uint8_t *ptr_primary = (uint8_t *)FLASH_PRIMARY_STORAGE_START;
-    uint8_t *ptr_secondary = (uint8_t *)FLASH_SECONDARY_STORAGE_START;
+    byte *ptr_primary = (byte *)FLASH_PRIMARY_STORAGE_START;
+    byte *ptr_secondary = (byte *)FLASH_SECONDARY_STORAGE_START;
     FlashRecord_t *rec_secondary = (FlashRecord_t *)ptr_secondary;
-    while (rec_secondary->magic == FLASH_MAGIC_NUMBER && ptr_secondary < FLASH_SECONDARY_STORAGE_END)
+    while (rec_secondary->magic == FLASH_MAGIC_NUMBER && (uint32_t)ptr_secondary < FLASH_SECONDARY_STORAGE_END)
     {
-        uint8_t total_size = sizeof(FlashRecord_t) + rec_secondary->size;
+        byte total_size = sizeof(FlashRecord_t) + rec_secondary->size;
         FlashStatus_t status = _flash_write_data_((uint32_t)ptr_primary, ptr_secondary, total_size);
         if (status != FLASH_OK)
             return status;
@@ -231,12 +231,12 @@ FlashStatus_t _flash_compact_storage_(void)
     return FLASH_OK;
 }
 
-FlashStatus_t save_data_to_flash(uint8_t key, const uint8_t *value, uint8_t size)
+FlashStatus_t save_data_to_flash(byte key, const byte *value, byte size)
 {
     if (size == 0)
         return FLASH_ERR_NOT_FOUND;
 
-    uint8_t *ptr = _flash_find_next_free();
+    __IO byte *ptr = _flash_find_next_free();
     if (ptr == NULL)
     {
         FlashStatus_t status = _flash_compact_storage_();
@@ -247,14 +247,14 @@ FlashStatus_t save_data_to_flash(uint8_t key, const uint8_t *value, uint8_t size
             return FLASH_ERR_WRITE;
     }
 
-    FlashRecord_t *last_rec = _flash_find_first_valid_entry_(key);
+    __IO FlashRecord_t *last_rec = _flash_find_first_valid_entry_(key);
     if (last_rec != NULL)
     {
         FlashRecord_t updated_last_rec;
-        hal_memcpy(&updated_last_rec, last_rec, sizeof(FlashRecord_t));
+        hal_memcpy(&updated_last_rec, (const void*)last_rec, sizeof(FlashRecord_t));
         updated_last_rec.status = FLASH_DELETED;
         FlashStatus_t status = _flash_write_data_((uint32_t)(last_rec),
-                                                  &updated_last_rec, sizeof(FlashRecord_t));
+                                                  (const byte*)&updated_last_rec, sizeof(FlashRecord_t));
         if (status != FLASH_OK)
             return status;
     }
@@ -265,7 +265,7 @@ FlashStatus_t save_data_to_flash(uint8_t key, const uint8_t *value, uint8_t size
     rec.size = size;
     rec.status = FLASH_VALID;
     rec.crc = _flash_calculate_crc_(value, size);
-    FlashStatus_t status = _flash_write_data_((uint32_t)ptr, &rec, sizeof(FlashRecord_t));
+    FlashStatus_t status = _flash_write_data_((uint32_t)ptr, (const byte *)&rec, sizeof(FlashRecord_t));
     if (status != FLASH_OK)
         return status;
     ptr += (sizeof(FlashRecord_t) % 2 == 0 ? sizeof(FlashRecord_t) : sizeof(FlashRecord_t) + 1);
@@ -273,12 +273,12 @@ FlashStatus_t save_data_to_flash(uint8_t key, const uint8_t *value, uint8_t size
     return status;
 }
 
-FlashStatus_t read_data_from_flash(uint8_t key, uint8_t *value, uint8_t *size)
+FlashStatus_t read_data_from_flash(byte key, byte *value, byte *size)
 {
-    FlashRecord_t *last_rec = _flash_find_first_valid_entry_(key);
+    __IO FlashRecord_t *last_rec = _flash_find_first_valid_entry_(key);
     if (last_rec == NULL)
         return FLASH_ERR_NOT_FOUND;
-    uint8_t *src = ((uint8_t *)last_rec) + sizeof(FlashRecord_t);
+    byte *src = ((byte *)last_rec) + sizeof(FlashRecord_t);
     *size = last_rec->size;
     hal_memcpy(value, src, *size);
     if (last_rec->crc != _flash_calculate_crc_(value, *size))

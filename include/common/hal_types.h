@@ -16,8 +16,13 @@
 
 #ifndef HAL_TYPES
 #define HAL_TYPES
+#include <stdint.h>
 
 #define __IO volatile /**< Defines volatile memory access for I/O registers. */
-#define NULL 0        /**< Defines the null pointer constant. */
-
+#ifndef NULL
+#define NULL (void *)0 /**< Defines the null pointer constant. */
+#endif                 // !NULL
+#ifndef byte
+#define byte uint8_t
+#endif
 #endif // !HAL_TYPES

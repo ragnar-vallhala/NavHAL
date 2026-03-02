@@ -14,6 +14,7 @@ void test_hal_clock_init_hsi(void) {
                             .ppre2_div = RCC_CFGR_PPRE_DIV1};
 
   hal_clock_init(&cfg, NULL);
+  
   uart2_init(9600);
   TEST_ASSERT_EQUAL_UINT32(0, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
@@ -24,6 +25,7 @@ void test_hal_clock_init_hse(void) {
                             .ppre1_div = RCC_CFGR_PPRE_DIV1,
                             .ppre2_div = RCC_CFGR_PPRE_DIV1};
   hal_clock_init(&cfg, NULL);
+  
   uart2_init(9600);
   TEST_ASSERT_EQUAL_UINT32(1, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
@@ -39,19 +41,19 @@ void test_hal_clock_init_pll(void) {
                               .pll_p = 2,
                               .pll_q = 7};
   hal_clock_init(&cfg, &pll_cfg);
+  
   uart2_init(9600);
   TEST_ASSERT_EQUAL_UINT32(2, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
 
 // -------------------- SYSCLK --------------------
 void test_hal_clock_get_sysclk_returns_correct_value_hsi(void) {
-  RCC->CR |= RCC_CR_HSIRDY | RCC_CR_HSERDY |
-             RCC_CR_PLLRDY; // fake the ready status of clocks
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI,
                             .hpre_div = RCC_CFGR_HPRE_DIV1,
                             .ppre1_div = RCC_CFGR_PPRE_DIV1,
                             .ppre2_div = RCC_CFGR_PPRE_DIV1};
   hal_clock_init(&cfg, NULL);
+  
   uart2_init(9600);
   uint32_t sysclk = hal_clock_get_sysclk();
   TEST_ASSERT_EQUAL_UINT32(16000000, sysclk);
@@ -63,6 +65,7 @@ void test_hal_clock_get_sysclk_returns_correct_value_hse(void) {
                             .ppre1_div = RCC_CFGR_PPRE_DIV1,
                             .ppre2_div = RCC_CFGR_PPRE_DIV1};
   hal_clock_init(&cfg, NULL);
+  
   uart2_init(9600);
   uint32_t sysclk = hal_clock_get_sysclk();
   TEST_ASSERT_EQUAL_UINT32(8000000, sysclk);
@@ -79,6 +82,7 @@ void test_hal_clock_get_sysclk_returns_correct_value_pll(void) {
                               .pll_p = 2,
                               .pll_q = 7};
   hal_clock_init(&cfg, &pll_cfg);
+  
   uart2_init(9600);
   uint32_t sysclk = hal_clock_get_sysclk();
   uint32_t expected = (8000000 / pll_cfg.pll_m) * pll_cfg.pll_n / pll_cfg.pll_p;

@@ -49,16 +49,33 @@ int test_clock(void) {
   NAVTEST_BEGIN();
 
   RUN_TEST(test_hal_clock_init_hsi);
+  for (volatile int i = 0; i < 10000; i++)
+    __asm__("nop"); // Small delay to let UART finish
   RUN_TEST(test_hal_clock_init_hse);
+  for (volatile int i = 0; i < 10000; i++)
+    __asm__("nop"); // Small delay to let UART finish
   RUN_TEST(test_hal_clock_init_pll);
+  for (volatile int i = 0; i < 10000; i++)
+    __asm__("nop"); // Small delay to let UART finish
 
   RUN_TEST(test_hal_clock_get_sysclk_returns_correct_value_hsi);
+  for (volatile int i = 0; i < 10000; i++)
+    __asm__("nop"); // Small delay to let UART finish
   RUN_TEST(test_hal_clock_get_sysclk_returns_correct_value_hse);
+  for (volatile int i = 0; i < 10000; i++)
+    __asm__("nop"); // Small delay to let UART finish
   RUN_TEST(test_hal_clock_get_sysclk_returns_correct_value_pll);
-
+  for (volatile int i = 0; i < 10000; i++)
+    __asm__("nop"); // Small delay to let UART finish
   RUN_TEST(test_hal_clock_get_ahbclk_returns_correct_value);
+  for (volatile int i = 0; i < 10000; i++)
+    __asm__("nop"); // Small delay to let UART finish
   RUN_TEST(test_hal_clock_get_apb1clk_returns_correct_value);
+  for (volatile int i = 0; i < 10000; i++)
+    __asm__("nop"); // Small delay to let UART finish
   RUN_TEST(test_hal_clock_get_apb2clk_returns_correct_value);
+  for (volatile int i = 0; i < 10000; i++)
+    __asm__("nop"); // Small delay to let UART finish
 
   uart2_write("=========== CLOCK TEST END ===========\n");
   total_test_count += (int)navtest_get_test_count();

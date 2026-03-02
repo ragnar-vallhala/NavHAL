@@ -22,13 +22,23 @@ void hal_pwm_init(PWM_Handle *pwm, uint32_t frequency, float dutyCycle) {
 
   // 1. Get clock
   uint32_t bus_clk = hal_clock_get_apb1clk(); // default for TIM2-TIM5
+  uint32_t ppre = ((RCC->CFGR) >> RCC_CFGR_PPRE1_BIT) & 0x7;
   if (pwm->timer == TIM1 || pwm->timer == TIM9 || pwm->timer == TIM10 ||
       pwm->timer == TIM11) {
     bus_clk = hal_clock_get_apb2clk(); // For advanced timers
+    ppre = ((RCC->CFGR) >> RCC_CFGR_PPRE2_BIT) & 0x7;
   }
-  uint32_t psc = bus_clk / 1e6 - 1;
-  uint32_t arr = (bus_clk / (psc + 1)) / frequency - 1;
-  uint32_t ccr = (uint32_t)((arr + 1) * dutyCycle + 0.5f);
+
+  // STM32 Timer Clock Rule: If APB prescaler is 1, timer clock = APB clock.
+  // Otherwise, timer clock = 2 * APB clock.
+  uint32_t timer_clk = bus_clk;
+  if (ppre != 0) { // 0 is DIV1
+    timer_clk *= 2;
+  }
+
+  uint32_t psc = timer_clk / 1000000 - 1;
+  uint32_t arr = (timer_clk / (psc + 1)) / frequency - 1;
+  uint32_t ccr = (uint32_t)((float)(arr + 1) * dutyCycle + 0.5f);
   if (ccr > arr)
     ccr = arr;
   timer_init(pwm->timer, psc, arr);
@@ -62,7 +72,7 @@ void hal_pwm_stop(PWM_Handle *pwm) {
  */
 void hal_pwm_set_duty_cycle(PWM_Handle *pwm, float dutyCycle) {
   uint32_t arr = timer_get_arr(pwm->timer, pwm->channel);
-  uint32_t ccr = (uint32_t)((arr + 1) * dutyCycle + 0.5f);
+  uint32_t ccr = (uint32_t)((float)(arr + 1) * dutyCycle + 0.5f);
   if (ccr > arr)
     ccr = arr;
   timer_set_compare(pwm->timer, pwm->channel, ccr);

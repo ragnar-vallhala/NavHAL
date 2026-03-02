@@ -488,13 +488,18 @@ void timer_set_compare(hal_timer_t timer, uint8_t channel,
   default:
     break;
   }
+  // Correctly handle CCMRx bitfields
   if (channel <= 2) {
-    tim->CCMR1 &= (~TIMx_CCMRy_OCzM_MASK(channel));
-    tim->CCMR1 |= (~TIMx_CCMRy_OCzM_PWM_MODE1_MASK(channel));
+    // Clear OCxM bits
+    tim->CCMR1 &= ~TIMx_CCMRy_OCzM_MASK(channel);
+    // Set PWM Mode 1 (0x6) and Enable Preload
+    tim->CCMR1 |= TIMx_CCMRy_OCzM_PWM_MODE1_MASK(channel);
     tim->CCMR1 |= TIMx_CCMRy_OCxPE(channel);
   } else {
-    tim->CCMR2 &= (~TIMx_CCMRy_OCzM_MASK(channel));
-    tim->CCMR2 |= (~TIMx_CCMRy_OCzM_PWM_MODE1_MASK(channel));
+    // Clear OCxM bits
+    tim->CCMR2 &= ~TIMx_CCMRy_OCzM_MASK(channel);
+    // Set PWM Mode 1 (0x6) and Enable Preload
+    tim->CCMR2 |= TIMx_CCMRy_OCzM_PWM_MODE1_MASK(channel);
     tim->CCMR2 |= TIMx_CCMRy_OCxPE(channel);
   }
   timer_enable_channel(timer, channel);

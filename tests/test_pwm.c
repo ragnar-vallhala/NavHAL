@@ -30,8 +30,9 @@ void test_hal_pwm_init_apb1(void) {
   hal_pwm_init(&pwm, 1000, 0.5f); // 1 kHz, 50% duty
 
   uint32_t bus_clk = hal_clock_get_apb1clk();
-  uint32_t expected_psc = bus_clk / 1000000 - 1;
-  uint32_t expected_arr = (bus_clk / (expected_psc + 1)) / 1000 - 1;
+  uint32_t timer_clk = bus_clk * 2; // APB1 is DIV4 in hal_clock_init
+  uint32_t expected_psc = timer_clk / 1000000 - 1;
+  uint32_t expected_arr = (timer_clk / (expected_psc + 1)) / 1000 - 1;
   uint32_t expected_ccr = (uint32_t)((expected_arr + 1) * 0.5f + 0.5f);
 
   uart2_init(9600);
@@ -46,8 +47,9 @@ void test_hal_pwm_init_apb2(void) {
   hal_pwm_init(&pwm, 2000, 0.25f); // 2 kHz, 25% duty
 
   uint32_t bus_clk = hal_clock_get_apb2clk();
-  uint32_t expected_psc = bus_clk / 1000000 - 1;
-  uint32_t expected_arr = (bus_clk / (expected_psc + 1)) / 2000 - 1;
+  uint32_t timer_clk = bus_clk * 2; // APB2 is DIV2 in hal_clock_init
+  uint32_t expected_psc = timer_clk / 1000000 - 1;
+  uint32_t expected_arr = (timer_clk / (expected_psc + 1)) / 2000 - 1;
   uint32_t expected_ccr = (uint32_t)((expected_arr + 1) * 0.25f + 0.5f);
 
   uart2_init(9600);

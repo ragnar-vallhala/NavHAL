@@ -1,7 +1,7 @@
 #define CORTEX_M4
 #include "core/cortex-m4/gpio.h"
 #include "core/cortex-m4/gpio_reg.h"
-#include "unity.h"
+#include "navtest/navtest.h"
 #include <stdint.h>
 
 #define TEST_PIN GPIO_PC09

@@ -4,7 +4,7 @@
 #include "core/cortex-m4/timer.h"
 #include "core/cortex-m4/timer_reg.h"
 #include "core/cortex-m4/uart.h"
-#include "unity.h"
+#include "navtest/navtest.h"
 #include "utils/timer_types.h"
 #include <stdint.h>
 
@@ -90,4 +90,3 @@ void test_hal_pwm_set_duty_cycle_updates_ccr(void) {
   uart2_init(9600);
   TEST_ASSERT_EQUAL_UINT32(expected_ccr, timer_get_ccr(pwm.timer, pwm.channel));
 }
-

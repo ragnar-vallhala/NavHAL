@@ -2,7 +2,7 @@
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include "core/cortex-m4/uart.h"
-#include "unity.h"
+#include "navtest/navtest.h"
 #include "utils/clock_types.h"
 #include <stdint.h>
 
@@ -45,7 +45,8 @@ void test_hal_clock_init_pll(void) {
 
 // -------------------- SYSCLK --------------------
 void test_hal_clock_get_sysclk_returns_correct_value_hsi(void) {
-  RCC->CR |= RCC_CR_HSIRDY | RCC_CR_HSERDY | RCC_CR_PLLRDY; // fake the ready status of clocks
+  RCC->CR |= RCC_CR_HSIRDY | RCC_CR_HSERDY |
+             RCC_CR_PLLRDY; // fake the ready status of clocks
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI,
                             .hpre_div = RCC_CFGR_HPRE_DIV1,
                             .ppre1_div = RCC_CFGR_PPRE_DIV1,

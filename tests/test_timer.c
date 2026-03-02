@@ -1,7 +1,7 @@
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/timer.h"
 #include "core/cortex-m4/timer_reg.h"
-#include "unity.h"
+#include "navtest/navtest.h"
 #include <stdint.h>
 
 #define TEST_TIMER TIM2

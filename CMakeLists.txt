@@ -138,13 +138,12 @@ set(STARTUP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/core/${CMAKE_SYSTEM_PROCESSOR}/
 # Tests
 if(TEST)
   message("Tests enabled")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extern/unity/src ${CMAKE_CURRENT_SOURCE_DIR}/include)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
   file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
-  file(GLOB UNITY_SRC ${CMAKE_CURRENT_SOURCE_DIR}/extern/unity/src/*.c)
   file(GLOB_RECURSE HAL_SRC ${SRC_CORE}/*.c )
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
-  add_executable(tests ${TEST_SRC} ${UNITY_SRC} ${CMAKE_CURRENT_SOURCE_DIR}/src/core/cortex-m4/startup/startup.s)
+  add_executable(tests ${TEST_SRC} ${CMAKE_CURRENT_SOURCE_DIR}/src/core/cortex-m4/startup/startup.s)
   target_link_libraries(tests PRIVATE c gcc)
   set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib")
   target_compile_options(tests PRIVATE -march=armv7e-m -fno-exceptions 
@@ -152,6 +151,7 @@ if(TEST)
   -fno-asynchronous-unwind-tables
   )
   target_sources(tests PRIVATE ${HAL_SRC})
+  target_link_libraries(tests PRIVATE c gcc common)
   enable_testing()
   add_test(NAME tests COMMAND tests)
   
@@ -168,7 +168,7 @@ if(TEST)
    message(STATUS "Selected flasher: ${FLASHER}")
    message(STATUS "Selected flash address: ${FLASH_ADDRESS}")
    
-   add_custom_target(hal_test
+   add_custom_target(flash
      COMMAND ${CMAKE_OBJCOPY} -O binary tests tests.bin
      COMMAND ${FLASHER} write tests.bin ${FLASH_ADDRESS}
      DEPENDS tests

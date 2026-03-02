@@ -197,6 +197,7 @@ void uart2_init(uint32_t baudrate)
   volatile uint32_t tmp; // clear flags
   tmp = usart->SR;
   tmp = usart->DR;
+  (void)tmp;
   usart->CR1 |= USART_CR1_TE | USART_CR1_RE; // Enable transmitter and receiver
   usart->CR1 |= UART_CR1_RXNEIE;             // Enable interrupt
   usart->CR1 |= USART_CR1_UE;                // Enable USART

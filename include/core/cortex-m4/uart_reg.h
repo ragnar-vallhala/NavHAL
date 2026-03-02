@@ -46,7 +46,7 @@ typedef struct
   ((UARTx_Reg_Typedef *)(n == 1                        \
                              ? (USART1_BASE)           \
                              : (n == 2 ? (USART2_BASE) \
-                                       : (n == 6 ? (USART6_BASE) : (NULL)))))
+                                       : (n == 6 ? (USART6_BASE) : (0)))))
 
 /* Clock enable bits */
 #define RCC_APB1ENR_USART2EN (1 << 17)

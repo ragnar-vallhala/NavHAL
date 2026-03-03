@@ -145,9 +145,11 @@ __attribute__((weak)) void PendSV_Handler(void) {}
 __attribute__((weak)) void HardFault_Handler(void) {}
 __attribute__((weak)) void SVCall_Handler(void) {}
 __attribute__((weak)) void Default_Handler(void) {}
+__attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 
 #else
 void Default_Handler(void) {}
+__attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 #endif
 #include "core/cortex-m4/uart.h"
 void USART2_IRQHandler(void)

@@ -17,6 +17,7 @@
 
 #include "core/cortex-m4/dma.h"
 #include "core/cortex-m4/dma_reg.h"
+#include "core/cortex-m4/interrupt.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include <stdint.h>
 
@@ -174,6 +175,17 @@ int dma_transfer_complete(const dma_config_t *cfg) {
  */
 void dma_clear_flags(const dma_config_t *cfg) {
   _clear_flags(_get_dma(cfg), cfg->stream);
+}
+
+void DMA1_Stream6_IRQHandler(void) {
+  DMA_Typedef *dma = DMA1;
+  uint8_t stream = 6;
+  uint32_t mask =
+      (DMA_ISR_TCIF(stream) | DMA_ISR_HTIF(stream) | DMA_ISR_TEIF(stream) |
+       DMA_ISR_DMEIF(stream) | DMA_ISR_FEIF(stream));
+
+  *DMA_IFCR_REG(dma, stream) = mask;
+  hal_handle_interrupt(DMA1_Stream6_IRQn);
 }
 
 #endif /* _DMA_ENABLED */

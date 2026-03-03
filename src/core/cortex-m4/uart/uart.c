@@ -31,6 +31,7 @@
 #include "core/cortex-m4/uart_reg.h"
 #ifdef _UART_BACKEND_DMA
 #include "core/cortex-m4/dma.h"
+#include "core/cortex-m4/interrupt.h"
 #endif
 
 /**
@@ -656,20 +657,14 @@ void uart2_write_dma(const uint8_t *data, uint16_t length) {
   _uart2_dma_tx_cfg.data_count = length;
 
   dma_init(&_uart2_dma_tx_cfg);
+
+  /* Enable DMA interrupt in NVIC before starting */
+  hal_enable_interrupt(DMA1_Stream6_IRQn);
+
   dma_start(&_uart2_dma_tx_cfg);
 
-  /* Poll for completion (TC flag on USART side after DMA completes) */
-  while (!dma_transfer_complete(&_uart2_dma_tx_cfg))
-    ;
-
-  /* Wait for UART shift register to finish */
-  while (!(usart->SR & USART_SR_TC))
-    ;
-
-  dma_clear_flags(&_uart2_dma_tx_cfg);
-
-  /* Disable DMAT after transfer to allow normal polling TX if needed */
-  usart->CR3 &= ~USART_CR3_DMAT;
+  /* Note: Non-blocking. Caller must ensure buffer remains valid until transfer
+   * completes. */
 }
 
 /**

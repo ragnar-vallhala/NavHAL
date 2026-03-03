@@ -201,7 +201,7 @@ hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
   if (status != HAL_I2C_OK)
     return status;
 
-  status = _i2c_write_addr(bus, (dev_addr << 1) | 0); // Write
+  status = _i2c_write_addr(bus, (dev_addr << 1) | 0); // write
   if (status != HAL_I2C_OK) {
     _i2c_stop(bus);
     return status;
@@ -215,67 +215,99 @@ hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
     }
   }
 
-  // --- Read phase ---
-  status = _i2c_start(bus);
-  if (status != HAL_I2C_OK) {
-    _i2c_stop(bus);
-    return status;
-  }
-  status = _i2c_write_addr(bus, (dev_addr << 1) | 1); // Write
+  // --- Repeated START + read address ---
+  status = _i2c_start(bus); // repeated start
   if (status != HAL_I2C_OK) {
     _i2c_stop(bus);
     return status;
   }
 
+  status = _i2c_write_addr(bus, (dev_addr << 1) | 1); // read
+  if (status != HAL_I2C_OK) {
+    _i2c_stop(bus);
+    return status;
+  }
+
+  // Ensure ACK enabled by default for multi-byte
   I2C->CR1 |= I2C_CR1_ACK_MASK;
-  // Case 1: Single byte read
+
+  /********** Case N == 1 **********/
   if (rx_len == 1) {
-    I2C->CR1 &= ~I2C_CR1_ACK_MASK; // Disable ACK
-    (void)I2C->SR1;                // Clear ADDR
+    // For a single byte read: disable ACK, clear ADDR, generate STOP, then read
+    // DR
+    I2C->CR1 &= ~I2C_CR1_ACK_MASK; // NACK the single byte
+    (void)I2C->SR1;                // clear ADDR
     (void)I2C->SR2;
-    I2C->CR1 |= I2C_CR1_STOP_MASK; // Generate STOP
+    I2C->CR1 |= I2C_CR1_STOP_MASK; // generate STOP
     if (!_wait_flag(&I2C->SR1, I2C_SR1_RXNE_MASK))
       return HAL_I2C_ERR_TIMEOUT;
-    rx_data[0] = I2C->DR;
+    rx_data[0] = (uint8_t)I2C->DR;
     return HAL_I2C_OK;
   }
-  // Case 3: More than 1 byte (generalized from bmp180_read_u16)
-  else {
-    (void)I2C->SR1; // Clear ADDR
+
+  /********** Case N == 2 **********/
+  if (rx_len == 2) {
+    // For two bytes: clear ACK, set POS, clear ADDR, wait for BTF, then read
+    // two bytes.
+    I2C->CR1 &= ~I2C_CR1_ACK_MASK; // NACK the last byte
+    I2C->CR1 |= I2C_CR1_POS_MASK;  // set POS for N=2
+
+    (void)I2C->SR1; // clear ADDR
     (void)I2C->SR2;
 
-    I2C->CR1 |= I2C_CR1_ACK_MASK; // ACK first byte
+    // Wait until both bytes received
+    if (!_wait_flag(&I2C->SR1, I2C_SR1_BTF_MASK))
+      return HAL_I2C_ERR_TIMEOUT;
 
-    for (uint16_t i = 0; i < rx_len; i++) {
-      if (i == rx_len - 2) {
-        // Wait for second-to-last byte ready
-        if (!_wait_flag(&I2C->SR1, I2C_SR1_RXNE_MASK))
-          return HAL_I2C_ERR_TIMEOUT;
+    I2C->CR1 |= I2C_CR1_STOP_MASK; // generate STOP
 
-        rx_data[i++] = I2C->DR;
+    rx_data[0] = (uint8_t)I2C->DR; // read byte N-1
+    rx_data[1] = (uint8_t)I2C->DR; // read byte N
 
-        // Disable ACK so last byte gets NACKed
-        I2C->CR1 &= ~I2C_CR1_ACK_MASK;
+    // restore POS bit
+    I2C->CR1 &= ~I2C_CR1_POS_MASK;
 
-        // Generate STOP before reading last two bytes
-        I2C->CR1 |= I2C_CR1_STOP_MASK;
-        if (!_wait_flag(&I2C->SR1, I2C_SR1_RXNE_MASK))
-          return HAL_I2C_ERR_TIMEOUT;
-
-        // Read N-1
-        rx_data[i] = I2C->DR;
-
-        break;
-      }
-
-      // Wait for RXNE for intermediate bytes
-      if (!_wait_flag(&I2C->SR1, I2C_SR1_RXNE_MASK))
-        return HAL_I2C_ERR_TIMEOUT;
-      rx_data[i] = I2C->DR;
-    }
-
-    // Re-enable ACK for next transaction
-    I2C->CR1 |= I2C_CR1_ACK_MASK;
     return HAL_I2C_OK;
   }
+
+  /********** Case N > 2 **********/
+  // Clear ADDR first
+  (void)I2C->SR1;
+  (void)I2C->SR2;
+
+  // Read N-3 bytes using RXNE
+  uint16_t i = 0;
+  for (; i < (rx_len - 3); ++i) {
+    if (!_wait_flag(&I2C->SR1, I2C_SR1_RXNE_MASK))
+      return HAL_I2C_ERR_TIMEOUT;
+    rx_data[i] = (uint8_t)I2C->DR;
+  }
+
+  // Now we are at the point to handle the last three bytes
+  // Wait for BTF: indicates two bytes are in DR/shift reg
+  if (!_wait_flag(&I2C->SR1, I2C_SR1_BTF_MASK))
+    return HAL_I2C_ERR_TIMEOUT;
+
+  // At this point there are at least two bytes pending. Disable ACK so the last
+  // byte will be NACKed.
+  I2C->CR1 &= ~I2C_CR1_ACK_MASK;
+
+  // Read the next byte (N-2)
+  rx_data[i++] = (uint8_t)I2C->DR;
+
+  // Wait for BTF again for the remaining two bytes
+  if (!_wait_flag(&I2C->SR1, I2C_SR1_BTF_MASK))
+    return HAL_I2C_ERR_TIMEOUT;
+
+  // Generate STOP before reading the last two bytes
+  I2C->CR1 |= I2C_CR1_STOP_MASK;
+
+  // Read remaining two bytes
+  rx_data[i++] = (uint8_t)I2C->DR; // N-1
+  rx_data[i] = (uint8_t)I2C->DR;   // N
+
+  // Re-enable ACK for next transaction (optional, but safe)
+  I2C->CR1 |= I2C_CR1_ACK_MASK;
+
+  return HAL_I2C_OK;
 }

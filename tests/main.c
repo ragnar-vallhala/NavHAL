@@ -1,11 +1,21 @@
 #define CORTEX_M4
 #include "core/cortex-m4/uart.h"
+#include "core/cortex-m4/uart_reg.h"
 #include "navhal.h"
 #include "navtest/navtest.h"
 #include "test_clock.h"
 #include "test_gpio.h"
 #include "test_pwm.h"
 #include "test_timer.h"
+#ifdef _DMA_ENABLED
+#include "test_dma.h"
+#endif
+
+static void wait_uart_empty(void) {
+  volatile UARTx_Reg_Typedef *uart2 = (volatile UARTx_Reg_Typedef*)(GET_USARTx_BASE(2));
+  while (!(uart2->SR & USART_SR_TC))
+    ;
+}
 
 static int total_test_count = 0;
 
@@ -49,30 +59,22 @@ int test_clock(void) {
   NAVTEST_BEGIN();
 
   RUN_TEST(test_hal_clock_init_hsi);
-  for (volatile int i = 0; i < 10000; i++)
-    __asm__("nop"); // Small delay to let UART finish
+  wait_uart_empty();
   RUN_TEST(test_hal_clock_init_hse);
-  for (volatile int i = 0; i < 10000; i++)
-    __asm__("nop"); // Small delay to let UART finish
+  wait_uart_empty();
   RUN_TEST(test_hal_clock_init_pll);
-  for (volatile int i = 0; i < 10000; i++)
-    __asm__("nop"); // Small delay to let UART finish
+  wait_uart_empty();
 
   RUN_TEST(test_hal_clock_get_sysclk_returns_correct_value_hsi);
-  for (volatile int i = 0; i < 10000; i++)
-    __asm__("nop"); // Small delay to let UART finish
+  wait_uart_empty();
   RUN_TEST(test_hal_clock_get_sysclk_returns_correct_value_hse);
-  for (volatile int i = 0; i < 10000; i++)
-    __asm__("nop"); // Small delay to let UART finish
+  wait_uart_empty();
   RUN_TEST(test_hal_clock_get_sysclk_returns_correct_value_pll);
-  for (volatile int i = 0; i < 10000; i++)
-    __asm__("nop"); // Small delay to let UART finish
+  wait_uart_empty();
   RUN_TEST(test_hal_clock_get_ahbclk_returns_correct_value);
-  for (volatile int i = 0; i < 10000; i++)
-    __asm__("nop"); // Small delay to let UART finish
+  wait_uart_empty();
   RUN_TEST(test_hal_clock_get_apb1clk_returns_correct_value);
-  for (volatile int i = 0; i < 10000; i++)
-    __asm__("nop"); // Small delay to let UART finish
+  wait_uart_empty();
   RUN_TEST(test_hal_clock_get_apb2clk_returns_correct_value);
   for (volatile int i = 0; i < 10000; i++)
     __asm__("nop"); // Small delay to let UART finish
@@ -97,6 +99,33 @@ int test_pwm(void) {
   total_test_count += (int)navtest_get_test_count();
   return NAVTEST_END();
 }
+
+#ifdef _DMA_ENABLED
+// -------------------- DMA --------------------
+int test_dma_suite(void) {
+  uart2_write("\n=========== DMA TEST START ===========\n");
+  NAVTEST_BEGIN();
+
+  RUN_TEST(test_dma_clock_enable_dma1);
+  RUN_TEST(test_dma_clock_enable_dma2);
+  RUN_TEST(test_dma_init_sets_channel);
+  RUN_TEST(test_dma_init_sets_direction_m2p);
+  RUN_TEST(test_dma_init_sets_direction_p2m);
+  RUN_TEST(test_dma_init_sets_minc);
+  RUN_TEST(test_dma_init_sets_priority);
+  RUN_TEST(test_dma_init_sets_ndtr);
+  RUN_TEST(test_dma_init_sets_peripheral_address);
+  RUN_TEST(test_dma_init_sets_memory_address);
+  RUN_TEST(test_dma_start_enables_stream);
+  RUN_TEST(test_dma_stop_disables_stream);
+  RUN_TEST(test_dma_transfer_complete_returns_zero_before_start);
+  RUN_TEST(test_dma_clear_flags_clears_isr);
+
+  uart2_write("=========== DMA TEST END ===========\n");
+  total_test_count += (int)navtest_get_test_count();
+  return NAVTEST_END();
+}
+#endif
 
 void print_startup_message(void) {
   uart2_write_char(0x1B); // ESC
@@ -128,6 +157,9 @@ int main(void) {
   failed += test_timer();
   failed += test_clock();
   failed += test_pwm();
+#ifdef _DMA_ENABLED
+  failed += test_dma_suite();
+#endif
 
   uart2_write("\n\n=========== FINAL RESULTS ===========\n\n");
   uart2_write("Total tests run: ");

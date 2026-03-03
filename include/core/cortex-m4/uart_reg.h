@@ -12,8 +12,7 @@
 #include "common/hal_types.h"
 #include <stdint.h>
 
-typedef struct
-{
+typedef struct {
   __IO uint32_t SR;  /*!< 0x00: Status Register
                       *  Contains flags like TXE, RXNE, TC, etc.
                       */
@@ -42,11 +41,11 @@ typedef struct
 #define USART2_BASE 0x40004400
 #define USART6_BASE 0x40011400
 
-#define GET_USARTx_BASE(n)                             \
-  ((UARTx_Reg_Typedef *)(n == 1                        \
-                             ? (USART1_BASE)           \
-                             : (n == 2 ? (USART2_BASE) \
-                                       : (n == 6 ? (USART6_BASE) : (0)))))
+#define GET_USARTx_BASE(n)                                                     \
+  ((volatile UARTx_Reg_Typedef *)(n == 1 ? (USART1_BASE)                       \
+                                         : (n == 2 ? (USART2_BASE)             \
+                                                   : (n == 6 ? (USART6_BASE)   \
+                                                              : (0)))))
 
 /* Clock enable bits */
 #define RCC_APB1ENR_USART2EN (1 << 17)
@@ -54,13 +53,24 @@ typedef struct
 #define RCC_APB2ENR_USART6EN (1 << 5)
 
 /* Control register bits */
-#define USART_CR1_UE (1 << 13)   ///< USART Enable
-#define USART_CR1_TE (1 << 3)    ///< Transmitter Enable
-#define USART_CR1_RE (1 << 2)    ///< Receiver Enable
-#define UART_CR1_RXNEIE (1 << 5) ///< RXNE interrupt enable 0: Interrupt is inhibited 1: An USART interrupt is generated whenever RXNE=1 in the USART_SR register
+#define USART_CR1_UE (1 << 13) ///< USART Enable
+#define USART_CR1_TE (1 << 3)  ///< Transmitter Enable
+#define USART_CR1_RE (1 << 2)  ///< Receiver Enable
+#define UART_CR1_RXNEIE                                                        \
+  (1                                                                           \
+   << 5) ///< RXNE interrupt enable 0: Interrupt is inhibited 1: An USART
+         ///< interrupt is generated whenever RXNE=1 in the USART_SR register
 
 /* Status register bits */
 #define USART_SR_TXE (1 << 7)  ///< Transmit Data Register Empty
 #define USART_SR_RXNE (1 << 5) ///< Read Data Register Not Empty
+#define USART_SR_TC (1 << 6)   ///< Transmission Complete
+
+/* CR3 DMA enable bits (only meaningful when _DMA_ENABLED and _UART_BACKEND_DMA
+ * are defined) */
+#ifdef _DMA_ENABLED
+#define USART_CR3_DMAT (1 << 7) ///< DMA enable for transmitter
+#define USART_CR3_DMAR (1 << 6) ///< DMA enable for receiver
+#endif                          /* _DMA_ENABLED */
 
 #endif // !CORTEX_M4_UART_REG_H

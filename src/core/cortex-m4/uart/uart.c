@@ -29,6 +29,9 @@
 #include "core/cortex-m4/gpio.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include "core/cortex-m4/uart_reg.h"
+#ifdef _UART_BACKEND_DMA
+#include "core/cortex-m4/dma.h"
+#endif
 
 /**
  * @brief Initialize the specified UART peripheral
@@ -38,8 +41,7 @@
  * @param baudrate Desired communication speed in bits per second
  * @param uart     UART instance to initialize (UART1, UART2, or UART6)
  */
-void uart_init(uint32_t baudrate, hal_uart_t uart)
-{
+void uart_init(uint32_t baudrate, hal_uart_t uart) {
   if (uart == UART2)
     uart2_init(baudrate);
   else if (uart == UART1)
@@ -54,10 +56,8 @@ void uart_init(uint32_t baudrate, hal_uart_t uart)
  * @param c    Character to transmit
  * @param uart UART instance to use
  */
-void uart_write_char(char c, hal_uart_t uart)
-{
-  if (c == '\n')
-  {
+void uart_write_char(char c, hal_uart_t uart) {
+  if (c == '\n') {
     if (uart == UART2)
       uart2_write_char('\r');
     else if (uart == UART1)
@@ -81,8 +81,7 @@ void uart_write_char(char c, hal_uart_t uart)
  * @param num  Integer to transmit
  * @param uart UART instance to use
  */
-void uart_write_int(int32_t num, hal_uart_t uart)
-{
+void uart_write_int(int32_t num, hal_uart_t uart) {
   if (uart == UART2)
     uart2_write_int(num);
   else if (uart == UART1)
@@ -99,8 +98,7 @@ void uart_write_int(int32_t num, hal_uart_t uart)
  * @param num  Floating-point number to transmit
  * @param uart UART instance to use
  */
-void uart_write_float(float num, hal_uart_t uart)
-{
+void uart_write_float(float num, hal_uart_t uart) {
   if (uart == UART2)
     uart2_write_float(num);
   else if (uart == UART1)
@@ -115,8 +113,7 @@ void uart_write_float(float num, hal_uart_t uart)
  * @param s    Null-terminated string to transmit
  * @param uart UART instance to use
  */
-void uart_write_string(const char *s, hal_uart_t uart)
-{
+void uart_write_string(const char *s, hal_uart_t uart) {
   if (uart == UART2)
     uart2_write_string(s);
   else if (uart == UART1)
@@ -136,8 +133,7 @@ void uart_write_string(const char *s, hal_uart_t uart)
  *
  * @param baudrate Desired communication speed in bits per second
  */
-void uart1_init(uint32_t baudrate)
-{
+void uart1_init(uint32_t baudrate) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
   if (usart == NULL)
     return;
@@ -160,8 +156,7 @@ void uart1_init(uint32_t baudrate)
  *
  * @param baudrate Desired communication speed in bits per second
  */
-void uart6_init(uint32_t baudrate)
-{
+void uart6_init(uint32_t baudrate) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
   if (usart == NULL)
     return;
@@ -184,8 +179,7 @@ void uart6_init(uint32_t baudrate)
  *
  * @param baudrate Desired communication speed in bits per second
  */
-void uart2_init(uint32_t baudrate)
-{
+void uart2_init(uint32_t baudrate) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return;
@@ -210,14 +204,12 @@ void uart2_init(uint32_t baudrate)
  *
  * @param c Character to transmit
  */
-void uart2_write_char(char c)
-{
+void uart2_write_char(char c) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return;
 #ifdef TEST
-  if (c == '\n')
-  {
+  if (c == '\n') {
     while (!(usart->SR & USART_SR_TXE))
       ;
     usart->DR = '\r';
@@ -232,8 +224,7 @@ void uart2_write_char(char c)
  *
  * @param c Character to transmit
  */
-void uart1_write_char(char c)
-{
+void uart1_write_char(char c) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
   if (usart == NULL)
     return;
@@ -247,8 +238,7 @@ void uart1_write_char(char c)
  *
  * @param c Character to transmit
  */
-void uart6_write_char(char c)
-{
+void uart6_write_char(char c) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
   if (usart == NULL)
     return;
@@ -265,31 +255,26 @@ void uart6_write_char(char c)
  *
  * @param num Integer to transmit
  */
-void uart2_write_int(int32_t num)
-{
+void uart2_write_int(int32_t num) {
   char buf[12]; // Buffer large enough for 32-bit int (-2147483648)
   int i = 0;
 
-  if (num == 0)
-  {
+  if (num == 0) {
     uart2_write_char('0');
     return;
   }
 
-  if (num < 0)
-  {
+  if (num < 0) {
     uart2_write_char('-');
     num = -num;
   }
 
-  while (num > 0)
-  {
+  while (num > 0) {
     buf[i++] = '0' + (num % 10);
     num /= 10;
   }
 
-  while (i--)
-  {
+  while (i--) {
     uart2_write_char(buf[i]); // Write digits in reverse order
   }
 }
@@ -301,31 +286,26 @@ void uart2_write_int(int32_t num)
  *
  * @param num Integer to transmit
  */
-void uart2_write_uint(uint32_t num)
-{
+void uart2_write_uint(uint32_t num) {
   char buf[12]; // Buffer large enough for 32-bit int (-2147483648)
   int i = 0;
 
-  if (num == 0)
-  {
+  if (num == 0) {
     uart2_write_char('0');
     return;
   }
 
-  if (num < 0)
-  {
+  if (num < 0) {
     uart2_write_char('-');
     num = -num;
   }
 
-  while (num > 0)
-  {
+  while (num > 0) {
     buf[i++] = '0' + (num % 10);
     num /= 10;
   }
 
-  while (i--)
-  {
+  while (i--) {
     uart2_write_char(buf[i]); // Write digits in reverse order
   }
 }
@@ -335,31 +315,26 @@ void uart2_write_uint(uint32_t num)
  *
  * @param num Integer to transmit
  */
-void uart1_write_int(int32_t num)
-{
+void uart1_write_int(int32_t num) {
   char buf[12];
   int i = 0;
 
-  if (num == 0)
-  {
+  if (num == 0) {
     uart1_write_char('0');
     return;
   }
 
-  if (num < 0)
-  {
+  if (num < 0) {
     uart1_write_char('-');
     num = -num;
   }
 
-  while (num > 0)
-  {
+  while (num > 0) {
     buf[i++] = '0' + (num % 10);
     num /= 10;
   }
 
-  while (i--)
-  {
+  while (i--) {
     uart1_write_char(buf[i]);
   }
 }
@@ -369,31 +344,26 @@ void uart1_write_int(int32_t num)
  *
  * @param num Integer to transmit
  */
-void uart6_write_int(int32_t num)
-{
+void uart6_write_int(int32_t num) {
   char buf[12];
   int i = 0;
 
-  if (num == 0)
-  {
+  if (num == 0) {
     uart6_write_char('0');
     return;
   }
 
-  if (num < 0)
-  {
+  if (num < 0) {
     uart6_write_char('-');
     num = -num;
   }
 
-  while (num > 0)
-  {
+  while (num > 0) {
     buf[i++] = '0' + (num % 10);
     num /= 10;
   }
 
-  while (i--)
-  {
+  while (i--) {
     uart6_write_char(buf[i]);
   }
 }
@@ -406,10 +376,8 @@ void uart6_write_int(int32_t num)
  *
  * @param num Floating-point number to transmit
  */
-void uart2_write_float(float num)
-{
-  if (num < 0)
-  {
+void uart2_write_float(float num) {
+  if (num < 0) {
     uart2_write_char('-');
     num = -num;
   }
@@ -427,10 +395,8 @@ void uart2_write_float(float num)
  *
  * @param num Floating-point number to transmit
  */
-void uart1_write_float(float num)
-{
-  if (num < 0)
-  {
+void uart1_write_float(float num) {
+  if (num < 0) {
     uart1_write_char('-');
     num = -num;
   }
@@ -447,10 +413,8 @@ void uart1_write_float(float num)
  *
  * @param num Floating-point number to transmit
  */
-void uart6_write_float(float num)
-{
-  if (num < 0)
-  {
+void uart6_write_float(float num) {
+  if (num < 0) {
     uart6_write_char('-');
     num = -num;
   }
@@ -467,10 +431,8 @@ void uart6_write_float(float num)
  *
  * @param s Null-terminated string to transmit
  */
-void uart2_write_string(const char *s)
-{
-  while (*s)
-  {
+void uart2_write_string(const char *s) {
+  while (*s) {
     uart2_write_char(*s++);
   }
 }
@@ -480,10 +442,8 @@ void uart2_write_string(const char *s)
  *
  * @param s Null-terminated string to transmit
  */
-void uart1_write_string(const char *s)
-{
-  while (*s)
-  {
+void uart1_write_string(const char *s) {
+  while (*s) {
     uart1_write_char(*s++);
   }
 }
@@ -493,10 +453,8 @@ void uart1_write_string(const char *s)
  *
  * @param s Null-terminated string to transmit
  */
-void uart6_write_string(const char *s)
-{
-  while (*s)
-  {
+void uart6_write_string(const char *s) {
+  while (*s) {
     uart6_write_char(*s++);
   }
 }
@@ -509,8 +467,7 @@ void uart6_write_string(const char *s)
  * @param uart UART instance to read from
  * @return Received character
  */
-char uart_read_char(hal_uart_t uart)
-{
+char uart_read_char(hal_uart_t uart) {
   if (uart == UART1)
     return uart1_read_char();
   else if (uart == UART2)
@@ -525,8 +482,7 @@ char uart_read_char(hal_uart_t uart)
  *
  * @return Received character
  */
-char uart1_read_char(void)
-{
+char uart1_read_char(void) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
   if (usart == NULL)
     return 0;
@@ -540,8 +496,7 @@ char uart1_read_char(void)
  *
  * @return Received character
  */
-char uart2_read_char(void)
-{
+char uart2_read_char(void) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return 0;
@@ -555,8 +510,7 @@ char uart2_read_char(void)
  *
  * @return Received character
  */
-char uart6_read_char(void)
-{
+char uart6_read_char(void) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
   if (usart == NULL)
     return 0;
@@ -571,8 +525,7 @@ char uart6_read_char(void)
  * @param uart UART instance to check
  * @return Non-zero if data is available, 0 otherwise
  */
-int uart_available(hal_uart_t uart)
-{
+int uart_available(hal_uart_t uart) {
   if (uart == UART1)
     return uart1_available();
   else if (uart == UART2)
@@ -587,8 +540,7 @@ int uart_available(hal_uart_t uart)
  *
  * @return Non-zero if data is available, 0 otherwise
  */
-int uart1_available(void)
-{
+int uart1_available(void) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
   if (usart == NULL)
     return 0;
@@ -600,8 +552,7 @@ int uart1_available(void)
  *
  * @return Non-zero if data is available, 0 otherwise
  */
-int uart2_available(void)
-{
+int uart2_available(void) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return 0;
@@ -613,8 +564,7 @@ int uart2_available(void)
  *
  * @return Non-zero if data is available, 0 otherwise
  */
-int uart6_available(void)
-{
+int uart6_available(void) {
   UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
   if (usart == NULL)
     return 0;
@@ -635,18 +585,15 @@ int uart6_available(void)
  * @param delimiter  Character that terminates the read
  * @return Number of characters read (excluding null terminator)
  */
-uint32_t uart2_read_until(char *buffer, uint32_t maxlen, char delimiter)
-{
+uint32_t uart2_read_until(char *buffer, uint32_t maxlen, char delimiter) {
   uint32_t i = 0;
 
-  while (i < maxlen - 1)
-  {
+  while (i < maxlen - 1) {
     while (!uart2_available())
       ; // Wait until a character is available
 
     char c = uart2_read_char();
-    if (c == delimiter)
-    {
+    if (c == delimiter) {
       break;
     }
 
@@ -656,3 +603,90 @@ uint32_t uart2_read_until(char *buffer, uint32_t maxlen, char delimiter)
   buffer[i] = '\0'; // Null-terminate
   return i;
 }
+
+/*===========================================================================
+ * DMA-backed UART transmit — compiled only when _UART_BACKEND_DMA is defined
+ *===========================================================================*/
+#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+
+/**
+ * @brief DMA configuration for USART2 TX.
+ *
+ * USART2_TX is on DMA1 Stream6, Channel 4 (per STM32F4 datasheet).
+ * The peripheral address points to USART2->DR.
+ * Caller must fill in src_addr and data_count before calling dma_start().
+ */
+static dma_config_t _uart2_dma_tx_cfg = {
+    .controller = DMA_CONTROLLER_1,
+    .stream = 6,
+    .channel = 4,
+    .direction = DMA_DIR_M2P,
+    .src_addr = 0,                  /* set at runtime */
+    .dst_addr = USART2_BASE + 0x04, /* &USART2->DR */
+    .data_count = 0,                /* set at runtime */
+    .src_inc = 1,
+    .dst_inc = 0,
+    .data_width = DMA_DATA_WIDTH_8,
+    .priority = DMA_PRIORITY_HIGH,
+    .circular = 0,
+};
+
+/**
+ * @brief Transmit a buffer over USART2 using DMA (blocking until done).
+ *
+ * Enables USART2 CR3.DMAT so the UART hardware triggers DMA requests.
+ * Waits for the DMA transfer-complete flag before returning.
+ *
+ * @param data   Pointer to the byte buffer to transmit.
+ * @param length Number of bytes to send.
+ */
+void uart2_write_dma(const uint8_t *data, uint16_t length) {
+  if (!data || length == 0)
+    return;
+
+  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  if (usart == NULL)
+    return;
+
+  /* Enable UART DMA TX request */
+  usart->CR3 |= USART_CR3_DMAT;
+
+  /* Configure and launch DMA transfer */
+  _uart2_dma_tx_cfg.src_addr = (uint32_t)data;
+  _uart2_dma_tx_cfg.data_count = length;
+
+  dma_init(&_uart2_dma_tx_cfg);
+  dma_start(&_uart2_dma_tx_cfg);
+
+  /* Poll for completion (TC flag on USART side after DMA completes) */
+  while (!dma_transfer_complete(&_uart2_dma_tx_cfg))
+    ;
+
+  /* Wait for UART shift register to finish */
+  while (!(usart->SR & USART_SR_TC))
+    ;
+
+  dma_clear_flags(&_uart2_dma_tx_cfg);
+
+  /* Disable DMAT after transfer to allow normal polling TX if needed */
+  usart->CR3 &= ~USART_CR3_DMAT;
+}
+
+/**
+ * @brief Transmit a null-terminated string over USART2 using DMA.
+ *
+ * @note The string must remain valid until the transfer completes (no copy).
+ *       For stack-allocated strings consider making a static/global buffer.
+ *
+ * @param s Null-terminated string to transmit.
+ */
+void uart2_write_string_dma(const char *s) {
+  if (!s)
+    return;
+  uint16_t len = 0;
+  while (s[len])
+    len++;
+  uart2_write_dma((const uint8_t *)s, len);
+}
+
+#endif /* _DMA_ENABLED && _UART_BACKEND_DMA */

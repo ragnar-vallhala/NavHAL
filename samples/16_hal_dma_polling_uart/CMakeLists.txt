@@ -15,16 +15,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 message(STATUS "Linker args ${CMAKE_EXE_LINKER_FLAGS}")
 
-add_executable(${SAMPLE} main.c 
-    ${CMAKE_SOURCE_DIR}/tests/main.c 
-    ${CMAKE_SOURCE_DIR}/tests/test_gpio.c 
-    ${CMAKE_SOURCE_DIR}/tests/test_timer.c 
-    ${CMAKE_SOURCE_DIR}/tests/test_clock.c 
-    ${CMAKE_SOURCE_DIR}/tests/test_pwm.c
-    ${CMAKE_SOURCE_DIR}/tests/test_dma.c
-    ${CMAKE_SOURCE_DIR}/tests/navtest_state.c 
-    ${CMAKE_SOURCE_DIR}/tests/stubs.c
-)
+add_executable(${SAMPLE} main.c)
 
 # target_link_libraries(${SAMPLE} hal)
 

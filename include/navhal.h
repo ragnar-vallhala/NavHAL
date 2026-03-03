@@ -48,4 +48,5 @@
 
 #include "common/hal_flash.h"
 
+#include "common/hal_config.h"
 #endif // NAVHAL_H

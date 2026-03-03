@@ -24,6 +24,7 @@
 
 #ifndef CORTEX_M4_UART_H
 #define CORTEX_M4_UART_H
+#include "core/cortex-m4/config.h"
 #include "core/cortex-m4/uart_reg.h"
 #include <stdint.h>
 /**
@@ -36,6 +37,15 @@ typedef enum {
   UART2 = 2, ///< USART2 - APB1 peripheral
   UART6 = 6  ///< USART6 - APB2 peripheral
 } hal_uart_t;
+
+/**
+ * @brief Use DMA for UART transmission.
+ *
+ * @note This option is only available if _DMA_ENABLED is defined.
+ */
+#ifdef _DMA_ENABLED
+#define _UART_BACKEND_DMA
+#endif
 
 /** @defgroup UART_WRITE_MACROS Type-Generic Write Macros
  *  @brief Simplified macros to write different types to UART using `_Generic`.
@@ -59,15 +69,15 @@ typedef enum {
   _Generic((val),                                                              \
       char: uart2_write_char,                                                  \
       signed char: uart2_write_int,                                            \
-      unsigned char: uart2_write_uint,                                          \
+      unsigned char: uart2_write_uint,                                         \
       short: uart2_write_int,                                                  \
-      unsigned short: uart2_write_uint,                                         \
+      unsigned short: uart2_write_uint,                                        \
       int: uart2_write_int,                                                    \
-      unsigned int: uart2_write_uint,                                           \
+      unsigned int: uart2_write_uint,                                          \
       long: uart2_write_int,                                                   \
-      unsigned long: uart2_write_uint,                                          \
+      unsigned long: uart2_write_uint,                                         \
       long long: uart2_write_int,                                              \
-      unsigned long long: uart2_write_uint,                                     \
+      unsigned long long: uart2_write_uint,                                    \
       float: uart2_write_float,                                                \
       double: uart2_write_float,                                               \
       const char *: uart2_write_string,                                        \
@@ -77,15 +87,15 @@ typedef enum {
   _Generic((val),                                                              \
       char: uart1_write_char,                                                  \
       signed char: uart1_write_int,                                            \
-      unsigned char: uart1_write_uint,                                          \
+      unsigned char: uart1_write_uint,                                         \
       short: uart1_write_int,                                                  \
-      unsigned short: uart1_write_uint,                                         \
+      unsigned short: uart1_write_uint,                                        \
       int: uart1_write_int,                                                    \
-      unsigned int: uart1_write_uint,                                           \
+      unsigned int: uart1_write_uint,                                          \
       long: uart1_write_int,                                                   \
-      unsigned long: uart1_write_uint,                                          \
+      unsigned long: uart1_write_uint,                                         \
       long long: uart1_write_int,                                              \
-      unsigned long long: uart1_write_uint,                                     \
+      unsigned long long: uart1_write_uint,                                    \
       float: uart1_write_float,                                                \
       double: uart1_write_float,                                               \
       const char *: uart1_write_string,                                        \
@@ -95,15 +105,15 @@ typedef enum {
   _Generic((val),                                                              \
       char: uart6_write_char,                                                  \
       signed char: uart6_write_int,                                            \
-      unsigned char: uart6_write_uint,                                          \
+      unsigned char: uart6_write_uint,                                         \
       short: uart6_write_int,                                                  \
-      unsigned short: uart6_write_uint,                                         \
+      unsigned short: uart6_write_uint,                                        \
       int: uart6_write_int,                                                    \
-      unsigned int: uart6_write_uint,                                           \
+      unsigned int: uart6_write_uint,                                          \
       long: uart6_write_int,                                                   \
-      unsigned long: uart6_write_uint,                                          \
+      unsigned long: uart6_write_uint,                                         \
       long long: uart6_write_int,                                              \
-      unsigned long long: uart6_write_uint,                                     \
+      unsigned long long: uart6_write_uint,                                    \
       float: uart6_write_float,                                                \
       double: uart6_write_float,                                               \
       const char *: uart6_write_string,                                        \
@@ -150,7 +160,6 @@ void uart_write_char(char c, hal_uart_t uart);
  * @param uart UART instance to use.
  */
 void uart_write_int(int32_t num, hal_uart_t uart);
-
 
 /**
  * @brief Transmit a floating-point number via UART.
@@ -278,5 +287,39 @@ char uart6_read_char(void);
 uint32_t uart2_read_until(char *buffer, uint32_t maxlen, char delimiter);
 
 /** @} */ // end of UART_API
+
+/*---------------------------------------------------------------------------
+ * DMA-backed UART TX — only available when _DMA_ENABLED and
+ * _UART_BACKEND_DMA are both defined.
+ *---------------------------------------------------------------------------*/
+#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+
+/**
+ * @brief Transmit a raw byte buffer over USART2 using DMA.
+ *
+ * Blocking: returns only after the DMA transfer is complete and the
+ * UART shift register has finished clocking out the last byte.
+ *
+ * USART2_TX maps to DMA1 Stream6 Channel4 on STM32F4.
+ *
+ * @param data   Pointer to source buffer (must stay valid until return).
+ * @param length Number of bytes to transmit.
+ *
+ * @ingroup HAL_UART
+ */
+void uart2_write_dma(const uint8_t *data, uint16_t length);
+
+/**
+ * @brief Transmit a null-terminated string over USART2 using DMA.
+ *
+ * Convenience wrapper around uart2_write_dma().
+ *
+ * @param s Null-terminated string (must stay valid until return).
+ *
+ * @ingroup HAL_UART
+ */
+void uart2_write_string_dma(const char *s);
+
+#endif /* _DMA_ENABLED && _UART_BACKEND_DMA */
 
 #endif // !CORTEX_M4_UART_H

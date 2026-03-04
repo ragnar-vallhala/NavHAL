@@ -60,16 +60,16 @@ set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
 # Compiler Flags [UPDATE] thumb mode is on for now, can be removed later and
 # choosen dynamically
 set(CMAKE_C_FLAGS
-"-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb -Wall -O0 -g -std=c11") # C++
+"-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb -Wall -O0 -g -std=c11 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED") # C++
 # standard
 # 11
 
 
 
-set(CMAKE_ASM_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb")
+set(CMAKE_ASM_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16")
 
 if(NOT STANDALONE)
-  set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib") # can be
+  set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib -mfloat-abi=hard -mfpu=fpv4-sp-d16") # can be
                                                                    # later
                                                                    # modified to
                                                                    # use
@@ -79,7 +79,7 @@ if(NOT STANDALONE)
                                                                    # dynamically
 endif()
 if(STANDALONE)
-set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib") # can be
+set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib -mfloat-abi=hard -mfpu=fpv4-sp-d16") # can be
 endif()
 # subdirectories are commented, they will be added as code is added
 if(NOT STANDALONE)
@@ -145,7 +145,7 @@ if(TEST)
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
   add_executable(tests ${TEST_SRC} ${CMAKE_CURRENT_SOURCE_DIR}/src/core/cortex-m4/startup/startup.s)
   target_link_libraries(tests PRIVATE c gcc)
-  set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib")
+  set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib -mfloat-abi=hard -mfpu=fpv4-sp-d16")
   target_compile_options(tests PRIVATE -march=armv7e-m -fno-exceptions 
   -fno-unwind-tables
   -fno-asynchronous-unwind-tables

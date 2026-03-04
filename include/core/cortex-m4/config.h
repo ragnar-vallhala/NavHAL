@@ -6,7 +6,7 @@
 // flag (e.g. from CMake's add_compile_definitions). This avoids redefinition
 // warnings when both the build system and this header enable the same feature.
 #ifndef _FPU_ENABLED
-#define _FPU_ENABLED
+// #define _FPU_ENABLED
 #endif
 
 #ifndef _DMA_ENABLED

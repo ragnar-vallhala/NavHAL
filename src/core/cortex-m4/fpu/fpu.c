@@ -1,8 +1,9 @@
-#include "common/hal_fpu.h"
-
+#include "core/cortex-m4/fpu.h"
+#include <stdint.h>
 #define CPACR (*(volatile uint32_t *)0xE000ED88)
 #define FPCCR (*(volatile uint32_t *)0xE000EF34)
 
+#ifdef _FPU_ENABLED
 void hal_fpu_enable(void) {
   // CPACR: Enable full access to CP10 and CP11
   CPACR |= (0xF << 20);
@@ -14,3 +15,6 @@ void hal_fpu_enable(void) {
   __asm volatile("dsb");
   __asm volatile("isb");
 }
+#else
+void hal_fpu_enable(void) {}
+#endif

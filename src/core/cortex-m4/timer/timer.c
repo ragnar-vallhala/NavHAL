@@ -138,9 +138,7 @@ uint32_t hal_get_micros(void) {
  *
  * @note This handler is intended to be wired into the vector table.
  */
-#ifndef SUBMODULE
 void SysTick_Handler(void) { systick_ticks++; }
-#endif
 
 /**
  * @internal

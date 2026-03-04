@@ -44,6 +44,7 @@ set(STANDALONE
 set(SAMPLE
     ""
     CACHE STRING "Name of the sample to build")
+option(USE_FPU "Enable hardware FPU" ON)
 
 
 # Messages
@@ -57,19 +58,28 @@ set(SRC_BOARD ${CMAKE_CURRENT_SOURCE_DIR}/src/board/${BOARD})
 set(SRC_CORE ${CMAKE_CURRENT_SOURCE_DIR}/src/core)
 set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
 set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
+# FPU Configuration
+if(USE_FPU)
+    set(FPU_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED")
+    message(STATUS "FPU: Hardware enabled")
+else()
+    set(FPU_FLAGS "-mfloat-abi=soft")
+    message(STATUS "FPU: Software emulation")
+endif()
+
 # Compiler Flags [UPDATE] thumb mode is on for now, can be removed later and
 # choosen dynamically
 set(CMAKE_C_FLAGS
-"-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb -Wall -O0 -g -std=c11 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED") # C++
+"-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb -Wall -O0 -g -std=c11 ${FPU_FLAGS}") # C++
 # standard
 # 11
 
 
 
-set(CMAKE_ASM_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16")
+set(CMAKE_ASM_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
 
 if(NOT STANDALONE)
-  set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib -mfloat-abi=hard -mfpu=fpv4-sp-d16") # can be
+  set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}") # can be
                                                                    # later
                                                                    # modified to
                                                                    # use
@@ -79,7 +89,7 @@ if(NOT STANDALONE)
                                                                    # dynamically
 endif()
 if(STANDALONE)
-set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib -mfloat-abi=hard -mfpu=fpv4-sp-d16") # can be
+set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}") # can be
 endif()
 # subdirectories are commented, they will be added as code is added
 if(NOT STANDALONE)

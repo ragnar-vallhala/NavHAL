@@ -18,28 +18,26 @@
 #define NAVTEST_H
 
 #include "core/cortex-m4/uart.h"
-#include <setjmp.h>
 #include <stdint.h>
 
 /* -------------------------------------------------------------------------
  * ANSI color escapes  (define NAVTEST_NO_COLOR before including to disable)
  * ---------------------------------------------------------------------- */
 #ifndef NAVTEST_NO_COLOR
-#  define _NT_RST    "\033[0m"
-#  define _NT_BOLD   "\033[1m"
-#  define _NT_RED    "\033[31m"
-#  define _NT_GREEN  "\033[32m"
-#  define _NT_YELLOW "\033[33m"
-#  define _NT_CYAN   "\033[36m"
+#define _NT_RST "\033[0m"
+#define _NT_BOLD "\033[1m"
+#define _NT_RED "\033[31m"
+#define _NT_GREEN "\033[32m"
+#define _NT_YELLOW "\033[33m"
+#define _NT_CYAN "\033[36m"
 #else
-#  define _NT_RST    ""
-#  define _NT_BOLD   ""
-#  define _NT_RED    ""
-#  define _NT_GREEN  ""
-#  define _NT_YELLOW ""
-#  define _NT_CYAN   ""
+#define _NT_RST ""
+#define _NT_BOLD ""
+#define _NT_RED ""
+#define _NT_GREEN ""
+#define _NT_YELLOW ""
+#define _NT_CYAN ""
 #endif
-
 
 /* -------------------------------------------------------------------------
  * Internal state (defined once in navtest_state.c)
@@ -52,7 +50,6 @@ typedef struct {
 } _NavTestState;
 
 extern _NavTestState _navtest;
-extern jmp_buf _navtest_jmp;
 
 /* -------------------------------------------------------------------------
  * setUp / tearDown — defined as weak no-ops in navtest_state.c
@@ -89,7 +86,6 @@ static inline void _navtest_fail(const char *file, uint32_t line,
   uart2_write(msg);
   uart2_write("\r\n");
   _navtest.failures++;
-  longjmp(_navtest_jmp, 1);
 }
 
 static inline int _navtest_end_impl(void) {
@@ -128,12 +124,13 @@ static inline uint32_t navtest_get_test_count(void) { return _navtest.tests; }
 #define RUN_TEST(fn)                                                           \
   do {                                                                         \
     _navtest.tests++;                                                          \
+    uint32_t _prev_failures = _navtest.failures;                               \
     setUp();                                                                   \
-    uart2_write(_NT_CYAN "  >> " _NT_BOLD #fn _NT_RST "\r\n");               \
-    if (setjmp(_navtest_jmp) == 0) {                                           \
-      fn();                                                                    \
+    uart2_write(_NT_CYAN "  >> " _NT_BOLD #fn _NT_RST "\r\n");                 \
+    fn();                                                                      \
+    if (_navtest.failures == _prev_failures) {                                 \
       _navtest.passes++;                                                       \
-      uart2_write(_NT_BOLD _NT_GREEN "  PASS" _NT_RST "\r\n");               \
+      uart2_write(_NT_BOLD _NT_GREEN "  PASS" _NT_RST "\r\n");                 \
     }                                                                          \
     tearDown();                                                                \
   } while (0)

@@ -19,6 +19,7 @@ hal_uart_int
 hal_uart_dma
 hal_dma_polling_uart
 hal_fpu
+hal_crc
 )
 set(SAMPLE_DIRS
 00_test_sample
@@ -41,6 +42,7 @@ set(SAMPLE_DIRS
 15_hal_uart_dma
 16_hal_dma_polling_uart
 17_hal_fpu
+18_hal_crc
 )
 
 # Check if sample is defined

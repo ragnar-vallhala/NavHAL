@@ -15,8 +15,8 @@
 
 static dma_config_t test_cfg;
 
-/* Setup called before each RUN_TEST */
-void setUp(void) {
+/* Setup called before each RUN_TEST manually */
+static void dma_setUp(void) {
   /* Reset RCC DMA clocks */
   RCC->AHB1ENR &= ~(RCC_AHB1ENR_DMA1EN | RCC_AHB1ENR_DMA2EN);
 
@@ -40,21 +40,24 @@ void setUp(void) {
     ;
 }
 
-void tearDown(void) { /* Cleanup */ }
+static void dma_tearDown(void) { /* Cleanup */ }
 
 void test_dma_clock_enable_dma1(void) {
+  dma_setUp();
   test_cfg.controller = DMA_CONTROLLER_1;
   dma_init(&test_cfg);
   TEST_ASSERT_BITS_HIGH(RCC_AHB1ENR_DMA1EN, RCC->AHB1ENR);
 }
 
 void test_dma_clock_enable_dma2(void) {
+  dma_setUp();
   test_cfg.controller = DMA_CONTROLLER_2;
   dma_init(&test_cfg);
   TEST_ASSERT_BITS_HIGH(RCC_AHB1ENR_DMA2EN, RCC->AHB1ENR);
 }
 
 void test_dma_init_sets_channel(void) {
+  dma_setUp();
   test_cfg.channel = 3;
   dma_init(&test_cfg);
   uint32_t cr = DMA1->STREAM[0].CR;
@@ -62,6 +65,7 @@ void test_dma_init_sets_channel(void) {
 }
 
 void test_dma_init_sets_direction_m2p(void) {
+  dma_setUp();
   test_cfg.direction = DMA_DIR_M2P;
   dma_init(&test_cfg);
   uint32_t cr = DMA1->STREAM[0].CR;
@@ -69,6 +73,7 @@ void test_dma_init_sets_direction_m2p(void) {
 }
 
 void test_dma_init_sets_direction_p2m(void) {
+  dma_setUp();
   test_cfg.direction = DMA_DIR_P2M;
   dma_init(&test_cfg);
   uint32_t cr = DMA1->STREAM[0].CR;
@@ -76,6 +81,7 @@ void test_dma_init_sets_direction_p2m(void) {
 }
 
 void test_dma_init_sets_minc(void) {
+  dma_setUp();
   test_cfg.direction = DMA_DIR_M2P;
   test_cfg.src_inc = 1; /* Source is Memory in M2P */
   dma_init(&test_cfg);
@@ -83,6 +89,7 @@ void test_dma_init_sets_minc(void) {
 }
 
 void test_dma_init_sets_priority(void) {
+  dma_setUp();
   test_cfg.priority = DMA_PRIORITY_HIGH;
   dma_init(&test_cfg);
   uint32_t cr = DMA1->STREAM[0].CR;
@@ -90,12 +97,14 @@ void test_dma_init_sets_priority(void) {
 }
 
 void test_dma_init_sets_ndtr(void) {
+  dma_setUp();
   test_cfg.data_count = 512;
   dma_init(&test_cfg);
   TEST_ASSERT_EQUAL_UINT32(512, DMA1->STREAM[0].NDTR);
 }
 
 void test_dma_init_sets_peripheral_address(void) {
+  dma_setUp();
   test_cfg.direction = DMA_DIR_M2P;
   test_cfg.dst_addr = 0x40011004; /* e.g. USART1->DR */
   dma_init(&test_cfg);
@@ -103,6 +112,7 @@ void test_dma_init_sets_peripheral_address(void) {
 }
 
 void test_dma_init_sets_memory_address(void) {
+  dma_setUp();
   test_cfg.direction = DMA_DIR_M2P;
   test_cfg.src_addr = 0x20001234;
   dma_init(&test_cfg);
@@ -110,6 +120,7 @@ void test_dma_init_sets_memory_address(void) {
 }
 
 void test_dma_start_enables_stream(void) {
+  dma_setUp();
   dma_init(&test_cfg);
   dma_start(&test_cfg);
   TEST_ASSERT_BITS_HIGH(DMA_SxCR_EN, DMA1->STREAM[0].CR);
@@ -117,6 +128,7 @@ void test_dma_start_enables_stream(void) {
 }
 
 void test_dma_stop_disables_stream(void) {
+  dma_setUp();
   dma_init(&test_cfg);
   dma_start(&test_cfg);
   dma_stop(&test_cfg);
@@ -124,12 +136,14 @@ void test_dma_stop_disables_stream(void) {
 }
 
 void test_dma_transfer_complete_returns_zero_before_start(void) {
+  dma_setUp();
   dma_init(&test_cfg);
   dma_clear_flags(&test_cfg);
   TEST_ASSERT_EQUAL_UINT32(0, dma_transfer_complete(&test_cfg));
 }
 
 void test_dma_clear_flags_clears_isr(void) {
+  dma_setUp();
   dma_init(&test_cfg);
   /* Manually setting ISR bits is not possible (read-only), but we can call
      clear and verify we don't crash. Since we can't inject a software interrupt

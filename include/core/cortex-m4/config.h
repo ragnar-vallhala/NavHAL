@@ -12,5 +12,7 @@
 #ifndef _DMA_ENABLED
 #define _DMA_ENABLED
 #endif
-
+#ifndef _CRC_HW_ENABLED
+// #define _CRC_HW_ENABLED
+#endif
 #endif // CORTEX_M4_CONFIG_H

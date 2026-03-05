@@ -10,9 +10,12 @@
 #ifdef _DMA_ENABLED
 #include "test_dma.h"
 #endif
+#include "core/cortex-m4/fpu.h"
+#include "test_crc.h"
 
 static void wait_uart_empty(void) {
-  volatile UARTx_Reg_Typedef *uart2 = (volatile UARTx_Reg_Typedef*)(GET_USARTx_BASE(2));
+  volatile UARTx_Reg_Typedef *uart2 =
+      (volatile UARTx_Reg_Typedef *)(GET_USARTx_BASE(2));
   while (!(uart2->SR & USART_SR_TC))
     ;
 }
@@ -127,6 +130,22 @@ int test_dma_suite(void) {
 }
 #endif
 
+// -------------------- CRC --------------------
+int test_crc_suite(void) {
+  uart2_write("\n=========== CRC TEST START ===========\n");
+  NAVTEST_BEGIN();
+
+  RUN_TEST(test_crc_empty_returns_init);
+  RUN_TEST(test_crc_single_byte);
+  RUN_TEST(test_crc_known_vector);
+  RUN_TEST(test_crc_accumulate_matches_compute);
+  RUN_TEST(test_crc_reset_restores_init);
+
+  uart2_write("=========== CRC TEST END ===========\n");
+  total_test_count += (int)navtest_get_test_count();
+  return NAVTEST_END();
+}
+
 void print_startup_message(void) {
   uart2_write_char(0x1B); // ESC
   uart2_write_char('[');
@@ -150,6 +169,7 @@ void print_startup_message(void) {
 
 int main(void) {
   uart2_init(9600);
+  hal_fpu_enable();
   print_startup_message();
 
   int failed = 0;
@@ -160,6 +180,7 @@ int main(void) {
 #ifdef _DMA_ENABLED
   failed += test_dma_suite();
 #endif
+  failed += test_crc_suite();
 
   uart2_write("\n\n=========== FINAL RESULTS ===========\n\n");
   uart2_write("Total tests run: ");

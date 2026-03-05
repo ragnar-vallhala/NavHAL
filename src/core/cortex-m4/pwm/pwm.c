@@ -19,7 +19,6 @@
  * @param dutyCycle Duty cycle as a fraction (0.0f - 1.0f).
  */
 void hal_pwm_init(PWM_Handle *pwm, uint32_t frequency, float dutyCycle) {
-
   // 1. Get clock
   uint32_t bus_clk = hal_clock_get_apb1clk(); // default for TIM2-TIM5
   uint32_t ppre = ((RCC->CFGR) >> RCC_CFGR_PPRE1_BIT) & 0x7;
@@ -41,7 +40,9 @@ void hal_pwm_init(PWM_Handle *pwm, uint32_t frequency, float dutyCycle) {
   uint32_t ccr = (uint32_t)((float)(arr + 1) * dutyCycle + 0.5f);
   if (ccr > arr)
     ccr = arr;
+
   timer_init(pwm->timer, psc, arr);
+
   timer_set_compare(pwm->timer, pwm->channel, ccr);
 }
 

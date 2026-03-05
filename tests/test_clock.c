@@ -6,6 +6,13 @@
 #include "utils/clock_types.h"
 #include <stdint.h>
 
+static void wait_uart_empty(void) {
+  volatile UARTx_Reg_Typedef *uart2 =
+      (volatile UARTx_Reg_Typedef *)(GET_USARTx_BASE(2));
+  while (!(uart2->SR & USART_SR_TC))
+    ;
+}
+
 // -------------------- Clock Initialization --------------------
 void test_hal_clock_init_hsi(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI,
@@ -13,9 +20,11 @@ void test_hal_clock_init_hsi(void) {
                             .ppre1_div = RCC_CFGR_PPRE_DIV1,
                             .ppre2_div = RCC_CFGR_PPRE_DIV1};
 
+  wait_uart_empty();
   hal_clock_init(&cfg, NULL);
-  
+
   uart2_init(9600);
+
   TEST_ASSERT_EQUAL_UINT32(0, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
 
@@ -24,8 +33,9 @@ void test_hal_clock_init_hse(void) {
                             .hpre_div = RCC_CFGR_HPRE_DIV1,
                             .ppre1_div = RCC_CFGR_PPRE_DIV1,
                             .ppre2_div = RCC_CFGR_PPRE_DIV1};
+  wait_uart_empty();
   hal_clock_init(&cfg, NULL);
-  
+
   uart2_init(9600);
   TEST_ASSERT_EQUAL_UINT32(1, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
@@ -40,8 +50,9 @@ void test_hal_clock_init_pll(void) {
                               .pll_n = 168,
                               .pll_p = 2,
                               .pll_q = 7};
+  wait_uart_empty();
   hal_clock_init(&cfg, &pll_cfg);
-  
+
   uart2_init(9600);
   TEST_ASSERT_EQUAL_UINT32(2, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
@@ -52,8 +63,9 @@ void test_hal_clock_get_sysclk_returns_correct_value_hsi(void) {
                             .hpre_div = RCC_CFGR_HPRE_DIV1,
                             .ppre1_div = RCC_CFGR_PPRE_DIV1,
                             .ppre2_div = RCC_CFGR_PPRE_DIV1};
+  wait_uart_empty();
   hal_clock_init(&cfg, NULL);
-  
+
   uart2_init(9600);
   uint32_t sysclk = hal_clock_get_sysclk();
   TEST_ASSERT_EQUAL_UINT32(16000000, sysclk);
@@ -64,8 +76,9 @@ void test_hal_clock_get_sysclk_returns_correct_value_hse(void) {
                             .hpre_div = RCC_CFGR_HPRE_DIV1,
                             .ppre1_div = RCC_CFGR_PPRE_DIV1,
                             .ppre2_div = RCC_CFGR_PPRE_DIV1};
+  wait_uart_empty();
   hal_clock_init(&cfg, NULL);
-  
+
   uart2_init(9600);
   uint32_t sysclk = hal_clock_get_sysclk();
   TEST_ASSERT_EQUAL_UINT32(8000000, sysclk);
@@ -81,8 +94,9 @@ void test_hal_clock_get_sysclk_returns_correct_value_pll(void) {
                               .pll_n = 168,
                               .pll_p = 2,
                               .pll_q = 7};
+  wait_uart_empty();
   hal_clock_init(&cfg, &pll_cfg);
-  
+
   uart2_init(9600);
   uint32_t sysclk = hal_clock_get_sysclk();
   uint32_t expected = (8000000 / pll_cfg.pll_m) * pll_cfg.pll_n / pll_cfg.pll_p;
@@ -91,18 +105,21 @@ void test_hal_clock_get_sysclk_returns_correct_value_pll(void) {
 
 // -------------------- AHB / APB --------------------
 void test_hal_clock_get_ahbclk_returns_correct_value(void) {
+  wait_uart_empty();
   RCC->CFGR &= ~RCC_CFGR_HPRE_MASK;
   RCC->CFGR |= (0x0 << RCC_CFGR_HPRE_BIT); // divide by 1
   TEST_ASSERT_EQUAL_UINT32(hal_clock_get_sysclk(), hal_clock_get_ahbclk());
 }
 
 void test_hal_clock_get_apb1clk_returns_correct_value(void) {
+  wait_uart_empty();
   RCC->CFGR &= ~RCC_CFGR_PPRE1_MASK;
   RCC->CFGR |= (0x5 << RCC_CFGR_PPRE1_BIT); // divide by 4
   TEST_ASSERT_EQUAL_UINT32(hal_clock_get_sysclk() / 4, hal_clock_get_apb1clk());
 }
 
 void test_hal_clock_get_apb2clk_returns_correct_value(void) {
+  wait_uart_empty();
   RCC->CFGR &= ~RCC_CFGR_PPRE2_MASK;
   RCC->CFGR |= (0x4 << RCC_CFGR_PPRE2_BIT); // divide by 2
   TEST_ASSERT_EQUAL_UINT32(hal_clock_get_sysclk() / 2, hal_clock_get_apb2clk());

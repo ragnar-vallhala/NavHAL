@@ -54,10 +54,11 @@ void _toggle_pll_clock(uint8_t state) {
 
 void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg) {
   // Enable and wait for selected clock source
-  if (cfg->source == HAL_CLOCK_SOURCE_HSE)
+  if (cfg->source == HAL_CLOCK_SOURCE_HSE) {
     _toggle_hse_clock(RCC_ON);
-  else if (cfg->source == HAL_CLOCK_SOURCE_HSI)
+  } else if (cfg->source == HAL_CLOCK_SOURCE_HSI) {
     _toggle_hsi_clock(RCC_ON);
+  }
 
   // PLL configuration and enabling (if PLL is selected)
   else if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
@@ -84,11 +85,15 @@ void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg) {
     _toggle_pll_clock(RCC_ON);
   }
 
-  // Configure flash latency (hardcoded 5 WS here, ideally adapt to SYSCLK)
+  // Configure flash latency based on target clock
   volatile uint32_t *const FLASH_ACR =
       (volatile uint32_t *)(FLASH_INTERFACE_REGISTER);
-  (*FLASH_ACR) &= ~(0x7 << FLASH_ACR_LATENCY_BIT); // Clear latency bits
-  (*FLASH_ACR) |= (5 << FLASH_ACR_LATENCY_BIT);    // Set to 5 wait states
+
+  // When increasing frequency (switching to PLL), increase wait states FIRST
+  if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
+    (*FLASH_ACR) &= ~(0x7 << FLASH_ACR_LATENCY_BIT);
+    (*FLASH_ACR) |= (2 << FLASH_ACR_LATENCY_BIT);
+  }
 
   // Configure AHB, APB1, APB2 prescalers
   (RCC->CFGR) &=
@@ -115,6 +120,13 @@ void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg) {
     (RCC->CFGR) |= (2 << RCC_CFGR_SW_BIT); // Select PLL
     while ((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 2)
       ;
+  }
+
+  // When decreasing frequency (switching from PLL to HSI/HSE), decrease wait
+  // states AFTER
+  if (cfg->source != HAL_CLOCK_SOURCE_PLL) {
+    (*FLASH_ACR) &= ~(0x7 << FLASH_ACR_LATENCY_BIT);
+    (*FLASH_ACR) |= (0 << FLASH_ACR_LATENCY_BIT);
   }
 }
 

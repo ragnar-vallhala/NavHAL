@@ -13,6 +13,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c
 ${CMAKE_CURRENT_SOURCE_DIR}/flash/flash.c
 ${CMAKE_CURRENT_SOURCE_DIR}/dma/dma.c
 ${CMAKE_CURRENT_SOURCE_DIR}/fpu/fpu.c
+${CMAKE_CURRENT_SOURCE_DIR}/crc/crc.c
 )
 
 target_link_libraries(hal gcc common)

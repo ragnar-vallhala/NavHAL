@@ -49,4 +49,7 @@
 #include "common/hal_fpu.h"
 
 #include "common/hal_config.h"
+
+#include "common/hal_crc.h"
+
 #endif // NAVHAL_H

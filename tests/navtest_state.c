@@ -11,7 +11,6 @@
 
 /* Global state */
 _NavTestState _navtest = {0, 0, 0};
-jmp_buf _navtest_jmp;
 
 /* Default setUp / tearDown — weak so any test file can override */
 __attribute__((weak)) void setUp(void) {}

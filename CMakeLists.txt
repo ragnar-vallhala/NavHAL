@@ -178,7 +178,7 @@ if(TEST)
    message(STATUS "Selected flasher: ${FLASHER}")
    message(STATUS "Selected flash address: ${FLASH_ADDRESS}")
    
-   add_custom_target(flash
+  add_custom_target(flash
      COMMAND ${CMAKE_OBJCOPY} -O binary tests tests.bin
      COMMAND ${FLASHER} write tests.bin ${FLASH_ADDRESS}
      DEPENDS tests

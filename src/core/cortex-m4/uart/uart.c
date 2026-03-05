@@ -641,6 +641,17 @@ static dma_config_t _uart2_dma_tx_cfg = {
  * @param data   Pointer to the byte buffer to transmit.
  * @param length Number of bytes to send.
  */
+/**
+ * @brief Transmit a buffer over USART2 using DMA (blocking until done).
+ *
+ * dma_init() is called only on the FIRST invocation so we never hit its
+ * blocking while(EN) spin from inside SysTick_Handler.  Subsequent calls
+ * wait for the previous transfer to finish (TC flag set), then reload
+ * NDTR / M0AR and re-enable the stream directly.
+ *
+ * @param data   Pointer to the byte buffer to transmit.
+ * @param length Number of bytes to send.
+ */
 void uart2_write_dma(const uint8_t *data, uint16_t length) {
   if (!data || length == 0)
     return;
@@ -649,22 +660,49 @@ void uart2_write_dma(const uint8_t *data, uint16_t length) {
   if (usart == NULL)
     return;
 
-  /* Enable UART DMA TX request */
+  /* Enable UART DMA TX request once */
   usart->CR3 |= USART_CR3_DMAT;
 
-  /* Configure and launch DMA transfer */
-  _uart2_dma_tx_cfg.src_addr = (uint32_t)data;
-  _uart2_dma_tx_cfg.data_count = length;
+  /* --- First-time init -------------------------------------------------- */
+  static uint8_t s_dma_initialised = 0;
+  if (!s_dma_initialised) {
+    _uart2_dma_tx_cfg.src_addr = (uint32_t)data;
+    _uart2_dma_tx_cfg.data_count = length;
+    dma_init(&_uart2_dma_tx_cfg);        /* sets up CR, enables TCIE     */
+    dma_clear_flags(&_uart2_dma_tx_cfg); /* clear stale flags             */
+    hal_enable_interrupt(DMA1_Stream6_IRQn);
+    s_dma_initialised = 1;
+  } else {
+    /* --- Subsequent calls: restart without blocking dma_init() ---------- */
+    /* The stream must be disabled before touching NDTR/M0AR.              */
+    /* We wait for TC (non-blocking guard) instead of waiting for EN=0,   */
+    /* because we know the previous transfer completed (read_lock was 0).  */
+    DMA_Stream_Typedef *s = &DMA1->STREAM[6];
 
-  dma_init(&_uart2_dma_tx_cfg);
+    /* Disable stream — stream finishes quickly after TC, so this should   */
+    /* clear almost instantly.  Hard-cap the spin to avoid ISR lockup.     */
+    s->CR &= ~DMA_SxCR_EN;
+    uint32_t guard = 0;
+    while ((s->CR & DMA_SxCR_EN) && guard++ < 1000u)
+      ;
+    /* If the stream is still somehow active after the guard, abort this   */
+    /* flush and let the next SysTick pick it up.                          */
+    if (s->CR & DMA_SxCR_EN)
+      return;
 
-  /* Enable DMA interrupt in NVIC before starting */
+    dma_clear_flags(&_uart2_dma_tx_cfg);
+
+    /* Reload transfer parameters */
+    s->M0AR = (uint32_t)data;
+    s->NDTR = length;
+
+    /* Re-enable TCIE in case it was cleared, then start */
+    s->CR |= DMA_SxCR_TCIE;
+  }
+
+  /* Enable DMA interrupt and start the transfer */
   hal_enable_interrupt(DMA1_Stream6_IRQn);
-
   dma_start(&_uart2_dma_tx_cfg);
-
-  /* Note: Non-blocking. Caller must ensure buffer remains valid until transfer
-   * completes. */
 }
 
 /**

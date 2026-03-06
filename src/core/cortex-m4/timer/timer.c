@@ -266,9 +266,17 @@ uint32_t timer_get_frequency(hal_timer_t timer) {
     return 0;
 
   // 1. Get clock
-  uint32_t timer_clk = hal_clock_get_apb1clk(); // default for TIM2-TIM5
+  uint32_t timer_clk;
+
+  uint32_t ppre1 = (RCC->CFGR >> RCC_CFGR_PPRE1_BIT) & 0x7;
+  uint32_t ppre2 = (RCC->CFGR >> RCC_CFGR_PPRE2_BIT) & 0x7;
+
   if (timer == TIM1 || timer == TIM9 || timer == TIM10 || timer == TIM11) {
-    timer_clk = hal_clock_get_apb2clk(); // For advanced timers
+    uint32_t apb2 = hal_clock_get_apb2clk();
+    timer_clk = (ppre2 == 0) ? apb2 : (apb2 * 2);
+  } else {
+    uint32_t apb1 = hal_clock_get_apb1clk();
+    timer_clk = (ppre1 == 0) ? apb1 : (apb1 * 2);
   }
 
   // 2. Get prescaler and ARR

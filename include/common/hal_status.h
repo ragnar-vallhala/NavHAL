@@ -19,6 +19,6 @@
 #define STATUS_H
 
 #define SUCCESS 0   /**< Indicates successful operation. */
-#define FAILURE -1  /**< Indicates failed operation. */
+#define FAILURE 1  /**< Indicates failed operation. */
 
 #endif // !STATUS_H

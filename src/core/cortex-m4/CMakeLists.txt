@@ -17,3 +17,4 @@ ${CMAKE_CURRENT_SOURCE_DIR}/crc/crc.c
 )
 
 target_link_libraries(hal gcc common)
+target_compile_definitions(hal PUBLIC _DMA_ENABLED)

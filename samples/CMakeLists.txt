@@ -1,6 +1,6 @@
-set(AVAILABLE_SAMPLES 
+set(AVAILABLE_SAMPLES
 test_sample
-no_hal_blink 
+no_hal_blink
 hal_blink
 hal_pupd
 no_hal_uart_tx
@@ -13,6 +13,7 @@ no_hal_pwm
 hal_clock
 no_hal_i2c
 hal_i2c
+hal_dma_i2c
 no_hal_flash
 hal_flash
 hal_uart_int
@@ -23,7 +24,7 @@ hal_crc
 )
 set(SAMPLE_DIRS
 00_test_sample
-01_no_hal_blink 
+01_no_hal_blink
 01_hal_blink
 02_hal_pupd
 03_no_hal_uart_tx
@@ -36,6 +37,7 @@ set(SAMPLE_DIRS
 09_hal_clock
 10_no_hal_i2c
 11_hal_i2c
+19_hal_dma_i2c
 12_no_hal_flash
 13_hal_flash
 14_hal_uart_int

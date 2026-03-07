@@ -60,7 +60,7 @@ set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
 set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
 # FPU Configuration
 if(USE_FPU)
-    set(FPU_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED")
+    set(FPU_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED -D_DMA_ENABLED")
     message(STATUS "FPU: Hardware enabled")
 else()
     set(FPU_FLAGS "-mfloat-abi=soft")

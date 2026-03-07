@@ -19,8 +19,132 @@ static uint8_t __i2c_init_status = 0;
 
 // Initializes the I2C peripheral
 
+int _wait_flag(volatile uint32_t *reg, uint32_t mask);
+
 uint8_t hal_i2c_get_init_status(void) { return __i2c_init_status; }
 
+#ifdef _DMA_ENABLED
+#include "core/cortex-m4/interrupt.h"
+
+static void (*_i2c_dma_rx_callback)(void) = NULL;
+static dma_config_t _active_i2c_dma_config;
+
+hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
+                                       uint8_t reg, const dma_config_t *dma_cfg,
+                                       void (*callback)(void)) {
+  I2C_Reg_Typedef *I2Cx =
+      I2C_GET_BASE(bus); // Changed get_i2c_base to I2C_GET_BASE
+  if (!I2Cx)
+    return HAL_I2C_ERR_REINIT;
+
+  int timeout = TIMEOUT;
+  while ((I2Cx->SR2 & I2C_SR2_BUSY) && --timeout) {
+  }
+  if (timeout == 0)
+    return HAL_I2C_ERR_BUS;
+
+  /* START -> DEV_ADDR(W) -> REG_ADDR */
+  I2Cx->CR1 |= I2C_CR1_START_MASK;
+  if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_SB_MASK))
+    return HAL_I2C_ERR_TIMEOUT;
+
+  I2Cx->DR = (dev_addr << 1) & ~0x01; // Write
+  if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_ADDR_MASK))
+    return HAL_I2C_ERR_TIMEOUT;
+
+  (void)I2Cx->SR1;
+  (void)I2Cx->SR2; // Clear ADDR
+
+  if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_TXE_MASK))
+    return HAL_I2C_ERR_TIMEOUT;
+  I2Cx->DR = reg;
+  if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_BTF_MASK))
+    return HAL_I2C_ERR_TIMEOUT;
+
+  /* RESTART -> DEV_ADDR(R) */
+  I2Cx->CR1 |= I2C_CR1_START_MASK;
+  if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_SB_MASK))
+    return HAL_I2C_ERR_TIMEOUT;
+
+  I2Cx->DR = (dev_addr << 1) | 0x01; // Read
+  if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_ADDR_MASK))
+    return HAL_I2C_ERR_TIMEOUT;
+
+  /* Now switch to DMA for the remaining RX transaction */
+  _i2c_dma_rx_callback = callback;
+
+  // Make a local copy to know what flags to clear during interrupt
+  _active_i2c_dma_config = *dma_cfg;
+
+  // Init/Start the DMA (CR, NDTR, M0AR config + Enable)
+  dma_init(&_active_i2c_dma_config);
+
+  // We need to enable the specific DMA channel interrupt to process the
+  // complete callback
+  if (_active_i2c_dma_config.controller == DMA_CONTROLLER_1) {
+    if (_active_i2c_dma_config.stream == 0)
+      hal_enable_interrupt(DMA1_Stream0_IRQn);
+    else if (_active_i2c_dma_config.stream == 5)
+      hal_enable_interrupt(DMA1_Stream5_IRQn);
+  }
+
+  dma_start(&_active_i2c_dma_config);
+
+  // Set ACK to ensure we pull data normally until DMA flags LAST
+  I2Cx->CR1 |= I2C_CR1_ACK_MASK;
+  // I2C DMA specific setup: Enable DMAEN in CR2 + Enable LAST for terminating
+  // NACK
+  I2Cx->CR2 |= I2C_CR2_LAST; // LAST bit
+  I2Cx->CR2 |= I2C_CR2_DMAEN;
+
+  (void)I2Cx->SR1;
+  (void)I2Cx->SR2; // Clear ADDR to release clock stretching and let DMA read
+
+  return HAL_I2C_OK;
+}
+
+// Global IRQ handlers multiplexed for DMA callback trigger
+void DMA1_Stream0_IRQHandler(void) {
+  if (dma_transfer_complete(&_active_i2c_dma_config)) {
+    dma_clear_flags(&_active_i2c_dma_config);
+
+    // Stop and Disable I2C DMA gracefully
+    I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(I2C1); // Map logic for DMA1_Stream0
+    if (I2Cx) {
+      I2Cx->CR1 |=
+          I2C_CR1_STOP_MASK; // Changed I2C_CR1_STOP to I2C_CR1_STOP_MASK
+      I2Cx->CR2 &=
+          ~I2C_CR2_DMAEN; // Changed I2C_CR2_DMAEN to I2C_CR2_DMAEN_MASK
+    }
+
+    // Fire user callback
+    if (_i2c_dma_rx_callback) {
+      _i2c_dma_rx_callback();
+    }
+  }
+}
+
+void DMA1_Stream5_IRQHandler(void) {
+  if (dma_transfer_complete(&_active_i2c_dma_config)) {
+    dma_clear_flags(&_active_i2c_dma_config);
+
+    // Stop and Disable I2C DMA gracefully
+    I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(I2C1); // Map logic for DMA1_Stream5
+    if (I2Cx) {
+      I2Cx->CR1 |=
+          I2C_CR1_STOP_MASK; // Changed I2C_CR1_STOP to I2C_CR1_STOP_MASK
+      I2Cx->CR2 &=
+          ~I2C_CR2_DMAEN; // Changed I2C_CR2_DMAEN to I2C_CR2_DMAEN_MASK
+    }
+
+    // Fire user callback
+    if (_i2c_dma_rx_callback) {
+      _i2c_dma_rx_callback();
+    }
+  }
+}
+
+#endif
 hal_i2c_status_t hal_i2c_init(hal_i2c_bus_t bus, hal_i2c_config_t *config) {
   if (__i2c_init_status & (1 << bus))
     return HAL_I2C_ERR_REINIT; // avoid reintialization

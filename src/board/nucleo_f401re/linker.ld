@@ -21,6 +21,11 @@ SECTIONS {
     
   } > FLASH
 
+  /DISCARD/ :
+  {
+      *(.ARM.extab* .gnu.linkonce.armextab.*)
+      *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+  }
 
   .data : AT (ADDR(.text) + SIZEOF(.text)) {
     _sdata = .;

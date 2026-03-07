@@ -42,6 +42,8 @@
 .global TIM4_IRQHandler 
 .global Default_Handler
 .global USART2_IRQHandler
+.global DMA1_Stream0_IRQHandler
+.global DMA1_Stream5_IRQHandler
 .global DMA1_Stream6_IRQHandler
 
 /**
@@ -79,12 +81,12 @@
     .word  Default_Handler            /* 8. EXTI Line2 */
     .word  Default_Handler            /* 9. EXTI Line3 */
     .word  Default_Handler            /* 10. EXTI Line4 */
-    .word  Default_Handler            /* 11. DMA1 Stream 0 */
+    .word  DMA1_Stream0_IRQHandler    /* 11. DMA1 Stream 0 */
     .word  Default_Handler            /* 12. DMA1 Stream 1 */
     .word  Default_Handler            /* 13. DMA1 Stream 2 */
     .word  Default_Handler            /* 14. DMA1 Stream 3 */
     .word  Default_Handler            /* 15. DMA1 Stream 4 */
-    .word  Default_Handler            /* 16. DMA1 Stream 5 */
+    .word  DMA1_Stream5_IRQHandler    /* 16. DMA1 Stream 5 */
     .word  DMA1_Stream6_IRQHandler      /* 17. DMA1 Stream 6 */
     .word  Default_Handler            /* 18. ADC1 */
     .word  0                        /* 19. Reserved */

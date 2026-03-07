@@ -27,28 +27,28 @@
  * @brief I²C operation status codes.
  */
 typedef enum {
-    HAL_I2C_OK = 0,          /**< Operation successful */
-    HAL_I2C_ERR_TIMEOUT,     /**< Timeout occurred */
-    HAL_I2C_ERR_BUS,         /**< Bus error */
-    HAL_I2C_ERR_NACK,        /**< NACK received */
-    HAL_I2C_ERR_REINIT       /**< Reinitialization required */
+  HAL_I2C_OK = 0,      /**< Operation successful */
+  HAL_I2C_ERR_TIMEOUT, /**< Timeout occurred */
+  HAL_I2C_ERR_BUS,     /**< Bus error */
+  HAL_I2C_ERR_NACK,    /**< NACK received */
+  HAL_I2C_ERR_REINIT   /**< Reinitialization required */
 } hal_i2c_status_t;
 
 /**
  * @brief Supported I²C bus instances.
  */
 typedef enum {
-    I2C1 = 0, /**< I²C bus 1 */
-    I2C2 = 1, /**< I²C bus 2 */
-    I2C3 = 2  /**< I²C bus 3 */
+  I2C1 = 0, /**< I²C bus 1 */
+  I2C2 = 1, /**< I²C bus 2 */
+  I2C3 = 2  /**< I²C bus 3 */
 } hal_i2c_bus_t;
 
 /**
  * @brief I²C speed modes.
  */
 typedef enum {
-    STANDARD_MODE = 0, /**< 100 kHz standard mode */
-    FAST_MODE = 1      /**< 400 kHz fast mode */
+  STANDARD_MODE = 0, /**< 100 kHz standard mode */
+  FAST_MODE = 1      /**< 400 kHz fast mode */
 } hal_i2c_speed_t;
 
 /** Master mode identifier */
@@ -61,9 +61,9 @@ typedef enum {
  * @brief I²C configuration structure.
  */
 typedef struct {
-    hal_i2c_speed_t clock_speed; /**< Clock speed in Hz */
-    uint8_t own_address;         /**< 7-bit device address (0 if master) */
-    bool acknowledge;            /**< Enable/disable ACK */
+  hal_i2c_speed_t clock_speed; /**< Clock speed in Hz */
+  uint8_t own_address;         /**< 7-bit device address (0 if master) */
+  bool acknowledge;            /**< Enable/disable ACK */
 } hal_i2c_config_t;
 
 /**
@@ -113,6 +113,30 @@ hal_i2c_status_t hal_i2c_read(uint8_t bus, uint8_t dev_addr, uint8_t *data,
 hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
                                     const uint8_t *tx_data, uint16_t tx_len,
                                     uint8_t *rx_data, uint16_t rx_len);
+
+#ifdef _DMA_ENABLED
+#include "core/cortex-m4/dma.h"
+
+/**
+ * @brief Write to a device register and read back data using DMA.
+ *
+ * This function triggers an I2C transaction sequence for reading registers.
+ * Once the register address has been written in polled mode, the read sequence
+ * is handed off to the DMA stream specified in the \p dma_cfg. The function
+ * returns immediately. When the transfer completes, the provided \p callback is
+ * fired.
+ *
+ * @param bus The I²C bus instance.
+ * @param dev_addr The 7-bit address of the target device.
+ * @param reg The target device register address.
+ * @param dma_cfg Pointer to a completely populated DMA configuration block.
+ * @param callback The function to execute once the DMA stream completes.
+ * @return Status code indicating successful sequence initiation.
+ */
+hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
+                                       uint8_t reg, const dma_config_t *dma_cfg,
+                                       void (*callback)(void));
+#endif
 
 /**
  * @brief Get the initialization status of the I²C peripheral.

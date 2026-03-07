@@ -1,4 +1,4 @@
-include_directories(${CMAKE_SOURCE_DIR}/include)
+# Use target-based include to ensure NavHAL headers are prioritized even when built as submodule
 
 add_library(hal 
 STATIC
@@ -17,4 +17,5 @@ ${CMAKE_CURRENT_SOURCE_DIR}/crc/crc.c
 )
 
 target_link_libraries(hal gcc common)
+target_include_directories(hal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../../include)
 target_compile_definitions(hal PUBLIC _DMA_ENABLED)

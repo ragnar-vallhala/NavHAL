@@ -21,6 +21,7 @@
 #ifndef CORTEX_M4_GPIO_REG_H
 #define CORTEX_M4_GPIO_REG_H
 
+#include "common/hal_types.h"
 #include "utils/types.h"
 #include <stdint.h>
 
@@ -41,16 +42,16 @@
  * - AFRH    : Alternate function high register
  */
 typedef struct {
-    __IO uint32_t MODER;   /**< GPIO port mode register */
-    __IO uint32_t OTYPER;  /**< GPIO output type register */
-    __IO uint32_t OSPEEDR; /**< GPIO output speed register */
-    __IO uint32_t PUPDR;   /**< GPIO pull-up/pull-down register */
-    __IO uint32_t IDR;     /**< GPIO input data register */
-    __IO uint32_t ODR;     /**< GPIO output data register */
-    __IO uint32_t BSRR;    /**< GPIO bit set/reset register */
-    __IO uint32_t LCKR;    /**< GPIO configuration lock register */
-    __IO uint32_t AFRL;    /**< GPIO alternate function low register */
-    __IO uint32_t AFRH;    /**< GPIO alternate function high register */
+  __IO uint32_t MODER;   /**< GPIO port mode register */
+  __IO uint32_t OTYPER;  /**< GPIO output type register */
+  __IO uint32_t OSPEEDR; /**< GPIO output speed register */
+  __IO uint32_t PUPDR;   /**< GPIO pull-up/pull-down register */
+  __IO uint32_t IDR;     /**< GPIO input data register */
+  __IO uint32_t ODR;     /**< GPIO output data register */
+  __IO uint32_t BSRR;    /**< GPIO bit set/reset register */
+  __IO uint32_t LCKR;    /**< GPIO configuration lock register */
+  __IO uint32_t AFRL;    /**< GPIO alternate function low register */
+  __IO uint32_t AFRH;    /**< GPIO alternate function high register */
 } GPIOx_Typedef;
 
 /** Base addresses for GPIO ports */
@@ -65,7 +66,7 @@ typedef struct {
 #define GPIO_GET_PORT_NUMBER(n) (n / 16 == 5 ? 7 : n / 16)
 
 /** Get pointer to GPIO port structure from absolute pin number */
-#define GPIO_GET_PORT(n) \
+#define GPIO_GET_PORT(n)                                                       \
   ((GPIOx_Typedef *)(GPIOA_BASE_ADDR + ((GPIO_GET_PORT_NUMBER(n)) * 0x400)))
 
 /** Get pin number within the port from absolute pin number */

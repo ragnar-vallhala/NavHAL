@@ -24,7 +24,8 @@
 #ifndef CORTEX_M4_I2C_REG_H
 #define CORTEX_M4_I2C_REG_H
 
-#include "utils/types.h" /**< For __IO macro */
+#include "common/hal_types.h"
+#include "utils/types.h"
 #include <stdint.h>
 
 /**

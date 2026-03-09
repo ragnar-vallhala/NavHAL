@@ -52,6 +52,8 @@ void hal_systick_set_callback(void (*cb)(void));
 
 // General Purpose Timer (TIMx) Initialization & Control
 void timer_init(hal_timer_t timer, uint32_t prescaler, uint32_t auto_reload);
+void timer_init_freq(hal_timer_t timer, uint32_t freq);
+
 void timer_start(hal_timer_t timer);
 void timer_stop(hal_timer_t timer);
 void timer_reset(hal_timer_t timer);

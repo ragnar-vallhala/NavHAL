@@ -45,7 +45,7 @@ typedef struct {
   ((volatile UARTx_Reg_Typedef *)(n == 1 ? (USART1_BASE)                       \
                                          : (n == 2 ? (USART2_BASE)             \
                                                    : (n == 6 ? (USART6_BASE)   \
-                                                              : (0)))))
+                                                             : (0)))))
 
 /* Clock enable bits */
 #define RCC_APB1ENR_USART2EN (1 << 17)
@@ -65,6 +65,10 @@ typedef struct {
 #define USART_SR_TXE (1 << 7)  ///< Transmit Data Register Empty
 #define USART_SR_RXNE (1 << 5) ///< Read Data Register Not Empty
 #define USART_SR_TC (1 << 6)   ///< Transmission Complete
+#define USART_SR_PE (1 << 0)   ///< Parity Error
+#define USART_SR_FE (1 << 1)   ///< Framing Error
+#define USART_SR_NE (1 << 2)   ///< Noise Error
+#define USART_SR_ORE (1 << 3)  ///< Overrun Error
 
 /* CR3 DMA enable bits (only meaningful when _DMA_ENABLED and _UART_BACKEND_DMA
  * are defined) */

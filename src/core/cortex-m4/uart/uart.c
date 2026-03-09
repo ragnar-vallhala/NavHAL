@@ -135,7 +135,7 @@ void uart_write_string(const char *s, hal_uart_t uart) {
  * @param baudrate Desired communication speed in bits per second
  */
 void uart1_init(uint32_t baudrate) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
   if (usart == NULL)
     return;
   hal_gpio_set_alternate_function(GPIO_PA09, GPIO_AF07);
@@ -158,7 +158,7 @@ void uart1_init(uint32_t baudrate) {
  * @param baudrate Desired communication speed in bits per second
  */
 void uart6_init(uint32_t baudrate) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
   if (usart == NULL)
     return;
   hal_gpio_set_alternate_function(GPIO_PC06, GPIO_AF07);
@@ -181,7 +181,7 @@ void uart6_init(uint32_t baudrate) {
  * @param baudrate Desired communication speed in bits per second
  */
 void uart2_init(uint32_t baudrate) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return;
   RCC->APB1ENR |= RCC_APB1ENR_USART2EN;                  // Enable USART2 clock
@@ -206,7 +206,7 @@ void uart2_init(uint32_t baudrate) {
  * @param c Character to transmit
  */
 void uart2_write_char(char c) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return;
 #ifdef TEST
@@ -226,7 +226,7 @@ void uart2_write_char(char c) {
  * @param c Character to transmit
  */
 void uart1_write_char(char c) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
   if (usart == NULL)
     return;
   while (!(usart->SR & USART_SR_TXE))
@@ -240,7 +240,7 @@ void uart1_write_char(char c) {
  * @param c Character to transmit
  */
 void uart6_write_char(char c) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
   if (usart == NULL)
     return;
   while (!(usart->SR & USART_SR_TXE))
@@ -484,7 +484,7 @@ char uart_read_char(hal_uart_t uart) {
  * @return Received character
  */
 char uart1_read_char(void) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
   if (usart == NULL)
     return 0;
   while (!(usart->SR & USART_SR_RXNE))
@@ -498,9 +498,20 @@ char uart1_read_char(void) {
  * @return Received character
  */
 char uart2_read_char(void) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return 0;
+
+  // Check for errors (Overrun, Noise, Framing, Parity)
+  // If any error occurs, the RXNE might not be set as expected,
+  // or the status register might need clearing to receive next byte.
+  uint32_t status = usart->SR;
+  if (status & (USART_SR_ORE | USART_SR_NE | USART_SR_FE | USART_SR_PE)) {
+    // Reading SR then DR clears these flags on STM32F4
+    (void)usart->DR;
+    return 0;
+  }
+
   while (!(usart->SR & USART_SR_RXNE))
     ;
   return usart->DR;
@@ -512,7 +523,7 @@ char uart2_read_char(void) {
  * @return Received character
  */
 char uart6_read_char(void) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
   if (usart == NULL)
     return 0;
   while (!(usart->SR & USART_SR_RXNE))
@@ -542,7 +553,7 @@ int uart_available(hal_uart_t uart) {
  * @return Non-zero if data is available, 0 otherwise
  */
 int uart1_available(void) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
   if (usart == NULL)
     return 0;
   return (usart->SR & USART_SR_RXNE);
@@ -554,7 +565,7 @@ int uart1_available(void) {
  * @return Non-zero if data is available, 0 otherwise
  */
 int uart2_available(void) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return 0;
   return (usart->SR & USART_SR_RXNE);
@@ -566,7 +577,7 @@ int uart2_available(void) {
  * @return Non-zero if data is available, 0 otherwise
  */
 int uart6_available(void) {
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(6);
   if (usart == NULL)
     return 0;
   return (usart->SR & USART_SR_RXNE);
@@ -656,7 +667,7 @@ void uart2_write_dma(const uint8_t *data, uint16_t length) {
   if (!data || length == 0)
     return;
 
-  UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
   if (usart == NULL)
     return;
 

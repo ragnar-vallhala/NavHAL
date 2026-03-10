@@ -310,6 +310,17 @@ uint32_t uart2_read_until(char *buffer, uint32_t maxlen, char delimiter);
 void uart2_write_dma(const uint8_t *data, uint16_t length);
 
 /**
+ * @brief Initialize USART1 for DMA-based reception.
+ *
+ * Sets up the DMA2 Stream 2 Channel 4 in circular mode to fill the provided
+ * buffer.
+ *
+ * @param buffer Destination buffer for received bytes.
+ * @param length Size of the buffer.
+ */
+void uart1_init_dma_rx(uint8_t *buffer, uint16_t length, uint32_t baudrate);
+
+/**
  * @brief Transmit a null-terminated string over USART2 using DMA.
  *
  * Convenience wrapper around uart2_write_dma().

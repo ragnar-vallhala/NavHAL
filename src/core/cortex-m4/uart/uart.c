@@ -733,4 +733,48 @@ void uart2_write_string_dma(const char *s) {
   uart2_write_dma((const uint8_t *)s, len);
 }
 
+static dma_config_t _uart1_dma_rx_cfg = {
+    .controller = DMA_CONTROLLER_2,
+    .stream = 2,
+    .channel = 4,
+    .direction = DMA_DIR_P2M,
+    .src_addr = USART1_BASE + 0x04, /* &USART1->DR */
+    .dst_addr = 0,                  /* set at runtime */
+    .data_count = 0,                /* set at runtime */
+    .src_inc = 0,
+    .dst_inc = 1,
+    .data_width = DMA_DATA_WIDTH_8,
+    .priority = DMA_PRIORITY_MEDIUM,
+    .circular = 1,
+};
+
+void uart1_init_dma_rx(uint8_t *buffer, uint16_t length, uint32_t baudrate) {
+  if (!buffer || length == 0)
+    return;
+
+  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
+  if (usart == NULL)
+    return;
+
+  /* Peripheral init */
+  RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+  hal_gpio_set_alternate_function(GPIO_PA09, GPIO_AF07); // TX (standard)
+  hal_gpio_set_alternate_function(GPIO_PA10, GPIO_AF07); // RX
+
+  /* Configure Baud Rate */
+  usart->BRR = (hal_clock_get_apb2clk() + (baudrate / 2)) / baudrate;
+
+  /* Setup DMA Transfer */
+  _uart1_dma_rx_cfg.dst_addr = (uint32_t)buffer;
+  _uart1_dma_rx_cfg.data_count = length;
+
+  dma_init(&_uart1_dma_rx_cfg);
+
+  /* Enable UART DMA RX request */
+  usart->CR3 |= USART_CR3_DMAR;
+  usart->CR1 |= USART_CR1_RE | USART_CR1_UE;
+
+  dma_start(&_uart1_dma_rx_cfg);
+}
+
 #endif /* _DMA_ENABLED && _UART_BACKEND_DMA */

@@ -138,7 +138,7 @@ void uart1_init(uint32_t baudrate) {
   volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
   if (usart == NULL)
     return;
-  hal_gpio_set_alternate_function(GPIO_PA09, GPIO_AF07);
+  hal_gpio_set_alternate_function(GPIO_PB06, GPIO_AF07);
   RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
   usart->BRR = (hal_clock_get_apb2clk() + (baudrate / 2)) /
                baudrate;      // BRR calculation with rounding
@@ -758,8 +758,8 @@ void uart1_init_dma_rx(uint8_t *buffer, uint16_t length, uint32_t baudrate) {
 
   /* Peripheral init */
   RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-  hal_gpio_set_alternate_function(GPIO_PA09, GPIO_AF07); // TX (standard)
-  hal_gpio_set_alternate_function(GPIO_PA10, GPIO_AF07); // RX
+  hal_gpio_set_alternate_function(GPIO_PB06, GPIO_AF07); // TX
+  hal_gpio_set_alternate_function(GPIO_PB07, GPIO_AF07); // RX
 
   /* Configure Baud Rate */
   usart->BRR = (hal_clock_get_apb2clk() + (baudrate / 2)) / baudrate;

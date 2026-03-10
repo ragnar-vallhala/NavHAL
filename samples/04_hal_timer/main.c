@@ -11,19 +11,26 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
+#include <stdint.h>
 #define CORTEX_M4
 #include "navhal.h"
+int old = 0;
+void print() {
+  uint32_t t = hal_get_tick();
+  int r = t - old;
+  old = t;
+  uart2_write(r);
+  uart2_write("\n\r");
+}
 
 int main(void) {
 
-  systick_init(1000);              /**< Initialize SysTick with 1 ms tick */
-  uart2_init(9600);                /**< Initialize UART2 at 9600 baud */
-  timer_init(TIM5, 0, 1000000000); /**< Initialize TIM5 with auto-reload 1e9 */
-
+  systick_init(1000);       /**< Initialize SysTick with 1 ms tick */
+  uart2_init(9600);         /**< Initialize UART2 at 9600 baud */
+  timer_init_freq(TIM5, 1000); /**< Initialize TIM5 with 1 Hz frequency */
+  uint32_t old = 0;
+  timer_attach_callback(TIM5, print); /**< Newline and carriage return */
+  timer_enable_interrupt(TIM5);
   while (1) {
-    uart2_write("Timer: ");             /**< Print label */
-    uart2_write(timer_get_count(TIM5)); /**< Convert timer value to string */
-    uart2_write("\n\r");                /**< Newline and carriage return */
-    // delay_ms(10);                                 /**< Optional delay */
   }
 }

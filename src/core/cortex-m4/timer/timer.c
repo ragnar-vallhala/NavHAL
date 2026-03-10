@@ -203,6 +203,90 @@ void timer_init(hal_timer_t timer, uint32_t prescaler, uint32_t auto_reload) {
 }
 
 /**
+ * @brief Initialize a timer to a specific frequency.
+ *
+ * @param timer Timer identifier.
+ * @param freq Desired frequency in Hz.
+ *
+ * @return The remainder ("rest") of the clock division (cycles lost due to
+ * integer division).
+ *
+ * @note This function calculates the optimal PSC and ARR to achieve the
+ *       target frequency. It handles 16-bit and 32-bit timers.
+ */
+void timer_init_freq(hal_timer_t timer, uint32_t freq) {
+  if (freq == 0)
+    return 0;
+
+  // 1. Get clock
+  uint32_t timer_clk;
+  uint32_t ppre1 = (RCC->CFGR >> RCC_CFGR_PPRE1_BIT) & 0x7;
+  uint32_t ppre2 = (RCC->CFGR >> RCC_CFGR_PPRE2_BIT) & 0x7;
+
+  if (timer == TIM1 || timer == TIM9 || timer == TIM10 || timer == TIM11) {
+    uint32_t apb2 = hal_clock_get_apb2clk();
+    timer_clk = (ppre2 == 0) ? apb2 : (apb2 * 2);
+  } else {
+    uint32_t apb1 = hal_clock_get_apb1clk();
+    timer_clk = (ppre1 == 0) ? apb1 : (apb1 * 2);
+  }
+
+  // 2. Calculate ticks = timer_clk / freq
+  uint64_t total_ticks = (uint64_t)timer_clk / freq;
+  uint32_t rest = (uint32_t)((uint64_t)timer_clk % freq);
+
+  if (total_ticks == 0) {
+    total_ticks = 1;
+    rest = 0;
+  }
+
+  uint32_t psc = 0;
+  uint32_t arr = 0;
+
+  // For 32-bit timers (TIM2, TIM5), ARR can be up to 0xFFFFFFFF
+  if (timer == TIM2 || timer == TIM5) {
+    if (total_ticks > 0xFFFFFFFFULL) {
+      psc = (uint32_t)(total_ticks / 0xFFFFFFFFULL);
+      arr = (uint32_t)(total_ticks / (psc + 1)) - 1;
+    } else {
+      psc = 0;
+      arr = (uint32_t)total_ticks - 1;
+    }
+  } else {
+    // 16-bit timers (TIM1, TIM3, TIM4, TIM9, TIM10, TIM11)
+    if (total_ticks > 0x10000ULL) {
+      // Find PSC and ARR such that (PSC+1)*(ARR+1) is closest to total_ticks
+      // We can iterate over PSC values or use a clever heuristic.
+      // Smallest possible PSC is total_ticks / 65536
+      uint32_t min_psc = (uint32_t)(total_ticks / 0x10000ULL);
+      uint32_t best_psc = min_psc;
+      uint32_t best_arr = (uint32_t)(total_ticks / (min_psc + 1)) - 1;
+      uint64_t min_error = total_ticks % (min_psc + 1);
+
+      // Simple search for better PSC if remainder is large
+      for (uint32_t p = min_psc; p < min_psc + 10 && p <= 0xFFFF; p++) {
+        uint64_t error = total_ticks % (p + 1);
+        if (error < min_error) {
+          min_error = error;
+          best_psc = p;
+          best_arr = (uint32_t)(total_ticks / (p + 1)) - 1;
+        }
+        if (error == 0)
+          break;
+      }
+      psc = best_psc;
+      arr = best_arr;
+      rest += (uint32_t)min_error; // Add the quantization error to rest
+    } else {
+      psc = 0;
+      arr = (uint32_t)total_ticks - 1;
+    }
+  }
+
+  timer_init(timer, psc, arr);
+}
+
+/**
  * @brief Start the specified timer.
  *
  * @param timer Timer identifier.

@@ -99,12 +99,12 @@ static inline TIMx_Reg_Typedef *GET_TIMx_BASE(uint8_t n) {
 #define TIM2_5_CCRy_MASK 0xFFFFFFFF
 
 // CCER
-#define TIMx_CCER_CCxE_MASK(n) (0x1 << (((n % 4) - 1) * 4))
+#define TIMx_CCER_CCxE_MASK(n) (0x1 << ((n - 1) * 4))
 
 // CCMRx
 // Use channel 1,2 with CCMR1 and 3,4 with CCMR2
-#define TIMx_CCMRy_OCzPE_Pos(ch) ((ch % 2 == 1) ? 0x3 : 0x11)
-#define TIMx_CCMRy_OCzM_Pos(ch) ((ch % 2 == 1) ? 0x4 : 0x12)
+#define TIMx_CCMRy_OCzPE_Pos(ch) ((ch % 2 == 1) ? 3 : 11)
+#define TIMx_CCMRy_OCzM_Pos(ch) ((ch % 2 == 1) ? 4 : 12)
 
 #define TIMx_CCMRy_OCzM_MASK(ch) (0x7 << (TIMx_CCMRy_OCzM_Pos(ch)))
 #define TIMx_CCMRy_OCzM_PWM_MODE1_MASK(ch)                                     \
@@ -119,5 +119,7 @@ static inline TIMx_Reg_Typedef *GET_TIMx_BASE(uint8_t n) {
 // else active. In downcounting, channel 1 is active as long as
 // TIMx_CNT>TIMx_CCR1 else inactive.
 #define TIMx_CCMRy_OCxPE(ch) (0x1 << TIMx_CCMRy_OCzPE_Pos(ch))
+// BDTR
+#define TIMx_BDTR_MOE (0x1 << 15)
 
 #endif // !CORTEX_M4_TIMER_REG_H

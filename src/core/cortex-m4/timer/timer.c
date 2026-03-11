@@ -216,7 +216,7 @@ void timer_init(hal_timer_t timer, uint32_t prescaler, uint32_t auto_reload) {
  */
 void timer_init_freq(hal_timer_t timer, uint32_t freq) {
   if (freq == 0)
-    return 0;
+    return;
 
   // 1. Get clock
   uint32_t timer_clk;
@@ -626,6 +626,9 @@ void timer_enable_channel(hal_timer_t timer, uint32_t channel) {
   if (tim == NULL || channel < 1 || channel > 4)
     return;
   tim->CCER |= TIMx_CCER_CCxE_MASK(channel);
+  if (timer == TIM1) {
+    tim->BDTR |= TIMx_BDTR_MOE;
+  }
 }
 
 /**

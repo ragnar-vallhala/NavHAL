@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(EXECUTABLE_NAME "hal_dma_i2c")
-
-# Require DMA enabled for the sample
-add_definitions(-D_DMA_ENABLED)
+set(EXECUTABLE_NAME "hal_sdio")
 
 # Define source files for this sample
 set(SAMPLE_SOURCES

@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(EXECUTABLE_NAME "hal_dma_i2c")
-
-# Require DMA enabled for the sample
-add_definitions(-D_DMA_ENABLED)
+set(EXECUTABLE_NAME "hal_sdio_block")
 
 # Define source files for this sample
 set(SAMPLE_SOURCES
@@ -36,6 +33,7 @@ add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
 # Custom target for flashing
 add_custom_target(flash
     COMMAND st-flash --connect-under-reset write ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE_NAME}.bin 0x08000000
+    COMMAND st-flash reset
     DEPENDS ${EXECUTABLE_NAME}
-    COMMENT "Flashing ${EXECUTABLE_NAME}.bin to board"
+    COMMENT "Flashing ${EXECUTABLE_NAME}.bin to board and resetting"
 )

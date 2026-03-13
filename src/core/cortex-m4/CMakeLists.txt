@@ -14,6 +14,8 @@ ${CMAKE_CURRENT_SOURCE_DIR}/flash/flash.c
 ${CMAKE_CURRENT_SOURCE_DIR}/dma/dma.c
 ${CMAKE_CURRENT_SOURCE_DIR}/fpu/fpu.c
 ${CMAKE_CURRENT_SOURCE_DIR}/crc/crc.c
+${CMAKE_CURRENT_SOURCE_DIR}/sdio/sdio.c
+${CMAKE_CURRENT_SOURCE_DIR}/sdio/diskio.c
 )
 
 target_link_libraries(hal gcc common)

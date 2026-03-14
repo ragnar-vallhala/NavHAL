@@ -115,4 +115,6 @@ hal_sdio_error_t sdio_read_block(uint32_t addr, uint8_t *buffer);
  */
 hal_sdio_error_t sdio_write_block(uint32_t addr, const uint8_t *buffer);
 
+uint32_t sdio_get_sector_count(void);
+
 #endif // !CORTEX_M4_SDIO_H

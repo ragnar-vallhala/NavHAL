@@ -52,4 +52,12 @@ hal_disk_write(uint8_t pdrv,        /**< Physical drive number */
                uint32_t count       /**< Number of sectors to write */
 );
 
+/* Generic IOCTL commands */
+#define HAL_DISK_IO_SYNC 0
+#define HAL_DISK_IO_GET_SECTOR_COUNT 1
+#define HAL_DISK_IO_GET_SECTOR_SIZE 2
+#define HAL_DISK_IO_GET_BLOCK_SIZE 3
+
+hal_disk_result_t hal_disk_ioctl(uint8_t pdrv, uint8_t cmd, void *buff);
+
 #endif // !HAL_DISKIO_H

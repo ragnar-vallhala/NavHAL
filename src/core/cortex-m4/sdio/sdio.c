@@ -2,6 +2,7 @@
 #include "core/cortex-m4/gpio.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include "core/cortex-m4/timer.h"
+#include "core/cortex-m4/uart.h"
 #include <stdint.h>
 
 /**
@@ -261,6 +262,9 @@ hal_sdio_error_t sdio_read_block(uint32_t addr, uint8_t *buf) {
 
   if (words > 0) {
     SDIO->DCTRL = 0;
+    uart2_write_string("SDIO Read Timeout (Rest: ");
+    uart2_write(words);
+    uart2_write_string(" words)\n\r");
     return HAL_SDIO_TIMEOUT;
   }
 
@@ -276,6 +280,7 @@ hal_sdio_error_t sdio_read_block(uint32_t addr, uint8_t *buf) {
 
   if (timeout == 0xFFFFFFFF) {
     SDIO->DCTRL = 0;
+    uart2_write_string("SDIO Read DBCKEND Timeout\n\r");
     return HAL_SDIO_TIMEOUT;
   }
 
@@ -354,4 +359,42 @@ hal_sdio_error_t sdio_write_block(uint32_t addr, const uint8_t *buf) {
   SDIO->DCTRL = 0;
 
   return sdio_wait_card_ready();
+}
+
+uint32_t sdio_get_sector_count(void) {
+  uint32_t csd[4];
+
+  /* Send CMD9 (SEND_CSD) to get card capacity. Long response (R2) */
+  if (sdio_send_command(9, sd_rca, 3) != HAL_SDIO_OK) {
+    return 0;
+  }
+
+  /* RESP1 contains bits [127:96], RESP2 [95:64], RESP3 [63:32], RESP4 [31:0]
+   */
+  csd[0] = SDIO->RESP1;
+  csd[1] = SDIO->RESP2;
+  csd[2] = SDIO->RESP3;
+  csd[3] = SDIO->RESP4;
+
+  /* CSD Structure depends on CSD_STRUCTURE field [127:126] */
+  uint8_t csd_struct = (csd[0] >> 30) & 0x3;
+
+  if (csd_struct == 1) { /* CSD Version 2.0 (High Capacity/Extended Capacity) */
+    /* C_SIZE is at [69:48] of CSD structure */
+    /* RESP2 bits [5:0] and RESP3 bits [31:16] */
+    uint32_t c_size =
+        ((csd[1] & 0x0000003F) << 16) | ((csd[2] & 0xFFFF0000) >> 16);
+    return (c_size + 1) * 1024; /* Capacity in sectors (512 bytes each) */
+  } else if (csd_struct == 0) { /* CSD Version 1.0 (Standard Capacity) */
+    /* C_SIZE [73:62], C_SIZE_MULT [49:47], READ_BL_LEN [83:80] */
+    uint32_t c_size =
+        ((csd[1] & 0x000003FF) << 2) | ((csd[2] & 0xC0000000) >> 30);
+    uint8_t c_size_mult = (csd[2] >> 15) & 0x7;
+    uint8_t read_bl_len = (csd[1] >> 16) & 0xF;
+    uint32_t mult = 1 << (c_size_mult + 2);
+    uint32_t block_len = 1 << read_bl_len;
+    return (c_size + 1) * mult * (block_len / 512);
+  }
+
+  return 0;
 }

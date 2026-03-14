@@ -23,6 +23,7 @@ hal_fpu
 hal_crc
 hal_sdio
 hal_sdio_block
+hal_fatfs_posix
 )
 set(SAMPLE_DIRS
 00_test_sample
@@ -49,6 +50,7 @@ set(SAMPLE_DIRS
 18_hal_crc
 20_hal_sdio
 21_hal_sdio_block
+22_hal_fatfs_posix
 )
 
 # Check if sample is defined

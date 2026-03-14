@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(EXECUTABLE_NAME "hal_sdio_block")
+set(EXECUTABLE_NAME "hal_fatfs_posix")
 
 # Define source files for this sample
 set(SAMPLE_SOURCES

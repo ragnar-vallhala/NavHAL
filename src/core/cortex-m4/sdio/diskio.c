@@ -60,3 +60,25 @@ hal_disk_result_t hal_disk_write(uint8_t pdrv, const uint8_t *buff,
 
   return HAL_DISK_RES_OK;
 }
+hal_disk_result_t hal_disk_ioctl(uint8_t pdrv, uint8_t cmd, void *buff) {
+  if (pdrv != 0)
+    return HAL_DISK_RES_PARERR;
+  if (disk_stat & HAL_DISK_STATUS_NOINIT)
+    return HAL_DISK_RES_NOTRDY;
+
+  switch (cmd) {
+  case HAL_DISK_IO_SYNC:
+    return HAL_DISK_RES_OK;
+  case HAL_DISK_IO_GET_SECTOR_COUNT:
+    *((uint32_t *)buff) = sdio_get_sector_count();
+    return HAL_DISK_RES_OK;
+  case HAL_DISK_IO_GET_SECTOR_SIZE:
+    *((uint16_t *)buff) = 512;
+    return HAL_DISK_RES_OK;
+  case HAL_DISK_IO_GET_BLOCK_SIZE:
+    *((uint32_t *)buff) = 1;
+    return HAL_DISK_RES_OK;
+  default:
+    return HAL_DISK_RES_PARERR;
+  }
+}

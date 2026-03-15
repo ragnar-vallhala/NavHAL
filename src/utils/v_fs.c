@@ -29,8 +29,9 @@ v_fd_t v_open(const char *path, int flags) {
     }
   }
 
-  if (fd == -1)
+  if (fd == -1) {
     return -1;
+  }
 
   uint8_t mode = 0;
   if (flags & V_O_RDONLY)
@@ -71,8 +72,8 @@ int v_read(v_fd_t fd, void *buf, size_t count) {
   if (fd < 0 || fd >= MAX_OPEN_FILES || !file_in_use[fd])
     return -1;
 
-  uint32_t br;
-  FRESULT res = f_read(&open_files[fd], buf, (uint32_t)count, &br);
+  unsigned int br;
+  FRESULT res = f_read(&open_files[fd], buf, (unsigned int)count, &br);
   if (res == FR_OK)
     return (int)br;
   return -(int)res;
@@ -82,8 +83,8 @@ int v_write(v_fd_t fd, const void *buf, size_t count) {
   if (fd < 0 || fd >= MAX_OPEN_FILES || !file_in_use[fd])
     return -1;
 
-  uint32_t bw;
-  FRESULT res = f_write(&open_files[fd], buf, (uint32_t)count, &bw);
+  unsigned int bw;
+  FRESULT res = f_write(&open_files[fd], buf, (unsigned int)count, &bw);
   if (res == FR_OK)
     return (int)bw;
   return -(int)res;
@@ -126,4 +127,47 @@ int v_unlink(const char *path) {
   if (res == FR_OK)
     return 0;
   return -(int)res;
+}
+
+int v_sync(v_fd_t fd) {
+  if (fd < 0 || fd >= MAX_OPEN_FILES || !file_in_use[fd])
+    return -1;
+
+  FRESULT res = f_sync(&open_files[fd]);
+  if (res == FR_OK)
+    return 0;
+  return -(int)res;
+}
+
+int v_preallocate(const char *path, uint32_t size) {
+  /* Only create the file if it does not already exist.
+   * FA_CREATE_NEW returns FR_EXIST when the file is present —
+   * meaning we already pre-allocated it on a previous boot. */
+  FIL fil;
+  FRESULT res = f_open(&fil, path, FA_CREATE_NEW | FA_WRITE);
+  if (res == FR_EXIST)
+    return 0; /* Already pre-allocated — nothing to do */
+  if (res != FR_OK)
+    return -(int)res;
+
+  /* Fill the file with zeros sector by sector.
+   * This commits the full FAT cluster chain to the card NOW, at boot.
+   * Subsequent writes seek in-place — no FAT modification needed. */
+  static const uint8_t zero_buf[512] = {0};
+  uint32_t remaining = size;
+  while (remaining > 0) {
+    UINT chunk = (remaining < sizeof(zero_buf)) ? remaining : sizeof(zero_buf);
+    UINT bw = 0;
+    res = f_write(&fil, zero_buf, chunk, &bw);
+    if (res != FR_OK || bw != chunk) {
+      f_close(&fil);
+      return (res != FR_OK) ? -(int)res : -1;
+    }
+    remaining -= bw;
+  }
+
+  /* Flush FAT + directory entry before closing */
+  f_sync(&fil);
+  f_close(&fil);
+  return 0;
 }

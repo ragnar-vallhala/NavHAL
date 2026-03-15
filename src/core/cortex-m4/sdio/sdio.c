@@ -1,4 +1,5 @@
 #include "core/cortex-m4/sdio.h"
+#include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/gpio.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include "core/cortex-m4/timer.h"
@@ -17,6 +18,19 @@ static uint8_t desired_bus_width = 0;
 /* ------------------------------------------------------------- */
 /* INIT */
 /* ------------------------------------------------------------- */
+
+static uint32_t get_sdioclk(void) {
+  uint8_t sws = ((RCC->CFGR) >> 2) & 0x3; // RCC_CFGR_SWS_BIT
+  if (sws == 2) {                         // PLL
+    uint32_t pll_m = (RCC->PLLCFGR >> 0) & 0x3F;
+    uint32_t pll_n = (RCC->PLLCFGR >> 6) & 0x1FF;
+    uint32_t pll_q = (RCC->PLLCFGR >> 24) & 0xF;
+    uint32_t pll_src = (RCC->PLLCFGR >> 22) & 0x1;
+    uint32_t vco_in = pll_src ? 8000000 : 16000000;
+    return (vco_in / pll_m) * pll_n / pll_q;
+  }
+  return hal_clock_get_sysclk();
+}
 
 hal_sdio_error_t sdio_init(const hal_sdio_config_t *config) {
   if (!config)
@@ -44,7 +58,16 @@ hal_sdio_error_t sdio_init(const hal_sdio_config_t *config) {
 
   desired_bus_width = config->bus_width;
 
-  uint32_t clkcr = config->clock_div & 0xFF;
+  uint32_t sdioclk = get_sdioclk();
+  uint32_t div = (sdioclk / 400000);
+  if (div >= 2)
+    div -= 2;
+  else
+    div = 0;
+  if (div > 255)
+    div = 255;
+
+  uint32_t clkcr = div & 0xFF;
 
   /* Always start in 1-bit mode for handshake */
   clkcr |= SDIO_CLKCR_WIDBUS_1B;
@@ -151,6 +174,11 @@ static hal_sdio_error_t sdio_wait_card_ready(void) {
 /* ------------------------------------------------------------- */
 
 hal_sdio_error_t sdio_card_init(void) {
+  static uint8_t initialized = 0;
+  if (initialized) {
+    return HAL_SDIO_OK; /* Already initialized, skip handshake */
+  }
+
   hal_sdio_error_t err;
   uint32_t resp;
 
@@ -208,6 +236,7 @@ hal_sdio_error_t sdio_card_init(void) {
                                  SDIO_CLKCR_PWRSAV)) |
                 8 | SDIO_CLKCR_CLKEN;
 
+  initialized = 1;
   return HAL_SDIO_OK;
 }
 
@@ -239,11 +268,13 @@ hal_sdio_error_t sdio_read_block(uint32_t addr, uint8_t *buf) {
   int words = 128;
   uint32_t timeout = 5000000;
 
+  __asm volatile("cpsid i" : : : "memory");
   while (words > 0 && timeout--) {
     uint32_t sta = SDIO->STA;
 
     if (sta & (SDIO_STA_RXOVERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
       SDIO->DCTRL = 0;
+      __asm volatile("cpsie i" : : : "memory");
       return HAL_SDIO_ERROR;
     }
 
@@ -259,6 +290,7 @@ hal_sdio_error_t sdio_read_block(uint32_t addr, uint8_t *buf) {
       timeout = 5000000;
     }
   }
+  __asm volatile("cpsie i" : : : "memory");
 
   if (words > 0) {
     SDIO->DCTRL = 0;
@@ -317,11 +349,13 @@ hal_sdio_error_t sdio_write_block(uint32_t addr, const uint8_t *buf) {
   int words = 128;
   uint32_t timeout = 5000000;
 
+  __asm volatile("cpsid i" : : : "memory");
   while (words > 0 && timeout--) {
     uint32_t sta = SDIO->STA;
 
     if (sta & (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
       SDIO->DCTRL = 0;
+      __asm volatile("cpsie i" : : : "memory");
       return HAL_SDIO_ERROR;
     }
 
@@ -334,6 +368,7 @@ hal_sdio_error_t sdio_write_block(uint32_t addr, const uint8_t *buf) {
       timeout = 5000000;
     }
   }
+  __asm volatile("cpsie i" : : : "memory");
 
   if (words > 0) {
     SDIO->DCTRL = 0;

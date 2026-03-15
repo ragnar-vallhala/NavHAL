@@ -82,4 +82,25 @@ int v_mkdir(const char *path);
  */
 int v_unlink(const char *path);
 
+/**
+ * @brief Flush cached data to a file.
+ * @param fd File descriptor.
+ * @return 0 on success, negative error code otherwise.
+ */
+int v_sync(v_fd_t fd);
+
+/**
+ * @brief Pre-allocate a file with contiguous sectors on first boot.
+ *
+ * If the file already exists this is a no-op. Otherwise the file is
+ * created and f_expand() is used to reserve `size` bytes of contiguous
+ * space so that subsequent in-place writes never modify the FAT chain,
+ * giving near-crash-safe behaviour for sequential logs.
+ *
+ * @param path Path to the file (with drive prefix, e.g. "0:log.dat").
+ * @param size Number of bytes to pre-allocate.
+ * @return 0 on success, negative FatFS error code otherwise.
+ */
+int v_preallocate(const char *path, uint32_t size);
+
 #endif // V_FS_H

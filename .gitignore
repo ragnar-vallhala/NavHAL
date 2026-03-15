@@ -4,4 +4,3 @@ docs/
 *.bin
 *.json 
 .cache/
-flash.sh

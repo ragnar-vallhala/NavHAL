@@ -27,7 +27,7 @@
  *
  * @note Unit: ticks (tick duration set by systick_init).
  */
-static volatile uint64_t systick_ticks = 0; // global ticks
+volatile uint64_t systick_ticks = 0; // global ticks
 
 /**
  * @brief SysTick tick duration in microseconds.
@@ -233,11 +233,9 @@ void timer_init_freq(hal_timer_t timer, uint32_t freq) {
 
   // 2. Calculate ticks = timer_clk / freq
   uint64_t total_ticks = (uint64_t)timer_clk / freq;
-  uint32_t rest = (uint32_t)((uint64_t)timer_clk % freq);
 
   if (total_ticks == 0) {
     total_ticks = 1;
-    rest = 0;
   }
 
   uint32_t psc = 0;
@@ -276,7 +274,6 @@ void timer_init_freq(hal_timer_t timer, uint32_t freq) {
       }
       psc = best_psc;
       arr = best_arr;
-      rest += (uint32_t)min_error; // Add the quantization error to rest
     } else {
       psc = 0;
       arr = (uint32_t)total_ticks - 1;

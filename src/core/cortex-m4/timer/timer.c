@@ -27,7 +27,7 @@
  *
  * @note Unit: ticks (tick duration set by systick_init).
  */
-static volatile uint64_t systick_ticks = 0; // global ticks
+volatile uint64_t systick_ticks = 0; // global ticks
 
 /**
  * @brief SysTick tick duration in microseconds.

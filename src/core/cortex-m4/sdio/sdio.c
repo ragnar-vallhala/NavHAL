@@ -234,7 +234,7 @@ hal_sdio_error_t sdio_card_init(void) {
   /* DIV=2 for stable high-speed, keep WIDBUS, enable HWFC */
   SDIO->CLKCR = (SDIO->CLKCR & ~(SDIO_CLKCR_CLKDIV | SDIO_CLKCR_HWFC_EN |
                                  SDIO_CLKCR_PWRSAV)) |
-                1 | SDIO_CLKCR_HWFC_EN | SDIO_CLKCR_CLKEN;
+                2 | SDIO_CLKCR_HWFC_EN | SDIO_CLKCR_CLKEN;
 
   initialized = 1;
   return HAL_SDIO_OK;

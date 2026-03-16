@@ -64,9 +64,14 @@ hal_disk_result_t hal_disk_write(uint8_t pdrv, const uint8_t *buff,
     return HAL_DISK_RES_NOTRDY;
 
 #ifdef _DMA_ENABLED
-  if (count == 1) {
-    if (sdio_write_block_dma(sector, buff) != HAL_SDIO_OK) {
-      return HAL_DISK_RES_ERROR;
+  if (count <= 4) {
+    /* Small writes — safer to use single block */
+    while (count--) {
+      if (sdio_write_block_dma(sector, buff) != HAL_SDIO_OK)
+        return HAL_DISK_RES_ERROR;
+
+      sector++;
+      buff += 512;
     }
   } else {
     if (sdio_write_blocks_dma(sector, buff, count) != HAL_SDIO_OK) {

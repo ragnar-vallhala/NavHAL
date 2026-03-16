@@ -17,10 +17,13 @@
 #define SD_CMD_SEND_REL_ADDR 3
 #define SD_CMD_SELECT_DESELECT_CARD 7
 #define SD_CMD_HS_SEND_EXT_CSD 8
+#define SD_CMD_STOP_TRANSMISSION 12
 #define SD_CMD_SEND_STATUS 13
 #define SD_CMD_SET_BLOCKLEN 16
 #define SD_CMD_READ_SINGLE_BLOCK 17
+#define SD_CMD_READ_MULT_BLOCK 18
 #define SD_CMD_WRITE_SINGLE_BLOCK 24
+#define SD_CMD_WRITE_MULT_BLOCK 25
 #define SD_CMD_APP_CMD 55
 #define SD_ACMD_SD_SEND_OP_COND 41
 #define SD_ACMD_SET_BUS_WIDTH 6
@@ -119,6 +122,11 @@ hal_sdio_error_t sdio_write_block(uint32_t addr, const uint8_t *buffer);
 #ifdef _DMA_ENABLED
 hal_sdio_error_t sdio_read_block_dma(uint32_t addr, uint8_t *buffer);
 hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buffer);
+
+hal_sdio_error_t sdio_read_blocks_dma(uint32_t addr, uint8_t *buffer,
+                                      uint32_t count);
+hal_sdio_error_t sdio_write_blocks_dma(uint32_t addr, const uint8_t *buffer,
+                                       uint32_t count);
 #endif
 
 uint32_t sdio_get_sector_count(void);

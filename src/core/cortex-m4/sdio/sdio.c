@@ -69,8 +69,8 @@ hal_sdio_error_t sdio_init(const hal_sdio_config_t *config) {
 
   uint32_t clkcr = div & 0xFF;
 
-  /* Always start in 1-bit mode for handshake */
-  clkcr |= SDIO_CLKCR_WIDBUS_1B;
+  /* Switch to 4-bit mode if requested (handled in sdio_card_init) */
+  /* hardware flow control is essential for DMA write */
   clkcr |= SDIO_CLKCR_HWFC_EN | SDIO_CLKCR_CLKEN;
 
   SDIO->CLKCR = clkcr;
@@ -294,9 +294,6 @@ hal_sdio_error_t sdio_read_block(uint32_t addr, uint8_t *buf) {
 
   if (words > 0) {
     SDIO->DCTRL = 0;
-    uart2_write_string("SDIO Read Timeout (Rest: ");
-    uart2_write(words);
-    uart2_write_string(" words)\n\r");
     return HAL_SDIO_TIMEOUT;
   }
 
@@ -533,7 +530,7 @@ hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buf) {
 
   dma_config_t dma_write_cfg = {
       .controller = DMA_CONTROLLER_2,
-      .stream = 3,
+      .stream = 6,
       .channel = 4,
       .direction = DMA_DIR_M2P,
       .src_addr = (uint32_t)buf,
@@ -558,18 +555,17 @@ hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buf) {
   SDIO->DCTRL =
       (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
 
-  dma_start(&dma_write_cfg);
-
   if (sdio_send_command(SD_CMD_WRITE_SINGLE_BLOCK, addr, 1)) {
     SDIO->DCTRL = 0;
     dma_stop(&dma_write_cfg);
     return HAL_SDIO_ERROR;
   }
-
+  dma_start(&dma_write_cfg);
   uint32_t timeout = 5000000;
   while (!(SDIO->STA & SDIO_STA_DATAEND) && timeout--) {
     if (SDIO->STA &
         (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
+
       SDIO->DCTRL = 0;
       dma_stop(&dma_write_cfg);
       return HAL_SDIO_ERROR;
@@ -584,8 +580,8 @@ hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buf) {
 
   timeout = 5000000;
   while (!(SDIO->STA & SDIO_STA_DBCKEND) && timeout--) {
-    uint32_t sta = SDIO->STA;
-    if (sta & (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
+    if (SDIO->STA &
+        (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
       SDIO->DCTRL = 0;
       dma_stop(&dma_write_cfg);
       return HAL_SDIO_ERROR;

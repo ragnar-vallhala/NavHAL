@@ -115,6 +115,12 @@ hal_sdio_error_t sdio_read_block(uint32_t addr, uint8_t *buffer);
  */
 hal_sdio_error_t sdio_write_block(uint32_t addr, const uint8_t *buffer);
 
+#include "core/cortex-m4/config.h"
+#ifdef _DMA_ENABLED
+hal_sdio_error_t sdio_read_block_dma(uint32_t addr, uint8_t *buffer);
+hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buffer);
+#endif
+
 uint32_t sdio_get_sector_count(void);
 
 #endif // !CORTEX_M4_SDIO_H

@@ -33,7 +33,11 @@ hal_disk_result_t hal_disk_read(uint8_t pdrv, uint8_t *buff, uint32_t sector,
     return HAL_DISK_RES_NOTRDY;
 
   while (count--) {
+#ifdef _DMA_ENABLED
+    if (sdio_read_block_dma(sector, buff) != HAL_SDIO_OK) {
+#else
     if (sdio_read_block(sector, buff) != HAL_SDIO_OK) {
+#endif
       return HAL_DISK_RES_ERROR;
     }
     sector++;
@@ -51,7 +55,11 @@ hal_disk_result_t hal_disk_write(uint8_t pdrv, const uint8_t *buff,
     return HAL_DISK_RES_NOTRDY;
 
   while (count--) {
+#ifdef _DMA_ENABLED
+    if (sdio_write_block_dma(sector, buff) != HAL_SDIO_OK) {
+#else
     if (sdio_write_block(sector, buff) != HAL_SDIO_OK) {
+#endif
       return HAL_DISK_RES_ERROR;
     }
     sector++;

@@ -79,6 +79,26 @@ typedef enum {
   DMA_PRIORITY_VERY_HIGH = 3,
 } dma_priority_t;
 
+/**
+ * @brief Burst transfer configuration.
+ */
+typedef enum {
+  DMA_BURST_SINGLE = 0,
+  DMA_BURST_INCR4 = 1,
+  DMA_BURST_INCR8 = 2,
+  DMA_BURST_INCR16 = 3,
+} dma_burst_t;
+
+/**
+ * @brief FIFO threshold selection.
+ */
+typedef enum {
+  DMA_FIFO_THRESHOLD_1_4 = 0,
+  DMA_FIFO_THRESHOLD_1_2 = 1,
+  DMA_FIFO_THRESHOLD_3_4 = 2,
+  DMA_FIFO_THRESHOLD_FULL = 3,
+} dma_fifo_threshold_t;
+
 /*---------------------------------------------------------------------------
  * Configuration structure
  *---------------------------------------------------------------------------*/
@@ -102,6 +122,11 @@ typedef struct {
   dma_data_width_t data_width; /**< Data size (applied to both src and dst) */
   dma_priority_t priority;     /**< Stream priority */
   uint8_t circular;            /**< 1 = circular (ring-buffer) mode */
+  uint8_t pfctrl;              /**< 1 = peripheral is the flow controller */
+  uint8_t fifo_mode;           /**< 1 = direct mode disabled (FIFO enabled) */
+  dma_fifo_threshold_t fifo_threshold; /**< FIFO threshold level */
+  dma_burst_t mburst; /**< Memory burst transfer configuration */
+  dma_burst_t pburst; /**< Peripheral burst transfer configuration */
 } dma_config_t;
 
 /*---------------------------------------------------------------------------

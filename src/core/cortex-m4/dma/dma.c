@@ -133,10 +133,27 @@ void dma_init(const dma_config_t *cfg) {
   if (cfg->circular)
     cr |= DMA_SxCR_CIRC;
 
+  /* Peripheral flow control */
+  if (cfg->pfctrl)
+    cr |= DMA_SxCR_PFCTRL;
+
+  /* Burst modes */
+  cr |= ((uint32_t)cfg->mburst << DMA_SxCR_MBURST_POS) & DMA_SxCR_MBURST_MASK;
+  cr |= ((uint32_t)cfg->pburst << DMA_SxCR_PBURST_POS) & DMA_SxCR_PBURST_MASK;
+
   /* Transfer-complete interrupt enable (useful for ISR-driven usage) */
   cr |= DMA_SxCR_TCIE;
 
   s->CR = cr;
+
+  /* 7. Build FCR value */
+  uint32_t fcr = 0;
+  if (cfg->fifo_mode) {
+    fcr |= DMA_SxFCR_DMDIS;
+    fcr |= ((uint32_t)cfg->fifo_threshold << DMA_SxFCR_FTH_POS) &
+           DMA_SxFCR_FTH_MASK;
+  }
+  s->FCR = fcr;
 }
 
 /**

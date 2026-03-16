@@ -433,3 +433,178 @@ uint32_t sdio_get_sector_count(void) {
 
   return 0;
 }
+
+#ifdef _DMA_ENABLED
+#include "core/cortex-m4/dma.h"
+
+hal_sdio_error_t sdio_read_block_dma(uint32_t addr, uint8_t *buf) {
+  if (!card_is_sdhc)
+    addr *= 512;
+
+  if (sdio_wait_card_ready())
+    return HAL_SDIO_TIMEOUT;
+
+  SDIO->ICR = 0xFFFFFFFF;
+
+  dma_config_t dma_read_cfg = {
+      .controller = DMA_CONTROLLER_2,
+      .stream = 3,
+      .channel = 4,
+      .direction = DMA_DIR_P2M,
+      .src_addr = (uint32_t)&SDIO->FIFO,
+      .dst_addr = (uint32_t)buf,
+      .data_count = 512 / 4,
+      .src_inc = 0,
+      .dst_inc = 1,
+      .data_width = DMA_DATA_WIDTH_32,
+      .priority = DMA_PRIORITY_VERY_HIGH,
+      .circular = 0,
+      .pfctrl = 1,
+      .fifo_mode = 1,
+      .fifo_threshold = DMA_FIFO_THRESHOLD_FULL,
+      .mburst = DMA_BURST_INCR4,
+      .pburst = DMA_BURST_INCR4,
+  };
+
+  dma_init(&dma_read_cfg);
+
+  SDIO->DTIMER = 0xFFFFFFFF;
+  SDIO->DLEN = 512;
+  SDIO->DCTRL = (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DTDIR |
+                SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
+
+  dma_start(&dma_read_cfg);
+
+  if (sdio_send_command(SD_CMD_READ_SINGLE_BLOCK, addr, 1)) {
+    SDIO->DCTRL = 0;
+    dma_stop(&dma_read_cfg);
+    return HAL_SDIO_ERROR;
+  }
+
+  uint32_t timeout = 5000000;
+  while (!(SDIO->STA & SDIO_STA_DATAEND) && timeout--) {
+    if (SDIO->STA &
+        (SDIO_STA_RXOVERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
+      SDIO->DCTRL = 0;
+      dma_stop(&dma_read_cfg);
+      return HAL_SDIO_ERROR;
+    }
+  }
+
+  if (timeout == 0xFFFFFFFF) {
+    SDIO->DCTRL = 0;
+    dma_stop(&dma_read_cfg);
+    return HAL_SDIO_TIMEOUT;
+  }
+
+  timeout = 5000000;
+  while (!(SDIO->STA & SDIO_STA_DBCKEND) && timeout--) {
+    uint32_t sta = SDIO->STA;
+    if (sta & (SDIO_STA_RXOVERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
+      SDIO->DCTRL = 0;
+      return HAL_SDIO_ERROR;
+    }
+  }
+
+  if (timeout == 0xFFFFFFFF) {
+    SDIO->DCTRL = 0;
+    dma_stop(&dma_read_cfg);
+    return HAL_SDIO_TIMEOUT;
+  }
+
+  SDIO->ICR = 0xFFFFFFFF;
+  SDIO->DCTRL = 0;
+
+  while (!dma_transfer_complete(&dma_read_cfg))
+    ;
+  dma_clear_flags(&dma_read_cfg);
+
+  return HAL_SDIO_OK;
+}
+
+hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buf) {
+  if (!card_is_sdhc)
+    addr *= 512;
+
+  if (sdio_wait_card_ready())
+    return HAL_SDIO_TIMEOUT;
+
+  SDIO->ICR = 0xFFFFFFFF;
+
+  dma_config_t dma_write_cfg = {
+      .controller = DMA_CONTROLLER_2,
+      .stream = 3,
+      .channel = 4,
+      .direction = DMA_DIR_M2P,
+      .src_addr = (uint32_t)buf,
+      .dst_addr = (uint32_t)&SDIO->FIFO,
+      .data_count = 512 / 4,
+      .src_inc = 1,
+      .dst_inc = 0,
+      .data_width = DMA_DATA_WIDTH_32,
+      .priority = DMA_PRIORITY_VERY_HIGH,
+      .circular = 0,
+      .pfctrl = 1,
+      .fifo_mode = 1,
+      .fifo_threshold = DMA_FIFO_THRESHOLD_FULL,
+      .mburst = DMA_BURST_INCR4,
+      .pburst = DMA_BURST_INCR4,
+  };
+
+  dma_init(&dma_write_cfg);
+
+  SDIO->DTIMER = 0xFFFFFFFF;
+  SDIO->DLEN = 512;
+  SDIO->DCTRL =
+      (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
+
+  dma_start(&dma_write_cfg);
+
+  if (sdio_send_command(SD_CMD_WRITE_SINGLE_BLOCK, addr, 1)) {
+    SDIO->DCTRL = 0;
+    dma_stop(&dma_write_cfg);
+    return HAL_SDIO_ERROR;
+  }
+
+  uint32_t timeout = 5000000;
+  while (!(SDIO->STA & SDIO_STA_DATAEND) && timeout--) {
+    if (SDIO->STA &
+        (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
+      SDIO->DCTRL = 0;
+      dma_stop(&dma_write_cfg);
+      return HAL_SDIO_ERROR;
+    }
+  }
+
+  if (timeout == 0xFFFFFFFF) {
+    SDIO->DCTRL = 0;
+    dma_stop(&dma_write_cfg);
+    return HAL_SDIO_TIMEOUT;
+  }
+
+  timeout = 5000000;
+  while (!(SDIO->STA & SDIO_STA_DBCKEND) && timeout--) {
+    uint32_t sta = SDIO->STA;
+    if (sta & (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
+      SDIO->DCTRL = 0;
+      dma_stop(&dma_write_cfg);
+      return HAL_SDIO_ERROR;
+    }
+  }
+
+  if (timeout == 0xFFFFFFFF) {
+    SDIO->DCTRL = 0;
+    dma_stop(&dma_write_cfg);
+    return HAL_SDIO_TIMEOUT;
+  }
+
+  SDIO->ICR = 0xFFFFFFFF;
+  SDIO->DCTRL = 0;
+
+  while (!dma_transfer_complete(&dma_write_cfg))
+    ;
+  dma_clear_flags(&dma_write_cfg);
+
+  return sdio_wait_card_ready();
+}
+#endif

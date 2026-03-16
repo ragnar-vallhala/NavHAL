@@ -91,9 +91,11 @@ typedef struct {
 /** Direction field (bits [7:6]) */
 #define DMA_SxCR_DIR_POS 6U
 #define DMA_SxCR_DIR_MASK (0x3U << DMA_SxCR_DIR_POS)
-#define DMA_SxCR_DIR_P2M (0x0U << DMA_SxCR_DIR_POS) /**< Peripheral-to-memory  \
-                                                     */
-#define DMA_SxCR_DIR_M2P (0x1U << DMA_SxCR_DIR_POS) /**< Memory-to-peripheral  \
+#define DMA_SxCR_DIR_P2M                                                       \
+  (0x0U << DMA_SxCR_DIR_POS) /**< Peripheral-to-memory                         \
+                              */
+#define DMA_SxCR_DIR_M2P                                                       \
+  (0x1U << DMA_SxCR_DIR_POS)                        /**< Memory-to-peripheral  \
                                                      */
 #define DMA_SxCR_DIR_M2M (0x2U << DMA_SxCR_DIR_POS) /**< Memory-to-memory */
 
@@ -128,12 +130,33 @@ typedef struct {
 #define DMA_SxCR_CHSEL_MASK (0x7U << DMA_SxCR_CHSEL_POS)
 #define DMA_SxCR_CHSEL(ch) (((ch) & 0x7U) << DMA_SxCR_CHSEL_POS)
 
+/** Peripheral burst transfer configuration (bits [22:21]) */
+#define DMA_SxCR_PBURST_POS 21U
+#define DMA_SxCR_PBURST_MASK (0x3U << DMA_SxCR_PBURST_POS)
+#define DMA_SxCR_PBURST_SINGLE (0x0U << DMA_SxCR_PBURST_POS)
+#define DMA_SxCR_PBURST_INCR4 (0x1U << DMA_SxCR_PBURST_POS)
+#define DMA_SxCR_PBURST_INCR8 (0x2U << DMA_SxCR_PBURST_POS)
+#define DMA_SxCR_PBURST_INCR16 (0x3U << DMA_SxCR_PBURST_POS)
+
+/** Memory burst transfer configuration (bits [24:23]) */
+#define DMA_SxCR_MBURST_POS 23U
+#define DMA_SxCR_MBURST_MASK (0x3U << DMA_SxCR_MBURST_POS)
+#define DMA_SxCR_MBURST_SINGLE (0x0U << DMA_SxCR_MBURST_POS)
+#define DMA_SxCR_MBURST_INCR4 (0x1U << DMA_SxCR_MBURST_POS)
+#define DMA_SxCR_MBURST_INCR8 (0x2U << DMA_SxCR_MBURST_POS)
+#define DMA_SxCR_MBURST_INCR16 (0x3U << DMA_SxCR_MBURST_POS)
+
 /*---------------------------------------------------------------------------
  * DMA_SxFCR – FIFO control register
  *---------------------------------------------------------------------------*/
 
 #define DMA_SxFCR_DMDIS (1U << 2) /**< Direct mode disable (enable FIFO) */
-#define DMA_SxFCR_FTH_FULL (0x3U) /**< FIFO threshold: full */
+#define DMA_SxFCR_FTH_POS 0U
+#define DMA_SxFCR_FTH_MASK (0x3U << DMA_SxFCR_FTH_POS)
+#define DMA_SxFCR_FTH_1_4 (0x0U << DMA_SxFCR_FTH_POS)
+#define DMA_SxFCR_FTH_1_2 (0x1U << DMA_SxFCR_FTH_POS)
+#define DMA_SxFCR_FTH_3_4 (0x2U << DMA_SxFCR_FTH_POS)
+#define DMA_SxFCR_FTH_FULL (0x3U << DMA_SxFCR_FTH_POS)
 
 /*---------------------------------------------------------------------------
  * Interrupt status / flag-clear bit helpers (LISR/HISR/LIFCR/HIFCR)

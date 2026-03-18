@@ -1,6 +1,7 @@
 #include "core/cortex-m4/sdio.h"
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/gpio.h"
+#include "core/cortex-m4/interrupt.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include "core/cortex-m4/timer.h"
 #include "core/cortex-m4/uart.h"
@@ -14,6 +15,12 @@
 static uint32_t sd_rca = 0;
 static uint8_t card_is_sdhc = 0;
 static uint8_t desired_bus_width = 0;
+static hal_sdio_callback_t sd_callback = 0;
+static volatile uint8_t sd_busy = 0;
+static volatile uint8_t dma_done = 0;
+static volatile uint8_t sdio_done = 0;
+static volatile uint8_t is_multi_block = 0;
+static hal_sdio_error_t sd_last_error = HAL_SDIO_OK;
 
 /* ------------------------------------------------------------- */
 /* INIT */
@@ -75,8 +82,21 @@ hal_sdio_error_t sdio_init(const hal_sdio_config_t *config) {
 
   SDIO->CLKCR = clkcr;
 
+  /* Enable SDIO Interrupts in NVIC */
+  hal_enable_interrupt(SDIO_IRQn);
+  hal_set_interrupt_priority(SDIO_IRQn, 5);
+
+#ifdef _DMA_ENABLED
+  hal_enable_interrupt(DMA2_Stream3_IRQn);
+  hal_enable_interrupt(DMA2_Stream6_IRQn);
+  hal_set_interrupt_priority(DMA2_Stream3_IRQn, 5);
+  hal_set_interrupt_priority(DMA2_Stream6_IRQn, 5);
+#endif
+
   return HAL_SDIO_OK;
 }
+
+void sdio_set_callback(hal_sdio_callback_t callback) { sd_callback = callback; }
 
 /* ------------------------------------------------------------- */
 /* COMMAND HANDLING */
@@ -435,7 +455,13 @@ uint32_t sdio_get_sector_count(void) {
 #include "core/cortex-m4/dma.h"
 #include "core/cortex-m4/uart.h"
 
-hal_sdio_error_t sdio_read_block_dma(uint32_t addr, uint8_t *buf) {
+static dma_config_t dma2_stream3_cfg;
+static dma_config_t dma2_stream6_cfg;
+
+hal_sdio_error_t sdio_read_block_async(uint32_t addr, uint8_t *buf) {
+  if (sd_busy)
+    return HAL_SDIO_BUSY;
+
   if (!card_is_sdhc)
     addr *= 512;
 
@@ -444,7 +470,7 @@ hal_sdio_error_t sdio_read_block_dma(uint32_t addr, uint8_t *buf) {
 
   SDIO->ICR = 0xFFFFFFFF;
 
-  dma_config_t dma_read_cfg = {
+  dma2_stream3_cfg = (dma_config_t){
       .controller = DMA_CONTROLLER_2,
       .stream = 3,
       .channel = 4,
@@ -464,63 +490,39 @@ hal_sdio_error_t sdio_read_block_dma(uint32_t addr, uint8_t *buf) {
       .pburst = DMA_BURST_INCR4,
   };
 
-  dma_init(&dma_read_cfg);
+  dma_init((const dma_config_t *)&dma2_stream3_cfg);
 
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512;
   SDIO->DCTRL = (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DTDIR |
                 SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
 
-  dma_start(&dma_read_cfg);
+  dma_start((const dma_config_t *)&dma2_stream3_cfg);
 
   if (sdio_send_command(SD_CMD_READ_SINGLE_BLOCK, addr, 1)) {
     SDIO->DCTRL = 0;
-    dma_stop(&dma_read_cfg);
+    dma_stop((const dma_config_t *)&dma2_stream3_cfg);
     return HAL_SDIO_ERROR;
   }
 
-  uint32_t timeout = 5000000;
-  while (!(SDIO->STA & SDIO_STA_DATAEND) && timeout--) {
-    if (SDIO->STA &
-        (SDIO_STA_RXOVERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
-      SDIO->DCTRL = 0;
-      dma_stop(&dma_read_cfg);
-      return HAL_SDIO_ERROR;
-    }
-  }
+  sd_busy = 1;
+  dma_done = 0;
+  sdio_done = 0;
+  is_multi_block = 0;
+  sd_last_error = HAL_SDIO_OK;
 
-  if (timeout == 0) {
-    SDIO->DCTRL = 0;
-    dma_stop(&dma_read_cfg);
-    return HAL_SDIO_TIMEOUT;
-  }
+  /* Enable SDIO interrupts: DATAEND, DBCKEND, and error flags */
+  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
+                SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
+                SDIO_MASK_RXOVERRIE;
 
-  timeout = 5000000;
-  while (!(SDIO->STA & SDIO_STA_DBCKEND) && timeout--) {
-    uint32_t sta = SDIO->STA;
-    if (sta & (SDIO_STA_RXOVERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
-      SDIO->DCTRL = 0;
-      return HAL_SDIO_ERROR;
-    }
-  }
-
-  if (timeout == 0) {
-    SDIO->DCTRL = 0;
-    dma_stop(&dma_read_cfg);
-    return HAL_SDIO_TIMEOUT;
-  }
-
-  SDIO->ICR = 0xFFFFFFFF;
-  SDIO->DCTRL = 0;
-
-  while (!dma_transfer_complete(&dma_read_cfg))
-    ;
-  dma_clear_flags(&dma_read_cfg);
-
-  return HAL_SDIO_OK;
+  return HAL_SDIO_PENDING;
 }
 
-hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buf) {
+hal_sdio_error_t sdio_write_block_async(uint32_t addr, const uint8_t *buf) {
+  if (sd_busy)
+    return HAL_SDIO_BUSY;
+
   if (!card_is_sdhc)
     addr *= 512;
 
@@ -529,7 +531,7 @@ hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buf) {
 
   SDIO->ICR = 0xFFFFFFFF;
 
-  dma_config_t dma_write_cfg = {
+  dma2_stream6_cfg = (dma_config_t){
       .controller = DMA_CONTROLLER_2,
       .stream = 6,
       .channel = 4,
@@ -549,7 +551,7 @@ hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buf) {
       .pburst = DMA_BURST_INCR4,
   };
 
-  dma_init(&dma_write_cfg);
+  dma_init((const dma_config_t *)&dma2_stream6_cfg);
 
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512;
@@ -558,55 +560,29 @@ hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buf) {
 
   if (sdio_send_command(SD_CMD_WRITE_SINGLE_BLOCK, addr, 1)) {
     SDIO->DCTRL = 0;
-    dma_stop(&dma_write_cfg);
+    dma_stop((const dma_config_t *)&dma2_stream6_cfg);
     return HAL_SDIO_ERROR;
   }
-  dma_start(&dma_write_cfg);
-  uint32_t timeout = 5000000;
-  while (!(SDIO->STA & SDIO_STA_DATAEND) && timeout--) {
-    if (SDIO->STA &
-        (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
+  dma_start((const dma_config_t *)&dma2_stream6_cfg);
 
-      SDIO->DCTRL = 0;
-      dma_stop(&dma_write_cfg);
-      return HAL_SDIO_ERROR;
-    }
-  }
+  sd_busy = 1;
+  dma_done = 0;
+  sdio_done = 0;
+  sd_last_error = HAL_SDIO_OK;
 
-  if (timeout == 0) {
-    SDIO->DCTRL = 0;
-    dma_stop(&dma_write_cfg);
-    return HAL_SDIO_TIMEOUT;
-  }
+  /* Enable SDIO interrupts: DATAEND, DBCKEND, and error flags */
+  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
+                SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
+                SDIO_MASK_TXUNDERRIE;
 
-  timeout = 5000000;
-  while (!(SDIO->STA & SDIO_STA_DBCKEND) && timeout--) {
-    if (SDIO->STA &
-        (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
-      SDIO->DCTRL = 0;
-      dma_stop(&dma_write_cfg);
-      return HAL_SDIO_ERROR;
-    }
-  }
-
-  if (timeout == 0) {
-    SDIO->DCTRL = 0;
-    dma_stop(&dma_write_cfg);
-    return HAL_SDIO_TIMEOUT;
-  }
-
-  SDIO->ICR = 0xFFFFFFFF;
-  SDIO->DCTRL = 0;
-
-  while (!dma_transfer_complete(&dma_write_cfg))
-    ;
-  dma_clear_flags(&dma_write_cfg);
-
-  return sdio_wait_card_ready();
+  return HAL_SDIO_PENDING;
 }
 
-hal_sdio_error_t sdio_read_blocks_dma(uint32_t addr, uint8_t *buf,
-                                      uint32_t count) {
+hal_sdio_error_t sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
+                                        uint32_t count) {
+  if (sd_busy)
+    return HAL_SDIO_BUSY;
+
   if (!card_is_sdhc)
     addr *= 512;
 
@@ -615,7 +591,7 @@ hal_sdio_error_t sdio_read_blocks_dma(uint32_t addr, uint8_t *buf,
 
   SDIO->ICR = 0xFFFFFFFF;
 
-  dma_config_t dma_read_cfg = {
+  dma2_stream3_cfg = (dma_config_t){
       .controller = DMA_CONTROLLER_2,
       .stream = 3,
       .channel = 4,
@@ -635,71 +611,50 @@ hal_sdio_error_t sdio_read_blocks_dma(uint32_t addr, uint8_t *buf,
       .pburst = DMA_BURST_INCR4,
   };
 
-  dma_init(&dma_read_cfg);
+  dma_init((const dma_config_t *)&dma2_stream3_cfg);
   SDIO->DCTRL = 0;
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512 * count;
-  SDIO->DCTRL = (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DTDIR |
-                SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
 
   if (sdio_send_command(SD_CMD_READ_MULT_BLOCK, addr, 1)) {
-    SDIO->DCTRL = 0;
-    dma_stop(&dma_read_cfg);
+    dma_stop((const dma_config_t *)&dma2_stream3_cfg);
 #ifdef _DMA_ENABLED
     uart2_write_string("Read Multi CMD18 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
   }
-  dma_start(&dma_read_cfg);
 
-  uint32_t timeout = 5000000;
-  while ((SDIO->STA & SDIO_STA_RXACT) && timeout--) {
-    if (SDIO->STA &
-        (SDIO_STA_RXOVERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
-      uint32_t sta = SDIO->STA;
-      SDIO->DCTRL = 0;
-      dma_stop(&dma_read_cfg);
+  /* Enable DPSM AFTER command per spec */
+  SDIO->DCTRL = (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DTDIR |
+                SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
 
-#ifdef _DMA_ENABLED
-      uart2_write_string("Read Multi DATAEND wait failed with STA = ");
-      uart2_write_int((int)sta);
-      uart2_write_string("\r\n");
-#endif
-      return HAL_SDIO_ERROR;
-    }
-  }
+  dma_start((const dma_config_t *)&dma2_stream3_cfg);
 
-  if (timeout == 0) {
-    SDIO->DCTRL = 0;
-    dma_stop(&dma_read_cfg);
-    return HAL_SDIO_TIMEOUT;
-  }
+  sd_busy = 1;
+  dma_done = 0;
+  sdio_done = 0;
+  is_multi_block = 1;
+  sd_last_error = HAL_SDIO_OK;
 
-  SDIO->ICR = 0xFFFFFFFF;
-  SDIO->DCTRL = 0;
+  /* Enable SDIO interrupts: DATAEND, DBCKEND, and error flags */
+  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
+                SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
+                SDIO_MASK_RXOVERRIE;
 
-  while (!dma_transfer_complete(&dma_read_cfg))
-    ;
-  dma_clear_flags(&dma_read_cfg);
-
-  /* Send STOP_TRANSMISSION command */
-  sdio_send_command(SD_CMD_STOP_TRANSMISSION, sd_rca, 1);
-  sdio_wait_card_ready();
-
-  return HAL_SDIO_OK;
+  return HAL_SDIO_PENDING;
 }
 
-hal_sdio_error_t sdio_write_blocks_dma(uint32_t addr, const uint8_t *buf,
-                                       uint32_t count) {
+hal_sdio_error_t sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
+                                         uint32_t count) {
+  if (sd_busy)
+    return HAL_SDIO_BUSY;
+
   if (!card_is_sdhc)
     addr *= 512;
 
-  // if (sdio_wait_card_ready())
-  //   return HAL_SDIO_TIMEOUT;
-
   SDIO->ICR = 0xFFFFFFFF;
 
-  dma_config_t dma_write_cfg = {
+  dma2_stream6_cfg = (dma_config_t){
       .controller = DMA_CONTROLLER_2,
       .stream = 6,
       .channel = 4,
@@ -719,70 +674,132 @@ hal_sdio_error_t sdio_write_blocks_dma(uint32_t addr, const uint8_t *buf,
       .pburst = DMA_BURST_INCR4,
   };
 
-  dma_init(&dma_write_cfg);
+  dma_init((const dma_config_t *)&dma2_stream6_cfg);
 
   SDIO->ICR = 0xFFFFFFFF;
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512 * count;
-  sdio_send_command(SD_CMD_APP_CMD, sd_rca, 1);
-  /* Tell card how many blocks we will write */
-  sdio_send_command(23, count, 1); // CMD23
-  /* Start DMA */
-
-  // sdio_send_command(SD_CMD_WRITE_MULT_BLOCK, addr, 1);
-  // sdio_send_command(SD_CMD_APP_CMD, sd_rca, 1);
-  // sdio_send_command(23, count, 1);
-  /* Enable DPSM AFTER command */
-  SDIO->DCTRL =
-      (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
 
   if (sdio_send_command(SD_CMD_WRITE_MULT_BLOCK, addr, 1)) {
-    dma_stop(&dma_write_cfg);
+    dma_stop((const dma_config_t *)&dma2_stream6_cfg);
 #ifdef _DMA_ENABLED
     uart2_write_string("Write Multi CMD25 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
   }
-  dma_start(&dma_write_cfg);
-  uint32_t timeout = 5000000;
-  while (!(SDIO->STA & SDIO_STA_DATAEND) && timeout--) {
-    if (SDIO->STA &
-        (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
-      uint32_t sta = SDIO->STA;
-      SDIO->DCTRL = 0;
-      dma_stop(&dma_write_cfg);
-#ifdef _DMA_ENABLED
-      uart2_write_string("Write Multi DATAEND wait failed with STA = ");
-      uart2_write_int((int)sta);
-      uart2_write_string("\r\n");
-#endif
-      return HAL_SDIO_ERROR;
+
+  /* FIX: Start DMA FIRST so it pre-fills the SDIO FIFO */
+  dma_start((const dma_config_t *)&dma2_stream6_cfg);
+
+  /* FIX: Enable DPSM AFTER DMA is running to avoid TXUNDERRUN */
+  SDIO->DCTRL =
+      (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
+
+  sd_busy = 1;
+  dma_done = 0;
+  sdio_done = 0;
+  is_multi_block = 1;
+  sd_last_error = HAL_SDIO_OK;
+
+  /* Enable SDIO interrupts: DATAEND and error flags */
+  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DCRCFAILIE |
+                SDIO_MASK_DTIMEOUTIE | SDIO_MASK_TXUNDERRIE;
+
+  return HAL_SDIO_PENDING;
+}
+
+void SDIO_IRQHandler(void) {
+  uint32_t sta = SDIO->STA;
+  hal_sdio_error_t err = HAL_SDIO_OK;
+
+  if (sta & SDIO_STA_DCRCFAIL)
+    err = HAL_SDIO_CRC_FAIL;
+  else if (sta & SDIO_STA_DTIMEOUT)
+    err = HAL_SDIO_TIMEOUT;
+  else if (sta & SDIO_STA_RXOVERR)
+    err = HAL_SDIO_RX_OVERRUN;
+  else if (sta & SDIO_STA_TXUNDERR)
+    err = HAL_SDIO_TX_UNDERRUN;
+
+  /* FIX: Use DATAEND instead of DBCKEND to support multi-block */
+  if (err != HAL_SDIO_OK || (sta & SDIO_STA_DATAEND)) {
+    SDIO->MASK &=
+        ~(SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE | SDIO_MASK_DCRCFAILIE |
+          SDIO_MASK_DTIMEOUTIE | SDIO_MASK_RXOVERRIE | SDIO_MASK_TXUNDERRIE);
+    SDIO->ICR = 0xFFFFFFFF;
+    SDIO->DCTRL = 0;
+    sd_last_error = err;
+    sdio_done = 1;
+
+    /* Coordination with DMA TC */
+    if (dma_done || err != HAL_SDIO_OK) {
+      sd_busy = 0;
+      if (sd_callback) {
+        sd_callback(err);
+      }
     }
   }
+}
 
-  if (timeout == 0) {
-    SDIO->DCTRL = 0;
-    dma_stop(&dma_write_cfg);
+void DMA2_Stream3_IRQHandler(void) {
+  dma_clear_flags((const dma_config_t *)&dma2_stream3_cfg);
+  dma_done = 1;
+  if (sdio_done || sd_last_error != HAL_SDIO_OK) {
+    sd_busy = 0;
+    if (sd_callback) {
+      sd_callback(sd_last_error);
+    }
+  }
+}
+
+void DMA2_Stream6_IRQHandler(void) {
+  dma_clear_flags((const dma_config_t *)&dma2_stream6_cfg);
+  dma_done = 1;
+  if (sdio_done || sd_last_error != HAL_SDIO_OK) {
+    sd_busy = 0;
+    if (sd_callback) {
+      sd_callback(sd_last_error);
+    }
+  }
+}
+
+hal_sdio_error_t sdio_wait_sync(hal_sdio_error_t result) {
+  if (result != HAL_SDIO_PENDING)
+    return result;
+
+  uint32_t start = hal_get_millis();
+  uint32_t timeout_ms = 10000;
+  if (is_multi_block)
+    timeout_ms = 1000;
+  else
+    timeout_ms = 200;
+  while (sd_busy) {
+    if ((uint32_t)(hal_get_millis() - start) >= timeout_ms)
+      break;
+    __asm volatile("wfi");
+    // fallback safety
+    __asm volatile("nop");
+  }
+
+  if (hal_get_millis() - start >= timeout_ms) {
     return HAL_SDIO_TIMEOUT;
   }
 
-  SDIO->ICR = 0xFFFFFFFF;
-  SDIO->DCTRL = 0;
+  if (sd_last_error == HAL_SDIO_OK && is_multi_block) {
+    if (sdio_send_command(SD_CMD_STOP_TRANSMISSION, sd_rca, 1) != HAL_SDIO_OK) {
+      return HAL_SDIO_ERROR;
+    }
 
-  while (!dma_transfer_complete(&dma_write_cfg))
-    ;
-  dma_clear_flags(&dma_write_cfg);
+    uint32_t start = hal_get_millis();
+    while (sdio_wait_card_ready() != HAL_SDIO_OK) {
+      if ((uint32_t)(hal_get_millis() - start) >= 500) {
+        return HAL_SDIO_TIMEOUT;
+      }
+    }
 
-  /* Send STOP_TRANSMISSION command */
-  sdio_send_command(SD_CMD_STOP_TRANSMISSION, sd_rca, 1);
-  sdio_wait_card_ready();
-
-  if (timeout == 0) {
-    SDIO->DCTRL = 0;
-    dma_stop(&dma_write_cfg);
-    return HAL_SDIO_TIMEOUT;
+    is_multi_block = 0;
   }
 
-  return HAL_SDIO_OK;
+  return sd_last_error;
 }
 #endif

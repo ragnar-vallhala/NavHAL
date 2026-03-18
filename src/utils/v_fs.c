@@ -59,7 +59,6 @@ v_fd_t v_open(const char *path, int flags) {
 int v_close(v_fd_t fd) {
   if (fd < 0 || fd >= MAX_OPEN_FILES || !file_in_use[fd])
     return -1;
-
   FRESULT res = f_close(&open_files[fd]);
   if (res == FR_OK) {
     file_in_use[fd] = 0;

@@ -5,7 +5,6 @@
 
 #include "common/hal_diskio.h"
 #include "core/cortex-m4/sdio.h"
-#include "core/cortex-m4/uart.h"
 
 static hal_disk_status_t disk_stat = HAL_DISK_STATUS_NOINIT;
 
@@ -35,11 +34,12 @@ hal_disk_result_t hal_disk_read(uint8_t pdrv, uint8_t *buff, uint32_t sector,
 
 #ifdef _DMA_ENABLED
   if (count == 1) {
-    if (sdio_read_block_dma(sector, buff) != HAL_SDIO_OK) {
+    if (sdio_wait_sync(sdio_read_block_async(sector, buff)) != HAL_SDIO_OK) {
       return HAL_DISK_RES_ERROR;
     }
   } else {
-    if (sdio_read_blocks_dma(sector, buff, count) != HAL_SDIO_OK) {
+    if (sdio_wait_sync(sdio_read_blocks_async(sector, buff, count)) !=
+        HAL_SDIO_OK) {
       return HAL_DISK_RES_ERROR;
     }
   }
@@ -67,14 +67,15 @@ hal_disk_result_t hal_disk_write(uint8_t pdrv, const uint8_t *buff,
   if (count <= 4) {
     /* Small writes — safer to use single block */
     while (count--) {
-      if (sdio_write_block_dma(sector, buff) != HAL_SDIO_OK)
+      if (sdio_wait_sync(sdio_write_block_async(sector, buff)) != HAL_SDIO_OK)
         return HAL_DISK_RES_ERROR;
 
       sector++;
       buff += 512;
     }
   } else {
-    if (sdio_write_blocks_dma(sector, buff, count) != HAL_SDIO_OK) {
+    if (sdio_wait_sync(sdio_write_blocks_async(sector, buff, count)) !=
+        HAL_SDIO_OK) {
       return HAL_DISK_RES_ERROR;
     }
   }

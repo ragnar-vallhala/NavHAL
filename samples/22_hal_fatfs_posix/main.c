@@ -3,6 +3,8 @@
  * @brief Example: Test FatFS and POSIX-like API.
  */
 
+#include "core/cortex-m4/timer.h"
+#include <stdint.h>
 #define CORTEX_M4
 #include "navhal.h"
 #include "utils/util.h"
@@ -49,25 +51,42 @@ int main(void) {
 
   /* 5. Create and write to a file */
   uart2_write_string("Creating test.txt...\n\r");
-  v_fd_t fd = v_open("test.txt", V_O_CREAT | V_O_RDWR | V_O_TRUNC);
-  if (fd < 0) {
-    uart2_write_string("Failed to open test.txt for writing.\n\r");
-    while (1)
-      ;
-  }
+  uint32_t size = 1 * 1024;
+  timer_init_freq(TIM1, 1000000);
+  v_fd_t fd;
 
-  const char *msg = "Hello from NavHAL FatFS!";
-  int written = v_write(fd, msg, 24);
-  if (written > 0) {
-    uart2_write_string("Write Success (");
-    uart2_write(written);
-    uart2_write_string(" bytes).\n\r");
-  } else {
-    uart2_write_string("Write Error (Code: ");
-    uart2_write(-written);
-    uart2_write_string(").\n\r");
+  for (; size < 1024 * 10; size <<= 1) {
+    fd = v_open("test.txt", V_O_CREAT | V_O_RDWR | V_O_TRUNC);
+    if (fd < 0) {
+      uart2_write_string("Failed to open test.txt for writing.\n\r");
+      while (1)
+        ;
+    }
+    char str[size];
+    hal_memset(str, 0, sizeof(str));
+    for (int i = 0; i < size; i++) {
+      str[i] = i;
+    }
+    timer_start(TIM1);
+    timer_reset(TIM1);
+    int written = v_write(fd, str, size);
+    timer_stop(TIM1);
+    uint32_t time = timer_get_count(TIM1);
+    uart2_write_string("Write Time: ");
+    uart2_write(time);
+    uart2_write_string(" ticks\n\r");
+    if (written > 0) {
+      uart2_write_string("Write Success (");
+      uart2_write(written);
+      uart2_write_string(" bytes).\n\r");
+    } else {
+      uart2_write_string("Write Error (Code: ");
+      uart2_write(-written);
+      uart2_write_string(").\n\r");
+    }
+    v_sync(fd);
+    v_close(fd);
   }
-  v_close(fd);
 
   /* 6. Read back from the file */
   uart2_write_string("Reading back test.txt...\n\r");
@@ -78,9 +97,9 @@ int main(void) {
       ;
   }
 
-  uint8_t read_buf[32] __attribute__((aligned(4)));
+  uint8_t read_buf[1024 * 6] __attribute__((aligned(4)));
   hal_memset(read_buf, 0, sizeof(read_buf));
-  int read_bytes = v_read(fd, read_buf, 25);
+  int read_bytes = v_read(fd, read_buf, 1024 * 6);
   if (read_bytes > 0) {
     uart2_write_string("Read Success (");
     uart2_write(read_bytes);

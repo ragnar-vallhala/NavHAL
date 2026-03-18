@@ -48,8 +48,22 @@ typedef enum {
   HAL_SDIO_TIMEOUT,
   HAL_SDIO_CRC_FAIL,
   HAL_SDIO_RX_OVERRUN,
-  HAL_SDIO_TX_UNDERRUN
+  HAL_SDIO_TX_UNDERRUN,
+  HAL_SDIO_PENDING,
+  HAL_SDIO_BUSY
 } hal_sdio_error_t;
+
+/**
+ * @brief SDIO Callback function type.
+ */
+typedef void (*hal_sdio_callback_t)(hal_sdio_error_t error);
+
+/**
+ * @brief Set the callback for asynchronous SDIO operations.
+ *
+ * @param callback Function to call when operation completes.
+ */
+void sdio_set_callback(hal_sdio_callback_t callback);
 
 /**
  * @brief Initialize the SDIO peripheral and GPIOs.
@@ -101,6 +115,14 @@ uint32_t sdio_get_response(uint8_t response_reg);
 hal_sdio_error_t sdio_wait_flag(uint32_t flag, uint32_t timeout);
 
 /**
+ * @brief Wait for an asynchronous operation to complete (synchronous wrapper).
+ *
+ * @param result The result from the async function (e.g., HAL_SDIO_PENDING).
+ * @return hal_sdio_error_t final status.
+ */
+hal_sdio_error_t sdio_wait_sync(hal_sdio_error_t result);
+
+/**
  * @brief Read a single 512-byte block from the SD card.
  *
  * @param addr   Sector address (LBA).
@@ -120,13 +142,13 @@ hal_sdio_error_t sdio_write_block(uint32_t addr, const uint8_t *buffer);
 
 #include "core/cortex-m4/config.h"
 #ifdef _DMA_ENABLED
-hal_sdio_error_t sdio_read_block_dma(uint32_t addr, uint8_t *buffer);
-hal_sdio_error_t sdio_write_block_dma(uint32_t addr, const uint8_t *buffer);
+hal_sdio_error_t sdio_read_block_async(uint32_t addr, uint8_t *buffer);
+hal_sdio_error_t sdio_write_block_async(uint32_t addr, const uint8_t *buffer);
 
-hal_sdio_error_t sdio_read_blocks_dma(uint32_t addr, uint8_t *buffer,
-                                      uint32_t count);
-hal_sdio_error_t sdio_write_blocks_dma(uint32_t addr, const uint8_t *buffer,
-                                       uint32_t count);
+hal_sdio_error_t sdio_read_blocks_async(uint32_t addr, uint8_t *buffer,
+                                        uint32_t count);
+hal_sdio_error_t sdio_write_blocks_async(uint32_t addr, const uint8_t *buffer,
+                                         uint32_t count);
 #endif
 
 uint32_t sdio_get_sector_count(void);

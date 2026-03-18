@@ -45,6 +45,9 @@
 .global DMA1_Stream0_IRQHandler
 .global DMA1_Stream5_IRQHandler
 .global DMA1_Stream6_IRQHandler
+.global DMA2_Stream3_IRQHandler
+.global DMA2_Stream6_IRQHandler
+.global SDIO_IRQHandler
 
 /**
  * @brief Vector Table
@@ -119,7 +122,7 @@
     .word  0                        /* 46. Reserved */
     .word  Default_Handler            /* 47. DMA1 Stream 7 */
     .word  0                        /* 48. Reserved */
-    .word  Default_Handler            /* 49. SDIO */
+    .word  SDIO_IRQHandler            /* 49. SDIO */
     .word  TIM5_IRQHandler            /* 50. TIM5 */
     .word  Default_Handler            /* 51. SPI3 */
     /*Done till above*/
@@ -130,7 +133,7 @@
     .word  Default_Handler /* 73. DMA2 Stream 0 */
     .word  Default_Handler /* 74. DMA2 Stream 1 */
     .word  Default_Handler /* 75. DMA2 Stream 2 */
-    .word  Default_Handler /* 76. DMA2 Stream 3 */
+    .word  DMA2_Stream3_IRQHandler  /* 76. DMA2 Stream 3 */
     .word  Default_Handler /* 77. DMA2 Stream 4 */
     .word  0                       /* 78. Reserved */
     .word  0                       /* 79. Reserved */
@@ -140,7 +143,7 @@
     .word  0                       /* 83. Reserved */
     .word  Default_Handler /* 84. USB OTG FS */
     .word  Default_Handler /* 85. DMA2 Stream 5 */
-    .word  Default_Handler /* 86. DMA2 Stream 6 */
+    .word  DMA2_Stream6_IRQHandler /* 86. DMA2 Stream 6 */
     .word  Default_Handler /* 87. DMA2 Stream 7 */
     .word  Default_Handler /* 88. USART6 */
     .word  Default_Handler /* 89. I2C3 Event */

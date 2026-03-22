@@ -76,6 +76,13 @@ hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
   // Make a local copy to know what flags to clear during interrupt
   _active_i2c_dma_config = *dma_cfg;
 
+  // Set ACK to ensure we pull data normally until DMA flags LAST
+  I2Cx->CR1 |= I2C_CR1_ACK_MASK;
+  // I2C DMA specific setup: Enable DMAEN in CR2 + Enable LAST for terminating
+  // NACK
+  I2Cx->CR2 |= I2C_CR2_LAST; // LAST bit
+  I2Cx->CR2 |= I2C_CR2_DMAEN;
+
   // Init/Start the DMA (CR, NDTR, M0AR config + Enable)
   dma_init(&_active_i2c_dma_config);
 
@@ -90,13 +97,6 @@ hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
 
   dma_start(&_active_i2c_dma_config);
 
-  // Set ACK to ensure we pull data normally until DMA flags LAST
-  I2Cx->CR1 |= I2C_CR1_ACK_MASK;
-  // I2C DMA specific setup: Enable DMAEN in CR2 + Enable LAST for terminating
-  // NACK
-  I2Cx->CR2 |= I2C_CR2_LAST; // LAST bit
-  I2Cx->CR2 |= I2C_CR2_DMAEN;
-
   (void)I2Cx->SR1;
   (void)I2Cx->SR2; // Clear ADDR to release clock stretching and let DMA read
 
@@ -108,18 +108,16 @@ void DMA1_Stream0_IRQHandler(void) {
   if (dma_transfer_complete(&_active_i2c_dma_config)) {
     dma_clear_flags(&_active_i2c_dma_config);
 
-    // Stop and Disable I2C DMA gracefully
-    I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(I2C1); // Map logic for DMA1_Stream0
+    I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(I2C1);
     if (I2Cx) {
-      I2Cx->CR1 |=
-          I2C_CR1_STOP_MASK; // Changed I2C_CR1_STOP to I2C_CR1_STOP_MASK
-      I2Cx->CR2 &=
-          ~I2C_CR2_DMAEN; // Changed I2C_CR2_DMAEN to I2C_CR2_DMAEN_MASK
+      I2Cx->CR2 &= ~I2C_CR2_DMAEN;
+      I2Cx->CR2 &= ~I2C_CR2_LAST;
+      I2Cx->CR1 |= I2C_CR1_ACK_MASK;
+      I2Cx->CR1 |= I2C_CR1_STOP_MASK; // Issue STOP last, don't wait for it
     }
 
-    // Fire user callback
     if (_i2c_dma_rx_callback) {
-      _i2c_dma_rx_callback();
+      _i2c_dma_rx_callback(); // Let the task-level BUSY check absorb the wait
     }
   }
 }
@@ -131,10 +129,10 @@ void DMA1_Stream5_IRQHandler(void) {
     // Stop and Disable I2C DMA gracefully
     I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(I2C1); // Map logic for DMA1_Stream5
     if (I2Cx) {
-      I2Cx->CR1 |=
-          I2C_CR1_STOP_MASK; // Changed I2C_CR1_STOP to I2C_CR1_STOP_MASK
-      I2Cx->CR2 &=
-          ~I2C_CR2_DMAEN; // Changed I2C_CR2_DMAEN to I2C_CR2_DMAEN_MASK
+      I2Cx->CR2 &= ~I2C_CR2_DMAEN;
+      I2Cx->CR2 &= ~I2C_CR2_LAST;
+      I2Cx->CR1 |= I2C_CR1_ACK_MASK;
+      I2Cx->CR1 |= I2C_CR1_STOP_MASK; // Issue STOP last, don't wait for it
     }
 
     // Fire user callback

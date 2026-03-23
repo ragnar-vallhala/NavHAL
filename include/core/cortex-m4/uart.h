@@ -67,57 +67,92 @@ typedef enum {
 
 #define uart2_write(val)                                                       \
   _Generic((val),                                                              \
-      char: uart2_write_char,                                                  \
-      signed char: uart2_write_int,                                            \
-      unsigned char: uart2_write_uint,                                         \
-      short: uart2_write_int,                                                  \
-      unsigned short: uart2_write_uint,                                        \
-      int: uart2_write_int,                                                    \
-      unsigned int: uart2_write_uint,                                          \
-      long: uart2_write_int,                                                   \
-      unsigned long: uart2_write_uint,                                         \
-      long long: uart2_write_int,                                              \
-      unsigned long long: uart2_write_uint,                                    \
-      float: uart2_write_float,                                                \
-      double: uart2_write_float,                                               \
-      const char *: uart2_write_string,                                        \
-      char *: uart2_write_string)(val)
+      char: uart_write_char,                                                   \
+      signed char: uart_write_int,                                             \
+      unsigned char: uart_write_uint,                                          \
+      short: uart_write_int,                                                   \
+      unsigned short: uart_write_uint,                                         \
+      int: uart_write_int,                                                     \
+      unsigned int: uart_write_uint,                                           \
+      long: uart_write_int,                                                    \
+      unsigned long: uart_write_uint,                                          \
+      long long: uart_write_int,                                               \
+      unsigned long long: uart_write_uint,                                     \
+      float: uart_write_float,                                                 \
+      double: uart_write_float,                                                \
+      const char *: uart_write_string,                                         \
+      char *: uart_write_string)(val, UART2)
 
 #define uart1_write(val)                                                       \
   _Generic((val),                                                              \
-      char: uart1_write_char,                                                  \
-      signed char: uart1_write_int,                                            \
-      unsigned char: uart1_write_uint,                                         \
-      short: uart1_write_int,                                                  \
-      unsigned short: uart1_write_uint,                                        \
-      int: uart1_write_int,                                                    \
-      unsigned int: uart1_write_uint,                                          \
-      long: uart1_write_int,                                                   \
-      unsigned long: uart1_write_uint,                                         \
-      long long: uart1_write_int,                                              \
-      unsigned long long: uart1_write_uint,                                    \
-      float: uart1_write_float,                                                \
-      double: uart1_write_float,                                               \
-      const char *: uart1_write_string,                                        \
-      char *: uart1_write_string)(val)
+      char: uart_write_char,                                                   \
+      signed char: uart_write_int,                                             \
+      unsigned char: uart_write_uint,                                          \
+      short: uart_write_int,                                                   \
+      unsigned short: uart_write_uint,                                         \
+      int: uart_write_int,                                                     \
+      unsigned int: uart_write_uint,                                           \
+      long: uart_write_int,                                                    \
+      unsigned long: uart_write_uint,                                          \
+      long long: uart_write_int,                                               \
+      unsigned long long: uart_write_uint,                                     \
+      float: uart_write_float,                                                 \
+      double: uart_write_float,                                                \
+      const char *: uart_write_string,                                         \
+      char *: uart_write_string)(val, UART1)
 
 #define uart6_write(val)                                                       \
   _Generic((val),                                                              \
-      char: uart6_write_char,                                                  \
-      signed char: uart6_write_int,                                            \
-      unsigned char: uart6_write_uint,                                         \
-      short: uart6_write_int,                                                  \
-      unsigned short: uart6_write_uint,                                        \
-      int: uart6_write_int,                                                    \
-      unsigned int: uart6_write_uint,                                          \
-      long: uart6_write_int,                                                   \
-      unsigned long: uart6_write_uint,                                         \
-      long long: uart6_write_int,                                              \
-      unsigned long long: uart6_write_uint,                                    \
-      float: uart6_write_float,                                                \
-      double: uart6_write_float,                                               \
-      const char *: uart6_write_string,                                        \
-      char *: uart6_write_string)(val)
+      char: uart_write_char,                                                   \
+      signed char: uart_write_int,                                             \
+      unsigned char: uart_write_uint,                                          \
+      short: uart_write_int,                                                   \
+      unsigned short: uart_write_uint,                                         \
+      int: uart_write_int,                                                     \
+      unsigned int: uart_write_uint,                                           \
+      long: uart_write_int,                                                    \
+      unsigned long: uart_write_uint,                                          \
+      long long: uart_write_int,                                               \
+      unsigned long long: uart_write_uint,                                     \
+      float: uart_write_float,                                                 \
+      double: uart_write_float,                                                \
+      const char *: uart_write_string,                                         \
+      char *: uart_write_string)(val, UART6)
+
+/**
+ * @brief Truly generic UART write macro.
+ *
+ * Dispatches to the correct write function based on value type AND UART
+ * instance.
+ *
+ * Example:
+ * @code
+ * hal_uart_write(42, UART2);      // Calls uart_write_int(42, UART2)
+ * hal_uart_write("Hi", UART6);   // Calls uart_write_string("Hi", UART6)
+ * @endcode
+ */
+#define hal_uart_write(val, uart)                                              \
+  _Generic((val),                                                              \
+      char: uart_write_char,                                                   \
+      signed char: uart_write_int,                                             \
+      unsigned char: uart_write_uint,                                          \
+      short: uart_write_int,                                                   \
+      unsigned short: uart_write_uint,                                         \
+      int: uart_write_int,                                                     \
+      unsigned int: uart_write_uint,                                           \
+      long: uart_write_int,                                                    \
+      unsigned long: uart_write_uint,                                          \
+      long long: uart_write_int,                                               \
+      unsigned long long: uart_write_uint,                                     \
+      float: uart_write_float,                                                 \
+      double: uart_write_float,                                                \
+      const char *: uart_write_string,                                         \
+      char *: uart_write_string)(val, uart)
+
+/**
+ * @brief Default UART write macro (targets UART2).
+ */
+#define uart_write(val) uart2_write(val)
 
 /** @} */ // end of UART_WRITE_MACROS
 
@@ -162,6 +197,14 @@ void uart_write_char(char c, hal_uart_t uart);
 void uart_write_int(int32_t num, hal_uart_t uart);
 
 /**
+ * @brief Transmit a 32-bit unsigned integer via UART.
+ *
+ * @param num  Unsigned integer to transmit.
+ * @param uart UART instance to use.
+ */
+void uart_write_uint(uint32_t num, hal_uart_t uart);
+
+/**
  * @brief Transmit a floating-point number via UART.
  *
  * Converts the float to its string representation with default formatting
@@ -182,59 +225,55 @@ void uart_write_float(float num, hal_uart_t uart);
  */
 void uart_write_string(const char *s, hal_uart_t uart);
 
-/* USART1 specific functions */
-
 /**
- * @brief Initialize USART1 peripheral.
+ * @brief Transmit a raw byte buffer via the specified UART (polling).
  *
- * @param baudrate Desired communication speed in bits per second.
+ * @param data   Pointer to the byte buffer.
+ * @param length Number of bytes to transmit.
+ * @param uart   UART instance to use.
  */
+void uart_write_buf(const uint8_t *data, uint16_t length, hal_uart_t uart);
+
+/* USART1 specific functions/macros */
 void uart1_init(uint32_t baudrate);
+#define uart1_write_char(c) uart_write_char(c, UART1)
+#define uart1_write_int(n) uart_write_int(n, UART1)
+#define uart1_write_uint(n) uart_write_uint(n, UART1)
+#define uart1_write_float(n) uart_write_float(n, UART1)
+#define uart1_write_string(s) uart_write_string(s, UART1)
+#define uart1_available() uart_available(UART1)
+#define uart1_read_char() uart_read_char(UART1)
+#define uart1_read_until(b, m, d) uart_read_until(b, m, d, UART1)
 
-/**
- * @brief Transmit a single character via USART1.
- */
-void uart1_write_char(char c);
-
-/**
- * @brief Transmit a 32-bit signed integer via USART1.
- */
-void uart1_write_int(int32_t num);
-void uart1_write_uint(uint32_t num);
-
-/**
- * @brief Transmit a floating-point number via USART1.
- */
-void uart1_write_float(float num);
-
-/**
- * @brief Transmit a null-terminated string via USART1.
- */
-void uart1_write_string(const char *s);
-
-/* USART2 specific functions */
+/* USART2 specific functions/macros */
 
 /**
  * @brief Initialize USART2 peripheral.
  */
 void uart2_init(uint32_t baudrate);
-void uart2_write_char(char c);
-void uart2_write_int(int32_t num);
-void uart2_write_uint(uint32_t num);
-void uart2_write_float(float num);
-void uart2_write_string(const char *s);
+#define uart2_write_char(c) uart_write_char(c, UART2)
+#define uart2_write_int(n) uart_write_int(n, UART2)
+#define uart2_write_uint(n) uart_write_uint(n, UART2)
+#define uart2_write_float(n) uart_write_float(n, UART2)
+#define uart2_write_string(s) uart_write_string(s, UART2)
+#define uart2_available() uart_available(UART2)
+#define uart2_read_char() uart_read_char(UART2)
+#define uart2_read_until(b, m, d) uart_read_until(b, m, d, UART2)
 
-/* USART6 specific functions */
+/* USART6 specific functions/macros */
 
 /**
  * @brief Initialize USART6 peripheral.
  */
 void uart6_init(uint32_t baudrate);
-void uart6_write_char(char c);
-void uart6_write_int(int32_t num);
-void uart6_write_uint(uint32_t num);
-void uart6_write_float(float num);
-void uart6_write_string(const char *s);
+#define uart6_write_char(c) uart_write_char(c, UART6)
+#define uart6_write_int(n) uart_write_int(n, UART6)
+#define uart6_write_uint(n) uart_write_uint(n, UART6)
+#define uart6_write_float(n) uart_write_float(n, UART6)
+#define uart6_write_string(s) uart_write_string(s, UART6)
+#define uart6_available() uart_available(UART6)
+#define uart6_read_char() uart_read_char(UART6)
+#define uart6_read_until(b, m, d) uart_read_until(b, m, d, UART6)
 
 /**
  * @brief Read a single character from the specified UART.
@@ -254,37 +293,18 @@ char uart_read_char(hal_uart_t uart);
  */
 int uart_available(hal_uart_t uart);
 
-/* USART1 specific receive functions */
-int uart1_available(void);
-char uart1_read_char(void);
-
-/* USART2 specific receive functions */
-int uart2_available(void);
-char uart2_read_char(void);
-
-/* USART6 specific receive functions */
-int uart6_available(void);
-char uart6_read_char(void);
-
 /**
- * @brief Read characters into a buffer until a delimiter is found or max length
- * is reached.
+ * @brief Read characters from UART until a delimiter is found or max_len is
+ * reached.
  *
- * Reads characters into the provided buffer until either:
- * - The specified delimiter character is received
- * - The maximum buffer length is reached
- * - A timeout occurs
- *
- * The delimiter character is not included in the buffer. The buffer is always
- * null-terminated.
- *
- * @param buffer     Destination buffer for received characters.
- * @param maxlen     Maximum number of characters to read (including null
- * terminator).
- * @param delimiter  Character that terminates the read operation.
- * @return Number of characters read (excluding null terminator).
+ * @param buffer    Pointer to the buffer to store received data.
+ * @param maxlen    Maximum number of bytes to read into the buffer.
+ * @param delimiter Character to stop reading at.
+ * @param uart      UART instance to read from.
+ * @return Number of characters read.
  */
-uint32_t uart2_read_until(char *buffer, uint32_t maxlen, char delimiter);
+uint32_t uart_read_until(char *buffer, uint32_t maxlen, char delimiter,
+                         hal_uart_t uart);
 
 /** @} */ // end of UART_API
 

@@ -16,15 +16,15 @@
 int main(void)
 {
     systick_init(1000);   /**< Initialize SysTick with 1 ms tick */
-    uart2_init(9600);     /**< Initialize UART2 at 9600 baud */
+    uart6_init(9600);     /**< Initialize UART2 at 9600 baud */
     int n = hal_get_tick();
     int iter = 100;
     while (iter--)
     {
-        uart2_write_string("Hello World\n\r");  /**< Send string over UART2 */
+        uart6_write("Hello World\n\r");  /**< Send string over UART2 */
     }
-    uart2_write("UART TX NO DMA Test finished: ");
-    uart2_write(hal_get_tick() - n);
-    uart2_write(" ticks\n\r");
+    uart6_write("UART TX NO DMA Test finished: ");
+    uart6_write(hal_get_tick() - n);
+    uart6_write(" ticks\n\r");
     return 0;
 }

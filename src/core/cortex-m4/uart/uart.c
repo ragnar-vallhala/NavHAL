@@ -337,6 +337,8 @@ void uart_write_dma(const uint8_t *data, uint16_t length, hal_uart_t uart) {
     /* Safe-Async: Wait for previous transfer before starting new one */
     while (s->CR & DMA_SxCR_EN)
       ;
+    s->M0AR = (uint32_t)data;
+    s->NDTR = length;
   }
 
   dma_clear_flags(&cfg);

@@ -27,11 +27,12 @@
 #include "core/cortex-m4/uart.h"
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/gpio.h"
+#include "core/cortex-m4/interrupt.h" // Moved here
 #include "core/cortex-m4/rcc_reg.h"
 #include "core/cortex-m4/uart_reg.h"
+#include <stdint.h> // Added
 #ifdef _UART_BACKEND_DMA
 #include "core/cortex-m4/dma.h"
-#include "core/cortex-m4/interrupt.h"
 #endif
 
 static inline volatile UARTx_Reg_Typedef *_get_usart(hal_uart_t uart) {
@@ -94,6 +95,28 @@ static void _uart_hw_init(hal_uart_t uart, uint32_t baudrate) {
  */
 void uart_init(uint32_t baudrate, hal_uart_t uart) {
   _uart_hw_init(uart, baudrate);
+}
+
+void hal_uart_enable_interrupt(hal_uart_t uart, uint8_t rx_en, uint8_t tx_en) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart); // Added volatile
+  if (!usart)
+    return;
+
+  if (rx_en)
+    usart->CR1 |= UART_CR1_RXNEIE;
+  else
+    usart->CR1 &= ~UART_CR1_RXNEIE;
+
+  if (tx_en)
+    usart->CR1 |= (1 << 7); // TXEIE is bit 7 in CR1
+  else
+    usart->CR1 &= ~(1 << 7);
+
+  // Also enable in NVIC
+  IRQn_Type irq = (uart == UART1)   ? USART1_IRQn
+                  : (uart == UART6) ? USART6_IRQn
+                                    : USART2_IRQn;
+  hal_enable_interrupt(irq);
 }
 
 void uart1_init(uint32_t baudrate) { _uart_hw_init(UART1, baudrate); }

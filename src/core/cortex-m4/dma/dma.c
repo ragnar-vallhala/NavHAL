@@ -194,15 +194,34 @@ void dma_clear_flags(const dma_config_t *cfg) {
   _clear_flags(_get_dma(cfg), cfg->stream);
 }
 
-void DMA1_Stream6_IRQHandler(void) {
-  DMA_Typedef *dma = DMA1;
-  uint8_t stream = 6;
-  uint32_t mask =
-      (DMA_ISR_TCIF(stream) | DMA_ISR_HTIF(stream) | DMA_ISR_TEIF(stream) |
-       DMA_ISR_DMEIF(stream) | DMA_ISR_FEIF(stream));
+/*---------------------------------------------------------------------------
+ * Central DMA Interrupt Dispatchers
+ * Each stream handler clears peripheral flags and routes to the HAL callback
+ *system.
+ *---------------------------------------------------------------------------*/
 
-  *DMA_IFCR_REG(dma, stream) = mask;
-  hal_handle_interrupt(DMA1_Stream6_IRQn);
-}
+#define DMA_ISR_GEN(controller, stream, irqn)                                  \
+  void controller##_Stream##stream##_IRQHandler(void) {                        \
+    _clear_flags(controller, stream);                                          \
+    hal_handle_interrupt(irqn);                                                \
+  }
+
+DMA_ISR_GEN(DMA1, 0, DMA1_Stream0_IRQn)
+DMA_ISR_GEN(DMA1, 1, DMA1_Stream1_IRQn)
+DMA_ISR_GEN(DMA1, 2, DMA1_Stream2_IRQn)
+DMA_ISR_GEN(DMA1, 3, DMA1_Stream3_IRQn)
+DMA_ISR_GEN(DMA1, 4, DMA1_Stream4_IRQn)
+DMA_ISR_GEN(DMA1, 5, DMA1_Stream5_IRQn)
+DMA_ISR_GEN(DMA1, 6, DMA1_Stream6_IRQn)
+DMA_ISR_GEN(DMA1, 7, DMA1_Stream7_IRQn)
+
+DMA_ISR_GEN(DMA2, 0, DMA2_Stream0_IRQn)
+DMA_ISR_GEN(DMA2, 1, DMA2_Stream1_IRQn)
+DMA_ISR_GEN(DMA2, 2, DMA2_Stream2_IRQn)
+DMA_ISR_GEN(DMA2, 3, DMA2_Stream3_IRQn)
+DMA_ISR_GEN(DMA2, 4, DMA2_Stream4_IRQn)
+DMA_ISR_GEN(DMA2, 5, DMA2_Stream5_IRQn)
+DMA_ISR_GEN(DMA2, 6, DMA2_Stream6_IRQn)
+DMA_ISR_GEN(DMA2, 7, DMA2_Stream7_IRQn)
 
 #endif /* _DMA_ENABLED */

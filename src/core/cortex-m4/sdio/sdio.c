@@ -458,6 +458,9 @@ uint32_t sdio_get_sector_count(void) {
 static dma_config_t dma2_stream3_cfg;
 static dma_config_t dma2_stream6_cfg;
 
+static void _sdio_dma_rx_irq_handler(void);
+static void _sdio_dma_tx_irq_handler(void);
+
 hal_sdio_error_t sdio_read_block_async(uint32_t addr, uint8_t *buf) {
   if (sd_busy)
     return HAL_SDIO_BUSY;
@@ -491,6 +494,7 @@ hal_sdio_error_t sdio_read_block_async(uint32_t addr, uint8_t *buf) {
   };
 
   dma_init((const dma_config_t *)&dma2_stream3_cfg);
+  hal_interrupt_attach_callback(DMA2_Stream3_IRQn, _sdio_dma_rx_irq_handler);
 
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512;
@@ -552,6 +556,7 @@ hal_sdio_error_t sdio_write_block_async(uint32_t addr, const uint8_t *buf) {
   };
 
   dma_init((const dma_config_t *)&dma2_stream6_cfg);
+  hal_interrupt_attach_callback(DMA2_Stream6_IRQn, _sdio_dma_tx_irq_handler);
 
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512;
@@ -612,6 +617,7 @@ hal_sdio_error_t sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
   };
 
   dma_init((const dma_config_t *)&dma2_stream3_cfg);
+  hal_interrupt_attach_callback(DMA2_Stream3_IRQn, _sdio_dma_rx_irq_handler);
   SDIO->DCTRL = 0;
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512 * count;
@@ -675,6 +681,7 @@ hal_sdio_error_t sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
   };
 
   dma_init((const dma_config_t *)&dma2_stream6_cfg);
+  hal_interrupt_attach_callback(DMA2_Stream6_IRQn, _sdio_dma_tx_irq_handler);
 
   SDIO->ICR = 0xFFFFFFFF;
   SDIO->DTIMER = 0xFFFFFFFF;
@@ -741,7 +748,7 @@ void SDIO_IRQHandler(void) {
   }
 }
 
-void DMA2_Stream3_IRQHandler(void) {
+static void _sdio_dma_rx_irq_handler(void) {
   dma_clear_flags((const dma_config_t *)&dma2_stream3_cfg);
   dma_done = 1;
   if (sdio_done || sd_last_error != HAL_SDIO_OK) {
@@ -752,7 +759,7 @@ void DMA2_Stream3_IRQHandler(void) {
   }
 }
 
-void DMA2_Stream6_IRQHandler(void) {
+static void _sdio_dma_tx_irq_handler(void) {
   dma_clear_flags((const dma_config_t *)&dma2_stream6_cfg);
   dma_done = 1;
   if (sdio_done || sd_last_error != HAL_SDIO_OK) {

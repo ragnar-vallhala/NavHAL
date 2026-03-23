@@ -3,17 +3,17 @@
 
 int main() {
   systick_init(1000); /**< Initialize SysTick for 1ms ticks */
-  uart2_init(9600);
+  uart6_init(9600);
 
   /* --- DMA benchmark --- */
 #if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
   int n = hal_get_tick();
   int iter = 100;
   while (iter--)
-    uart2_write_string_dma("Hello World\n\r"); /**< DMA transfer */
-  uart2_write_string("DMA done: ");
-  uart2_write(hal_get_tick() - n);
-  uart2_write_string(" ticks\n\r");
+    uart6_write_string_dma("Hello World\n\r"); /**< DMA transfer */
+  uart6_write_string("DMA done: ");
+  uart6_write(hal_get_tick() - n);
+  uart6_write_string(" ticks\n\r");
 #else
   /* --- Polling benchmark (fallback) --- */
   int n = hal_get_tick();

@@ -309,47 +309,51 @@ uint32_t uart_read_until(char *buffer, uint32_t maxlen, char delimiter,
 /** @} */ // end of UART_API
 
 /*---------------------------------------------------------------------------
- * DMA-backed UART TX — only available when _DMA_ENABLED and
+ * DMA-backed UART API — only available when _DMA_ENABLED and
  * _UART_BACKEND_DMA are both defined.
  *---------------------------------------------------------------------------*/
 #if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
 
 /**
- * @brief Transmit a raw byte buffer over USART2 using DMA.
- *
- * Blocking: returns only after the DMA transfer is complete and the
- * UART shift register has finished clocking out the last byte.
- *
- * USART2_TX maps to DMA1 Stream6 Channel4 on STM32F4.
+ * @brief Transmit a raw byte buffer over the specified UART using DMA.
  *
  * @param data   Pointer to source buffer (must stay valid until return).
  * @param length Number of bytes to transmit.
- *
- * @ingroup HAL_UART
+ * @param uart   UART instance to use.
  */
-void uart2_write_dma(const uint8_t *data, uint16_t length);
+void uart_write_dma(const uint8_t *data, uint16_t length, hal_uart_t uart);
 
 /**
- * @brief Initialize USART1 for DMA-based reception.
+ * @brief Initialize the specified UART for DMA-based circular reception.
  *
- * Sets up the DMA2 Stream 2 Channel 4 in circular mode to fill the provided
- * buffer.
+ * Sets up the DMA stream to fill the provided buffer in circular mode.
  *
  * @param buffer Destination buffer for received bytes.
  * @param length Size of the buffer.
+ * @param uart   UART instance to use.
  */
-void uart1_init_dma_rx(uint8_t *buffer, uint16_t length, uint32_t baudrate);
+void uart_init_dma_rx(uint8_t *buffer, uint16_t length, hal_uart_t uart);
 
 /**
- * @brief Transmit a null-terminated string over USART2 using DMA.
+ * @brief Transmit a null-terminated string over the specified UART using DMA.
  *
- * Convenience wrapper around uart2_write_dma().
- *
- * @param s Null-terminated string (must stay valid until return).
- *
- * @ingroup HAL_UART
+ * @param s    Null-terminated string (must stay valid until return).
+ * @param uart UART instance to use.
  */
-void uart2_write_string_dma(const char *s);
+void uart_write_string_dma(const char *s, hal_uart_t uart);
+
+/* Convenience macros for specific UART instances */
+#define uart1_write_dma(data, len) uart_write_dma(data, len, UART1)
+#define uart2_write_dma(data, len) uart_write_dma(data, len, UART2)
+#define uart6_write_dma(data, len) uart_write_dma(data, len, UART6)
+
+#define uart1_init_dma_rx(buf, len) uart_init_dma_rx(buf, len, UART1)
+#define uart2_init_dma_rx(buf, len) uart_init_dma_rx(buf, len, UART2)
+#define uart6_init_dma_rx(buf, len) uart_init_dma_rx(buf, len, UART6)
+
+#define uart1_write_string_dma(s) uart_write_string_dma(s, UART1)
+#define uart2_write_string_dma(s) uart_write_string_dma(s, UART2)
+#define uart6_write_string_dma(s) uart_write_string_dma(s, UART6)
 
 #endif /* _DMA_ENABLED && _UART_BACKEND_DMA */
 

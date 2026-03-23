@@ -28,6 +28,7 @@ uint8_t hal_i2c_get_init_status(void) { return __i2c_init_status; }
 
 static void (*_i2c_dma_rx_callback)(void) = NULL;
 static dma_config_t _active_i2c_dma_config;
+static void _i2c_dma_irq_handler(void);
 
 hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
                                        uint8_t reg, const dma_config_t *dma_cfg,
@@ -86,13 +87,15 @@ hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
   // Init/Start the DMA (CR, NDTR, M0AR config + Enable)
   dma_init(&_active_i2c_dma_config);
 
-  // We need to enable the specific DMA channel interrupt to process the
-  // complete callback
+  // Register our internal handler for the chosen stream
   if (_active_i2c_dma_config.controller == DMA_CONTROLLER_1) {
-    if (_active_i2c_dma_config.stream == 0)
+    if (_active_i2c_dma_config.stream == 0) {
+      hal_interrupt_attach_callback(DMA1_Stream0_IRQn, _i2c_dma_irq_handler);
       hal_enable_interrupt(DMA1_Stream0_IRQn);
-    else if (_active_i2c_dma_config.stream == 5)
+    } else if (_active_i2c_dma_config.stream == 5) {
+      hal_interrupt_attach_callback(DMA1_Stream5_IRQn, _i2c_dma_irq_handler);
       hal_enable_interrupt(DMA1_Stream5_IRQn);
+    }
   }
 
   dma_start(&_active_i2c_dma_config);
@@ -103,39 +106,20 @@ hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
   return HAL_I2C_OK;
 }
 
-// Global IRQ handlers multiplexed for DMA callback trigger
-void DMA1_Stream0_IRQHandler(void) {
+// Internal callback for I2C DMA RX completion
+static void _i2c_dma_irq_handler(void) {
   if (dma_transfer_complete(&_active_i2c_dma_config)) {
     dma_clear_flags(&_active_i2c_dma_config);
 
+    // Stop and Disable I2C DMA gracefully
     I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(I2C1);
     if (I2Cx) {
       I2Cx->CR2 &= ~I2C_CR2_DMAEN;
       I2Cx->CR2 &= ~I2C_CR2_LAST;
       I2Cx->CR1 |= I2C_CR1_ACK_MASK;
-      I2Cx->CR1 |= I2C_CR1_STOP_MASK; // Issue STOP last, don't wait for it
+      I2Cx->CR1 |= I2C_CR1_STOP_MASK;
     }
 
-    if (_i2c_dma_rx_callback) {
-      _i2c_dma_rx_callback(); // Let the task-level BUSY check absorb the wait
-    }
-  }
-}
-
-void DMA1_Stream5_IRQHandler(void) {
-  if (dma_transfer_complete(&_active_i2c_dma_config)) {
-    dma_clear_flags(&_active_i2c_dma_config);
-
-    // Stop and Disable I2C DMA gracefully
-    I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(I2C1); // Map logic for DMA1_Stream5
-    if (I2Cx) {
-      I2Cx->CR2 &= ~I2C_CR2_DMAEN;
-      I2Cx->CR2 &= ~I2C_CR2_LAST;
-      I2Cx->CR1 |= I2C_CR1_ACK_MASK;
-      I2Cx->CR1 |= I2C_CR1_STOP_MASK; // Issue STOP last, don't wait for it
-    }
-
-    // Fire user callback
     if (_i2c_dma_rx_callback) {
       _i2c_dma_rx_callback();
     }

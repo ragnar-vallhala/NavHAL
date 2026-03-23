@@ -239,153 +239,154 @@ uint32_t uart_read_until(char *buffer, uint32_t maxlen, char delimiter,
  * The peripheral address points to USART2->DR.
  * Caller must fill in src_addr and data_count before calling dma_start().
  */
-static dma_config_t _uart2_dma_tx_cfg = {
-    .controller = DMA_CONTROLLER_1,
-    .stream = 6,
-    .channel = 4,
-    .direction = DMA_DIR_M2P,
-    .src_addr = 0,                  /* set at runtime */
-    .dst_addr = USART2_BASE + 0x04, /* &USART2->DR */
-    .data_count = 0,                /* set at runtime */
-    .src_inc = 1,
-    .dst_inc = 0,
-    .data_width = DMA_DATA_WIDTH_8,
-    .priority = DMA_PRIORITY_HIGH,
-    .circular = 0,
-};
+#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+
+typedef struct {
+  DMA_Typedef *controller;
+  uint8_t stream;
+  uint8_t channel;
+  uint8_t irq;
+  uint32_t periph_addr;
+} _uart_dma_params_t;
 
 /**
- * @brief Transmit a buffer over USART2 using DMA (blocking until done).
- *
- * Enables USART2 CR3.DMAT so the UART hardware triggers DMA requests.
- * Waits for the DMA transfer-complete flag before returning.
- *
- * @param data   Pointer to the byte buffer to transmit.
- * @param length Number of bytes to send.
+ * @brief Helper to get DMA parameters for a given UART and direction
  */
-/**
- * @brief Transmit a buffer over USART2 using DMA (blocking until done).
- *
- * dma_init() is called only on the FIRST invocation so we never hit its
- * blocking while(EN) spin from inside SysTick_Handler.  Subsequent calls
- * wait for the previous transfer to finish (TC flag set), then reload
- * NDTR / M0AR and re-enable the stream directly.
- *
- * @param data   Pointer to the byte buffer to transmit.
- * @param length Number of bytes to send.
- */
-void uart2_write_dma(const uint8_t *data, uint16_t length) {
-  if (!data || length == 0)
-    return;
-
-  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(2);
-  if (usart == NULL)
-    return;
-
-  /* Enable UART DMA TX request once */
-  usart->CR3 |= USART_CR3_DMAT;
-
-  /* --- First-time init -------------------------------------------------- */
-  static uint8_t s_dma_initialised = 0;
-  if (!s_dma_initialised) {
-    _uart2_dma_tx_cfg.src_addr = (uint32_t)data;
-    _uart2_dma_tx_cfg.data_count = length;
-    dma_init(&_uart2_dma_tx_cfg);        /* sets up CR, enables TCIE     */
-    dma_clear_flags(&_uart2_dma_tx_cfg); /* clear stale flags             */
-    hal_enable_interrupt(DMA1_Stream6_IRQn);
-    s_dma_initialised = 1;
-  } else {
-    /* --- Subsequent calls: restart without blocking dma_init() ---------- */
-    /* The stream must be disabled before touching NDTR/M0AR.              */
-    /* We wait for TC (non-blocking guard) instead of waiting for EN=0,   */
-    /* because we know the previous transfer completed (read_lock was 0).  */
-    DMA_Stream_Typedef *s = &DMA1->STREAM[6];
-
-    /* Disable stream — stream finishes quickly after TC, so this should   */
-    /* clear almost instantly.  Hard-cap the spin to avoid ISR lockup.     */
-    s->CR &= ~DMA_SxCR_EN;
-    uint32_t guard = 0;
-    while ((s->CR & DMA_SxCR_EN) && guard++ < 1000u)
-      ;
-    /* If the stream is still somehow active after the guard, abort this   */
-    /* flush and let the next SysTick pick it up.                          */
-    if (s->CR & DMA_SxCR_EN)
-      return;
-
-    dma_clear_flags(&_uart2_dma_tx_cfg);
-
-    /* Reload transfer parameters */
-    s->M0AR = (uint32_t)data;
-    s->NDTR = length;
-
-    /* Re-enable TCIE in case it was cleared, then start */
-    s->CR |= DMA_SxCR_TCIE;
+static _uart_dma_params_t _get_uart_dma_params(hal_uart_t uart, int is_tx) {
+  _uart_dma_params_t p = {0};
+  if (uart == UART1) {
+    p.controller = DMA2;
+    p.periph_addr = USART1_BASE + 0x04;
+    if (is_tx) {
+      p.stream = 7;
+      p.channel = 4;
+      p.irq = DMA2_Stream7_IRQn;
+    } else {
+      p.stream = 2;
+      p.channel = 4;
+      p.irq = DMA2_Stream2_IRQn;
+    }
+  } else if (uart == UART2) {
+    p.controller = DMA1;
+    p.periph_addr = USART2_BASE + 0x04;
+    if (is_tx) {
+      p.stream = 6;
+      p.channel = 4;
+      p.irq = DMA1_Stream6_IRQn;
+    } else {
+      p.stream = 5;
+      p.channel = 4;
+      p.irq = DMA1_Stream5_IRQn;
+    }
+  } else if (uart == UART6) {
+    p.controller = DMA2;
+    p.periph_addr = USART6_BASE + 0x04;
+    if (is_tx) {
+      p.stream = 6;
+      p.channel = 5;
+      p.irq = DMA2_Stream6_IRQn;
+    } else {
+      p.stream = 1;
+      p.channel = 5;
+      p.irq = DMA2_Stream1_IRQn;
+    }
   }
-
-  /* Enable DMA interrupt and start the transfer */
-  hal_enable_interrupt(DMA1_Stream6_IRQn);
-  dma_start(&_uart2_dma_tx_cfg);
+  return p;
 }
 
 /**
- * @brief Transmit a null-terminated string over USART2 using DMA.
+ * @brief Tracks initialisation state for DMA streams to avoid redundant setups.
  *
- * @note The string must remain valid until the transfer completes (no copy).
- *       For stack-allocated strings consider making a static/global buffer.
- *
- * @param s Null-terminated string to transmit.
+ * Indices: UART1_TX=0, UART1_RX=1, UART2_TX=2, UART2_RX=3, UART6_TX=4,
+ * UART6_RX=5
  */
-void uart2_write_string_dma(const char *s) {
+static uint8_t _uart_dma_initialized[6] = {0};
+
+void uart_write_dma(const uint8_t *data, uint16_t length, hal_uart_t uart) {
+  if (!data || length == 0)
+    return;
+
+  _uart_dma_params_t p = _get_uart_dma_params(uart, 1);
+  if (!p.controller)
+    return;
+
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  usart->CR3 |= USART_CR3_DMAT;
+
+  int idx = (uart == UART1) ? 0 : (uart == UART2) ? 2 : 4;
+  dma_config_t cfg = {
+      .controller =
+          (p.controller == DMA1) ? DMA_CONTROLLER_1 : DMA_CONTROLLER_2,
+      .stream = p.stream,
+      .channel = p.channel,
+      .direction = DMA_DIR_M2P,
+      .src_addr = (uint32_t)data,
+      .dst_addr = p.periph_addr,
+      .data_count = length,
+      .src_inc = 1,
+      .dst_inc = 0,
+      .data_width = DMA_DATA_WIDTH_8,
+      .priority = DMA_PRIORITY_HIGH,
+  };
+
+  if (!_uart_dma_initialized[idx]) {
+    dma_init(&cfg);
+    _uart_dma_initialized[idx] = 1;
+  } else {
+    DMA_Stream_Typedef *s = &p.controller->STREAM[p.stream];
+    /* Safe-Async: Wait for previous transfer before starting new one */
+    while (s->CR & DMA_SxCR_EN)
+      ;
+  }
+
+  dma_clear_flags(&cfg);
+  hal_enable_interrupt((IRQn_Type)p.irq);
+  dma_start(&cfg);
+}
+
+void uart_init_dma_rx(uint8_t *buffer, uint16_t length, hal_uart_t uart) {
+  if (!buffer || length == 0)
+    return;
+
+  _uart_dma_params_t p = _get_uart_dma_params(uart, 0);
+  if (!p.controller)
+    return;
+
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  usart->CR3 |= USART_CR3_DMAR;
+
+  dma_config_t cfg = {
+      .controller =
+          (p.controller == DMA1) ? DMA_CONTROLLER_1 : DMA_CONTROLLER_2,
+      .stream = p.stream,
+      .channel = p.channel,
+      .direction = DMA_DIR_P2M,
+      .src_addr = p.periph_addr,
+      .dst_addr = (uint32_t)buffer,
+      .data_count = length,
+      .src_inc = 0,
+      .dst_inc = 1,
+      .data_width = DMA_DATA_WIDTH_8,
+      .priority = DMA_PRIORITY_MEDIUM,
+      .circular = 1,
+  };
+
+  dma_init(&cfg);
+  dma_start(&cfg);
+
+  int idx = (uart == UART1) ? 1 : (uart == UART2) ? 3 : 5;
+  _uart_dma_initialized[idx] = 1;
+}
+
+void uart_write_string_dma(const char *s, hal_uart_t uart) {
   if (!s)
     return;
   uint16_t len = 0;
   while (s[len])
     len++;
-  uart2_write_dma((const uint8_t *)s, len);
+  uart_write_dma((const uint8_t *)s, len, uart);
 }
 
-static dma_config_t _uart1_dma_rx_cfg = {
-    .controller = DMA_CONTROLLER_2,
-    .stream = 2,
-    .channel = 4,
-    .direction = DMA_DIR_P2M,
-    .src_addr = USART1_BASE + 0x04, /* &USART1->DR */
-    .dst_addr = 0,                  /* set at runtime */
-    .data_count = 0,                /* set at runtime */
-    .src_inc = 0,
-    .dst_inc = 1,
-    .data_width = DMA_DATA_WIDTH_8,
-    .priority = DMA_PRIORITY_MEDIUM,
-    .circular = 1,
-};
-
-void uart1_init_dma_rx(uint8_t *buffer, uint16_t length, uint32_t baudrate) {
-  if (!buffer || length == 0)
-    return;
-
-  volatile UARTx_Reg_Typedef *usart = GET_USARTx_BASE(1);
-  if (usart == NULL)
-    return;
-
-  /* Peripheral init */
-  RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-  hal_gpio_set_alternate_function(GPIO_PB06, GPIO_AF07); // TX
-  hal_gpio_set_alternate_function(GPIO_PB07, GPIO_AF07); // RX
-
-  /* Configure Baud Rate */
-  usart->BRR = (hal_clock_get_apb2clk() + (baudrate / 2)) / baudrate;
-
-  /* Setup DMA Transfer */
-  _uart1_dma_rx_cfg.dst_addr = (uint32_t)buffer;
-  _uart1_dma_rx_cfg.data_count = length;
-
-  dma_init(&_uart1_dma_rx_cfg);
-
-  /* Enable UART DMA RX request */
-  usart->CR3 |= USART_CR3_DMAR;
-  usart->CR1 |= USART_CR1_RE | USART_CR1_UE;
-
-  dma_start(&_uart1_dma_rx_cfg);
-}
+#endif /* _DMA_ENABLED && _UART_BACKEND_DMA */
 
 #endif /* _DMA_ENABLED && _UART_BACKEND_DMA */

@@ -43,10 +43,21 @@
 .global Default_Handler
 .global USART2_IRQHandler
 .global DMA1_Stream0_IRQHandler
+.global DMA1_Stream1_IRQHandler
+.global DMA1_Stream2_IRQHandler
+.global DMA1_Stream3_IRQHandler
+.global DMA1_Stream4_IRQHandler
 .global DMA1_Stream5_IRQHandler
 .global DMA1_Stream6_IRQHandler
+.global DMA1_Stream7_IRQHandler
+.global DMA2_Stream0_IRQHandler
+.global DMA2_Stream1_IRQHandler
+.global DMA2_Stream2_IRQHandler
 .global DMA2_Stream3_IRQHandler
+.global DMA2_Stream4_IRQHandler
+.global DMA2_Stream5_IRQHandler
 .global DMA2_Stream6_IRQHandler
+.global DMA2_Stream7_IRQHandler
 .global SDIO_IRQHandler
 
 /**
@@ -85,10 +96,10 @@
     .word  Default_Handler            /* 9. EXTI Line3 */
     .word  Default_Handler            /* 10. EXTI Line4 */
     .word  DMA1_Stream0_IRQHandler    /* 11. DMA1 Stream 0 */
-    .word  Default_Handler            /* 12. DMA1 Stream 1 */
-    .word  Default_Handler            /* 13. DMA1 Stream 2 */
-    .word  Default_Handler            /* 14. DMA1 Stream 3 */
-    .word  Default_Handler            /* 15. DMA1 Stream 4 */
+    .word  DMA1_Stream1_IRQHandler    /* 12. DMA1 Stream 1 */
+    .word  DMA1_Stream2_IRQHandler    /* 13. DMA1 Stream 2 */
+    .word  DMA1_Stream3_IRQHandler    /* 14. DMA1 Stream 3 */
+    .word  DMA1_Stream4_IRQHandler    /* 15. DMA1 Stream 4 */
     .word  DMA1_Stream5_IRQHandler    /* 16. DMA1 Stream 5 */
     .word  DMA1_Stream6_IRQHandler      /* 17. DMA1 Stream 6 */
     .word  Default_Handler            /* 18. ADC1 */
@@ -120,7 +131,7 @@
     .word  0                        /* 44. Reserved */
     .word  0                        /* 45. Reserved */
     .word  0                        /* 46. Reserved */
-    .word  Default_Handler            /* 47. DMA1 Stream 7 */
+    .word  DMA1_Stream7_IRQHandler    /* 47. DMA1 Stream 7 */
     .word  0                        /* 48. Reserved */
     .word  SDIO_IRQHandler            /* 49. SDIO */
     .word  TIM5_IRQHandler            /* 50. TIM5 */
@@ -130,11 +141,11 @@
     .word  0                       /* 70. Reserved */
     .word  0                       /* 71. Reserved */
     .word  0                       /* 72. Reserved */
-    .word  Default_Handler /* 73. DMA2 Stream 0 */
-    .word  Default_Handler /* 74. DMA2 Stream 1 */
-    .word  Default_Handler /* 75. DMA2 Stream 2 */
+    .word  DMA2_Stream0_IRQHandler /* 73. DMA2 Stream 0 */
+    .word  DMA2_Stream1_IRQHandler /* 74. DMA2 Stream 1 */
+    .word  DMA2_Stream2_IRQHandler /* 75. DMA2 Stream 2 */
     .word  DMA2_Stream3_IRQHandler  /* 76. DMA2 Stream 3 */
-    .word  Default_Handler /* 77. DMA2 Stream 4 */
+    .word  DMA2_Stream4_IRQHandler /* 77. DMA2 Stream 4 */
     .word  0                       /* 78. Reserved */
     .word  0                       /* 79. Reserved */
     .word  0                       /* 80. Reserved */
@@ -142,9 +153,9 @@
     .word  0                       /* 82. Reserved */
     .word  0                       /* 83. Reserved */
     .word  Default_Handler /* 84. USB OTG FS */
-    .word  Default_Handler /* 85. DMA2 Stream 5 */
+    .word  DMA2_Stream5_IRQHandler /* 85. DMA2 Stream 5 */
     .word  DMA2_Stream6_IRQHandler /* 86. DMA2 Stream 6 */
-    .word  Default_Handler /* 87. DMA2 Stream 7 */
+    .word  DMA2_Stream7_IRQHandler /* 87. DMA2 Stream 7 */
     .word  Default_Handler /* 88. USART6 */
     .word  Default_Handler /* 89. I2C3 Event */
     .word  Default_Handler /* 90. I2C3 Error */
@@ -199,3 +210,41 @@ call_main:
     // If main returns, loop forever
 loop_forever:
     b loop_forever
+
+.weak DMA1_Stream0_IRQHandler
+.weak DMA1_Stream1_IRQHandler
+.weak DMA1_Stream2_IRQHandler
+.weak DMA1_Stream3_IRQHandler
+.weak DMA1_Stream4_IRQHandler
+.weak DMA1_Stream5_IRQHandler
+.weak DMA1_Stream6_IRQHandler
+.weak DMA1_Stream7_IRQHandler
+.weak DMA2_Stream0_IRQHandler
+.weak DMA2_Stream1_IRQHandler
+.weak DMA2_Stream2_IRQHandler
+.weak DMA2_Stream3_IRQHandler
+.weak DMA2_Stream4_IRQHandler
+.weak DMA2_Stream5_IRQHandler
+.weak DMA2_Stream6_IRQHandler
+.weak DMA2_Stream7_IRQHandler
+
+.set DMA1_Stream0_IRQHandler, Default_Handler
+.set DMA1_Stream1_IRQHandler, Default_Handler
+.set DMA1_Stream2_IRQHandler, Default_Handler
+.set DMA1_Stream3_IRQHandler, Default_Handler
+.set DMA1_Stream4_IRQHandler, Default_Handler
+.set DMA1_Stream5_IRQHandler, Default_Handler
+.set DMA1_Stream6_IRQHandler, Default_Handler
+.set DMA1_Stream7_IRQHandler, Default_Handler
+.set DMA2_Stream0_IRQHandler, Default_Handler
+.set DMA2_Stream1_IRQHandler, Default_Handler
+.set DMA2_Stream2_IRQHandler, Default_Handler
+.set DMA2_Stream3_IRQHandler, Default_Handler
+.set DMA2_Stream4_IRQHandler, Default_Handler
+.set DMA2_Stream5_IRQHandler, Default_Handler
+.set DMA2_Stream6_IRQHandler, Default_Handler
+.set DMA2_Stream7_IRQHandler, Default_Handler
+
+.section .text.Default_Handler, "ax", %progbits
+Default_Handler:
+    b .

@@ -202,8 +202,8 @@ void dma_clear_flags(const dma_config_t *cfg) {
 
 #define DMA_ISR_GEN(controller, stream, irqn)                                  \
   void controller##_Stream##stream##_IRQHandler(void) {                        \
-    _clear_flags(controller, stream);                                          \
     hal_handle_interrupt(irqn);                                                \
+    _clear_flags(controller, stream);                                          \
   }
 
 DMA_ISR_GEN(DMA1, 0, DMA1_Stream0_IRQn)

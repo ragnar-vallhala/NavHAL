@@ -211,6 +211,7 @@ call_main:
 loop_forever:
     b loop_forever
 
+.weak Default_Handler
 .weak DMA1_Stream0_IRQHandler
 .weak DMA1_Stream1_IRQHandler
 .weak DMA1_Stream2_IRQHandler

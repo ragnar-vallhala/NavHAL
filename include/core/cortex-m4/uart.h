@@ -177,6 +177,15 @@ typedef enum {
 void uart_init(uint32_t baudrate, hal_uart_t uart);
 
 /**
+ * @brief Enable/disable UART interrupts (peripheral and NVIC).
+ *
+ * @param uart  UART instance.
+ * @param rx_en 1 to enable RXNE interrupt, 0 to disable.
+ * @param tx_en 1 to enable TXE interrupt, 0 to disable.
+ */
+void hal_uart_enable_interrupt(hal_uart_t uart, uint8_t rx_en, uint8_t tx_en);
+
+/**
  * @brief Transmit a single character via the specified UART.
  *
  * Blocks until the transmit buffer is empty before sending.

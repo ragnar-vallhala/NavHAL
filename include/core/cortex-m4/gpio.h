@@ -5,8 +5,8 @@
  * @details
  * This header defines the function prototypes for configuring and controlling
  * GPIO pins on Cortex-M4 microcontrollers. Functions include setting pin modes,
- * reading and writing digital states, enabling clocks, and configuring alternate
- * functions, output type, and speed.
+ * reading and writing digital states, enabling clocks, and configuring
+ * alternate functions, output type, and speed.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -14,6 +14,7 @@
 #ifndef CORTEX_M4_GPIO_H
 #define CORTEX_M4_GPIO_H
 
+#include "core/cortex-m4/gpio_reg.h"
 #include "utils/gpio_types.h"
 
 /**
@@ -40,7 +41,13 @@ hal_gpio_mode hal_gpio_getmode(hal_gpio_pin pin);
  * @param pin The GPIO pin to write.
  * @param state The digital state to set (HIGH/LOW).
  */
-void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state);
+static inline void hal_gpio_digitalwrite(hal_gpio_pin pin,
+                                         hal_gpio_state state) {
+  if (state)
+    GPIO_GET_PORT(pin)->BSRR = (1U << GPIO_GET_PIN(pin));
+  else
+    GPIO_GET_PORT(pin)->BSRR = (1U << (GPIO_GET_PIN(pin) + 16));
+}
 
 /**
  * @brief Read the digital state from a GPIO pin.
@@ -48,7 +55,9 @@ void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state);
  * @param pin The GPIO pin to read.
  * @return The current digital state of the pin (HIGH/LOW).
  */
-hal_gpio_state hal_gpio_digitalread(hal_gpio_pin pin);
+static inline hal_gpio_state hal_gpio_digitalread(hal_gpio_pin pin) {
+  return (hal_gpio_state)((GPIO_GET_PORT(pin)->IDR >> GPIO_GET_PIN(pin)) & 0x1);
+}
 
 /**
  * @brief Enable the RCC clock for a specific GPIO pin's port.

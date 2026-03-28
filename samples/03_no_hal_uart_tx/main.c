@@ -38,7 +38,7 @@ void delay(volatile uint32_t count)
         __asm__("nop");
 }
 
-void uart2_init(void)
+void uart2_init_nh(void)
 {
     // 1. Enable clocks
     RCC_AHB1ENR |= RCC_AHB1ENR_GPIOAEN;  // Enable GPIOA clock
@@ -58,27 +58,27 @@ void uart2_init(void)
     USART2_CR1 |= USART_CR1_UE; // Enable USART
 }
 
-void uart2_write_char(char c)
+void uart2_write_char_nh(char c)
 {
     while (!(USART2_SR & USART_SR_TXE))
         ;          // Wait until TXE = 1
     USART2_DR = c; // Write data
 }
 
-void uart2_write_int(int num)
+void uart2_write_int_nh(int num)
 {
     char buf[12]; // Enough for 32-bit int
     int i = 0;
 
     if (num == 0)
     {
-        uart2_write_char('0');
+        uart2_write_char_nh('0');
         return;
     }
 
     if (num < 0)
     {
-        uart2_write_char('-');
+        uart2_write_char_nh('-');
         num = -num;
     }
 
@@ -90,15 +90,15 @@ void uart2_write_int(int num)
 
     while (i--)
     {
-        uart2_write_char(buf[i]);
+        uart2_write_char_nh(buf[i]);
     }
 }
 
-void uart2_write_string(const char *s)
+void uart2_write_string_nh(const char *s)
 {
     while (*s)
     {
-        uart2_write_char(*s++);
+        uart2_write_char_nh(*s++);
     }
 }
 
@@ -117,31 +117,31 @@ int main(void)
 
     hal_clock_init(&clk_cfg, &pll_cfg);
 
-    uart2_init();
+    uart2_init_nh();
     hal_gpio_setmode(GPIO_PA06, GPIO_INPUT, GPIO_PULLUP);
     hal_gpio_setmode(GPIO_PA05, GPIO_OUTPUT, 0);
 
     while (1)
     {
-        uart2_write_string("SYSCLK: ");
-        uart2_write_int(hal_clock_get_sysclk());
-        uart2_write_string(", AHBCLK: ");
-        uart2_write_int(hal_clock_get_ahbclk());
-        uart2_write_string(", ABP1CLK: ");
-        uart2_write_int(hal_clock_get_apb1clk());
-        uart2_write_string(", ABP2CLK: ");
-        uart2_write_int(hal_clock_get_apb2clk());
-        uart2_write_string("\n");
+        uart2_write_string_nh("SYSCLK: ");
+        uart2_write_int_nh(hal_clock_get_sysclk());
+        uart2_write_string_nh(", AHBCLK: ");
+        uart2_write_int_nh(hal_clock_get_ahbclk());
+        uart2_write_string_nh(", ABP1CLK: ");
+        uart2_write_int_nh(hal_clock_get_apb1clk());
+        uart2_write_string_nh(", ABP2CLK: ");
+        uart2_write_int_nh(hal_clock_get_apb2clk());
+        uart2_write_string_nh("\n");
 
         // if (hal_gpio_digitalread(GPIO_PA06))
         // {
         //     hal_gpio_digitalwrite(GPIO_PA05, GPIO_HIGH);
-        //     uart2_write_string("PA06 is HIGH\n");
+        //     uart2_write_string_nh("PA06 is HIGH\n");
         // }
         // else
         // {
         //     hal_gpio_digitalwrite(GPIO_PA05, GPIO_LOW);
-        //     uart2_write_string("PA06 is LOW\n");
+        //     uart2_write_string_nh("PA06 is LOW\n");
         // }
         delay(100000);
     }

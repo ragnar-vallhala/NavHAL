@@ -17,14 +17,14 @@
 int main(void)
 {
     systick_init(1000);
-    hal_gpio_setmode(GPIO_PA05, GPIO_OUTPUT, 0);
+    hal_gpio_setmode(GPIO_PB07, GPIO_OUTPUT, 0);
     hal_gpio_setmode(GPIO_PC13, GPIO_INPUT, GPIO_PULLUP);
 
     while (1)
     {
-        if (hal_gpio_digitalread(GPIO_PC13))
-            hal_gpio_digitalwrite(GPIO_PA05, GPIO_LOW);
+        if (hal_gpio_digitalread(GPIO_PC13)==0)
+            hal_gpio_digitalwrite(GPIO_PB07, GPIO_LOW);
         else
-            hal_gpio_digitalwrite(GPIO_PA05, GPIO_HIGH);
+            hal_gpio_digitalwrite(GPIO_PB07, GPIO_HIGH);
     }
 }

@@ -18,8 +18,10 @@
 #define HAL_TYPES
 #include <stdint.h>
 
-#define __IO volatile /**< Defines volatile memory access for I/O registers.   \
-                       */
+#define __I volatile const /**< Defines read-only memory access. */
+#define __O volatile       /**< Defines write-only memory access. */
+#define __IO                                                                   \
+  volatile /**< Defines read/write memory access for I/O registers. */
 #ifndef NULL
 #define NULL (void *)0 /**< Defines the null pointer constant. */
 #endif                 // !NULL

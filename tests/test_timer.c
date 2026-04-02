@@ -1,6 +1,7 @@
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/timer.h"
 #include "core/cortex-m4/timer_reg.h"
+#include "core/cortex-m4/rcc_reg.h"
 #include "navtest/navtest.h"
 #include <stdint.h>
 
@@ -153,7 +154,11 @@ void test_timer_get_frequency_returns_correct_value(void) {
   timer_init(TEST_TIMER, 9, 99); // prescaler=9, ARR=99
   uint32_t freq = timer_get_frequency(TEST_TIMER);
 
-  uint32_t timer_clk = hal_clock_get_apb1clk();
+  uint32_t timer_clk;
+  uint32_t ppre1 = (RCC->CFGR >> RCC_CFGR_PPRE1_BIT) & 0x7;
+  uint32_t apb1 = hal_clock_get_apb1clk();
+  timer_clk = (ppre1 == 0) ? apb1 : (apb1 * 2);
+
   uint32_t expected = timer_clk / (9 + 1) / (99 + 1);
   TEST_ASSERT_EQUAL_UINT32(expected, freq);
 }

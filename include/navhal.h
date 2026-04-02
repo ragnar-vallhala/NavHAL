@@ -52,6 +52,7 @@
 
 #include "common/hal_crc.h"
 #include "common/hal_diskio.h"
+#include "common/hal_dwt.h"
 #include "common/hal_sdio.h"
 
 #endif // NAVHAL_H

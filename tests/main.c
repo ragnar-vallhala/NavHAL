@@ -12,6 +12,7 @@
 #endif
 #include "core/cortex-m4/fpu.h"
 #include "test_crc.h"
+#include "test_dwt.h"
 
 static void wait_uart_empty(void) {
   volatile UARTx_Reg_Typedef *uart2 =
@@ -146,6 +147,21 @@ int test_crc_suite(void) {
   return NAVTEST_END();
 }
 
+// -------------------- DWT --------------------
+int test_dwt_suite(void) {
+  uart2_write("\n=========== DWT TEST START ===========\n");
+  NAVTEST_BEGIN();
+
+  RUN_TEST(test_dwt_init_enables_counters);
+  RUN_TEST(test_dwt_get_cycles_increments);
+  RUN_TEST(test_dwt_reset_cycles_zeros_counter);
+  RUN_TEST(test_dwt_delay_cycles_elapses_time);
+
+  uart2_write("=========== DWT TEST END ===========\n");
+  total_test_count += (int)navtest_get_test_count();
+  return NAVTEST_END();
+}
+
 void print_startup_message(void) {
   uart2_write_char(0x1B); // ESC
   uart2_write_char('[');
@@ -181,6 +197,7 @@ int main(void) {
   failed += test_dma_suite();
 #endif
   failed += test_crc_suite();
+  failed += test_dwt_suite();
 
   uart2_write("\n\n=========== FINAL RESULTS ===========\n\n");
   uart2_write("Total tests run: ");

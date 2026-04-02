@@ -54,31 +54,6 @@ hal_gpio_mode hal_gpio_getmode(hal_gpio_pin pin) {
 }
 
 /**
- * @brief Write a digital value to a GPIO pin.
- * @param pin Pin identifier.
- * @param state Desired pin state (high or low).
- * @code
- * // Example: Set PA5 high
- * hal_gpio_digitalwrite(PA5, HAL_GPIO_HIGH);
- * @endcode
- */
-void hal_gpio_digitalwrite(hal_gpio_pin pin, hal_gpio_state state) {
-  if (state)
-    GPIO_GET_PORT(pin)->BSRR |= (1 << GPIO_GET_PIN(pin)); // Set pin
-  else
-    GPIO_GET_PORT(pin)->BSRR |= (1 << (GPIO_GET_PIN(pin) + 16)); // Reset pin
-}
-
-/**
- * @brief Read the digital value from a GPIO pin.
- * @param pin Pin identifier.
- * @return Current pin state (high or low).
- */
-hal_gpio_state hal_gpio_digitalread(hal_gpio_pin pin) {
-  return (GPIO_GET_PORT(pin)->IDR >> GPIO_GET_PIN(pin)) & 0x1;
-}
-
-/**
  * @brief Enable the RCC clock for the GPIO port of a given pin.
  * @param pin Pin identifier.
  * @note This function is usually called automatically by other GPIO functions,
@@ -93,7 +68,8 @@ void hal_gpio_enable_rcc(hal_gpio_pin pin) {
  * @brief Configure the alternate function of a GPIO pin.
  * @param pin Pin identifier.
  * @param alt_fn Alternate function number/type.
- * @note This function will internally set the pin mode to alternate function mode.
+ * @note This function will internally set the pin mode to alternate function
+ * mode.
  * @code
  * // Example: Set PA2 to USART2_TX alternate function
  * hal_gpio_set_alternate_function(PA2, HAL_GPIO_AF_USART2);

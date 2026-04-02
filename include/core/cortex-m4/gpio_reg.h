@@ -63,13 +63,13 @@ typedef struct {
 #define GPIOH_BASE_ADDR 0x40021C00 /**< GPIOH base address */
 
 /** Get port number from absolute pin number */
-#define GPIO_GET_PORT_NUMBER(n) (n / 16 == 5 ? 7 : n / 16)
+#define GPIO_GET_PORT_NUMBER(n) (((n) >> 4) == 5 ? 7 : ((n) >> 4))
 
 /** Get pointer to GPIO port structure from absolute pin number */
 #define GPIO_GET_PORT(n)                                                       \
-  ((GPIOx_Typedef *)(GPIOA_BASE_ADDR + ((GPIO_GET_PORT_NUMBER(n)) * 0x400)))
+  ((GPIOx_Typedef *)(GPIOA_BASE_ADDR + (GPIO_GET_PORT_NUMBER(n) << 10)))
 
 /** Get pin number within the port from absolute pin number */
-#define GPIO_GET_PIN(n) (n % 16)
+#define GPIO_GET_PIN(n) ((n) & 0x0F)
 
 #endif // !CORTEX_M4_GPIO_REG_H

@@ -27,6 +27,7 @@ hal_fatfs_posix
 hal_sdio_perf
 hal_uart_dma_bridge
 hal_spi_esp_bridge
+hal_dwt
 )
 set(SAMPLE_DIRS
 00_test_sample
@@ -57,6 +58,7 @@ set(SAMPLE_DIRS
 23_hal_sdio_perf
 24_hal_uart_dma_bridge
 25_hal_spi_esp_bridge
+26_hal_dwt
 )
 
 # Check if sample is defined

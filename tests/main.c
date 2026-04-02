@@ -13,6 +13,11 @@
 #include "core/cortex-m4/fpu.h"
 #include "test_crc.h"
 #include "test_dwt.h"
+#include "test_flash_raw.h"
+#include "test_fpu_accel.h"
+#include "test_i2c.h"
+#include "test_spi.h"
+#include "test_uart_protocol.h"
 
 static void wait_uart_empty(void) {
   volatile UARTx_Reg_Typedef *uart2 =
@@ -162,6 +167,69 @@ int test_dwt_suite(void) {
   return NAVTEST_END();
 }
 
+// -------------------- FPU --------------------
+int test_fpu_suite(void) {
+  uart2_write("\n=========== FPU TEST START ===========\n");
+  NAVTEST_BEGIN();
+
+  RUN_TEST(test_fpu_basic_arithmetic);
+  RUN_TEST(test_fpu_benchmark_cycles);
+
+  uart2_write("=========== FPU TEST END ===========\n");
+  total_test_count += (int)navtest_get_test_count();
+  return NAVTEST_END();
+}
+
+// -------------------- UART --------------------
+int test_uart_protocol_suite(void) {
+  uart2_write("\n=========== UART PROTOCOL TEST START ===========\n");
+  NAVTEST_BEGIN();
+
+  RUN_TEST(test_uart_baudrate_9600);
+  RUN_TEST(test_uart_baudrate_115200);
+
+  uart2_write("=========== UART PROTOCOL TEST END ===========\n");
+  total_test_count += (int)navtest_get_test_count();
+  return NAVTEST_END();
+}
+
+// -------------------- I2C --------------------
+int test_i2c_suite(void) {
+  uart2_write("\n=========== I2C TEST START ===========\n");
+  NAVTEST_BEGIN();
+
+  RUN_TEST(test_i2c_init_config);
+  RUN_TEST(test_i2c_fast_mode_config);
+
+  uart2_write("=========== I2C TEST END ===========\n");
+  total_test_count += (int)navtest_get_test_count();
+  return NAVTEST_END();
+}
+
+// -------------------- SPI --------------------
+int test_spi_suite(void) {
+  uart2_write("\n=========== SPI TEST START ===========\n");
+  NAVTEST_BEGIN();
+
+  RUN_TEST(test_spi_init_config);
+
+  uart2_write("=========== SPI TEST END ===========\n");
+  total_test_count += (int)navtest_get_test_count();
+  return NAVTEST_END();
+}
+
+// -------------------- FLASH --------------------
+int test_flash_suite(void) {
+  uart2_write("\n=========== FLASH RELIABILITY TEST START ===========\n");
+  NAVTEST_BEGIN();
+
+  RUN_TEST(test_flash_storage_integration);
+
+  uart2_write("=========== FLASH RELIABILITY TEST END ===========\n");
+  total_test_count += (int)navtest_get_test_count();
+  return NAVTEST_END();
+}
+
 void print_startup_message(void) {
   uart2_write_char(0x1B); // ESC
   uart2_write_char('[');
@@ -198,6 +266,11 @@ int main(void) {
 #endif
   failed += test_crc_suite();
   failed += test_dwt_suite();
+  failed += test_fpu_suite();
+  failed += test_uart_protocol_suite();
+  failed += test_i2c_suite();
+  failed += test_spi_suite();
+  failed += test_flash_suite();
 
   uart2_write("\n\n=========== FINAL RESULTS ===========\n\n");
   uart2_write("Total tests run: ");

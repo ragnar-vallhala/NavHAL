@@ -4,3 +4,8 @@ docs/
 *.bin
 *.json 
 .cache/
+node_modules/
+dist/
+*.log
+out/
+*.vsix

@@ -9,3 +9,4 @@ dist/
 *.log
 out/
 *.vsix
+.aider*

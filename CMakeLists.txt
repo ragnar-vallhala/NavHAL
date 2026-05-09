@@ -23,26 +23,30 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_COMPILE_COMMANDS_OUTPUT "${CMAKE_SOURCE_DIR}/compile_commands.json")
+# Kconfig Integration
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
+set(KCONFIG_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/tools/kconfig.py")
+set(KCONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Kconfig")
+set(CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.config")
+set(GENERATED_CMAKE "${CMAKE_BINARY_DIR}/config.cmake")
+set(GENERATED_HEADER "${CMAKE_BINARY_DIR}/autoconf.h")
 
+message(STATUS "Running Kconfig configuration generation...")
+execute_process(
+    COMMAND ${Python3_EXECUTABLE} ${KCONFIG_SCRIPT}
+            --kconfig ${KCONFIG_FILE}
+            --config ${CONFIG_FILE}
+            --cmake-out ${GENERATED_CMAKE}
+            --header-out ${GENERATED_HEADER}
+    RESULT_VARIABLE KCONFIG_RESULT
+)
+if(NOT KCONFIG_RESULT EQUAL 0)
+    message(FATAL_ERROR "Kconfig generation failed!")
+endif()
 
-# Defaults
-set(CMAKE_SYSTEM_PROCESSOR
-    cortex-m4
-    CACHE STRING "Target processor" FORCE) # Processor on board
-set(BOARD
-    nucleo_f401re
-    CACHE STRING "Target board")
-set(VENDOR
-    stm32
-    CACHE STRING "Vendor")
-set(STANDALONE
-    OFF
-    CACHE BOOL "Build sample without HAL")
-set(SAMPLE
-    ""
-    CACHE STRING "Name of the sample to build")
-option(USE_FPU "Enable hardware FPU" ON)
+# Include the generated CMake configuration which sets BOARD, VENDOR, etc.
+include(${GENERATED_CMAKE})
 
 
 # Messages

@@ -150,5 +150,5 @@ __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 void Default_Handler(void) {}
 __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 #endif
-#include "core/cortex-m4/uart.h"
+// #include "core/cortex-m4/uart.h"
 void USART2_IRQHandler(void) { hal_handle_interrupt(USART2_IRQn); }

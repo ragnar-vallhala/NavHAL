@@ -6,23 +6,6 @@ set(CMAKE_OSX_ARCHITECTURES "" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS_INIT "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_INIT "" CACHE STRING "" FORCE)
 
-# Toolchain settings
-set(TOOLCHAIN_PREFIX arm-none-eabi-)
-set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
-set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
-set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
-set(CMAKE_BINARY_SIZE ${TOOLCHAIN_PREFIX}size)
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
-
-# set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
-# extern/NavHAL/CMakeLists.txt
-if(NOT DEFINED CMAKE_PROJECT_NAME)
-    project(NavHAL C ASM)
-endif()
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_COMPILE_COMMANDS_OUTPUT "${CMAKE_SOURCE_DIR}/compile_commands.json")
 # Kconfig Integration
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
@@ -39,14 +22,37 @@ execute_process(
             --config ${CONFIG_FILE}
             --cmake-out ${GENERATED_CMAKE}
             --header-out ${GENERATED_HEADER}
+            --sample-override "${SAMPLE}"
     RESULT_VARIABLE KCONFIG_RESULT
 )
 if(NOT KCONFIG_RESULT EQUAL 0)
     message(FATAL_ERROR "Kconfig generation failed!")
 endif()
 
-# Include the generated CMake configuration which sets BOARD, VENDOR, etc.
+# Include the generated CMake configuration which may provide TOOLCHAIN_PREFIX, BOARD, VENDOR, etc.
 include(${GENERATED_CMAKE})
+
+# Toolchain settings
+# Allow configuration from KConfig (via GENERATED_CMAKE) to override the default.
+if(NOT DEFINED TOOLCHAIN_PREFIX)
+    set(TOOLCHAIN_PREFIX "arm-none-eabi-")
+endif()
+set(TOOLCHAIN_PREFIX "${TOOLCHAIN_PREFIX}" CACHE STRING "Toolchain prefix for compiler binaries")
+set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
+set(CMAKE_BINARY_SIZE ${TOOLCHAIN_PREFIX}size)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+
+# set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
+# extern/NavHAL/CMakeLists.txt
+if(NOT DEFINED CMAKE_PROJECT_NAME)
+    project(NavHAL C ASM)
+endif()
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_COMPILE_COMMANDS_OUTPUT "${CMAKE_SOURCE_DIR}/compile_commands.json")
 
 
 # Messages
@@ -61,24 +67,37 @@ set(SRC_CORE ${CMAKE_CURRENT_SOURCE_DIR}/src/core)
 set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
 set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
 # FPU Configuration
-if(USE_FPU)
-    set(FPU_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED -D_DMA_ENABLED")
-    message(STATUS "FPU: Hardware enabled")
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
+    if(USE_FPU)
+        set(FPU_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED -D_DMA_ENABLED")
+        message(STATUS "FPU: Hardware enabled (Cortex-M4)")
+    else()
+        set(FPU_FLAGS "-mfloat-abi=soft")
+        message(STATUS "FPU: Software emulation (Cortex-M4)")
+    endif()
 else()
-    set(FPU_FLAGS "-mfloat-abi=soft")
-    message(STATUS "FPU: Software emulation")
+    # Unsupported/Generic core default
+    set(FPU_FLAGS "")
+    message(WARNING "FPU Configuration not predefined for core '${CMAKE_SYSTEM_PROCESSOR}'")
 endif()
 
-# Compiler Flags [UPDATE] thumb mode is on for now, can be removed later and
-# choosen dynamically
+# Architecture Flags
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
+    set(ARCH_FLAGS "-mthumb")
+else()
+    set(ARCH_FLAGS "")
+endif()
+
+# Compiler Flags
 set(CMAKE_C_FLAGS
-"-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb -Wall -O0 -g -std=c11 ${FPU_FLAGS}") # C++
+"-mcpu=${CMAKE_SYSTEM_PROCESSOR} ${ARCH_FLAGS} -Wall -O0 -g -std=c11 ${FPU_FLAGS}")
+ # C++
 # standard
 # 11
 
 
 
-set(CMAKE_ASM_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
+set(CMAKE_ASM_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} ${ARCH_FLAGS} ${FPU_FLAGS}")
 
 if(NOT STANDALONE)
   set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}") # can be
@@ -146,7 +165,12 @@ add_custom_target(copy_compile_commands ALL
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-set(STARTUP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/core/${CMAKE_SYSTEM_PROCESSOR}/startup/startup.s PARENT_SCOPE)
+# Define startup file path
+set(STARTUP_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/core/${CMAKE_SYSTEM_PROCESSOR}/startup/startup.s")
+# Export path to parent project if included via add_subdirectory()
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(STARTUP_FILE "${STARTUP_FILE}" PARENT_SCOPE)
+endif()
 # Tests
 if(TEST)
   message("Tests enabled")
@@ -155,13 +179,17 @@ if(TEST)
   file(GLOB_RECURSE HAL_SRC ${SRC_CORE}/*.c )
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
-  add_executable(tests ${TEST_SRC} ${CMAKE_CURRENT_SOURCE_DIR}/src/core/cortex-m4/startup/startup.s)
+  add_executable(tests ${TEST_SRC} ${STARTUP_FILE})
   target_link_libraries(tests PRIVATE c gcc)
-  set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib -mfloat-abi=hard -mfpu=fpv4-sp-d16")
-  target_compile_options(tests PRIVATE -march=armv7e-m -fno-exceptions 
-  -fno-unwind-tables
-  -fno-asynchronous-unwind-tables
-  )
+  set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib ${FPU_FLAGS}")
+  
+  # Dynamic architecture options for test compiler flags
+  set(TEST_FLAGS "-fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables")
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
+      set(TEST_FLAGS "-march=armv7e-m ${TEST_FLAGS}")
+  endif()
+  
+  target_compile_options(tests PRIVATE ${TEST_FLAGS})
   target_sources(tests PRIVATE ${HAL_SRC})
   target_link_libraries(tests PRIVATE c gcc common)
   enable_testing()

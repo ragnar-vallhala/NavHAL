@@ -4,7 +4,7 @@
 #include "core/cortex-m4/interrupt.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include "core/cortex-m4/timer.h"
-#include "core/cortex-m4/uart.h"
+// #include "core/cortex-m4/uart.h"
 #include <stdint.h>
 
 /**
@@ -329,7 +329,7 @@ hal_sdio_error_t sdio_read_block(uint32_t addr, uint8_t *buf) {
 
   if (timeout == 0) {
     SDIO->DCTRL = 0;
-    uart2_write_string("SDIO Read DBCKEND Timeout\n\r");
+//    uart2_write_string("SDIO Read DBCKEND Timeout\n\r");
     return HAL_SDIO_TIMEOUT;
   }
 
@@ -453,7 +453,7 @@ uint32_t sdio_get_sector_count(void) {
 
 #ifdef _DMA_ENABLED
 #include "core/cortex-m4/dma.h"
-#include "core/cortex-m4/uart.h"
+// #include "core/cortex-m4/uart.h"
 
 static dma_config_t dma2_stream3_cfg;
 static dma_config_t dma2_stream6_cfg;
@@ -625,7 +625,7 @@ hal_sdio_error_t sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
   if (sdio_send_command(SD_CMD_READ_MULT_BLOCK, addr, 1)) {
     dma_stop((const dma_config_t *)&dma2_stream3_cfg);
 #ifdef _DMA_ENABLED
-    uart2_write_string("Read Multi CMD18 failed\r\n");
+//    uart2_write_string("Read Multi CMD18 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
   }
@@ -690,7 +690,7 @@ hal_sdio_error_t sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
   if (sdio_send_command(SD_CMD_WRITE_MULT_BLOCK, addr, 1)) {
     dma_stop((const dma_config_t *)&dma2_stream6_cfg);
 #ifdef _DMA_ENABLED
-    uart2_write_string("Write Multi CMD25 failed\r\n");
+//    uart2_write_string("Write Multi CMD25 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
   }

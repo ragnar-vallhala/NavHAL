@@ -2,103 +2,296 @@ mainmenu "NavHAL Configuration System"
 
 menu "Target Platform Configuration"
 
-config BOARD
-    string "Target Board"
-    default "nucleo_f401re"
+choice
+    prompt "Processor Architecture"
+    default ARCH_CORTEX_M4
     help
-      Name of the target development board (e.g., nucleo_f401re).
+      Select the target processor architecture.
 
-config VENDOR
-    string "Target Vendor"
-    default "stm32"
-    help
-      Silicon vendor (e.g., stm32).
+config ARCH_CORTEX_M4
+    bool "Cortex-M4"
+
+endchoice
 
 config CMAKE_SYSTEM_PROCESSOR
-    string "Target Processor"
-    default "cortex-m4"
+    string
+    default "cortex-m4" if ARCH_CORTEX_M4
+
+choice
+    prompt "Vendor"
+    default VENDOR_STM32
     help
-      Processor core model (e.g., cortex-m4).
+      Select the silicon vendor.
+
+config VENDOR_STM32
+    bool "STM32"
+
+endchoice
+
+config VENDOR
+    string
+    default "stm32" if VENDOR_STM32
+
+choice
+    prompt "Target Board"
+    default BOARD_NUCLEO_F401RE
+    help
+      Select the target development board.
+
+config BOARD_NUCLEO_F401RE
+    bool "nucleo_f401re"
+
+endchoice
+
+config BOARD
+    string
+    default "nucleo_f401re" if BOARD_NUCLEO_F401RE
+
+endmenu
+
+menu "System & Features Configuration"
 
 config USE_FPU
-    bool "Enable Hardware FPU"
-    default y
+    bool "Enable Hardware FPU Compiler Flags"
+    default n
     help
       Enable hardware Floating Point Unit compiler and linker flags.
+
+config DRV_DMA
+    bool "Enable Direct Memory Access (DMA)"
+    default n
+    select DRV_INTERRUPT
+    help
+      Enables support for the DMA hardware controller.
+
+config DRV_CRC
+    bool "Enable Hardware CRC Unit"
+    default n
+    help
+      Enables hardware cyclic redundancy check unit support.
+
+config DRV_DWT
+    bool "Enable Debug Watchpoint and Trace (DWT)"
+    default n
+    help
+      Enables the DWT counter for high-resolution timing.
+
+config DRV_FPU
+    bool "Enable FPU Driver Extension"
+    default n
+    help
+      Enables compilation of hardware FPU runtime setup files.
 
 endmenu
 
 menu "HAL Drivers Configuration"
-
-config DRV_GPIO
-    bool "Enable GPIO Driver"
-    default y
+    depends on ARCH_CORTEX_M4
 
 config DRV_CLOCK
     bool "Enable Clock Driver"
-    default y
-
-config DRV_UART
-    bool "Enable UART Driver"
-    default y
-
-config DRV_TIMER
-    bool "Enable Timer Driver"
     default y
 
 config DRV_INTERRUPT
     bool "Enable Interrupt Driver"
     default y
 
-config DRV_PWM
-    bool "Enable PWM Driver"
+config DRV_GPIO
+    bool "Enable GPIO Driver"
     default y
+
+config DRV_TIMER
+    bool "Enable Timer Driver"
+    default y
+    select DRV_CLOCK
+    select DRV_INTERRUPT
+
+config DRV_UART
+    bool "Enable UART Driver"
+    default y
+    select DRV_GPIO
+    select DRV_CLOCK
+    select DRV_INTERRUPT
+    select DRV_DMA
 
 config DRV_I2C
     bool "Enable I2C Driver"
-    default y
+    default n
+    select DRV_CLOCK
+    select DRV_INTERRUPT
+    select DRV_DMA
 
 config DRV_SPI
     bool "Enable SPI Driver"
-    default y
+    default n
+    select DRV_GPIO
+    select DRV_TIMER
 
-config DRV_FLASH
-    bool "Enable Flash Driver"
-    default y
-
-config DRV_DMA
-    bool "Enable DMA Driver"
-    default y
-
-config DRV_FPU
-    bool "Enable FPU Driver"
-    default y
-
-config DRV_CRC
-    bool "Enable CRC Driver"
-    default y
+config DRV_PWM
+    bool "Enable PWM Driver"
+    default n
+    select DRV_CLOCK
+    select DRV_TIMER
 
 config DRV_SDIO
     bool "Enable SDIO Driver"
-    default y
+    default n
+    select DRV_CLOCK
+    select DRV_GPIO
+    select DRV_INTERRUPT
+    select DRV_TIMER
 
-config DRV_DWT
-    bool "Enable DWT Driver"
-    default y
+config DRV_FLASH
+    bool "Enable Flash Driver"
+    default n
 
 endmenu
 
 menu "Build Options"
 
+config TOOLCHAIN_PREFIX
+    string "Toolchain Binary Prefix"
+    default "arm-none-eabi-"
+    help
+      Prefix for the toolchain binaries (e.g., arm-none-eabi-).
+
 config STANDALONE
     bool "Build Standalone Samples (without full HAL)"
     default n
 
-config SAMPLE
-    string "Sample Name"
-    default ""
+choice
+    prompt "Sample Application"
+    default SAMPLE_NONE
     help
-      The name of the sample to build (e.g., hal_blink).
+      Select the sample application to compile.
+
+config SAMPLE_NONE
+    bool "None"
+
+config SAMPLE_00_TEST_SAMPLE
+    bool "00_test_sample"
+
+config SAMPLE_01_HAL_BLINK
+    bool "01_hal_blink"
+
+config SAMPLE_01_NO_HAL_BLINK
+    bool "01_no_hal_blink"
+
+config SAMPLE_02_HAL_PUPD
+    bool "02_hal_pupd"
+
+config SAMPLE_03_HAL_UART_TX
+    bool "03_hal_uart_tx"
+
+config SAMPLE_03_NO_HAL_UART_TX
+    bool "03_no_hal_uart_tx"
+
+config SAMPLE_04_HAL_TIMER
+    bool "04_hal_timer"
+
+config SAMPLE_05_HAL_SYSTICK
+    bool "05_hal_systick"
+
+config SAMPLE_06_HAL_BLINK_DELAY
+    bool "06_hal_blink_delay"
+
+config SAMPLE_07_HAL_PWM
+    bool "07_hal_pwm"
+
+config SAMPLE_08_NO_HAL_PWM
+    bool "08_no_hal_pwm"
+
+config SAMPLE_09_HAL_CLOCK
+    bool "09_hal_clock"
+
+config SAMPLE_10_NO_HAL_I2C
+    bool "10_no_hal_i2c"
+
+config SAMPLE_11_HAL_I2C
+    bool "11_hal_i2c"
+
+config SAMPLE_12_NO_HAL_FLASH
+    bool "12_no_hal_flash"
+
+config SAMPLE_13_HAL_FLASH
+    bool "13_hal_flash"
+
+config SAMPLE_14_HAL_UART_INT
+    bool "14_hal_uart_int"
+
+config SAMPLE_15_HAL_UART_DMA
+    bool "15_hal_uart_dma"
+
+config SAMPLE_16_HAL_DMA_POLLING_UART
+    bool "16_hal_dma_polling_uart"
+
+config SAMPLE_17_HAL_FPU
+    bool "17_hal_fpu"
+
+config SAMPLE_18_HAL_CRC
+    bool "18_hal_crc"
+
+config SAMPLE_19_HAL_DMA_I2C
+    bool "19_hal_dma_i2c"
+
+config SAMPLE_20_HAL_SDIO
+    bool "20_hal_sdio"
+
+config SAMPLE_21_HAL_SDIO_BLOCK
+    bool "21_hal_sdio_block"
+
+config SAMPLE_22_HAL_FATFS_POSIX
+    bool "22_hal_fatfs_posix"
+
+config SAMPLE_23_HAL_SDIO_PERF
+    bool "23_hal_sdio_perf"
+
+config SAMPLE_24_HAL_UART_DMA_BRIDGE
+    bool "24_hal_uart_dma_bridge"
+
+config SAMPLE_25_HAL_SPI_ESP_BRIDGE
+    bool "25_hal_spi_esp_bridge"
+
+config SAMPLE_26_HAL_DWT
+    bool "26_hal_dwt"
+    select DRV_DWT
+    select DRV_UART
+    select DRV_FPU
+    select USE_FPU
+
+endchoice
+
+config SAMPLE
+    string
+    default "" if SAMPLE_NONE
+    default "00_test_sample" if SAMPLE_00_TEST_SAMPLE
+    default "01_hal_blink" if SAMPLE_01_HAL_BLINK
+    default "01_no_hal_blink" if SAMPLE_01_NO_HAL_BLINK
+    default "02_hal_pupd" if SAMPLE_02_HAL_PUPD
+    default "03_hal_uart_tx" if SAMPLE_03_HAL_UART_TX
+    default "03_no_hal_uart_tx" if SAMPLE_03_NO_HAL_UART_TX
+    default "04_hal_timer" if SAMPLE_04_HAL_TIMER
+    default "05_hal_systick" if SAMPLE_05_HAL_SYSTICK
+    default "06_hal_blink_delay" if SAMPLE_06_HAL_BLINK_DELAY
+    default "07_hal_pwm" if SAMPLE_07_HAL_PWM
+    default "08_no_hal_pwm" if SAMPLE_08_NO_HAL_PWM
+    default "09_hal_clock" if SAMPLE_09_HAL_CLOCK
+    default "10_no_hal_i2c" if SAMPLE_10_NO_HAL_I2C
+    default "11_hal_i2c" if SAMPLE_11_HAL_I2C
+    default "12_no_hal_flash" if SAMPLE_12_NO_HAL_FLASH
+    default "13_hal_flash" if SAMPLE_13_HAL_FLASH
+    default "14_hal_uart_int" if SAMPLE_14_HAL_UART_INT
+    default "15_hal_uart_dma" if SAMPLE_15_HAL_UART_DMA
+    default "16_hal_dma_polling_uart" if SAMPLE_16_HAL_DMA_POLLING_UART
+    default "17_hal_fpu" if SAMPLE_17_HAL_FPU
+    default "18_hal_crc" if SAMPLE_18_HAL_CRC
+    default "19_hal_dma_i2c" if SAMPLE_19_HAL_DMA_I2C
+    default "20_hal_sdio" if SAMPLE_20_HAL_SDIO
+    default "21_hal_sdio_block" if SAMPLE_21_HAL_SDIO_BLOCK
+    default "22_hal_fatfs_posix" if SAMPLE_22_HAL_FATFS_POSIX
+    default "23_hal_sdio_perf" if SAMPLE_23_HAL_SDIO_PERF
+    default "24_hal_uart_dma_bridge" if SAMPLE_24_HAL_UART_DMA_BRIDGE
+    default "25_hal_spi_esp_bridge" if SAMPLE_25_HAL_SPI_ESP_BRIDGE
+    default "26_hal_dwt" if SAMPLE_26_HAL_DWT
 
 config TEST
     bool "Build Unit Tests"

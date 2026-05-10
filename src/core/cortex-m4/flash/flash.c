@@ -1,7 +1,7 @@
 #include "core/cortex-m4/flash.h"
 #include "common/hal_types.h"
 #include "core/cortex-m4/flash_reg.h"
-#include "core/cortex-m4/uart.h"
+// #include "core/cortex-m4/uart.h"
 #include "utils/util.h"
 #include <stddef.h>
 #include <stdint.h>
@@ -187,17 +187,17 @@ FlashStatus_t _flash_shift_sector_secondary_to_primary_(void) {
 }
 
 FlashStatus_t _flash_compact_storage_(void) {
-  uart2_write("Compacting flash storage...\n");
+//  uart2_write("Compacting flash storage...\n");
   FlashStatus_t status;
   status = _flash_shift_sector_primary_to_secondary_();
   if (status != FLASH_OK)
     return status;
-  uart2_write("Erasing primary sector...\n");
+//  uart2_write("Erasing primary sector...\n");
   _flash_erase_sector_(PRIMARY_FLASH_SECTOR);
   status = _flash_shift_sector_secondary_to_primary_();
   if (status != FLASH_OK)
     return status;
-  uart2_write("Erasing secondary sector...\n");
+//  uart2_write("Erasing secondary sector...\n");
   _flash_erase_sector_(SECONDARY_FLASH_SECTOR);
   return FLASH_OK;
 }

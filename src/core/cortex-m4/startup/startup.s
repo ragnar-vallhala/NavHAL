@@ -228,6 +228,13 @@ loop_forever:
 .weak DMA2_Stream5_IRQHandler
 .weak DMA2_Stream6_IRQHandler
 .weak DMA2_Stream7_IRQHandler
+.weak SDIO_IRQHandler
+.weak USART2_IRQHandler
+.weak TIM1BRK_TIM9_IRQHandler
+.weak TIM2_IRQHandler
+.weak TIM3_IRQHandler
+.weak TIM4_IRQHandler
+.weak TIM5_IRQHandler
 
 .set DMA1_Stream0_IRQHandler, Default_Handler
 .set DMA1_Stream1_IRQHandler, Default_Handler
@@ -245,6 +252,13 @@ loop_forever:
 .set DMA2_Stream5_IRQHandler, Default_Handler
 .set DMA2_Stream6_IRQHandler, Default_Handler
 .set DMA2_Stream7_IRQHandler, Default_Handler
+.set SDIO_IRQHandler, Default_Handler
+.set USART2_IRQHandler, Default_Handler
+.set TIM1BRK_TIM9_IRQHandler, Default_Handler
+.set TIM2_IRQHandler, Default_Handler
+.set TIM3_IRQHandler, Default_Handler
+.set TIM4_IRQHandler, Default_Handler
+.set TIM5_IRQHandler, Default_Handler
 
 .section .text.Default_Handler, "ax", %progbits
 Default_Handler:

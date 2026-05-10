@@ -1,0 +1,8 @@
+---
+If:
+  PathMatch: .*Kconfig.*
+Index:
+  Background: Skip
+Diagnostics:
+  Suppress: ["*"]
+---

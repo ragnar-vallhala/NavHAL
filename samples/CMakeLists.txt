@@ -70,8 +70,13 @@ endif()
 # Check for the sample asked to build
 list(FIND AVAILABLE_SAMPLES ${SAMPLE} SAMPLE_INDEX)
 if(${SAMPLE_INDEX} EQUAL -1)
+  # Fallback: allow selecting by the full directory name (e.g. "01_hal_blink")
+  list(FIND SAMPLE_DIRS ${SAMPLE} SAMPLE_INDEX)
+endif()
+
+if(${SAMPLE_INDEX} EQUAL -1)
   message(
-    FATAL_ERROR "Sample ${SAMPLE} not found. Available: ${AVAILABLE_SAMPLES}")
+    FATAL_ERROR "Sample ${SAMPLE} not found. Available samples: ${AVAILABLE_SAMPLES}\nAvailable dirs: ${SAMPLE_DIRS}")
 endif()
 
 list(GET SAMPLE_DIRS ${SAMPLE_INDEX} SAMPLE_DIR)

@@ -36,7 +36,7 @@ endif()
 # Flashing board
 add_custom_target(flash
   COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${SAMPLE}> ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin
-  COMMAND ${FLASHER} --connect-under-reset write ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin ${FLASH_ADDRESS}
+  COMMAND ${FLASHER} --connect-under-reset --reset write ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin ${FLASH_ADDRESS}
   DEPENDS ${SAMPLE}
   COMMENT "Converting ELF to BIN and flashing to board"
 )

@@ -43,7 +43,7 @@ int main(void)
     uart2_write(buff.status);
     uart2_write(" \n");
 
-    uart2_write("Next free address: ");
-    uart2_write((uint32_t)_flash_find_next_free());
+    uart2_write("Storage needs compaction: ");
+    uart2_write(hal_flash_needs_compaction() ? 1 : 0);
     uart2_write(" \n");
 }

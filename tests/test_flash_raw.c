@@ -10,11 +10,11 @@ void test_flash_storage_integration(void) {
   uint8_t size = 0;
 
   // This test uses the actual high-level API which uses Sectors 6/7
-  FlashStatus_t status = save_data_to_flash(0x77, data_in, 4);
-  TEST_ASSERT_TRUE(status == FLASH_OK);
+  hal_status_t status = hal_flash_save(0x77, data_in, 4);
+  TEST_ASSERT_TRUE(status == HAL_OK);
 
-  status = read_data_from_flash(0x77, data_out, &size);
-  TEST_ASSERT_TRUE(status == FLASH_OK);
+  status = hal_flash_read(0x77, data_out, &size);
+  TEST_ASSERT_TRUE(status == HAL_OK);
   TEST_ASSERT_EQUAL_UINT32(4, (uint32_t)size);
 
   for (int i = 0; i < 4; i++) {

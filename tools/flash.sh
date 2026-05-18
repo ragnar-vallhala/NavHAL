@@ -1,4 +1,4 @@
-SAMPLE=${1:-hal_fpu}
+SAMPLE=${1:-hal_blink}
 rm -rf build
 mkdir -p build
 cd build

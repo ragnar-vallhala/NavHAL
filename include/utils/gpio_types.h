@@ -15,6 +15,8 @@
 #ifndef GPIO_TYPES_H
 #define GPIO_TYPES_H
 
+#include "common/navhal_compiler.h"
+
 /**
  * @enum hal_gpio_pin
  * @brief Enumeration of GPIO pins across ports A to E.
@@ -127,65 +129,132 @@ typedef enum {
 
 } hal_gpio_pin;
 
-/**
- * @enum hal_gpio_mode
- * @brief GPIO pin modes.
+/*
+ * Each enum below carries its standardized HAL_GPIO_* constants plus the
+ * pre-standardization GPIO_* aliases. The aliases are marked deprecated, so
+ * using one emits a compiler warning pointing at the standardized name.
+ * All deprecated aliases are removed in M5.
  */
-typedef enum {
-  GPIO_INPUT,  /**< Configure pin as input */
-  GPIO_OUTPUT, /**< Configure pin as output */
-  GPIO_AF,     /**< Configure pin as alternate function */
-  GPIO_ANALOG  /**< Configure pin as analog */
-} hal_gpio_mode;
 
 /**
- * @enum hal_gpio_state
- * @brief GPIO pin logic levels.
+ * @enum hal_gpio_mode_t
+ * @brief GPIO pin mode (values match the STM32 MODER field encoding).
  */
 typedef enum {
-  GPIO_LOW = 0, /**< Logic low state */
-  GPIO_HIGH = 1 /**< Logic high state */
-} hal_gpio_state;
+  HAL_GPIO_MODE_INPUT = 0,  /**< Digital input. */
+  HAL_GPIO_MODE_OUTPUT = 1, /**< Digital output. */
+  HAL_GPIO_MODE_AF = 2,     /**< Alternate function. */
+  HAL_GPIO_MODE_ANALOG = 3, /**< Analog. */
+  GPIO_INPUT NAVHAL_DEPRECATED("use HAL_GPIO_MODE_INPUT") = 0,
+  GPIO_OUTPUT NAVHAL_DEPRECATED("use HAL_GPIO_MODE_OUTPUT") = 1,
+  GPIO_AF NAVHAL_DEPRECATED("use HAL_GPIO_MODE_AF") = 2,
+  GPIO_ANALOG NAVHAL_DEPRECATED("use HAL_GPIO_MODE_ANALOG") = 3,
+} hal_gpio_mode_t;
 
 /**
- * @enum hal_gpio_pullup_pulldown
+ * @enum hal_gpio_state_t
+ * @brief GPIO pin logic level.
+ */
+typedef enum {
+  HAL_GPIO_LOW = 0,  /**< Logic low. */
+  HAL_GPIO_HIGH = 1, /**< Logic high. */
+  GPIO_LOW NAVHAL_DEPRECATED("use HAL_GPIO_LOW") = 0,
+  GPIO_HIGH NAVHAL_DEPRECATED("use HAL_GPIO_HIGH") = 1,
+} hal_gpio_state_t;
+
+/**
+ * @enum hal_gpio_pull_t
  * @brief GPIO pull-up/pull-down resistor configuration.
  */
 typedef enum {
-  GPIO_PUPD_NONE, /**< No pull resistor */
-  GPIO_PULLUP,    /**< Pull-up resistor enabled */
-  GPIO_PULLDOWN   /**< Pull-down resistor enabled */
-} hal_gpio_pullup_pulldown;
+  HAL_GPIO_PULL_NONE = 0, /**< No pull resistor. */
+  HAL_GPIO_PULL_UP = 1,   /**< Pull-up resistor enabled. */
+  HAL_GPIO_PULL_DOWN = 2, /**< Pull-down resistor enabled. */
+  GPIO_PUPD_NONE NAVHAL_DEPRECATED("use HAL_GPIO_PULL_NONE") = 0,
+  GPIO_PULLUP NAVHAL_DEPRECATED("use HAL_GPIO_PULL_UP") = 1,
+  GPIO_PULLDOWN NAVHAL_DEPRECATED("use HAL_GPIO_PULL_DOWN") = 2,
+} hal_gpio_pull_t;
 
+/**
+ * @enum hal_gpio_output_type_t
+ * @brief GPIO output driver type.
+ */
 typedef enum {
-  GPIO_PUSH_PULL = 0, ///< push pull otyper
-  GPIO_OPEN_DRAIN     ///< open drain otyper
-} hal_gpio_output_type;
-typedef enum {
-  GPIO_LOW_SPEED = 0,
-  GPIO_MEDIUM_SPEED,
-  GPIO_HIGH_SPEED,
-  GPIO_VERY_HIGH_SPEED,
+  HAL_GPIO_OTYPE_PUSH_PULL = 0,  /**< Push-pull output. */
+  HAL_GPIO_OTYPE_OPEN_DRAIN = 1, /**< Open-drain output. */
+  GPIO_PUSH_PULL NAVHAL_DEPRECATED("use HAL_GPIO_OTYPE_PUSH_PULL") = 0,
+  GPIO_OPEN_DRAIN NAVHAL_DEPRECATED("use HAL_GPIO_OTYPE_OPEN_DRAIN") = 1,
+} hal_gpio_output_type_t;
 
-} hal_gpio_output_speed;
+/**
+ * @enum hal_gpio_output_speed_t
+ * @brief GPIO output slew-rate / speed.
+ */
 typedef enum {
-  GPIO_AF00,
-  GPIO_AF01,
-  GPIO_AF02,
-  GPIO_AF03,
-  GPIO_AF04,
-  GPIO_AF05,
-  GPIO_AF06,
-  GPIO_AF07,
-  GPIO_AF08,
-  GPIO_AF09,
-  GPIO_AF10,
-  GPIO_AF11,
-  GPIO_AF12,
-  GPIO_AF13,
-  GPIO_AF14,
-  GPIO_AF15
-} hal_gpio_alternate_function_t;
+  HAL_GPIO_SPEED_LOW = 0,       /**< Low speed. */
+  HAL_GPIO_SPEED_MEDIUM = 1,    /**< Medium speed. */
+  HAL_GPIO_SPEED_HIGH = 2,      /**< High speed. */
+  HAL_GPIO_SPEED_VERY_HIGH = 3, /**< Very high speed. */
+  GPIO_LOW_SPEED NAVHAL_DEPRECATED("use HAL_GPIO_SPEED_LOW") = 0,
+  GPIO_MEDIUM_SPEED NAVHAL_DEPRECATED("use HAL_GPIO_SPEED_MEDIUM") = 1,
+  GPIO_HIGH_SPEED NAVHAL_DEPRECATED("use HAL_GPIO_SPEED_HIGH") = 2,
+  GPIO_VERY_HIGH_SPEED NAVHAL_DEPRECATED("use HAL_GPIO_SPEED_VERY_HIGH") = 3,
+} hal_gpio_output_speed_t;
+
+/**
+ * @enum hal_gpio_af_t
+ * @brief GPIO alternate-function selector (AF0..AF15).
+ */
+typedef enum {
+  HAL_GPIO_AF0 = 0,
+  HAL_GPIO_AF1,
+  HAL_GPIO_AF2,
+  HAL_GPIO_AF3,
+  HAL_GPIO_AF4,
+  HAL_GPIO_AF5,
+  HAL_GPIO_AF6,
+  HAL_GPIO_AF7,
+  HAL_GPIO_AF8,
+  HAL_GPIO_AF9,
+  HAL_GPIO_AF10,
+  HAL_GPIO_AF11,
+  HAL_GPIO_AF12,
+  HAL_GPIO_AF13,
+  HAL_GPIO_AF14,
+  HAL_GPIO_AF15,
+  GPIO_AF00 NAVHAL_DEPRECATED("use HAL_GPIO_AF0") = 0,
+  GPIO_AF01 NAVHAL_DEPRECATED("use HAL_GPIO_AF1") = 1,
+  GPIO_AF02 NAVHAL_DEPRECATED("use HAL_GPIO_AF2") = 2,
+  GPIO_AF03 NAVHAL_DEPRECATED("use HAL_GPIO_AF3") = 3,
+  GPIO_AF04 NAVHAL_DEPRECATED("use HAL_GPIO_AF4") = 4,
+  GPIO_AF05 NAVHAL_DEPRECATED("use HAL_GPIO_AF5") = 5,
+  GPIO_AF06 NAVHAL_DEPRECATED("use HAL_GPIO_AF6") = 6,
+  GPIO_AF07 NAVHAL_DEPRECATED("use HAL_GPIO_AF7") = 7,
+  GPIO_AF08 NAVHAL_DEPRECATED("use HAL_GPIO_AF8") = 8,
+  GPIO_AF09 NAVHAL_DEPRECATED("use HAL_GPIO_AF9") = 9,
+  GPIO_AF10 NAVHAL_DEPRECATED("use HAL_GPIO_AF10") = 10,
+  GPIO_AF11 NAVHAL_DEPRECATED("use HAL_GPIO_AF11") = 11,
+  GPIO_AF12 NAVHAL_DEPRECATED("use HAL_GPIO_AF12") = 12,
+  GPIO_AF13 NAVHAL_DEPRECATED("use HAL_GPIO_AF13") = 13,
+  GPIO_AF14 NAVHAL_DEPRECATED("use HAL_GPIO_AF14") = 14,
+  GPIO_AF15 NAVHAL_DEPRECATED("use HAL_GPIO_AF15") = 15,
+} hal_gpio_af_t;
+
+/* -------------------------------------------------------------------------- *
+ * Deprecated — pre-standardization GPIO type names. Removed in M5.
+ * -------------------------------------------------------------------------- */
+typedef hal_gpio_mode_t hal_gpio_mode
+    NAVHAL_DEPRECATED("use hal_gpio_mode_t");
+typedef hal_gpio_state_t hal_gpio_state
+    NAVHAL_DEPRECATED("use hal_gpio_state_t");
+typedef hal_gpio_pull_t hal_gpio_pullup_pulldown
+    NAVHAL_DEPRECATED("use hal_gpio_pull_t");
+typedef hal_gpio_output_type_t hal_gpio_output_type
+    NAVHAL_DEPRECATED("use hal_gpio_output_type_t");
+typedef hal_gpio_output_speed_t hal_gpio_output_speed
+    NAVHAL_DEPRECATED("use hal_gpio_output_speed_t");
+typedef hal_gpio_af_t hal_gpio_alternate_function_t
+    NAVHAL_DEPRECATED("use hal_gpio_af_t");
 
 /**
  * @brief Standardized type name for a GPIO pin identifier.

@@ -1,66 +1,73 @@
 /**
- * @file pwm.h
- * @brief HAL interface for PWM (Pulse Width Modulation) configuration and control.
+ * @file core/cortex-m4/pwm.h
+ * @brief Cortex-M4 / STM32F4 PWM HAL driver interface.
  *
  * @details
- * This header provides:
- * - PWM handle structure linking hardware timers and channels.
- * - Functions to initialize, start, stop, and configure PWM signals.
+ * Standardized PWM API (see `docs/api_standardization.md`). PWM is generated
+ * on a timer channel; a ::hal_pwm_handle_t binds the timer and channel, and
+ * is the first argument to every `hal_pwm_*` function. Functions return
+ * ::hal_status_t.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef PWM_H
-#define PWM_H
+#ifndef CORTEX_M4_PWM_H
+#define CORTEX_M4_PWM_H
 
+#include "common/hal_status.h"
+#include "common/navhal_compiler.h"
 #include "utils/timer_types.h"
 #include <stdint.h>
 
 /**
- * @brief PWM handle structure linking timer and channel.
+ * @brief PWM handle binding a hardware timer and channel.
  */
 typedef struct {
-  hal_timer_t timer;   /**< Hardware timer used for PWM generation. */
-  uint32_t channel;    /**< PWM channel number associated with the timer. */
-} PWM_Handle;
+  hal_timer_t timer; /**< Hardware timer used for PWM generation. */
+  uint32_t channel;  /**< Timer channel (1-4) used for the PWM output. */
+} hal_pwm_handle_t;
 
 /**
- * @brief Initialize a PWM handle with the specified frequency and duty cycle.
- *
- * @param pwm Pointer to the PWM handle.
- * @param frequency PWM frequency in Hz.
- * @param dutyCycle Duty cycle as a percentage (0.0 to 100.0).
+ * @brief Initialize a PWM output with the given frequency and duty cycle.
+ * @param pwm        PWM handle (timer + channel); must not be NULL.
+ * @param frequency  PWM frequency in Hz; must be non-zero.
+ * @param duty_cycle Duty cycle as a fraction (0.0 - 1.0).
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL handle / zero frequency.
  */
-void hal_pwm_init(PWM_Handle *pwm, uint32_t frequency, float dutyCycle);
+hal_status_t hal_pwm_init(hal_pwm_handle_t *pwm, uint32_t frequency,
+                          float duty_cycle);
 
 /**
  * @brief Start PWM signal generation.
- *
- * @param pwm Pointer to the PWM handle.
+ * @param pwm PWM handle; must not be NULL.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG.
  */
-void hal_pwm_start(PWM_Handle *pwm);
+hal_status_t hal_pwm_start(hal_pwm_handle_t *pwm);
 
 /**
  * @brief Stop PWM signal generation.
- *
- * @param pwm Pointer to the PWM handle.
+ * @param pwm PWM handle; must not be NULL.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG.
  */
-void hal_pwm_stop(PWM_Handle *pwm);
+hal_status_t hal_pwm_stop(hal_pwm_handle_t *pwm);
 
 /**
  * @brief Set the PWM duty cycle.
- *
- * @param pwm Pointer to the PWM handle.
- * @param dutyCycle Duty cycle as a percentage (0.0 to 100.0).
+ * @param pwm        PWM handle; must not be NULL.
+ * @param duty_cycle Duty cycle as a fraction (0.0 - 1.0).
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG.
  */
-void hal_pwm_set_duty_cycle(PWM_Handle *pwm, float dutyCycle);
+hal_status_t hal_pwm_set_duty_cycle(hal_pwm_handle_t *pwm, float duty_cycle);
 
 /**
  * @brief Set the PWM frequency.
- *
- * @param pwm Pointer to the PWM handle.
+ * @param pwm       PWM handle; must not be NULL.
  * @param frequency PWM frequency in Hz.
+ * @return ::HAL_ERR_NOT_SUPPORTED — not yet implemented.
  */
-void hal_pwm_set_frequency(PWM_Handle *pwm, uint32_t frequency);
+hal_status_t hal_pwm_set_frequency(hal_pwm_handle_t *pwm, uint32_t frequency);
 
-#endif // PWM_H
+/* Deprecated pre-standardization PWM handle type — removed in M5. */
+typedef hal_pwm_handle_t PWM_Handle NAVHAL_DEPRECATED("use hal_pwm_handle_t");
+
+#endif // CORTEX_M4_PWM_H

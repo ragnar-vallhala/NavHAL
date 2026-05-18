@@ -210,7 +210,7 @@ if(TEST)
    
   add_custom_target(flash_tests
      COMMAND ${CMAKE_OBJCOPY} -O binary tests tests.bin
-     COMMAND ${FLASHER} write tests.bin ${FLASH_ADDRESS}
+     COMMAND ${FLASHER} --reset write tests.bin ${FLASH_ADDRESS}
      DEPENDS tests
      COMMENT "Converting ELF to BIN and flashing to board"
    )

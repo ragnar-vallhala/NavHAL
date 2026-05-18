@@ -32,7 +32,7 @@ add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
 
 # Custom target for flashing
 add_custom_target(flash
-    COMMAND st-flash --connect-under-reset write ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE_NAME}.bin 0x08000000
+    COMMAND st-flash --connect-under-reset --reset write ${CMAKE_CURRENT_BINARY_DIR}/${EXECUTABLE_NAME}.bin 0x08000000
     DEPENDS ${EXECUTABLE_NAME}
     COMMENT "Flashing ${EXECUTABLE_NAME}.bin to board"
 )

@@ -1,51 +1,78 @@
+/**
+ * @file interrupt.c
+ * @brief Standardized HAL interrupt-controller (NVIC) driver for Cortex-M4.
+ *
+ * @details
+ * Implements the standardized `hal_interrupt_*` API declared in
+ * `core/cortex-m4/interrupt.h`: per-IRQ enable/disable, pending control,
+ * priority configuration, callback registration/dispatch, and global
+ * interrupt masking.
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
+ */
+
 #include "core/cortex-m4/interrupt.h"
 #include "common/hal_status.h"
 #include <stdint.h>
+
 #define MAX_IRQ 128
-static void (*irq_callbacks[MAX_IRQ])(void) = {0};
+static hal_interrupt_callback_t irq_callbacks[MAX_IRQ] = {0};
 
-int8_t hal_enable_interrupt(IRQn_Type interrupt) {
-  if (interrupt < 0)
-    return FAILURE; // CortexM interrupts
+hal_status_t hal_interrupt_enable(IRQn_Type irq) {
+  if (irq < 0)
+    return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
 
-  uint32_t irq_num = (uint32_t)interrupt;
-  uint32_t reg_idx = irq_num / 32;
-  uint32_t bit_pos = irq_num % 32;
-
-  NVIC->ISER[reg_idx] |= (1U << bit_pos);
-  return SUCCESS;
+  uint32_t irq_num = (uint32_t)irq;
+  NVIC->ISER[irq_num / 32] |= (1U << (irq_num % 32));
+  return HAL_OK;
 }
 
-int8_t hal_disable_interrupt(IRQn_Type interrupt) {
-  if (interrupt < 0)
-    return FAILURE; // CortexM interrupts
+hal_status_t hal_interrupt_disable(IRQn_Type irq) {
+  if (irq < 0)
+    return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
 
-  uint32_t irq_num = (uint32_t)interrupt;
-  uint32_t reg_idx = irq_num / 32;
-  uint32_t bit_pos = irq_num % 32;
-
-  NVIC->ICER[reg_idx] |= (1 << bit_pos);
-  return SUCCESS;
+  uint32_t irq_num = (uint32_t)irq;
+  NVIC->ICER[irq_num / 32] |= (1U << (irq_num % 32));
+  return HAL_OK;
 }
 
-void hal_interrupt_attach_callback(IRQn_Type interrupt,
-                                   void (*callback)(void)) {
-  if (interrupt < 0 || interrupt >= MAX_IRQ)
+hal_status_t hal_interrupt_clear_pending(IRQn_Type irq) {
+  if (irq < 0)
+    return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
+
+  uint32_t irq_num = (uint32_t)irq;
+  NVIC->ICPR[irq_num / 32] = (1U << (irq_num % 32));
+  return HAL_OK;
+}
+
+bool hal_interrupt_is_pending(IRQn_Type irq) {
+  if (irq < 0)
+    return false;
+
+  uint32_t irq_num = (uint32_t)irq;
+  return ((NVIC->ISPR[irq_num / 32] >> (irq_num % 32)) & 1U) != 0U;
+}
+
+hal_status_t hal_interrupt_attach_callback(IRQn_Type irq,
+                                           hal_interrupt_callback_t callback) {
+  if (irq < 0 || irq >= MAX_IRQ)
+    return HAL_ERR_INVALID_ARG;
+  irq_callbacks[(uint32_t)irq] = callback;
+  return HAL_OK;
+}
+
+hal_status_t hal_interrupt_detach_callback(IRQn_Type irq) {
+  if (irq < 0 || irq >= MAX_IRQ)
+    return HAL_ERR_INVALID_ARG;
+  irq_callbacks[(uint32_t)irq] = 0;
+  return HAL_OK;
+}
+
+void hal_interrupt_dispatch(IRQn_Type irq) {
+  if (irq < 0 || irq >= MAX_IRQ)
     return;
-  irq_callbacks[(uint32_t)interrupt] = callback;
-}
-
-void hal_interrupt_detach_callback(IRQn_Type interrupt) {
-  if (interrupt < 0 || interrupt >= MAX_IRQ)
-    return;
-  irq_callbacks[(uint32_t)interrupt] = 0;
-}
-
-void hal_handle_interrupt(IRQn_Type interrupt) {
-  if (interrupt < 0 || interrupt >= MAX_IRQ)
-    return;
-  if (irq_callbacks[(uint32_t)interrupt])
-    irq_callbacks[(uint32_t)interrupt]();
+  if (irq_callbacks[(uint32_t)irq])
+    irq_callbacks[(uint32_t)irq]();
 }
 
 #define SCB_SHPR1                                                              \
@@ -55,16 +82,16 @@ void hal_handle_interrupt(IRQn_Type interrupt) {
 #define __NVIC_PRIO_BITS 4
 #define PRIORITY_MASK ((1UL << __NVIC_PRIO_BITS) - 1)
 
-void hal_set_interrupt_priority(IRQn_Type interrupt, uint8_t priority) {
+hal_status_t hal_interrupt_set_priority(IRQn_Type irq, uint8_t priority) {
   // Normalize to top 4 bits (0-15 effective priority levels)
   uint32_t prio = (priority & PRIORITY_MASK) << (8 - __NVIC_PRIO_BITS);
 
-  if (interrupt >= 0) {
+  if (irq >= 0) {
     // External interrupts
-    NVIC->IPR[(uint32_t)interrupt] = prio;
+    NVIC->IPR[(uint32_t)irq] = prio;
   } else {
     // System exceptions (negative IRQn)
-    switch (interrupt) {
+    switch (irq) {
     case MemoryManagement_IRQn:
       SCB_SHPR1 = (SCB_SHPR1 & ~(0xFFU << 0)) | (prio << 0);
       break;
@@ -88,16 +115,17 @@ void hal_set_interrupt_priority(IRQn_Type interrupt, uint8_t priority) {
       break;
     }
   }
+  return HAL_OK;
 }
 
-uint8_t hal_get_interrupt_priority(IRQn_Type interrupt) {
-  if (interrupt >= 0) {
+uint8_t hal_interrupt_get_priority(IRQn_Type irq) {
+  if (irq >= 0) {
     // External interrupts
-    return NVIC->IPR[(uint32_t)interrupt] >> 4; // only upper 4 bits are valid
+    return NVIC->IPR[(uint32_t)irq] >> 4; // only upper 4 bits are valid
   } else {
     // System exceptions
     uint32_t value = 0;
-    switch (interrupt) {
+    switch (irq) {
     case MemoryManagement_IRQn:
       value = (SCB_SHPR1 >> 0) & 0xFF;
       break;
@@ -123,22 +151,23 @@ uint8_t hal_get_interrupt_priority(IRQn_Type interrupt) {
   }
 }
 
-void hal_enable_global_interrupts(uint32_t state) {
+void hal_interrupt_enable_global(uint32_t state) {
   __asm volatile("msr primask, %0" : : "r"(state) : "memory");
 }
 
-uint32_t hal_disable_global_interrupts(void) {
+uint32_t hal_interrupt_disable_global(void) {
   uint32_t state;
   __asm volatile("mrs %0, primask" : "=r"(state));
   __asm volatile("cpsid i" : : : "memory");
   return state;
 }
 
-void hal_clear_all_pending_interrupts(void) {
+void hal_interrupt_clear_all_pending(void) {
   for (int i = 0; i < 8; i++) {
     NVIC->ICPR[i] = 0xFFFFFFFF;
   }
 }
+
 #ifndef SUBMODULE
 __attribute__((weak)) void PendSV_Handler(void) {}
 __attribute__((weak)) void HardFault_Handler(void) {}
@@ -150,5 +179,5 @@ __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 void Default_Handler(void) {}
 __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 #endif
-// #include "core/cortex-m4/uart.h"
-void USART2_IRQHandler(void) { hal_handle_interrupt(USART2_IRQn); }
+
+void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }

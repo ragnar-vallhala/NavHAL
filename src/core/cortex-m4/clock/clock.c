@@ -16,18 +16,8 @@
 #include "core/cortex-m4/rcc_reg.h"
 #include <stdint.h>
 
-/**
- * @brief Initialize system clocks based on the provided configuration.
- *
- * Enables and waits for the selected clock source (HSI, HSE, or PLL).
- * If PLL is selected, configures PLL parameters and switches system clock
- * source to PLL output.
- *
- * @param cfg Pointer to clock configuration structure specifying source.
- * @param pll_cfg Pointer to PLL configuration structure (used if source is
- * PLL).
- */
-void _toggle_hse_clock(uint8_t state) {
+/* Internal clock-source toggle helpers (file-local). */
+static void _toggle_hse_clock(uint8_t state) {
   if (state) {
     RCC->CR |= RCC_CR_HSEON;
   } else
@@ -35,7 +25,7 @@ void _toggle_hse_clock(uint8_t state) {
   while (((RCC->CR & RCC_CR_HSERDY) != 0) != (state))
     ;
 }
-void _toggle_hsi_clock(uint8_t state) {
+static void _toggle_hsi_clock(uint8_t state) {
   if (state)
     RCC->CR |= RCC_CR_HSION;
   else
@@ -43,7 +33,7 @@ void _toggle_hsi_clock(uint8_t state) {
   while (((RCC->CR & RCC_CR_HSIRDY) != 0) != (state))
     ;
 }
-void _toggle_pll_clock(uint8_t state) {
+static void _toggle_pll_clock(uint8_t state) {
   if (state)
     RCC->CR |= RCC_CR_PLLON;
   else
@@ -52,7 +42,24 @@ void _toggle_pll_clock(uint8_t state) {
     ;
 }
 
-void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg) {
+/**
+ * @brief Initialize system clocks based on the provided configuration.
+ *
+ * Enables and waits for the selected clock source (HSI, HSE, or PLL).
+ * If PLL is selected, configures PLL parameters and switches system clock
+ * source to PLL output.
+ *
+ * @param cfg     Clock configuration specifying the source; must not be NULL.
+ * @param pll_cfg PLL configuration; must not be NULL when the source is PLL.
+ * @return ::HAL_OK on success, ::HAL_ERR_INVALID_ARG on a missing argument.
+ */
+hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
+                            const hal_pll_config_t *pll_cfg) {
+  if (cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
+  if (cfg->source == HAL_CLOCK_SOURCE_PLL && pll_cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
+
   // Enable and wait for selected clock source
   if (cfg->source == HAL_CLOCK_SOURCE_HSE) {
     _toggle_hse_clock(RCC_ON);
@@ -128,6 +135,8 @@ void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg) {
     (*FLASH_ACR) &= ~(0x7 << FLASH_ACR_LATENCY_BIT);
     (*FLASH_ACR) |= (0 << FLASH_ACR_LATENCY_BIT);
   }
+
+  return HAL_OK;
 }
 
 /**

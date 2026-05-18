@@ -1,17 +1,18 @@
 /**
  * @file timer.c
- * @brief Timer, SysTick and timer-peripheral helpers for STM32F4 (Cortex-M4).
+ * @brief Timebase and general-purpose timer driver for STM32F4 (Cortex-M4).
  *
  * @details
  * This translation unit implements:
- * - SysTick initialization and a microsecond tick counter.
- * - Busy-wait delay helpers (`delay_us`, `delay_ms`).
+ * - The SysTick-backed timebase and busy-wait delay helpers.
  * - Timer peripheral base lookup, RCC enable, init/start/stop/reset.
  * - Timer interrupt control, attach/detach callbacks and IRQ handlers.
  * - Channel compare and PWM setup helpers.
  *
  * All logic is intentionally low-level (direct register access) and matches
  * the STM32F4 register layout / behavior expected by the rest of the HAL.
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #include "core/cortex-m4/timer.h"
@@ -22,36 +23,39 @@
 #include "utils/timer_types.h"
 #include <stdint.h>
 
-/**
- * @brief Global system tick counter (increments in SysTick_Handler).
- *
- * @note Unit: ticks (tick duration set by systick_init).
- */
-volatile uint64_t systick_ticks = 0; // global ticks
+/* ========================================================================= *
+ * Timebase (SysTick-backed)
+ * ========================================================================= */
 
 /**
- * @brief SysTick tick duration in microseconds.
- *
- * @note Default value is 1 us until systick_init is called.
+ * @brief Global timebase tick counter (incremented in SysTick_Handler).
+ * @note Unit: ticks; tick duration is set by hal_timebase_init().
  */
-static volatile uint32_t tick_duration_us = 1; // global tick duration in us
+static volatile uint32_t systick_ticks = 0;
+
+/** @brief Timebase tick duration in microseconds (1 us until init). */
+static volatile uint32_t tick_duration_us = 1;
+
+/** @brief SysTick reload value (24-bit) currently configured. */
+static volatile uint32_t tick_reload_value = 0;
+
+/** @brief User callback invoked on every timebase tick. */
+static hal_timebase_callback_t timebase_callback = 0;
 
 /**
- * @brief SysTick reload value (24-bit) currently configured.
+ * @brief Initialize the timebase (SysTick) to generate periodic ticks.
+ *
+ * @param tick_us Tick period in microseconds; must be non-zero.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p tick_us is 0.
+ *
+ * @note The SysTick reload is 24-bit; the computed reload value is clipped
+ *       to 24 bits. Configures the clock source, enables the SysTick
+ *       interrupt and starts the timer.
  */
-static volatile uint32_t tick_reload_value = 0; // ticks relaod value
+hal_status_t hal_timebase_init(uint32_t tick_us) {
+  if (tick_us == 0)
+    return HAL_ERR_INVALID_ARG;
 
-/**
- * @brief Initialize the SysTick timer to generate periodic ticks.
- *
- * @param tick_us Tick period in microseconds.
- *
- * @note The SysTick reload is limited to 24 bits; this function clips the
- *       computed reload value to 24 bits. The function configures SysTick
- *       to use the selected clock source, enables the SysTick interrupt
- *       and starts the timer.
- */
-void systick_init(uint32_t tick_us) {
   // systick interrupt is not under the NVIC
   systick_ticks = 0;
   tick_duration_us = tick_us;
@@ -62,11 +66,19 @@ void systick_init(uint32_t tick_us) {
   tick_reload_value = reload;
   SYST_RVR = reload; // Set reload value
   SYST_CVR = 0;      // Clear current value
-  SYST_CSR =
-      (1 << SYST_CSR_EN_BIT) | (1 << SYST_CSR_TICKINT_BIT) |
-      (1 << SYST_CSR_CLKSOURCE_BIT); // Enable | TickInt | ClkSource
-                                     // CLOCK source 0 means the systick run at
-                                     // ahbclk/8 and if it's 1 it runs at ahbclk
+  SYST_CSR = (1 << SYST_CSR_EN_BIT) | (1 << SYST_CSR_TICKINT_BIT) |
+             (1 << SYST_CSR_CLKSOURCE_BIT); // Enable | TickInt | ClkSource
+  return HAL_OK;
+}
+
+/**
+ * @brief Register a callback invoked on every timebase tick.
+ * @param cb Callback function, or NULL to clear.
+ * @return ::HAL_OK.
+ */
+hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb) {
+  timebase_callback = cb;
+  return HAL_OK;
 }
 
 /**
@@ -74,81 +86,65 @@ void systick_init(uint32_t tick_us) {
  *
  * @param us Number of microseconds to delay.
  *
- * @note This is a blocking busy-wait that uses hal_get_tick() and the
- *       configured tick duration. It will wait at least one tick if
- *       the requested delay is smaller than the tick duration.
+ * @note Blocking busy-wait using the timebase tick; waits at least one tick
+ *       if the requested delay is smaller than the tick duration.
  */
-void delay_us(uint64_t us) {
-  volatile uint64_t ticks_needed = us / hal_get_tick_duration_us();
-  if (ticks_needed ==
-      0) // if 0 ticks are needed for the delay raise it to 1 tick
+void hal_delay_us(uint32_t us) {
+  uint32_t ticks_needed = us / hal_timebase_get_tick_duration_us();
+  if (ticks_needed == 0)
     ticks_needed = 1;
-  volatile uint32_t start = hal_get_tick();
-  while (hal_get_tick() - start < ticks_needed)
+  uint32_t start = hal_timebase_get_tick();
+  while (hal_timebase_get_tick() - start < ticks_needed)
     __asm__ volatile("nop"); // insert noops in bw
-  ;
 }
 
 /**
  * @brief Busy-wait for the specified number of milliseconds.
- *
  * @param ms Number of milliseconds to delay.
  */
-void delay_ms(uint32_t ms) { delay_us(ms * 1000); }
+void hal_delay_ms(uint32_t ms) { hal_delay_us(ms * 1000); }
 
-/**
- * @brief Return the current system tick count.
- *
- * @return Current tick count.
- */
-uint64_t hal_get_tick(void) { return systick_ticks; }
+/** @brief Return the current timebase tick count. */
+uint32_t hal_timebase_get_tick(void) { return systick_ticks; }
 
-/**
- * @brief Return the configured tick duration in microseconds.
- *
- * @return Tick duration (us).
- */
-uint32_t hal_get_tick_duration_us(void) { return tick_duration_us; }
+/** @brief Return the configured tick duration in microseconds. */
+uint32_t hal_timebase_get_tick_duration_us(void) { return tick_duration_us; }
 
-/**
- * @brief Return the SysTick reload value (24-bit truncated).
- *
- * @return Reload value currently configured in SYST_RVR.
- */
-uint32_t hal_get_tick_reload_value(void) { return tick_reload_value; }
+/** @brief Return the SysTick reload value (24-bit). */
+uint32_t hal_timebase_get_reload_value(void) { return tick_reload_value; }
 
-/**
- * @brief Return system uptime in milliseconds.
- *
- * @return Milliseconds since tick counter started.
- */
-uint32_t hal_get_millis(void) { return hal_get_micros() / 1000; }
+/** @brief Return elapsed time since timebase start, in milliseconds. */
+uint32_t hal_timebase_get_millis(void) {
+  return hal_timebase_get_micros() / 1000;
+}
 
-/**
- * @brief Return system uptime in microseconds.
- *
- * @return Microseconds since tick counter started.
- */
-uint32_t hal_get_micros(void) {
-  return hal_get_tick() * hal_get_tick_duration_us();
+/** @brief Return elapsed time since timebase start, in microseconds. */
+uint32_t hal_timebase_get_micros(void) {
+  return hal_timebase_get_tick() * hal_timebase_get_tick_duration_us();
 }
 
 /**
- * @brief SysTick interrupt handler increments the global tick counter.
- *
- * @note This handler is intended to be wired into the vector table.
+ * @brief SysTick exception handler — increments the tick counter and
+ *        invokes the registered timebase callback, if any.
  */
 #ifndef SUBMODULE
-void SysTick_Handler(void) { systick_ticks++; }
+void SysTick_Handler(void) {
+  systick_ticks++;
+  if (timebase_callback)
+    timebase_callback();
+}
 #endif
+
+/* ========================================================================= *
+ * General-purpose timers (TIMx)
+ * ========================================================================= */
 
 /**
  * @internal
- * @brief Enable peripheral clock for the given timer in RCC registers.
- *
- * @param timer Timer identifier (hal_timer_t).
+ * @brief Enable the peripheral clock for the given timer in RCC registers.
+ * @param timer Timer identifier.
  */
-void _enable_timer_rcc(hal_timer_t timer) {
+static void _enable_timer_rcc(hal_timer_t timer) {
   switch (timer) {
   case TIM1:
     RCC->APB2ENR |= (1 << RCC_APB2ENR_TIM1_OFFSET);
@@ -180,43 +176,48 @@ void _enable_timer_rcc(hal_timer_t timer) {
 }
 
 /**
- * @brief Initialize a timer based on its type (advanced / gp1 / gp2).
+ * @brief Initialize a timer with a prescaler and auto-reload value.
  *
  * @param timer Timer identifier.
- * @param prescaler Prescaler value.
- * @param auto_reload Auto-reload value.
+ * @param cfg   Configuration (prescaler + auto-reload); must not be NULL.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p cfg is NULL or the timer
+ *         is invalid.
  */
-void timer_init(hal_timer_t timer, uint32_t prescaler, uint32_t auto_reload) {
+hal_status_t hal_timer_init(hal_timer_t timer, const hal_timer_config_t *cfg) {
+  if (cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
-    return;
+    return HAL_ERR_INVALID_ARG;
+
+  uint32_t auto_reload = cfg->auto_reload;
   // Enable clock
   _enable_timer_rcc(timer);
   tim->CR1 &= (~(TIMx_CR1_CEN));
-  tim->PSC = prescaler;
+  tim->PSC = cfg->prescaler;
   tim->CNT = 0;
   if (!(timer == TIM2 || timer == TIM5))
     auto_reload = (uint16_t)auto_reload;
   tim->ARR = auto_reload;
   tim->EGR |= TIMx_EGR_UG;
   tim->CR1 |= TIMx_CR1_CEN;
+  return HAL_OK;
 }
 
 /**
- * @brief Initialize a timer to a specific frequency.
+ * @brief Initialize a timer to a specific update frequency.
  *
  * @param timer Timer identifier.
- * @param freq Desired frequency in Hz.
+ * @param freq  Desired frequency in Hz; must be non-zero.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p freq is 0 or the timer is
+ *         invalid.
  *
- * @return The remainder ("rest") of the clock division (cycles lost due to
- * integer division).
- *
- * @note This function calculates the optimal PSC and ARR to achieve the
- *       target frequency. It handles 16-bit and 32-bit timers.
+ * @note Computes the optimal PSC and ARR to achieve the target frequency,
+ *       handling both 16-bit and 32-bit timers.
  */
-void timer_init_freq(hal_timer_t timer, uint32_t freq) {
+hal_status_t hal_timer_init_freq(hal_timer_t timer, uint32_t freq) {
   if (freq == 0)
-    return;
+    return HAL_ERR_INVALID_ARG;
 
   // 1. Get clock
   uint32_t timer_clk;
@@ -280,52 +281,55 @@ void timer_init_freq(hal_timer_t timer, uint32_t freq) {
     }
   }
 
-  timer_init(timer, psc, arr);
+  hal_timer_config_t cfg = {.prescaler = psc, .auto_reload = arr};
+  return hal_timer_init(timer, &cfg);
 }
 
 /**
  * @brief Start the specified timer.
- *
  * @param timer Timer identifier.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-void timer_start(hal_timer_t timer) {
+hal_status_t hal_timer_start(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
-    return;
+    return HAL_ERR_INVALID_ARG;
   tim->CR1 |= TIMx_CR1_CEN;
+  return HAL_OK;
 }
 
 /**
  * @brief Stop the specified timer.
- *
  * @param timer Timer identifier.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-void timer_stop(hal_timer_t timer) {
+hal_status_t hal_timer_stop(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
-    return;
+    return HAL_ERR_INVALID_ARG;
   tim->CR1 &= (~TIMx_CR1_CEN);
+  return HAL_OK;
 }
 
 /**
- * @brief Reset timer counter to zero.
- *
+ * @brief Reset the timer counter to zero.
  * @param timer Timer identifier.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-void timer_reset(hal_timer_t timer) {
+hal_status_t hal_timer_reset(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
-    return;
+    return HAL_ERR_INVALID_ARG;
   tim->CNT = 0;
+  return HAL_OK;
 }
 
 /**
- * @brief Get the current counter value for a timer.
- *
+ * @brief Get the current counter value of a timer.
  * @param timer Timer identifier.
- * @return Current counter value or 0 if invalid timer.
+ * @return Current counter value, or 0 for an invalid timer.
  */
-uint32_t timer_get_count(hal_timer_t timer) {
+uint32_t hal_timer_get_count(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return 0;
@@ -333,15 +337,11 @@ uint32_t timer_get_count(hal_timer_t timer) {
 }
 
 /**
- * @brief Calculate the timer's current base frequency using PSC and ARR.
- *
+ * @brief Calculate a timer's current base frequency from PSC and ARR.
  * @param timer Timer identifier.
- * @return Timer frequency in Hz or 0 if invalid timer.
- *
- * @note This reads PSC and ARR directly from timer registers and uses
- *       the appropriate APB clock for the timer.
+ * @return Timer frequency in Hz, or 0 for an invalid timer.
  */
-uint32_t timer_get_frequency(hal_timer_t timer) {
+uint32_t hal_timer_get_frequency(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return 0;
@@ -371,77 +371,105 @@ uint32_t timer_get_frequency(hal_timer_t timer) {
   uint32_t freq = timer_clk / (prescaler + 1) / (arr + 1);
   return freq;
 }
-void timer_set_arr(hal_timer_t timer, uint32_t channel, uint32_t arr) {
+
+/**
+ * @brief Set a timer's prescaler (PSC) register.
+ * @param timer     Timer identifier.
+ * @param prescaler Prescaler value.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
+ */
+hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
-    return;
+    return HAL_ERR_INVALID_ARG;
+  tim->PSC = prescaler;
+  return HAL_OK;
+}
 
-  timer_stop(timer);
+/**
+ * @brief Set a timer's auto-reload (ARR) register.
+ * @param timer       Timer identifier.
+ * @param auto_reload Auto-reload value (clamped to 16 bits for 16-bit timers).
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
+ */
+hal_status_t hal_timer_set_auto_reload(hal_timer_t timer,
+                                       uint32_t auto_reload) {
+  TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
+  if (tim == NULL)
+    return HAL_ERR_INVALID_ARG;
+
+  hal_timer_stop(timer);
   if (!(timer == TIM2 || timer == TIM5))
-    arr = (uint16_t)arr;
-  tim->ARR = arr;
-  timer_start(timer);
+    auto_reload = (uint16_t)auto_reload;
+  tim->ARR = auto_reload;
+  hal_timer_start(timer);
+  return HAL_OK;
 }
 
-void timer_clear_interrupt_flag(hal_timer_t timer) {
+/**
+ * @brief Get a timer's auto-reload (ARR) register value.
+ * @param timer Timer identifier.
+ * @return Auto-reload value, or 0 for an invalid timer.
+ */
+uint32_t hal_timer_get_auto_reload(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
-    return;
+    return 0;
+  return tim->ARR;
+}
+
+/**
+ * @brief Clear a timer's update interrupt flag.
+ * @param timer Timer identifier.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
+ */
+hal_status_t hal_timer_clear_interrupt_flag(hal_timer_t timer) {
+  TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
+  if (tim == NULL)
+    return HAL_ERR_INVALID_ARG;
   tim->SR &= ~TIMx_SR_UIF;
+  return HAL_OK;
+}
+
+/** @brief IRQ handler wrapper for TIM2. */
+void TIM2_IRQHandler(void) {
+  hal_timer_clear_interrupt_flag(TIM2);
+  hal_interrupt_dispatch(TIM2_IRQn);
+}
+
+/** @brief IRQ handler wrapper for TIM3. */
+void TIM3_IRQHandler(void) {
+  hal_timer_clear_interrupt_flag(TIM3);
+  hal_interrupt_dispatch(TIM3_IRQn);
+}
+
+/** @brief IRQ handler wrapper for TIM4. */
+void TIM4_IRQHandler(void) {
+  hal_timer_clear_interrupt_flag(TIM4);
+  hal_interrupt_dispatch(TIM4_IRQn);
+}
+
+/** @brief IRQ handler wrapper for TIM5. */
+void TIM5_IRQHandler(void) {
+  hal_timer_clear_interrupt_flag(TIM5);
+  hal_interrupt_dispatch(TIM5_IRQn);
 }
 
 /**
- * @brief IRQ handler wrapper for TIM2.
- *
- * Clears the flag and dispatches to the HAL interrupt handler table.
+ * @brief IRQ handler for the shared TIM1-BRK / TIM9 vector.
+ * @note Clears TIM9's flag and dispatches using the shared IRQn.
  */
-void TIM2_IRQHandler() {
-  timer_clear_interrupt_flag(TIM2);
-  hal_handle_interrupt(TIM2_IRQn);
-}
-
-/**
- * @brief IRQ handler wrapper for TIM3.
- */
-void TIM3_IRQHandler() {
-  timer_clear_interrupt_flag(TIM3);
-  hal_handle_interrupt(TIM3_IRQn);
-}
-
-/**
- * @brief IRQ handler wrapper for TIM4.
- */
-void TIM4_IRQHandler() {
-  timer_clear_interrupt_flag(TIM4);
-  hal_handle_interrupt(TIM4_IRQn);
-}
-
-/**
- * @brief IRQ handler wrapper for TIM5.
- */
-void TIM5_IRQHandler() {
-  timer_clear_interrupt_flag(TIM5);
-  hal_handle_interrupt(TIM5_IRQn);
-}
-
-/**
- * @brief IRQ handler for TIM1 BRK and TIM9 shared vector.
- *
- * @note This function clears TIM9's flag and dispatches using the shared
- * IRQn.
- */
-void TIM1BRK_TIM9_IRQHandler() {
-  timer_clear_interrupt_flag(TIM9);
-  hal_handle_interrupt(TIM1_BRK_TIM9_IRQn); // shared with TIM1 BRK
+void TIM1BRK_TIM9_IRQHandler(void) {
+  hal_timer_clear_interrupt_flag(TIM9);
+  hal_interrupt_dispatch(TIM1_BRK_TIM9_IRQn); // shared with TIM1 BRK
 }
 
 /**
  * @internal
- * @brief Set the update interrupt enable bit in DIER for the specified timer.
- *
+ * @brief Set the update-interrupt-enable bit (DIER UIE) for a timer.
  * @param timer Timer identifier.
  */
-void _set_interrupt_enable_bit(hal_timer_t timer) {
+static void _set_interrupt_enable_bit(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return;
@@ -449,47 +477,78 @@ void _set_interrupt_enable_bit(hal_timer_t timer) {
 }
 
 /**
- * @brief Enable timer interrupts (NVIC + DIER UIE) for supported timers.
- *
+ * @brief Enable a timer's update interrupt (NVIC + DIER UIE).
  * @param timer Timer identifier.
- *
- * @note For TIM1 more complex options exist and are left TODO in the
- * original.
+ * @return ::HAL_OK.
+ * @note TIM1's more complex interrupt options are not yet implemented.
  */
-void timer_enable_interrupt(hal_timer_t timer) {
-  // [TODO]: add all timer interrupts
+hal_status_t hal_timer_enable_interrupt(hal_timer_t timer) {
   switch (timer) {
   case TIM1:
     break; // [TODO] Implement the complex interrupt options
   case TIM2:
-    hal_enable_interrupt(TIM2_IRQn);
+    hal_interrupt_enable(TIM2_IRQn);
     break;
   case TIM3:
-    hal_enable_interrupt(TIM3_IRQn);
+    hal_interrupt_enable(TIM3_IRQn);
     break;
   case TIM4:
-    hal_enable_interrupt(TIM4_IRQn);
+    hal_interrupt_enable(TIM4_IRQn);
     break;
   case TIM5:
-    hal_enable_interrupt(TIM5_IRQn);
+    hal_interrupt_enable(TIM5_IRQn);
     break;
   case TIM9:
-    hal_enable_interrupt(TIM1_BRK_TIM9_IRQn);
+    hal_interrupt_enable(TIM1_BRK_TIM9_IRQn);
     break;
   default:
     break;
   }
   _set_interrupt_enable_bit(timer);
+  return HAL_OK;
 }
 
 /**
- * @brief Attach a callback to the timer's HAL interrupt table.
- *
+ * @brief Disable a timer's update interrupt (NVIC + DIER UIE).
  * @param timer Timer identifier.
- * @param callback Function pointer to call when the timer IRQ fires.
+ * @return ::HAL_OK.
  */
-void timer_attach_callback(hal_timer_t timer, void (*callback)(void)) {
-  // [TODO]: add all timer interrupts
+hal_status_t hal_timer_disable_interrupt(hal_timer_t timer) {
+  switch (timer) {
+  case TIM1:
+    break; // [TODO] Implement the complex interrupt options
+  case TIM2:
+    hal_interrupt_disable(TIM2_IRQn);
+    break;
+  case TIM3:
+    hal_interrupt_disable(TIM3_IRQn);
+    break;
+  case TIM4:
+    hal_interrupt_disable(TIM4_IRQn);
+    break;
+  case TIM5:
+    hal_interrupt_disable(TIM5_IRQn);
+    break;
+  case TIM9:
+    hal_interrupt_disable(TIM1_BRK_TIM9_IRQn);
+    break;
+  default:
+    break;
+  }
+  TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
+  if (tim != NULL)
+    tim->DIER &= ~TIMx_DIER_UIE;
+  return HAL_OK;
+}
+
+/**
+ * @brief Register a callback for a timer's update interrupt.
+ * @param timer    Timer identifier.
+ * @param callback Callback to invoke, or NULL to clear.
+ * @return ::HAL_OK.
+ */
+hal_status_t hal_timer_attach_callback(hal_timer_t timer,
+                                       hal_timer_callback_t callback) {
   switch (timer) {
   case TIM1:
     break; // [TODO] Implement the complex interrupt options
@@ -511,15 +570,15 @@ void timer_attach_callback(hal_timer_t timer, void (*callback)(void)) {
   default:
     break;
   }
+  return HAL_OK;
 }
 
 /**
- * @brief Detach a previously attached callback for the given timer.
- *
+ * @brief Remove the callback registered for a timer's update interrupt.
  * @param timer Timer identifier.
+ * @return ::HAL_OK.
  */
-void timer_detach_callback(hal_timer_t timer) {
-  // [TODO]: add all timer interrupts
+hal_status_t hal_timer_detach_callback(hal_timer_t timer) {
   switch (timer) {
   case TIM1:
     break; // [TODO] Implement the complex interrupt options
@@ -541,26 +600,24 @@ void timer_detach_callback(hal_timer_t timer) {
   default:
     break;
   }
+  return HAL_OK;
 }
 
 /**
- * @brief Set the compare (CCR) register for a timer channel and configure
- * CCMR.
+ * @brief Set a channel's compare register and configure it for PWM mode 1.
  *
- * @param timer Timer identifier.
- * @param channel Channel number (1-4).
+ * @param timer         Timer identifier.
+ * @param channel       Channel number (1-4).
  * @param compare_value Value to write into CCRx.
- *
- * @note This function sets PWM mode 1 and enables the channel after writing
- * CCR.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer/channel.
  */
-void timer_set_compare(hal_timer_t timer, uint8_t channel,
-                       uint32_t compare_value) {
+hal_status_t hal_timer_set_compare(hal_timer_t timer, uint8_t channel,
+                                   uint32_t compare_value) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
-    return;
+    return HAL_ERR_INVALID_ARG;
   if (channel < 1 || channel > 4)
-    return; // only 4 valid channels
+    return HAL_ERR_INVALID_ARG; // only 4 valid channels
   switch (channel) {
   case 1:
     tim->CCR1 = compare_value;
@@ -591,9 +648,17 @@ void timer_set_compare(hal_timer_t timer, uint8_t channel,
     tim->CCMR2 |= TIMx_CCMRy_OCzM_PWM_MODE1_MASK(channel);
     tim->CCMR2 |= TIMx_CCMRy_OCxPE(channel);
   }
-  timer_enable_channel(timer, channel);
+  hal_timer_enable_channel(timer, channel);
+  return HAL_OK;
 }
-uint32_t timer_get_compare(hal_timer_t timer, uint32_t channel) {
+
+/**
+ * @brief Get a channel's compare register value.
+ * @param timer   Timer identifier.
+ * @param channel Channel number (1-4).
+ * @return Compare value, or 0 for an invalid timer/channel.
+ */
+uint32_t hal_timer_get_compare(hal_timer_t timer, uint32_t channel) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL || channel < 1 || channel > 4)
     return 0;
@@ -611,32 +676,33 @@ uint32_t timer_get_compare(hal_timer_t timer, uint32_t channel) {
   }
 }
 
-uint32_t timer_get_arr(hal_timer_t timer, uint32_t channel) {
+/**
+ * @brief Enable output on a timer channel (CCxE = 1).
+ * @param timer   Timer identifier.
+ * @param channel Channel number (1-4).
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer/channel.
+ */
+hal_status_t hal_timer_enable_channel(hal_timer_t timer, uint32_t channel) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL || channel < 1 || channel > 4)
-    return 0;
-  return tim->ARR;
-}
-
-void timer_enable_channel(hal_timer_t timer, uint32_t channel) {
-  TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
-  if (tim == NULL || channel < 1 || channel > 4)
-    return;
+    return HAL_ERR_INVALID_ARG;
   tim->CCER |= TIMx_CCER_CCxE_MASK(channel);
   if (timer == TIM1) {
     tim->BDTR |= TIMx_BDTR_MOE;
   }
+  return HAL_OK;
 }
 
 /**
- * @brief Disable output on the specified timer channel (CCxE = 0).
- *
- * @param timer Timer identifier.
+ * @brief Disable output on a timer channel (CCxE = 0).
+ * @param timer   Timer identifier.
  * @param channel Channel number (1-4).
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer/channel.
  */
-void timer_disable_channel(hal_timer_t timer, uint32_t channel) {
+hal_status_t hal_timer_disable_channel(hal_timer_t timer, uint32_t channel) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL || channel < 1 || channel > 4)
-    return;
+    return HAL_ERR_INVALID_ARG;
   tim->CCER &= (~TIMx_CCER_CCxE_MASK(channel));
+  return HAL_OK;
 }

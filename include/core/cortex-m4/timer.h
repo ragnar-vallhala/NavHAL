@@ -10,6 +10,7 @@
 
 #ifndef CORTEX_M4_TIMER_H
 #define CORTEX_M4_TIMER_H
+#include "common/hal_status.h"
 #include "common/hal_types.h"
 #include "utils/timer_types.h"
 #include <stdint.h>
@@ -37,39 +38,85 @@
 #define SYST_CSR_TICKINT_BIT 1
 #define SYST_CSR_CLKSOURCE_BIT 2
 
-// SysTick Timer Functions
-// TIM5 is used for systick
-void systick_init(uint32_t tick_us);
-void delay_ms(uint32_t ms);
-void delay_us(uint64_t us);
-uint64_t hal_get_tick(void);
-uint32_t hal_get_tick_duration_us(void);
-uint32_t hal_get_tick_reload_value(void);
-uint32_t hal_get_millis(void);
-uint32_t hal_get_micros(void);
-void SysTick_Handler(void); // ISR for systick interrupts
-void hal_systick_set_callback(void (*cb)(void));
+/* ===== Timebase API (SysTick-backed) ===== */
 
-// General Purpose Timer (TIMx) Initialization & Control
-void timer_init(hal_timer_t timer, uint32_t prescaler, uint32_t auto_reload);
-void timer_init_freq(hal_timer_t timer, uint32_t freq);
+/** @brief Callback invoked on every timebase tick (from the SysTick ISR). */
+typedef void (*hal_timebase_callback_t)(void);
 
-void timer_start(hal_timer_t timer);
-void timer_stop(hal_timer_t timer);
-void timer_reset(hal_timer_t timer);
-uint32_t timer_get_count(hal_timer_t timer);
+/**
+ * @brief Initialize the timebase tick at the given period.
+ * @param tick_us Tick period in microseconds; must be non-zero.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p tick_us is 0.
+ */
+hal_status_t hal_timebase_init(uint32_t tick_us);
 
-// Timer Interrupt Management
-void timer_enable_interrupt(hal_timer_t timer);
-void timer_disable_interrupt(
-    hal_timer_t timer); // [TODO]Add support for all timers
-void timer_clear_interrupt_flag(
-    hal_timer_t timer); // [TODO]Add support for all timers
-void timer_attach_callback(
-    hal_timer_t timer,
-    void (*callback)(void)); //[TODO] Add support for all timers
-void timer_detach_callback(
-    hal_timer_t timer); // [TODO] Add support for all timers
+/** @brief Get the current timebase tick count. */
+uint32_t hal_timebase_get_tick(void);
+
+/** @brief Get the configured tick period in microseconds. */
+uint32_t hal_timebase_get_tick_duration_us(void);
+
+/** @brief Get the currently configured SysTick reload value (24-bit). */
+uint32_t hal_timebase_get_reload_value(void);
+
+/** @brief Get elapsed time since timebase start, in milliseconds. */
+uint32_t hal_timebase_get_millis(void);
+
+/** @brief Get elapsed time since timebase start, in microseconds. */
+uint32_t hal_timebase_get_micros(void);
+
+/**
+ * @brief Register a callback invoked on every timebase tick.
+ * @param cb Callback function, or NULL to clear.
+ * @return ::HAL_OK.
+ */
+hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb);
+
+/** @brief Busy-wait delay for @p ms milliseconds. */
+void hal_delay_ms(uint32_t ms);
+
+/** @brief Busy-wait delay for @p us microseconds. */
+void hal_delay_us(uint32_t us);
+
+/** @brief SysTick exception handler (vector-table entry). */
+void SysTick_Handler(void);
+
+/* ===== General-purpose timer API ===== */
+
+/** @brief Callback invoked when a timer's update interrupt fires. */
+typedef void (*hal_timer_callback_t)(void);
+
+/** @brief Timer base configuration: prescaler (PSC) and auto-reload (ARR). */
+typedef struct {
+  uint32_t prescaler;   /**< Prescaler (PSC) value. */
+  uint32_t auto_reload; /**< Auto-reload (ARR) value. */
+} hal_timer_config_t;
+
+/** @brief Initialize a timer with the given prescaler / auto-reload. */
+hal_status_t hal_timer_init(hal_timer_t timer, const hal_timer_config_t *cfg);
+/** @brief Initialize a timer to a target update frequency in Hz. */
+hal_status_t hal_timer_init_freq(hal_timer_t timer, uint32_t freq);
+/** @brief Start a timer. */
+hal_status_t hal_timer_start(hal_timer_t timer);
+/** @brief Stop a timer. */
+hal_status_t hal_timer_stop(hal_timer_t timer);
+/** @brief Reset a timer's counter to zero. */
+hal_status_t hal_timer_reset(hal_timer_t timer);
+/** @brief Get a timer's current counter value. */
+uint32_t hal_timer_get_count(hal_timer_t timer);
+
+/* Interrupt management */
+/** @brief Enable a timer's update interrupt (NVIC + DIER UIE). */
+hal_status_t hal_timer_enable_interrupt(hal_timer_t timer);
+/** @brief Disable a timer's update interrupt. */
+hal_status_t hal_timer_disable_interrupt(hal_timer_t timer);
+/** @brief Clear a timer's update interrupt flag. */
+hal_status_t hal_timer_clear_interrupt_flag(hal_timer_t timer);
+/** @brief Register a timer update-interrupt callback (NULL to clear). */
+hal_status_t hal_timer_attach_callback(hal_timer_t timer,
+                                       hal_timer_callback_t callback);
+/** @brief Remove a timer's update-interrupt callback. */
+hal_status_t hal_timer_detach_callback(hal_timer_t timer);
 
 // Timer IRQ Handlers
 void TIM2_IRQHandler(void);
@@ -79,19 +126,30 @@ void TIM5_IRQHandler(void);
 void TIM9_IRQHandler(void);
 void TIM12_IRQHandler(void);
 
-// PWM and Output Compare (Future Stage)
-void timer_set_compare(hal_timer_t timer, uint8_t channel,
-                       uint32_t compare_value);
-uint32_t timer_get_compare(hal_timer_t timer, uint32_t channel);
-uint32_t timer_get_arr(hal_timer_t timer, uint32_t channel);
-void timer_set_arr(hal_timer_t timer, uint32_t channel, uint32_t arr);
-void timer_enable_channel(hal_timer_t timer, uint32_t channel);
+/* Output compare / PWM channels */
+/** @brief Set a channel's compare value (configures PWM mode 1). */
+hal_status_t hal_timer_set_compare(hal_timer_t timer, uint8_t channel,
+                                   uint32_t compare_value);
+/** @brief Get a channel's compare value. */
+uint32_t hal_timer_get_compare(hal_timer_t timer, uint32_t channel);
+/** @brief Enable output on a timer channel (1-4). */
+hal_status_t hal_timer_enable_channel(hal_timer_t timer, uint32_t channel);
+/** @brief Disable output on a timer channel (1-4). */
+hal_status_t hal_timer_disable_channel(hal_timer_t timer, uint32_t channel);
 
-void timer_disable_channel(hal_timer_t timer, uint32_t channel);
+/* Configuration query / update */
+/** @brief Get a timer's current base frequency in Hz. */
+uint32_t hal_timer_get_frequency(hal_timer_t timer);
+/** @brief Set a timer's prescaler (PSC). */
+hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler);
+/** @brief Set a timer's auto-reload (ARR). */
+hal_status_t hal_timer_set_auto_reload(hal_timer_t timer,
+                                       uint32_t auto_reload);
+/** @brief Get a timer's auto-reload (ARR). */
+uint32_t hal_timer_get_auto_reload(hal_timer_t timer);
 
-// Utility Functions
-uint32_t timer_get_frequency(hal_timer_t timer);
-void timer_set_prescaler(hal_timer_t timer, uint32_t prescaler);
-void timer_set_auto_reload(hal_timer_t timer, uint32_t arr);
+/* Deprecated pre-standardization timebase/timer names — removed in M5. */
+#include "compat/timebase_compat.h"
+#include "compat/timer_compat.h"
 
 #endif // !CORTEX_M4_TIMER_H

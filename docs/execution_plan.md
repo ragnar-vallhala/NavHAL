@@ -25,17 +25,21 @@ with no DMA, no NVIC, no FPU, 2 KB RAM, and a Harvard memory model?"
 ## 1. Sequencing overview
 
 ```
-M0  Baseline & bug fixes          ── safe, no API change
-M1  Foundations (status, types)   ── new primitives, old code untouched
-M2  Naming & signature unify      ── per-driver, deprecation shims keep samples green
-M3  Directory restructure         ── arch / vendor / board split (file moves)
-M4  Build-time dispatch           ── kill #ifdef ARCH, Kconfig-generated target header
-M5  Conformance + samples + cleanup ── remove shims, HAL_API_VERSION = 1
-M6  AVR / ATmega328p port          ── second ISA proves the design
+M0   Baseline & bug fixes          ── safe, no API change
+M1   Foundations (status, types)   ── new primitives, old code untouched
+M2   Naming & signature unify      ── per-driver, deprecation shims keep samples green
+M2+  Comprehensive test suite      ── full-API regression net before the refactors
+M3   Directory restructure         ── arch / vendor / board split (file moves)
+M4   Build-time dispatch           ── kill #ifdef ARCH, Kconfig-generated target header
+M5   Conformance + samples + cleanup ── remove shims, HAL_API_VERSION = 1
+M6   AVR / ATmega328p port          ── second ISA proves the design
 ```
 
 M0→M5 are the **Cortex-M4 standardization**. M6 is the **AVR expansion**.
 M1–M2 may proceed driver-by-driver in parallel once the primitives land.
+M2+ slots between M2 and M3: M2 froze the API surface, so building the
+test suite *before* the M3/M4 refactors turns those large mechanical
+changes into verifiable, behavior-preserving ones.
 
 ---
 
@@ -139,6 +143,58 @@ old + new APIs both build; test passes.
 
 **AVR lens:** Wave E drivers must end up fully behind `NAVHAL_HAS_*` so an AVR
 build simply omits them. Wave B locks the `uint32_t` tick decision.
+
+---
+
+## 5+. M2+ — Comprehensive test suite
+
+**Objective:** Grow the unit-test suite from its current partial state
+(~3-6 tests per driver) into comprehensive coverage of the **whole
+standardized `hal_*` API** — every function, success *and* error paths — so
+the M3/M4 refactors are provably behavior-preserving and M6 (AVR) has a real
+conformance bar.
+
+**Why here:** M2 froze the API surface. M3 (file moves) and M4 (dispatch
+rework) are large, mechanical changes that can silently regress behavior. A
+full-surface suite turns them into verifiable refactors. The suite is also the
+conformance harness the AVR port is validated against — so it must exist
+before M6, and is most cheaply built now while the Cortex-M4 behavior is the
+known-good reference.
+
+Work items:
+- WI2+.1 — **Make the test build self-contained.** `cmake -DTEST=ON` currently
+  collides with a sample's `flash` target and does not cleanly separate a test
+  build from a sample build (the duplicate-target error seen during M2). Make
+  `TEST` exclude the sample targets so `tests` builds from one clean configure.
+- WI2+.2 — **Per-driver API coverage.** For each of the 14 drivers, extend
+  `tests/test_<driver>.c` to exercise every standardized function — lifecycle
+  (`init`/`deinit`), every operation, every getter — not just a sampled subset.
+- WI2+.3 — **Error-path tests.** Assert the `hal_status_t` contract: NULL
+  config → `HAL_ERR_INVALID_ARG`, out-of-range instance id, etc. The
+  standardized error model only has value if it is tested.
+- WI2+.4 — **Capability-gated drivers.** Exercise `dma`, `sdio`, `fpu`,
+  `cycle_counter` under their enabling `CONFIG_*`; confirm they are cleanly
+  absent (not stubbed) when disabled.
+- WI2+.5 — **Host-runnable subset.** Split out the pure-logic tests (conversion
+  utils, `hal_status` helpers / `HAL_OK_OR_RETURN`, the software CRC path, GPIO
+  pin encoding) so they compile and run on the build host with no hardware —
+  fast CI feedback. Register-touching tests stay on-target.
+- WI2+.6 — **Harness improvements.** A central per-driver test registry with a
+  pass/fail summary; reduce the manual `RUN_TEST` boilerplate in `tests/main.c`.
+- WI2+.7 — **CI.** A GitHub Actions workflow that compile-builds the on-target
+  `tests` binary and runs the host subset. (The `ci.yml` the README badge
+  points at does not yet exist — create it.)
+- WI2+.8 — **`docs/testing.md`** — how to build/run the suite (on-target vs
+  host) and how to add a test for a new driver.
+
+**Acceptance:** every standardized `hal_*` function has at least one
+success-path test, and an error-path test where it returns `hal_status_t`;
+the `tests` binary builds clean from a single `cmake -DTEST=ON`; the host
+subset runs in CI; `docs/testing.md` exists.
+
+**AVR lens:** keep the per-driver test structure and the host-runnable subset
+target-agnostic. In M6 the portable subset becomes the ATmega328p conformance
+harness — the same tests proving the second ISA behaves to the contract.
 
 ---
 
@@ -279,6 +335,9 @@ Work items:
 - M0: no known defects; docs in-tree; `hal_blink` builds.
 - M1: standard primitives compile under both toolchains.
 - M2: every driver exposes the standard API; old API deprecated; tests pass.
+- M2+: every standardized `hal_*` function has a success-path test (and an
+  error-path test where it returns `hal_status_t`); `tests` builds from one
+  clean `cmake -DTEST=ON`; host subset runs in CI.
 - M3: layered tree in place; no logic change; build verified.
 - M4: zero `#ifdef ARCH` in headers; Kconfig-driven build.
 - M5: shims removed; `HAL_API_VERSION = 1`; samples + tests pass; AVR readiness

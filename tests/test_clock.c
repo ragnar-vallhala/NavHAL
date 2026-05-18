@@ -104,23 +104,41 @@ void test_hal_clock_get_sysclk_returns_correct_value_pll(void) {
 }
 
 // -------------------- AHB / APB --------------------
+/*
+ * These tests temporarily reprogram the AHB/APB bus prescalers to verify the
+ * clock getters. The APB1 bus clocks USART2 (the test console UART), so
+ * RCC->CFGR is saved and restored *before* the assertion is reported — the
+ * pass/fail output then leaves at the original, correct baud rate.
+ */
 void test_hal_clock_get_ahbclk_returns_correct_value(void) {
   wait_uart_empty();
+  uint32_t saved = RCC->CFGR;
   RCC->CFGR &= ~RCC_CFGR_HPRE_MASK;
   RCC->CFGR |= (0x0 << RCC_CFGR_HPRE_BIT); // divide by 1
-  TEST_ASSERT_EQUAL_UINT32(hal_clock_get_sysclk(), hal_clock_get_ahbclk());
+  uint32_t expected = hal_clock_get_sysclk();
+  uint32_t result = hal_clock_get_ahbclk();
+  RCC->CFGR = saved; // restore bus prescalers before reporting
+  TEST_ASSERT_EQUAL_UINT32(expected, result);
 }
 
 void test_hal_clock_get_apb1clk_returns_correct_value(void) {
   wait_uart_empty();
+  uint32_t saved = RCC->CFGR;
   RCC->CFGR &= ~RCC_CFGR_PPRE1_MASK;
   RCC->CFGR |= (0x5 << RCC_CFGR_PPRE1_BIT); // divide by 4
-  TEST_ASSERT_EQUAL_UINT32(hal_clock_get_sysclk() / 4, hal_clock_get_apb1clk());
+  uint32_t expected = hal_clock_get_sysclk() / 4;
+  uint32_t result = hal_clock_get_apb1clk();
+  RCC->CFGR = saved; // restore APB1 prescaler — keeps the console UART valid
+  TEST_ASSERT_EQUAL_UINT32(expected, result);
 }
 
 void test_hal_clock_get_apb2clk_returns_correct_value(void) {
   wait_uart_empty();
+  uint32_t saved = RCC->CFGR;
   RCC->CFGR &= ~RCC_CFGR_PPRE2_MASK;
   RCC->CFGR |= (0x4 << RCC_CFGR_PPRE2_BIT); // divide by 2
-  TEST_ASSERT_EQUAL_UINT32(hal_clock_get_sysclk() / 2, hal_clock_get_apb2clk());
+  uint32_t expected = hal_clock_get_sysclk() / 2;
+  uint32_t result = hal_clock_get_apb2clk();
+  RCC->CFGR = saved; // restore bus prescalers before reporting
+  TEST_ASSERT_EQUAL_UINT32(expected, result);
 }

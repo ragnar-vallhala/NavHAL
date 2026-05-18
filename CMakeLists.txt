@@ -47,7 +47,14 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
 # set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
 # extern/NavHAL/CMakeLists.txt
-if(NOT DEFINED CMAKE_PROJECT_NAME)
+#
+# project() enables the C/ASM languages and must run on EVERY configure.
+# Guarding it on CMAKE_PROJECT_NAME (a cache variable) made it run only on the
+# first configure of a build directory — every later reconfigure skipped it,
+# leaving the languages unenabled ("Cannot determine link language for
+# target ..."). Detect the top-level build via a path comparison instead, which
+# is re-evaluated fresh each configure and is true only for a standalone build.
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(NavHAL C ASM)
 endif()
 

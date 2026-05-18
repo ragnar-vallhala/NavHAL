@@ -187,4 +187,23 @@ typedef enum {
   GPIO_AF15
 } hal_gpio_alternate_function_t;
 
+/**
+ * @brief Standardized type name for a GPIO pin identifier.
+ *
+ * NavHAL GPIO pins use a two-layer model (see Section 7 of
+ * `docs/api_standardization.md`):
+ *
+ * - **Core layer (per-MCU):** the @ref hal_gpio_pin enumeration above names
+ *   each physical pin (`GPIO_PA05`, ...). The constant set is target-defined;
+ *   STM32F401RE enumerates ports A-E plus H. Drivers and the HAL contract
+ *   operate on this layer.
+ * - **Board layer (per-board):** each board's `board.h` adds macro aliases
+ *   (`D5`, `LED_BUILTIN`, ...) that resolve to core enum constants. Portable
+ *   application code uses these.
+ *
+ * `hal_gpio_pin_t` is the canonical, standards-compliant spelling; the bare
+ * `hal_gpio_pin` enum tag is retained for source compatibility.
+ */
+typedef hal_gpio_pin hal_gpio_pin_t;
+
 #endif // GPIO_TYPES_H

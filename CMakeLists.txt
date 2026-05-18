@@ -184,9 +184,9 @@ if(TEST)
   set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib ${FPU_FLAGS}")
   
   # Dynamic architecture options for test compiler flags
-  set(TEST_FLAGS "-fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables")
+  set(TEST_FLAGS "-fno-exceptions" "-fno-unwind-tables" "-fno-asynchronous-unwind-tables")
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
-      set(TEST_FLAGS "-march=armv7e-m ${TEST_FLAGS}")
+      list(APPEND TEST_FLAGS "-march=armv7e-m")
   endif()
   
   target_compile_options(tests PRIVATE ${TEST_FLAGS})
@@ -208,7 +208,7 @@ if(TEST)
    message(STATUS "Selected flasher: ${FLASHER}")
    message(STATUS "Selected flash address: ${FLASH_ADDRESS}")
    
-  add_custom_target(flash
+  add_custom_target(flash_tests
      COMMAND ${CMAKE_OBJCOPY} -O binary tests tests.bin
      COMMAND ${FLASHER} write tests.bin ${FLASH_ADDRESS}
      DEPENDS tests

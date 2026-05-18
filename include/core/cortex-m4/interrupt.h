@@ -1,16 +1,12 @@
 /**
  * @file core/cortex-m4/interrupt.h
- * @brief NVIC register definitions, IRQ numbers, and HAL interrupt control API for STM32F4.
+ * @brief Cortex-M4 / STM32F4 interrupt-controller (NVIC) HAL driver interface.
  *
  * @details
- * This header provides:
- * - NVIC register mapping for the Cortex-M4 interrupt controller.
- * - Enumeration of all Cortex-M4 and STM32F4-specific IRQ numbers.
- * - HAL functions to enable/disable interrupts, set priorities, attach/detach callbacks,
- *   and query pending/active interrupt status.
- *
- * The definitions are tailored for the STM32F4 series but are based on the ARM Cortex-M4
- * NVIC architecture. All register mappings match the reference manual.
+ * Standardized interrupt API (see `docs/api_standardization.md`). All public
+ * functions use the `hal_interrupt_` prefix and `snake_case` verbs. Per-IRQ
+ * control operations return ::hal_status_t; queries return their value
+ * directly. IRQs are identified by ::IRQn_Type.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -18,92 +14,101 @@
 #ifndef CORTEX_M4_INTERRUPT_H
 #define CORTEX_M4_INTERRUPT_H
 
+#include "common/hal_status.h"
 #include "core/cortex-m4/interrupt_reg.h"
+#include <stdbool.h>
 #include <stdint.h>
 
 /**
- * @brief Enable a specific interrupt.
- * @param interrupt IRQ number.
- * @return 0 if successful, -1 if failed.
+ * @brief Callback invoked by ::hal_interrupt_dispatch for a registered IRQ.
  */
-int8_t hal_enable_interrupt(IRQn_Type interrupt);
+typedef void (*hal_interrupt_callback_t)(void);
 
 /**
- * @brief Disable a specific interrupt.
- * @param interrupt IRQ number.
- * @return 0 if successful, -1 if failed.
+ * @brief Enable a specific interrupt in the NVIC.
+ * @param irq IRQ number.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a non-NVIC (negative) IRQ.
  */
-int8_t hal_disable_interrupt(IRQn_Type interrupt);
+hal_status_t hal_interrupt_enable(IRQn_Type irq);
+
+/**
+ * @brief Disable a specific interrupt in the NVIC.
+ * @param irq IRQ number.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a non-NVIC (negative) IRQ.
+ */
+hal_status_t hal_interrupt_disable(IRQn_Type irq);
 
 /**
  * @brief Clear the pending flag of a specific interrupt.
- * @param interrupt IRQ number.
- * @note Implementation pending, platform-specific.
+ * @param irq IRQ number.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a non-NVIC (negative) IRQ.
  */
-void hal_clear_interrupt_flag(IRQn_Type interrupt);
+hal_status_t hal_interrupt_clear_pending(IRQn_Type irq);
 
 /**
- * @brief Attach a callback function to a specific interrupt.
- * @param interrupt IRQ number.
- * @param callback Function pointer to be called when interrupt occurs.
+ * @brief Set the priority of a specific interrupt or system exception.
+ * @param irq      IRQ number.
+ * @param priority Priority value (lower is more urgent; normalized to the
+ *                 implemented priority bits).
+ * @return ::HAL_OK.
  */
-void hal_interrupt_attach_callback(IRQn_Type interrupt, void (*callback)(void));
+hal_status_t hal_interrupt_set_priority(IRQn_Type irq, uint8_t priority);
 
 /**
- * @brief Detach a callback function from a specific interrupt.
- * @param interrupt IRQ number.
+ * @brief Get the priority of a specific interrupt or system exception.
+ * @param irq IRQ number.
+ * @return Normalized priority value.
  */
-void hal_interrupt_detach_callback(IRQn_Type interrupt);
+uint8_t hal_interrupt_get_priority(IRQn_Type irq);
 
 /**
- * @brief Central interrupt handler function.
- * @param interrupt IRQ number that occurred.
+ * @brief Check whether a specific interrupt is pending.
+ * @param irq IRQ number.
+ * @return true if pending, false otherwise.
  */
-void hal_handle_interrupt(IRQn_Type interrupt);
+bool hal_interrupt_is_pending(IRQn_Type irq);
 
 /**
- * @brief Set priority for a specific interrupt.
- * @param interrupt IRQ number.
- * @param priority Priority value.
- * @note Implementation pending.
+ * @brief Register a callback to be invoked for a specific IRQ.
+ * @param irq      IRQ number.
+ * @param callback Callback function, or NULL to clear.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an out-of-range IRQ.
  */
-void hal_set_interrupt_priority(IRQn_Type interrupt, uint8_t priority);
+hal_status_t hal_interrupt_attach_callback(IRQn_Type irq,
+                                           hal_interrupt_callback_t callback);
 
 /**
- * @brief Get priority for a specific interrupt.
- * @param interrupt IRQ number.
- * @return Priority value.
- * @note Implementation pending.
+ * @brief Remove the callback registered for a specific IRQ.
+ * @param irq IRQ number.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an out-of-range IRQ.
  */
-uint8_t hal_get_interrupt_priority(IRQn_Type interrupt);
+hal_status_t hal_interrupt_detach_callback(IRQn_Type irq);
 
 /**
- * @brief Check if a specific interrupt is pending.
- * @param interrupt IRQ number.
- * @return 1 if pending, 0 if not.
- * @note Implementation pending.
+ * @brief Invoke the callback registered for an IRQ (called from an ISR).
+ * @param irq IRQ number that occurred.
  */
-int hal_is_interrupt_pending(IRQn_Type interrupt);
+void hal_interrupt_dispatch(IRQn_Type irq);
 
 /**
- * @brief Enable global interrupts.
- * @param state Optional state flag.
- * @note Implementation pending.
+ * @brief Restore the global interrupt-enable state (PRIMASK).
+ * @param state State previously returned by ::hal_interrupt_disable_global.
  */
-void hal_enable_global_interrupts(uint32_t state);
+void hal_interrupt_enable_global(uint32_t state);
 
 /**
- * @brief Disable global interrupts.
- * @return Previous interrupt state.
- * @note Implementation pending.
+ * @brief Disable all maskable interrupts globally.
+ * @return The previous global interrupt state, for use with
+ *         ::hal_interrupt_enable_global.
  */
-uint32_t hal_disable_global_interrupts(void);
+uint32_t hal_interrupt_disable_global(void);
 
 /**
- * @brief Clear all pending interrupts.
- * @note Implementation pending.
+ * @brief Clear the pending flag of every NVIC interrupt.
  */
-void hal_clear_all_pending_interrupts(void);
+void hal_interrupt_clear_all_pending(void);
 
+/* Deprecated pre-standardization interrupt names — removed in M5. */
+#include "compat/interrupt_compat.h"
 
 #endif // CORTEX_M4_INTERRUPT_H

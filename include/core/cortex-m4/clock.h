@@ -17,6 +17,7 @@
 #ifndef CORTEX_M4_CLOCK_H
 #define CORTEX_M4_CLOCK_H
 
+#include "common/hal_status.h"
 #include "utils/clock_types.h"
 
 /**
@@ -37,12 +38,16 @@ typedef struct {
 /**
  * @brief Initialize the system clock.
  *
- * @param cfg Pointer to the main clock configuration structure.
- * @param pll_cfg Pointer to the PLL configuration structure.
+ * @param cfg     Main clock configuration; must not be NULL.
+ * @param pll_cfg PLL configuration; must not be NULL when
+ *                @c cfg->source is ::HAL_CLOCK_SOURCE_PLL, ignored otherwise.
+ * @return ::HAL_OK on success, or ::HAL_ERR_INVALID_ARG if a required
+ *         argument is NULL.
  *
  * @note This function must be called before using other peripheral clocks.
  */
-void hal_clock_init(hal_clock_config_t *cfg, hal_pll_config_t *pll_cfg);
+hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
+                            const hal_pll_config_t *pll_cfg);
 
 /**
  * @brief Get the system clock frequency (SYSCLK).

@@ -1,5 +1,5 @@
 /**
- * @file status.h
+ * @file hal_status.h
  * @brief Common status code definitions for HAL and application modules.
  *
  * @details
@@ -9,8 +9,8 @@
  * error handling and return values.
  *
  * Macros:
- * - `SUCCESS` (0)  : Operation completed successfully.
- * - `FAILURE` (-1) : Operation failed.
+ * - `SUCCESS` (0) : Operation completed successfully.
+ * - `FAILURE` (1) : Operation failed.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */

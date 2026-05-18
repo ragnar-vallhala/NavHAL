@@ -1,5 +1,5 @@
 /**
- * @file hal_12c.h
+ * @file hal_i2c.h
  * @brief Hardware Abstraction Layer (HAL) interface for I2C communication.
  *
  * @details

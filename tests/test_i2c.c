@@ -8,10 +8,11 @@
 #include <stdint.h>
 
 void test_i2c_init_config(void) {
-  hal_i2c_config_t config = {
-      .clock_speed = STANDARD_MODE, .own_address = 0, .acknowledge = true};
-  hal_i2c_init(I2C1, &config);
-  I2C_Reg_Typedef *I2C = I2C_GET_BASE(I2C1);
+  hal_i2c_config_t config = {.clock_speed = HAL_I2C_SPEED_STANDARD,
+                             .own_address = 0,
+                             .acknowledge = true};
+  hal_i2c_init(HAL_I2C_1, &config);
+  I2C_Reg_Typedef *I2C = I2C_GET_BASE(HAL_I2C_1);
 
   uint32_t pclk1 = hal_clock_get_apb1clk();
   TEST_ASSERT_EQUAL_UINT32(pclk1 / 1000000, I2C->CR2 & I2C_CR2_FREQ_MASK);
@@ -23,11 +24,12 @@ void test_i2c_init_config(void) {
 }
 
 void test_i2c_fast_mode_config(void) {
-  hal_i2c_config_t config = {
-      .clock_speed = FAST_MODE, .own_address = 0, .acknowledge = true};
+  hal_i2c_config_t config = {.clock_speed = HAL_I2C_SPEED_FAST,
+                             .own_address = 0,
+                             .acknowledge = true};
   // Use I2C2 to avoid re-init error in current HAL
-  hal_i2c_init(I2C2, &config);
-  I2C_Reg_Typedef *I2C = I2C_GET_BASE(I2C2);
+  hal_i2c_init(HAL_I2C_2, &config);
+  I2C_Reg_Typedef *I2C = I2C_GET_BASE(HAL_I2C_2);
 
   uint32_t pclk1 = hal_clock_get_apb1clk();
   // Fast mode CCR = pclk / (3 * 400kHz)

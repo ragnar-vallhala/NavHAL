@@ -1,17 +1,12 @@
 /**
  * @file core/cortex-m4/i2c.h
- * @brief Cortex-M4 I²C HAL interface.
+ * @brief Cortex-M4 / STM32F4 I²C HAL driver interface.
  *
  * @details
- * This header defines types, structures, and function prototypes for
- * I²C communication on Cortex-M4 microcontrollers. It provides functions
- * for initializing the I²C peripheral, reading/writing data, and performing
- * combined write-read transactions.
- *
- * Supported features:
- * - Standard and Fast mode I²C communication.
- * - Master mode operations.
- * - Error handling with status codes.
+ * Standardized I²C API (see `docs/api_standardization.md`). All public
+ * functions use the `hal_i2c_` prefix, take the I²C bus as their first
+ * argument (typed ::hal_i2c_bus_t), and return ::hal_status_t. Master-mode
+ * standard/fast-speed operation on the STM32F401RE.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -19,130 +14,127 @@
 #ifndef CORTEX_M4_I2C_H
 #define CORTEX_M4_I2C_H
 
+#include "common/hal_status.h"
+#include "common/navhal_compiler.h"
 #include "utils/gpio_types.h"
 #include <stdbool.h>
 #include <stdint.h>
 
 /**
- * @brief I²C operation status codes.
- */
-typedef enum {
-  HAL_I2C_OK = 0,      /**< Operation successful */
-  HAL_I2C_ERR_TIMEOUT, /**< Timeout occurred */
-  HAL_I2C_ERR_BUS,     /**< Bus error */
-  HAL_I2C_ERR_NACK,    /**< NACK received */
-  HAL_I2C_ERR_REINIT   /**< Reinitialization required */
-} hal_i2c_status_t;
-
-/**
  * @brief Supported I²C bus instances.
  */
 typedef enum {
-  I2C1 = 0, /**< I²C bus 1 */
-  I2C2 = 1, /**< I²C bus 2 */
-  I2C3 = 2  /**< I²C bus 3 */
+  HAL_I2C_1 = 0, /**< I²C bus 1. */
+  HAL_I2C_2 = 1, /**< I²C bus 2. */
+  HAL_I2C_3 = 2, /**< I²C bus 3. */
+  I2C1 NAVHAL_DEPRECATED("use HAL_I2C_1") = 0,
+  I2C2 NAVHAL_DEPRECATED("use HAL_I2C_2") = 1,
+  I2C3 NAVHAL_DEPRECATED("use HAL_I2C_3") = 2,
 } hal_i2c_bus_t;
 
 /**
  * @brief I²C speed modes.
  */
 typedef enum {
-  STANDARD_MODE = 0, /**< 100 kHz standard mode */
-  FAST_MODE = 1      /**< 400 kHz fast mode */
+  HAL_I2C_SPEED_STANDARD = 0, /**< 100 kHz standard mode. */
+  HAL_I2C_SPEED_FAST = 1,     /**< 400 kHz fast mode. */
+  STANDARD_MODE NAVHAL_DEPRECATED("use HAL_I2C_SPEED_STANDARD") = 0,
+  FAST_MODE NAVHAL_DEPRECATED("use HAL_I2C_SPEED_FAST") = 1,
 } hal_i2c_speed_t;
 
-/** Master mode identifier */
+/** @brief Own-address value selecting master mode. */
 #define I2C_MASTER 0
 
-/** GPIO alternate function for I²C pins */
-#define GPIO_FUNC_I2C GPIO_AF04
+/** @brief GPIO alternate function for I²C pins. */
+#define GPIO_FUNC_I2C HAL_GPIO_AF4
 
 /**
  * @brief I²C configuration structure.
  */
 typedef struct {
-  hal_i2c_speed_t clock_speed; /**< Clock speed in Hz */
-  uint8_t own_address;         /**< 7-bit device address (0 if master) */
-  bool acknowledge;            /**< Enable/disable ACK */
+  hal_i2c_speed_t clock_speed; /**< Bus speed mode. */
+  uint8_t own_address;         /**< 7-bit own address (I2C_MASTER if master). */
+  bool acknowledge;            /**< Enable/disable ACK. */
 } hal_i2c_config_t;
 
 /**
- * @brief Initialize the I²C peripheral.
- *
- * @param bus The I²C bus instance to initialize.
- * @param config Pointer to the configuration structure.
- * @return Status code of the initialization operation.
+ * @brief Initialize an I²C bus.
+ * @param bus    I²C bus instance.
+ * @param config Configuration; must not be NULL.
+ * @return ::HAL_OK on success; ::HAL_ERR_NOT_INITIALIZED if the bus is already
+ *         initialized; ::HAL_ERR_IO if slave mode is requested (unsupported).
  */
-hal_i2c_status_t hal_i2c_init(hal_i2c_bus_t bus, hal_i2c_config_t *config);
+hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config);
 
 /**
- * @brief Write data to an I²C device.
- *
- * @param bus The I²C bus instance.
- * @param dev_addr The 7-bit address of the target device.
- * @param data Pointer to data buffer to transmit.
- * @param len Number of bytes to transmit.
- * @return Status code of the write operation.
+ * @brief Write a byte buffer to an I²C device (blocking).
+ * @param bus      I²C bus instance.
+ * @param dev_addr 7-bit device address.
+ * @param data     Source buffer.
+ * @param len      Number of bytes to transmit.
+ * @return ::HAL_OK, or an error status.
  */
-hal_i2c_status_t hal_i2c_write(uint8_t bus, uint8_t dev_addr,
-                               const uint8_t *data, uint16_t len);
+hal_status_t hal_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
+                           const uint8_t *data, uint16_t len);
 
 /**
- * @brief Read data from an I²C device.
- *
- * @param bus The I²C bus instance.
- * @param dev_addr The 7-bit address of the target device.
- * @param data Pointer to buffer for received data.
- * @param len Number of bytes to read.
- * @return Status code of the read operation.
+ * @brief Read a byte buffer from an I²C device (blocking).
+ * @param bus      I²C bus instance.
+ * @param dev_addr 7-bit device address.
+ * @param data     Destination buffer.
+ * @param len      Number of bytes to read.
+ * @return ::HAL_OK, or an error status.
  */
-hal_i2c_status_t hal_i2c_read(uint8_t bus, uint8_t dev_addr, uint8_t *data,
-                              uint16_t len);
+hal_status_t hal_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr, uint8_t *data,
+                          uint16_t len);
 
 /**
- * @brief Write to a device register and read back data.
- *
- * @param bus The I²C bus instance.
- * @param dev_addr The 7-bit address of the target device.
- * @param tx_data Pointer to data to write.
- * @param tx_len Number of bytes to write.
- * @param rx_data Pointer to buffer for received data.
- * @param rx_len Number of bytes to read.
- * @return Status code of the write-read operation.
+ * @brief Write then read in a single combined transaction (blocking).
+ * @param bus      I²C bus instance.
+ * @param dev_addr 7-bit device address.
+ * @param tx_data  Bytes to write.
+ * @param tx_len   Number of bytes to write.
+ * @param rx_data  Destination buffer for the read.
+ * @param rx_len   Number of bytes to read.
+ * @return ::HAL_OK, or an error status.
  */
-hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
-                                    const uint8_t *tx_data, uint16_t tx_len,
-                                    uint8_t *rx_data, uint16_t rx_len);
+hal_status_t hal_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                const uint8_t *tx_data, uint16_t tx_len,
+                                uint8_t *rx_data, uint16_t rx_len);
 
 #ifdef _DMA_ENABLED
 #include "core/cortex-m4/dma.h"
 
 /**
- * @brief Write to a device register and read back data using DMA.
- *
- * This function triggers an I2C transaction sequence for reading registers.
- * Once the register address has been written in polled mode, the read sequence
- * is handed off to the DMA stream specified in the \p dma_cfg. The function
- * returns immediately. When the transfer completes, the provided \p callback is
- * fired.
- *
- * @param bus The I²C bus instance.
- * @param dev_addr The 7-bit address of the target device.
- * @param reg The target device register address.
- * @param dma_cfg Pointer to a completely populated DMA configuration block.
- * @param callback The function to execute once the DMA stream completes.
- * @return Status code indicating successful sequence initiation.
+ * @brief Write a register address then read it back via DMA (non-blocking).
+ * @param bus      I²C bus instance.
+ * @param dev_addr 7-bit device address.
+ * @param reg      Target register address.
+ * @param dma_cfg  Fully populated DMA configuration.
+ * @param callback Invoked when the DMA transfer completes.
+ * @return ::HAL_OK once the sequence is started, or an error status.
  */
-hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
-                                       uint8_t reg, const dma_config_t *dma_cfg,
-                                       void (*callback)(void));
+hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                   uint8_t reg, const dma_config_t *dma_cfg,
+                                   void (*callback)(void));
 #endif
 
 /**
- * @brief Get the initialization status of the I²C peripheral.
- *
- * @return 0 if not initialized, non-zero if initialized.
+ * @brief Get the per-bus initialization bitmask.
+ * @return Bitmask of initialized buses (0 if none).
  */
 uint8_t hal_i2c_get_init_status(void);
+
+/* -------------------------------------------------------------------------- *
+ * Deprecated — pre-standardization I²C status type and codes. The status enum
+ * is now ::hal_status_t; these aliases keep existing code building. Removed
+ * in M5.
+ * -------------------------------------------------------------------------- */
+typedef hal_status_t hal_i2c_status_t NAVHAL_DEPRECATED("use hal_status_t");
+#define HAL_I2C_OK HAL_OK                       /**< @deprecated HAL_OK */
+#define HAL_I2C_ERR_TIMEOUT HAL_ERR_TIMEOUT     /**< @deprecated HAL_ERR_TIMEOUT */
+#define HAL_I2C_ERR_BUS HAL_ERR_IO              /**< @deprecated HAL_ERR_IO */
+#define HAL_I2C_ERR_NACK HAL_ERR_IO             /**< @deprecated HAL_ERR_IO */
+#define HAL_I2C_ERR_REINIT HAL_ERR_NOT_INITIALIZED /**< @deprecated HAL_ERR_NOT_INITIALIZED */
 
 #endif // !CORTEX_M4_I2C_H

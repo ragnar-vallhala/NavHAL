@@ -1,8 +1,7 @@
 build/
-docs/
 *.elf
 *.bin
-*.json 
+*.json
 .cache/
 node_modules/
 dist/
@@ -12,3 +11,13 @@ out/
 .aider*
 .config*
 plan/
+
+# LaTeX build artifacts (docs/ source is tracked; generated output is not)
+docs/*.aux
+docs/*.fdb_latexmk
+docs/*.fls
+docs/*.out
+docs/*.synctex.gz
+docs/*.toc
+docs/*.pdf
+docs/sections/*.aux

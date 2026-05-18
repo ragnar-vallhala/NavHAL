@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/flash.h
+ * @file flash_reg.h
  * @brief Cortex-M4 Flash memory interface definitions.
  *
  * @details

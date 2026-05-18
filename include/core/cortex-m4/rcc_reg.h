@@ -1,5 +1,5 @@
 /**
- * @file cortex_m4_rcc_reg.h
+ * @file rcc_reg.h
  * @brief HAL interface for RCC (Reset and Clock Control) registers on STM32F4.
  *
  * @details

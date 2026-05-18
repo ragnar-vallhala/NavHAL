@@ -42,7 +42,7 @@
 
 #include "common/hal_pwm.h"
 
-#include "common/hal_12c.h"
+#include "common/hal_i2c.h"
 
 #include "common/hal_interrupt.h"
 

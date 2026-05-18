@@ -23,35 +23,34 @@
 #include <stdint.h>
 
 /**
- * @brief Global system tick counter (increments in SysTick_Handler).
- *
- * @note Unit: ticks (tick duration set by systick_init).
+ * @brief Global timebase tick counter (incremented in SysTick_Handler).
+ * @note Unit: ticks; tick duration is set by hal_timebase_init().
  */
-volatile uint64_t systick_ticks = 0; // global ticks
+static volatile uint32_t systick_ticks = 0;
+
+/** @brief Timebase tick duration in microseconds (1 us until init). */
+static volatile uint32_t tick_duration_us = 1;
+
+/** @brief SysTick reload value (24-bit) currently configured. */
+static volatile uint32_t tick_reload_value = 0;
+
+/** @brief User callback invoked on every timebase tick. */
+static hal_timebase_callback_t timebase_callback = 0;
 
 /**
- * @brief SysTick tick duration in microseconds.
+ * @brief Initialize the timebase (SysTick) to generate periodic ticks.
  *
- * @note Default value is 1 us until systick_init is called.
+ * @param tick_us Tick period in microseconds; must be non-zero.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p tick_us is 0.
+ *
+ * @note The SysTick reload is 24-bit; the computed reload value is clipped
+ *       to 24 bits. Configures the clock source, enables the SysTick
+ *       interrupt and starts the timer.
  */
-static volatile uint32_t tick_duration_us = 1; // global tick duration in us
+hal_status_t hal_timebase_init(uint32_t tick_us) {
+  if (tick_us == 0)
+    return HAL_ERR_INVALID_ARG;
 
-/**
- * @brief SysTick reload value (24-bit) currently configured.
- */
-static volatile uint32_t tick_reload_value = 0; // ticks relaod value
-
-/**
- * @brief Initialize the SysTick timer to generate periodic ticks.
- *
- * @param tick_us Tick period in microseconds.
- *
- * @note The SysTick reload is limited to 24 bits; this function clips the
- *       computed reload value to 24 bits. The function configures SysTick
- *       to use the selected clock source, enables the SysTick interrupt
- *       and starts the timer.
- */
-void systick_init(uint32_t tick_us) {
   // systick interrupt is not under the NVIC
   systick_ticks = 0;
   tick_duration_us = tick_us;
@@ -62,11 +61,19 @@ void systick_init(uint32_t tick_us) {
   tick_reload_value = reload;
   SYST_RVR = reload; // Set reload value
   SYST_CVR = 0;      // Clear current value
-  SYST_CSR =
-      (1 << SYST_CSR_EN_BIT) | (1 << SYST_CSR_TICKINT_BIT) |
-      (1 << SYST_CSR_CLKSOURCE_BIT); // Enable | TickInt | ClkSource
-                                     // CLOCK source 0 means the systick run at
-                                     // ahbclk/8 and if it's 1 it runs at ahbclk
+  SYST_CSR = (1 << SYST_CSR_EN_BIT) | (1 << SYST_CSR_TICKINT_BIT) |
+             (1 << SYST_CSR_CLKSOURCE_BIT); // Enable | TickInt | ClkSource
+  return HAL_OK;
+}
+
+/**
+ * @brief Register a callback invoked on every timebase tick.
+ * @param cb Callback function, or NULL to clear.
+ * @return ::HAL_OK.
+ */
+hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb) {
+  timebase_callback = cb;
+  return HAL_OK;
 }
 
 /**
@@ -74,72 +81,53 @@ void systick_init(uint32_t tick_us) {
  *
  * @param us Number of microseconds to delay.
  *
- * @note This is a blocking busy-wait that uses hal_get_tick() and the
- *       configured tick duration. It will wait at least one tick if
- *       the requested delay is smaller than the tick duration.
+ * @note Blocking busy-wait using the timebase tick; waits at least one tick
+ *       if the requested delay is smaller than the tick duration.
  */
-void delay_us(uint64_t us) {
-  volatile uint64_t ticks_needed = us / hal_get_tick_duration_us();
-  if (ticks_needed ==
-      0) // if 0 ticks are needed for the delay raise it to 1 tick
+void hal_delay_us(uint32_t us) {
+  uint32_t ticks_needed = us / hal_timebase_get_tick_duration_us();
+  if (ticks_needed == 0)
     ticks_needed = 1;
-  volatile uint32_t start = hal_get_tick();
-  while (hal_get_tick() - start < ticks_needed)
+  uint32_t start = hal_timebase_get_tick();
+  while (hal_timebase_get_tick() - start < ticks_needed)
     __asm__ volatile("nop"); // insert noops in bw
-  ;
 }
 
 /**
  * @brief Busy-wait for the specified number of milliseconds.
- *
  * @param ms Number of milliseconds to delay.
  */
-void delay_ms(uint32_t ms) { delay_us(ms * 1000); }
+void hal_delay_ms(uint32_t ms) { hal_delay_us(ms * 1000); }
 
-/**
- * @brief Return the current system tick count.
- *
- * @return Current tick count.
- */
-uint64_t hal_get_tick(void) { return systick_ticks; }
+/** @brief Return the current timebase tick count. */
+uint32_t hal_timebase_get_tick(void) { return systick_ticks; }
 
-/**
- * @brief Return the configured tick duration in microseconds.
- *
- * @return Tick duration (us).
- */
-uint32_t hal_get_tick_duration_us(void) { return tick_duration_us; }
+/** @brief Return the configured tick duration in microseconds. */
+uint32_t hal_timebase_get_tick_duration_us(void) { return tick_duration_us; }
 
-/**
- * @brief Return the SysTick reload value (24-bit truncated).
- *
- * @return Reload value currently configured in SYST_RVR.
- */
-uint32_t hal_get_tick_reload_value(void) { return tick_reload_value; }
+/** @brief Return the SysTick reload value (24-bit). */
+uint32_t hal_timebase_get_reload_value(void) { return tick_reload_value; }
 
-/**
- * @brief Return system uptime in milliseconds.
- *
- * @return Milliseconds since tick counter started.
- */
-uint32_t hal_get_millis(void) { return hal_get_micros() / 1000; }
+/** @brief Return elapsed time since timebase start, in milliseconds. */
+uint32_t hal_timebase_get_millis(void) {
+  return hal_timebase_get_micros() / 1000;
+}
 
-/**
- * @brief Return system uptime in microseconds.
- *
- * @return Microseconds since tick counter started.
- */
-uint32_t hal_get_micros(void) {
-  return hal_get_tick() * hal_get_tick_duration_us();
+/** @brief Return elapsed time since timebase start, in microseconds. */
+uint32_t hal_timebase_get_micros(void) {
+  return hal_timebase_get_tick() * hal_timebase_get_tick_duration_us();
 }
 
 /**
- * @brief SysTick interrupt handler increments the global tick counter.
- *
- * @note This handler is intended to be wired into the vector table.
+ * @brief SysTick exception handler — increments the tick counter and
+ *        invokes the registered timebase callback, if any.
  */
 #ifndef SUBMODULE
-void SysTick_Handler(void) { systick_ticks++; }
+void SysTick_Handler(void) {
+  systick_ticks++;
+  if (timebase_callback)
+    timebase_callback();
+}
 #endif
 
 /**

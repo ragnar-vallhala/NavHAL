@@ -140,9 +140,9 @@ void test_timer_get_count_returns_correct_value(void) {
 
 // -------------------- Tick Tests --------------------
 void test_systick_tick_increments(void) {
-  uint64_t tick_before = (uint32_t)hal_get_tick();
+  uint32_t tick_before = hal_timebase_get_tick();
   SysTick_Handler(); // manually call
-  uint64_t tick_after = (uint32_t)hal_get_tick();
+  uint32_t tick_after = hal_timebase_get_tick();
   TEST_ASSERT_EQUAL_UINT32(tick_before + 1, tick_after);
 }
 

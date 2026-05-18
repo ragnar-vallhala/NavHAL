@@ -10,6 +10,7 @@
 
 #ifndef CORTEX_M4_TIMER_H
 #define CORTEX_M4_TIMER_H
+#include "common/hal_status.h"
 #include "common/hal_types.h"
 #include "utils/timer_types.h"
 #include <stdint.h>
@@ -37,18 +38,48 @@
 #define SYST_CSR_TICKINT_BIT 1
 #define SYST_CSR_CLKSOURCE_BIT 2
 
-// SysTick Timer Functions
-// TIM5 is used for systick
-void systick_init(uint32_t tick_us);
-void delay_ms(uint32_t ms);
-void delay_us(uint64_t us);
-uint64_t hal_get_tick(void);
-uint32_t hal_get_tick_duration_us(void);
-uint32_t hal_get_tick_reload_value(void);
-uint32_t hal_get_millis(void);
-uint32_t hal_get_micros(void);
-void SysTick_Handler(void); // ISR for systick interrupts
-void hal_systick_set_callback(void (*cb)(void));
+/* ===== Timebase API (SysTick-backed) ===== */
+
+/** @brief Callback invoked on every timebase tick (from the SysTick ISR). */
+typedef void (*hal_timebase_callback_t)(void);
+
+/**
+ * @brief Initialize the timebase tick at the given period.
+ * @param tick_us Tick period in microseconds; must be non-zero.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p tick_us is 0.
+ */
+hal_status_t hal_timebase_init(uint32_t tick_us);
+
+/** @brief Get the current timebase tick count. */
+uint32_t hal_timebase_get_tick(void);
+
+/** @brief Get the configured tick period in microseconds. */
+uint32_t hal_timebase_get_tick_duration_us(void);
+
+/** @brief Get the currently configured SysTick reload value (24-bit). */
+uint32_t hal_timebase_get_reload_value(void);
+
+/** @brief Get elapsed time since timebase start, in milliseconds. */
+uint32_t hal_timebase_get_millis(void);
+
+/** @brief Get elapsed time since timebase start, in microseconds. */
+uint32_t hal_timebase_get_micros(void);
+
+/**
+ * @brief Register a callback invoked on every timebase tick.
+ * @param cb Callback function, or NULL to clear.
+ * @return ::HAL_OK.
+ */
+hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb);
+
+/** @brief Busy-wait delay for @p ms milliseconds. */
+void hal_delay_ms(uint32_t ms);
+
+/** @brief Busy-wait delay for @p us microseconds. */
+void hal_delay_us(uint32_t us);
+
+/** @brief SysTick exception handler (vector-table entry). */
+void SysTick_Handler(void);
 
 // General Purpose Timer (TIMx) Initialization & Control
 void timer_init(hal_timer_t timer, uint32_t prescaler, uint32_t auto_reload);
@@ -93,5 +124,8 @@ void timer_disable_channel(hal_timer_t timer, uint32_t channel);
 uint32_t timer_get_frequency(hal_timer_t timer);
 void timer_set_prescaler(hal_timer_t timer, uint32_t prescaler);
 void timer_set_auto_reload(hal_timer_t timer, uint32_t arr);
+
+/* Deprecated pre-standardization timebase names — removed in M5. */
+#include "compat/timebase_compat.h"
 
 #endif // !CORTEX_M4_TIMER_H

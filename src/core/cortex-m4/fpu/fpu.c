@@ -1,10 +1,18 @@
+/**
+ * @file fpu.c
+ * @brief Standardized HAL hardware-FPU driver for Cortex-M4.
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
+ */
+
 #include "core/cortex-m4/fpu.h"
 #include <stdint.h>
+
 #define CPACR (*(volatile uint32_t *)0xE000ED88)
 #define FPCCR (*(volatile uint32_t *)0xE000EF34)
 
 #ifdef _FPU_ENABLED
-void hal_fpu_enable(void) {
+hal_status_t hal_fpu_enable(void) {
   // CPACR: Enable full access to CP10 and CP11
   CPACR |= (0xF << 20);
 
@@ -14,7 +22,8 @@ void hal_fpu_enable(void) {
   // Ensure all pipeline operations are complete
   __asm volatile("dsb");
   __asm volatile("isb");
+  return HAL_OK;
 }
 #else
-void hal_fpu_enable(void) {}
+hal_status_t hal_fpu_enable(void) { return HAL_ERR_NOT_SUPPORTED; }
 #endif

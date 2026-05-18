@@ -1,13 +1,23 @@
 /**
- * @file sdio.h
- * @brief SDIO driver interface for NavHAL (Cortex-M4).
+ * @file core/cortex-m4/sdio.h
+ * @brief Cortex-M4 / STM32F4 SDIO HAL driver interface.
  *
- * Provides high-level functions for SD card communication using the SDIO
- * peripheral. Supports 1-bit and 4-bit bus widths.
+ * @details
+ * Standardized SDIO API (see `docs/api_standardization.md`). All public
+ * functions use the `hal_sdio_` prefix. Supports 1-bit and 4-bit bus widths
+ * and (when DMA is enabled) asynchronous block transfers.
+ *
+ * @note SDIO returns the driver-specific ::hal_sdio_error_t rather than
+ *       ::hal_status_t — its asynchronous model needs ::HAL_SDIO_PENDING,
+ *       which the standard status enum cannot express. Flagged for the M5
+ *       conformance review.
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #ifndef CORTEX_M4_SDIO_H
 #define CORTEX_M4_SDIO_H
+
 #define SDIO_CMD_WAITPEND (1 << 9)
 #define SDIO_CMD_CPSMEN (1 << 10)
 
@@ -32,15 +42,15 @@
 #include <stdint.h>
 
 /**
- * @brief SDIO initialization structure.
+ * @brief SDIO initialization configuration.
  */
 typedef struct {
-  uint32_t clock_div; /**< SDIO_CK = SDIOCLK / [clock_div + 2] */
-  uint8_t bus_width;  /**< 0: 1-bit, 1: 4-bit */
+  uint32_t clock_div; /**< SDIO_CK = SDIOCLK / (clock_div + 2). */
+  uint8_t bus_width;  /**< 0: 1-bit, 1: 4-bit. */
 } hal_sdio_config_t;
 
 /**
- * @brief SDIO Error codes.
+ * @brief SDIO operation status / error codes.
  */
 typedef enum {
   HAL_SDIO_OK = 0,
@@ -54,103 +64,100 @@ typedef enum {
 } hal_sdio_error_t;
 
 /**
- * @brief SDIO Callback function type.
+ * @brief SDIO completion callback type for asynchronous operations.
  */
 typedef void (*hal_sdio_callback_t)(hal_sdio_error_t error);
 
 /**
  * @brief Set the callback for asynchronous SDIO operations.
- *
- * @param callback Function to call when operation completes.
+ * @param callback Function invoked when an async operation completes.
  */
-void sdio_set_callback(hal_sdio_callback_t callback);
+void hal_sdio_set_callback(hal_sdio_callback_t callback);
 
 /**
- * @brief Initialize the SDIO peripheral and GPIOs.
- *
- * Configures PC8-PC11 (DAT0-3), PC12 (CLK), and PD2 (CMD).
- * Enables the SDIO clock.
- *
- * @param config Pointer to configuration settings.
- * @return hal_sdio_error_t Status of operation.
+ * @brief Initialize the SDIO peripheral and its GPIOs.
+ * @param config Configuration; must not be NULL.
+ * @return Operation status.
  */
-hal_sdio_error_t sdio_init(const hal_sdio_config_t *config);
+hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config);
 
 /**
- * @brief Full initialization sequence for SD card.
- *
- * Performs CMD0, CMD8, ACMD41, CMD2, CMD3 and CMD7 to put card
- * into Transfer State.
- *
- * @return hal_sdio_error_t Status of initialization.
+ * @brief Run the full SD-card initialization sequence (CMD0/8/ACMD41/2/3/7).
+ * @return Initialization status.
  */
-hal_sdio_error_t sdio_card_init(void);
+hal_sdio_error_t hal_sdio_card_init(void);
 
 /**
  * @brief Send a command to the SD card.
- *
  * @param cmd_index Command index (0-63).
  * @param argument  Command argument.
- * @param wait_resp Wait response type (None, Short, Long).
- * @return hal_sdio_error_t Status of command transmission.
+ * @param wait_resp Response type (none / short / long).
+ * @return Command transmission status.
  */
-hal_sdio_error_t sdio_send_command(uint8_t cmd_index, uint32_t argument,
-                                   uint32_t wait_resp);
+hal_sdio_error_t hal_sdio_send_command(uint8_t cmd_index, uint32_t argument,
+                                       uint32_t wait_resp);
 
 /**
- * @brief Get the response from the last command.
- *
+ * @brief Get a response register from the last command.
  * @param response_reg Response register index (1-4).
- * @return uint32_t Response value.
+ * @return Response value.
  */
-uint32_t sdio_get_response(uint8_t response_reg);
+uint32_t hal_sdio_get_response(uint8_t response_reg);
 
 /**
- * @brief Wait for the SDIO status flag.
- *
- * @param flag Status flag to wait for.
+ * @brief Wait for an SDIO status flag.
+ * @param flag    Status flag to wait for.
  * @param timeout Maximum wait time.
- * @return hal_sdio_error_t OK if flag is set, TIMEOUT otherwise.
+ * @return ::HAL_SDIO_OK if the flag was set, ::HAL_SDIO_TIMEOUT otherwise.
  */
-hal_sdio_error_t sdio_wait_flag(uint32_t flag, uint32_t timeout);
+hal_sdio_error_t hal_sdio_wait_flag(uint32_t flag, uint32_t timeout);
 
 /**
- * @brief Wait for an asynchronous operation to complete (synchronous wrapper).
- *
- * @param result The result from the async function (e.g., HAL_SDIO_PENDING).
- * @return hal_sdio_error_t final status.
+ * @brief Block until an asynchronous operation completes.
+ * @param result The result returned by the async function.
+ * @return Final operation status.
  */
-hal_sdio_error_t sdio_wait_sync(hal_sdio_error_t result);
+hal_sdio_error_t hal_sdio_wait_sync(hal_sdio_error_t result);
 
 /**
  * @brief Read a single 512-byte block from the SD card.
- *
  * @param addr   Sector address (LBA).
- * @param buffer Pointer to 512-byte destination buffer.
- * @return hal_sdio_error_t Status of read operation.
+ * @param buffer 512-byte destination buffer.
+ * @return Read status.
  */
-hal_sdio_error_t sdio_read_block(uint32_t addr, uint8_t *buffer);
+hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buffer);
 
 /**
  * @brief Write a single 512-byte block to the SD card.
- *
  * @param addr   Sector address (LBA).
- * @param buffer Pointer to 512-byte source buffer.
- * @return hal_sdio_error_t Status of write operation.
+ * @param buffer 512-byte source buffer.
+ * @return Write status.
  */
-hal_sdio_error_t sdio_write_block(uint32_t addr, const uint8_t *buffer);
+hal_sdio_error_t hal_sdio_write_block(uint32_t addr, const uint8_t *buffer);
 
 #include "core/cortex-m4/config.h"
 #ifdef _DMA_ENABLED
-hal_sdio_error_t sdio_read_block_async(uint32_t addr, uint8_t *buffer);
-hal_sdio_error_t sdio_write_block_async(uint32_t addr, const uint8_t *buffer);
-
-hal_sdio_error_t sdio_read_blocks_async(uint32_t addr, uint8_t *buffer,
-                                        uint32_t count);
-hal_sdio_error_t sdio_write_blocks_async(uint32_t addr, const uint8_t *buffer,
-                                         uint32_t count);
+/** @brief Asynchronous (DMA) single-block read. */
+hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buffer);
+/** @brief Asynchronous (DMA) single-block write. */
+hal_sdio_error_t hal_sdio_write_block_async(uint32_t addr,
+                                            const uint8_t *buffer);
+/** @brief Asynchronous (DMA) multi-block read. */
+hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buffer,
+                                            uint32_t count);
+/** @brief Asynchronous (DMA) multi-block write. */
+hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr,
+                                             const uint8_t *buffer,
+                                             uint32_t count);
 #endif
 
-uint32_t sdio_get_sector_count(void);
+/**
+ * @brief Get the SD card's total sector count.
+ * @return Number of 512-byte sectors.
+ */
+uint32_t hal_sdio_get_sector_count(void);
+
+/* Deprecated pre-standardization SDIO names — removed in M5. */
+#include "compat/sdio_compat.h"
 
 #endif // !CORTEX_M4_SDIO_H

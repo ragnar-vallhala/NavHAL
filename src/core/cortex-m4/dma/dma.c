@@ -1,14 +1,13 @@
 /**
- * @file src/core/cortex-m4/dma/dma.c
- * @brief DMA driver implementation for STM32F4.
+ * @file dma.c
+ * @brief Standardized HAL DMA driver for STM32F4 (Cortex-M4).
  *
  * @details
- * Implements clock enable, stream configuration, start/stop, flag polling,
- * and flag clearing for DMA1 and DMA2 on STM32F4.
+ * Implements the standardized `hal_dma_*` API declared in
+ * `core/cortex-m4/dma.h`: clock enable, stream configuration, start/stop,
+ * flag polling and clearing for DMA1 and DMA2. Compiled only when
+ * @c _DMA_ENABLED is defined.
  *
- * Only compiled when @c _DMA_ENABLED is defined.
- *
- * @ingroup HAL_DMA
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
@@ -26,12 +25,12 @@
  *---------------------------------------------------------------------------*/
 
 /** Return a pointer to the DMA controller based on cfg->controller. */
-static inline DMA_Typedef *_get_dma(const dma_config_t *cfg) {
-  return (cfg->controller == DMA_CONTROLLER_2) ? DMA2 : DMA1;
+static inline DMA_Typedef *_get_dma(const hal_dma_config_t *cfg) {
+  return (cfg->controller == HAL_DMA_CONTROLLER_2) ? DMA2 : DMA1;
 }
 
 /** Return a pointer to the specific stream register block. */
-static inline DMA_Stream_Typedef *_get_stream(const dma_config_t *cfg) {
+static inline DMA_Stream_Typedef *_get_stream(const hal_dma_config_t *cfg) {
   return &_get_dma(cfg)->STREAM[cfg->stream & 0x7U];
 }
 
@@ -52,12 +51,12 @@ static void _clear_flags(DMA_Typedef *dma, uint8_t stream) {
  * Public API
  *---------------------------------------------------------------------------*/
 
-/**
- * @brief Initialize a DMA stream.
- */
-void dma_init(const dma_config_t *cfg) {
+hal_status_t hal_dma_init(const hal_dma_config_t *cfg) {
+  if (cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
+
   /* 1. Enable peripheral clock */
-  if (cfg->controller == DMA_CONTROLLER_1)
+  if (cfg->controller == HAL_DMA_CONTROLLER_1)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
   else
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
@@ -74,7 +73,7 @@ void dma_init(const dma_config_t *cfg) {
   _clear_flags(d, cfg->stream);
 
   /* 4. Set peripheral and memory addresses */
-  if (cfg->direction == DMA_DIR_M2P) {
+  if (cfg->direction == HAL_DMA_DIR_M2P) {
     s->PAR = cfg->dst_addr;  /* peripheral = destination */
     s->M0AR = cfg->src_addr; /* memory     = source      */
   } else {
@@ -93,13 +92,13 @@ void dma_init(const dma_config_t *cfg) {
 
   /* Direction */
   switch (cfg->direction) {
-  case DMA_DIR_P2M:
+  case HAL_DMA_DIR_P2M:
     cr |= DMA_SxCR_DIR_P2M;
     break;
-  case DMA_DIR_M2P:
+  case HAL_DMA_DIR_M2P:
     cr |= DMA_SxCR_DIR_M2P;
     break;
-  case DMA_DIR_M2M:
+  case HAL_DMA_DIR_M2M:
     cr |= DMA_SxCR_DIR_M2M;
     break;
   }
@@ -117,7 +116,7 @@ void dma_init(const dma_config_t *cfg) {
    *   In M2P: src = memory (increment), dst = peripheral (no increment)
    *   In P2M: src = peripheral (no increment), dst = memory (increment)
    */
-  if (cfg->direction == DMA_DIR_M2P) {
+  if (cfg->direction == HAL_DMA_DIR_M2P) {
     if (cfg->src_inc)
       cr |= DMA_SxCR_MINC;
     if (cfg->dst_inc)
@@ -154,55 +153,55 @@ void dma_init(const dma_config_t *cfg) {
            DMA_SxFCR_FTH_MASK;
   }
   s->FCR = fcr;
+  return HAL_OK;
 }
 
-/**
- * @brief Enable a DMA stream to begin the transfer.
- */
-void dma_start(const dma_config_t *cfg) {
+hal_status_t hal_dma_start(const hal_dma_config_t *cfg) {
+  if (cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
+
   DMA_Typedef *d = _get_dma(cfg);
   DMA_Stream_Typedef *s = _get_stream(cfg);
 
   _clear_flags(d, cfg->stream);
   s->CR |= DMA_SxCR_EN;
+  return HAL_OK;
 }
 
-/**
- * @brief Disable a DMA stream immediately.
- */
-void dma_stop(const dma_config_t *cfg) {
+hal_status_t hal_dma_stop(const hal_dma_config_t *cfg) {
+  if (cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
+
   DMA_Stream_Typedef *s = _get_stream(cfg);
   s->CR &= ~DMA_SxCR_EN;
   while (s->CR & DMA_SxCR_EN)
     ;
+  return HAL_OK;
 }
 
-/**
- * @brief Poll for transfer-complete flag.
- *
- * @return 1 if transfer complete, 0 otherwise.
- */
-int dma_transfer_complete(const dma_config_t *cfg) {
+bool hal_dma_transfer_complete(const hal_dma_config_t *cfg) {
+  if (cfg == NULL)
+    return false;
   DMA_Typedef *d = _get_dma(cfg);
-  return (*DMA_ISR_REG(d, cfg->stream) & DMA_ISR_TCIF(cfg->stream)) ? 1 : 0;
+  return (*DMA_ISR_REG(d, cfg->stream) & DMA_ISR_TCIF(cfg->stream)) != 0;
 }
 
-/**
- * @brief Clear all interrupt flags for the configured stream.
- */
-void dma_clear_flags(const dma_config_t *cfg) {
+hal_status_t hal_dma_clear_flags(const hal_dma_config_t *cfg) {
+  if (cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
   _clear_flags(_get_dma(cfg), cfg->stream);
+  return HAL_OK;
 }
 
 /*---------------------------------------------------------------------------
  * Central DMA Interrupt Dispatchers
  * Each stream handler clears peripheral flags and routes to the HAL callback
- *system.
+ * system.
  *---------------------------------------------------------------------------*/
 
 #define DMA_ISR_GEN(controller, stream, irqn)                                  \
   void controller##_Stream##stream##_IRQHandler(void) {                        \
-    hal_handle_interrupt(irqn);                                                \
+    hal_interrupt_dispatch(irqn);                                              \
     _clear_flags(controller, stream);                                          \
   }
 

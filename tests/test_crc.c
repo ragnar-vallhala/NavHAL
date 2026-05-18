@@ -9,10 +9,10 @@
 #include "core/cortex-m4/crc.h"
 #include "navtest/navtest.h"
 
-static crc_config_t test_cfg;
+static hal_crc_config_t test_cfg;
 
 static void crc_setUp(void) {
-  test_cfg.polynomial = CRC_POLY_CRC32;
+  test_cfg.polynomial = HAL_CRC_POLY_CRC32;
   test_cfg.init_value = 0xFFFFFFFF;
   hal_crc_init(&test_cfg);
 }

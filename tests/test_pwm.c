@@ -25,7 +25,7 @@ uint32_t timer_get_ccr(hal_timer_t timer, uint32_t channel) {
   }
 }
 void test_hal_pwm_init_apb1(void) {
-  PWM_Handle pwm = {.timer = TIM2, .channel = 1};
+  hal_pwm_handle_t pwm = {.timer = TIM2, .channel = 1};
 
   hal_pwm_init(&pwm, 1000, 0.5f); // 1 kHz, 50% duty
 
@@ -35,14 +35,14 @@ void test_hal_pwm_init_apb1(void) {
   uint32_t expected_arr = (timer_clk / (expected_psc + 1)) / 1000 - 1;
   uint32_t expected_ccr = (uint32_t)((expected_arr + 1) * 0.5f + 0.5f);
 
-  uart2_init(9600);
-  TEST_ASSERT_EQUAL_UINT32(expected_arr, timer_get_arr(pwm.timer, pwm.channel));
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate = 9600});
+  TEST_ASSERT_EQUAL_UINT32(expected_arr, hal_timer_get_auto_reload(pwm.timer));
   // CCR should be close to expected duty
   TEST_ASSERT_EQUAL_UINT32(expected_ccr, timer_get_ccr(pwm.timer, pwm.channel));
 }
 
 void test_hal_pwm_init_apb2(void) {
-  PWM_Handle pwm = {.timer = TIM1, .channel = 2};
+  hal_pwm_handle_t pwm = {.timer = TIM1, .channel = 2};
 
   hal_pwm_init(&pwm, 2000, 0.25f); // 2 kHz, 25% duty
 
@@ -52,43 +52,43 @@ void test_hal_pwm_init_apb2(void) {
   uint32_t expected_arr = (timer_clk / (expected_psc + 1)) / 2000 - 1;
   uint32_t expected_ccr = (uint32_t)((expected_arr + 1) * 0.25f + 0.5f);
 
-  uart2_init(9600);
-  TEST_ASSERT_EQUAL_UINT32(expected_arr, timer_get_arr(pwm.timer, pwm.channel));
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate = 9600});
+  TEST_ASSERT_EQUAL_UINT32(expected_arr, hal_timer_get_auto_reload(pwm.timer));
   TEST_ASSERT_EQUAL_UINT32(expected_ccr, timer_get_ccr(pwm.timer, pwm.channel));
 }
 
 // -------------------- PWM Start/Stop --------------------
 void test_hal_pwm_start_sets_counter_enable(void) {
-  PWM_Handle pwm = {.timer = TIM3, .channel = 1};
+  hal_pwm_handle_t pwm = {.timer = TIM3, .channel = 1};
 
   hal_pwm_init(&pwm, 1000, 0.5f);
   hal_pwm_start(&pwm);
 
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate = 9600});
   TEST_ASSERT_TRUE((GET_TIMx_BASE(pwm.timer)->CR1 & TIMx_CR1_CEN) != 0);
 }
 
 void test_hal_pwm_stop_clears_counter_enable(void) {
-  PWM_Handle pwm = {.timer = TIM4, .channel = 2};
+  hal_pwm_handle_t pwm = {.timer = TIM4, .channel = 2};
 
   hal_pwm_init(&pwm, 500, 0.5f);
   hal_pwm_start(&pwm);
   hal_pwm_stop(&pwm);
 
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate = 9600});
   TEST_ASSERT_TRUE((GET_TIMx_BASE(pwm.timer)->CR1 & TIMx_CR1_CEN) == 0);
 }
 
 // -------------------- PWM Duty Cycle --------------------
 void test_hal_pwm_set_duty_cycle_updates_ccr(void) {
-  PWM_Handle pwm = {.timer = TIM2, .channel = 1};
+  hal_pwm_handle_t pwm = {.timer = TIM2, .channel = 1};
 
   hal_pwm_init(&pwm, 1000, 0.1f); // start with 10%
   hal_pwm_set_duty_cycle(&pwm, 0.75f);
 
-  uint32_t arr = timer_get_arr(pwm.timer, pwm.channel);
+  uint32_t arr = hal_timer_get_auto_reload(pwm.timer);
   uint32_t expected_ccr = (uint32_t)((arr + 1) * 0.75f + 0.5f);
 
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate = 9600});
   TEST_ASSERT_EQUAL_UINT32(expected_ccr, timer_get_ccr(pwm.timer, pwm.channel));
 }

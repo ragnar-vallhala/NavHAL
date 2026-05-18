@@ -19,9 +19,9 @@ static uint32_t s_crc_init_value = 0xFFFFFFFF;
 #include "core/cortex-m4/crc_reg.h"
 #include "core/cortex-m4/rcc_reg.h"
 
-void hal_crc_init(const crc_config_t *cfg) {
+hal_status_t hal_crc_init(const hal_crc_config_t *cfg) {
   if (cfg == NULL)
-    return;
+    return HAL_ERR_INVALID_ARG;
   s_crc_init_value = cfg->init_value;
 
   /* Enable CRC clock */
@@ -29,9 +29,10 @@ void hal_crc_init(const crc_config_t *cfg) {
 
   /* Issue reset */
   hal_crc_reset();
+  return HAL_OK;
 }
 
-void hal_crc_reset(void) {
+hal_status_t hal_crc_reset(void) {
   CRC->CR = CRC_CR_RESET;
   /* Hardware always resets to 0xFFFFFFFF. If a different init value
      was requested, we would ideally write it here, but STM32F4 CRC
@@ -39,6 +40,7 @@ void hal_crc_reset(void) {
      (or it does on newer F4s via INIT register, but standard F401/411
      doesn't have it). For our API, we only guarantee 0xFFFFFFFF works
      natively on all F4 hardware for now. */
+  return HAL_OK;
 }
 
 uint32_t hal_crc_accumulate(const uint8_t *data, uint32_t len) {
@@ -145,14 +147,18 @@ static const uint32_t crc32_mpeg2_table[256] = {
 
 static uint32_t s_current_crc = 0xFFFFFFFF;
 
-void hal_crc_init(const crc_config_t *cfg) {
+hal_status_t hal_crc_init(const hal_crc_config_t *cfg) {
   if (cfg == NULL)
-    return;
+    return HAL_ERR_INVALID_ARG;
   s_crc_init_value = cfg->init_value;
   hal_crc_reset();
+  return HAL_OK;
 }
 
-void hal_crc_reset(void) { s_current_crc = s_crc_init_value; }
+hal_status_t hal_crc_reset(void) {
+  s_current_crc = s_crc_init_value;
+  return HAL_OK;
+}
 
 uint32_t hal_crc_accumulate(const uint8_t *data, uint32_t len) {
   if (data == NULL || len == 0) {

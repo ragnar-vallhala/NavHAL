@@ -4,7 +4,7 @@
 
 // Test pin and AF values
 #define TEST_PIN GPIO_PC09
-#define TEST_AF GPIO_AF07
+#define TEST_AF HAL_GPIO_AF7
 
 // Test function declarations
 void test_hal_gpio_setmode(void);

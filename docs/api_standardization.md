@@ -387,7 +387,7 @@ new API; delete the Phase-2 shims; bump `HAL_API_VERSION` to 1.
 | `uart_write_string(s, u)` | `hal_uart_write(u, (const uint8_t*)s, strlen(s), tmo)` |
 | `uart_read_char(u)` | `hal_uart_read(u, &c, 1, tmo)` |
 | `uart_write_dma(d,l,u)` | `hal_uart_write_dma(u, d, l)` |
-| `hal_gpio_setmode(pin,mode,pupd)` | `hal_gpio_set_mode(pin, &(hal_gpio_config_t){.mode=mode,.pull=pupd})` |
+| `hal_gpio_setmode(pin,mode,pupd)` | `hal_gpio_set_mode(pin, mode, pull)` — or `hal_gpio_init(pin, &cfg)` for full config |
 | `hal_gpio_digitalwrite(pin,st)` | `hal_gpio_write(pin, st)` |
 | `hal_gpio_digitalread(pin)` | `hal_gpio_read(pin)` |
 | `systick_init(us)` / `delay_ms(ms)` | `hal_systick_init(us)` / `hal_delay_ms(ms)` |

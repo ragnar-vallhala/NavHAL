@@ -1,100 +1,93 @@
+/**
+ * @file gpio.c
+ * @brief Standardized HAL GPIO driver implementation for STM32F4 (Cortex-M4).
+ *
+ * @details
+ * Implements the standardized `hal_gpio_*` API declared in
+ * `core/cortex-m4/gpio.h`: pin configuration, mode/pull/alternate-function
+ * setup, output type/speed, and port clock enabling. The hot-path
+ * write/read/toggle helpers are defined `static inline` in the header.
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
+ */
+
 #include "core/cortex-m4/gpio.h"
 #include "core/cortex-m4/gpio_reg.h"
 #include "core/cortex-m4/rcc_reg.h"
 
-/**
- * @file gpio.c
- * @brief HAL GPIO driver implementation for STM32F4 series.
- * @details
- * This file contains the implementation of the high-level HAL functions
- * declared in `gpio.h` for configuring and controlling GPIO pins.
- *
- * The functions in this file handle:
- * - Pin mode configuration
- * - Pull-up/pull-down settings
- * - Digital read/write operations
- * - RCC clock enabling for GPIO ports
- * - Alternate function selection
- */
+hal_status_t hal_gpio_enable_clock(hal_gpio_pin_t pin) {
+  uint32_t port = GPIO_GET_PORT_NUMBER(pin);
+  if (!(RCC->AHB1ENR & (1U << port)))
+    RCC->AHB1ENR |= (1U << port);
+  return HAL_OK;
+}
 
-/**
- * @brief Configure the mode and pull-up/pull-down for a GPIO pin.
- * @param pin Pin identifier.
- * @param mode GPIO mode (input, output, alternate function, analog).
- * @param pupd Pull-up/pull-down configuration.
- * @note This function automatically enables the RCC clock for the GPIO port.
- * @code
- * // Example: Configure PA5 as output with no pull-up/pull-down
- * hal_gpio_setmode(PA5, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_NO_PULL);
- * @endcode
- */
-void hal_gpio_setmode(hal_gpio_pin pin, hal_gpio_mode mode,
-                      hal_gpio_pullup_pulldown pupd) {
-  hal_gpio_enable_rcc(pin); // Ensure GPIO port clock enabled
+hal_status_t hal_gpio_set_mode(hal_gpio_pin_t pin, hal_gpio_mode_t mode,
+                               hal_gpio_pull_t pull) {
+  hal_gpio_enable_clock(pin); // Ensure GPIO port clock enabled
+
+  uint32_t shift = GPIO_GET_PIN(pin) * 2;
 
   // Set the mode bits for the pin
-  GPIO_GET_PORT(pin)->MODER &=
-      ~(0x3 << (GPIO_GET_PIN(pin) * 2)); // clear mode bits for moder
-  GPIO_GET_PORT(pin)->MODER |= ((mode & 0x3) << (GPIO_GET_PIN(pin) * 2));
+  GPIO_GET_PORT(pin)->MODER &= ~(0x3U << shift);
+  GPIO_GET_PORT(pin)->MODER |= (((uint32_t)mode & 0x3U) << shift);
 
   // Configure pull-up/pull-down resistor
-  GPIO_GET_PORT(pin)->PUPDR &=
-      ~(0x3 << (GPIO_GET_PIN(pin) * 2)); // clear mode bits for pupdr
-  GPIO_GET_PORT(pin)->PUPDR |= ((uint8_t)pupd & 0x3)
-                               << (GPIO_GET_PIN(pin) * 2); // Set new pupd bits
+  GPIO_GET_PORT(pin)->PUPDR &= ~(0x3U << shift);
+  GPIO_GET_PORT(pin)->PUPDR |= (((uint32_t)pull & 0x3U) << shift);
+
+  return HAL_OK;
 }
 
-/**
- * @brief Get the current mode of a GPIO pin.
- * @param pin Pin identifier.
- * @return The current GPIO mode of the pin.
- */
-hal_gpio_mode hal_gpio_getmode(hal_gpio_pin pin) {
-  return ((GPIO_GET_PORT(pin)->MODER) >> (GPIO_GET_PIN(pin) * 2)) & 0x3;
+hal_gpio_mode_t hal_gpio_get_mode(hal_gpio_pin_t pin) {
+  return (hal_gpio_mode_t)((GPIO_GET_PORT(pin)->MODER >>
+                            (GPIO_GET_PIN(pin) * 2)) &
+                           0x3U);
 }
 
-/**
- * @brief Enable the RCC clock for the GPIO port of a given pin.
- * @param pin Pin identifier.
- * @note This function is usually called automatically by other GPIO functions,
- * but can be called manually if required.
- */
-void hal_gpio_enable_rcc(hal_gpio_pin pin) {
-  if (!(RCC->AHB1ENR & (1 << GPIO_GET_PORT_NUMBER(pin))))
-    RCC->AHB1ENR |= (1 << GPIO_GET_PORT_NUMBER(pin));
-}
+hal_status_t hal_gpio_set_alternate_function(hal_gpio_pin_t pin,
+                                             hal_gpio_af_t af) {
+  hal_gpio_set_mode(pin, HAL_GPIO_MODE_AF, HAL_GPIO_PULL_NONE);
 
-/**
- * @brief Configure the alternate function of a GPIO pin.
- * @param pin Pin identifier.
- * @param alt_fn Alternate function number/type.
- * @note This function will internally set the pin mode to alternate function
- * mode.
- * @code
- * // Example: Set PA2 to USART2_TX alternate function
- * hal_gpio_set_alternate_function(PA2, HAL_GPIO_AF_USART2);
- * @endcode
- */
-void hal_gpio_set_alternate_function(hal_gpio_pin pin,
-                                     hal_gpio_alternate_function_t alt_fn) {
-  hal_gpio_setmode(pin, GPIO_AF, GPIO_PUPD_NONE);
   uint8_t pin_num = GPIO_GET_PIN(pin);
-  uint32_t mask = 0xF << (4 * (pin_num % 8));
+  uint32_t mask = 0xFU << (4 * (pin_num % 8));
   if (pin_num < 8) {
-    GPIO_GET_PORT(pin)->AFRL &= ~mask;                     // clear bits
-    GPIO_GET_PORT(pin)->AFRL |= (alt_fn << (4 * pin_num)); // set new value
+    GPIO_GET_PORT(pin)->AFRL &= ~mask;
+    GPIO_GET_PORT(pin)->AFRL |= ((uint32_t)af << (4 * pin_num));
   } else {
-    GPIO_GET_PORT(pin)->AFRH &= ~mask; // clear bits
-    GPIO_GET_PORT(pin)->AFRH |=
-        (alt_fn << (4 * (pin_num % 8))); // set new value
+    GPIO_GET_PORT(pin)->AFRH &= ~mask;
+    GPIO_GET_PORT(pin)->AFRH |= ((uint32_t)af << (4 * (pin_num % 8)));
   }
+  return HAL_OK;
 }
 
-void hal_gpio_set_output_type(hal_gpio_pin pin, hal_gpio_output_type otyper) {
-  GPIO_GET_PORT(pin)->OTYPER &= ~(0x1 << GPIO_GET_PIN(pin));
-  GPIO_GET_PORT(pin)->OTYPER |= ((otyper & 0x1) << GPIO_GET_PIN(pin));
+hal_status_t hal_gpio_set_output_type(hal_gpio_pin_t pin,
+                                      hal_gpio_output_type_t type) {
+  GPIO_GET_PORT(pin)->OTYPER &= ~(0x1U << GPIO_GET_PIN(pin));
+  GPIO_GET_PORT(pin)->OTYPER |= (((uint32_t)type & 0x1U) << GPIO_GET_PIN(pin));
+  return HAL_OK;
 }
-void hal_gpio_set_output_speed(hal_gpio_pin pin, hal_gpio_output_speed speed) {
-  GPIO_GET_PORT(pin)->OSPEEDR &= ~(0x3 << GPIO_GET_PIN(pin));
-  GPIO_GET_PORT(pin)->OSPEEDR |= ((speed & 0x3) << GPIO_GET_PIN(pin));
+
+hal_status_t hal_gpio_set_output_speed(hal_gpio_pin_t pin,
+                                       hal_gpio_output_speed_t speed) {
+  GPIO_GET_PORT(pin)->OSPEEDR &= ~(0x3U << GPIO_GET_PIN(pin));
+  GPIO_GET_PORT(pin)->OSPEEDR |=
+      (((uint32_t)speed & 0x3U) << GPIO_GET_PIN(pin));
+  return HAL_OK;
+}
+
+hal_status_t hal_gpio_init(hal_gpio_pin_t pin, const hal_gpio_config_t *cfg) {
+  if (cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
+
+  hal_gpio_set_mode(pin, cfg->mode, cfg->pull);
+
+  if (cfg->mode == HAL_GPIO_MODE_OUTPUT || cfg->mode == HAL_GPIO_MODE_AF) {
+    hal_gpio_set_output_type(pin, cfg->output_type);
+    hal_gpio_set_output_speed(pin, cfg->output_speed);
+  }
+  if (cfg->mode == HAL_GPIO_MODE_AF)
+    hal_gpio_set_alternate_function(pin, cfg->alternate);
+
+  return HAL_OK;
 }

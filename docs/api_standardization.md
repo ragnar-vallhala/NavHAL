@@ -365,6 +365,13 @@ per driver so existing samples build:
 ```
 Mark shims with `__attribute__((deprecated))` where possible.
 
+**Phase 2+ — Comprehensive test suite.**
+With the API surface frozen by Phase 2, grow `tests/` to cover the whole
+standardized `hal_*` API — every function, success and `hal_status_t` error
+paths — plus a host-runnable subset and CI. Built before Phases 3–4 so those
+mechanical refactors are provably behavior-preserving, and it doubles as the
+conformance harness for the M6 AVR port. See M2+ in `docs/execution_plan.md`.
+
 **Phase 3 — Directory restructure.**
 Split `core/cortex-m4/` into `arch/armv7e-m/`, `vendor/stm32/`,
 `board/nucleo_f401re/`. Move `*_reg.h` to family-private. Update CMake globs.

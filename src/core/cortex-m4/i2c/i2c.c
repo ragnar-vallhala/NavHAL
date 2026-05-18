@@ -1,4 +1,20 @@
-// i2c.c
+/**
+ * @file i2c.c
+ * @brief Standardized HAL I²C driver for STM32F4 (Cortex-M4).
+ *
+ * @details
+ * Implements the standardized `hal_i2c_*` API declared in
+ * `core/cortex-m4/i2c.h`: master-mode initialization, blocking write/read/
+ * combined transactions, and an optional DMA register-read path.
+ *
+ * Bus pin mapping:
+ *   I²C1 -> PB6 (SCL) / PB7 (SDA)
+ *   I²C2 -> PB10 (SCL) / PB11 (SDA)
+ *   I²C3 -> PA8 (SCL) / PB4 (SDA)
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
+ */
+
 #include "core/cortex-m4/i2c.h"
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/i2c_reg.h"
@@ -6,20 +22,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// BUS  | SCL   | SDA
-// I²C1 → PB6 / PB7
-// I²C2 → PB10 / PB11
-// I²C3 → PA8 / PB4
-
 #define TIMEOUT 1000000
 #define I2C1_EN 1
 #define I2C2_EN 2
 #define I2C3_EN 4
 static uint8_t __i2c_init_status = 0;
 
-// Initializes the I2C peripheral
-
-int _wait_flag(volatile uint32_t *reg, uint32_t mask);
+static int _wait_flag(volatile uint32_t *reg, uint32_t mask);
 
 uint8_t hal_i2c_get_init_status(void) { return __i2c_init_status; }
 
@@ -30,46 +39,46 @@ static void (*_i2c_dma_rx_callback)(void) = NULL;
 static dma_config_t _active_i2c_dma_config;
 static void _i2c_dma_irq_handler(void);
 
-hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
-                                       uint8_t reg, const dma_config_t *dma_cfg,
-                                       void (*callback)(void)) {
+hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                   uint8_t reg, const dma_config_t *dma_cfg,
+                                   void (*callback)(void)) {
   I2C_Reg_Typedef *I2Cx =
       I2C_GET_BASE(bus); // Changed get_i2c_base to I2C_GET_BASE
   if (!I2Cx)
-    return HAL_I2C_ERR_REINIT;
+    return HAL_ERR_NOT_INITIALIZED;
 
   int timeout = TIMEOUT;
   while ((I2Cx->SR2 & I2C_SR2_BUSY) && --timeout) {
   }
   if (timeout == 0)
-    return HAL_I2C_ERR_BUS;
+    return HAL_ERR_IO;
 
   /* START -> DEV_ADDR(W) -> REG_ADDR */
   I2Cx->CR1 |= I2C_CR1_START_MASK;
   if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_SB_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
 
   I2Cx->DR = (dev_addr << 1) & ~0x01; // Write
   if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_ADDR_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
 
   (void)I2Cx->SR1;
   (void)I2Cx->SR2; // Clear ADDR
 
   if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_TXE_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
   I2Cx->DR = reg;
   if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_BTF_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
 
   /* RESTART -> DEV_ADDR(R) */
   I2Cx->CR1 |= I2C_CR1_START_MASK;
   if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_SB_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
 
   I2Cx->DR = (dev_addr << 1) | 0x01; // Read
   if (!_wait_flag(&(I2Cx->SR1), I2C_SR1_ADDR_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
 
   /* Now switch to DMA for the remaining RX transaction */
   _i2c_dma_rx_callback = callback;
@@ -91,10 +100,10 @@ hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
   if (_active_i2c_dma_config.controller == DMA_CONTROLLER_1) {
     if (_active_i2c_dma_config.stream == 0) {
       hal_interrupt_attach_callback(DMA1_Stream0_IRQn, _i2c_dma_irq_handler);
-      hal_enable_interrupt(DMA1_Stream0_IRQn);
+      hal_interrupt_enable(DMA1_Stream0_IRQn);
     } else if (_active_i2c_dma_config.stream == 5) {
       hal_interrupt_attach_callback(DMA1_Stream5_IRQn, _i2c_dma_irq_handler);
-      hal_enable_interrupt(DMA1_Stream5_IRQn);
+      hal_interrupt_enable(DMA1_Stream5_IRQn);
     }
   }
 
@@ -103,7 +112,7 @@ hal_i2c_status_t hal_i2c_read_regs_dma(uint8_t bus, uint8_t dev_addr,
   (void)I2Cx->SR1;
   (void)I2Cx->SR2; // Clear ADDR to release clock stretching and let DMA read
 
-  return HAL_I2C_OK;
+  return HAL_OK;
 }
 
 // Internal callback for I2C DMA RX completion
@@ -112,7 +121,7 @@ static void _i2c_dma_irq_handler(void) {
     dma_clear_flags(&_active_i2c_dma_config);
 
     // Stop and Disable I2C DMA gracefully
-    I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(I2C1);
+    I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(HAL_I2C_1);
     if (I2Cx) {
       I2Cx->CR2 &= ~I2C_CR2_DMAEN;
       I2Cx->CR2 &= ~I2C_CR2_LAST;
@@ -127,9 +136,9 @@ static void _i2c_dma_irq_handler(void) {
 }
 
 #endif
-hal_i2c_status_t hal_i2c_init(hal_i2c_bus_t bus, hal_i2c_config_t *config) {
+hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config) {
   if (__i2c_init_status & (1 << bus))
-    return HAL_I2C_ERR_REINIT; // avoid reintialization
+    return HAL_ERR_NOT_INITIALIZED; // avoid reintialization
 
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
 
@@ -148,89 +157,90 @@ hal_i2c_status_t hal_i2c_init(hal_i2c_bus_t bus, hal_i2c_config_t *config) {
     I2C->CR2 |= ((bus_clock_freq / 1000000U) & I2C_CR2_FREQ_MASK);
 
     // set scl freq to 100kHz or 400 kHz
-    uint32_t fscl = config->clock_speed == STANDARD_MODE ? 100000U : 400000U;
+    uint32_t fscl =
+        config->clock_speed == HAL_I2C_SPEED_STANDARD ? 100000U : 400000U;
 
     I2C->CCR &= ~((I2C_CCR_CCR_MASK) | (I2C_CCR_FS_MASK));
-    if (config->clock_speed == STANDARD_MODE) {
+    if (config->clock_speed == HAL_I2C_SPEED_STANDARD) {
       I2C->CCR |= bus_clock_freq / (2 * fscl);
 
       I2C->TRISE = (I2C->CR2 & 0x1F) + 1;
-    } else if (config->clock_speed == FAST_MODE) {
+    } else if (config->clock_speed == HAL_I2C_SPEED_FAST) {
       I2C->CCR |= I2C_CCR_FS_MASK | bus_clock_freq / (3 * fscl);
       I2C->TRISE =
           ((uint32_t)((I2C->CR2 & I2C_CR2_FREQ_MASK) * 300) / 1000) + 1;
     }
     I2C->CR1 |= I2C_CR1_PE_MASK;
     switch (bus) {
-    case I2C1:
+    case HAL_I2C_1:
       __i2c_init_status += 1;
       break;
-    case I2C2:
+    case HAL_I2C_2:
       __i2c_init_status += 2;
       break;
-    case I2C3:
+    case HAL_I2C_3:
       __i2c_init_status += 4;
       break;
     default:
       break;
     }
-    return HAL_I2C_OK;
+    return HAL_OK;
 
   } else {
     // [TODO] Implement slave mode
-    return HAL_I2C_ERR_BUS;
+    return HAL_ERR_IO;
   }
 }
 
-int _wait_flag(volatile uint32_t *reg, uint32_t mask) {
+static int _wait_flag(volatile uint32_t *reg, uint32_t mask) {
   int timeout = TIMEOUT;
   while (((*reg & mask) == 0) && --timeout) {
   }
   return (timeout > 0);
 }
 
-hal_i2c_status_t _i2c_start(hal_i2c_bus_t bus) {
+static hal_status_t _i2c_start(hal_i2c_bus_t bus) {
   I2C_GET_BASE(bus)->CR1 |= I2C_CR1_START_MASK;
   if (!_wait_flag(&(I2C_GET_BASE(bus)->SR1), I2C_SR1_SB_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
   else
-    return HAL_I2C_OK;
+    return HAL_OK;
 }
 
-void _i2c_stop(hal_i2c_bus_t bus) {
+static void _i2c_stop(hal_i2c_bus_t bus) {
   I2C_GET_BASE(bus)->CR1 |= I2C_CR1_STOP_MASK;
 }
-hal_i2c_status_t _i2c_write_addr(hal_i2c_bus_t bus, uint8_t addr) {
+static hal_status_t _i2c_write_addr(hal_i2c_bus_t bus, uint8_t addr) {
   I2C_GET_BASE(bus)->DR = addr;
   if (!_wait_flag(&(I2C_GET_BASE(bus)->SR1), I2C_SR1_ADDR_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
   // clear if raeding
   (void)I2C_GET_BASE(bus)->SR1;
   (void)I2C_GET_BASE(bus)->SR2;
-  return HAL_I2C_OK;
+  return HAL_OK;
 }
-hal_i2c_status_t _i2c_write_data(hal_i2c_bus_t bus, uint8_t data) {
+static hal_status_t _i2c_write_data(hal_i2c_bus_t bus, uint8_t data) {
   if (!_wait_flag(&(I2C_GET_BASE(bus)->SR1), I2C_SR1_TXE_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
   I2C_GET_BASE(bus)->DR = data;
   if (!_wait_flag(&(I2C_GET_BASE(bus)->SR1), I2C_SR1_BTF_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
   else
-    return HAL_I2C_OK;
+    return HAL_OK;
 }
 
-hal_i2c_status_t hal_i2c_write(uint8_t bus, uint8_t dev_addr,
-                               const uint8_t *data, uint16_t len) {
-  hal_i2c_status_t status;
+hal_status_t hal_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
+                           const uint8_t *data, uint16_t len) {
+  hal_status_t status;
 
   // Generate START condition
   status = _i2c_start(bus);
-  if (status != HAL_I2C_OK)
+  if (status != HAL_OK)
     return status;
 
   // Send device address with write bit (last bit 0)
   status = _i2c_write_addr(bus, dev_addr << 1);
-  if (status != HAL_I2C_OK) {
+  if (status != HAL_OK) {
     _i2c_stop(bus);
     return status;
   }
@@ -238,7 +248,7 @@ hal_i2c_status_t hal_i2c_write(uint8_t bus, uint8_t dev_addr,
   // Send all data bytes
   for (uint16_t i = 0; i < len; i++) {
     status = _i2c_write_data(bus, data[i]);
-    if (status != HAL_I2C_OK) {
+    if (status != HAL_OK) {
       _i2c_stop(bus);
       return status;
     }
@@ -247,24 +257,24 @@ hal_i2c_status_t hal_i2c_write(uint8_t bus, uint8_t dev_addr,
   // Generate STOP condition
   _i2c_stop(bus);
 
-  return HAL_I2C_OK;
+  return HAL_OK;
 }
 
-hal_i2c_status_t hal_i2c_read(uint8_t bus, uint8_t dev_addr, uint8_t *data,
-                              uint16_t len) {
+hal_status_t hal_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr, uint8_t *data,
+                          uint16_t len) {
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
 
   if (len == 0 || data == NULL)
-    return HAL_I2C_ERR_BUS;
+    return HAL_ERR_IO;
 
   // Generate start condition
-  if (_i2c_start(bus) != HAL_I2C_OK)
-    return HAL_I2C_ERR_TIMEOUT;
+  if (_i2c_start(bus) != HAL_OK)
+    return HAL_ERR_TIMEOUT;
 
   // Send device address with read bit (1)
-  if (_i2c_write_addr(bus, (dev_addr << 1) | 1) != HAL_I2C_OK) {
+  if (_i2c_write_addr(bus, (dev_addr << 1) | 1) != HAL_OK) {
     _i2c_stop(bus);
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
   }
 
   for (uint16_t i = 0; i < len; i++) {
@@ -280,7 +290,7 @@ hal_i2c_status_t hal_i2c_read(uint8_t bus, uint8_t dev_addr, uint8_t *data,
     // Wait until RXNE (data received)
     if (!_wait_flag(&(I2C->SR1), I2C_SR1_RXNE_MASK)) {
       _i2c_stop(bus);
-      return HAL_I2C_ERR_TIMEOUT;
+      return HAL_ERR_TIMEOUT;
     }
 
     // Read data from DR
@@ -290,32 +300,32 @@ hal_i2c_status_t hal_i2c_read(uint8_t bus, uint8_t dev_addr, uint8_t *data,
   // Re-enable ACK for future receptions
   I2C->CR1 |= I2C_CR1_ACK_MASK;
 
-  return HAL_I2C_OK;
+  return HAL_OK;
 }
 
-hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
-                                    const uint8_t *tx_data, uint16_t tx_len,
-                                    uint8_t *rx_data, uint16_t rx_len) {
-  hal_i2c_status_t status;
+hal_status_t hal_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                const uint8_t *tx_data, uint16_t tx_len,
+                                uint8_t *rx_data, uint16_t rx_len) {
+  hal_status_t status;
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
 
   if (rx_len == 0 || rx_data == NULL)
-    return HAL_I2C_ERR_BUS;
+    return HAL_ERR_IO;
 
   // --- Write phase ---
   status = _i2c_start(bus);
-  if (status != HAL_I2C_OK)
+  if (status != HAL_OK)
     return status;
 
   status = _i2c_write_addr(bus, (dev_addr << 1) | 0); // write
-  if (status != HAL_I2C_OK) {
+  if (status != HAL_OK) {
     _i2c_stop(bus);
     return status;
   }
 
   for (uint16_t i = 0; i < tx_len; i++) {
     status = _i2c_write_data(bus, tx_data[i]);
-    if (status != HAL_I2C_OK) {
+    if (status != HAL_OK) {
       _i2c_stop(bus);
       return status;
     }
@@ -323,13 +333,13 @@ hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
 
   // --- Repeated START + read address ---
   status = _i2c_start(bus); // repeated start
-  if (status != HAL_I2C_OK) {
+  if (status != HAL_OK) {
     _i2c_stop(bus);
     return status;
   }
 
   status = _i2c_write_addr(bus, (dev_addr << 1) | 1); // read
-  if (status != HAL_I2C_OK) {
+  if (status != HAL_OK) {
     _i2c_stop(bus);
     return status;
   }
@@ -346,9 +356,9 @@ hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
     (void)I2C->SR2;
     I2C->CR1 |= I2C_CR1_STOP_MASK; // generate STOP
     if (!_wait_flag(&I2C->SR1, I2C_SR1_RXNE_MASK))
-      return HAL_I2C_ERR_TIMEOUT;
+      return HAL_ERR_TIMEOUT;
     rx_data[0] = (uint8_t)I2C->DR;
-    return HAL_I2C_OK;
+    return HAL_OK;
   }
 
   /********** Case N == 2 **********/
@@ -363,7 +373,7 @@ hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
 
     // Wait until both bytes received
     if (!_wait_flag(&I2C->SR1, I2C_SR1_BTF_MASK))
-      return HAL_I2C_ERR_TIMEOUT;
+      return HAL_ERR_TIMEOUT;
 
     I2C->CR1 |= I2C_CR1_STOP_MASK; // generate STOP
 
@@ -373,7 +383,7 @@ hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
     // restore POS bit
     I2C->CR1 &= ~I2C_CR1_POS_MASK;
 
-    return HAL_I2C_OK;
+    return HAL_OK;
   }
 
   /********** Case N > 2 **********/
@@ -385,14 +395,14 @@ hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
   uint16_t i = 0;
   for (; i < (rx_len - 3); ++i) {
     if (!_wait_flag(&I2C->SR1, I2C_SR1_RXNE_MASK))
-      return HAL_I2C_ERR_TIMEOUT;
+      return HAL_ERR_TIMEOUT;
     rx_data[i] = (uint8_t)I2C->DR;
   }
 
   // Now we are at the point to handle the last three bytes
   // Wait for BTF: indicates two bytes are in DR/shift reg
   if (!_wait_flag(&I2C->SR1, I2C_SR1_BTF_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
 
   // At this point there are at least two bytes pending. Disable ACK so the last
   // byte will be NACKed.
@@ -403,7 +413,7 @@ hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
 
   // Wait for BTF again for the remaining two bytes
   if (!_wait_flag(&I2C->SR1, I2C_SR1_BTF_MASK))
-    return HAL_I2C_ERR_TIMEOUT;
+    return HAL_ERR_TIMEOUT;
 
   // Generate STOP before reading the last two bytes
   I2C->CR1 |= I2C_CR1_STOP_MASK;
@@ -415,5 +425,5 @@ hal_i2c_status_t hal_i2c_write_read(uint8_t bus, uint8_t dev_addr,
   // Re-enable ACK for next transaction (optional, but safe)
   I2C->CR1 |= I2C_CR1_ACK_MASK;
 
-  return HAL_I2C_OK;
+  return HAL_OK;
 }

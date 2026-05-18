@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 void test_uart_baudrate_9600(void) {
-  uart_init(9600, UART1);
+  hal_uart_init(HAL_UART_1, &(hal_uart_config_t){.baudrate = 9600});
   volatile UARTx_Reg_Typedef *u1 = GET_USARTx_BASE(1);
   uint32_t pclk = hal_clock_get_apb2clk();
   uint32_t expected_brr = (pclk + 4800) / 9600;
@@ -15,7 +15,7 @@ void test_uart_baudrate_9600(void) {
 }
 
 void test_uart_baudrate_115200(void) {
-  uart_init(115200, UART6);
+  hal_uart_init(HAL_UART_6, &(hal_uart_config_t){.baudrate = 115200});
   volatile UARTx_Reg_Typedef *u6 = GET_USARTx_BASE(6);
   uint32_t pclk = hal_clock_get_apb2clk();
   uint32_t expected_brr = (pclk + 57600) / 115200;

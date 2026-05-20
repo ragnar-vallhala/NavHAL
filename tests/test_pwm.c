@@ -93,12 +93,55 @@ void test_hal_pwm_set_duty_cycle_updates_ccr(void) {
   TEST_ASSERT_EQUAL_UINT32(expected_ccr, timer_get_ccr(pwm.timer, pwm.channel));
 }
 
+/* -------------------- Standardized contract -------------------- */
+
+void test_hal_pwm_init_rejects_null_handle(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_pwm_init(NULL, 1000, 0.5f));
+}
+
+void test_hal_pwm_start_rejects_null_handle(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_pwm_start(NULL));
+}
+
+void test_hal_pwm_stop_rejects_null_handle(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_pwm_stop(NULL));
+}
+
+void test_hal_pwm_set_duty_cycle_rejects_null_handle(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_pwm_set_duty_cycle(NULL, 0.5f));
+}
+
+void test_hal_pwm_set_frequency_returns_ok(void) {
+  hal_pwm_handle_t pwm = {.timer = TIM2, .channel = 1};
+  hal_pwm_init(&pwm, 1000, 0.5f);
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK, (uint32_t)hal_pwm_set_frequency(&pwm, 2000));
+}
+
+void test_hal_pwm_set_frequency_rejects_null_handle(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_pwm_set_frequency(NULL, 1000));
+}
+
 static const navtest_case_t pwm_cases[] = {
     NAVTEST_CASE(test_hal_pwm_init_apb1),
     NAVTEST_CASE(test_hal_pwm_init_apb2),
     NAVTEST_CASE(test_hal_pwm_start_sets_counter_enable),
     NAVTEST_CASE(test_hal_pwm_stop_clears_counter_enable),
     NAVTEST_CASE(test_hal_pwm_set_duty_cycle_updates_ccr),
+    /* standardized contract */
+    NAVTEST_CASE(test_hal_pwm_init_rejects_null_handle),
+    NAVTEST_CASE(test_hal_pwm_start_rejects_null_handle),
+    NAVTEST_CASE(test_hal_pwm_stop_rejects_null_handle),
+    NAVTEST_CASE(test_hal_pwm_set_duty_cycle_rejects_null_handle),
+    NAVTEST_CASE(test_hal_pwm_set_frequency_returns_ok),
+    NAVTEST_CASE(test_hal_pwm_set_frequency_rejects_null_handle),
 };
 
 const navtest_suite_t test_pwm_suite = {

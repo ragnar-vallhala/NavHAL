@@ -87,12 +87,31 @@ void test_crc_reset_restores_init(void) {
   TEST_ASSERT_EQUAL_UINT32(first, second);
 }
 
+/* -------------------- Standardized contract -------------------- */
+
+void test_hal_crc_init_rejects_null_config(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_crc_init(NULL));
+}
+
+void test_hal_crc_compute_mpeg2_reference_vector(void) {
+  hal_crc_config_t cfg = {.polynomial = HAL_CRC_POLY_CRC32,
+                          .init_value = 0xFFFFFFFFu};
+  hal_crc_init(&cfg);
+  /* "123456789" canonical CRC-32/MPEG-2 vector — must match the host
+   * software path's value verified in PR2. */
+  const uint8_t s[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+  TEST_ASSERT_EQUAL_UINT32(0x0376E6E7u, hal_crc_compute(s, sizeof(s)));
+}
+
 static const navtest_case_t crc_cases[] = {
     NAVTEST_CASE(test_crc_empty_returns_init),
     NAVTEST_CASE(test_crc_single_byte),
     NAVTEST_CASE(test_crc_known_vector),
     NAVTEST_CASE(test_crc_accumulate_matches_compute),
     NAVTEST_CASE(test_crc_reset_restores_init),
+    NAVTEST_CASE(test_hal_crc_init_rejects_null_config),
+    NAVTEST_CASE(test_hal_crc_compute_mpeg2_reference_vector),
 };
 
 const navtest_suite_t test_crc_suite = {

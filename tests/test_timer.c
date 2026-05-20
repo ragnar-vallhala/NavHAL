@@ -164,3 +164,25 @@ void test_timer_get_frequency_returns_correct_value(void) {
   uint32_t expected = timer_clk / (9 + 1) / (99 + 1);
   TEST_ASSERT_EQUAL_UINT32(expected, freq);
 }
+
+static const navtest_case_t timer_cases[] = {
+    NAVTEST_CASE(test_timer_init_sets_prescaler_and_arr),
+    NAVTEST_CASE(test_timer_start_sets_CEN_bit),
+    NAVTEST_CASE(test_timer_stop_clears_CEN_bit),
+    NAVTEST_CASE(test_timer_reset_clears_count),
+    NAVTEST_CASE(test_timer_set_compare_and_get_compare),
+    NAVTEST_CASE(test_timer_enable_and_disable_channel),
+    /* test_timer_enable_and_disable_interrupt — disabled: hangs UART */
+    NAVTEST_CASE(test_timer_clear_interrupt_flag_clears_UIF),
+    NAVTEST_CASE(test_timer_set_arr_and_get_arr),
+    NAVTEST_CASE(test_timer_get_count_returns_correct_value),
+    NAVTEST_CASE(test_systick_tick_increments),
+    NAVTEST_CASE(test_timer_get_frequency_returns_correct_value),
+};
+
+const navtest_suite_t test_timer_suite = {
+    .name = "TIMER",
+    .cases = timer_cases,
+    .count = sizeof(timer_cases) / sizeof(timer_cases[0]),
+    .between = NULL,
+};

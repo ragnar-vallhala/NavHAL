@@ -22,3 +22,14 @@ void test_spi_init_config(void) {
   TEST_ASSERT_TRUE(S1->CR1 & SPI_CR1_LSBFIRST);
   TEST_ASSERT_TRUE(S1->CR1 & SPI_CR1_MSTR);
 }
+
+static const navtest_case_t spi_cases[] = {
+    NAVTEST_CASE(test_spi_init_config),
+};
+
+const navtest_suite_t test_spi_suite = {
+    .name = "SPI",
+    .cases = spi_cases,
+    .count = sizeof(spi_cases) / sizeof(spi_cases[0]),
+    .between = NULL,
+};

@@ -124,7 +124,14 @@ if(NOT STANDALONE)
 add_subdirectory(${SRC_DIR})
 endif()
 
-if(SAMPLE AND NOT STANDALONE)
+# TEST mode is exclusive: it builds its own `tests` executable from a GLOB of
+# HAL sources (see the if(TEST) block below) and adds a `flash_tests` custom
+# target. Pulling in samples/ here would also register each sample's own
+# `flash` custom target (samples/*/CMakeLists.txt), conflicting with the test
+# build. So when -DTEST=ON, skip samples/ and src/core/ entirely.
+if(TEST)
+  message(STATUS "TEST=ON — skipping samples/ and src/core/ (test build is self-contained)")
+elseif(SAMPLE AND NOT STANDALONE)
   message(STATUS "Sample selected: ${SAMPLE} (with HAL)")
   message(STATUS  "Linker flag: ${CMAKE_EXE_LINKER_FLAGS}")
   # add_subdirectory(${SRC_BOARD})

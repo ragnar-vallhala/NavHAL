@@ -152,4 +152,28 @@ void test_dma_clear_flags_clears_isr(void) {
   TEST_ASSERT_TRUE(1);
 }
 
+static const navtest_case_t dma_cases[] = {
+    NAVTEST_CASE(test_dma_clock_enable_dma1),
+    NAVTEST_CASE(test_dma_clock_enable_dma2),
+    NAVTEST_CASE(test_dma_init_sets_channel),
+    NAVTEST_CASE(test_dma_init_sets_direction_m2p),
+    NAVTEST_CASE(test_dma_init_sets_direction_p2m),
+    NAVTEST_CASE(test_dma_init_sets_minc),
+    NAVTEST_CASE(test_dma_init_sets_priority),
+    NAVTEST_CASE(test_dma_init_sets_ndtr),
+    NAVTEST_CASE(test_dma_init_sets_peripheral_address),
+    NAVTEST_CASE(test_dma_init_sets_memory_address),
+    NAVTEST_CASE(test_dma_start_enables_stream),
+    NAVTEST_CASE(test_dma_stop_disables_stream),
+    NAVTEST_CASE(test_dma_transfer_complete_returns_zero_before_start),
+    NAVTEST_CASE(test_dma_clear_flags_clears_isr),
+};
+
+const navtest_suite_t test_dma_suite = {
+    .name = "DMA",
+    .cases = dma_cases,
+    .count = sizeof(dma_cases) / sizeof(dma_cases[0]),
+    .between = NULL,
+};
+
 #endif /* _DMA_ENABLED */

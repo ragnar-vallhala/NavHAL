@@ -21,3 +21,14 @@ void test_flash_storage_integration(void) {
     TEST_ASSERT_TRUE(data_in[i] == data_out[i]);
   }
 }
+
+static const navtest_case_t flash_cases[] = {
+    NAVTEST_CASE(test_flash_storage_integration),
+};
+
+const navtest_suite_t test_flash_suite = {
+    .name = "FLASH RELIABILITY",
+    .cases = flash_cases,
+    .count = sizeof(flash_cases) / sizeof(flash_cases[0]),
+    .between = NULL,
+};

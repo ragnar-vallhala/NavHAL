@@ -142,3 +142,23 @@ void test_hal_clock_get_apb2clk_returns_correct_value(void) {
   RCC->CFGR = saved; // restore bus prescalers before reporting
   TEST_ASSERT_EQUAL_UINT32(expected, result);
 }
+
+static const navtest_case_t clock_cases[] = {
+    NAVTEST_CASE(test_hal_clock_init_hsi),
+    NAVTEST_CASE(test_hal_clock_init_hse),
+    NAVTEST_CASE(test_hal_clock_init_pll),
+    NAVTEST_CASE(test_hal_clock_get_sysclk_returns_correct_value_hsi),
+    NAVTEST_CASE(test_hal_clock_get_sysclk_returns_correct_value_hse),
+    NAVTEST_CASE(test_hal_clock_get_sysclk_returns_correct_value_pll),
+    NAVTEST_CASE(test_hal_clock_get_ahbclk_returns_correct_value),
+    NAVTEST_CASE(test_hal_clock_get_apb1clk_returns_correct_value),
+    NAVTEST_CASE(test_hal_clock_get_apb2clk_returns_correct_value),
+};
+
+const navtest_suite_t test_clock_suite = {
+    .name = "CLOCK",
+    .cases = clock_cases,
+    .count = sizeof(clock_cases) / sizeof(clock_cases[0]),
+    /* Reconfiguring the clock corrupts the UART baud — flush after each. */
+    .between = wait_uart_empty,
+};

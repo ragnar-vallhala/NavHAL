@@ -47,3 +47,17 @@ void test_dwt_delay_cycles_elapses_time(void) {
 
   TEST_ASSERT_TRUE((end - start) >= delay);
 }
+
+static const navtest_case_t dwt_cases[] = {
+    NAVTEST_CASE(test_dwt_init_enables_counters),
+    NAVTEST_CASE(test_dwt_get_cycles_increments),
+    NAVTEST_CASE(test_dwt_reset_cycles_zeros_counter),
+    NAVTEST_CASE(test_dwt_delay_cycles_elapses_time),
+};
+
+const navtest_suite_t test_dwt_suite = {
+    .name = "DWT",
+    .cases = dwt_cases,
+    .count = sizeof(dwt_cases) / sizeof(dwt_cases[0]),
+    .between = NULL,
+};

@@ -21,3 +21,15 @@ void test_uart_baudrate_115200(void) {
   uint32_t expected_brr = (pclk + 57600) / 115200;
   TEST_ASSERT_EQUAL_UINT32(expected_brr, u6->BRR);
 }
+
+static const navtest_case_t uart_protocol_cases[] = {
+    NAVTEST_CASE(test_uart_baudrate_9600),
+    NAVTEST_CASE(test_uart_baudrate_115200),
+};
+
+const navtest_suite_t test_uart_protocol_suite = {
+    .name = "UART PROTOCOL",
+    .cases = uart_protocol_cases,
+    .count = sizeof(uart_protocol_cases) / sizeof(uart_protocol_cases[0]),
+    .between = NULL,
+};

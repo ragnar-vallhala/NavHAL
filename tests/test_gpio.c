@@ -46,3 +46,18 @@ void test_gpio_set_alternate_function(void) {
                                        ((4 * (GPIO_GET_PIN(TEST_PIN) % 8)))) &
                                           0xf);
 }
+
+static const navtest_case_t gpio_cases[] = {
+    NAVTEST_CASE(test_hal_gpio_setmode),
+    NAVTEST_CASE(test_hal_gpio_getmode),
+    NAVTEST_CASE(test_hal_gpio_digitalwrite_sets_pin_high),
+    NAVTEST_CASE(test_hal_gpio_digitalwrite_sets_pin_low),
+    NAVTEST_CASE(test_gpio_set_alternate_function),
+};
+
+const navtest_suite_t test_gpio_suite = {
+    .name = "GPIO",
+    .cases = gpio_cases,
+    .count = sizeof(gpio_cases) / sizeof(gpio_cases[0]),
+    .between = NULL,
+};

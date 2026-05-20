@@ -1,6 +1,7 @@
 #ifndef TEST_TIMER_H
 #define TEST_TIMER_H
 
+#include "navtest/navtest.h"
 #include <stdint.h>
 
 // -------------------- Timer Init --------------------
@@ -34,5 +35,7 @@ void test_systick_tick_increments(void);
 
 // -------------------- Frequency Calculation --------------------
 void test_timer_get_frequency_returns_correct_value(void);
+
+extern const navtest_suite_t test_timer_suite;
 
 #endif // TEST_TIMER_H

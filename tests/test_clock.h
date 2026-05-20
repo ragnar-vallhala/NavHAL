@@ -1,6 +1,7 @@
 #ifndef TEST_CLOCK_H
 #define TEST_CLOCK_H
 
+#include "navtest/navtest.h"
 #include <stdint.h>
 
 // -------------------- Clock Initialization --------------------
@@ -17,5 +18,7 @@ void test_hal_clock_get_sysclk_returns_correct_value_pll(void);
 void test_hal_clock_get_ahbclk_returns_correct_value(void);
 void test_hal_clock_get_apb1clk_returns_correct_value(void);
 void test_hal_clock_get_apb2clk_returns_correct_value(void);
+
+extern const navtest_suite_t test_clock_suite;
 
 #endif // TEST_CLOCK_H

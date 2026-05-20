@@ -37,3 +37,15 @@ void test_i2c_fast_mode_config(void) {
   TEST_ASSERT_EQUAL_UINT32(expected_ccr, I2C->CCR & I2C_CCR_CCR_MASK);
   TEST_ASSERT_TRUE(I2C->CCR & I2C_CCR_FS_MASK);
 }
+
+static const navtest_case_t i2c_cases[] = {
+    NAVTEST_CASE(test_i2c_init_config),
+    NAVTEST_CASE(test_i2c_fast_mode_config),
+};
+
+const navtest_suite_t test_i2c_suite = {
+    .name = "I2C",
+    .cases = i2c_cases,
+    .count = sizeof(i2c_cases) / sizeof(i2c_cases[0]),
+    .between = NULL,
+};

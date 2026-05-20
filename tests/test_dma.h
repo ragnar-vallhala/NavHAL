@@ -7,6 +7,7 @@
 #ifndef TEST_DMA_H
 #define TEST_DMA_H
 #include "common/hal_config.h"
+#include "navtest/navtest.h"
 #ifdef _DMA_ENABLED
 
 void test_dma_clock_enable_dma1(void);
@@ -24,6 +25,8 @@ void test_dma_start_enables_stream(void);
 void test_dma_stop_disables_stream(void);
 void test_dma_transfer_complete_returns_zero_before_start(void);
 void test_dma_clear_flags_clears_isr(void);
+
+extern const navtest_suite_t test_dma_suite;
 
 #endif /* _DMA_ENABLED */
 

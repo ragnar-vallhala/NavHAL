@@ -92,3 +92,18 @@ void test_hal_pwm_set_duty_cycle_updates_ccr(void) {
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate = 9600});
   TEST_ASSERT_EQUAL_UINT32(expected_ccr, timer_get_ccr(pwm.timer, pwm.channel));
 }
+
+static const navtest_case_t pwm_cases[] = {
+    NAVTEST_CASE(test_hal_pwm_init_apb1),
+    NAVTEST_CASE(test_hal_pwm_init_apb2),
+    NAVTEST_CASE(test_hal_pwm_start_sets_counter_enable),
+    NAVTEST_CASE(test_hal_pwm_stop_clears_counter_enable),
+    NAVTEST_CASE(test_hal_pwm_set_duty_cycle_updates_ccr),
+};
+
+const navtest_suite_t test_pwm_suite = {
+    .name = "PWM",
+    .cases = pwm_cases,
+    .count = sizeof(pwm_cases) / sizeof(pwm_cases[0]),
+    .between = NULL,
+};

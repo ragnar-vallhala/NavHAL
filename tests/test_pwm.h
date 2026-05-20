@@ -6,6 +6,7 @@
 #ifndef TEST_PWM_H
 #define TEST_PWM_H
 
+#include "navtest/navtest.h"
 #include <stdint.h>
 
 // -------------------- Prototypes --------------------
@@ -20,6 +21,8 @@ void test_hal_pwm_stop_clears_counter_enable(void);
 
 // PWM Duty Cycle
 void test_hal_pwm_set_duty_cycle_updates_ccr(void);
+
+extern const navtest_suite_t test_pwm_suite;
 
 #endif // TEST_PWM_H
 

@@ -18,6 +18,7 @@
 #define NAVTEST_H
 
 #include "core/cortex-m4/uart.h"
+#include <stddef.h>
 #include <stdint.h>
 
 /* -------------------------------------------------------------------------
@@ -134,6 +135,33 @@ static inline uint32_t navtest_get_test_count(void) { return _navtest.tests; }
     }                                                                          \
     tearDown();                                                                \
   } while (0)
+
+/* -------------------------------------------------------------------------
+ * Suite registry — replaces per-driver RUN_TEST boilerplate in main.c.
+ *
+ * Each driver test file declares a `const navtest_suite_t test_<x>_suite`
+ * pointing at its case table; `tests/main.c` walks an array of suite ptrs.
+ * ---------------------------------------------------------------------- */
+
+typedef void (*navtest_fn_t)(void);
+typedef void (*navtest_hook_t)(void);
+
+typedef struct {
+  navtest_fn_t fn;
+  const char *name;
+} navtest_case_t;
+
+typedef struct {
+  const char *name;
+  const navtest_case_t *cases;
+  size_t count;
+  navtest_hook_t between; /* optional: runs between cases; NULL for none */
+} navtest_suite_t;
+
+#define NAVTEST_CASE(f) {(f), #f}
+
+/** Run every case in @p suite, printing a banner + summary. Returns failures. */
+int navtest_run_suite(const navtest_suite_t *suite);
 
 /* -------------------------------------------------------------------------
  * Assertion macros

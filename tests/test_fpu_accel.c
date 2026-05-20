@@ -38,3 +38,15 @@ void test_fpu_benchmark_cycles(void) {
   TEST_ASSERT_TRUE(total_cycles < 50000);
   TEST_ASSERT_TRUE(total_cycles > 0);
 }
+
+static const navtest_case_t fpu_cases[] = {
+    NAVTEST_CASE(test_fpu_basic_arithmetic),
+    NAVTEST_CASE(test_fpu_benchmark_cycles),
+};
+
+const navtest_suite_t test_fpu_suite = {
+    .name = "FPU",
+    .cases = fpu_cases,
+    .count = sizeof(fpu_cases) / sizeof(fpu_cases[0]),
+    .between = NULL,
+};

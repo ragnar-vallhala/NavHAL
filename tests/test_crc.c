@@ -86,3 +86,18 @@ void test_crc_reset_restores_init(void) {
 
   TEST_ASSERT_EQUAL_UINT32(first, second);
 }
+
+static const navtest_case_t crc_cases[] = {
+    NAVTEST_CASE(test_crc_empty_returns_init),
+    NAVTEST_CASE(test_crc_single_byte),
+    NAVTEST_CASE(test_crc_known_vector),
+    NAVTEST_CASE(test_crc_accumulate_matches_compute),
+    NAVTEST_CASE(test_crc_reset_restores_init),
+};
+
+const navtest_suite_t test_crc_suite = {
+    .name = "CRC",
+    .cases = crc_cases,
+    .count = sizeof(crc_cases) / sizeof(crc_cases[0]),
+    .between = NULL,
+};

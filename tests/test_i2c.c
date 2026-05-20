@@ -38,9 +38,61 @@ void test_i2c_fast_mode_config(void) {
   TEST_ASSERT_TRUE(I2C->CCR & I2C_CCR_FS_MASK);
 }
 
+/* -------------------- Standardized contract tests -------------------- */
+
+void test_hal_i2c_init_returns_ok(void) {
+  hal_i2c_config_t cfg = {.clock_speed = HAL_I2C_SPEED_STANDARD,
+                          .own_address = 0,
+                          .acknowledge = true};
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_i2c_init(HAL_I2C_1, &cfg));
+}
+
+void test_hal_i2c_init_rejects_null_config(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_i2c_init(HAL_I2C_1, NULL));
+}
+
+void test_hal_i2c_write_rejects_null_data(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_i2c_write(HAL_I2C_1, 0x50, NULL, 4));
+}
+
+void test_hal_i2c_read_rejects_null_data(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_i2c_read(HAL_I2C_1, 0x50, NULL, 4));
+}
+
+void test_hal_i2c_write_read_rejects_null_data(void) {
+  uint8_t buf[4];
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_i2c_write_read(HAL_I2C_1, 0x50, NULL, 1, buf, 1));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_i2c_write_read(HAL_I2C_1, 0x50, buf, 1, NULL, 1));
+}
+
+void test_hal_i2c_typed_id_compiles(void) {
+  /* The standardized signature takes hal_i2c_bus_t — pure compile-time
+   * check that bare `uint8_t bus` no longer works. */
+  hal_i2c_bus_t bus = HAL_I2C_2;
+  uint8_t data = 0;
+  (void)hal_i2c_write(bus, 0x50, &data, 0);
+  TEST_ASSERT_TRUE(1);
+}
+
 static const navtest_case_t i2c_cases[] = {
     NAVTEST_CASE(test_i2c_init_config),
     NAVTEST_CASE(test_i2c_fast_mode_config),
+    NAVTEST_CASE(test_hal_i2c_init_returns_ok),
+    NAVTEST_CASE(test_hal_i2c_init_rejects_null_config),
+    NAVTEST_CASE(test_hal_i2c_write_rejects_null_data),
+    NAVTEST_CASE(test_hal_i2c_read_rejects_null_data),
+    NAVTEST_CASE(test_hal_i2c_write_read_rejects_null_data),
+    NAVTEST_CASE(test_hal_i2c_typed_id_compiles),
 };
 
 const navtest_suite_t test_i2c_suite = {

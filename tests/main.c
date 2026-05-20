@@ -17,12 +17,14 @@
 #include "test_interrupt.h"
 #include "test_pwm.h"
 #include "test_spi.h"
+#include "test_timebase.h"
 #include "test_timer.h"
 #include "test_uart_protocol.h"
 
 static const navtest_suite_t *const all_suites[] = {
     &test_gpio_suite,
     &test_interrupt_suite,
+    &test_timebase_suite,
     &test_timer_suite,
     &test_clock_suite,
     &test_pwm_suite,

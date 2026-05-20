@@ -140,13 +140,6 @@ void test_timer_get_count_returns_correct_value(void) {
 }
 
 // -------------------- Tick Tests --------------------
-void test_systick_tick_increments(void) {
-  uint32_t tick_before = hal_timebase_get_tick();
-  SysTick_Handler(); // manually call
-  uint32_t tick_after = hal_timebase_get_tick();
-  TEST_ASSERT_EQUAL_UINT32(tick_before + 1, tick_after);
-}
-
 // -------------------- Frequency Calculation --------------------
 void test_timer_get_frequency_returns_correct_value(void) {
   TIMx_Reg_Typedef *timer = GET_TIMx_BASE(TEST_TIMER);
@@ -165,6 +158,48 @@ void test_timer_get_frequency_returns_correct_value(void) {
   TEST_ASSERT_EQUAL_UINT32(expected, freq);
 }
 
+/* -------------------- Additional standardized-API coverage -------------------- */
+
+void test_hal_timer_init_rejects_null_config(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_timer_init(TEST_TIMER, NULL));
+}
+
+void test_hal_timer_init_freq_returns_ok(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_timer_init_freq(TEST_TIMER, 1000));
+}
+
+void test_hal_timer_set_prescaler_round_trip(void) {
+  hal_timer_config_t cfg = {.prescaler = TEST_PSC, .auto_reload = TEST_ARR};
+  hal_timer_init(TEST_TIMER, &cfg);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_timer_set_prescaler(TEST_TIMER, 42));
+  TIMx_Reg_Typedef *t = GET_TIMx_BASE(TEST_TIMER);
+  TEST_ASSERT_EQUAL_UINT32(42u, t->PSC & 0xFFFFu);
+}
+
+void test_hal_timer_set_get_auto_reload(void) {
+  hal_timer_config_t cfg = {.prescaler = TEST_PSC, .auto_reload = TEST_ARR};
+  hal_timer_init(TEST_TIMER, &cfg);
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_timer_set_auto_reload(TEST_TIMER, 1234));
+  TEST_ASSERT_EQUAL_UINT32(1234u,
+                           hal_timer_get_auto_reload(TEST_TIMER));
+}
+
+static volatile uint32_t s_timer_cb_hits = 0;
+static void timer_test_cb(void) { s_timer_cb_hits++; }
+
+void test_hal_timer_attach_then_detach_callback(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_timer_attach_callback(TEST_TIMER, timer_test_cb));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK, (uint32_t)hal_timer_detach_callback(TEST_TIMER));
+}
+
 static const navtest_case_t timer_cases[] = {
     NAVTEST_CASE(test_timer_init_sets_prescaler_and_arr),
     NAVTEST_CASE(test_timer_start_sets_CEN_bit),
@@ -176,8 +211,13 @@ static const navtest_case_t timer_cases[] = {
     NAVTEST_CASE(test_timer_clear_interrupt_flag_clears_UIF),
     NAVTEST_CASE(test_timer_set_arr_and_get_arr),
     NAVTEST_CASE(test_timer_get_count_returns_correct_value),
-    NAVTEST_CASE(test_systick_tick_increments),
     NAVTEST_CASE(test_timer_get_frequency_returns_correct_value),
+    /* extra coverage */
+    NAVTEST_CASE(test_hal_timer_init_rejects_null_config),
+    NAVTEST_CASE(test_hal_timer_init_freq_returns_ok),
+    NAVTEST_CASE(test_hal_timer_set_prescaler_round_trip),
+    NAVTEST_CASE(test_hal_timer_set_get_auto_reload),
+    NAVTEST_CASE(test_hal_timer_attach_then_detach_callback),
 };
 
 const navtest_suite_t test_timer_suite = {

@@ -14,6 +14,7 @@
 #include "test_fpu_accel.h"
 #include "test_gpio.h"
 #include "test_i2c.h"
+#include "test_interrupt.h"
 #include "test_pwm.h"
 #include "test_spi.h"
 #include "test_timer.h"
@@ -21,6 +22,7 @@
 
 static const navtest_suite_t *const all_suites[] = {
     &test_gpio_suite,
+    &test_interrupt_suite,
     &test_timer_suite,
     &test_clock_suite,
     &test_pwm_suite,

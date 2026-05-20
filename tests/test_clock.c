@@ -143,6 +143,33 @@ void test_hal_clock_get_apb2clk_returns_correct_value(void) {
   TEST_ASSERT_EQUAL_UINT32(expected, result);
 }
 
+/* -------------------- Status-return contract -------------------- */
+
+void test_hal_clock_init_returns_ok_for_hsi(void) {
+  hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI,
+                            .hpre_div = RCC_CFGR_HPRE_DIV1,
+                            .ppre1_div = RCC_CFGR_PPRE_DIV1,
+                            .ppre2_div = RCC_CFGR_PPRE_DIV1};
+  wait_uart_empty();
+  hal_status_t s = hal_clock_init(&cfg, NULL);
+  uart2_init(9600);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)s);
+}
+
+void test_hal_clock_init_rejects_null_cfg(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_clock_init(NULL, NULL));
+}
+
+void test_hal_clock_init_pll_rejects_null_pll_cfg(void) {
+  hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_PLL,
+                            .hpre_div = RCC_CFGR_HPRE_DIV1,
+                            .ppre1_div = RCC_CFGR_PPRE_DIV1,
+                            .ppre2_div = RCC_CFGR_PPRE_DIV1};
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_clock_init(&cfg, NULL));
+}
+
 static const navtest_case_t clock_cases[] = {
     NAVTEST_CASE(test_hal_clock_init_hsi),
     NAVTEST_CASE(test_hal_clock_init_hse),
@@ -153,6 +180,10 @@ static const navtest_case_t clock_cases[] = {
     NAVTEST_CASE(test_hal_clock_get_ahbclk_returns_correct_value),
     NAVTEST_CASE(test_hal_clock_get_apb1clk_returns_correct_value),
     NAVTEST_CASE(test_hal_clock_get_apb2clk_returns_correct_value),
+    /* status-return contract — success + error paths */
+    NAVTEST_CASE(test_hal_clock_init_returns_ok_for_hsi),
+    NAVTEST_CASE(test_hal_clock_init_rejects_null_cfg),
+    NAVTEST_CASE(test_hal_clock_init_pll_rejects_null_pll_cfg),
 };
 
 const navtest_suite_t test_clock_suite = {

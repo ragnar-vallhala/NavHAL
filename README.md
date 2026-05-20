@@ -82,6 +82,14 @@ cmake --build . --target doc
 
 Documentation will be available in `docs/html`.
 
+Other docs in this repository:
+
+- [`docs/api_standardization.md`](docs/api_standardization.md) — the v1 public-API contract.
+- [`docs/execution_plan.md`](docs/execution_plan.md) — milestone breakdown (M0 → M6, AVR port).
+- [`docs/m2_plus_plan.md`](docs/m2_plus_plan.md) — M2+ test-suite execution plan.
+- [`docs/testing.md`](docs/testing.md) — how to build and run the test suites
+  (host subset, on-target, Renode-in-CI), and how to add tests for a new driver.
+
 ---
 
 ## Project Structure

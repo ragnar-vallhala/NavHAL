@@ -1,0 +1,30 @@
+:name: NavHAL F401RE test runner
+:description: Boots a Renode STM32F4 machine model, loads the navtest ELF,
+:             routes USART2 to a log file, and runs the suite to completion.
+:
+:             Variables:
+:               $bin     — absolute path to the test ELF (set with `--variable bin=...`)
+:               $logfile — absolute path for the captured UART log
+:                          (set with `--variable logfile=...`)
+
+using sysbus
+
+# The Nucleo-F401RE shares its silicon family with the STM32F4 Discovery
+# board; Renode ships a mainline `stm32f4_discovery` platform model that
+# exposes the same USART2/GPIO/timer set used by the navtest binary.
+mach create "navhal"
+machine LoadPlatformDescription @platforms/boards/stm32f4_discovery.repl
+
+# Send USART2 traffic to the log file; CI greps the file for the navtest
+# summary. `flushAfterWrite` keeps the log usable even if the emulation
+# is killed mid-run.
+sysbus.usart2 CreateFileBackend $logfile true
+
+sysbus LoadELF $bin
+
+# 30 s of emulated time is enough for the full suite at the current size
+# (~70 tests). Bumps go here when the suite grows.
+start
+emulation RunFor "30"
+pause
+quit

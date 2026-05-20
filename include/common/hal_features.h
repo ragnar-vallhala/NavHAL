@@ -54,12 +54,16 @@
 #endif
 
 /** @brief 1 if a cycle counter (Cortex DWT, or equivalent) is available. */
-#ifndef NAVHAL_HAS_CYCLE_COUNTER
+#if defined(_DWT_ENABLED)
+#define NAVHAL_HAS_CYCLE_COUNTER 1
+#elif !defined(NAVHAL_HAS_CYCLE_COUNTER)
 #define NAVHAL_HAS_CYCLE_COUNTER 0
 #endif
 
 /** @brief 1 if an SDIO / SD-card peripheral is available. */
-#ifndef NAVHAL_HAS_SDIO
+#if defined(_SDIO_ENABLED)
+#define NAVHAL_HAS_SDIO 1
+#elif !defined(NAVHAL_HAS_SDIO)
 #define NAVHAL_HAS_SDIO 0
 #endif
 

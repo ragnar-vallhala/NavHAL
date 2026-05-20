@@ -1,7 +1,12 @@
+#define CORTEX_M4
 #include "test_fpu_accel.h"
-#include "core/cortex-m4/dwt.h"
+#include "common/hal_features.h"
 #include "navtest/navtest.h"
 #include <stdint.h>
+
+#if NAVHAL_HAS_FPU
+#include "core/cortex-m4/dwt.h"
+#include "core/cortex-m4/fpu.h"
 
 static volatile float f1 = 1.23456f;
 static volatile float f2 = 2.34567f;
@@ -39,9 +44,14 @@ void test_fpu_benchmark_cycles(void) {
   TEST_ASSERT_TRUE(total_cycles > 0);
 }
 
+void test_hal_fpu_enable_returns_ok(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_fpu_enable());
+}
+
 static const navtest_case_t fpu_cases[] = {
     NAVTEST_CASE(test_fpu_basic_arithmetic),
     NAVTEST_CASE(test_fpu_benchmark_cycles),
+    NAVTEST_CASE(test_hal_fpu_enable_returns_ok),
 };
 
 const navtest_suite_t test_fpu_suite = {
@@ -50,3 +60,5 @@ const navtest_suite_t test_fpu_suite = {
     .count = sizeof(fpu_cases) / sizeof(fpu_cases[0]),
     .between = NULL,
 };
+
+#endif /* NAVHAL_HAS_FPU */

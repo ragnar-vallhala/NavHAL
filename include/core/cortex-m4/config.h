@@ -16,4 +16,13 @@
 #ifndef _CRC_HW_ENABLED
 #define _CRC_HW_ENABLED
 #endif
+
+#ifndef _DWT_ENABLED
+#define _DWT_ENABLED
+#endif
+
+#ifndef _SDIO_ENABLED
+#define _SDIO_ENABLED
+#endif
+
 #endif // CORTEX_M4_CONFIG_H

@@ -6,7 +6,8 @@
 #define CORTEX_M4
 #include "common/hal_config.h"
 
-#ifdef _DMA_ENABLED
+#include "common/hal_features.h"
+#if NAVHAL_HAS_DMA
 
 #include "core/cortex-m4/dma.h"
 #include "core/cortex-m4/rcc_reg.h"
@@ -152,6 +153,23 @@ void test_dma_clear_flags_clears_isr(void) {
   TEST_ASSERT_TRUE(1);
 }
 
+/* -------------------- Standardized contract -------------------- */
+
+void test_hal_dma_init_rejects_null_config(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_dma_init(NULL));
+}
+
+void test_hal_dma_start_rejects_null_config(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_dma_start(NULL));
+}
+
+void test_hal_dma_stop_rejects_null_config(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_dma_stop(NULL));
+}
+
 static const navtest_case_t dma_cases[] = {
     NAVTEST_CASE(test_dma_clock_enable_dma1),
     NAVTEST_CASE(test_dma_clock_enable_dma2),
@@ -167,6 +185,10 @@ static const navtest_case_t dma_cases[] = {
     NAVTEST_CASE(test_dma_stop_disables_stream),
     NAVTEST_CASE(test_dma_transfer_complete_returns_zero_before_start),
     NAVTEST_CASE(test_dma_clear_flags_clears_isr),
+    /* standardized contract */
+    NAVTEST_CASE(test_hal_dma_init_rejects_null_config),
+    NAVTEST_CASE(test_hal_dma_start_rejects_null_config),
+    NAVTEST_CASE(test_hal_dma_stop_rejects_null_config),
 };
 
 const navtest_suite_t test_dma_suite = {
@@ -176,4 +198,4 @@ const navtest_suite_t test_dma_suite = {
     .between = NULL,
 };
 
-#endif /* _DMA_ENABLED */
+#endif /* NAVHAL_HAS_DMA */

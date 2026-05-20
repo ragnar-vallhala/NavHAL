@@ -1,8 +1,12 @@
+#define CORTEX_M4
 #include "test_dwt.h"
-#include "core/cortex-m4/dwt.h"
-#include "core/cortex-m4/dwt_reg.h"
+#include "common/hal_features.h"
 #include "navtest/navtest.h"
 #include <stdint.h>
+
+#if NAVHAL_HAS_CYCLE_COUNTER
+#include "core/cortex-m4/dwt.h"
+#include "core/cortex-m4/dwt_reg.h"
 
 void test_dwt_init_enables_counters(void) {
   hal_cycle_counter_init();
@@ -48,16 +52,33 @@ void test_dwt_delay_cycles_elapses_time(void) {
   TEST_ASSERT_TRUE((end - start) >= delay);
 }
 
+/* -------------------- Standardized contract -------------------- */
+
+void test_hal_cycle_counter_init_returns_ok(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_cycle_counter_init());
+}
+
+void test_hal_cycle_counter_reset_returns_ok(void) {
+  hal_cycle_counter_init();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_cycle_counter_reset());
+}
+
 static const navtest_case_t dwt_cases[] = {
     NAVTEST_CASE(test_dwt_init_enables_counters),
     NAVTEST_CASE(test_dwt_get_cycles_increments),
     NAVTEST_CASE(test_dwt_reset_cycles_zeros_counter),
     NAVTEST_CASE(test_dwt_delay_cycles_elapses_time),
+    NAVTEST_CASE(test_hal_cycle_counter_init_returns_ok),
+    NAVTEST_CASE(test_hal_cycle_counter_reset_returns_ok),
 };
 
 const navtest_suite_t test_dwt_suite = {
-    .name = "DWT",
+    .name = "CYCLE_COUNTER",
     .cases = dwt_cases,
     .count = sizeof(dwt_cases) / sizeof(dwt_cases[0]),
     .between = NULL,
 };
+
+#endif /* NAVHAL_HAS_CYCLE_COUNTER */

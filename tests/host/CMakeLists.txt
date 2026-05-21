@@ -44,7 +44,7 @@ add_executable(tests_host
 
   # source under test — pure-logic only (no register access)
   ${NAVHAL_ROOT}/src/utils/conversion.c
-  ${NAVHAL_ROOT}/src/core/cortex-m4/crc/crc.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/crc/crc.c
 )
 
 enable_testing()

@@ -2,7 +2,7 @@
  * @file tests/host/test_crc_sw.c
  * @brief Host-runnable tests for the software CRC-32/MPEG-2 path.
  *
- * The driver under src/core/cortex-m4/crc/crc.c provides a hardware path
+ * The driver under src/vendor/stm32/crc/crc.c provides a hardware path
  * (when _CRC_HW_ENABLED is defined) and a software lookup-table path
  * otherwise. The host build does not define _CRC_HW_ENABLED, so the same
  * source compiles down to the pure-C software implementation — exercised

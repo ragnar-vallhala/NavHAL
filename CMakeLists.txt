@@ -71,7 +71,7 @@ message(STATUS "Building for processor: ${CMAKE_SYSTEM_PROCESSOR}")
 # Paths
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(SRC_BOARD ${CMAKE_CURRENT_SOURCE_DIR}/src/board/${BOARD})
-set(SRC_CORE ${CMAKE_CURRENT_SOURCE_DIR}/src/core)
+set(SRC_ARCH ${CMAKE_CURRENT_SOURCE_DIR}/src/arch/armv7e-m)
 set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
 set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
 # FPU Configuration
@@ -129,14 +129,14 @@ endif()
 # HAL sources (see the if(TEST) block below) and adds a `flash_tests` custom
 # target. Pulling in samples/ here would also register each sample's own
 # `flash` custom target (samples/*/CMakeLists.txt), conflicting with the test
-# build. So when -DTEST=ON, skip samples/ and src/core/ entirely.
+# build. So when -DTEST=ON, skip samples/ and src/vendor/ entirely.
 if(TEST)
-  message(STATUS "TEST=ON — skipping samples/ and src/core/ (test build is self-contained)")
+  message(STATUS "TEST=ON — skipping samples/ and src/vendor/ (test build is self-contained)")
 elseif(SAMPLE AND NOT STANDALONE)
   message(STATUS "Sample selected: ${SAMPLE} (with HAL)")
   message(STATUS  "Linker flag: ${CMAKE_EXE_LINKER_FLAGS}")
   # add_subdirectory(${SRC_BOARD})
-  add_subdirectory(${SRC_CORE})
+  add_subdirectory(${SRC_VENDOR})
   # add_subdirectory(${SRC_VENDOR})
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/samples)
   # Sources
@@ -147,7 +147,7 @@ elseif(SAMPLE AND STANDALONE)
 else()
   message(STATUS "No SAMPLE defined. Building HAL only.")
   # add_subdirectory(${SRC_BOARD})
-  add_subdirectory(${SRC_CORE})
+  add_subdirectory(${SRC_VENDOR})
   # add_subdirectory(${SRC_VENDOR})
 endif()
 
@@ -195,8 +195,8 @@ if(TEST)
   )
   file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
   file(GLOB_RECURSE HAL_SRC
-    ${SRC_CORE}/*.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/arch/armv7e-m/*.c
+    ${SRC_VENDOR}/*.c
+    ${SRC_ARCH}/*.c
   )
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)

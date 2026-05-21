@@ -1,12 +1,8 @@
-# Use target-based include to ensure NavHAL headers are prioritized even when built as submodule
-#
-# This file still hosts the *vendor* IP drivers (gpio, uart, timer, …). The
-# ARMv7E-M arch sources (interrupt/NVIC, fpu, dwt, startup.s, the SysTick-
-# backed timebase) moved to src/arch/armv7e-m/ in M3 PR2; they are aggregated
-# here so the existing `hal` library target stays the single link point until
-# M4 reworks the build into per-layer libraries.
-
-set(SRC_ARCH ${CMAKE_CURRENT_SOURCE_DIR}/../../arch/armv7e-m)
+# STM32 vendor IP drivers (gpio, uart, timer, …). Arch sources (interrupt/
+# NVIC, fpu, dwt, startup.s, SysTick-backed timebase) live under
+# src/arch/armv7e-m/ and are pulled in via the SRC_ARCH path that the root
+# CMakeLists.txt sets. Everything is aggregated into one `hal` library
+# target until M4 reworks the build into per-layer libraries.
 
 set(HAL_SOURCES)
 

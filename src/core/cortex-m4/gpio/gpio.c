@@ -70,9 +70,10 @@ hal_status_t hal_gpio_set_output_type(hal_gpio_pin_t pin,
 
 hal_status_t hal_gpio_set_output_speed(hal_gpio_pin_t pin,
                                        hal_gpio_output_speed_t speed) {
-  GPIO_GET_PORT(pin)->OSPEEDR &= ~(0x3U << GPIO_GET_PIN(pin));
-  GPIO_GET_PORT(pin)->OSPEEDR |=
-      (((uint32_t)speed & 0x3U) << GPIO_GET_PIN(pin));
+  /* OSPEEDR is 2 bits per pin (M4 RM0383 §8.4.3); the shift must scale. */
+  uint32_t shift = GPIO_GET_PIN(pin) * 2;
+  GPIO_GET_PORT(pin)->OSPEEDR &= ~(0x3U << shift);
+  GPIO_GET_PORT(pin)->OSPEEDR |= (((uint32_t)speed & 0x3U) << shift);
   return HAL_OK;
 }
 

@@ -1,4 +1,12 @@
 # Use target-based include to ensure NavHAL headers are prioritized even when built as submodule
+#
+# This file still hosts the *vendor* IP drivers (gpio, uart, timer, …). The
+# ARMv7E-M arch sources (interrupt/NVIC, fpu, dwt, startup.s, the SysTick-
+# backed timebase) moved to src/arch/armv7e-m/ in M3 PR2; they are aggregated
+# here so the existing `hal` library target stays the single link point until
+# M4 reworks the build into per-layer libraries.
+
+set(SRC_ARCH ${CMAKE_CURRENT_SOURCE_DIR}/../../arch/armv7e-m)
 
 set(HAL_SOURCES)
 
@@ -12,14 +20,17 @@ if(CONFIG_DRV_UART)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
 endif()
 if(CONFIG_DRV_TIMER)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/timer/timer.c)
+    list(APPEND HAL_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/timer/timer.c
+        ${SRC_ARCH}/timebase/timebase.c
+    )
 endif()
 
-# Always include startup assembly code
-list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/startup/startup.s)
+# Startup is arch-layer code; always linked in.
+list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)
 
 if(CONFIG_DRV_INTERRUPT)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/interrupt/interrupt.c)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/interrupt/interrupt.c)
 endif()
 if(CONFIG_DRV_PWM)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/pwm/pwm.c)
@@ -37,7 +48,7 @@ if(CONFIG_DRV_DMA)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/dma/dma.c)
 endif()
 if(CONFIG_DRV_FPU)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/fpu/fpu.c)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/fpu/fpu.c)
 endif()
 if(CONFIG_DRV_CRC)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/crc/crc.c)
@@ -47,7 +58,7 @@ if(CONFIG_DRV_SDIO)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/sdio/diskio.c)
 endif()
 if(CONFIG_DRV_DWT)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/dwt/dwt.c)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/dwt/dwt.c)
 endif()
 
 add_library(hal STATIC

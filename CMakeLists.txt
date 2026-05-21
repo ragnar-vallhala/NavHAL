@@ -180,8 +180,8 @@ add_custom_target(copy_compile_commands ALL
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-# Define startup file path
-set(STARTUP_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/core/${CMAKE_SYSTEM_PROCESSOR}/startup/startup.s")
+# Define startup file path (arch layer; ARMv7E-M = Cortex-M3/M4/M7).
+set(STARTUP_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/arch/armv7e-m/startup/startup.s")
 # Export path to parent project if included via add_subdirectory()
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(STARTUP_FILE "${STARTUP_FILE}" PARENT_SCOPE)
@@ -194,7 +194,10 @@ if(TEST)
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/stm32/family/stm32f4/include
   )
   file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
-  file(GLOB_RECURSE HAL_SRC ${SRC_CORE}/*.c )
+  file(GLOB_RECURSE HAL_SRC
+    ${SRC_CORE}/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/arch/armv7e-m/*.c
+  )
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
   add_executable(tests ${TEST_SRC} ${STARTUP_FILE})

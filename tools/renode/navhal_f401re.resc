@@ -57,9 +57,12 @@ sysbus LoadELF $bin
 # suite consumes ~90 minutes wall-clock on this rig; 3 emulated hours is
 # a comfortable cap that finishes well inside that.
 #
-# Renode exits as soon as emulation completes; the wrapper greps the
-# captured UART log for the navtest summary, so a too-large budget only
-# burns wall-clock time on an actual hang, never on success.
+# This RunFor is the *hang backstop*, not the success-path exit. The
+# firmware enters an idle loop after the last test, so it never naturally
+# stops — and `RunFor` would otherwise keep emulating those NOPs for the
+# full 3 emulated hours. tools/renode/run_tests.sh watches the UART log
+# and SIGTERMs Renode the moment "Total failures:" appears, so the budget
+# only matters when the suite genuinely hangs.
 #
 # `emulation RunFor` starts emulation itself — do NOT pair it with a
 # separate `start` line (Renode 1.16 errors with "This action is not

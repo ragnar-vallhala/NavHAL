@@ -28,6 +28,7 @@ hal_sdio_perf
 hal_uart_dma_bridge
 hal_spi_esp_bridge
 hal_dwt
+hal_blink_cpp
 )
 set(SAMPLE_DIRS
 00_test_sample
@@ -59,6 +60,7 @@ set(SAMPLE_DIRS
 24_hal_uart_dma_bridge
 25_hal_spi_esp_bridge
 26_hal_dwt
+27_hal_blink_cpp
 )
 
 # Check if sample is defined

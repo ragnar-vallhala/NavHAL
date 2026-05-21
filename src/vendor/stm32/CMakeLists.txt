@@ -66,6 +66,7 @@ target_link_libraries(hal gcc)
 target_include_directories(hal PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../src/vendor/stm32/family/stm32f4/include
+    ${SRC_BOARD}
     ${CMAKE_BINARY_DIR}
 )
 

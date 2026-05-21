@@ -192,6 +192,7 @@ if(TEST)
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/stm32/family/stm32f4/include
+    ${SRC_BOARD}
   )
   file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
   file(GLOB_RECURSE HAL_SRC

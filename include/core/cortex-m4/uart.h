@@ -22,6 +22,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief UART peripheral instance identifier.
  */
@@ -157,4 +161,8 @@ hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 /* Deprecated pre-standardization UART names — removed in M5. */
 #include "compat/uart_compat.h"
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_UART_H

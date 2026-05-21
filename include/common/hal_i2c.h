@@ -16,8 +16,16 @@
 #ifndef HAL_I2C_H
 #define HAL_I2C_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef CORTEX_M4
 #include "core/cortex-m4/i2c.h" /**< Include Cortex-M4 specific I2C driver. */
 #endif
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !HAL_I2C_H

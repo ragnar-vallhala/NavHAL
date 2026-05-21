@@ -27,6 +27,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Direct DWT/SCS register pointers — independent of the cycle-counter
  * driver, so the probe still compiles when NAVHAL_HAS_CYCLE_COUNTER is
  * off (the cap-disabled CI build). */
@@ -72,5 +76,9 @@ static inline bool navtest_in_pil(void) {
       return;                                                                  \
     }                                                                          \
   } while (0)
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* NAVTEST_PIL_H */

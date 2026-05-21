@@ -20,6 +20,10 @@
 #include "common/hal_status.h"
 #include "utils/clock_types.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief PLL (Phase Locked Loop) configuration structure.
  *
@@ -77,4 +81,8 @@ uint32_t hal_clock_get_apb1clk(void);
  */
 uint32_t hal_clock_get_apb2clk(void);
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_CLOCK_H

@@ -12,6 +12,10 @@
 #include "common/hal_types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 typedef struct {
   __IO uint32_t SR;  /*!< 0x00: Status Register
                       *  Contains flags like TXE, RXNE, TC, etc.
@@ -77,4 +81,8 @@ typedef struct {
 #define USART_CR3_DMAR (1 << 6) ///< DMA enable for receiver
 #endif                          /* _DMA_ENABLED */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_UART_REG_H

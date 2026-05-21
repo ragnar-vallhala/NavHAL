@@ -23,6 +23,10 @@
  
  #include <stdint.h>
  
+
+#ifdef __cplusplus
+extern "C" {
+#endif
  /**
   * @brief Convert a string to a 32-bit signed integer
   *
@@ -45,4 +49,8 @@
   */
  float str_to_float(const char *s);
  
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
  #endif // CONVERSION_H

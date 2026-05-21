@@ -4,6 +4,10 @@
 #include "navtest/navtest.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 // -------------------- Timer Init --------------------
 void test_timer_init_sets_prescaler_and_arr(void);
 
@@ -42,4 +46,8 @@ void test_hal_timer_attach_then_detach_callback(void);
 
 extern const navtest_suite_t test_timer_suite;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TEST_TIMER_H

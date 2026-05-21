@@ -17,6 +17,10 @@
 #include "core/cortex-m4/rcc_reg.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Enumeration of possible system clock sources.
  */
@@ -39,4 +43,8 @@ typedef struct {
   rcc_cfgr_ppre_div_t ppre2_div;
 } hal_clock_config_t;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CLOCK_TYPES_H

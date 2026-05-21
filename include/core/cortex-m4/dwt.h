@@ -18,6 +18,10 @@
 #include "common/hal_status.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize and start the cycle counter.
  * @return ::HAL_OK.
@@ -45,4 +49,8 @@ void hal_cycle_counter_delay(uint32_t cycles);
 /* Deprecated pre-standardization DWT names — removed in M5. */
 #include "compat/dwt_compat.h"
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_DWT_H

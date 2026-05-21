@@ -14,8 +14,16 @@
 #ifndef HAL_DWT_H
 #define HAL_DWT_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef CORTEX_M4
 #include "core/cortex-m4/dwt.h" /**< Include Cortex-M4 specific DWT driver. */
 #endif                          // CORTEX_M4
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // HAL_DWT_H

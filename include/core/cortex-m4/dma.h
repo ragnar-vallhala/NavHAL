@@ -32,6 +32,10 @@
 #ifndef CORTEX_M4_DMA_H
 #define CORTEX_M4_DMA_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef _DMA_ENABLED
 
 #include "common/hal_status.h"
@@ -181,4 +185,8 @@ typedef hal_dma_config_t dma_config_t NAVHAL_DEPRECATED("use hal_dma_config_t");
 
 #endif /* _DMA_ENABLED */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* CORTEX_M4_DMA_H */

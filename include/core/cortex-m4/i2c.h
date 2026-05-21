@@ -20,6 +20,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Supported I²C bus instances.
  */
@@ -137,4 +141,8 @@ typedef hal_status_t hal_i2c_status_t NAVHAL_DEPRECATED("use hal_status_t");
 #define HAL_I2C_ERR_NACK HAL_ERR_IO             /**< @deprecated HAL_ERR_IO */
 #define HAL_I2C_ERR_REINIT HAL_ERR_NOT_INITIALIZED /**< @deprecated HAL_ERR_NOT_INITIALIZED */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_I2C_H

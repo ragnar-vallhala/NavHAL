@@ -16,6 +16,10 @@
 #include "common/hal_types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief SPI peripheral register map.
  */
@@ -64,4 +68,8 @@ typedef struct {
 #define SPI_SR_TXE (1U << 1)
 #define SPI_SR_BSY (1U << 7)
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_SPI_REG_H

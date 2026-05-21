@@ -4,6 +4,10 @@
 #include "navtest/navtest.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 // -------------------- Clock Initialization --------------------
 void test_hal_clock_init_hsi(void);
 void test_hal_clock_init_hse(void);
@@ -26,4 +30,8 @@ void test_hal_clock_init_pll_rejects_null_pll_cfg(void);
 
 extern const navtest_suite_t test_clock_suite;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TEST_CLOCK_H

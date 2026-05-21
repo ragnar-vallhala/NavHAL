@@ -18,6 +18,10 @@
 #ifndef HAL_STATUS_H
 #define HAL_STATUS_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Standard return type for all fallible NavHAL functions.
  *
@@ -66,4 +70,8 @@ typedef enum {
 #define SUCCESS HAL_OK  /**< @deprecated Use HAL_OK. */
 #define FAILURE HAL_ERR /**< @deprecated Use HAL_ERR. */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* HAL_STATUS_H */

@@ -11,6 +11,10 @@
 
 #include "navtest/navtest.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* baud-rate / init tests */
 void test_uart_baudrate_9600(void);
 void test_uart_baudrate_115200(void);
@@ -31,4 +35,8 @@ void test_hal_uart_available_after_init_is_false(void);
 
 extern const navtest_suite_t test_uart_protocol_suite;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TEST_UART_PROTOCOL_H

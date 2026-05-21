@@ -18,4 +18,12 @@
 #include "timer_types.h" /**< Timer-specific type definitions */
 #include <stdbool.h>     /**< Standard boolean types */
 #include <stdint.h>      /**< Standard fixed-width integer types */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TYPES_H

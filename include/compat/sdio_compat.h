@@ -18,6 +18,10 @@
 #include "common/navhal_compiler.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @deprecated Use hal_sdio_set_callback(). */
 NAVHAL_DEPRECATED("use hal_sdio_set_callback")
 static inline void sdio_set_callback(hal_sdio_callback_t callback) {
@@ -112,4 +116,8 @@ sdio_write_blocks_async(uint32_t addr, const uint8_t *buffer, uint32_t count) {
 }
 #endif /* _DMA_ENABLED */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_SDIO_COMPAT_H */

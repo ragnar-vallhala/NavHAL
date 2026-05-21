@@ -20,6 +20,10 @@
 #include "common/hal_types.h" /**< For __IO macro */
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief NVIC register map.
  *
@@ -155,4 +159,8 @@ typedef enum {
     FPU_IRQn = 81               /*!< Floating Point Unit Interrupt */
 } IRQn_Type;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_INTERRUPT_REG_H

@@ -21,6 +21,10 @@
 #include "core/cortex-m4/interrupt_reg.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @deprecated Use hal_interrupt_enable(). */
 NAVHAL_DEPRECATED("use hal_interrupt_enable")
 static inline hal_status_t hal_enable_interrupt(IRQn_Type irq) {
@@ -82,4 +86,8 @@ static inline void hal_clear_all_pending_interrupts(void) {
   hal_interrupt_clear_all_pending();
 }
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_INTERRUPT_COMPAT_H */

@@ -19,6 +19,10 @@
 #include "utils/timer_types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief PWM handle binding a hardware timer and channel.
  */
@@ -70,4 +74,8 @@ hal_status_t hal_pwm_set_frequency(hal_pwm_handle_t *pwm, uint32_t frequency);
 /* Deprecated pre-standardization PWM handle type — removed in M5. */
 typedef hal_pwm_handle_t PWM_Handle NAVHAL_DEPRECATED("use hal_pwm_handle_t");
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_PWM_H

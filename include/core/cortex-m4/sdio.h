@@ -21,6 +21,10 @@
 #define SDIO_CMD_WAITPEND (1 << 9)
 #define SDIO_CMD_CPSMEN (1 << 10)
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* --- SD Commands --- */
 #define SD_CMD_GO_IDLE_STATE 0
 #define SD_CMD_ALL_SEND_CID 2
@@ -160,4 +164,8 @@ uint32_t hal_sdio_get_sector_count(void);
 /* Deprecated pre-standardization SDIO names — removed in M5. */
 #include "compat/sdio_compat.h"
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_SDIO_H

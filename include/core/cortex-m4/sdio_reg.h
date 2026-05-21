@@ -13,6 +13,10 @@
 #include "common/hal_types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief SDIO Register Structure
  */
@@ -158,4 +162,8 @@ typedef struct {
 #define SDIO_DCTRL_DMAEN (1 << 3)
 #define SDIO_DCTRL_DBLOCKSIZE_Pos 4
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_SDIO_REG_H

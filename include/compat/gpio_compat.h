@@ -23,6 +23,10 @@
 #include "common/navhal_compiler.h"
 #include "utils/gpio_types.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @deprecated Use hal_gpio_set_mode(). */
 NAVHAL_DEPRECATED("use hal_gpio_set_mode")
 static inline hal_status_t hal_gpio_setmode(hal_gpio_pin_t pin,
@@ -56,4 +60,8 @@ static inline hal_status_t hal_gpio_enable_rcc(hal_gpio_pin_t pin) {
   return hal_gpio_enable_clock(pin);
 }
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_GPIO_COMPAT_H */

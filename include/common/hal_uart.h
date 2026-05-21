@@ -17,8 +17,16 @@
 #ifndef HAL_UART_H
 #define HAL_UART_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef CORTEX_M4
 #include "core/cortex-m4/uart.h" /**< Include Cortex-M4 specific UART driver. */
 #endif
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !HAL_UART_H

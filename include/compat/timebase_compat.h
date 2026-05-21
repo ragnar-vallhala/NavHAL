@@ -21,6 +21,10 @@
 #include "common/navhal_compiler.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @deprecated Use hal_timebase_init(). */
 NAVHAL_DEPRECATED("use hal_timebase_init")
 static inline hal_status_t systick_init(uint32_t tick_us) {
@@ -69,4 +73,8 @@ static inline void hal_systick_set_callback(hal_timebase_callback_t cb) {
   hal_timebase_set_callback(cb);
 }
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_TIMEBASE_COMPAT_H */

@@ -20,6 +20,10 @@
 #include "common/navhal_compiler.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @deprecated Use hal_timer_init(). */
 NAVHAL_DEPRECATED("use hal_timer_init")
 static inline void timer_init(hal_timer_t timer, uint32_t prescaler,
@@ -141,4 +145,8 @@ static inline void timer_set_auto_reload(hal_timer_t timer, uint32_t arr) {
   hal_timer_set_auto_reload(timer, arr);
 }
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_TIMER_COMPAT_H */

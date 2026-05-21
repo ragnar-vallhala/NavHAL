@@ -16,8 +16,16 @@
 #ifndef HAL_GPIO_H
 #define HAL_GPIO_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef CORTEX_M4
 #include "core/cortex-m4/gpio.h" /**< Include Cortex-M4 specific GPIO driver. */
 #endif // CORTEX_M4
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // HAL_GPIO_H

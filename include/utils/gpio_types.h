@@ -17,6 +17,10 @@
 
 #include "common/navhal_compiler.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @enum hal_gpio_pin
  * @brief Enumeration of GPIO pins across ports A to E.
@@ -275,4 +279,8 @@ typedef hal_gpio_af_t hal_gpio_alternate_function_t
  */
 typedef hal_gpio_pin hal_gpio_pin_t;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // GPIO_TYPES_H

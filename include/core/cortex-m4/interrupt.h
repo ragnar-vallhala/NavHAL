@@ -19,6 +19,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Callback invoked by ::hal_interrupt_dispatch for a registered IRQ.
  */
@@ -111,4 +115,8 @@ void hal_interrupt_clear_all_pending(void);
 /* Deprecated pre-standardization interrupt names — removed in M5. */
 #include "compat/interrupt_compat.h"
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_INTERRUPT_H

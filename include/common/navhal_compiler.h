@@ -21,6 +21,10 @@
 #ifndef NAVHAL_COMPILER_H
 #define NAVHAL_COMPILER_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #if defined(__GNUC__)
 
 #define NAVHAL_INLINE        static inline                              /**< Internal-linkage inline function. */
@@ -45,4 +49,8 @@
 
 #endif
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_COMPILER_H */

@@ -8,6 +8,10 @@
 
 #include "navtest/navtest.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 void test_hal_interrupt_enable_sets_iser_bit(void);
 void test_hal_interrupt_disable_sets_icer_bit(void);
 void test_hal_interrupt_clear_pending_clears_ispr_bit(void);
@@ -27,4 +31,8 @@ void test_hal_interrupt_detach_rejects_out_of_range(void);
 
 extern const navtest_suite_t test_interrupt_suite;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TEST_INTERRUPT_H

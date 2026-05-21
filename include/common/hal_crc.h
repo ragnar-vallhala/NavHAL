@@ -14,8 +14,16 @@
 #ifndef HAL_CRC_H
 #define HAL_CRC_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef CORTEX_M4
 #include "core/cortex-m4/crc.h" /**< Include Cortex-M4 specific CRC driver. */
 #endif                          /* CORTEX_M4 */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* HAL_CRC_H */

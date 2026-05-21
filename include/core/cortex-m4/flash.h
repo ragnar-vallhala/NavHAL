@@ -20,6 +20,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief On-flash key/value record header.
  */
@@ -84,4 +88,8 @@ typedef hal_status_t FlashStatus_t NAVHAL_DEPRECATED("use hal_status_t");
 /* Deprecated pre-standardization function names — removed in M5. */
 #include "compat/flash_compat.h"
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_FLASH_H

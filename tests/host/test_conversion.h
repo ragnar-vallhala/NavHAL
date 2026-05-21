@@ -3,6 +3,10 @@
 
 #include "navtest/navtest.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 void test_str_to_int_basic(void);
 void test_str_to_int_negative(void);
 void test_str_to_int_plus_sign(void);
@@ -16,4 +20,8 @@ void test_str_to_float_negative(void);
 
 extern const navtest_suite_t test_conversion_suite;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif

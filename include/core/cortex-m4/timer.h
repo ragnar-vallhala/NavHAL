@@ -15,6 +15,10 @@
 #include "utils/timer_types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 // APB1
 #define RCC_APB1ENR_TIM2_OFFSET 0
 #define RCC_APB1ENR_TIM3_OFFSET 1
@@ -152,4 +156,8 @@ uint32_t hal_timer_get_auto_reload(hal_timer_t timer);
 #include "compat/timebase_compat.h"
 #include "compat/timer_compat.h"
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_TIMER_H

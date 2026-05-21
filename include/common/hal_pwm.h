@@ -17,8 +17,16 @@
 #ifndef HAL_PWM_H
 #define HAL_PWM_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef CORTEX_M4
 #include "core/cortex-m4/pwm.h" /**< Include Cortex-M4 specific PWM driver. */
 #endif
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !HAL_PWM_H

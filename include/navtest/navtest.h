@@ -20,6 +20,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Sink for all test output. Backends:
  *   - target (default): writes via uart2_write (see tests/navtest_state.c)
  *   - host  (-DNAVTEST_HOST): writes to stdout (see tests/host/host_backend.c)
@@ -238,5 +242,9 @@ int navtest_run_suite(const navtest_suite_t *suite);
                     "TEST_ASSERT_BITS_LOW: bits not cleared");                 \
     }                                                                          \
   } while (0)
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* NAVTEST_H */

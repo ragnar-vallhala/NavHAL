@@ -9,6 +9,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* File access modes */
 #define V_O_RDONLY 0x01
 #define V_O_WRONLY 0x02
@@ -103,4 +107,8 @@ int v_sync(v_fd_t fd);
  */
 int v_preallocate(const char *path, uint32_t size);
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // V_FS_H

@@ -28,6 +28,10 @@
 #include "utils/types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief I²C peripheral register map.
  *
@@ -128,4 +132,8 @@ typedef struct {
 #define I2C_TRISE_TRISE_Pos 0
 #define I2C_TRISE_TRISE_Msk (0x3FU << I2C_TRISE_TRISE_Pos)
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_I2C_REG_H

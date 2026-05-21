@@ -1,5 +1,9 @@
 #ifndef HAL_INTERRUPT_H
 #define HAL_INTERRUPT_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @file hal_interrupt.h
  * @brief Common Interrupt HAL interface for NavHAL.
@@ -16,4 +20,8 @@
  */
 #include "core/cortex-m4/interrupt.h" // Include architecture-specific interrupt definitions
 #include "core/cortex-m4/interrupt_reg.h" // Include architecture-specific interrupt register definitions
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !HAL_INTERRUPT_H

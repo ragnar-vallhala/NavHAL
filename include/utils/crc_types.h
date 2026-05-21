@@ -14,6 +14,10 @@
 #include "common/navhal_compiler.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @enum hal_crc_polynomial_t
  * @brief Supported CRC polynomial presets.
@@ -43,4 +47,8 @@ typedef hal_crc_polynomial_t crc_polynomial_t
     NAVHAL_DEPRECATED("use hal_crc_polynomial_t");
 typedef hal_crc_config_t crc_config_t NAVHAL_DEPRECATED("use hal_crc_config_t");
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* CRC_TYPES_H */

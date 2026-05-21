@@ -20,6 +20,10 @@
 
 #include "common/navhal_compiler.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @name Memory-mapped I/O access qualifiers
  *  @{ */
 #define __I  volatile const /**< Read-only register access. */
@@ -44,4 +48,8 @@
 #define __UNUSED NAVHAL_UNUSED /**< @deprecated Use NAVHAL_UNUSED. */
 #endif
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* HAL_TYPES_H */

@@ -12,6 +12,10 @@
 
 #include "navtest/navtest.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 void test_hal_timebase_init_returns_ok(void);
 void test_hal_timebase_tick_increments(void);
 void test_hal_timebase_get_tick_duration_us_matches_init(void);
@@ -23,4 +27,8 @@ void test_hal_timebase_returns_uint32(void);
 
 extern const navtest_suite_t test_timebase_suite;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TEST_TIMEBASE_H

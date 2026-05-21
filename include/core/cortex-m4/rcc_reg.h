@@ -17,6 +17,10 @@
 #include "common/hal_types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief RCC register map structure.
  */
@@ -144,4 +148,8 @@ typedef enum {
 
 
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_RCC_REG_H

@@ -21,6 +21,10 @@
 #define VERSION_PATCH 0
 #define VERSION "0.1.0"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @defgroup NAVHAL Core HAL
  * @brief Top-level includes for the NavHAL framework.
@@ -56,4 +60,8 @@
 #include "common/hal_flash.h"
 #include "common/hal_sdio.h"
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // NAVHAL_H

@@ -17,6 +17,10 @@
 #ifndef CORTEX_M4_DMA_REG_H
 #define CORTEX_M4_DMA_REG_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef _DMA_ENABLED
 
 #include "common/hal_types.h"
@@ -189,4 +193,8 @@ static const uint8_t _dma_isr_shift[4] = {0, 6, 16, 22};
 
 #endif /* _DMA_ENABLED */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* CORTEX_M4_DMA_REG_H */

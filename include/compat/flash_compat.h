@@ -20,6 +20,10 @@
 #include "common/navhal_compiler.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @deprecated Use hal_flash_save(). */
 NAVHAL_DEPRECATED("use hal_flash_save")
 static inline hal_status_t save_data_to_flash(uint8_t key,
@@ -53,4 +57,8 @@ static inline int flash_storage_needs_compaction(void) {
   return hal_flash_needs_compaction() ? 1 : 0;
 }
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_FLASH_COMPAT_H */

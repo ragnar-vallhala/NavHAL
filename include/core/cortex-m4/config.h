@@ -1,6 +1,10 @@
 #ifndef CORTEX_M4_CONFIG_H
 #define CORTEX_M4_CONFIG_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 // Configuration options
 // Each flag is only defined here if it was not already set via a compiler -D
 // flag (e.g. from CMake's add_compile_definitions). This avoids redefinition
@@ -25,4 +29,8 @@
 #define _SDIO_ENABLED
 #endif
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_CONFIG_H

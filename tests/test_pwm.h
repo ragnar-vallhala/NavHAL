@@ -9,6 +9,10 @@
 #include "navtest/navtest.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 // -------------------- Prototypes --------------------
 
 // PWM Init
@@ -32,5 +36,9 @@ void test_hal_pwm_set_frequency_rejects_null_handle(void);
 
 extern const navtest_suite_t test_pwm_suite;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TEST_PWM_H
 

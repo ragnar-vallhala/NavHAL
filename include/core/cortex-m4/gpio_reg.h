@@ -25,6 +25,10 @@
 #include "utils/types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief GPIO port register structure.
  *
@@ -72,4 +76,8 @@ typedef struct {
 /** Get pin number within the port from absolute pin number */
 #define GPIO_GET_PIN(n) ((n) & 0x0F)
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_GPIO_REG_H

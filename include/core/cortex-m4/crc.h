@@ -35,6 +35,10 @@
 #include "utils/crc_types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize the CRC module.
  *
@@ -75,4 +79,8 @@ uint32_t hal_crc_accumulate(const uint8_t *data, uint32_t len);
  */
 hal_status_t hal_crc_reset(void);
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* CORTEX_M4_CRC_H */

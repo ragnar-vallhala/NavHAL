@@ -19,6 +19,10 @@
 #include "common/navhal_compiler.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @deprecated Use hal_cycle_counter_init(). */
 NAVHAL_DEPRECATED("use hal_cycle_counter_init")
 static inline hal_status_t dwt_init(void) { return hal_cycle_counter_init(); }
@@ -39,4 +43,8 @@ static inline void dwt_delay_cycles(uint32_t cycles) {
   hal_cycle_counter_delay(cycles);
 }
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_DWT_COMPAT_H */

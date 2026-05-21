@@ -19,6 +19,10 @@
 #include "common/hal_types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief DWT (Data Watchpoint and Trace) register map.
  */
@@ -62,4 +66,8 @@ typedef struct {
 /** CoreDebug DEMCR bits */
 #define CORE_DEBUG_DEMCR_TRCENA_BIT (1 << 24) /**< Trace enable bit */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_DWT_REG_H

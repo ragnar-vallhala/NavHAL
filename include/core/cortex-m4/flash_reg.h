@@ -27,6 +27,10 @@
 #define FLASH_CR (*(volatile uint32_t *)(FLASH_BASE + 0x10))
 #define FLASH_OPTCR (*(volatile uint32_t *)(FLASH_BASE + 0x14))
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* Flash key values */
 #define FLASH_KEY1 0x45670123U
 #define FLASH_KEY2 0xCDEF89ABU
@@ -95,4 +99,8 @@
 #define FLASH_DELETED 0x00
 #define FLASH_DEFAULT_BLOCK 5
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_FLASH_REG_H

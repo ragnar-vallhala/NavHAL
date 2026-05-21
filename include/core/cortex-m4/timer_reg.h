@@ -4,6 +4,10 @@
 #include "common/hal_types.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 typedef struct {
   __IO uint32_t CR1; /*!< 0x00: Control register 1 (All timers) */
   __IO uint32_t CR2; /*!< 0x04: Control register 2 (All timers; basic timers use
@@ -122,4 +126,8 @@ static inline TIMx_Reg_Typedef *GET_TIMx_BASE(uint8_t n) {
 // BDTR
 #define TIMx_BDTR_MOE (0x1 << 15)
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !CORTEX_M4_TIMER_REG_H

@@ -18,6 +18,10 @@
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @deprecated Use hal_dma_init(). */
 NAVHAL_DEPRECATED("use hal_dma_init")
 static inline hal_status_t dma_init(const hal_dma_config_t *cfg) {
@@ -48,4 +52,8 @@ static inline hal_status_t dma_clear_flags(const hal_dma_config_t *cfg) {
   return hal_dma_clear_flags(cfg);
 }
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_DMA_COMPAT_H */

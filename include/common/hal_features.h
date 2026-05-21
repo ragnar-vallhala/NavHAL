@@ -32,6 +32,10 @@
 
 #include "common/hal_config.h" /* pulls in the target's _<feature>_ENABLED flags */
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** @brief 1 if a DMA controller and the DMA-mode API are available. */
 #if defined(_DMA_ENABLED)
 #define NAVHAL_HAS_DMA 1
@@ -67,4 +71,8 @@
 #define NAVHAL_HAS_SDIO 0
 #endif
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* HAL_FEATURES_H */

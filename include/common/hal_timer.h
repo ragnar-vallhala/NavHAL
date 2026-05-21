@@ -17,8 +17,16 @@
 #ifndef HAL_TIMER_H
 #define HAL_TIMER_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef CORTEX_M4
 #include "core/cortex-m4/timer.h" /**< Include Cortex-M4 specific timer driver. */
 #endif
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !HAL_TIMER_H

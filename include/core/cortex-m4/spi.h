@@ -18,6 +18,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Supported SPI instances.
  */
@@ -156,4 +160,8 @@ typedef hal_status_t hal_spi_status_t NAVHAL_DEPRECATED("use hal_status_t");
 #define HAL_SPI_ERR_BUSY HAL_ERR_BUSY        /**< @deprecated HAL_ERR_BUSY */
 #define HAL_SPI_ERR_PARAM HAL_ERR_INVALID_ARG /**< @deprecated HAL_ERR_INVALID_ARG */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_SPI_H

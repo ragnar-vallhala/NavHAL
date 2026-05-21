@@ -18,6 +18,10 @@
 #ifndef CORTEX_M4_CRC_REG_H
 #define CORTEX_M4_CRC_REG_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #ifdef _CRC_HW_ENABLED
 
 #include "common/hal_types.h"
@@ -61,4 +65,8 @@ typedef struct {
 
 #endif /* _CRC_HW_ENABLED */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* CORTEX_M4_CRC_REG_H */

@@ -18,6 +18,10 @@
 #include "core/cortex-m4/gpio_reg.h"
 #include "utils/gpio_types.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Aggregate configuration for a single GPIO pin.
  *
@@ -126,4 +130,8 @@ static inline void hal_gpio_toggle(hal_gpio_pin_t pin) {
 /* Deprecated pre-standardization GPIO names — removed in M5. */
 #include "compat/gpio_compat.h"
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // CORTEX_M4_GPIO_H

@@ -26,6 +26,10 @@
 #include "common/navhal_compiler.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* ---- Generic (instance-as-argument) legacy functions -------------------- */
 
 /** @deprecated Use hal_uart_init(). */
@@ -198,4 +202,8 @@ _NAVHAL_UART_INSTANCE_DMA_COMPAT(6, HAL_UART_6)
 
 #endif /* _DMA_ENABLED && _UART_BACKEND_DMA */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* NAVHAL_UART_COMPAT_H */

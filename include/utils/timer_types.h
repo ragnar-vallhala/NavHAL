@@ -1,6 +1,10 @@
 #ifndef TIMER_TYPES_H
 #define TIMER_TYPES_H
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 // Timer types available in STM32
 typedef enum {
   TIM0,
@@ -17,4 +21,8 @@ typedef enum {
   TIM11,
   TIM12,
 } hal_timer_t;
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !TIMER_TYPES_H

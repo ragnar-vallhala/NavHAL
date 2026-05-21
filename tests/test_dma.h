@@ -9,6 +9,10 @@
 #include "common/hal_config.h"
 #include "common/hal_features.h"
 #include "navtest/navtest.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #if NAVHAL_HAS_DMA
 
 void test_dma_clock_enable_dma1(void);
@@ -34,4 +38,8 @@ extern const navtest_suite_t test_dma_suite;
 
 #endif /* NAVHAL_HAS_DMA */
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif /* TEST_DMA_H */

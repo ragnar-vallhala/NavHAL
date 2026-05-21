@@ -9,6 +9,10 @@
 #include "navtest/navtest.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* All tests target this pin (PC09 — unused on Nucleo-F401RE board header). */
 #define TEST_GPIO_PIN GPIO_PC09
 #define TEST_GPIO_AF  HAL_GPIO_AF7
@@ -27,4 +31,8 @@ void test_hal_gpio_toggle_flips_state(void);
 
 extern const navtest_suite_t test_gpio_suite;
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TEST_GPIO_H

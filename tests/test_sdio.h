@@ -13,6 +13,10 @@
 #include "common/hal_features.h"
 #include "navtest/navtest.h"
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #if NAVHAL_HAS_SDIO
 
 void test_hal_sdio_init_rejects_null_config(void);
@@ -24,4 +28,8 @@ void test_hal_sdio_set_callback_smoke(void);
 extern const navtest_suite_t test_sdio_suite;
 
 #endif /* NAVHAL_HAS_SDIO */
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TEST_SDIO_H

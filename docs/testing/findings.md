@@ -33,6 +33,42 @@ real silicon writes them to the wrong physical position. The Renode
 model is correct as a *protocol* model but doesn't model the bit-layout
 constraint.
 
+### 1.2 NVIC struct missing ARM-mandated reserved padding
+
+**Symptom (HIL):** two tests in PR4 originally failed and were
+relaxed in PR10 with a wrong-root-cause attribution:
+
+- `test_hal_interrupt_disable_sets_icer_bit` — ICER write didn't
+  clear the corresponding ISER bit.
+- `test_hal_interrupt_set_get_priority_round_trip` — set priority 5,
+  get priority returned 0.
+
+**Symptom (PIL):** the same root cause produced thousands of
+Renode "Unhandled write to offset 0x148 (SetEnable+0x48)" warnings
+per second, drowning out the actual log.
+
+**Root cause:** `NVIC_Typedef` in `include/core/cortex-m4/interrupt_reg.h`
+laid out ISER / ICER / ISPR / ICPR / IABR / IPR contiguously, but the
+Cortex-M4 NVIC layout (PM0214 §4.3) has a 0x60-byte reserved gap between
+each pair. The first array (ISER) was at the right address; every
+subsequent register array landed in the reserved gap.  `hal_interrupt_enable`
+happened to work because it touches ISER; `hal_interrupt_disable`,
+`hal_interrupt_clear_pending`, and `hal_interrupt_set_priority` all
+wrote to reserved memory and never reached the peripheral. Real
+silicon silently absorbed the writes; the relaxed tests passed by
+coincidence (reading 0 from reserved memory).
+
+**Fix:** added RESERVED0..RESERVED4 padding arrays in the struct;
+widened IPR to 240 bytes (was 60 — F4 has 240 priority bytes); capped
+`hal_interrupt_clear_all_pending` to 3 words (F401RE wires IRQs 0..81).
+Un-relaxed the two PR4 tests; they now pass on real hardware against
+the correct contract.
+
+**Why it took PIL to surface:** HIL tests were green because real
+silicon doesn't warn about writes to reserved space — it just absorbs
+them. Renode's NVIC model is stricter and warns. The warning flood
+that prompted "stop the warnings" turned out to be the bug yelling.
+
 ## 2. Latent driver gaps — *flagged as `TODO(driver)`*
 
 ### 2.1 `hal_flash_save` / `hal_flash_read` don't NULL-check
@@ -207,22 +243,30 @@ a runtime-detected "extended" capability.
 ## 6. The pyramid score so far
 
 ```
-                  driver bugs    test relaxations    deferred gaps    model gaps
-SIL  (host)         0                0                0                 —
-PIL  (Renode)       0                0                0                 3
-HIL  (Nucleo)       1                5                2                 —
+                  driver bugs    test re-tightenings    deferred gaps    model gaps
+SIL  (host)         0                —                   0                 —
+PIL  (Renode)       1                +2 (un-relaxed)     0                 3
+HIL  (Nucleo)       1                5                   2                 —
 ```
 
-HIL has earned its keep on the very first run — found a real bug,
-exposed two latent gaps, and let us right-size five over-strict
-assertions.
+HIL caught one real bug (GPIO OSPEEDR shift, §1.1) on its first
+run, plus exposed five over-specific assertions and two latent gaps.
 
-PIL hasn't found any new driver bugs, but it has flagged three
-*Renode model* gaps (GPIO bit positions, timer UIF latching, slow
-RCC ready flags). That's the level being honest about its own
-limits — useful signal for choosing what to gate on PIL vs HIL.
+PIL — initially "found nothing new" — has now earned a finding of
+its own: the NVIC struct-padding bug (§1.2). The warning flood that
+showed up the first time the Renode wrapper ran end-to-end was
+*the bug yelling*, not noise. Two HIL tests had been relaxed under
+the wrong root cause; PIL pointed at the right one. Both tests were
+re-tightened after the fix and still pass on HIL.
 
-SIL has not yet flagged anything, which is the correct outcome for
-pure-logic tests against algorithms with known reference vectors.
+The model gaps stay where they are — Renode's GPIO bit-position
+fidelity, timer UIF latching, slow RCC ready — but the broader
+picture is clearer: even with model gaps, **PIL provides signal HIL
+can't, because the model is stricter about reserved memory** than
+real silicon is. The two levels are complementary, not redundant.
+
+SIL has still not flagged anything, which is the correct outcome
+for pure-logic tests against algorithms with known reference vectors.
 The interesting bugs in this codebase live below the API contract,
-where only PIL/HIL can see them.
+where only PIL/HIL can see them — and as the NVIC bug shows, PIL and
+HIL see *different* slices of "below the contract."

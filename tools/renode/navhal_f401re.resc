@@ -18,6 +18,16 @@ using sysbus
 mach create "navhal"
 machine LoadPlatformDescription @platforms/boards/stm32f4_discovery.repl
 
+# Silence Cortex-M private-peripheral warnings. The `stm32f4_discovery`
+# Renode model omits the DWT block (0xE0001000–0xE0001FFF — read by every
+# `hal_cycle_counter_get`) and the ITM/TPIU/ETM cluster at 0xE0000000.
+# Without these silenced, the cycle-counter tests flood the log with
+# "ReadDoubleWord from non existing peripheral at 0xE0001004" once per
+# iteration. The cycle-counter suite is a HIL-only test in practice
+# (see docs/testing/findings.md §4); silencing the range keeps the
+# Renode log readable without changing test outcomes.
+sysbus SilenceRange <0xE0000000, 0xE0001FFF>
+
 # Send USART2 traffic to the log file; CI greps the file for the navtest
 # summary. `flushAfterWrite` keeps the log usable even if the emulation
 # is killed mid-run.

@@ -1,6 +1,10 @@
 /**
  * @file core/cortex-m4/fpu.h
- * @brief Cortex-M4 hardware FPU HAL driver interface.
+ * @brief Cortex-M4 FPU port header.
+ *
+ * @details
+ * The public prototype lives in @c common/hal_fpu.h, which includes this
+ * header. Retained to preserve the @c #include "core/cortex-m4/fpu.h" path.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -8,25 +12,6 @@
 #ifndef CORTEX_M4_FPU_H
 #define CORTEX_M4_FPU_H
 
-#include "common/hal_status.h"
+#include "common/hal_fpu.h"
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-/**
- * @brief Enable the hardware Floating Point Unit.
- *
- * Enables full access to the CP10/CP11 coprocessors and configures lazy
- * FPU-context stacking.
- *
- * @return ::HAL_OK if the FPU was enabled, or ::HAL_ERR_NOT_SUPPORTED when the
- *         build was configured without hardware-FPU support.
- */
-hal_status_t hal_fpu_enable(void);
-
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-#endif // CORTEX_M4_FPU_H
+#endif /* CORTEX_M4_FPU_H */

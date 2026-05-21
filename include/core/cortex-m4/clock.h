@@ -1,15 +1,10 @@
 /**
  * @file core/cortex-m4/clock.h
- * @brief Cortex-M4 specific clock control HAL interface.
+ * @brief Cortex-M4 clock-control port header.
  *
  * @details
- * This header defines the structures and functions to configure and query
- * the system and peripheral clocks for Cortex-M4 microcontrollers.
- * It includes PLL configuration, system clock initialization, and AHB/APB
- * clock retrieval functions.
- *
- * The HAL provides a platform-independent abstraction while leveraging
- * the Cortex-M4 specific hardware.
+ * The public prototypes live in @c common/hal_clock.h, which includes this
+ * header. Retained to preserve the @c #include "core/cortex-m4/clock.h" path.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -17,72 +12,6 @@
 #ifndef CORTEX_M4_CLOCK_H
 #define CORTEX_M4_CLOCK_H
 
-#include "common/hal_status.h"
-#include "utils/clock_types.h"
+#include "common/hal_clock.h"
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-/**
- * @brief PLL (Phase Locked Loop) configuration structure.
- *
- * @details
- * This structure defines the parameters for configuring the PLL to generate
- * the system clock from the selected input source.
- */
-typedef struct {
-    hal_clock_source_t input_src; /**< Clock input source for PLL. */
-    uint8_t pll_m;                /**< Division factor for PLL input. */
-    uint16_t pll_n;               /**< Multiplication factor for PLL VCO. */
-    uint8_t pll_p;                /**< Division factor for main system clock. */
-    uint8_t pll_q;                /**< Division factor for peripheral clocks. */
-} hal_pll_config_t;
-
-/**
- * @brief Initialize the system clock.
- *
- * @param cfg     Main clock configuration; must not be NULL.
- * @param pll_cfg PLL configuration; must not be NULL when
- *                @c cfg->source is ::HAL_CLOCK_SOURCE_PLL, ignored otherwise.
- * @return ::HAL_OK on success, or ::HAL_ERR_INVALID_ARG if a required
- *         argument is NULL.
- *
- * @note This function must be called before using other peripheral clocks.
- */
-hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
-                            const hal_pll_config_t *pll_cfg);
-
-/**
- * @brief Get the system clock frequency (SYSCLK).
- *
- * @return System clock frequency in Hz.
- */
-uint32_t hal_clock_get_sysclk(void);
-
-/**
- * @brief Get the AHB bus clock frequency.
- *
- * @return AHB clock frequency in Hz.
- */
-uint32_t hal_clock_get_ahbclk(void);
-
-/**
- * @brief Get the APB1 bus clock frequency.
- *
- * @return APB1 clock frequency in Hz.
- */
-uint32_t hal_clock_get_apb1clk(void);
-
-/**
- * @brief Get the APB2 bus clock frequency.
- *
- * @return APB2 clock frequency in Hz.
- */
-uint32_t hal_clock_get_apb2clk(void);
-
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-#endif // CORTEX_M4_CLOCK_H
+#endif /* CORTEX_M4_CLOCK_H */

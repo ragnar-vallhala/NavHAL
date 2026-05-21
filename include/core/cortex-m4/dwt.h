@@ -1,13 +1,12 @@
 /**
  * @file core/cortex-m4/dwt.h
- * @brief Cortex-M4 cycle-counter HAL driver interface.
+ * @brief Cortex-M4 cycle-counter port header.
  *
  * @details
- * Standardized cycle-counter API (see `docs/api_standardization.md`). Backed
- * by the Cortex-M4 DWT unit; the public API is named `hal_cycle_counter_*`
- * rather than `dwt_*` so it stays architecture-neutral (a target without a
- * DWT can provide an equivalent counter, or gate the feature off via
- * `NAVHAL_HAS_CYCLE_COUNTER`).
+ * The public prototypes live in @c common/hal_dwt.h, which includes this
+ * header. This file is currently the deprecated-name compatibility shim only;
+ * its presence preserves the @c #include "core/cortex-m4/dwt.h" path used by
+ * existing source files.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -15,42 +14,10 @@
 #ifndef CORTEX_M4_DWT_H
 #define CORTEX_M4_DWT_H
 
-#include "common/hal_status.h"
-#include <stdint.h>
+#include "common/hal_dwt.h"
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-/**
- * @brief Initialize and start the cycle counter.
- * @return ::HAL_OK.
- */
-hal_status_t hal_cycle_counter_init(void);
-
-/**
- * @brief Get the current cycle count.
- * @return 32-bit cycle count.
- */
-uint32_t hal_cycle_counter_get(void);
-
-/**
- * @brief Reset the cycle counter to zero.
- * @return ::HAL_OK.
- */
-hal_status_t hal_cycle_counter_reset(void);
-
-/**
- * @brief Busy-wait for a number of processor cycles.
- * @param cycles Number of cycles to delay.
- */
-void hal_cycle_counter_delay(uint32_t cycles);
 
 /* Deprecated pre-standardization DWT names — removed in M5. */
 #include "compat/dwt_compat.h"
 
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-#endif // CORTEX_M4_DWT_H
+#endif /* CORTEX_M4_DWT_H */

@@ -53,22 +53,26 @@ driver that has a software fallback.
 |---|---|
 | **Substrate** | The on-target ELF (cross-compiled with `arm-none-eabi-gcc`) running inside Renode against a modeled STM32F4 machine. |
 | **What runs** | The full `tests/` suite — the same binary that flashes to a real board. |
-| **Entry point** | `tools/renode/run_tests.sh build/tests` (locally), `renode-on-target` job in `.github/workflows/ci.yml` (CI). |
-| **Speed** | ~1 min to install Renode + run the 30 s emulated session. |
+| **Entry point** | `tools/renode/run_tests.sh build/tests` (locally), `Full suite in Renode` job in `.github/workflows/renode.yml` (CI — nightly + on demand). |
+| **Speed** | Slow. The full 142-test suite takes ~90 min wall-clock. Renode advances emulated time slower than wall-clock when the firmware busy-waits, and our `hal_clock_init` paths busy-wait on PLL/HSE ready flags that the Renode RCC model is slow to assert. |
 | **Output** | USART2 captured to a file by Renode's `CreateFileBackend`; the wrapper greps for `Total failures:` and exits with that count. |
 | **What it catches** | Register-write logic (does `hal_gpio_set_mode` actually flip the right bits in MODER?), ISA-level math (32-bit cycle counter wraparound, byte order), build-time integration (does the linker script + startup code actually run the suite to completion?). |
 | **What it can't catch** | Peripheral edge cases the model glosses over — e.g. real I²C arbitration timing, true SPI clock-data alignment, ADC noise, electrical issues, current draw, the exact NVIC pending-write behavior on real silicon. |
 
-Renode is good enough to be the gate before the CI merge button — it
-turns the M3 (directory restructure) and M4 (Kconfig dispatch) refactors
-into provably behavior-preserving changes, which is the whole reason
-M2+ existed.
+Renode is intentionally **not** wired as a per-PR gate — the
+wall-clock cost is too high. Instead, it runs on a nightly schedule
+and on-demand via `workflow_dispatch`. Per-PR CI (`ci.yml`) still
+catches build breaks via `build-on-target` and the host subset via
+`host-tests`; the nightly Renode run is the slower follow-up that
+provides the "M3 refactor was behavior-preserving" signal M2+ planned
+for, just on a less aggressive cadence.
 
 The Renode `.resc` script (`tools/renode/navhal_f401re.resc`) currently
 loads the `stm32f4_discovery` board model. The F401RE shares its silicon
 family with the Discovery; the model exposes USART2, GPIO, the RCC and
 timers used by the suite. Limitations of the model are documented inline
-in the `.resc` file as they're discovered.
+in the `.resc` file as they're discovered — and in
+`docs/testing/findings.md` once they show up in test runs.
 
 ---
 

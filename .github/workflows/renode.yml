@@ -1,0 +1,51 @@
+name: Renode (PIL)
+
+# PIL (Processor-in-the-Loop) — the full M2+ on-target suite in a
+# Renode-emulated STM32F4. Empirically takes ~90 min wall-clock (the
+# firmware's clock-init busy-waits on PLL/HSE flags that the Renode
+# RCC model is slow to assert). Too expensive to gate every PR on, so
+# this lives in a separate workflow that runs:
+#
+#   - nightly at 02:30 UTC,
+#   - on demand via the Actions tab (`workflow_dispatch`).
+#
+# CI gating per PR is handled by `.github/workflows/ci.yml`, which
+# does host-tests + build-on-target + build-no-cap (each ~minute).
+# See docs/testing/model.md §"PIL" for the cost/benefit reasoning.
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: renode-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  renode:
+    name: Full suite in Renode
+    runs-on: ubuntu-latest
+    timeout-minutes: 150  # Renode RunFor cap is 3h emulated; wall-clock is shorter.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arm-none-eabi toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+      - name: Build on-target ELF
+        run: |
+          cmake -B build-test -DTEST=ON
+          cmake --build build-test --target tests -j
+          arm-none-eabi-size build-test/tests
+      - name: Install Renode
+        run: |
+          RENODE_VERSION=1.16.1
+          RENODE_DEB=renode_${RENODE_VERSION}_amd64.deb
+          curl -sSL -o "$RENODE_DEB" \
+            "https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/${RENODE_DEB}"
+          sudo apt-get install -y "./${RENODE_DEB}"
+          renode --version
+      - name: Run navtest in Renode (slow — ~90 min)
+        run: tools/renode/run_tests.sh build-test/tests

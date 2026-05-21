@@ -2,10 +2,13 @@
 :description: Boots a Renode STM32F4 machine model, loads the navtest ELF,
 :             routes USART2 to a log file, and runs the suite to completion.
 :
-:             Variables:
-:               $bin     — absolute path to the test ELF (set with `--variable bin=...`)
+:             Variables (set by the caller via the Monitor before `include`):
+:               $bin     — absolute path to the test ELF
 :               $logfile — absolute path for the captured UART log
-:                          (set with `--variable logfile=...`)
+:
+:             tools/renode/run_tests.sh wires these up with:
+:               renode --console --disable-xwt \
+:                 -e "$bin = @<elf>; $logfile = @<log>; i @<this-file>"
 
 using sysbus
 
@@ -22,9 +25,16 @@ sysbus.usart2 CreateFileBackend $logfile true
 
 sysbus LoadELF $bin
 
-# 30 s of emulated time is enough for the full suite at the current size
-# (~70 tests). Bumps go here when the suite grows.
+# Renode is slow per emulated second when the firmware busy-waits — and
+# our clock-init paths busy-wait on PLL/HSE ready flags that the Renode
+# RCC model doesn't always assert promptly. Empirically the full 142-test
+# suite consumes ~90 minutes wall-clock on this rig; 3 emulated hours is
+# a comfortable cap that finishes well inside that.
+#
+# Renode exits as soon as emulation completes; the wrapper greps the
+# captured UART log for the navtest summary, so a too-large budget only
+# burns wall-clock time on an actual hang, never on success.
 start
-emulation RunFor "30"
+emulation RunFor "03:00:00"
 pause
 quit

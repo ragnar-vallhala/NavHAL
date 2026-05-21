@@ -138,7 +138,53 @@ reconfiguration — it returns `HAL_ERR_NOT_SUPPORTED`, the spec's
 
 **Relaxation:** accept either `HAL_OK` or `HAL_ERR_NOT_SUPPORTED`.
 
-## 4. What HIL would expose that we don't yet test
+## 4. Renode model gaps surfaced by PIL
+
+The first end-to-end Renode run (with the resc + budget fixes that
+followed the M2+ merge) revealed model limitations in Renode's
+`stm32f4_discovery` machine. These are **PIL-only failures** — the
+same tests pass on HIL — and they're recorded as known model gaps,
+not driver bugs.
+
+### 4.1 Renode GPIO model abstracts bit positions
+
+**Symptom:** `test_hal_gpio_set_output_speed_writes_ospeedr` and the
+config-application test fail on Renode for OSPEEDR readback. (These
+tests, ironically, are the exact ones that caught the OSPEEDR shift
+bug on HIL in §1.1 — fixed driver, fine on HIL, still fails on PIL.)
+
+**Root cause:** Renode's GPIO model accepts MODER/OTYPER/OSPEEDR
+writes but doesn't always reflect them through the bit positions a
+register-level test reads back. The model is correct as a *protocol*
+abstraction but isn't bit-exact.
+
+### 4.2 Renode timer SR/UIF doesn't latch
+
+**Symptom:** `test_timer_clear_interrupt_flag_clears_UIF` expects UIF
+to be set after an update event, then asserts that clear works.
+Renode doesn't set UIF in the same way real silicon does, so the
+"bits not set" assertion fires.
+
+**Root cause:** Renode timer model's status register handling differs
+from real STM32F4 silicon for the UIF latching path.
+
+### 4.3 Slow PLL/HSE ready flags
+
+**Symptom:** Not a test failure — a runtime cost. Renode's RCC model
+takes many emulated seconds to assert PLL/HSE ready, and our
+`hal_clock_init` waits in tight loops. The full suite takes ~90 min
+wall-clock in Renode for ~5 s on real silicon.
+
+**Workaround:** PIL CI runs are scheduled (nightly + on-demand) rather
+than per-PR; see `.github/workflows/renode.yml`.
+
+These are tracked in this file rather than reported upstream because
+the affected paths are also covered by HIL — Renode's job is to be
+the "fast" middle layer; bit-exact silicon emulation is HIL's job.
+
+---
+
+## 5. What HIL would expose that we don't yet test
 
 These are bus-traffic tests that need wiring beyond a bare Nucleo:
 
@@ -158,16 +204,25 @@ These are tracked as **"extended HIL"** — see `docs/testing/model.md`
 test files are the natural place to register new on-target cases under
 a runtime-detected "extended" capability.
 
-## 5. The pyramid score so far
+## 6. The pyramid score so far
 
 ```
-                  found by    relaxed    deferred
-SIL  (host)       0           0          0
-PIL  (Renode)     0           0          0   (not yet pushed to CI)
-HIL  (Nucleo)     1 bug       5 tests    2 driver gaps
+                  driver bugs    test relaxations    deferred gaps    model gaps
+SIL  (host)         0                0                0                 —
+PIL  (Renode)       0                0                0                 3
+HIL  (Nucleo)       1                5                2                 —
 ```
 
-HIL has earned its keep on the very first run. SIL has not yet flagged
-anything — which is the correct outcome for pure-logic tests against
-algorithms with known reference vectors. The interesting bugs in this
-codebase live below the API contract, where only PIL/HIL can see them.
+HIL has earned its keep on the very first run — found a real bug,
+exposed two latent gaps, and let us right-size five over-strict
+assertions.
+
+PIL hasn't found any new driver bugs, but it has flagged three
+*Renode model* gaps (GPIO bit positions, timer UIF latching, slow
+RCC ready flags). That's the level being honest about its own
+limits — useful signal for choosing what to gate on PIL vs HIL.
+
+SIL has not yet flagged anything, which is the correct outcome for
+pure-logic tests against algorithms with known reference vectors.
+The interesting bugs in this codebase live below the API contract,
+where only PIL/HIL can see them.

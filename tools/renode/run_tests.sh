@@ -29,12 +29,13 @@ trap 'rm -f "$LOGFILE"' EXIT
 echo ">> Renode: booting F401RE with $ELF"
 echo ">> uart log → $LOGFILE"
 
+# Renode >= 1.15 doesn't accept the legacy `--variable name=value` flag;
+# variables are now set through the Monitor via `-e "$name = value"` and
+# the script is included via `i @path`.
 renode \
   --disable-xwt \
   --console \
-  --variable "bin=@$ELF" \
-  --variable "logfile=@$LOGFILE" \
-  "$RESC"
+  -e "\$bin = @$ELF; \$logfile = @$LOGFILE; i @$RESC"
 
 echo
 echo ">> ===== captured UART log ====="

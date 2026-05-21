@@ -252,14 +252,23 @@ fills in directories — it does not touch the build system's structure.
 
 Work items:
 - WI5.1 — Per-driver conformance audit against the Section 14 checklist.
-- WI5.2 — Migrate all 27 samples to the new API; rename for clarity if needed.
+- WI5.2 — Migrate all 28 samples to the new API; rename for clarity if needed.
 - WI5.3 — Delete the M2 `compat/` shims and the deprecated `SUCCESS`/`FAILURE`.
 - WI5.4 — Set `HAL_API_VERSION = 1`; update `README.md` (correct the
   multi-arch claims to reflect actual support) and Doxygen `mainpage.md`.
 - WI5.5 — Regenerate Doxygen + the LaTeX design doc.
+- WI5.6 — **C++ compatibility.** `extern "C"` guards on every public header
+  so the C-compiled HAL archive links clean from a C++ TU; `CMAKE_CXX_COMPILER`
+  wired at the toolchain block so `arm-none-eabi-g++` is picked up project-wide;
+  a C++ sample (`27_hal_blink_cpp`) that drives the standardized `hal_*`
+  surface through `navhal.h` under bare-metal flags (`-fno-exceptions
+  -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics`) — proves the guards
+  hold end-to-end on hardware. (Landed early, before the rest of M5, via
+  commits `885889a` and `89893de`.)
 
 **Acceptance:** No deprecated symbols remain; all samples + tests build and pass
-on the F401RE; `HAL_API_VERSION` frozen at 1.
+on the F401RE; `HAL_API_VERSION` frozen at 1; at least one C++ sample builds
+and runs on-target.
 
 **Milestone gate — "AVR readiness review":** before starting M6, review the
 frozen API against the Section 2 table. Any item that still fails is fixed here,
@@ -340,8 +349,8 @@ Work items:
   clean `cmake -DTEST=ON`; host subset runs in CI.
 - M3: layered tree in place; no logic change; build verified.
 - M4: zero `#ifdef ARCH` in headers; Kconfig-driven build.
-- M5: shims removed; `HAL_API_VERSION = 1`; samples + tests pass; AVR readiness
-  review signed off.
+- M5: shims removed; `HAL_API_VERSION = 1`; samples + tests pass (incl. one
+  C++ sample on-target); AVR readiness review signed off.
 - M6: ATmega328p runs `hal_blink` + `hal_uart_tx` from a Kconfig switch with no
   changes to the public API or the STM32 port.
 

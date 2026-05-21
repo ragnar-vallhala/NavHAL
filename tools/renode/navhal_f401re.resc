@@ -28,6 +28,22 @@ machine LoadPlatformDescription @platforms/boards/stm32f4_discovery.repl
 # Renode log readable without changing test outcomes.
 sysbus SilenceRange <0xE0000000, 0xE0001FFF>
 
+# Silence model-tag warnings on peripherals that Renode does model but
+# tags certain bits as "known but not implemented." These bits *are*
+# correctly written by the firmware — Renode just doesn't simulate
+# their secondary effects. The warnings would otherwise flood the log
+# once per write. Suppressing at level 3 (error-only) for these
+# peripherals keeps real errors visible but drops the noise.
+logLevel 3 gpioPortC
+logLevel 3 rcc
+logLevel 3 timer1
+logLevel 3 timer2
+logLevel 3 timer3
+logLevel 3 timer4
+logLevel 3 dma1
+logLevel 3 dma2
+logLevel 3 nvic
+
 # Send USART2 traffic to the log file; CI greps the file for the navtest
 # summary. `flushAfterWrite` keeps the log usable even if the emulation
 # is killed mid-run.
@@ -44,7 +60,9 @@ sysbus LoadELF $bin
 # Renode exits as soon as emulation completes; the wrapper greps the
 # captured UART log for the navtest summary, so a too-large budget only
 # burns wall-clock time on an actual hang, never on success.
-start
+#
+# `emulation RunFor` starts emulation itself — do NOT pair it with a
+# separate `start` line (Renode 1.16 errors with "This action is not
+# available when emulation is already started").
 emulation RunFor "03:00:00"
-pause
 quit

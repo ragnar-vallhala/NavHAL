@@ -70,11 +70,16 @@ message(STATUS "Building for board: ${BOARD}")
 message(STATUS "Building for vendor: ${VENDOR}")
 message(STATUS "Building for processor: ${CMAKE_SYSTEM_PROCESSOR}")
 
-# Paths
+# Paths — driven by the resolved Kconfig output (ARCH_ISA / VENDOR /
+# FAMILY / BOARD / CMAKE_SYSTEM_PROCESSOR), not hardcoded slugs. M6's
+# AVR port will populate src/arch/avr/, src/vendor/microchip/, etc.
+# without further CMake edits.
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(SRC_BOARD ${CMAKE_CURRENT_SOURCE_DIR}/src/board/${BOARD})
-set(SRC_ARCH ${CMAKE_CURRENT_SOURCE_DIR}/src/arch/armv7e-m)
+set(SRC_ARCH ${CMAKE_CURRENT_SOURCE_DIR}/src/arch/${ARCH_ISA})
 set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
+set(INCLUDE_PORT ${CMAKE_CURRENT_SOURCE_DIR}/include/port/${CMAKE_SYSTEM_PROCESSOR})
+set(INCLUDE_FAMILY ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR}/family/${FAMILY}/include)
 set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
 # FPU Configuration
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
@@ -193,8 +198,8 @@ if(TEST)
   message("Tests enabled")
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/port/cortex-m4
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/stm32/family/stm32f4/include
+    ${INCLUDE_PORT}
+    ${INCLUDE_FAMILY}
     ${SRC_BOARD}
   )
   file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)

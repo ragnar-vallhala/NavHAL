@@ -28,6 +28,10 @@ add_compile_definitions(NAVTEST_HOST)
 
 include_directories(
   ${NAVHAL_ROOT}/include
+  # The host build always targets the Cortex-M4 / STM32F4 port (it
+  # compiles a subset of those sources with the system compiler), so
+  # we don't drive these paths from Kconfig here — the embedded build
+  # in ${NAVHAL_ROOT}/CMakeLists.txt does, via ARCH_ISA / FAMILY.
   ${NAVHAL_ROOT}/include/port/cortex-m4
   ${NAVHAL_ROOT}/src/vendor/stm32/family/stm32f4/include
 )

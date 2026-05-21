@@ -26,6 +26,15 @@ config CMAKE_SYSTEM_PROCESSOR
     default "cortex-m4" if ARCH_CORTEX_M4
     default "avr"       if ARCH_AVR8
 
+# Source-tree slug for the ISA / arch layer (src/arch/<ARCH_ISA>/).
+# A single ISA covers multiple processors (Cortex-M3/M4/M7 all share
+# armv7e-m startup, NVIC, SysTick), so this is a distinct axis from
+# CMAKE_SYSTEM_PROCESSOR which names a specific core.
+config ARCH_ISA
+    string
+    default "armv7e-m" if ARCH_CORTEX_M4
+    default "avr"      if ARCH_AVR8
+
 choice
     prompt "Vendor"
     default VENDOR_STM32     if ARCH_CORTEX_M4

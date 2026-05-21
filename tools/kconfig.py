@@ -81,7 +81,7 @@ def generate_cmake(kconfig_obj, output_path):
                 f.write(f"set({prefix_name} {val} CACHE INTERNAL \"\")\n")
             
             # Unprefixed legacy bridges
-            legacy = ["BOARD", "VENDOR", "CMAKE_SYSTEM_PROCESSOR", "USE_FPU", "STANDALONE", "SAMPLE", "TEST", "FLASHER", "FLASH_ADDRESS"]
+            legacy = ["BOARD", "VENDOR", "FAMILY", "ARCH_ISA", "CMAKE_SYSTEM_PROCESSOR", "USE_FPU", "STANDALONE", "SAMPLE", "TEST", "FLASHER", "FLASH_ADDRESS"]
             if name in legacy:
                 if sym.type == kconfiglib.BOOL:
                      c_val = "ON" if val == 'y' else "OFF"

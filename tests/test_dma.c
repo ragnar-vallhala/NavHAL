@@ -10,7 +10,7 @@
 #if NAVHAL_HAS_DMA
 
 #include "core/cortex-m4/dma.h"
-#include "core/cortex-m4/rcc_reg.h"
+#include "family/rcc_reg.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"
 #include "test_dma.h"

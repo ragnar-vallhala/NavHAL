@@ -17,8 +17,8 @@
 
 #include "core/cortex-m4/i2c.h"
 #include "core/cortex-m4/clock.h"
-#include "core/cortex-m4/i2c_reg.h"
-#include "core/cortex-m4/rcc_reg.h"
+#include "family/i2c_reg.h"
+#include "family/rcc_reg.h"
 #include <stdbool.h>
 #include <stdint.h>
 

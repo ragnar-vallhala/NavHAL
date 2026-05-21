@@ -11,7 +11,7 @@
  */
 
 #include "core/cortex-m4/dwt.h"
-#include "core/cortex-m4/dwt_reg.h"
+#include "family/dwt_reg.h"
 
 hal_status_t hal_cycle_counter_init(void) {
   // 1. Enable CoreDebug TRCENA

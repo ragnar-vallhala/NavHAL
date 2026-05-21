@@ -18,7 +18,7 @@
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 #include "core/cortex-m4/config.h"
-#include "core/cortex-m4/uart_reg.h"
+#include "family/uart_reg.h"
 #include <stdbool.h>
 #include <stdint.h>
 

@@ -12,8 +12,8 @@
  */
 
 #include "core/cortex-m4/gpio.h"
-#include "core/cortex-m4/gpio_reg.h"
-#include "core/cortex-m4/rcc_reg.h"
+#include "family/gpio_reg.h"
+#include "family/rcc_reg.h"
 
 hal_status_t hal_gpio_enable_clock(hal_gpio_pin_t pin) {
   uint32_t port = GPIO_GET_PORT_NUMBER(pin);

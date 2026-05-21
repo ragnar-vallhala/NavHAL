@@ -18,8 +18,8 @@
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/gpio.h"
 #include "core/cortex-m4/interrupt.h"
-#include "core/cortex-m4/rcc_reg.h"
-#include "core/cortex-m4/uart_reg.h"
+#include "family/rcc_reg.h"
+#include "family/uart_reg.h"
 #include <stdint.h>
 #ifdef _UART_BACKEND_DMA
 #include "core/cortex-m4/dma.h"

@@ -7,7 +7,7 @@
 
 #if NAVHAL_HAS_CYCLE_COUNTER
 #include "core/cortex-m4/dwt.h"
-#include "core/cortex-m4/dwt_reg.h"
+#include "family/dwt_reg.h"
 
 void test_dwt_init_enables_counters(void) {
   NAVTEST_SKIP_ON_PIL();

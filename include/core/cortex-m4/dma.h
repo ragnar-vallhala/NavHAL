@@ -40,7 +40,7 @@ extern "C" {
 
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
-#include "core/cortex-m4/dma_reg.h"
+#include "family/dma_reg.h"
 #include <stdbool.h>
 #include <stdint.h>
 

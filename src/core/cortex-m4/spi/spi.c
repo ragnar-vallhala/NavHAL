@@ -12,8 +12,8 @@
 
 #include "core/cortex-m4/spi.h"
 #include "core/cortex-m4/gpio.h"
-#include "core/cortex-m4/rcc_reg.h"
-#include "core/cortex-m4/spi_reg.h"
+#include "family/rcc_reg.h"
+#include "family/spi_reg.h"
 #include "core/cortex-m4/timer.h"
 
 static inline volatile SPI_Reg_Typedef *_get_spi(hal_spi_instance_t spi) {

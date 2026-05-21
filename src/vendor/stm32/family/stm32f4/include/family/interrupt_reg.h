@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/interrupt_reg.h
+ * @file family/interrupt_reg.h
  * @brief Cortex-M4 NVIC (Nested Vector Interrupt Controller) register definitions.
  *
  * @details

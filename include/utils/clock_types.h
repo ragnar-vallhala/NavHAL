@@ -14,7 +14,7 @@
 #ifndef CLOCK_TYPES_H
 #define CLOCK_TYPES_H
 
-#include "core/cortex-m4/rcc_reg.h"
+#include "family/rcc_reg.h"
 #include <stdint.h>
 
 

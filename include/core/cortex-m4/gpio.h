@@ -15,7 +15,7 @@
 #define CORTEX_M4_GPIO_H
 
 #include "common/hal_status.h"
-#include "core/cortex-m4/gpio_reg.h"
+#include "family/gpio_reg.h"
 #include "utils/gpio_types.h"
 
 

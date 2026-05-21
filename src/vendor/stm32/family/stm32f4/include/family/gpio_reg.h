@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/gpio_reg.h
+ * @file family/gpio_reg.h
  * @brief Cortex-M4 GPIO register definitions and access macros.
  *
  * @details

@@ -1,7 +1,7 @@
 #include "test_i2c.h"
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/i2c.h"
-#include "core/cortex-m4/i2c_reg.h"
+#include "family/i2c_reg.h"
 #include "navtest/navtest.h"
 #include <stdbool.h>
 #include <stddef.h>

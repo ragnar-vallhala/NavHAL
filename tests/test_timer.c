@@ -1,7 +1,7 @@
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/timer.h"
-#include "core/cortex-m4/timer_reg.h"
-#include "core/cortex-m4/rcc_reg.h"
+#include "family/timer_reg.h"
+#include "family/rcc_reg.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"
 #include <stdint.h>

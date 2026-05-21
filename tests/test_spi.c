@@ -1,6 +1,6 @@
 #include "test_spi.h"
 #include "core/cortex-m4/spi.h"
-#include "core/cortex-m4/spi_reg.h"
+#include "family/spi_reg.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"
 #include <stddef.h>

@@ -1,6 +1,6 @@
 #define CORTEX_M4
 #include "core/cortex-m4/config.h"
-#include "core/cortex-m4/dma_reg.h"
+#include "family/dma_reg.h"
 #include "navhal.h"
 
 #define BUF_SIZE 256

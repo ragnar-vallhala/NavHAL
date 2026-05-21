@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/spi_reg.h
+ * @file family/spi_reg.h
  * @brief Cortex-M4 SPI peripheral register definitions and bit masks.
  *
  * @details

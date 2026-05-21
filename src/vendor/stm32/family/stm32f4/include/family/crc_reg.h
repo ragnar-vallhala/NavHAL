@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/crc_reg.h
+ * @file family/crc_reg.h
  * @brief CRC peripheral register definitions for STM32F4.
  *
  * @details

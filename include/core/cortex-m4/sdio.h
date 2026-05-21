@@ -42,7 +42,7 @@ extern "C" {
 #define SD_ACMD_SD_SEND_OP_COND 41
 #define SD_ACMD_SET_BUS_WIDTH 6
 
-#include "core/cortex-m4/sdio_reg.h"
+#include "family/sdio_reg.h"
 #include <stdint.h>
 
 /**

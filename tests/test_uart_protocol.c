@@ -12,7 +12,7 @@
 #include "test_uart_protocol.h"
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/uart.h"
-#include "core/cortex-m4/uart_reg.h"
+#include "family/uart_reg.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"
 

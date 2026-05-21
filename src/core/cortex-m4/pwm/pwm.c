@@ -13,7 +13,7 @@
 
 #include "core/cortex-m4/pwm.h"
 #include "core/cortex-m4/clock.h"
-#include "core/cortex-m4/rcc_reg.h"
+#include "family/rcc_reg.h"
 #include "core/cortex-m4/timer.h"
 #include <stdint.h>
 

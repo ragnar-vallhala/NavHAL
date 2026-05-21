@@ -189,7 +189,10 @@ endif()
 # Tests
 if(TEST)
   message("Tests enabled")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+  include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/stm32/family/stm32f4/include
+  )
   file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
   file(GLOB_RECURSE HAL_SRC ${SRC_CORE}/*.c )
   message("Files: ${HAL_SRC}")

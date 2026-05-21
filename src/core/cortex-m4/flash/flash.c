@@ -12,7 +12,7 @@
 
 #include "core/cortex-m4/flash.h"
 #include "common/hal_types.h"
-#include "core/cortex-m4/flash_reg.h"
+#include "family/flash_reg.h"
 #include "utils/util.h"
 #include <stddef.h>
 #include <stdint.h>

@@ -15,7 +15,7 @@
 #define CORTEX_M4_INTERRUPT_H
 
 #include "common/hal_status.h"
-#include "core/cortex-m4/interrupt_reg.h"
+#include "family/interrupt_reg.h"
 #include <stdbool.h>
 #include <stdint.h>
 

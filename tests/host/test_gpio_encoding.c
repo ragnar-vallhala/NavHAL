@@ -10,7 +10,7 @@
  * driver that touches a pin.
  */
 
-#include "core/cortex-m4/gpio_reg.h"
+#include "family/gpio_reg.h"
 #include "test_gpio_encoding.h"
 #include "utils/gpio_types.h"
 

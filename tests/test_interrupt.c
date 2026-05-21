@@ -5,7 +5,7 @@
 
 #define CORTEX_M4
 #include "core/cortex-m4/interrupt.h"
-#include "core/cortex-m4/interrupt_reg.h"
+#include "family/interrupt_reg.h"
 #include "navtest/navtest.h"
 #include "test_interrupt.h"
 

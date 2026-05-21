@@ -16,8 +16,8 @@ static uint32_t s_crc_init_value = 0xFFFFFFFF;
 
 #ifdef _CRC_HW_ENABLED
 
-#include "core/cortex-m4/crc_reg.h"
-#include "core/cortex-m4/rcc_reg.h"
+#include "family/crc_reg.h"
+#include "family/rcc_reg.h"
 
 hal_status_t hal_crc_init(const hal_crc_config_t *cfg) {
   if (cfg == NULL)

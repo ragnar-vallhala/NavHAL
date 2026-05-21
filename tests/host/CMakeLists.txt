@@ -28,6 +28,7 @@ add_compile_definitions(NAVTEST_HOST)
 
 include_directories(
   ${NAVHAL_ROOT}/include
+  ${NAVHAL_ROOT}/src/vendor/stm32/family/stm32f4/include
 )
 
 add_executable(tests_host

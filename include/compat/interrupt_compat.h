@@ -18,7 +18,7 @@
 
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
-#include "core/cortex-m4/interrupt_reg.h"
+#include "family/interrupt_reg.h"
 #include <stdint.h>
 
 

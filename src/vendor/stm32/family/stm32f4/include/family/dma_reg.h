@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/dma_reg.h
+ * @file family/dma_reg.h
  * @brief DMA peripheral register definitions for STM32F4.
  *
  * @details

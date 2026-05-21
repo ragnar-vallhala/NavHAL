@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/i2c_reg.h
+ * @file family/i2c_reg.h
  * @brief Cortex-M4 I²C peripheral register definitions and bit masks.
  *
  * @details

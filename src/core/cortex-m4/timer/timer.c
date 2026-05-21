@@ -18,8 +18,8 @@
 #include "core/cortex-m4/timer.h"
 #include "core/cortex-m4/clock.h"
 #include "core/cortex-m4/interrupt.h"
-#include "core/cortex-m4/rcc_reg.h"
-#include "core/cortex-m4/timer_reg.h"
+#include "family/rcc_reg.h"
+#include "family/timer_reg.h"
 #include "utils/timer_types.h"
 #include <stdint.h>
 

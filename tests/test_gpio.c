@@ -5,8 +5,8 @@
 
 #define CORTEX_M4
 #include "core/cortex-m4/gpio.h"
-#include "core/cortex-m4/gpio_reg.h"
-#include "core/cortex-m4/rcc_reg.h"
+#include "family/gpio_reg.h"
+#include "family/rcc_reg.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"
 #include "test_gpio.h"

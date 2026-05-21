@@ -115,6 +115,10 @@ NAVHAL_HAS_MAP = {
     "DRV_CLOCK":     "CLOCK",
     "DRV_INTERRUPT": "INTERRUPT",
     "DRV_FLASH":     "FLASH",
+    # Per-driver capability sub-options (WI4.4).
+    "DRV_UART_DMA":  "UART_DMA",
+    "DRV_I2C_DMA":   "I2C_DMA",
+    "DRV_SDIO_DMA":  "SDIO_DMA",
 }
 
 def _sym_str(kb, name):
@@ -151,6 +155,7 @@ def generate_navhal_target_header(kconfig_obj, output_path):
         f.write("/* ===== Target identity ===== */\n")
         f.write(f'#define NAVHAL_TARGET_ARCH   "{_sym_str(kconfig_obj, "CMAKE_SYSTEM_PROCESSOR")}"\n')
         f.write(f'#define NAVHAL_TARGET_VENDOR "{_sym_str(kconfig_obj, "VENDOR")}"\n')
+        f.write(f'#define NAVHAL_TARGET_FAMILY "{_sym_str(kconfig_obj, "FAMILY")}"\n')
         f.write(f'#define NAVHAL_TARGET_BOARD  "{_sym_str(kconfig_obj, "BOARD")}"\n\n')
 
         f.write("/* ===== Resolved Kconfig symbols (NAVHAL_CONFIG_*) ===== */\n")

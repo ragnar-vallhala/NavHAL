@@ -14,6 +14,7 @@ set(KCONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Kconfig")
 set(CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.config")
 set(GENERATED_CMAKE "${CMAKE_BINARY_DIR}/config.cmake")
 set(GENERATED_HEADER "${CMAKE_BINARY_DIR}/autoconf.h")
+set(GENERATED_NAVHAL_TARGET "${CMAKE_BINARY_DIR}/navhal_target.h")
 
 message(STATUS "Running Kconfig configuration generation...")
 execute_process(
@@ -22,6 +23,7 @@ execute_process(
             --config ${CONFIG_FILE}
             --cmake-out ${GENERATED_CMAKE}
             --header-out ${GENERATED_HEADER}
+            --navhal-target-out ${GENERATED_NAVHAL_TARGET}
             --sample-override "${SAMPLE}"
     RESULT_VARIABLE KCONFIG_RESULT
 )

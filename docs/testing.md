@@ -23,6 +23,12 @@ A standalone build that compiles the pure-logic tests with the system
 `gcc` and runs them as a native binary.
 
 ```sh
+tools/run_host_tests.sh
+```
+
+That's a thin wrapper over:
+
+```sh
 cmake -B build-host -S tests/host
 cmake --build build-host -j
 ./build-host/tests_host
@@ -72,13 +78,25 @@ captured UART log is echoed to stdout for context.
 
 ### 2b. Flash to a Nucleo-F401RE
 
+Single-command flow — build, flash, capture USART2, and exit on the
+navtest failure count:
+
 ```sh
-cmake --build build --target flash_tests
+tools/run_target_tests.sh                # /dev/ttyACM0 @ 9600, 120 s timeout
+tools/run_target_tests.sh /dev/ttyACM1   # override port
 ```
 
-Then connect a USB-TTL to the board's UART2 pins (PA2/PA3 on the
-Arduino-style header) at 9600 8N1 and watch the navtest summary. The
-binary returns from `main` — it does not loop indefinitely.
+Or the unwrapped pieces (useful if you already have a serial console
+attached):
+
+```sh
+cmake --build build --target flash_tests
+# then watch USART2 (PA2/PA3 on the Arduino-style header) at 9600 8N1.
+```
+
+The on-target binary returns from `main` — it does not loop
+indefinitely, so `tools/uart_capture.py` exits cleanly with the
+failure count (0 = green) the moment it sees the summary.
 
 ---
 

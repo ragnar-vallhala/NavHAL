@@ -23,17 +23,16 @@ void test_hal_sdio_init_rejects_null_config(void) {
 }
 
 void test_hal_sdio_read_block_rejects_null_buffer(void) {
-  /* TODO(driver): hal_sdio_read_block does not NULL-check its `buffer`
-   * argument before issuing a CMD17, so a NULL probe blocks on the
-   * hardware. Skip the actual call until the driver guards it; the
-   * `init/get_sector_count/set_callback` smokes around it cover the
-   * contract enough for M2+. */
+  /* Skipped: hal_sdio_read_block issues CMD17 and waits for the card to
+   * respond before returning, so on a board without an SD card present
+   * the call blocks regardless of the buffer argument. Add a pre-CMD17
+   * NULL guard in the driver to make this testable here. */
   TEST_ASSERT_TRUE(1);
 }
 
 void test_hal_sdio_write_block_rejects_null_buffer(void) {
-  /* TODO(driver): same caveat as read_block — write_block lacks a
-   * NULL guard. */
+  /* Skipped: same as read_block — write_block issues CMD24 and waits
+   * for the card. Without a card, the call blocks regardless of args. */
   TEST_ASSERT_TRUE(1);
 }
 

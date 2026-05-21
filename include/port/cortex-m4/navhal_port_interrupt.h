@@ -112,7 +112,7 @@ uint32_t hal_interrupt_disable_global(void);
  */
 void hal_interrupt_clear_all_pending(void);
 
-/* Deprecated pre-standardization interrupt names — removed in M5. */
+/* Deprecated pre-standardization interrupt names — retained as a backward-compat alias. */
 #include "compat/interrupt_compat.h"
 
 

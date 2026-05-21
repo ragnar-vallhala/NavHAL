@@ -17,7 +17,7 @@
 #include "common/hal_dwt.h"
 
 
-/* Deprecated pre-standardization DWT names — removed in M5. */
+/* Deprecated pre-standardization DWT names — retained as a backward-compat alias. */
 #include "compat/dwt_compat.h"
 
 #endif /* NAVHAL_PORT_DWT_H */

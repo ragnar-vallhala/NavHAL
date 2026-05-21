@@ -165,7 +165,7 @@ bool hal_dma_transfer_complete(const hal_dma_config_t *cfg);
 hal_status_t hal_dma_clear_flags(const hal_dma_config_t *cfg);
 
 /* -------------------------------------------------------------------------- *
- * Deprecated — pre-standardization DMA type names. Removed in M5.
+ * Deprecated — pre-standardization DMA type names. Retained as a backward-compat alias.
  * -------------------------------------------------------------------------- */
 typedef hal_dma_controller_t dma_controller_t
     NAVHAL_DEPRECATED("use hal_dma_controller_t");
@@ -180,7 +180,7 @@ typedef hal_dma_fifo_threshold_t dma_fifo_threshold_t
     NAVHAL_DEPRECATED("use hal_dma_fifo_threshold_t");
 typedef hal_dma_config_t dma_config_t NAVHAL_DEPRECATED("use hal_dma_config_t");
 
-/* Deprecated pre-standardization function names — removed in M5. */
+/* Deprecated pre-standardization function names — retained as a backward-compat alias. */
 #include "compat/dma_compat.h"
 
 #endif /* _DMA_ENABLED */

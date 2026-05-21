@@ -42,7 +42,7 @@ typedef struct {
   uint32_t init_value;             /**< Initial accumulator value. */
 } hal_crc_config_t;
 
-/* Deprecated pre-standardization CRC type names — removed in M5. */
+/* Deprecated pre-standardization CRC type names — retained as a backward-compat alias. */
 typedef hal_crc_polynomial_t crc_polynomial_t
     NAVHAL_DEPRECATED("use hal_crc_polynomial_t");
 typedef hal_crc_config_t crc_config_t NAVHAL_DEPRECATED("use hal_crc_config_t");

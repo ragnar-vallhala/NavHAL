@@ -9,7 +9,7 @@
  * the standardized replacement. Included automatically by
  * `port/cortex-m4/navhal_port_timer.h` after the standardized declarations.
  *
- * Removed in M5. New code MUST use the standardized names directly.
+ * Retained as a backward-compat alias behind NAVHAL_DEPRECATED. New code MUST use the standardized names directly.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */

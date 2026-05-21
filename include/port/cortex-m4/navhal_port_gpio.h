@@ -55,7 +55,7 @@ static inline void hal_gpio_toggle(hal_gpio_pin_t pin) {
 } /* extern "C" */
 #endif
 
-/* Deprecated pre-standardization GPIO names — removed in M5. */
+/* Deprecated pre-standardization GPIO names — retained as a backward-compat alias. */
 #include "compat/gpio_compat.h"
 
 #endif /* NAVHAL_PORT_GPIO_H */

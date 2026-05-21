@@ -7,7 +7,7 @@
  * `hal_dma_*` API as deprecated inline wrappers. Included automatically by
  * `port/cortex-m4/navhal_port_dma.h` (inside its `_DMA_ENABLED` guard).
  *
- * Removed in M5. New code MUST use the standardized names directly.
+ * Retained as a backward-compat alias behind NAVHAL_DEPRECATED. New code MUST use the standardized names directly.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */

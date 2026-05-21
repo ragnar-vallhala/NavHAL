@@ -42,7 +42,7 @@ A one-page cheat-sheet for contributors. The full rationale lives in
 `NAVHAL_WEAK`, `NAVHAL_PACKED`, `NAVHAL_NORETURN`, `NAVHAL_DEPRECATED(msg)` —
 all from `common/navhal_compiler.h`.
 
-## Deprecated (do not use in new code; removed in M5)
+## Deprecated (do not use in new code; retained as a backward-compat alias)
 
 `SUCCESS` / `FAILURE` (use `HAL_OK` / `HAL_ERR`), `byte` (use `uint8_t`),
 `__UNUSED` (use `NAVHAL_UNUSED`).

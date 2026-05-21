@@ -45,7 +45,7 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr,
 } /* extern "C" */
 #endif
 
-/* Deprecated pre-standardization SDIO names — removed in M5. */
+/* Deprecated pre-standardization SDIO names — retained as a backward-compat alias. */
 #include "compat/sdio_compat.h"
 
 #endif /* NAVHAL_PORT_SDIO_H */

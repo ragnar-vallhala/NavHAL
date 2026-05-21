@@ -58,7 +58,7 @@ void TIM12_IRQHandler(void);
 } /* extern "C" */
 #endif
 
-/* Deprecated pre-standardization timebase/timer names — removed in M5. */
+/* Deprecated pre-standardization timebase/timer names — retained as a backward-compat alias. */
 #include "compat/timebase_compat.h"
 #include "compat/timer_compat.h"
 

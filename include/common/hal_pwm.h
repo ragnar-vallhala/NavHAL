@@ -72,7 +72,7 @@ hal_status_t hal_pwm_set_duty_cycle(hal_pwm_handle_t *pwm, float duty_cycle);
  */
 hal_status_t hal_pwm_set_frequency(hal_pwm_handle_t *pwm, uint32_t frequency);
 
-/* Deprecated pre-standardization PWM handle type — removed in M5. */
+/* Deprecated pre-standardization PWM handle type — retained as a backward-compat alias. */
 typedef hal_pwm_handle_t PWM_Handle NAVHAL_DEPRECATED("use hal_pwm_handle_t");
 
 #ifdef __cplusplus

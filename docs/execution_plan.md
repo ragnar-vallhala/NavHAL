@@ -253,7 +253,13 @@ fills in directories — it does not touch the build system's structure.
 Work items:
 - WI5.1 — Per-driver conformance audit against the Section 14 checklist.
 - WI5.2 — Migrate all 28 samples to the new API; rename for clarity if needed.
-- WI5.3 — Delete the M2 `compat/` shims and the deprecated `SUCCESS`/`FAILURE`.
+- WI5.3 — **Keep the `compat/` shims and pre-standardization aliases as a
+  permanent backward-compatibility surface.** The M2 deprecations
+  (`SUCCESS`/`FAILURE`, the `dma_*` / `hal_get_millis` / `UART1` /
+  `FlashRecord_t` / `HAL_I2C_OK` / etc. names) stay in tree behind
+  `NAVHAL_DEPRECATED` so existing application code continues to compile
+  with a warning, not an error. Update the per-symbol doc strings that
+  currently say "removed in M5" to reflect the new policy.
 - WI5.4 — Set `HAL_API_VERSION = 1`; update `README.md` (correct the
   multi-arch claims to reflect actual support) and Doxygen `mainpage.md`.
 - WI5.5 — Regenerate Doxygen + the LaTeX design doc.
@@ -266,9 +272,11 @@ Work items:
   hold end-to-end on hardware. (Landed early, before the rest of M5, via
   commits `885889a` and `89893de`.)
 
-**Acceptance:** No deprecated symbols remain; all samples + tests build and pass
-on the F401RE; `HAL_API_VERSION` frozen at 1; at least one C++ sample builds
-and runs on-target.
+**Acceptance:** all samples + tests build and pass on the F401RE using
+v1-only API; the deprecated aliases still compile (with deprecation warnings,
+not errors); `HAL_API_VERSION` frozen at 1; at least one C++ sample builds
+and runs on-target. Removing the shim layer is explicitly deferred — it would
+be a v2 API break, not part of v1's stabilisation.
 
 **Milestone gate — "AVR readiness review":** before starting M6, review the
 frozen API against the Section 2 table. Any item that still fails is fixed here,
@@ -349,8 +357,10 @@ Work items:
   clean `cmake -DTEST=ON`; host subset runs in CI.
 - M3: layered tree in place; no logic change; build verified.
 - M4: zero `#ifdef ARCH` in headers; Kconfig-driven build.
-- M5: shims removed; `HAL_API_VERSION = 1`; samples + tests pass (incl. one
-  C++ sample on-target); AVR readiness review signed off.
+- M5: `HAL_API_VERSION = 1`; samples + tests pass against the v1 API (incl.
+  one C++ sample on-target); deprecated aliases retained behind
+  `NAVHAL_DEPRECATED` for backward compatibility; AVR readiness review signed
+  off.
 - M6: ATmega328p runs `hal_blink` + `hal_uart_tx` from a Kconfig switch with no
   changes to the public API or the STM32 port.
 

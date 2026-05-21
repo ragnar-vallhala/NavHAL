@@ -15,7 +15,7 @@
 #include "common/hal_flash.h"
 
 
-/* Deprecated pre-standardization function names — removed in M5. */
+/* Deprecated pre-standardization function names — retained as a backward-compat alias. */
 #include "compat/flash_compat.h"
 
 #endif /* NAVHAL_PORT_FLASH_H */

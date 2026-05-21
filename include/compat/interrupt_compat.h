@@ -8,7 +8,7 @@
  * name produces a compiler warning naming the standardized replacement.
  * Included automatically by `port/cortex-m4/navhal_port_interrupt.h`.
  *
- * Removed in M5. New code MUST use the standardized names directly.
+ * Retained as a backward-compat alias behind NAVHAL_DEPRECATED. New code MUST use the standardized names directly.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */

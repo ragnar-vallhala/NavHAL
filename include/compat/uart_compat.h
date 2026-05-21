@@ -14,7 +14,7 @@
  * *last* argument; the standardized API takes it *first*. These wrappers
  * reorder accordingly.
  *
- * Removed in M5. New code MUST use the standardized names directly.
+ * Retained as a backward-compat alias behind NAVHAL_DEPRECATED. New code MUST use the standardized names directly.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */

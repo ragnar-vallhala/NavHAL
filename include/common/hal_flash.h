@@ -76,7 +76,7 @@ bool hal_flash_needs_compaction(void);
 
 /* -------------------------------------------------------------------------- *
  * Deprecated — pre-standardization Flash type names. The status enum is now
- * ::hal_status_t. Removed in M5.
+ * ::hal_status_t. Retained as a backward-compat alias.
  * -------------------------------------------------------------------------- */
 typedef hal_flash_record_t FlashRecord_t
     NAVHAL_DEPRECATED("use hal_flash_record_t");

@@ -47,7 +47,7 @@ hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 } /* extern "C" */
 #endif
 
-/* Deprecated pre-standardization UART names — removed in M5. */
+/* Deprecated pre-standardization UART names — retained as a backward-compat alias. */
 #include "compat/uart_compat.h"
 
 #endif /* NAVHAL_PORT_UART_H */

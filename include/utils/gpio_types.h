@@ -137,7 +137,7 @@ typedef enum {
  * Each enum below carries its standardized HAL_GPIO_* constants plus the
  * pre-standardization GPIO_* aliases. The aliases are marked deprecated, so
  * using one emits a compiler warning pointing at the standardized name.
- * All deprecated aliases are removed in M5.
+ * All deprecated aliases are retained as a backward-compat surface behind NAVHAL_DEPRECATED.
  */
 
 /**
@@ -245,7 +245,7 @@ typedef enum {
 } hal_gpio_af_t;
 
 /* -------------------------------------------------------------------------- *
- * Deprecated — pre-standardization GPIO type names. Removed in M5.
+ * Deprecated — pre-standardization GPIO type names. Retained as a backward-compat alias.
  * -------------------------------------------------------------------------- */
 typedef hal_gpio_mode_t hal_gpio_mode
     NAVHAL_DEPRECATED("use hal_gpio_mode_t");

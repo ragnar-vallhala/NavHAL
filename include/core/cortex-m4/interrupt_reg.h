@@ -28,13 +28,22 @@
  * active bit registers, reserved space, and interrupt priority registers.
  */
 typedef struct {
+    /* Each NVIC register array is 0x20 bytes (8 words). The ARM Cortex-M4
+     * NVIC layout (PM0214 §4.3) leaves a 0x60-byte (24-word) reserved gap
+     * between successive arrays. Without these RESERVED slots in the struct,
+     * accesses to ICER / ISPR / ICPR / IABR / IPR land in the gap region
+     * and never reach the actual peripheral. */
     __IO uint32_t ISER[8];       /**< Interrupt Set-Enable Registers (0xE000E100 - 0xE000E11C) */
+    uint32_t RESERVED0[24];      /**< 0xE000E120 - 0xE000E17F */
     __IO uint32_t ICER[8];       /**< Interrupt Clear-Enable Registers (0xE000E180 - 0xE000E19C) */
+    uint32_t RESERVED1[24];      /**< 0xE000E1A0 - 0xE000E1FF */
     __IO uint32_t ISPR[8];       /**< Interrupt Set-Pending Registers (0xE000E200 - 0xE000E21C) */
+    uint32_t RESERVED2[24];      /**< 0xE000E220 - 0xE000E27F */
     __IO uint32_t ICPR[8];       /**< Interrupt Clear-Pending Registers (0xE000E280 - 0xE000E29C) */
+    uint32_t RESERVED3[24];      /**< 0xE000E2A0 - 0xE000E2FF */
     __IO uint32_t IABR[8];       /**< Interrupt Active Bit Registers (0xE000E300 - 0xE000E31C) */
-    __IO uint32_t RESERVED0[32]; /**< Reserved padding to 0xE000E400 */
-    __IO uint8_t IPR[60];        /**< Interrupt Priority Registers (8-bit) (0xE000E400 - 0xE000E4EC) */
+    uint32_t RESERVED4[56];      /**< 0xE000E320 - 0xE000E3FF */
+    __IO uint8_t IPR[240];       /**< Interrupt Priority Registers (0xE000E400 - 0xE000E4EF) */
 } NVIC_Typedef;
 
 /** NVIC base address */

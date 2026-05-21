@@ -36,13 +36,12 @@ void test_hal_interrupt_enable_sets_iser_bit(void) {
 }
 
 void test_hal_interrupt_disable_sets_icer_bit(void) {
-  /* `hal_interrupt_disable` must return HAL_OK on a valid IRQ; the side
-   * effect (ISER bit clear) is observable only when the surrounding
-   * context allows it (the test harness re-runs ISRs around this call,
-   * so we don't assert on ISER state here). */
   hal_interrupt_enable(TEST_IRQ);
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
                            (uint32_t)hal_interrupt_disable(TEST_IRQ));
+  /* Writing 1 to an ICER bit clears the matching ISER bit on Cortex-M
+   * NVIC; after disable, ISER[word] & bit must read 0. */
+  TEST_ASSERT_BITS_LOW(iser_bit(TEST_IRQ), NVIC->ISER[iser_word(TEST_IRQ)]);
 }
 
 void test_hal_interrupt_clear_pending_clears_ispr_bit(void) {
@@ -53,16 +52,13 @@ void test_hal_interrupt_clear_pending_clears_ispr_bit(void) {
 }
 
 void test_hal_interrupt_set_get_priority_round_trip(void) {
-  /* The driver shifts priority into the upper 4 bits before storing
-   * (Cortex-M4 implements the upper PRIO_BITS). The getter is the
-   * inverse. The exact normalization scheme is driver-internal; here we
-   * only assert that `set` returns HAL_OK and `get` returns a defined
-   * 8-bit value (no fault). */
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
                            (uint32_t)hal_interrupt_set_priority(TEST_IRQ, 5));
-  uint8_t got = hal_interrupt_get_priority(TEST_IRQ);
-  (void)got;
-  TEST_ASSERT_TRUE(1);
+  /* The driver shifts priority into the top 4 bits before storing
+   * (Cortex-M4 implements `__NVIC_PRIO_BITS = 4`); the getter inverts
+   * with `>> 4`, so the round-trip preserves the input value. */
+  TEST_ASSERT_EQUAL_UINT32(5u,
+                           (uint32_t)hal_interrupt_get_priority(TEST_IRQ));
 }
 
 void test_hal_interrupt_is_pending_after_set(void) {

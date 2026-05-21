@@ -163,7 +163,11 @@ uint32_t hal_interrupt_disable_global(void) {
 }
 
 void hal_interrupt_clear_all_pending(void) {
-  for (int i = 0; i < 8; i++) {
+  /* STM32F401RE wires IRQs 0..81 (NVIC ICPR words 0..2). Writing past
+   * that range is a no-op on real silicon but produces "unhandled
+   * write" warnings in Renode's NVIC model. Keep the loop tight to the
+   * chip's actual IRQ count. */
+  for (int i = 0; i < 3; i++) {
     NVIC->ICPR[i] = 0xFFFFFFFF;
   }
 }

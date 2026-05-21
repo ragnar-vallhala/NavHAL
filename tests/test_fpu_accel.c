@@ -2,6 +2,7 @@
 #include "test_fpu_accel.h"
 #include "common/hal_features.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
 #include <stdint.h>
 
 #if NAVHAL_HAS_FPU
@@ -22,6 +23,8 @@ void test_fpu_basic_arithmetic(void) {
 }
 
 void test_fpu_benchmark_cycles(void) {
+  /* Depends on DWT cycles advancing; PIL silences the DWT range. */
+  NAVTEST_SKIP_ON_PIL();
   uint32_t start, end;
   const int iterations = 1000;
 

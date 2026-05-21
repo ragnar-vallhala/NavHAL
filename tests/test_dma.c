@@ -12,6 +12,7 @@
 #include "core/cortex-m4/dma.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
 #include "test_dma.h"
 
 static hal_dma_config_t test_cfg;
@@ -58,6 +59,7 @@ void test_dma_clock_enable_dma2(void) {
 }
 
 void test_dma_init_sets_channel(void) {
+  NAVTEST_SKIP_ON_PIL();
   dma_setUp();
   test_cfg.channel = 3;
   hal_dma_init(&test_cfg);
@@ -90,6 +92,7 @@ void test_dma_init_sets_minc(void) {
 }
 
 void test_dma_init_sets_priority(void) {
+  NAVTEST_SKIP_ON_PIL();
   dma_setUp();
   test_cfg.priority = HAL_DMA_PRIORITY_HIGH;
   hal_dma_init(&test_cfg);

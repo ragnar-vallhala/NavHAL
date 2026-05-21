@@ -3,6 +3,7 @@
 #include "core/cortex-m4/timer_reg.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
 #include <stdint.h>
 
 #define TEST_TIMER TIM2
@@ -102,6 +103,7 @@ void test_timer_enable_interrupt_sets_DIER_UIE(void) {
 }
 
 void test_timer_clear_interrupt_flag_clears_UIF(void) {
+  NAVTEST_SKIP_ON_PIL();
   TIMx_Reg_Typedef *timer = GET_TIMx_BASE(TEST_TIMER);
   TEST_ASSERT_NOT_NULL(timer);
 

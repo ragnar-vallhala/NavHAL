@@ -2,6 +2,7 @@
 #include "test_dwt.h"
 #include "common/hal_features.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
 #include <stdint.h>
 
 #if NAVHAL_HAS_CYCLE_COUNTER
@@ -9,6 +10,7 @@
 #include "core/cortex-m4/dwt_reg.h"
 
 void test_dwt_init_enables_counters(void) {
+  NAVTEST_SKIP_ON_PIL();
   hal_cycle_counter_init();
 
   // Verify TRCENA bit in DEMCR
@@ -19,6 +21,7 @@ void test_dwt_init_enables_counters(void) {
 }
 
 void test_dwt_get_cycles_increments(void) {
+  NAVTEST_SKIP_ON_PIL();
   hal_cycle_counter_init();
   uint32_t c1 = hal_cycle_counter_get();
   // Small busy wait or just NOPs
@@ -30,6 +33,7 @@ void test_dwt_get_cycles_increments(void) {
 }
 
 void test_dwt_reset_cycles_zeros_counter(void) {
+  NAVTEST_SKIP_ON_PIL();
   hal_cycle_counter_init();
   // Let it run a bit
   for (volatile int i = 0; i < 100; i++)
@@ -43,25 +47,10 @@ void test_dwt_reset_cycles_zeros_counter(void) {
 }
 
 void test_dwt_delay_cycles_elapses_time(void) {
+  /* hal_cycle_counter_delay() busy-waits on CYCCNT. Without the skip
+   * the suite hangs forever in PIL where CYCCNT never advances. */
+  NAVTEST_SKIP_ON_PIL();
   hal_cycle_counter_init();
-
-  /* Probe: is the cycle counter actually advancing? On Renode the
-   * DWT block is omitted from the platform model and CYCCNT reads
-   * are silenced to 0 (see tools/renode/navhal_f401re.resc). Calling
-   * hal_cycle_counter_delay() there would busy-wait forever and hang
-   * the entire suite. Skip the delay assertion when the counter is
-   * dead — the previous three CYCLE_COUNTER cases already failed
-   * loudly enough to flag the environment. */
-  uint32_t probe1 = hal_cycle_counter_get();
-  for (volatile int i = 0; i < 1000; i++)
-    __asm__ volatile("nop");
-  uint32_t probe2 = hal_cycle_counter_get();
-  if (probe2 == probe1) {
-    /* Counter is dead (PIL / Renode). Don't call into hal_cycle_counter_delay. */
-    TEST_ASSERT_TRUE(1);
-    return;
-  }
-
   uint32_t delay = 1000;
   uint32_t start = hal_cycle_counter_get();
   hal_cycle_counter_delay(delay);

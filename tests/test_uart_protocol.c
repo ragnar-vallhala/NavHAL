@@ -14,6 +14,7 @@
 #include "core/cortex-m4/uart.h"
 #include "core/cortex-m4/uart_reg.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -36,6 +37,9 @@ void test_uart_baudrate_9600(void) {
 }
 
 void test_uart_baudrate_115200(void) {
+  /* Renode's UART6 model doesn't reflect BRR writes back to the register;
+   * the same test passes for UART1 above and on HIL for UART6. */
+  NAVTEST_SKIP_ON_PIL();
   hal_uart_init(HAL_UART_6, &(hal_uart_config_t){.baudrate = 115200});
   volatile UARTx_Reg_Typedef *u6 = GET_USARTx_BASE(6);
   uint32_t pclk = hal_clock_get_apb2clk();

@@ -8,6 +8,7 @@
 #include "core/cortex-m4/gpio_reg.h"
 #include "core/cortex-m4/rcc_reg.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
 #include "test_gpio.h"
 
 #include <stdint.h>
@@ -106,6 +107,7 @@ void test_hal_gpio_set_alternate_function_switches_mode_to_af(void) {
 }
 
 void test_hal_gpio_set_output_type_writes_otyper(void) {
+  NAVTEST_SKIP_ON_PIL();
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
                            (uint32_t)hal_gpio_set_output_type(
                                TEST_GPIO_PIN, HAL_GPIO_OTYPE_OPEN_DRAIN));

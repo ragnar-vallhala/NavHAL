@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/dma.h
+ * @file port/cortex-m4/navhal_port_dma.h
  * @brief Cortex-M4 / STM32F4 DMA HAL driver interface.
  *
  * @details
@@ -29,8 +29,8 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_DMA_H
-#define CORTEX_M4_DMA_H
+#ifndef NAVHAL_PORT_DMA_H
+#define NAVHAL_PORT_DMA_H
 
 
 #ifdef __cplusplus
@@ -189,4 +189,4 @@ typedef hal_dma_config_t dma_config_t NAVHAL_DEPRECATED("use hal_dma_config_t");
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-#endif /* CORTEX_M4_DMA_H */
+#endif /* NAVHAL_PORT_DMA_H */

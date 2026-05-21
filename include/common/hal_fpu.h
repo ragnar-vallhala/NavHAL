@@ -30,6 +30,6 @@ hal_status_t hal_fpu_enable(void);
 } /* extern "C" */
 #endif
 
-#include "core/cortex-m4/fpu.h"
+#include "navhal_port_fpu.h"
 
 #endif /* HAL_FPU_H */

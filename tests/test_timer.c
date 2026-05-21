@@ -1,5 +1,5 @@
-#include "core/cortex-m4/clock.h"
-#include "core/cortex-m4/timer.h"
+#include "navhal_port_clock.h"
+#include "navhal_port_timer.h"
 #include "family/timer_reg.h"
 #include "family/rcc_reg.h"
 #include "navtest/navtest.h"

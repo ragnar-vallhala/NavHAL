@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/flash.h
+ * @file port/cortex-m4/navhal_port_flash.h
  * @brief Cortex-M4 / STM32F4 Flash port header.
  *
  * @details
@@ -9,8 +9,8 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_FLASH_H
-#define CORTEX_M4_FLASH_H
+#ifndef NAVHAL_PORT_FLASH_H
+#define NAVHAL_PORT_FLASH_H
 
 #include "common/hal_flash.h"
 
@@ -18,4 +18,4 @@
 /* Deprecated pre-standardization function names — removed in M5. */
 #include "compat/flash_compat.h"
 
-#endif /* CORTEX_M4_FLASH_H */
+#endif /* NAVHAL_PORT_FLASH_H */

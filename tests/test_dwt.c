@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #if NAVHAL_HAS_CYCLE_COUNTER
-#include "core/cortex-m4/dwt.h"
+#include "navhal_port_dwt.h"
 #include "family/dwt_reg.h"
 
 void test_dwt_init_enables_counters(void) {

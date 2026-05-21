@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/gpio.h
+ * @file port/cortex-m4/navhal_port_gpio.h
  * @brief Cortex-M4 / STM32F4 GPIO port header.
  *
  * @details
@@ -10,8 +10,8 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_GPIO_H
-#define CORTEX_M4_GPIO_H
+#ifndef NAVHAL_PORT_GPIO_H
+#define NAVHAL_PORT_GPIO_H
 
 #include "common/hal_gpio.h"
 #include "family/gpio_reg.h"
@@ -58,4 +58,4 @@ static inline void hal_gpio_toggle(hal_gpio_pin_t pin) {
 /* Deprecated pre-standardization GPIO names — removed in M5. */
 #include "compat/gpio_compat.h"
 
-#endif /* CORTEX_M4_GPIO_H */
+#endif /* NAVHAL_PORT_GPIO_H */

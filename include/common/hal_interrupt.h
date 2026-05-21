@@ -18,7 +18,7 @@ extern "C" {
  * @author Ashutosh Vishwakarma
  * @date 2025-07-20
  */
-#include "core/cortex-m4/interrupt.h" // Include architecture-specific interrupt definitions
+#include "navhal_port_interrupt.h" // Include architecture-specific interrupt definitions
 #include "family/interrupt_reg.h" // Include architecture-specific interrupt register definitions
 
 #ifdef __cplusplus

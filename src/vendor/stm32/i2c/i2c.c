@@ -4,7 +4,7 @@
  *
  * @details
  * Implements the standardized `hal_i2c_*` API declared in
- * `core/cortex-m4/i2c.h`: master-mode initialization, blocking write/read/
+ * `port/cortex-m4/navhal_port_i2c.h`: master-mode initialization, blocking write/read/
  * combined transactions, and an optional DMA register-read path.
  *
  * Bus pin mapping:
@@ -15,8 +15,8 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/i2c.h"
-#include "core/cortex-m4/clock.h"
+#include "navhal_port_i2c.h"
+#include "navhal_port_clock.h"
 #include "family/i2c_reg.h"
 #include "family/rcc_reg.h"
 #include <stdbool.h>
@@ -33,7 +33,7 @@ static int _wait_flag(volatile uint32_t *reg, uint32_t mask);
 uint8_t hal_i2c_get_init_status(void) { return __i2c_init_status; }
 
 #ifdef _DMA_ENABLED
-#include "core/cortex-m4/interrupt.h"
+#include "navhal_port_interrupt.h"
 
 static void (*_i2c_dma_rx_callback)(void) = NULL;
 static dma_config_t _active_i2c_dma_config;

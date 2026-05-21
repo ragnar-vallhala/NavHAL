@@ -9,7 +9,7 @@
  * here against the standardized hal_crc_* API.
  */
 
-#include "core/cortex-m4/crc.h"
+#include "navhal_port_crc.h"
 #include "test_crc_sw.h"
 
 void test_crc_sw_init_rejects_null(void) {

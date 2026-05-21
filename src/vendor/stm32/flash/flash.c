@@ -4,13 +4,13 @@
  *
  * @details
  * Implements the standardized `hal_flash_*` API declared in
- * `core/cortex-m4/flash.h`: a simple key/value store backed by the on-chip
+ * `port/cortex-m4/navhal_port_flash.h`: a simple key/value store backed by the on-chip
  * Flash, with compaction between a primary and secondary sector.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/flash.h"
+#include "navhal_port_flash.h"
 #include "common/hal_types.h"
 #include "family/flash_reg.h"
 #include "utils/util.h"

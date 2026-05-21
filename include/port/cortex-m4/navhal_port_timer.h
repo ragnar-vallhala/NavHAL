@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/timer.h
+ * @file port/cortex-m4/navhal_port_timer.h
  * @brief Cortex-M4 / STM32F4 timer + SysTick port header.
  *
  * @details
@@ -9,8 +9,8 @@
  * @c TIMx_IRQHandler).
  */
 
-#ifndef CORTEX_M4_TIMER_H
-#define CORTEX_M4_TIMER_H
+#ifndef NAVHAL_PORT_TIMER_H
+#define NAVHAL_PORT_TIMER_H
 
 #include "common/hal_timer.h"
 #include "common/hal_types.h"
@@ -62,4 +62,4 @@ void TIM12_IRQHandler(void);
 #include "compat/timebase_compat.h"
 #include "compat/timer_compat.h"
 
-#endif /* CORTEX_M4_TIMER_H */
+#endif /* NAVHAL_PORT_TIMER_H */

@@ -6,7 +6,7 @@
 #define CORTEX_M4
 #include "test_crc.h"
 #include "common/hal_config.h"
-#include "core/cortex-m4/crc.h"
+#include "navhal_port_crc.h"
 #include "navtest/navtest.h"
 
 static hal_crc_config_t test_cfg;

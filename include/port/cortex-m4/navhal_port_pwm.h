@@ -1,17 +1,17 @@
 /**
- * @file core/cortex-m4/pwm.h
+ * @file port/cortex-m4/navhal_port_pwm.h
  * @brief Cortex-M4 PWM port header.
  *
  * @details
  * The public prototypes live in @c common/hal_pwm.h, which includes this
- * header. Retained to preserve the @c #include "core/cortex-m4/pwm.h" path.
+ * header. Retained to preserve the @c #include "navhal_port_pwm.h" path.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_PWM_H
-#define CORTEX_M4_PWM_H
+#ifndef NAVHAL_PORT_PWM_H
+#define NAVHAL_PORT_PWM_H
 
 #include "common/hal_pwm.h"
 
-#endif /* CORTEX_M4_PWM_H */
+#endif /* NAVHAL_PORT_PWM_H */

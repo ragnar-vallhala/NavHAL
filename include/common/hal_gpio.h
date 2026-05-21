@@ -7,7 +7,7 @@
  * function prototypes, and the typedef-only support pulled in from
  * @c utils/gpio_types.h. Hot-path accessors (write/read/toggle) and any
  * register-backed bits live in the target port header
- * (@c core/cortex-m4/gpio.h on the Cortex-M4 port), included at the bottom of
+ * (@c port/cortex-m4/navhal_port_gpio.h on the Cortex-M4 port), included at the bottom of
  * this file so callers only need to include @c common/hal_gpio.h.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
@@ -104,6 +104,6 @@ hal_status_t hal_gpio_set_output_speed(hal_gpio_pin_t pin,
 #endif
 
 /* Port-specific hot-path inlines + register-backed defines. */
-#include "core/cortex-m4/gpio.h"
+#include "navhal_port_gpio.h"
 
 #endif /* HAL_GPIO_H */

@@ -91,6 +91,6 @@ typedef hal_status_t FlashStatus_t NAVHAL_DEPRECATED("use hal_status_t");
 #endif
 
 /* Port-specific bits (compat shim with deprecated function names). */
-#include "core/cortex-m4/flash.h"
+#include "navhal_port_flash.h"
 
 #endif /* HAL_FLASH_H */

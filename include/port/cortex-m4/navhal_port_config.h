@@ -1,5 +1,5 @@
-#ifndef CORTEX_M4_CONFIG_H
-#define CORTEX_M4_CONFIG_H
+#ifndef NAVHAL_PORT_CONFIG_H
+#define NAVHAL_PORT_CONFIG_H
 
 
 #ifdef __cplusplus
@@ -33,4 +33,4 @@ extern "C" {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-#endif // CORTEX_M4_CONFIG_H
+#endif // NAVHAL_PORT_CONFIG_H

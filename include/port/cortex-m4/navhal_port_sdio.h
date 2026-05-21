@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/sdio.h
+ * @file port/cortex-m4/navhal_port_sdio.h
  * @brief Cortex-M4 / STM32F4 SDIO port header.
  *
  * @details
@@ -11,11 +11,11 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_SDIO_H
-#define CORTEX_M4_SDIO_H
+#ifndef NAVHAL_PORT_SDIO_H
+#define NAVHAL_PORT_SDIO_H
 
 #include "common/hal_sdio.h"
-#include "core/cortex-m4/config.h"
+#include "navhal_port_config.h"
 #include "family/sdio_reg.h"
 
 #define SDIO_CMD_WAITPEND (1 << 9)
@@ -48,4 +48,4 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr,
 /* Deprecated pre-standardization SDIO names — removed in M5. */
 #include "compat/sdio_compat.h"
 
-#endif /* CORTEX_M4_SDIO_H */
+#endif /* NAVHAL_PORT_SDIO_H */

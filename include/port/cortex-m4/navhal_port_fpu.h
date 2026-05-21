@@ -1,17 +1,17 @@
 /**
- * @file core/cortex-m4/fpu.h
+ * @file port/cortex-m4/navhal_port_fpu.h
  * @brief Cortex-M4 FPU port header.
  *
  * @details
  * The public prototype lives in @c common/hal_fpu.h, which includes this
- * header. Retained to preserve the @c #include "core/cortex-m4/fpu.h" path.
+ * header. Retained to preserve the @c #include "navhal_port_fpu.h" path.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_FPU_H
-#define CORTEX_M4_FPU_H
+#ifndef NAVHAL_PORT_FPU_H
+#define NAVHAL_PORT_FPU_H
 
 #include "common/hal_fpu.h"
 
-#endif /* CORTEX_M4_FPU_H */
+#endif /* NAVHAL_PORT_FPU_H */

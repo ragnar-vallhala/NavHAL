@@ -8,7 +8,7 @@
  * deprecated, so using a legacy name produces a compiler warning that names
  * the standardized replacement. Existing drivers and samples keep building
  * during the M2-M5 migration; this header is included automatically by
- * `core/cortex-m4/gpio.h`.
+ * `port/cortex-m4/navhal_port_gpio.h`.
  *
  * This header — and every symbol it defines — is removed in M5. New code MUST
  * use the standardized names directly.

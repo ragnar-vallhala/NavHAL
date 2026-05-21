@@ -7,7 +7,7 @@
  * deprecated inline wrappers over the standardized `hal_timebase_*` /
  * `hal_delay_*` API. Using a legacy name produces a compiler warning naming
  * the standardized replacement. Included automatically by
- * `core/cortex-m4/timer.h` after the standardized declarations.
+ * `port/cortex-m4/navhal_port_timer.h` after the standardized declarations.
  *
  * Removed in M5. New code MUST use the standardized names directly.
  *

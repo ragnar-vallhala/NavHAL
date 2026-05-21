@@ -8,7 +8,7 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/crc.h"
+#include "navhal_port_crc.h"
 #include <stddef.h>
 
 /* Keep track of configured init value */

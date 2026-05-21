@@ -6,8 +6,8 @@
 #include <stdint.h>
 
 #if NAVHAL_HAS_FPU
-#include "core/cortex-m4/dwt.h"
-#include "core/cortex-m4/fpu.h"
+#include "navhal_port_dwt.h"
+#include "navhal_port_fpu.h"
 
 static volatile float f1 = 1.23456f;
 static volatile float f2 = 2.34567f;

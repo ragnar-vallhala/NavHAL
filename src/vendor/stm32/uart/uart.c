@@ -4,7 +4,7 @@
  *
  * @details
  * Implements the standardized `hal_uart_*` API declared in
- * `core/cortex-m4/uart.h`: initialization, blocking character/number/string/
+ * `port/cortex-m4/navhal_port_uart.h`: initialization, blocking character/number/string/
  * buffer transmission, blocking reception, interrupt enable, and an optional
  * DMA transmit/receive backend.
  *
@@ -14,15 +14,15 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/uart.h"
-#include "core/cortex-m4/clock.h"
-#include "core/cortex-m4/gpio.h"
-#include "core/cortex-m4/interrupt.h"
+#include "navhal_port_uart.h"
+#include "navhal_port_clock.h"
+#include "navhal_port_gpio.h"
+#include "navhal_port_interrupt.h"
 #include "family/rcc_reg.h"
 #include "family/uart_reg.h"
 #include <stdint.h>
 #ifdef _UART_BACKEND_DMA
-#include "core/cortex-m4/dma.h"
+#include "navhal_port_dma.h"
 #endif
 
 static inline volatile UARTx_Reg_Typedef *_get_usart(hal_uart_t uart) {

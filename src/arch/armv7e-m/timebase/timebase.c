@@ -16,8 +16,8 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/clock.h"
-#include "core/cortex-m4/timer.h"
+#include "navhal_port_clock.h"
+#include "navhal_port_timer.h"
 #include <stdint.h>
 
 /**

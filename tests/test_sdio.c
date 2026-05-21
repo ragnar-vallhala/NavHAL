@@ -13,7 +13,7 @@
 
 #if NAVHAL_HAS_SDIO
 
-#include "core/cortex-m4/sdio.h"
+#include "navhal_port_sdio.h"
 #include "navtest/navtest.h"
 
 void test_hal_sdio_init_rejects_null_config(void) {

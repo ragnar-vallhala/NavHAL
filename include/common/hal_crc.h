@@ -83,7 +83,7 @@ hal_status_t hal_crc_reset(void);
 #endif
 
 /* Port-specific bits (currently none for CRC; header retained for the
- * existing @c #include "core/cortex-m4/crc.h" path). */
-#include "core/cortex-m4/crc.h"
+ * existing @c #include "navhal_port_crc.h" path). */
+#include "navhal_port_crc.h"
 
 #endif /* HAL_CRC_H */

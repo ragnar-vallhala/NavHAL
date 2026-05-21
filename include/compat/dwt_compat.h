@@ -5,7 +5,7 @@
  * @details
  * Maps the pre-standardization `dwt_*` names onto the standardized
  * `hal_cycle_counter_*` API as deprecated inline wrappers. Included
- * automatically by `core/cortex-m4/dwt.h`.
+ * automatically by `port/cortex-m4/navhal_port_dwt.h`.
  *
  * Removed in M5. New code MUST use the standardized names directly.
  *

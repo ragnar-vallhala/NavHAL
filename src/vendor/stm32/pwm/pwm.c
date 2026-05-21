@@ -4,17 +4,17 @@
  *
  * @details
  * Implements the standardized `hal_pwm_*` API declared in
- * `core/cortex-m4/pwm.h`. PWM signals are produced on a timer channel; this
+ * `port/cortex-m4/navhal_port_pwm.h`. PWM signals are produced on a timer channel; this
  * driver computes the timer prescaler / auto-reload / compare values and
  * delegates to the standardized timer driver.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/pwm.h"
-#include "core/cortex-m4/clock.h"
+#include "navhal_port_pwm.h"
+#include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
-#include "core/cortex-m4/timer.h"
+#include "navhal_port_timer.h"
 #include <stdint.h>
 
 hal_status_t hal_pwm_init(hal_pwm_handle_t *pwm, uint32_t frequency,

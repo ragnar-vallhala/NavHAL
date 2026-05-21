@@ -10,8 +10,8 @@
 
 #define CORTEX_M4
 #include "test_uart_protocol.h"
-#include "core/cortex-m4/clock.h"
-#include "core/cortex-m4/uart.h"
+#include "navhal_port_clock.h"
+#include "navhal_port_uart.h"
 #include "family/uart_reg.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"

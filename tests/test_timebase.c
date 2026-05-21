@@ -4,7 +4,7 @@
  */
 
 #define CORTEX_M4
-#include "core/cortex-m4/timer.h"
+#include "navhal_port_timer.h"
 #include "navtest/navtest.h"
 #include "test_timebase.h"
 

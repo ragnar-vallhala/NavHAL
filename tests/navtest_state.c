@@ -12,7 +12,7 @@
 #ifndef NAVTEST_HOST
 /* Target backend: route navtest output to UART2. The host backend lives in
  * tests/host/host_backend.c and routes to stdout. */
-#include "core/cortex-m4/uart.h"
+#include "navhal_port_uart.h"
 void navtest_write(const char *s) { uart2_write(s); }
 #endif
 

@@ -8,7 +8,7 @@
  * compiler warning naming the standardized replacement; the type-generic
  * `uartN_write` / `uart_write` macros forward silently (a `_Generic` macro
  * cannot carry an attribute). Included automatically by
- * `core/cortex-m4/uart.h` after the standardized declarations.
+ * `port/cortex-m4/navhal_port_uart.h` after the standardized declarations.
  *
  * Note: the pre-standardization functions took the UART instance as their
  * *last* argument; the standardized API takes it *first*. These wrappers

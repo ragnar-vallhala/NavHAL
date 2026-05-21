@@ -1,10 +1,10 @@
-#include "core/cortex-m4/sdio.h"
-#include "core/cortex-m4/clock.h"
-#include "core/cortex-m4/gpio.h"
-#include "core/cortex-m4/interrupt.h"
+#include "navhal_port_sdio.h"
+#include "navhal_port_clock.h"
+#include "navhal_port_gpio.h"
+#include "navhal_port_interrupt.h"
 #include "family/rcc_reg.h"
-#include "core/cortex-m4/timer.h"
-// #include "core/cortex-m4/uart.h"
+#include "navhal_port_timer.h"
+// #include "navhal_port_uart.h"
 #include <stdint.h>
 
 /**
@@ -452,8 +452,8 @@ uint32_t hal_sdio_get_sector_count(void) {
 }
 
 #ifdef _DMA_ENABLED
-#include "core/cortex-m4/dma.h"
-// #include "core/cortex-m4/uart.h"
+#include "navhal_port_dma.h"
+// #include "navhal_port_uart.h"
 
 static hal_dma_config_t dma2_stream3_cfg;
 static hal_dma_config_t dma2_stream6_cfg;

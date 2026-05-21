@@ -1,4 +1,4 @@
-#include "core/cortex-m4/uart.h"
+#include "navhal_port_uart.h"
 #include <stdint.h>
 #define CORTEX_M4
 #include "navhal.h"

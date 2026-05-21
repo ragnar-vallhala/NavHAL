@@ -130,6 +130,6 @@ typedef hal_status_t hal_i2c_status_t NAVHAL_DEPRECATED("use hal_status_t");
 #endif
 
 /* Port-specific bits: DMA-backed I²C API behind @c _DMA_ENABLED. */
-#include "core/cortex-m4/i2c.h"
+#include "navhal_port_i2c.h"
 
 #endif /* HAL_I2C_H */

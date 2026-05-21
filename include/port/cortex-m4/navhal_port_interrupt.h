@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/interrupt.h
+ * @file port/cortex-m4/navhal_port_interrupt.h
  * @brief Cortex-M4 / STM32F4 interrupt-controller (NVIC) HAL driver interface.
  *
  * @details
@@ -11,8 +11,8 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_INTERRUPT_H
-#define CORTEX_M4_INTERRUPT_H
+#ifndef NAVHAL_PORT_INTERRUPT_H
+#define NAVHAL_PORT_INTERRUPT_H
 
 #include "common/hal_status.h"
 #include "family/interrupt_reg.h"
@@ -119,4 +119,4 @@ void hal_interrupt_clear_all_pending(void);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-#endif // CORTEX_M4_INTERRUPT_H
+#endif // NAVHAL_PORT_INTERRUPT_H

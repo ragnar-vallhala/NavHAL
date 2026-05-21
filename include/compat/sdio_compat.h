@@ -5,7 +5,7 @@
  * @details
  * Maps the pre-standardization `sdio_*` function names onto the standardized
  * `hal_sdio_*` API as deprecated inline wrappers. Included automatically by
- * `core/cortex-m4/sdio.h`.
+ * `port/cortex-m4/navhal_port_sdio.h`.
  *
  * Removed in M5. New code MUST use the standardized names directly.
  *

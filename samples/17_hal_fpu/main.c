@@ -11,7 +11,7 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/uart.h"
+#include "navhal_port_uart.h"
 #define CORTEX_M4
 #include "navhal.h"
 

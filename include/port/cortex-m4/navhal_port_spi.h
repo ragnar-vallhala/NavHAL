@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/spi.h
+ * @file port/cortex-m4/navhal_port_spi.h
  * @brief Cortex-M4 / STM32F4 SPI HAL driver interface.
  *
  * @details
@@ -10,8 +10,8 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_SPI_H
-#define CORTEX_M4_SPI_H
+#ifndef NAVHAL_PORT_SPI_H
+#define NAVHAL_PORT_SPI_H
 
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
@@ -164,4 +164,4 @@ typedef hal_status_t hal_spi_status_t NAVHAL_DEPRECATED("use hal_status_t");
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-#endif // CORTEX_M4_SPI_H
+#endif // NAVHAL_PORT_SPI_H

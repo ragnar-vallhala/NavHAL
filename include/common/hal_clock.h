@@ -6,7 +6,7 @@
  * Public API for system and peripheral clock control. PLL configuration and
  * the system-clock initialization function live here; bus-frequency queries
  * are also portable. Any target-specific extensions live in the port header
- * (@c core/cortex-m4/clock.h on the Cortex-M4 port), included at the bottom.
+ * (@c port/cortex-m4/navhal_port_clock.h on the Cortex-M4 port), included at the bottom.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -67,6 +67,6 @@ uint32_t hal_clock_get_apb2clk(void);
 } /* extern "C" */
 #endif
 
-#include "core/cortex-m4/clock.h"
+#include "navhal_port_clock.h"
 
 #endif /* HAL_CLOCK_H */

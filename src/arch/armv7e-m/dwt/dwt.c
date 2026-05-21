@@ -4,13 +4,13 @@
  *
  * @details
  * Implements the standardized `hal_cycle_counter_*` API declared in
- * `core/cortex-m4/dwt.h`, using the Cortex-M4 DWT unit for high-resolution
+ * `port/cortex-m4/navhal_port_dwt.h`, using the Cortex-M4 DWT unit for high-resolution
  * cycle counting and timing.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/dwt.h"
+#include "navhal_port_dwt.h"
 #include "family/dwt_reg.h"
 
 hal_status_t hal_cycle_counter_init(void) {

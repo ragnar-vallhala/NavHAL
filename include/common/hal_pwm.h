@@ -79,6 +79,6 @@ typedef hal_pwm_handle_t PWM_Handle NAVHAL_DEPRECATED("use hal_pwm_handle_t");
 } /* extern "C" */
 #endif
 
-#include "core/cortex-m4/pwm.h"
+#include "navhal_port_pwm.h"
 
 #endif /* HAL_PWM_H */

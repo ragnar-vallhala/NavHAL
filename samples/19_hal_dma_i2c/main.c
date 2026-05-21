@@ -4,7 +4,7 @@
  */
 
 #define CORTEX_M4
-#include "core/cortex-m4/clock.h"
+#include "navhal_port_clock.h"
 #include "navhal.h"
 
 #define BMX160_I2C_ADDR 0x68

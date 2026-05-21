@@ -4,17 +4,17 @@
  *
  * @details
  * Implements the standardized `hal_spi_*` API declared in
- * `core/cortex-m4/spi.h`: master-mode initialization and blocking
+ * `port/cortex-m4/navhal_port_spi.h`: master-mode initialization and blocking
  * transmit / receive / full-duplex transfers.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/spi.h"
-#include "core/cortex-m4/gpio.h"
+#include "navhal_port_spi.h"
+#include "navhal_port_gpio.h"
 #include "family/rcc_reg.h"
 #include "family/spi_reg.h"
-#include "core/cortex-m4/timer.h"
+#include "navhal_port_timer.h"
 
 static inline volatile SPI_Reg_Typedef *_get_spi(hal_spi_instance_t spi) {
   return (volatile SPI_Reg_Typedef *)GET_SPIx_BASE((uint8_t)spi);

@@ -1,17 +1,17 @@
 /**
- * @file core/cortex-m4/clock.h
+ * @file port/cortex-m4/navhal_port_clock.h
  * @brief Cortex-M4 clock-control port header.
  *
  * @details
  * The public prototypes live in @c common/hal_clock.h, which includes this
- * header. Retained to preserve the @c #include "core/cortex-m4/clock.h" path.
+ * header. Retained to preserve the @c #include "navhal_port_clock.h" path.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_CLOCK_H
-#define CORTEX_M4_CLOCK_H
+#ifndef NAVHAL_PORT_CLOCK_H
+#define NAVHAL_PORT_CLOCK_H
 
 #include "common/hal_clock.h"
 
-#endif /* CORTEX_M4_CLOCK_H */
+#endif /* NAVHAL_PORT_CLOCK_H */

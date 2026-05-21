@@ -4,7 +4,7 @@
  */
 
 #include "common/hal_diskio.h"
-#include "core/cortex-m4/sdio.h"
+#include "navhal_port_sdio.h"
 
 static hal_disk_status_t disk_stat = HAL_DISK_STATUS_NOINIT;
 

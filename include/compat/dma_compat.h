@@ -5,7 +5,7 @@
  * @details
  * Maps the pre-standardization `dma_*` function names onto the standardized
  * `hal_dma_*` API as deprecated inline wrappers. Included automatically by
- * `core/cortex-m4/dma.h` (inside its `_DMA_ENABLED` guard).
+ * `port/cortex-m4/navhal_port_dma.h` (inside its `_DMA_ENABLED` guard).
  *
  * Removed in M5. New code MUST use the standardized names directly.
  *

@@ -14,6 +14,6 @@
 #ifndef HAL_CONFIG_H
 #define HAL_CONFIG_H
 
-#include "core/cortex-m4/config.h"
+#include "navhal_port_config.h"
 
 #endif /* HAL_CONFIG_H */

@@ -11,7 +11,7 @@
  * @date 2025-07-21
  */
 
-#include "core/cortex-m4/clock.h"
+#include "navhal_port_clock.h"
 #include "family/flash_reg.h"
 #include "family/rcc_reg.h"
 #include <stdint.h>

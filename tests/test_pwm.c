@@ -1,9 +1,9 @@
-#include "core/cortex-m4/clock.h"
-#include "core/cortex-m4/pwm.h"
+#include "navhal_port_clock.h"
+#include "navhal_port_pwm.h"
 #include "family/rcc_reg.h"
-#include "core/cortex-m4/timer.h"
+#include "navhal_port_timer.h"
 #include "family/timer_reg.h"
-#include "core/cortex-m4/uart.h"
+#include "navhal_port_uart.h"
 #include "navtest/navtest.h"
 #include "utils/timer_types.h"
 #include <stdint.h>

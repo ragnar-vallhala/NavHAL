@@ -1,7 +1,7 @@
 #define CORTEX_M4
 #include "common/hal_features.h"
-#include "core/cortex-m4/fpu.h"
-#include "core/cortex-m4/uart.h"
+#include "navhal_port_fpu.h"
+#include "navhal_port_uart.h"
 #include "navhal.h"
 #include "navtest/navtest.h"
 

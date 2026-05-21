@@ -7,7 +7,7 @@
  * Cortex-M4 port; general-purpose timer instances are identified by
  * ::hal_timer_t. Hardware-specific bits (register-address defines, IRQ
  * vector-table entries) live in the target port header
- * (@c core/cortex-m4/timer.h on the Cortex-M4 port).
+ * (@c port/cortex-m4/navhal_port_timer.h on the Cortex-M4 port).
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -129,6 +129,6 @@ uint32_t hal_timer_get_auto_reload(hal_timer_t timer);
 #endif
 
 /* Port-specific bits: SysTick / RCC register defines, vector-table entries. */
-#include "core/cortex-m4/timer.h"
+#include "navhal_port_timer.h"
 
 #endif /* HAL_TIMER_H */

@@ -1,6 +1,6 @@
 #define CORTEX_M4
-#include "core/cortex-m4/config.h"
-#include "core/cortex-m4/spi.h"
+#include "navhal_port_config.h"
+#include "navhal_port_spi.h"
 #include "navhal.h"
 #include <stddef.h>
 

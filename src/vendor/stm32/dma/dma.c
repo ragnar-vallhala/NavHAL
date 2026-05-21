@@ -4,19 +4,19 @@
  *
  * @details
  * Implements the standardized `hal_dma_*` API declared in
- * `core/cortex-m4/dma.h`: clock enable, stream configuration, start/stop,
+ * `port/cortex-m4/navhal_port_dma.h`: clock enable, stream configuration, start/stop,
  * flag polling and clearing for DMA1 and DMA2. Compiled only when
  * @c _DMA_ENABLED is defined.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/config.h"
+#include "navhal_port_config.h"
 #ifdef _DMA_ENABLED
 
-#include "core/cortex-m4/dma.h"
+#include "navhal_port_dma.h"
 #include "family/dma_reg.h"
-#include "core/cortex-m4/interrupt.h"
+#include "navhal_port_interrupt.h"
 #include "family/rcc_reg.h"
 #include <stdint.h>
 

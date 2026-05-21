@@ -191,6 +191,7 @@ if(TEST)
   message("Tests enabled")
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/port/cortex-m4
     ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/stm32/family/stm32f4/include
     ${SRC_BOARD}
   )

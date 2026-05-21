@@ -4,14 +4,14 @@
  *
  * @details
  * Implements the standardized `hal_interrupt_*` API declared in
- * `core/cortex-m4/interrupt.h`: per-IRQ enable/disable, pending control,
+ * `port/cortex-m4/navhal_port_interrupt.h`: per-IRQ enable/disable, pending control,
  * priority configuration, callback registration/dispatch, and global
  * interrupt masking.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/interrupt.h"
+#include "navhal_port_interrupt.h"
 #include "common/hal_status.h"
 #include <stdint.h>
 

@@ -1,5 +1,5 @@
 #include "test_flash_raw.h"
-#include "core/cortex-m4/flash.h"
+#include "navhal_port_flash.h"
 #include "navtest/navtest.h"
 #include <stdbool.h>
 #include <stddef.h>

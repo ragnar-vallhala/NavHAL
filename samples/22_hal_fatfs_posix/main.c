@@ -3,7 +3,7 @@
  * @brief Example: Test FatFS and POSIX-like API.
  */
 
-#include "core/cortex-m4/timer.h"
+#include "navhal_port_timer.h"
 #include <stdint.h>
 #define CORTEX_M4
 #include "navhal.h"

@@ -51,6 +51,6 @@ void hal_cycle_counter_delay(uint32_t cycles);
 #endif
 
 /* Port-specific bits (compat shim, deprecated names). */
-#include "core/cortex-m4/dwt.h"
+#include "navhal_port_dwt.h"
 
 #endif /* HAL_DWT_H */

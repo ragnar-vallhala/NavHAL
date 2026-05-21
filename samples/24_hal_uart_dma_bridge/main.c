@@ -1,5 +1,5 @@
 #define CORTEX_M4
-#include "core/cortex-m4/config.h"
+#include "navhal_port_config.h"
 #include "family/dma_reg.h"
 #include "navhal.h"
 

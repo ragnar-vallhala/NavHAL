@@ -6,7 +6,7 @@
  * Maps the pre-standardization Flash key/value function names onto the
  * standardized `hal_flash_*` API. Each wrapper is marked deprecated, so legacy
  * calls emit a compiler warning naming the replacement. Included automatically
- * by `core/cortex-m4/flash.h`.
+ * by `port/cortex-m4/navhal_port_flash.h`.
  *
  * Removed in M5. New code MUST use the standardized names directly.
  *

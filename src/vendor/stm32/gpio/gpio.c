@@ -4,14 +4,14 @@
  *
  * @details
  * Implements the standardized `hal_gpio_*` API declared in
- * `core/cortex-m4/gpio.h`: pin configuration, mode/pull/alternate-function
+ * `port/cortex-m4/navhal_port_gpio.h`: pin configuration, mode/pull/alternate-function
  * setup, output type/speed, and port clock enabling. The hot-path
  * write/read/toggle helpers are defined `static inline` in the header.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#include "core/cortex-m4/gpio.h"
+#include "navhal_port_gpio.h"
 #include "family/gpio_reg.h"
 #include "family/rcc_reg.h"
 

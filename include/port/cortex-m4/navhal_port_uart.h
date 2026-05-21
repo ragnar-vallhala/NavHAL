@@ -1,5 +1,5 @@
 /**
- * @file core/cortex-m4/uart.h
+ * @file port/cortex-m4/navhal_port_uart.h
  * @brief Cortex-M4 / STM32F4 UART port header.
  *
  * @details
@@ -10,11 +10,11 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#ifndef CORTEX_M4_UART_H
-#define CORTEX_M4_UART_H
+#ifndef NAVHAL_PORT_UART_H
+#define NAVHAL_PORT_UART_H
 
 #include "common/hal_uart.h"
-#include "core/cortex-m4/config.h"
+#include "navhal_port_config.h"
 #include "family/uart_reg.h"
 
 
@@ -50,4 +50,4 @@ hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 /* Deprecated pre-standardization UART names — removed in M5. */
 #include "compat/uart_compat.h"
 
-#endif /* CORTEX_M4_UART_H */
+#endif /* NAVHAL_PORT_UART_H */

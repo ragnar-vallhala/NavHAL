@@ -9,7 +9,7 @@
 #include "common/hal_features.h"
 #if NAVHAL_HAS_DMA
 
-#include "core/cortex-m4/dma.h"
+#include "navhal_port_dma.h"
 #include "family/rcc_reg.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"

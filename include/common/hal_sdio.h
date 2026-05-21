@@ -147,6 +147,6 @@ uint32_t hal_sdio_get_sector_count(void);
 #endif
 
 /* Port-specific bits: register-bit defines, async/DMA prototypes, compat. */
-#include "core/cortex-m4/sdio.h"
+#include "navhal_port_sdio.h"
 
 #endif /* HAL_SDIO_H */

@@ -203,10 +203,16 @@ def main():
         matched = False
         for sym in kb.unique_defined_syms:
              if sym.name and sym.name.startswith("SAMPLE_"):
-                  # Extract basic slug (e.g., 26_hal_dwt -> hal_dwt)
-                  slug = sym.name.replace("SAMPLE_", "").lower()
-                  # Try exact match on symbol tail or full slug
-                  if sample_name in slug or slug in sample_name:
+                  # Slug is "NN_<name>" (e.g. SAMPLE_11_HAL_I2C -> 11_hal_i2c).
+                  slug = sym.name.replace("SAMPLE_", "", 1).lower()
+                  # Strip the leading curriculum-number prefix, if present.
+                  parts = slug.split("_", 1)
+                  deslug = (parts[1] if len(parts) == 2 and parts[0].isdigit()
+                            else slug)
+                  # Exact match only — a substring test wrongly pairs
+                  # "hal_i2c" with "no_hal_i2c" (and picks whichever the
+                  # Kconfig lists first).
+                  if sample_name == slug or sample_name == deslug:
                        sym.set_value('y')
                        print(f"Forcing activation of sample symbol: {sym.name}")
                        matched = True

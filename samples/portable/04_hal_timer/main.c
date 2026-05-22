@@ -23,11 +23,12 @@
 #include "navhal.h"
 
 static uint32_t old_tick = 0;
-
+/* Written by the timer ISR, polled by main() — must be volatile so the
+ * compiler re-reads it from memory each loop iteration. */
+static volatile int32_t gap = -1;
 static void on_timer(void) {
   uint32_t now = hal_timebase_get_tick();
-  hal_uart_print(BOARD_CONSOLE_UART, now - old_tick);
-  hal_uart_print(BOARD_CONSOLE_UART, "\n\r");
+  gap = now - old_tick;
   old_tick = now;
 }
 
@@ -39,5 +40,10 @@ int main(void) {
   hal_timer_enable_interrupt(BOARD_GP_TIMER);
 
   while (1) {
+    if (gap > -1) {
+      hal_uart_print(BOARD_CONSOLE_UART, gap);
+      hal_uart_print(BOARD_CONSOLE_UART, "\n\r");
+      gap = -1;
+    }
   }
 }

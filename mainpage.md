@@ -2,12 +2,15 @@
  @mainpage NavHAL Documentation
  
  NavHAL is a hardware abstraction layer for embedded systems,
- offering clean interfaces for GPIO, UART, and more.
- 
- - Easy to port
+ offering a standardized C interface for GPIO, UART, timers, and more.
+
+ The public `hal_*` API is frozen at `HAL_API_VERSION 1`
+ (see `docs/api_standardization.md`).
+
+ - Standardized, versioned API contract
  - Minimal dependencies
- - Lightweight and architecture-agnostic
- - C++ wrapper layer and RTOS integration planned
+ - Lightweight; layered design built to host multiple ports
+ - C++-compatible headers (`extern "C"` guarded)
 
 
  ## Getting Started
@@ -36,31 +39,23 @@ cmake --build .
  cmake --build . --target flash
  ```
 
- ## Supported Platforms:
+ ## Supported Platforms
 
+### Implemented (v1)
+- **Board:** ST Nucleo-F401RE
+- **MCU family:** STM32F4 (STM32F401RE)
+- **Architecture:** ARM Cortex-M4 (ARMv7E-M)
 
+### Planned
+- AVR / ATmega328P — next milestone (M6); the Kconfig schema already
+  models `ARCH_AVR8` / `VENDOR_MICROCHIP` / `BOARD_ATMEGA328P`.
 
-### Microcontrollers: 
-- STM32 (HAL & LL)
-- Raspberry Pi Pico
-- AVR ATmega series(planned)
-- ESP32 (planned)
+### Operating Modes
+Bare-metal.
 
-### Architectures: 
-
-
-- ARM Cortex-M 
-- AVR (planned)
-- RISC-V (planned)
-- Other 32-bit/8-bit MCUs (planned)
-
-
-### Operating Modes: 
-Bare-metal and RTOS-integrated environments
-
-### Supported Toolchains:
- - GCC ARM
- - CMAKE-based builds
+### Supported Toolchains
+ - `arm-none-eabi-gcc` (GCC ARM)
+ - CMake-based builds, configured via Kconfig
 
 ## Contribution & support
 

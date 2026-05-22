@@ -48,18 +48,19 @@ WI5.1 PR · **n/a** not applicable to this driver.
 
 ## Accepted v1 deviations
 
-Each deviation below is a conscious choice for v1, not an oversight. The two
-flagged **(decide before WI5.4)** are the only ones that would be costly to
-revisit once `HAL_API_VERSION` is frozen.
+Each deviation below is a conscious choice for v1, not an oversight. D2 and
+D3 were the two costly-to-revisit-post-freeze items; both were **confirmed
+accepted for v1** before `HAL_API_VERSION` was set to 1 in WI5.4.
 
 - **D1 — header location.** Public headers live in `include/common/`, not
   `include/navhal/`. Deliberate (M4); the checklist text predates the decision.
-- **D2 — no `hal_<p>_deinit`. (decide before WI5.4)** No driver exposes a
-  teardown entry point. NavHAL targets configure-once bare-metal use:
+- **D2 — no `hal_<p>_deinit`. (confirmed accepted for v1)** No driver exposes
+  a teardown entry point. NavHAL targets configure-once bare-metal use:
   peripherals are set up at boot and run for the device's lifetime; no driver,
   sample, or test needs teardown. Adding 14 teardown functions would freeze
-  unused surface into v1. Revisit if a low-power / re-init use case appears.
-- **D3 — no UART/I2C timeouts. (decide before WI5.4)** `hal_uart_*` and
+  unused surface into v1. Can be added later as an additive (non-breaking)
+  change if a low-power / re-init use case appears.
+- **D3 — no UART/I2C timeouts. (confirmed accepted for v1)** `hal_uart_*` and
   `hal_i2c_*` blocking transfers take no timeout argument (SPI does). They are
   polling-mode blocking calls; adding a timeout is a signature change deferred
   past v1.
@@ -91,5 +92,5 @@ All 14 drivers expose the standardized `hal_<p>_` API, return `hal_status_t`
 from fallible functions (SDIO excepted, D5), carry no `#ifdef` target
 conditionals in their public headers, and have unit tests. The structural gap
 (spi/dma missing a `common/` header) is fixed. The remaining deviations are
-documented and accepted for v1; **D2 and D3 should be confirmed before
-`HAL_API_VERSION` is frozen in WI5.4.**
+documented and accepted for v1; D2 and D3 were confirmed before
+`HAL_API_VERSION` was frozen at 1 in WI5.4.

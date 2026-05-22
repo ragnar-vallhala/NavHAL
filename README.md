@@ -13,8 +13,15 @@
 
 ## Overview
 
-**NavHAL** is a professional, cross-platform hardware abstraction layer (HAL) written in C, designed for embedded systems across multiple architectures. It is architecture-agnostic by design, enabling scalable and portable embedded software development.
-Future extensions will provide C++ wrappers and RTOS integration to deliver a clean, modular, and extensible interface suitable for modern embedded projects.
+**NavHAL** is a hardware abstraction layer (HAL) written in C for embedded
+systems. Its API is architecture-agnostic *by design* — the layered
+arch / vendor / family / board structure and the Kconfig-driven build are
+built to host multiple targets — but the v1 release ships **one implemented
+port: ARM Cortex-M4 / STM32F4, on the Nucleo-F401RE.** An AVR / ATmega328P
+port is the next milestone (M6); the Kconfig schema already models it.
+
+The public `hal_*` API is frozen at `HAL_API_VERSION 1` (see
+[`docs/api_standardization.md`](docs/api_standardization.md)).
 
 NavHAL is developed and maintained by **NAVRobotec**, a company dedicated to innovative and robust embedded solutions.
 
@@ -22,12 +29,14 @@ NavHAL is developed and maintained by **NAVRobotec**, a company dedicated to inn
 
 ## Key Features
 
-* Architecture-independent HAL supporting multiple MCU families (ARM, AVR, RISC-V, etc.)
+* Standardized, versioned `hal_*` C API (`HAL_API_VERSION 1`) — frozen contract
+* Implemented today on ARM Cortex-M4 / STM32F4 (Nucleo-F401RE)
+* Layered arch / vendor / family / board source tree, Kconfig-driven build —
+  designed so a new port adds directories, not build-system changes
 * Clean, minimal, and efficient C core for portability and performance
-* Designed with modularity for easy extension and maintenance
-* Planned C++ wrapper layer for object-oriented APIs
-* Integration-ready with RTOS and bare-metal environments
-* Professional-grade tooling with CMake build system and Doxygen documentation
+* C++-compatible headers (`extern "C"`-guarded); a C++ sample builds on-target
+* Comprehensive unit-test suite (host subset + on-target runs)
+* Professional-grade tooling with a CMake build system and Doxygen documentation
 
 ---
 

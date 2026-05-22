@@ -37,13 +37,21 @@ hal_status_t hal_uart_init(hal_uart_t uart, const hal_uart_config_t *cfg) {
   if (!uart_valid(uart) || cfg == NULL || cfg->baudrate == 0u)
     return HAL_ERR_INVALID_ARG;
 
-  /* Normal-speed (U2X0 = 0) baud divisor: UBRR = F_CPU / (16 * baud) - 1. */
-  uint16_t ubrr = (uint16_t)((F_CPU / (16UL * cfg->baudrate)) - 1UL);
+  /* Double-speed mode (U2X0). At 16 MHz the normal-mode divisor for common
+   * high baud rates carries a large error — 115200 lands at 125000 (~8.5%),
+   * well outside UART tolerance, which garbles the line. Double speed (8x
+   * oversampling) plus a rounded divisor keeps the error in range:
+   *   UBRR = round(F_CPU / (8 * baud)) - 1
+   * e.g. 115200 @ 16 MHz -> UBRR 16 -> 117647 baud (+2.1%, within tolerance).
+   * This matches how the Arduino core configures 115200 at 16 MHz. */
+  uint16_t ubrr = (uint16_t)(((F_CPU + 4UL * cfg->baudrate) /
+                              (8UL * cfg->baudrate)) -
+                             1UL);
+
+  UCSR0A = (uint8_t)(1u << U2X0);                      /* double speed. */
   UBRR0H = (uint8_t)(ubrr >> 8);
   UBRR0L = (uint8_t)(ubrr & 0xFFu);
-
-  UCSR0A = 0u;                                      /* normal speed. */
-  UCSR0B = (uint8_t)((1u << RXEN0) | (1u << TXEN0)); /* RX + TX enable. */
+  UCSR0B = (uint8_t)((1u << RXEN0) | (1u << TXEN0));   /* RX + TX enable. */
   UCSR0C = (uint8_t)((1u << UCSZ01) | (1u << UCSZ00)); /* 8-N-1. */
   return HAL_OK;
 }

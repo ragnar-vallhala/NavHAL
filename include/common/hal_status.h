@@ -62,9 +62,9 @@ typedef enum {
 /* -------------------------------------------------------------------------- *
  * Deprecated — pre-standardization status macros.
  *
- * Kept so existing drivers keep building during the M2 migration; both map
- * onto the standardized enum with identical values (SUCCESS == HAL_OK == 0,
- * FAILURE == HAL_ERR == 1). Scheduled for removal in M5. New code MUST use
+ * Kept so existing drivers keep building; both map onto the standardized enum
+ * with identical values (SUCCESS == HAL_OK == 0, FAILURE == HAL_ERR == 1).
+ * Retained as a backward-compat alias. New code MUST use
  * hal_status_t / HAL_OK / HAL_ERR.
  * -------------------------------------------------------------------------- */
 #define SUCCESS HAL_OK  /**< @deprecated Use HAL_OK. */

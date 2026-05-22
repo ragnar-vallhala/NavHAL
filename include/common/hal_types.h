@@ -38,7 +38,7 @@ extern "C" {
 /* -------------------------------------------------------------------------- *
  * Deprecated — pre-standardization aliases.
  *
- * Retained so existing drivers keep building; scheduled for removal in M5.
+ * Retained so existing drivers keep building, as a backward-compat alias.
  * New code MUST use the standard names instead.
  * -------------------------------------------------------------------------- */
 #ifndef byte

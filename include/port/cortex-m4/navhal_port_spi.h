@@ -151,8 +151,8 @@ hal_status_t hal_spi_transmit_receive(hal_spi_instance_t spi,
 
 /* -------------------------------------------------------------------------- *
  * Deprecated — pre-standardization SPI status type and codes. The status enum
- * is now ::hal_status_t; these aliases keep existing code building. Removed
- * in M5.
+ * is now ::hal_status_t; these aliases are retained as a backward-compat
+ * surface behind NAVHAL_DEPRECATED.
  * -------------------------------------------------------------------------- */
 typedef hal_status_t hal_spi_status_t NAVHAL_DEPRECATED("use hal_status_t");
 #define HAL_SPI_OK HAL_OK                    /**< @deprecated HAL_OK */

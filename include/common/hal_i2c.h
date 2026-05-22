@@ -115,8 +115,8 @@ uint8_t hal_i2c_get_init_status(void);
 
 /* -------------------------------------------------------------------------- *
  * Deprecated — pre-standardization I²C status type and codes. The status enum
- * is now ::hal_status_t; these aliases keep existing code building. Removed
- * in M5.
+ * is now ::hal_status_t; these aliases are retained as a backward-compat
+ * surface behind NAVHAL_DEPRECATED.
  * -------------------------------------------------------------------------- */
 typedef hal_status_t hal_i2c_status_t NAVHAL_DEPRECATED("use hal_status_t");
 #define HAL_I2C_OK HAL_OK                       /**< @deprecated HAL_OK */

@@ -17,6 +17,7 @@
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 #include "utils/gpio_types.h"
+#include "utils/i2c_types.h" /* port-resolved ::hal_i2c_bus_t instance enum */
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -24,18 +25,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Supported I²C bus instances.
- */
-typedef enum {
-  HAL_I2C_1 = 0, /**< I²C bus 1. */
-  HAL_I2C_2 = 1, /**< I²C bus 2. */
-  HAL_I2C_3 = 2, /**< I²C bus 3. */
-  I2C1 NAVHAL_DEPRECATED("use HAL_I2C_1") = 0,
-  I2C2 NAVHAL_DEPRECATED("use HAL_I2C_2") = 1,
-  I2C3 NAVHAL_DEPRECATED("use HAL_I2C_3") = 2,
-} hal_i2c_bus_t;
 
 /**
  * @brief I²C speed modes.

@@ -17,6 +17,7 @@
 
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
+#include "utils/uart_types.h" /* port-resolved ::hal_uart_t instance enum */
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -24,18 +25,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief UART peripheral instance identifier.
- */
-typedef enum {
-  HAL_UART_1 = 1, /**< UART instance 1. */
-  HAL_UART_2 = 2, /**< UART instance 2. */
-  HAL_UART_6 = 6, /**< UART instance 6. */
-  UART1 NAVHAL_DEPRECATED("use HAL_UART_1") = 1,
-  UART2 NAVHAL_DEPRECATED("use HAL_UART_2") = 2,
-  UART6 NAVHAL_DEPRECATED("use HAL_UART_6") = 6,
-} hal_uart_t;
 
 /** @brief UART configuration passed to ::hal_uart_init. */
 typedef struct {

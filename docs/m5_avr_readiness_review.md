@@ -57,7 +57,18 @@ umbrella header. The AVR port could paper over this with an empty
 removes a class of M6 build failure. Small, self-contained change — do it
 under v1.
 
-### F2 — Target-shaped type enums live in shared `include/utils/` *(structural — decide now)*
+### F2 — Target-shaped enums in shared/common headers *(structural — extended during M6)*
+
+> **Scope correction (M6).** As first written this finding covered only the
+> `utils/*_types.h` headers below. Implementing M6 surfaced that the same
+> defect applies to **three peripheral *instance* enums baked directly into
+> the common headers** — `hal_uart_t` (`common/hal_uart.h`), `hal_i2c_bus_t`
+> (`common/hal_i2c.h`), `hal_spi_instance_t` (`common/hal_spi.h`), all
+> hardwired to STM32 instances (USART1/2/6, I2C1/2/3, SPI1/2). ATmega328P has
+> USART0 / one TWI / one SPI, and an enum cannot be extended port-side. This
+> original review under-scoped F2 by missing them; M6 resolves it by
+> port-resolving those three enums into `utils/{uart,i2c,spi}_types.h`
+> alongside the headers below — same mechanism, no STM32 value change.
 
 The two-layer GPIO model (constraint 8) is correctly *designed* — a per-MCU
 core pin enum plus per-board aliases (`board.h`, landed in M3 WI3.4/3.5). But

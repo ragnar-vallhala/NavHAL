@@ -15,6 +15,7 @@
 
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
+#include "utils/spi_types.h" /* port-resolved ::hal_spi_instance_t enum */
 #include <stddef.h>
 #include <stdint.h>
 
@@ -22,16 +23,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief Supported SPI instances.
- */
-typedef enum {
-  HAL_SPI_1 = 1, /**< SPI instance 1. */
-  HAL_SPI_2 = 2, /**< SPI instance 2. */
-  SPI_1 NAVHAL_DEPRECATED("use HAL_SPI_1") = 1,
-  SPI_2 NAVHAL_DEPRECATED("use HAL_SPI_2") = 2,
-} hal_spi_instance_t;
 
 /**
  * @brief SPI baud-rate prescaler.

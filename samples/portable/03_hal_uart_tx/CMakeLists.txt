@@ -35,30 +35,8 @@ if(NOT DEFINED FLASHER OR NOT DEFINED FLASH_ADDRESS)
 endif()
 
 
-# Flashing board — the toolchain differs per target: st-flash writes a raw
-# binary at a flash address; avrdude writes an Intel-HEX image through a
-# programmer. AVR_PROGRAMMER / AVR_PORT can be overridden at configure time.
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
-  if(NOT DEFINED AVR_PROGRAMMER)
-    set(AVR_PROGRAMMER arduino)
-  endif()
-  if(NOT DEFINED AVR_PORT)
-    set(AVR_PORT /dev/ttyACM0)
-  endif()
-  add_custom_target(flash
-    COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${SAMPLE}> ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.hex
-    COMMAND ${FLASHER} -p atmega328p -c ${AVR_PROGRAMMER} -P ${AVR_PORT} -U flash:w:${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.hex:i
-    DEPENDS ${SAMPLE}
-    COMMENT "Converting ELF to Intel HEX and flashing via avrdude"
-  )
-else()
-  add_custom_target(flash
-    COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${SAMPLE}> ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin
-    COMMAND ${FLASHER} --reset write ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin ${FLASH_ADDRESS}
-    DEPENDS ${SAMPLE}
-    COMMENT "Converting ELF to BIN and flashing to board"
-  )
-endif()
+# Flash target — shared, arch-aware (st-flash / avrdude); see samples/flash.cmake.
+include(${CMAKE_CURRENT_LIST_DIR}/../../flash.cmake)
 message(STATUS "TARGET File ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin")
 # elf file size calculation
 add_custom_command(

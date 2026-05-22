@@ -41,12 +41,8 @@ if(NOT DEFINED FLASHER OR NOT DEFINED FLASH_ADDRESS)
       "FLASHER and FLASH_ADDRESS must be defined to use 'flash' target.")
 endif()
 
-add_custom_target(flash
-  COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${SAMPLE}> ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin
-  COMMAND ${FLASHER} --reset write ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin ${FLASH_ADDRESS}
-  DEPENDS ${SAMPLE}
-  COMMENT "Converting ELF to BIN and flashing to board"
-)
+# Flash target — shared, arch-aware (st-flash / avrdude); see samples/flash.cmake.
+include(${CMAKE_CURRENT_LIST_DIR}/../../flash.cmake)
 message(STATUS "TARGET File ${CMAKE_CURRENT_BINARY_DIR}/${SAMPLE}.bin")
 
 add_custom_command(

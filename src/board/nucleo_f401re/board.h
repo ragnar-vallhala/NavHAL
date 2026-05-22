@@ -35,7 +35,8 @@ extern "C" {
 #define USER_BUTTON  GPIO_PC13  /**< B1 user button, active-low. */
 
 /* Board console UART — USART2 is wired to the ST-LINK virtual COM port. */
-#define BOARD_CONSOLE_UART  HAL_UART_2
+#define BOARD_CONSOLE_UART      HAL_UART_2
+#define BOARD_CONSOLE_UART_IRQ  USART2_IRQn
 
 /* General-purpose timer. */
 #define BOARD_GP_TIMER  TIM5

@@ -118,6 +118,10 @@ endif()
 set(CMAKE_C_FLAGS "${ARCH_C_FLAGS} -Wall -std=c11")
 set(CMAKE_ASM_FLAGS "${ARCH_ASM_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${ARCH_LINK_FLAGS}")
+# C++ shares the arch flags; a C++ TU only appears in the C++ sample, which
+# does enable_language(CXX). Bare-metal: no exceptions / RTTI / cxa-atexit.
+set(CMAKE_CXX_FLAGS
+    "${ARCH_C_FLAGS} -Wall -std=c++17 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics")
 # subdirectories are commented, they will be added as code is added
 if(NOT STANDALONE)
 add_subdirectory(${SRC_DIR})

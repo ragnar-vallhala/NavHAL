@@ -11,7 +11,9 @@
  */
 
 #include "common/hal_uart.h"
+#include "navhal_port_interrupt.h"
 
+#include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -165,3 +167,8 @@ uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,
   buffer[n] = '\0';
   return n;
 }
+
+/* USART0 receive-complete interrupt — routed to the callback registered via
+ * hal_interrupt_attach_callback(HAL_IRQ_USART_RX, ...). The callback must
+ * consume the byte (hal_uart_read_char) so the interrupt does not re-fire. */
+ISR(USART_RX_vect) { hal_interrupt_dispatch(HAL_IRQ_USART_RX); }

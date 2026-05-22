@@ -45,11 +45,11 @@ portable/02_hal_pupd
 no_hal/03_no_hal_uart_tx
 portable/03_hal_uart_tx
 portable/04_hal_timer
-portable/05_hal_systick
+cortex-m/05_hal_systick
 portable/06_hal_blink_delay
 portable/07_hal_pwm
 no_hal/08_no_hal_pwm
-portable/09_hal_clock
+cortex-m/09_hal_clock
 no_hal/10_no_hal_i2c
 portable/11_hal_i2c
 cortex-m/19_hal_dma_i2c

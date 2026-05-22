@@ -9,9 +9,8 @@
 # CMAKE_CXX_COMPILER is set in the root CMakeLists alongside CC/AS so the
 # arm-none-eabi-g++ driver is picked up here automatically.
 enable_language(CXX)
-
-set(CMAKE_CXX_FLAGS
-  "-mcpu=${CMAKE_SYSTEM_PROCESSOR} ${ARCH_FLAGS} -Wall -O0 -g -std=c++17 ${FPU_FLAGS} -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics")
+# CMAKE_CXX_FLAGS is set arch-conditionally by the root CMakeLists, alongside
+# CMAKE_C_FLAGS — no per-sample compiler flags needed here.
 
 if(NOT DEFINED FLASHER)
   set(FLASHER st-flash)

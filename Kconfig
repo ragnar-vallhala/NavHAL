@@ -281,6 +281,7 @@ config SAMPLE_04_HAL_TIMER
 
 config SAMPLE_05_HAL_SYSTICK
     bool "05_hal_systick"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_06_HAL_BLINK_DELAY
     bool "06_hal_blink_delay"
@@ -295,6 +296,7 @@ config SAMPLE_08_NO_HAL_PWM
 
 config SAMPLE_09_HAL_CLOCK
     bool "09_hal_clock"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_10_NO_HAL_I2C
     bool "10_no_hal_i2c"

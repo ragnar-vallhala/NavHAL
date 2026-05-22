@@ -27,8 +27,9 @@ extern "C" {
 #include "utils/timer_types.h"
 #include "utils/uart_types.h"
 
-/* On-board indicator */
+/* On-board indicator / input */
 #define LED_BUILTIN  GPIO_PB05  /**< On-board LED, shared with D13 (SCK). */
+#define USER_BUTTON  GPIO_PD02  /**< D2 — wire a button to GND; uses a pull-up. */
 
 /* Arduino-Uno digital header D0..D13 */
 #define D0   GPIO_PD00  /**< USART0 RXD. */
@@ -55,7 +56,8 @@ extern "C" {
 #define A5   GPIO_PC05  /**< TWI SCL. */
 
 /* Board console UART — the ATmega328P has a single USART. */
-#define BOARD_CONSOLE_UART  HAL_UART_0
+#define BOARD_CONSOLE_UART      HAL_UART_0
+#define BOARD_CONSOLE_UART_IRQ  HAL_IRQ_USART_RX
 
 /* General-purpose timer — Timer1 (16-bit); Timer0 backs the timebase. */
 #define BOARD_GP_TIMER  TIM1

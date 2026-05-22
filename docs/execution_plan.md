@@ -314,6 +314,18 @@ Work items:
 - WI6.7 — Port the unit-test harness; run the portable subset on AVR.
 - WI6.8 — Build a curated set of samples for AVR (blink, uart_tx, i2c, pwm,
   timer); samples needing DMA/SDIO/FPU are excluded by Kconfig.
+- WI6.9 — **Renode AVR simulation.** Stand up a Renode machine for the
+  ATmega328p, mirroring `tools/renode/navhal_f401re.resc` for the
+  Cortex-M4 port. There is no physical ATmega328p on the dev/CI rig, so a
+  simulator is the *only* PIL path for the AVR port — it gives the AVR
+  test build (WI6.7) the same emulated on-target run the STM32 port gets,
+  and unblocks the CI matrix in Section 10. Deliverables: a
+  `tools/renode/navhal_atmega328p.resc` script (load the ELF, wire
+  USART0 to a log file, RunFor a bounded window, exit on the navtest
+  summary line) and a thin `run_tests.sh` wrapper. Note: Renode's AVR
+  support is less mature than its Cortex-M support — if the ATmega328p
+  model proves inadequate, `simavr` is the fallback simulator; the
+  `.resc`-equivalent and the harness contract stay the same.
 
 **Acceptance:**
 - `hal_blink` and `hal_uart_tx` build for ATmega328p from a Kconfig switch, with
@@ -330,7 +342,9 @@ Work items:
 - One feature branch per milestone (`std/m1-foundations`, …); small PRs within.
 - M2 driver waves are independent PRs — reviewable one driver at a time.
 - CI must build `hal_blink` on every PR; from M4 onward, build a **matrix**:
-  F401RE today, and from M6, F401RE + ATmega328p.
+  F401RE today, and from M6, F401RE + ATmega328p. The ATmega328p row has no
+  physical board on the rig — its on-target run is the Renode AVR machine
+  from WI6.9 (the F401RE row already runs under Renode).
 - Add a CI compile-check that no header under `include/navhal/` contains
   `#ifdef CORTEX_M4` / `#ifdef ARCH_*` (enforces M4).
 - Keep `main` releasable: each milestone merges only when its acceptance

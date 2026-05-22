@@ -326,6 +326,16 @@ Work items:
   support is less mature than its Cortex-M support — if the ATmega328p
   model proves inadequate, `simavr` is the fallback simulator; the
   `.resc`-equivalent and the harness contract stay the same.
+- WI6.10 — **Samples reorganised by capability.** A flat `samples/` of
+  ~28 STM32-first samples gave the build no way to know which sample can
+  run where. Split into three tiers — `samples/portable/` (GPIO/UART/
+  timer/clock only; same source on every port), `samples/cortex-m/`
+  (needs DMA/FPU/DWT/SDIO), `samples/no_hal/` (register-level, per-MCU).
+  Each Cortex-M and No-HAL `SAMPLE_*` Kconfig entry gains
+  `depends on ARCH_CORTEX_M4`, so an AVR configure does not offer a
+  sample that cannot run on it. `samples/README.md` is the registry.
+  Portable samples migrate to board aliases incrementally (`hal_blink` /
+  `hal_uart_tx` done; the rest follow the WI6.2 drivers).
 
 **Acceptance:**
 - `hal_blink` and `hal_uart_tx` build for ATmega328p from a Kconfig switch, with

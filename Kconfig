@@ -259,14 +259,12 @@ choice
 config SAMPLE_NONE
     bool "None"
 
-config SAMPLE_00_TEST_SAMPLE
-    bool "00_test_sample"
-
 config SAMPLE_01_HAL_BLINK
     bool "01_hal_blink"
 
 config SAMPLE_01_NO_HAL_BLINK
     bool "01_no_hal_blink"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_02_HAL_PUPD
     bool "02_hal_pupd"
@@ -276,6 +274,7 @@ config SAMPLE_03_HAL_UART_TX
 
 config SAMPLE_03_NO_HAL_UART_TX
     bool "03_no_hal_uart_tx"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_04_HAL_TIMER
     bool "04_hal_timer"
@@ -291,18 +290,21 @@ config SAMPLE_07_HAL_PWM
 
 config SAMPLE_08_NO_HAL_PWM
     bool "08_no_hal_pwm"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_09_HAL_CLOCK
     bool "09_hal_clock"
 
 config SAMPLE_10_NO_HAL_I2C
     bool "10_no_hal_i2c"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_11_HAL_I2C
     bool "11_hal_i2c"
 
 config SAMPLE_12_NO_HAL_FLASH
     bool "12_no_hal_flash"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_13_HAL_FLASH
     bool "13_hal_flash"
@@ -312,39 +314,49 @@ config SAMPLE_14_HAL_UART_INT
 
 config SAMPLE_15_HAL_UART_DMA
     bool "15_hal_uart_dma"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_16_HAL_DMA_POLLING_UART
     bool "16_hal_dma_polling_uart"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_17_HAL_FPU
     bool "17_hal_fpu"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_18_HAL_CRC
     bool "18_hal_crc"
 
 config SAMPLE_19_HAL_DMA_I2C
     bool "19_hal_dma_i2c"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_20_HAL_SDIO
     bool "20_hal_sdio"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_21_HAL_SDIO_BLOCK
     bool "21_hal_sdio_block"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_22_HAL_FATFS_POSIX
     bool "22_hal_fatfs_posix"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_23_HAL_SDIO_PERF
     bool "23_hal_sdio_perf"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_24_HAL_UART_DMA_BRIDGE
     bool "24_hal_uart_dma_bridge"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_25_HAL_SPI_ESP_BRIDGE
     bool "25_hal_spi_esp_bridge"
 
 config SAMPLE_26_HAL_DWT
     bool "26_hal_dwt"
+    depends on ARCH_CORTEX_M4
     select DRV_DWT
     select DRV_UART
     select DRV_FPU
@@ -355,7 +367,6 @@ endchoice
 config SAMPLE
     string
     default "" if SAMPLE_NONE
-    default "test_sample" if SAMPLE_00_TEST_SAMPLE
     default "hal_blink" if SAMPLE_01_HAL_BLINK
     default "no_hal_blink" if SAMPLE_01_NO_HAL_BLINK
     default "hal_pupd" if SAMPLE_02_HAL_PUPD

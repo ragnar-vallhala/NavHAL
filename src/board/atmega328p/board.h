@@ -23,6 +23,7 @@ extern "C" {
 
 #include "utils/gpio_types.h"
 #include "utils/i2c_types.h"
+#include "utils/spi_types.h"
 #include "utils/timer_types.h"
 #include "utils/uart_types.h"
 
@@ -68,6 +69,10 @@ extern "C" {
 #define BOARD_I2C_BUS  HAL_I2C_0
 #define BOARD_I2C_SCL  GPIO_PC05
 #define BOARD_I2C_SDA  GPIO_PC04
+
+/* SPI bus — the SPI peripheral; CS uses PB2 (the hardware SS pin / D10). */
+#define BOARD_SPI_BUS  HAL_SPI_0
+#define BOARD_SPI_CS   GPIO_PB02
 
 /* On-board oscillator (Hz) — the Arduino Uno uses a 16 MHz crystal. */
 #define BOARD_XTAL_FREQ_HZ  16000000U

@@ -355,6 +355,7 @@ config SAMPLE_24_HAL_UART_DMA_BRIDGE
 
 config SAMPLE_25_HAL_SPI_ESP_BRIDGE
     bool "25_hal_spi_esp_bridge"
+    select DRV_SPI
 
 config SAMPLE_26_HAL_DWT
     bool "26_hal_dwt"

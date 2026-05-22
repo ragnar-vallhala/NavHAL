@@ -26,6 +26,7 @@ extern "C" {
 
 #include "utils/gpio_types.h"
 #include "utils/i2c_types.h"
+#include "utils/spi_types.h"
 #include "utils/timer_types.h"
 #include "utils/uart_types.h"
 
@@ -48,6 +49,10 @@ extern "C" {
 #define BOARD_I2C_BUS  HAL_I2C_1
 #define BOARD_I2C_SCL  GPIO_PB08
 #define BOARD_I2C_SDA  GPIO_PB09
+
+/* SPI bus — SPI1; CS on PA4. */
+#define BOARD_SPI_BUS  HAL_SPI_1
+#define BOARD_SPI_CS   GPIO_PA04
 
 /* Arduino-compatible digital headers (CN5/CN9 on the Nucleo-64) */
 #define D0   GPIO_PA03  /**< USART2 RX on the Arduino header. */

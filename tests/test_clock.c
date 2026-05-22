@@ -23,7 +23,7 @@ void test_hal_clock_init_hsi(void) {
   wait_uart_empty();
   hal_clock_init(&cfg, NULL);
 
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
 
   TEST_ASSERT_EQUAL_UINT32(0, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
@@ -36,7 +36,7 @@ void test_hal_clock_init_hse(void) {
   wait_uart_empty();
   hal_clock_init(&cfg, NULL);
 
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   TEST_ASSERT_EQUAL_UINT32(1, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
 
@@ -53,7 +53,7 @@ void test_hal_clock_init_pll(void) {
   wait_uart_empty();
   hal_clock_init(&cfg, &pll_cfg);
 
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   TEST_ASSERT_EQUAL_UINT32(2, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
 
@@ -66,7 +66,7 @@ void test_hal_clock_get_sysclk_returns_correct_value_hsi(void) {
   wait_uart_empty();
   hal_clock_init(&cfg, NULL);
 
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   uint32_t sysclk = hal_clock_get_sysclk();
   TEST_ASSERT_EQUAL_UINT32(16000000, sysclk);
 }
@@ -79,7 +79,7 @@ void test_hal_clock_get_sysclk_returns_correct_value_hse(void) {
   wait_uart_empty();
   hal_clock_init(&cfg, NULL);
 
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   uint32_t sysclk = hal_clock_get_sysclk();
   TEST_ASSERT_EQUAL_UINT32(8000000, sysclk);
 }
@@ -97,7 +97,7 @@ void test_hal_clock_get_sysclk_returns_correct_value_pll(void) {
   wait_uart_empty();
   hal_clock_init(&cfg, &pll_cfg);
 
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   uint32_t sysclk = hal_clock_get_sysclk();
   uint32_t expected = (8000000 / pll_cfg.pll_m) * pll_cfg.pll_n / pll_cfg.pll_p;
   TEST_ASSERT_EQUAL_UINT32(expected, sysclk);
@@ -152,7 +152,7 @@ void test_hal_clock_init_returns_ok_for_hsi(void) {
                             .ppre2_div = RCC_CFGR_PPRE_DIV1};
   wait_uart_empty();
   hal_status_t s = hal_clock_init(&cfg, NULL);
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)s);
 }
 

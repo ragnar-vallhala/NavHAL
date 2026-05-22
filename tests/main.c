@@ -48,14 +48,14 @@ static const navtest_suite_t *const all_suites[] = {
 };
 
 static void print_startup_message(void) {
-  uart2_write_char(0x1B); // ESC
-  uart2_write_char('[');
-  uart2_write_char('2');
-  uart2_write_char('J');
+  hal_uart_write_char(HAL_UART_2, 0x1B); // ESC
+  hal_uart_write_char(HAL_UART_2, '[');
+  hal_uart_write_char(HAL_UART_2, '2');
+  hal_uart_write_char(HAL_UART_2, 'J');
 
-  uart2_write_char(0x1B); // ESC
-  uart2_write_char('[');
-  uart2_write_char('H');
+  hal_uart_write_char(HAL_UART_2, 0x1B); // ESC
+  hal_uart_write_char(HAL_UART_2, '[');
+  hal_uart_write_char(HAL_UART_2, 'H');
   const char *msg = "\r\n"
                     "|========================================|\r\n"
                     "|    NAVrobotec Private Limited          |\r\n"
@@ -64,12 +64,12 @@ static void print_startup_message(void) {
                     "|========================================|\r\n";
 
   for (const char *p = msg; *p != '\0'; p++) {
-    uart2_write_char(*p);
+    hal_uart_write_char(HAL_UART_2, *p);
   }
 }
 
 int main(void) {
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
 #if NAVHAL_HAS_FPU
   hal_fpu_enable();
 #endif
@@ -83,12 +83,12 @@ int main(void) {
     total_tests += all_suites[i]->count;
   }
 
-  uart2_write("\n\n=========== FINAL RESULTS ===========\n\n");
-  uart2_write("Total tests run: ");
+  hal_uart_print(HAL_UART_2, "\n\n=========== FINAL RESULTS ===========\n\n");
+  hal_uart_print(HAL_UART_2, "Total tests run: ");
   _navtest_print_uint32(total_tests);
-  uart2_write("\nTotal failures:  ");
+  hal_uart_print(HAL_UART_2, "\nTotal failures:  ");
   _navtest_print_uint32((uint32_t)failed);
-  uart2_write("\n");
+  hal_uart_print(HAL_UART_2, "\n");
 
   return failed;
 }

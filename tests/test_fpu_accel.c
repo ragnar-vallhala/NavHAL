@@ -28,14 +28,14 @@ void test_fpu_benchmark_cycles(void) {
   uint32_t start, end;
   const int iterations = 1000;
 
-  dwt_init();
-  dwt_reset_cycles();
+  hal_cycle_counter_init();
+  hal_cycle_counter_reset();
 
-  start = dwt_get_cycles();
+  start = hal_cycle_counter_get();
   for (int i = 0; i < iterations; i++) {
     f3 = f1 * f2 + f1;
   }
-  end = dwt_get_cycles();
+  end = hal_cycle_counter_get();
 
   uint32_t total_cycles = end - start;
 

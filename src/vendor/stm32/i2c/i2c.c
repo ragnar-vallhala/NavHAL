@@ -36,11 +36,11 @@ uint8_t hal_i2c_get_init_status(void) { return __i2c_init_status; }
 #include "navhal_port_interrupt.h"
 
 static void (*_i2c_dma_rx_callback)(void) = NULL;
-static dma_config_t _active_i2c_dma_config;
+static hal_dma_config_t _active_i2c_dma_config;
 static void _i2c_dma_irq_handler(void);
 
 hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
-                                   uint8_t reg, const dma_config_t *dma_cfg,
+                                   uint8_t reg, const hal_dma_config_t *dma_cfg,
                                    void (*callback)(void)) {
   I2C_Reg_Typedef *I2Cx =
       I2C_GET_BASE(bus); // Changed get_i2c_base to I2C_GET_BASE
@@ -94,10 +94,10 @@ hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
   I2Cx->CR2 |= I2C_CR2_DMAEN;
 
   // Init/Start the DMA (CR, NDTR, M0AR config + Enable)
-  dma_init(&_active_i2c_dma_config);
+  hal_dma_init(&_active_i2c_dma_config);
 
   // Register our internal handler for the chosen stream
-  if (_active_i2c_dma_config.controller == DMA_CONTROLLER_1) {
+  if (_active_i2c_dma_config.controller == HAL_DMA_CONTROLLER_1) {
     if (_active_i2c_dma_config.stream == 0) {
       hal_interrupt_attach_callback(DMA1_Stream0_IRQn, _i2c_dma_irq_handler);
       hal_interrupt_enable(DMA1_Stream0_IRQn);
@@ -107,7 +107,7 @@ hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
     }
   }
 
-  dma_start(&_active_i2c_dma_config);
+  hal_dma_start(&_active_i2c_dma_config);
 
   (void)I2Cx->SR1;
   (void)I2Cx->SR2; // Clear ADDR to release clock stretching and let DMA read
@@ -117,8 +117,8 @@ hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
 
 // Internal callback for I2C DMA RX completion
 static void _i2c_dma_irq_handler(void) {
-  if (dma_transfer_complete(&_active_i2c_dma_config)) {
-    dma_clear_flags(&_active_i2c_dma_config);
+  if (hal_dma_transfer_complete(&_active_i2c_dma_config)) {
+    hal_dma_clear_flags(&_active_i2c_dma_config);
 
     // Stop and Disable I2C DMA gracefully
     I2C_Reg_Typedef *I2Cx = I2C_GET_BASE(HAL_I2C_1);

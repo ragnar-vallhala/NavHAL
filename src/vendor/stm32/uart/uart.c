@@ -307,23 +307,23 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
   usart->CR3 |= USART_CR3_DMAT;
 
   int idx = (uart == HAL_UART_1) ? 0 : (uart == HAL_UART_2) ? 2 : 4;
-  dma_config_t cfg = {
+  hal_dma_config_t cfg = {
       .controller =
-          (p.controller == DMA1) ? DMA_CONTROLLER_1 : DMA_CONTROLLER_2,
+          (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2,
       .stream = p.stream,
       .channel = p.channel,
-      .direction = DMA_DIR_M2P,
+      .direction = HAL_DMA_DIR_M2P,
       .src_addr = (uint32_t)data,
       .dst_addr = p.periph_addr,
       .data_count = length,
       .src_inc = 1,
       .dst_inc = 0,
-      .data_width = DMA_DATA_WIDTH_8,
-      .priority = DMA_PRIORITY_HIGH,
+      .data_width = HAL_DMA_DATA_WIDTH_8,
+      .priority = HAL_DMA_PRIORITY_HIGH,
   };
 
   if (!_uart_dma_initialized[idx]) {
-    dma_init(&cfg);
+    hal_dma_init(&cfg);
     _uart_dma_initialized[idx] = 1;
   } else {
     DMA_Stream_Typedef *s = &p.controller->STREAM[p.stream];
@@ -334,9 +334,9 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
     s->NDTR = length;
   }
 
-  dma_clear_flags(&cfg);
+  hal_dma_clear_flags(&cfg);
   hal_interrupt_enable((IRQn_Type)p.irq);
-  dma_start(&cfg);
+  hal_dma_start(&cfg);
   return HAL_OK;
 }
 
@@ -352,24 +352,24 @@ hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
   volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
   usart->CR3 |= USART_CR3_DMAR;
 
-  dma_config_t cfg = {
+  hal_dma_config_t cfg = {
       .controller =
-          (p.controller == DMA1) ? DMA_CONTROLLER_1 : DMA_CONTROLLER_2,
+          (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2,
       .stream = p.stream,
       .channel = p.channel,
-      .direction = DMA_DIR_P2M,
+      .direction = HAL_DMA_DIR_P2M,
       .src_addr = p.periph_addr,
       .dst_addr = (uint32_t)buffer,
       .data_count = length,
       .src_inc = 0,
       .dst_inc = 1,
-      .data_width = DMA_DATA_WIDTH_8,
-      .priority = DMA_PRIORITY_MEDIUM,
+      .data_width = HAL_DMA_DATA_WIDTH_8,
+      .priority = HAL_DMA_PRIORITY_MEDIUM,
       .circular = 1,
   };
 
-  dma_init(&cfg);
-  dma_start(&cfg);
+  hal_dma_init(&cfg);
+  hal_dma_start(&cfg);
 
   int idx = (uart == HAL_UART_1) ? 1 : (uart == HAL_UART_2) ? 3 : 5;
   _uart_dma_initialized[idx] = 1;

@@ -34,7 +34,8 @@ extern "C" {
  * @return ::HAL_OK once the sequence is started, or an error status.
  */
 hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
-                                   uint8_t reg, const dma_config_t *dma_cfg,
+                                   uint8_t reg,
+                                   const hal_dma_config_t *dma_cfg,
                                    void (*callback)(void));
 #endif
 

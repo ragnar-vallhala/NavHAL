@@ -43,20 +43,20 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config) {
   if (!config)
     return HAL_SDIO_ERROR;
 
-  hal_gpio_set_alternate_function(GPIO_PC08, GPIO_AF12);
-  hal_gpio_set_alternate_function(GPIO_PC09, GPIO_AF12);
-  hal_gpio_set_alternate_function(GPIO_PC10, GPIO_AF12);
-  hal_gpio_set_alternate_function(GPIO_PC11, GPIO_AF12);
-  hal_gpio_set_alternate_function(GPIO_PC12, GPIO_AF12);
-  hal_gpio_set_alternate_function(GPIO_PD02, GPIO_AF12);
+  hal_gpio_set_alternate_function(GPIO_PC08, HAL_GPIO_AF12);
+  hal_gpio_set_alternate_function(GPIO_PC09, HAL_GPIO_AF12);
+  hal_gpio_set_alternate_function(GPIO_PC10, HAL_GPIO_AF12);
+  hal_gpio_set_alternate_function(GPIO_PC11, HAL_GPIO_AF12);
+  hal_gpio_set_alternate_function(GPIO_PC12, HAL_GPIO_AF12);
+  hal_gpio_set_alternate_function(GPIO_PD02, HAL_GPIO_AF12);
 
   hal_gpio_pin pins[] = {GPIO_PC08, GPIO_PC09, GPIO_PC10,
                          GPIO_PC11, GPIO_PC12, GPIO_PD02};
 
   for (int i = 0; i < 6; i++) {
-    hal_gpio_set_output_speed(pins[i], GPIO_VERY_HIGH_SPEED);
-    hal_gpio_set_output_type(pins[i], GPIO_PUSH_PULL);
-    hal_gpio_setmode(pins[i], GPIO_AF, GPIO_PULLUP);
+    hal_gpio_set_output_speed(pins[i], HAL_GPIO_SPEED_VERY_HIGH);
+    hal_gpio_set_output_type(pins[i], HAL_GPIO_OTYPE_PUSH_PULL);
+    hal_gpio_set_mode(pins[i], HAL_GPIO_MODE_AF, HAL_GPIO_PULL_UP);
   }
 
   RCC->APB2ENR |= RCC_APB2ENR_SDIOEN;
@@ -84,13 +84,13 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config) {
 
   /* Enable SDIO Interrupts in NVIC */
   hal_interrupt_enable(SDIO_IRQn);
-  hal_set_interrupt_priority(SDIO_IRQn, 5);
+  hal_interrupt_set_priority(SDIO_IRQn, 5);
 
 #ifdef _DMA_ENABLED
   hal_interrupt_enable(DMA2_Stream3_IRQn);
   hal_interrupt_enable(DMA2_Stream6_IRQn);
-  hal_set_interrupt_priority(DMA2_Stream3_IRQn, 5);
-  hal_set_interrupt_priority(DMA2_Stream6_IRQn, 5);
+  hal_interrupt_set_priority(DMA2_Stream3_IRQn, 5);
+  hal_interrupt_set_priority(DMA2_Stream6_IRQn, 5);
 #endif
 
   return HAL_SDIO_OK;
@@ -183,7 +183,7 @@ static hal_sdio_error_t sdio_wait_card_ready(void) {
         return HAL_SDIO_OK;
     }
 
-    delay_ms(1);
+    hal_delay_ms(1);
   }
 
   return HAL_SDIO_TIMEOUT;
@@ -225,7 +225,7 @@ hal_sdio_error_t hal_sdio_card_init(void) {
       break;
     }
 
-    delay_ms(1);
+    hal_delay_ms(1);
   }
 
   if (!timeout)
@@ -329,7 +329,7 @@ hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buf) {
 
   if (timeout == 0) {
     SDIO->DCTRL = 0;
-//    uart2_write_string("SDIO Read DBCKEND Timeout\n\r");
+//    hal_uart_write_string(HAL_UART_2, "SDIO Read DBCKEND Timeout\n\r");
     return HAL_SDIO_TIMEOUT;
   }
 
@@ -625,7 +625,7 @@ hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
   if (hal_sdio_send_command(SD_CMD_READ_MULT_BLOCK, addr, 1)) {
     hal_dma_stop((const hal_dma_config_t *)&dma2_stream3_cfg);
 #ifdef _DMA_ENABLED
-//    uart2_write_string("Read Multi CMD18 failed\r\n");
+//    hal_uart_write_string(HAL_UART_2, "Read Multi CMD18 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
   }
@@ -690,7 +690,7 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
   if (hal_sdio_send_command(SD_CMD_WRITE_MULT_BLOCK, addr, 1)) {
     hal_dma_stop((const hal_dma_config_t *)&dma2_stream6_cfg);
 #ifdef _DMA_ENABLED
-//    uart2_write_string("Write Multi CMD25 failed\r\n");
+//    hal_uart_write_string(HAL_UART_2, "Write Multi CMD25 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
   }
@@ -774,21 +774,21 @@ hal_sdio_error_t hal_sdio_wait_sync(hal_sdio_error_t result) {
   if (result != HAL_SDIO_PENDING)
     return result;
 
-  uint32_t start = hal_get_millis();
+  uint32_t start = hal_timebase_get_millis();
   uint32_t timeout_ms = 10000;
   if (is_multi_block)
     timeout_ms = 1000;
   else
     timeout_ms = 200;
   while (sd_busy) {
-    if ((uint32_t)(hal_get_millis() - start) >= timeout_ms)
+    if ((uint32_t)(hal_timebase_get_millis() - start) >= timeout_ms)
       break;
     __asm volatile("wfi");
     // fallback safety
     __asm volatile("nop");
   }
 
-  if (hal_get_millis() - start >= timeout_ms) {
+  if (hal_timebase_get_millis() - start >= timeout_ms) {
     return HAL_SDIO_TIMEOUT;
   }
 
@@ -797,9 +797,9 @@ hal_sdio_error_t hal_sdio_wait_sync(hal_sdio_error_t result) {
       return HAL_SDIO_ERROR;
     }
 
-    uint32_t start = hal_get_millis();
+    uint32_t start = hal_timebase_get_millis();
     while (sdio_wait_card_ready() != HAL_SDIO_OK) {
-      if ((uint32_t)(hal_get_millis() - start) >= 500) {
+      if ((uint32_t)(hal_timebase_get_millis() - start) >= 500) {
         return HAL_SDIO_TIMEOUT;
       }
     }

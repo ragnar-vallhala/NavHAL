@@ -310,6 +310,7 @@ config SAMPLE_12_NO_HAL_FLASH
 
 config SAMPLE_13_HAL_FLASH
     bool "13_hal_flash"
+    select DRV_FLASH
 
 config SAMPLE_14_HAL_UART_INT
     bool "14_hal_uart_int"
@@ -328,6 +329,7 @@ config SAMPLE_17_HAL_FPU
 
 config SAMPLE_18_HAL_CRC
     bool "18_hal_crc"
+    select DRV_CRC
 
 config SAMPLE_19_HAL_DMA_I2C
     bool "19_hal_dma_i2c"

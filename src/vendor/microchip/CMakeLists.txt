@@ -39,6 +39,12 @@ endif()
 if(CONFIG_DRV_SPI)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spi/spi.c)
 endif()
+if(CONFIG_DRV_CRC)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/crc/crc.c)
+endif()
+if(CONFIG_DRV_FLASH)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/flash/flash.c)
+endif()
 
 add_library(hal STATIC
     ${HAL_SOURCES}

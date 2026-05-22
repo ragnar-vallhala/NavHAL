@@ -48,6 +48,8 @@ extern "C" {
 
 #include "common/hal_i2c.h"
 
+#include "common/hal_spi.h"
+
 #include "common/hal_interrupt.h"
 
 #include "common/hal_fpu.h"
@@ -56,6 +58,7 @@ extern "C" {
 
 #include "common/hal_crc.h"
 #include "common/hal_diskio.h"
+#include "common/hal_dma.h"
 #include "common/hal_dwt.h"
 #include "common/hal_flash.h"
 #include "common/hal_sdio.h"

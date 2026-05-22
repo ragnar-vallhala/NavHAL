@@ -25,10 +25,14 @@ extern "C" {
 #endif
 
 #include "utils/gpio_types.h"
+#include "utils/uart_types.h"
 
 /* On-board indicators / inputs */
 #define LED_BUILTIN  GPIO_PA05  /**< LD2 (green user LED), shared with D13. */
 #define USER_BUTTON  GPIO_PC13  /**< B1 user button, active-low. */
+
+/* Board console UART — USART2 is wired to the ST-LINK virtual COM port. */
+#define BOARD_CONSOLE_UART  HAL_UART_2
 
 /* Arduino-compatible digital headers (CN5/CN9 on the Nucleo-64) */
 #define D0   GPIO_PA03  /**< USART2 RX on the Arduino header. */

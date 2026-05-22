@@ -81,7 +81,11 @@ set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
 set(INCLUDE_PORT ${CMAKE_CURRENT_SOURCE_DIR}/include/port/${CMAKE_SYSTEM_PROCESSOR})
 set(INCLUDE_FAMILY ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR}/family/${FAMILY}/include)
 set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
-# FPU Configuration
+# ---- Architecture-specific compiler / linker flags ------------------------
+# Cortex-M and AVR need entirely different flag sets: -mcpu/-mthumb + a custom
+# linker script + -nostdlib for the bare-metal ARM build, versus -mmcu and the
+# startup/linker that the avr-libc toolchain supplies itself. Everything below
+# branches on the resolved CMAKE_SYSTEM_PROCESSOR.
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
     if(USE_FPU)
         set(FPU_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED -D_DMA_ENABLED")
@@ -90,43 +94,30 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
         set(FPU_FLAGS "-mfloat-abi=soft")
         message(STATUS "FPU: Software emulation (Cortex-M4)")
     endif()
-else()
-    # Unsupported/Generic core default
+    set(ARCH_C_FLAGS    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS} -O0 -g")
+    set(ARCH_ASM_FLAGS  "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
+    set(ARCH_LINK_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}")
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
+    # FAMILY is the avr-gcc -mmcu device name (atmega328p). F_CPU drives the
+    # avr-libc timing routines; 16 MHz matches the ATmega328P reference board.
     set(FPU_FLAGS "")
-    message(WARNING "FPU Configuration not predefined for core '${CMAKE_SYSTEM_PROCESSOR}'")
-endif()
-
-# Architecture Flags
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
-    set(ARCH_FLAGS "-mthumb")
+    set(AVR_MCU "${FAMILY}")
+    set(AVR_F_CPU "16000000UL")
+    message(STATUS "AVR: -mmcu=${AVR_MCU}, F_CPU=${AVR_F_CPU}")
+    set(ARCH_C_FLAGS    "-mmcu=${AVR_MCU} -DF_CPU=${AVR_F_CPU} -Os -g")
+    set(ARCH_ASM_FLAGS  "-mmcu=${AVR_MCU}")
+    set(ARCH_LINK_FLAGS "-mmcu=${AVR_MCU}")
 else()
-    set(ARCH_FLAGS "")
+    set(FPU_FLAGS "")
+    set(ARCH_C_FLAGS "")
+    set(ARCH_ASM_FLAGS "")
+    set(ARCH_LINK_FLAGS "")
+    message(WARNING "No architecture flags predefined for core '${CMAKE_SYSTEM_PROCESSOR}'")
 endif()
 
-# Compiler Flags
-set(CMAKE_C_FLAGS
-"-mcpu=${CMAKE_SYSTEM_PROCESSOR} ${ARCH_FLAGS} -Wall -O0 -g -std=c11 ${FPU_FLAGS}")
- # C++
-# standard
-# 11
-
-
-
-set(CMAKE_ASM_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} ${ARCH_FLAGS} ${FPU_FLAGS}")
-
-if(NOT STANDALONE)
-  set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}") # can be
-                                                                   # later
-                                                                   # modified to
-                                                                   # use
-                                                                   # multiple
-                                                                   # linker
-                                                                   # scripts
-                                                                   # dynamically
-endif()
-if(STANDALONE)
-set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}") # can be
-endif()
+set(CMAKE_C_FLAGS "${ARCH_C_FLAGS} -Wall -std=c11")
+set(CMAKE_ASM_FLAGS "${ARCH_ASM_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${ARCH_LINK_FLAGS}")
 # subdirectories are commented, they will be added as code is added
 if(NOT STANDALONE)
 add_subdirectory(${SRC_DIR})
@@ -187,8 +178,13 @@ add_custom_target(copy_compile_commands ALL
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-# Define startup file path (arch layer; ARMv7E-M = Cortex-M3/M4/M7).
-set(STARTUP_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/arch/armv7e-m/startup/startup.s")
+# Startup file (arch layer). The Cortex-M port ships an explicit startup.s;
+# the AVR port relies on the avr-libc C runtime and has none.
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
+    set(STARTUP_FILE "")
+else()
+    set(STARTUP_FILE "${SRC_ARCH}/startup/startup.s")
+endif()
 # Export path to parent project if included via add_subdirectory()
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(STARTUP_FILE "${STARTUP_FILE}" PARENT_SCOPE)

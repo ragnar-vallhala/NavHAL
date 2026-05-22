@@ -13,11 +13,10 @@ config ARCH_CORTEX_M4
     bool "Cortex-M4"
 
 config ARCH_AVR8
-    bool "AVR8 (8-bit) — placeholder, not yet implemented"
+    bool "AVR8 (8-bit)"
     help
-      Reserved for the M6 AVR / ATmega328P port. Selectable so the
-      Kconfig schema and tools/kconfig.py output already model the
-      arch; no source files exist for it yet.
+      8-bit AVR architecture (ATmega / ATtiny). Implemented by the M6
+      port; arch sources live under src/arch/avr/.
 
 endchoice
 
@@ -47,10 +46,10 @@ config VENDOR_STM32
     depends on ARCH_CORTEX_M4
 
 config VENDOR_MICROCHIP
-    bool "Microchip — placeholder, not yet implemented"
+    bool "Microchip"
     depends on ARCH_AVR8
     help
-      Reserved for the M6 AVR / ATmega328P port (see ARCH_AVR8).
+      Microchip (formerly Atmel) AVR silicon.
 
 endchoice
 
@@ -66,16 +65,14 @@ choice
     help
       Select the device family within the selected vendor. This is the
       register-layout axis: a single vendor can ship multiple families
-      with different register maps (STM32F4 vs STM32F0 vs ...). M4 ships
-      with one populated family (STM32F4); ATMEGA328P is a placeholder
-      for the M6 AVR port.
+      with different register maps (STM32F4 vs STM32F0 vs ...).
 
 config FAMILY_STM32F4
     bool "STM32F4 (Cortex-M4)"
     depends on VENDOR_STM32
 
 config FAMILY_ATMEGA328P
-    bool "ATmega328P — placeholder, not yet implemented"
+    bool "ATmega328P"
     depends on VENDOR_MICROCHIP
 
 endchoice
@@ -97,7 +94,7 @@ config BOARD_NUCLEO_F401RE
     depends on FAMILY_STM32F4
 
 config BOARD_ATMEGA328P
-    bool "atmega328p — placeholder, not yet implemented"
+    bool "atmega328p"
     depends on FAMILY_ATMEGA328P
 
 endchoice
@@ -111,14 +108,20 @@ endmenu
 
 menu "System & Features Configuration"
 
+# DMA, the hardware FPU and the DWT cycle counter are Cortex-M
+# peripherals with no ATmega328P equivalent — gated to ARCH_CORTEX_M4
+# so they cannot be selected on AVR.
+
 config USE_FPU
     bool "Enable Hardware FPU Compiler Flags"
+    depends on ARCH_CORTEX_M4
     default n
     help
       Enable hardware Floating Point Unit compiler and linker flags.
 
 config DRV_DMA
     bool "Enable Direct Memory Access (DMA)"
+    depends on ARCH_CORTEX_M4
     default n
     select DRV_INTERRUPT
     help
@@ -132,12 +135,14 @@ config DRV_CRC
 
 config DRV_DWT
     bool "Enable Debug Watchpoint and Trace (DWT)"
+    depends on ARCH_CORTEX_M4
     default n
     help
       Enables the DWT counter for high-resolution timing.
 
 config DRV_FPU
     bool "Enable FPU Driver Extension"
+    depends on ARCH_CORTEX_M4
     default n
     help
       Enables compilation of hardware FPU runtime setup files.
@@ -145,7 +150,7 @@ config DRV_FPU
 endmenu
 
 menu "HAL Drivers Configuration"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_AVR8
 
 config DRV_CLOCK
     bool "Enable Clock Driver"
@@ -171,7 +176,7 @@ config DRV_UART
     select DRV_GPIO
     select DRV_CLOCK
     select DRV_INTERRUPT
-    select DRV_DMA
+    select DRV_DMA if ARCH_CORTEX_M4
 
 config DRV_UART_DMA
     bool "Enable DMA-backed UART API"
@@ -187,7 +192,7 @@ config DRV_I2C
     default n
     select DRV_CLOCK
     select DRV_INTERRUPT
-    select DRV_DMA
+    select DRV_DMA if ARCH_CORTEX_M4
 
 config DRV_I2C_DMA
     bool "Enable DMA-backed I2C API"
@@ -211,6 +216,7 @@ config DRV_PWM
 
 config DRV_SDIO
     bool "Enable SDIO Driver"
+    depends on ARCH_CORTEX_M4
     default n
     select DRV_CLOCK
     select DRV_GPIO
@@ -235,9 +241,10 @@ menu "Build Options"
 
 config TOOLCHAIN_PREFIX
     string "Toolchain Binary Prefix"
-    default "arm-none-eabi-"
+    default "arm-none-eabi-" if ARCH_CORTEX_M4
+    default "avr-"           if ARCH_AVR8
     help
-      Prefix for the toolchain binaries (e.g., arm-none-eabi-).
+      Prefix for the toolchain binaries (e.g. arm-none-eabi-, avr-).
 
 config STANDALONE
     bool "Build Standalone Samples (without full HAL)"
@@ -384,10 +391,12 @@ config TEST
 
 config FLASHER
     string "Binary Flasher Tool"
-    default "st-flash"
+    default "st-flash" if ARCH_CORTEX_M4
+    default "avrdude"  if ARCH_AVR8
 
 config FLASH_ADDRESS
     string "Flash Target Address"
-    default "0x8000000"
+    default "0x8000000" if ARCH_CORTEX_M4
+    default "0x0"       if ARCH_AVR8
 
 endmenu

@@ -4,7 +4,7 @@
  *
  * @details
  * The public prototype lives in @c common/hal_fpu.h, which includes this
- * header. Retained to preserve the @c #include "navhal_port_fpu.h" path.
+ * header. Retained to preserve the @c navhal_port_fpu.h include path.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */

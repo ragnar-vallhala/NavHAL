@@ -5,7 +5,7 @@
  * @details
  * The public prototypes live in @c common/hal_dwt.h, which includes this
  * header. This file is currently the deprecated-name compatibility shim only;
- * its presence preserves the @c #include "navhal_port_dwt.h" path used by
+ * its presence preserves the @c navhal_port_dwt.h include path used by
  * existing source files.
  *
  * @copyright © NAVROBOTEC PVT. LTD.

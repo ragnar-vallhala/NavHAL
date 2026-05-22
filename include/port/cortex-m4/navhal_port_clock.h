@@ -4,7 +4,7 @@
  *
  * @details
  * The public prototypes live in @c common/hal_clock.h, which includes this
- * header. Retained to preserve the @c #include "navhal_port_clock.h" path.
+ * header. Retained to preserve the @c navhal_port_clock.h include path.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */

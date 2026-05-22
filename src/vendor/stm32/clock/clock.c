@@ -42,8 +42,9 @@ static void _toggle_pll_clock(uint8_t state) {
     ;
 }
 
-/**
+/*
  * @brief Initialize system clocks based on the provided configuration.
+ * (API doc lives in common/hal_clock.h; this is an implementation note.)
  *
  * Enables and waits for the selected clock source (HSI, HSE, or PLL).
  * If PLL is selected, configures PLL parameters and switches system clock

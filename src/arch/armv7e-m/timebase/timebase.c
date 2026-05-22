@@ -35,8 +35,9 @@ static volatile uint32_t tick_reload_value = 0;
 /** @brief User callback invoked on every timebase tick. */
 static hal_timebase_callback_t timebase_callback = 0;
 
-/**
+/*
  * @brief Initialize the timebase (SysTick) to generate periodic ticks.
+ * (API doc lives in common/hal_timer.h; this is an implementation note.)
  *
  * @param tick_us Tick period in microseconds; must be non-zero.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p tick_us is 0.

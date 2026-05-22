@@ -5,7 +5,7 @@
  * @details
  * The public prototypes live in @c common/hal_crc.h, which includes this
  * header. This file currently has no port-specific declarations; its presence
- * preserves the @c #include "navhal_port_crc.h" path used by existing
+ * preserves the @c navhal_port_crc.h include path used by existing
  * source files.
  *
  * @copyright © NAVROBOTEC PVT. LTD.

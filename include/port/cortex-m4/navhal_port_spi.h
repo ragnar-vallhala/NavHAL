@@ -5,7 +5,7 @@
  * @details
  * The public SPI API lives in @c common/hal_spi.h, which includes this
  * header. This file currently has no port-specific declarations; its presence
- * preserves the @c #include "navhal_port_spi.h" path used by existing source
+ * preserves the @c navhal_port_spi.h include path used by existing source
  * files.
  *
  * @copyright © NAVROBOTEC PVT. LTD.

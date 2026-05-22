@@ -1,5 +1,5 @@
 /**
- * @file blink_led.c
+ * @file main.c
  * @brief Blink an LED on STM32 using direct register access (no HAL/LL).
  * 
  * This program blinks the onboard LED connected to GPIOA pin 5 on STM32

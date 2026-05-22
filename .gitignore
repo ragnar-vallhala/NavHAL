@@ -13,7 +13,11 @@ out/
 .config*
 plan/
 
-# LaTeX build artifacts (docs/ source is tracked; generated output is not)
+# Generated documentation (docs/ source is tracked; generated output is not)
+docs/html/
+docs/latex/
+
+# LaTeX build artifacts
 docs/*.aux
 docs/*.fdb_latexmk
 docs/*.fls

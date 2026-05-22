@@ -5,7 +5,7 @@
 
 ## Context
 
-M2 froze the standardized `hal_<p>_*` API surface across 13 drivers (~68 `hal_status_t` functions plus non-fallible getters). The current `tests/` directory has ~3–6 tests per driver that still call the **deprecated** legacy API (`uart2_init`, `hal_gpio_setmode`, etc.), exercises only happy paths, and has no CI. M3 (directory restructure) and M4 (Kconfig-driven dispatch) are large mechanical refactors that can silently regress behavior, and M6 (AVR port) needs a conformance bar.
+M2 froze the standardized `hal_{p}_*` API surface across 13 drivers (~68 `hal_status_t` functions plus non-fallible getters). The current `tests/` directory has ~3–6 tests per driver that still call the **deprecated** legacy API (`uart2_init`, `hal_gpio_setmode`, etc.), exercises only happy paths, and has no CI. M3 (directory restructure) and M4 (Kconfig-driven dispatch) are large mechanical refactors that can silently regress behavior, and M6 (AVR port) needs a conformance bar.
 
 M2+ grows the suite into full-surface coverage of the standardized API, fixes the build separation bug that blocks a clean `-DTEST=ON` configure, and stands up CI with both a fast host-runnable subset and a Renode-emulated on-target run of the full ELF. The sequencing is **infra-first, then driver waves**; the CI strategy is **Renode + host subset both**.
 
@@ -25,7 +25,7 @@ Acceptance (from `docs/execution_plan.md` §5+, §12):
 **Changes.**
 
 - `CMakeLists.txt`: make `TEST` exclusive — if `TEST=ON`, skip the `samples/` subdir entirely. Document the rule in a comment near the `if(SAMPLE …)` block.
-- `tests/main.c` → split: each `tests/test_<driver>.c` exports a `const navtest_case_t test_<driver>_cases[]` table (function ptr + name). `tests/main.c` becomes ~40 lines: iterates a master `navtest_suite_t` array and prints the rollup.
+- `tests/main.c` → split: each `tests/test_{driver}.c` exports a `const navtest_case_t test_{driver}_cases[]` table (function ptr + name). `tests/main.c` becomes ~40 lines: iterates a master `navtest_suite_t` array and prints the rollup.
 - `include/navtest/navtest.h`: add `navtest_case_t`/`navtest_suite_t` and a `NAVTEST_RUN_SUITE()` macro that walks the case table — replaces the manual `RUN_TEST` boilerplate. Keep `RUN_TEST()` for any one-off tests.
 - Verify the existing on-target build still passes (no API changes in this PR; only the harness shape).
 
@@ -66,10 +66,10 @@ Files: `.github/workflows/ci.yml`, `tools/renode/*`, `README.md`.
 
 ### PR4 — Wave A: gpio, clock, interrupt *(WI2+.2 + WI2+.3, first slice)*
 
-For each driver, rewrite `tests/test_<driver>.c` to call the standardized `hal_<p>_*` API only (drop all `uart2_*`, `hal_gpio_setmode`, etc.), and cover:
+For each driver, rewrite `tests/test_{driver}.c` to call the standardized `hal_{p}_*` API only (drop all `uart2_*`, `hal_gpio_setmode`, etc.), and cover:
 
-- **Lifecycle:** `hal_<p>_init` happy path + NULL-config → `HAL_ERR_INVALID_ARG`; `hal_<p>_deinit` round-trip.
-- **Every public function** in `include/core/cortex-m4/<driver>.h` gets at least one success-path test.
+- **Lifecycle:** `hal_{p}_init` happy path + NULL-config → `HAL_ERR_INVALID_ARG`; `hal_{p}_deinit` round-trip.
+- **Every public function** in `include/core/cortex-m4/{driver}.h` gets at least one success-path test.
 - **Every `hal_status_t`-returning function** gets at least one error-path test (NULL pointer, bad id, out-of-range arg, pre-init call → `HAL_ERR_NOT_INITIALIZED`).
 - Where two-layer GPIO is exercised (board macros), include a `LED_BUILTIN` / `GPIO_PA05` round-trip to lock the encoding contract for M6.
 
@@ -107,7 +107,7 @@ Files: `tests/test_pwm.{c,h}`, `tests/test_crc.{c,h}`, `tests/test_flash.{c,h}` 
 
 All four are capability-gated. For each:
 
-- The driver's `tests/test_<driver>.c` is wrapped in `#if NAVHAL_HAS_<X>` so the suite still links when the capability is off.
+- The driver's `tests/test_{driver}.c` is wrapped in `#if NAVHAL_HAS_{X}` so the suite still links when the capability is off.
 - The Wave E suite is registered into `tests/main.c`'s suite table only when its `NAVHAL_HAS_*` is on.
 - PR3's `build-no-cap` job proves the absence by building with these capabilities disabled and checking no symbol from the disabled driver landed in the ELF.
 - `dwt` → `cycle_counter` rename completes the M2 work; remove the legacy `test_dwt.{c,h}` once `test_cycle_counter.{c,h}` lands.
@@ -121,7 +121,7 @@ Concise (one page) document covering:
 1. **On-target run** — `cmake -B build -DTEST=ON && make -C build tests && make -C build flash_tests`. Connect a USB-TTL to UART2 and watch the navtest output.
 2. **Host subset run** — `cmake -B build-host -DTEST_HOST=ON && cmake --build build-host && build-host/tests_host`.
 3. **Renode run** — `tools/renode/run_tests.sh build/tests` → loads the ELF in the F401RE machine model and prints the captured UART log.
-4. **Adding a test for a new driver** — pattern: `tests/test_<x>.{c,h}` with a `navtest_case_t test_<x>_cases[]` table; register in `tests/main.c`'s suite array; if the driver is capability-gated, wrap in `#if NAVHAL_HAS_<X>`.
+4. **Adding a test for a new driver** — pattern: `tests/test_{x}.{c,h}` with a `navtest_case_t test_{x}_cases[]` table; register in `tests/main.c`'s suite array; if the driver is capability-gated, wrap in `#if NAVHAL_HAS_{X}`.
 5. **CI matrix** — what each job covers, when each one runs.
 
 Files: `docs/testing.md`, `README.md` (link in).

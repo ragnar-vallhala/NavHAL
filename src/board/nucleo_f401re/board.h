@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include "utils/gpio_types.h"
+#include "utils/i2c_types.h"
 #include "utils/timer_types.h"
 #include "utils/uart_types.h"
 
@@ -42,6 +43,11 @@ extern "C" {
 #define BOARD_PWM_TIMER    TIM2
 #define BOARD_PWM_CHANNEL  3
 #define BOARD_PWM_PIN      GPIO_PB10
+
+/* I2C bus — I2C1 on PB8 (SCL) / PB9 (SDA). */
+#define BOARD_I2C_BUS  HAL_I2C_1
+#define BOARD_I2C_SCL  GPIO_PB08
+#define BOARD_I2C_SDA  GPIO_PB09
 
 /* Arduino-compatible digital headers (CN5/CN9 on the Nucleo-64) */
 #define D0   GPIO_PA03  /**< USART2 RX on the Arduino header. */

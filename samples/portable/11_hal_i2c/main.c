@@ -1,180 +1,163 @@
 /**
  * @file main.c
- * @brief Example: Read accel, gyro, mag, and temp from BMX160 over I2C and
- * print via HAL_UART_2.
+ * @brief Read a BMX160 IMU over I²C and print accel/gyro/mag/temp.
  *
  * @details
- * - Initializes SysTick for delay functions.
- * - Configures HAL_UART_2 at 9600 baud for console output.
- * - Manually unsticks the I2C bus before giving it to the HAL.
- * - Configures HAL_I2C_1 and GPIO pins for BMX160 communication (PB8=SCL, PB9=SDA).
- * - Periodically reads the 30-byte data block and prints values.
+ * Target-agnostic: the console UART and the I²C bus / SCL / SDA pins are
+ * named by the board-layer aliases (::BOARD_CONSOLE_UART, ::BOARD_I2C_BUS,
+ * ::BOARD_I2C_SCL, ::BOARD_I2C_SDA), so the same source builds for the
+ * Nucleo-F401RE and the ATmega328P.
+ *
+ * Manually unsticks the bus, brings up the sensor, then prints its 30-byte
+ * data block every 500 ms.
+ *
+ * @copyright © NAVROBOTEC PVT. LTD.
  */
 
-#define CORTEX_M4
+#include "board.h"
 #include "navhal.h"
 
-// BMX160 I2C address (7-bit)
+/** @brief BMX160 7-bit I²C address. */
 #define BMX160_I2C_ADDR 0x68
 
-#define I2C_BUS HAL_I2C_1
-#define I2C_MODE HAL_I2C_SPEED_STANDARD
-#define I2C_PIN_1 GPIO_PB08 // SCL
-#define I2C_PIN_2 GPIO_PB09 // SDA
+#define I2C_BUS BOARD_I2C_BUS
+#define I2C_PIN_SCL BOARD_I2C_SCL
+#define I2C_PIN_SDA BOARD_I2C_SDA
 
-#define PERIPH_BASE 0x40000000UL
-#define AHB1PERIPH_BASE (PERIPH_BASE + 0x00020000UL)
-#define GPIOB_BASE (AHB1PERIPH_BASE + 0x0400UL)
-
+/** @brief Best-effort recovery of a stuck I²C bus before the HAL takes it. */
 void unstick_i2c_bus(void) {
-  // Try to manually clear the I2C bus in case the slave is stuck
-  // We temporarily take control of PB8 and PB9
-  hal_gpio_set_mode(GPIO_PB08, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_UP);
-  hal_gpio_set_mode(GPIO_PB09, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_UP);
-  hal_gpio_set_output_type(GPIO_PB08, HAL_GPIO_OTYPE_OPEN_DRAIN);
-  hal_gpio_set_output_type(GPIO_PB09, HAL_GPIO_OTYPE_OPEN_DRAIN);
+  hal_gpio_set_mode(I2C_PIN_SCL, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_UP);
+  hal_gpio_set_mode(I2C_PIN_SDA, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_UP);
+  hal_gpio_set_output_type(I2C_PIN_SCL, HAL_GPIO_OTYPE_OPEN_DRAIN);
+  hal_gpio_set_output_type(I2C_PIN_SDA, HAL_GPIO_OTYPE_OPEN_DRAIN);
 
-  // Set SDA high
-  hal_gpio_write(GPIO_PB09, HAL_GPIO_HIGH);
+  hal_gpio_write(I2C_PIN_SDA, HAL_GPIO_HIGH);
   for (volatile int i = 0; i < 100; i++)
     ;
 
-  // Toggle SCL 9 times
+  /* Clock out up to nine pulses to free a slave holding SDA low. */
   for (int i = 0; i < 9; ++i) {
-    hal_gpio_write(GPIO_PB08, HAL_GPIO_LOW);
+    hal_gpio_write(I2C_PIN_SCL, HAL_GPIO_LOW);
     for (volatile int j = 0; j < 200; j++)
       ;
-    hal_gpio_write(GPIO_PB08, HAL_GPIO_HIGH);
+    hal_gpio_write(I2C_PIN_SCL, HAL_GPIO_HIGH);
     for (volatile int j = 0; j < 200; j++)
       ;
   }
 
-  // Stop condition: SCL high, then SDA goes high
-  hal_gpio_write(GPIO_PB09, HAL_GPIO_LOW);
+  /* Stop condition: SDA rises while SCL is high. */
+  hal_gpio_write(I2C_PIN_SDA, HAL_GPIO_LOW);
   for (volatile int j = 0; j < 200; j++)
     ;
-  hal_gpio_write(GPIO_PB08, HAL_GPIO_HIGH);
+  hal_gpio_write(I2C_PIN_SCL, HAL_GPIO_HIGH);
   for (volatile int j = 0; j < 200; j++)
     ;
-  hal_gpio_write(GPIO_PB09, HAL_GPIO_HIGH);
+  hal_gpio_write(I2C_PIN_SDA, HAL_GPIO_HIGH);
   for (volatile int j = 0; j < 200; j++)
     ;
 }
 
 int main(void) {
-  hal_timebase_init(1000); /**< Initialize SysTick for delays */
-  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});   /**< Initialize HAL_UART_2 at 9600 baud */
+  hal_timebase_init(1000);
+  hal_uart_init(BOARD_CONSOLE_UART, &(hal_uart_config_t){.baudrate = 9600});
 
-  hal_uart_print(HAL_UART_2, "Initializing BMX160 via HAL...\n\r");
+  hal_uart_print(BOARD_CONSOLE_UART, "Initializing BMX160 via HAL...\n\r");
 
-  // Manually unstick bus before starting
   unstick_i2c_bus();
 
-  // I2C configuration
   hal_i2c_config_t i2c_config = {.clock_speed = HAL_I2C_SPEED_STANDARD,
                                  .own_address = I2C_MASTER,
                                  .acknowledge = true};
 
-  // Configure GPIO for HAL_I2C_1 (PB8=SCL, PB9=SDA)
-  hal_gpio_set_alternate_function(I2C_PIN_1, GPIO_FUNC_I2C);
-  hal_gpio_set_alternate_function(I2C_PIN_2, GPIO_FUNC_I2C);
-  hal_gpio_set_output_type(I2C_PIN_1, HAL_GPIO_OTYPE_OPEN_DRAIN);
-  hal_gpio_set_output_type(I2C_PIN_2, HAL_GPIO_OTYPE_OPEN_DRAIN);
-  hal_gpio_set_output_speed(I2C_PIN_1, HAL_GPIO_SPEED_VERY_HIGH);
-  hal_gpio_set_output_speed(I2C_PIN_2, HAL_GPIO_SPEED_VERY_HIGH);
+  /* On Cortex-M the SCL/SDA pins are routed through a GPIO alternate
+   * function; on the AVR the TWI peripheral owns its fixed pins, so these
+   * calls are harmless no-ops there. */
+  hal_gpio_set_alternate_function(I2C_PIN_SCL, GPIO_FUNC_I2C);
+  hal_gpio_set_alternate_function(I2C_PIN_SDA, GPIO_FUNC_I2C);
+  hal_gpio_set_output_type(I2C_PIN_SCL, HAL_GPIO_OTYPE_OPEN_DRAIN);
+  hal_gpio_set_output_type(I2C_PIN_SDA, HAL_GPIO_OTYPE_OPEN_DRAIN);
+  hal_gpio_set_output_speed(I2C_PIN_SCL, HAL_GPIO_SPEED_VERY_HIGH);
+  hal_gpio_set_output_speed(I2C_PIN_SDA, HAL_GPIO_SPEED_VERY_HIGH);
 
-  // Initialize I2C bus
   hal_status_t status = hal_i2c_init(I2C_BUS, &i2c_config);
   if (status != HAL_OK) {
-    hal_uart_print(HAL_UART_2, "HAL I2C init failed.\n\r");
+    hal_uart_print(BOARD_CONSOLE_UART, "HAL I2C init failed.\n\r");
     while (1)
-      ; /**< Stop execution if I2C init fails */
+      ;
   }
 
   uint8_t tx_buf[2];
 
-  // Read CHIP ID
   uint8_t chip_id = 0;
   tx_buf[0] = 0x00;
   if (hal_i2c_write_read(I2C_BUS, BMX160_I2C_ADDR, tx_buf, 1, &chip_id, 1) ==
       HAL_OK) {
     if (chip_id != 0xD8) {
-      hal_uart_print(HAL_UART_2, 
-          "BMX160 Chip ID mismatch (Not 0xD8). Continuing anyway...\n\r");
+      hal_uart_print(BOARD_CONSOLE_UART,
+                     "BMX160 Chip ID mismatch (Not 0xD8). Continuing...\n\r");
     } else {
-      hal_uart_print(HAL_UART_2, "BMX160 Chip ID OK: 0xD8\n\r");
+      hal_uart_print(BOARD_CONSOLE_UART, "BMX160 Chip ID OK: 0xD8\n\r");
     }
   } else {
-    hal_uart_print(HAL_UART_2, "Failed to read Chip ID.\n\r");
+    hal_uart_print(BOARD_CONSOLE_UART, "Failed to read Chip ID.\n\r");
   }
 
-  // Power up ACC (0x11)
+  /* Power up ACC, GYRO, MAG (register 0x7E command interface). */
   tx_buf[0] = 0x7E;
   tx_buf[1] = 0x11;
   hal_i2c_write(I2C_BUS, BMX160_I2C_ADDR, tx_buf, 2);
   hal_delay_ms(50);
-
-  // Power up GYRO (0x15)
   tx_buf[1] = 0x15;
   hal_i2c_write(I2C_BUS, BMX160_I2C_ADDR, tx_buf, 2);
   hal_delay_ms(100);
-
-  // Power up MAG (0x19)
   tx_buf[1] = 0x19;
   hal_i2c_write(I2C_BUS, BMX160_I2C_ADDR, tx_buf, 2);
   hal_delay_ms(100);
 
-  hal_uart_print(HAL_UART_2, "Sensors powered up. Starting loop...\n\r");
+  hal_uart_print(BOARD_CONSOLE_UART, "Sensors powered up. Starting loop...\n\r");
 
-  uint8_t rx_buf[30]; // 0x04 to 0x21
+  uint8_t rx_buf[30]; /* registers 0x04..0x21 */
 
   while (1) {
-    tx_buf[0] = 0x04; // MAG_X_LSB
+    tx_buf[0] = 0x04; /* MAG_X_LSB */
     status =
         hal_i2c_write_read(I2C_BUS, BMX160_I2C_ADDR, tx_buf, 1, rx_buf, 30);
 
     if (status != HAL_OK) {
-      hal_uart_print(HAL_UART_2, "I2C Read Error\n\r");
+      hal_uart_print(BOARD_CONSOLE_UART, "I2C Read Error\n\r");
     } else {
-      // MAG is 0x04-0x0B (Index 0-7)
       int16_t mx = (int16_t)((rx_buf[1] << 8) | rx_buf[0]);
       int16_t my = (int16_t)((rx_buf[3] << 8) | rx_buf[2]);
       int16_t mz = (int16_t)((rx_buf[5] << 8) | rx_buf[4]);
-
-      // GYR is 0x0C-0x11 (Index 8-13)
       int16_t gx = (int16_t)((rx_buf[9] << 8) | rx_buf[8]);
       int16_t gy = (int16_t)((rx_buf[11] << 8) | rx_buf[10]);
       int16_t gz = (int16_t)((rx_buf[13] << 8) | rx_buf[12]);
-
-      // ACC is 0x12-0x17 (Index 14-19)
       int16_t ax = (int16_t)((rx_buf[15] << 8) | rx_buf[14]);
       int16_t ay = (int16_t)((rx_buf[17] << 8) | rx_buf[16]);
       int16_t az = (int16_t)((rx_buf[19] << 8) | rx_buf[18]);
-
-      // TEMP is 0x20-0x21 (Index 28-29)
       int16_t temp = (int16_t)((rx_buf[29] << 8) | rx_buf[28]);
 
-      hal_uart_print(HAL_UART_2, "A:");
-      hal_uart_write_int(HAL_UART_2, ax);
-      hal_uart_print(HAL_UART_2, ",");
-      hal_uart_write_int(HAL_UART_2, ay);
-      hal_uart_print(HAL_UART_2, ",");
-      hal_uart_write_int(HAL_UART_2, az);
-      hal_uart_print(HAL_UART_2, " G:");
-      hal_uart_write_int(HAL_UART_2, gx);
-      hal_uart_print(HAL_UART_2, ",");
-      hal_uart_write_int(HAL_UART_2, gy);
-      hal_uart_print(HAL_UART_2, ",");
-      hal_uart_write_int(HAL_UART_2, gz);
-      hal_uart_print(HAL_UART_2, " M:");
-      hal_uart_write_int(HAL_UART_2, mx);
-      hal_uart_print(HAL_UART_2, ",");
-      hal_uart_write_int(HAL_UART_2, my);
-      hal_uart_print(HAL_UART_2, ",");
-      hal_uart_write_int(HAL_UART_2, mz);
-      hal_uart_print(HAL_UART_2, " T:");
-      hal_uart_write_int(HAL_UART_2, temp);
-      hal_uart_print(HAL_UART_2, "\n\r");
+      hal_uart_print(BOARD_CONSOLE_UART, "A:");
+      hal_uart_write_int(BOARD_CONSOLE_UART, ax);
+      hal_uart_print(BOARD_CONSOLE_UART, ",");
+      hal_uart_write_int(BOARD_CONSOLE_UART, ay);
+      hal_uart_print(BOARD_CONSOLE_UART, ",");
+      hal_uart_write_int(BOARD_CONSOLE_UART, az);
+      hal_uart_print(BOARD_CONSOLE_UART, " G:");
+      hal_uart_write_int(BOARD_CONSOLE_UART, gx);
+      hal_uart_print(BOARD_CONSOLE_UART, ",");
+      hal_uart_write_int(BOARD_CONSOLE_UART, gy);
+      hal_uart_print(BOARD_CONSOLE_UART, ",");
+      hal_uart_write_int(BOARD_CONSOLE_UART, gz);
+      hal_uart_print(BOARD_CONSOLE_UART, " M:");
+      hal_uart_write_int(BOARD_CONSOLE_UART, mx);
+      hal_uart_print(BOARD_CONSOLE_UART, ",");
+      hal_uart_write_int(BOARD_CONSOLE_UART, my);
+      hal_uart_print(BOARD_CONSOLE_UART, ",");
+      hal_uart_write_int(BOARD_CONSOLE_UART, mz);
+      hal_uart_print(BOARD_CONSOLE_UART, " T:");
+      hal_uart_write_int(BOARD_CONSOLE_UART, temp);
+      hal_uart_print(BOARD_CONSOLE_UART, "\n\r");
     }
 
     hal_delay_ms(500);

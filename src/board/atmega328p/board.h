@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include "utils/gpio_types.h"
+#include "utils/i2c_types.h"
 #include "utils/timer_types.h"
 #include "utils/uart_types.h"
 
@@ -62,6 +63,11 @@ extern "C" {
 #define BOARD_PWM_TIMER    TIM1
 #define BOARD_PWM_CHANNEL  1
 #define BOARD_PWM_PIN      GPIO_PB01
+
+/* I2C bus — the TWI peripheral on PC5 (SCL) / PC4 (SDA). */
+#define BOARD_I2C_BUS  HAL_I2C_0
+#define BOARD_I2C_SCL  GPIO_PC05
+#define BOARD_I2C_SDA  GPIO_PC04
 
 /* On-board oscillator (Hz) — the Arduino Uno uses a 16 MHz crystal. */
 #define BOARD_XTAL_FREQ_HZ  16000000U

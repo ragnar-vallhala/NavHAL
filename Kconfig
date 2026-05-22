@@ -302,6 +302,7 @@ config SAMPLE_10_NO_HAL_I2C
 
 config SAMPLE_11_HAL_I2C
     bool "11_hal_i2c"
+    select DRV_I2C
 
 config SAMPLE_12_NO_HAL_FLASH
     bool "12_no_hal_flash"

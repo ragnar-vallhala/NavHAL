@@ -33,6 +33,9 @@ endif()
 if(CONFIG_DRV_PWM)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/pwm/pwm.c)
 endif()
+if(CONFIG_DRV_I2C)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c)
+endif()
 
 add_library(hal STATIC
     ${HAL_SOURCES}

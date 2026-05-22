@@ -98,7 +98,7 @@ hal_status_t hal_uart_enable_interrupt(hal_uart_t uart, uint8_t rx_en,
     usart->CR1 &= ~(1 << 7);
 
   // Also enable in NVIC
-  IRQn_Type irq = (uart == HAL_UART_1)   ? USART1_IRQn
+  hal_irq_t irq = (uart == HAL_UART_1)   ? USART1_IRQn
                   : (uart == HAL_UART_6) ? USART6_IRQn
                                          : USART2_IRQn;
   hal_interrupt_enable(irq);
@@ -335,7 +335,7 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
   }
 
   hal_dma_clear_flags(&cfg);
-  hal_interrupt_enable((IRQn_Type)p.irq);
+  hal_interrupt_enable((hal_irq_t)p.irq);
   hal_dma_start(&cfg);
   return HAL_OK;
 }

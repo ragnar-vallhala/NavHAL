@@ -18,7 +18,7 @@
 #define MAX_IRQ 128
 static hal_interrupt_callback_t irq_callbacks[MAX_IRQ] = {0};
 
-hal_status_t hal_interrupt_enable(IRQn_Type irq) {
+hal_status_t hal_interrupt_enable(hal_irq_t irq) {
   if (irq < 0)
     return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
 
@@ -27,7 +27,7 @@ hal_status_t hal_interrupt_enable(IRQn_Type irq) {
   return HAL_OK;
 }
 
-hal_status_t hal_interrupt_disable(IRQn_Type irq) {
+hal_status_t hal_interrupt_disable(hal_irq_t irq) {
   if (irq < 0)
     return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
 
@@ -36,7 +36,7 @@ hal_status_t hal_interrupt_disable(IRQn_Type irq) {
   return HAL_OK;
 }
 
-hal_status_t hal_interrupt_clear_pending(IRQn_Type irq) {
+hal_status_t hal_interrupt_clear_pending(hal_irq_t irq) {
   if (irq < 0)
     return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
 
@@ -45,7 +45,7 @@ hal_status_t hal_interrupt_clear_pending(IRQn_Type irq) {
   return HAL_OK;
 }
 
-bool hal_interrupt_is_pending(IRQn_Type irq) {
+bool hal_interrupt_is_pending(hal_irq_t irq) {
   if (irq < 0)
     return false;
 
@@ -53,7 +53,7 @@ bool hal_interrupt_is_pending(IRQn_Type irq) {
   return ((NVIC->ISPR[irq_num / 32] >> (irq_num % 32)) & 1U) != 0U;
 }
 
-hal_status_t hal_interrupt_attach_callback(IRQn_Type irq,
+hal_status_t hal_interrupt_attach_callback(hal_irq_t irq,
                                            hal_interrupt_callback_t callback) {
   if (irq < 0 || irq >= MAX_IRQ)
     return HAL_ERR_INVALID_ARG;
@@ -61,14 +61,14 @@ hal_status_t hal_interrupt_attach_callback(IRQn_Type irq,
   return HAL_OK;
 }
 
-hal_status_t hal_interrupt_detach_callback(IRQn_Type irq) {
+hal_status_t hal_interrupt_detach_callback(hal_irq_t irq) {
   if (irq < 0 || irq >= MAX_IRQ)
     return HAL_ERR_INVALID_ARG;
   irq_callbacks[(uint32_t)irq] = 0;
   return HAL_OK;
 }
 
-void hal_interrupt_dispatch(IRQn_Type irq) {
+void hal_interrupt_dispatch(hal_irq_t irq) {
   if (irq < 0 || irq >= MAX_IRQ)
     return;
   if (irq_callbacks[(uint32_t)irq])
@@ -82,7 +82,7 @@ void hal_interrupt_dispatch(IRQn_Type irq) {
 #define __NVIC_PRIO_BITS 4
 #define PRIORITY_MASK ((1UL << __NVIC_PRIO_BITS) - 1)
 
-hal_status_t hal_interrupt_set_priority(IRQn_Type irq, uint8_t priority) {
+hal_status_t hal_interrupt_set_priority(hal_irq_t irq, uint8_t priority) {
   // Normalize to top 4 bits (0-15 effective priority levels)
   uint32_t prio = (priority & PRIORITY_MASK) << (8 - __NVIC_PRIO_BITS);
 
@@ -118,7 +118,7 @@ hal_status_t hal_interrupt_set_priority(IRQn_Type irq, uint8_t priority) {
   return HAL_OK;
 }
 
-uint8_t hal_interrupt_get_priority(IRQn_Type irq) {
+uint8_t hal_interrupt_get_priority(hal_irq_t irq) {
   if (irq >= 0) {
     // External interrupts
     return NVIC->IPR[(uint32_t)irq] >> 4; // only upper 4 bits are valid

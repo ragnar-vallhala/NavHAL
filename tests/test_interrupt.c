@@ -132,13 +132,13 @@ void test_hal_interrupt_attach_rejects_out_of_range(void) {
   /* The callback table covers 0..81; negative is out of range too. */
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
                            (uint32_t)hal_interrupt_attach_callback(
-                               (IRQn_Type)-99, test_irq_handler));
+                               (hal_irq_t)-99, test_irq_handler));
 }
 
 void test_hal_interrupt_detach_rejects_out_of_range(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
                            (uint32_t)hal_interrupt_detach_callback(
-                               (IRQn_Type)-99));
+                               (hal_irq_t)-99));
 }
 
 /* -------------------- Suite -------------------- */

@@ -6,7 +6,7 @@
  * Standardized interrupt API (see `docs/api_standardization.md`). All public
  * functions use the `hal_interrupt_` prefix and `snake_case` verbs. Per-IRQ
  * control operations return ::hal_status_t; queries return their value
- * directly. IRQs are identified by ::IRQn_Type.
+ * directly. IRQs are identified by ::hal_irq_t.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -33,21 +33,21 @@ typedef void (*hal_interrupt_callback_t)(void);
  * @param irq IRQ number.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a non-NVIC (negative) IRQ.
  */
-hal_status_t hal_interrupt_enable(IRQn_Type irq);
+hal_status_t hal_interrupt_enable(hal_irq_t irq);
 
 /**
  * @brief Disable a specific interrupt in the NVIC.
  * @param irq IRQ number.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a non-NVIC (negative) IRQ.
  */
-hal_status_t hal_interrupt_disable(IRQn_Type irq);
+hal_status_t hal_interrupt_disable(hal_irq_t irq);
 
 /**
  * @brief Clear the pending flag of a specific interrupt.
  * @param irq IRQ number.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a non-NVIC (negative) IRQ.
  */
-hal_status_t hal_interrupt_clear_pending(IRQn_Type irq);
+hal_status_t hal_interrupt_clear_pending(hal_irq_t irq);
 
 /**
  * @brief Set the priority of a specific interrupt or system exception.
@@ -56,21 +56,21 @@ hal_status_t hal_interrupt_clear_pending(IRQn_Type irq);
  *                 implemented priority bits).
  * @return ::HAL_OK.
  */
-hal_status_t hal_interrupt_set_priority(IRQn_Type irq, uint8_t priority);
+hal_status_t hal_interrupt_set_priority(hal_irq_t irq, uint8_t priority);
 
 /**
  * @brief Get the priority of a specific interrupt or system exception.
  * @param irq IRQ number.
  * @return Normalized priority value.
  */
-uint8_t hal_interrupt_get_priority(IRQn_Type irq);
+uint8_t hal_interrupt_get_priority(hal_irq_t irq);
 
 /**
  * @brief Check whether a specific interrupt is pending.
  * @param irq IRQ number.
  * @return true if pending, false otherwise.
  */
-bool hal_interrupt_is_pending(IRQn_Type irq);
+bool hal_interrupt_is_pending(hal_irq_t irq);
 
 /**
  * @brief Register a callback to be invoked for a specific IRQ.
@@ -78,7 +78,7 @@ bool hal_interrupt_is_pending(IRQn_Type irq);
  * @param callback Callback function, or NULL to clear.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an out-of-range IRQ.
  */
-hal_status_t hal_interrupt_attach_callback(IRQn_Type irq,
+hal_status_t hal_interrupt_attach_callback(hal_irq_t irq,
                                            hal_interrupt_callback_t callback);
 
 /**
@@ -86,13 +86,13 @@ hal_status_t hal_interrupt_attach_callback(IRQn_Type irq,
  * @param irq IRQ number.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an out-of-range IRQ.
  */
-hal_status_t hal_interrupt_detach_callback(IRQn_Type irq);
+hal_status_t hal_interrupt_detach_callback(hal_irq_t irq);
 
 /**
  * @brief Invoke the callback registered for an IRQ (called from an ISR).
  * @param irq IRQ number that occurred.
  */
-void hal_interrupt_dispatch(IRQn_Type irq);
+void hal_interrupt_dispatch(hal_irq_t irq);
 
 /**
  * @brief Restore the global interrupt-enable state (PRIMASK).

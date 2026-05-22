@@ -27,44 +27,44 @@ extern "C" {
 #endif
 /** @deprecated Use hal_interrupt_enable(). */
 NAVHAL_DEPRECATED("use hal_interrupt_enable")
-static inline hal_status_t hal_enable_interrupt(IRQn_Type irq) {
+static inline hal_status_t hal_enable_interrupt(hal_irq_t irq) {
   return hal_interrupt_enable(irq);
 }
 
 /** @deprecated Use hal_interrupt_disable(). */
 NAVHAL_DEPRECATED("use hal_interrupt_disable")
-static inline hal_status_t hal_disable_interrupt(IRQn_Type irq) {
+static inline hal_status_t hal_disable_interrupt(hal_irq_t irq) {
   return hal_interrupt_disable(irq);
 }
 
 /** @deprecated Use hal_interrupt_clear_pending(). */
 NAVHAL_DEPRECATED("use hal_interrupt_clear_pending")
-static inline hal_status_t hal_clear_interrupt_flag(IRQn_Type irq) {
+static inline hal_status_t hal_clear_interrupt_flag(hal_irq_t irq) {
   return hal_interrupt_clear_pending(irq);
 }
 
 /** @deprecated Use hal_interrupt_dispatch(). */
 NAVHAL_DEPRECATED("use hal_interrupt_dispatch")
-static inline void hal_handle_interrupt(IRQn_Type irq) {
+static inline void hal_handle_interrupt(hal_irq_t irq) {
   hal_interrupt_dispatch(irq);
 }
 
 /** @deprecated Use hal_interrupt_set_priority(). */
 NAVHAL_DEPRECATED("use hal_interrupt_set_priority")
-static inline hal_status_t hal_set_interrupt_priority(IRQn_Type irq,
+static inline hal_status_t hal_set_interrupt_priority(hal_irq_t irq,
                                                       uint8_t priority) {
   return hal_interrupt_set_priority(irq, priority);
 }
 
 /** @deprecated Use hal_interrupt_get_priority(). */
 NAVHAL_DEPRECATED("use hal_interrupt_get_priority")
-static inline uint8_t hal_get_interrupt_priority(IRQn_Type irq) {
+static inline uint8_t hal_get_interrupt_priority(hal_irq_t irq) {
   return hal_interrupt_get_priority(irq);
 }
 
 /** @deprecated Use hal_interrupt_is_pending(). */
 NAVHAL_DEPRECATED("use hal_interrupt_is_pending")
-static inline int hal_is_interrupt_pending(IRQn_Type irq) {
+static inline int hal_is_interrupt_pending(hal_irq_t irq) {
   return hal_interrupt_is_pending(irq) ? 1 : 0;
 }
 

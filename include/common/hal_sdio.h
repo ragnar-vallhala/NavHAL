@@ -7,6 +7,10 @@
  * functions use the @c hal_sdio_ prefix. Supports 1-bit and 4-bit bus widths
  * and (when the port's DMA backend is enabled) asynchronous block transfers.
  *
+ * The entire API is compiled only when @c _SDIO_ENABLED is defined (see
+ * ::NAVHAL_HAS_SDIO) — on a target without an SDIO peripheral the header
+ * collapses to nothing, exactly as @c hal_dma.h does for DMA.
+ *
  * @note SDIO returns the driver-specific ::hal_sdio_error_t rather than
  *       ::hal_status_t — its asynchronous model needs ::HAL_SDIO_PENDING,
  *       which the standard status enum cannot express. Flagged for the M5
@@ -18,12 +22,15 @@
 #ifndef HAL_SDIO_H
 #define HAL_SDIO_H
 
+#include "common/hal_config.h" /* sources the _SDIO_ENABLED capability flag */
 #include <stdint.h>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifdef _SDIO_ENABLED
 
 /* --- SD Commands --- */
 #define SD_CMD_GO_IDLE_STATE 0
@@ -141,6 +148,8 @@ hal_sdio_error_t hal_sdio_write_block(uint32_t addr, const uint8_t *buffer);
  * @return Number of 512-byte sectors.
  */
 uint32_t hal_sdio_get_sector_count(void);
+
+#endif /* _SDIO_ENABLED */
 
 #ifdef __cplusplus
 } /* extern "C" */

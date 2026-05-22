@@ -18,6 +18,7 @@
 #define CORTEX_M4_INTERRUPT_REG_H
 
 #include "common/hal_types.h" /**< For __IO macro */
+#include "common/navhal_compiler.h" /**< For NAVHAL_DEPRECATED */
 #include <stdint.h>
 
 
@@ -157,7 +158,16 @@ typedef enum {
     CRYP_IRQn = 79,             /*!< Cryptographic Interrupt */
     HASH_RNG_IRQn = 80,         /*!< Hash and RNG Interrupt */
     FPU_IRQn = 81               /*!< Floating Point Unit Interrupt */
-} IRQn_Type;
+} hal_irq_t;
+
+/**
+ * @brief Deprecated pre-standardization name for the IRQ identifier type.
+ *
+ * The portable v1 name is ::hal_irq_t. @c IRQn_Type carried CMSIS/Cortex
+ * convention into the contract; retained as a backward-compat alias behind
+ * NAVHAL_DEPRECATED.
+ */
+typedef hal_irq_t IRQn_Type NAVHAL_DEPRECATED("use hal_irq_t");
 
 
 #ifdef __cplusplus

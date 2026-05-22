@@ -2,48 +2,48 @@
 #define CORTEX_M4
 #include "navhal.h"
 
-FlashRecord_t rec;
+hal_flash_record_t rec;
 
 int main(void)
 {
-    systick_init(1000); /**< Initialize SysTick for delays */
-    uart2_init(9600);   /**< Initialize UART2 at 9600 baud */
-    uart2_write("HAL Flash Sample Application\n");
+    hal_timebase_init(1000); /**< Initialize SysTick for delays */
+    hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});   /**< Initialize HAL_UART_2 at 9600 baud */
+    hal_uart_print(HAL_UART_2, "HAL Flash Sample Application\n");
     rec.crc = 123;
-    save_data_to_flash(1, &rec, sizeof(FlashRecord_t));
-    uint8_t size = sizeof(FlashRecord_t);
-    FlashRecord_t buff;
-    read_data_from_flash(1, &buff, &size);
+    hal_flash_save(1, &rec, sizeof(hal_flash_record_t));
+    uint8_t size = sizeof(hal_flash_record_t);
+    hal_flash_record_t buff;
+    hal_flash_read(1, &buff, &size);
 
-    uart2_write("rec CRC: ");
-    uart2_write(rec.crc);
-    uart2_write(" | Key: ");
-    uart2_write(rec.key);
-    uart2_write(" | Magic: ");
-    uart2_write(rec.magic);
-    uart2_write(" | Reserved: ");
-    uart2_write(rec.reserved);
-    uart2_write(" | Size: ");
-    uart2_write(rec.size);
-    uart2_write(" | Status: ");
-    uart2_write(rec.status);
-    uart2_write(" \n");
+    hal_uart_print(HAL_UART_2, "rec CRC: ");
+    hal_uart_print(HAL_UART_2, rec.crc);
+    hal_uart_print(HAL_UART_2, " | Key: ");
+    hal_uart_print(HAL_UART_2, rec.key);
+    hal_uart_print(HAL_UART_2, " | Magic: ");
+    hal_uart_print(HAL_UART_2, rec.magic);
+    hal_uart_print(HAL_UART_2, " | Reserved: ");
+    hal_uart_print(HAL_UART_2, rec.reserved);
+    hal_uart_print(HAL_UART_2, " | Size: ");
+    hal_uart_print(HAL_UART_2, rec.size);
+    hal_uart_print(HAL_UART_2, " | Status: ");
+    hal_uart_print(HAL_UART_2, rec.status);
+    hal_uart_print(HAL_UART_2, " \n");
 
-    uart2_write("buff CRC: ");
-    uart2_write(buff.crc);
-    uart2_write(" | Key: ");
-    uart2_write(buff.key);
-    uart2_write(" | Magic: ");
-    uart2_write(buff.magic);
-    uart2_write(" | Reserved: ");
-    uart2_write(buff.reserved);
-    uart2_write(" | Size: ");
-    uart2_write(buff.size);
-    uart2_write(" | Status: ");
-    uart2_write(buff.status);
-    uart2_write(" \n");
+    hal_uart_print(HAL_UART_2, "buff CRC: ");
+    hal_uart_print(HAL_UART_2, buff.crc);
+    hal_uart_print(HAL_UART_2, " | Key: ");
+    hal_uart_print(HAL_UART_2, buff.key);
+    hal_uart_print(HAL_UART_2, " | Magic: ");
+    hal_uart_print(HAL_UART_2, buff.magic);
+    hal_uart_print(HAL_UART_2, " | Reserved: ");
+    hal_uart_print(HAL_UART_2, buff.reserved);
+    hal_uart_print(HAL_UART_2, " | Size: ");
+    hal_uart_print(HAL_UART_2, buff.size);
+    hal_uart_print(HAL_UART_2, " | Status: ");
+    hal_uart_print(HAL_UART_2, buff.status);
+    hal_uart_print(HAL_UART_2, " \n");
 
-    uart2_write("Storage needs compaction: ");
-    uart2_write(hal_flash_needs_compaction() ? 1 : 0);
-    uart2_write(" \n");
+    hal_uart_print(HAL_UART_2, "Storage needs compaction: ");
+    hal_uart_print(HAL_UART_2, hal_flash_needs_compaction() ? 1 : 0);
+    hal_uart_print(HAL_UART_2, " \n");
 }

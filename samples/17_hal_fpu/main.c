@@ -6,7 +6,7 @@
  * - Enables hardware FPU on Cortex-M4.
  * - Performs 3x3 matrix multiplication.
  * - Compares the result with pre-calculated expected results.
- * - Outputs results and status via UART2.
+ * - Outputs results and status via HAL_UART_2.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -275,30 +275,30 @@ int main(void) {
 #ifdef _FPU_ENABLED
   hal_fpu_enable();
 #endif
-  systick_init(1000); /**< Initialize SysTick with 1 ms tick */
-  uart2_init(9600);   /**< Initialize UART2 at 9600 baud */
+  hal_timebase_init(1000); /**< Initialize SysTick with 1 ms tick */
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});   /**< Initialize HAL_UART_2 at 9600 baud */
 
-  uart2_write_string("\n\r--- FPU Matrix Multiplication Test ---\n\r");
+  hal_uart_write_string(HAL_UART_2, "\n\r--- FPU Matrix Multiplication Test ---\n\r");
 #ifdef _FPU_ENABLED
-  uart2_write_string("FPU: Hardware enabled\n\r");
+  hal_uart_write_string(HAL_UART_2, "FPU: Hardware enabled\n\r");
 #else
-  uart2_write_string("FPU: Software emulation\n\r");
+  hal_uart_write_string(HAL_UART_2, "FPU: Software emulation\n\r");
 #endif
-  uart2_write_string("Verification count: ");
-  uart2_write((int32_t)ITERATIONS);
-  uart2_write_string("\n\r");
+  hal_uart_write_string(HAL_UART_2, "Verification count: ");
+  hal_uart_print(HAL_UART_2, (int32_t)ITERATIONS);
+  hal_uart_write_string(HAL_UART_2, "\n\r");
 
-  uart2_write_string("Checking timer...\n\r");
-  uint32_t t1 = (uint32_t)hal_get_tick();
-  delay_ms(100);
-  uint32_t t2 = (uint32_t)hal_get_tick();
-  uart2_write_string("Ticks after 100ms: ");
-  uart2_write((int32_t)(t2 - t1));
-  uart2_write_string("\n\r");
+  hal_uart_write_string(HAL_UART_2, "Checking timer...\n\r");
+  uint32_t t1 = (uint32_t)hal_timebase_get_tick();
+  hal_delay_ms(100);
+  uint32_t t2 = (uint32_t)hal_timebase_get_tick();
+  hal_uart_write_string(HAL_UART_2, "Ticks after 100ms: ");
+  hal_uart_print(HAL_UART_2, (int32_t)(t2 - t1));
+  hal_uart_write_string(HAL_UART_2, "\n\r");
 
   /* Perform Matrix Multiplication: result = matrix_a * matrix_b */
   int success = 1;
-  uint32_t start_tick = (uint32_t)hal_get_tick();
+  uint32_t start_tick = (uint32_t)hal_timebase_get_tick();
 
   for (int iter = 0; iter < ITERATIONS; iter++) {
     for (int i = 0; i < MATRIX_DIM; i++) {
@@ -327,45 +327,45 @@ int main(void) {
     }
   }
 
-  uint32_t end_tick = (uint32_t)hal_get_tick();
+  uint32_t end_tick = (uint32_t)hal_timebase_get_tick();
 
   /* Print Results */
-  // uart2_write_string("Result Matrix:\n\r");
+  // hal_uart_write_string(HAL_UART_2, "Result Matrix:\n\r");
   // for (int i = 0; i < MATRIX_DIM; i++) {
-  //   uart2_write_string("  ");
+  //   hal_uart_write_string(HAL_UART_2, "  ");
   //   for (int j = 0; j < MATRIX_DIM; j++) {
-  //     uart2_write(result[i][j]);
-  //     uart2_write_string("  ");
+  //     hal_uart_print(HAL_UART_2, result[i][j]);
+  //     hal_uart_write_string(HAL_UART_2, "  ");
   //   }
-  //   uart2_write_string("\n\r");
+  //   hal_uart_write_string(HAL_UART_2, "\n\r");
   // }
 
-  // uart2_write_string("Expected Matrix:\n\r");
+  // hal_uart_write_string(HAL_UART_2, "Expected Matrix:\n\r");
   // for (int i = 0; i < MATRIX_DIM; i++) {
-  //   uart2_write_string("  ");
+  //   hal_uart_write_string(HAL_UART_2, "  ");
   //   for (int j = 0; j < MATRIX_DIM; j++) {
-  //     uart2_write(expected_result[i][j]);
-  //     uart2_write_string("  ");
+  //     hal_uart_print(HAL_UART_2, expected_result[i][j]);
+  //     hal_uart_write_string(HAL_UART_2, "  ");
   //   }
-  //   uart2_write_string("\n\r");
+  //   hal_uart_write_string(HAL_UART_2, "\n\r");
   // }
 
   /* Verification */
 
   if (success) {
-    uart2_write_string("\n\rResult: PASSED\n\r");
+    hal_uart_write_string(HAL_UART_2, "\n\rResult: PASSED\n\r");
   } else {
-    uart2_write_string("\n\rResult: FAILED\n\r");
+    hal_uart_write_string(HAL_UART_2, "\n\rResult: FAILED\n\r");
   }
 
-  uart2_write_string("Time taken: ");
-  uart2_write((int32_t)(end_tick - start_tick));
-  uart2_write_string(" from ");
-  uart2_write((int32_t)(start_tick));
-  uart2_write_string(" to ");
-  uart2_write((int32_t)(end_tick));
-  uart2_write_string(" ms\n\r");
-  uart2_write_string("--------------------------------------\n\r");
+  hal_uart_write_string(HAL_UART_2, "Time taken: ");
+  hal_uart_print(HAL_UART_2, (int32_t)(end_tick - start_tick));
+  hal_uart_write_string(HAL_UART_2, " from ");
+  hal_uart_print(HAL_UART_2, (int32_t)(start_tick));
+  hal_uart_write_string(HAL_UART_2, " to ");
+  hal_uart_print(HAL_UART_2, (int32_t)(end_tick));
+  hal_uart_write_string(HAL_UART_2, " ms\n\r");
+  hal_uart_write_string(HAL_UART_2, "--------------------------------------\n\r");
 
   /* Spin forever */
   while (1) {

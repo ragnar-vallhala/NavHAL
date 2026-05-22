@@ -3,7 +3,7 @@
  * @brief Example application demonstrating DWT cycle counter for timing.
  *
  * @details
- * - Initializes the clock and UART2 for output.
+ * - Initializes the clock and HAL_UART_2 for output.
  * - Initializes DWT cycle counter.
  * - Measures and displays the number of processor cycles consumed by a float
  * workload.
@@ -35,17 +35,17 @@ int main(void) {
   // Initialize system
   hal_fpu_enable();
   hal_clock_init(&clock_cfg, &pll_cfg);
-  systick_init(1000);
-  uart2_init(9600);
+  hal_timebase_init(1000);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
 
   // Initialize DWT
-  dwt_init();
+  hal_cycle_counter_init();
 
-  uart2_write("\r\nNavHAL DWT Logic Timing Sample\r\n");
-  uart2_write("Measures cycles taken by a computational workload.\r\n");
+  hal_uart_print(HAL_UART_2, "\r\nNavHAL DWT Logic Timing Sample\r\n");
+  hal_uart_print(HAL_UART_2, "Measures cycles taken by a computational workload.\r\n");
 
   while (1) {
-    uint32_t start = dwt_get_cycles();
+    uint32_t start = hal_cycle_counter_get();
 
     // Computational workload: perform some float math in a loop
     volatile float f = 1.2345f;
@@ -53,18 +53,18 @@ int main(void) {
       f = f * 1.001f + 0.001f;
     }
 
-    uint32_t end = dwt_get_cycles();
+    uint32_t end = hal_cycle_counter_get();
     uint32_t elapsed = end - start;
 
     // Report results
-    uart2_write("Workload iterations: 1000\r\n");
-    uart2_write("Processor cycles: ");
-    uart2_write(elapsed);
-    uart2_write("\r\n");
+    hal_uart_print(HAL_UART_2, "Workload iterations: 1000\r\n");
+    hal_uart_print(HAL_UART_2, "Processor cycles: ");
+    hal_uart_print(HAL_UART_2, elapsed);
+    hal_uart_print(HAL_UART_2, "\r\n");
 
     // Reset cycles for next run
-    dwt_reset_cycles();
+    hal_cycle_counter_reset();
 
-    delay_ms(2000);
+    hal_delay_ms(2000);
   }
 }

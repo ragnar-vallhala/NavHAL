@@ -3,7 +3,7 @@
  * @brief Example application: Initialize SD card using SDIO in 4-bit mode.
  *
  * @details
- * - Initializes UART2 for logging.
+ * - Initializes HAL_UART_2 for logging.
  * - Configures SDIO for 4-bit mode and 400kHz clock (init phase).
  * - Sends CMD0 (GO_IDLE_STATE) to reset the card.
  *
@@ -30,10 +30,10 @@ int main(void) {
   /* Initialize System Clocks (Required for SDIO 48MHz clock) */
   hal_clock_init(&clk_cfg, &pll_cfg);
 
-  /* Initialize System Tick and UART2 for logging */
-  systick_init(1000);
-  uart2_init(115200);
-  uart2_write_string("\n\r--- NavHAL SDIO Init Sample ---\n\r");
+  /* Initialize System Tick and HAL_UART_2 for logging */
+  hal_timebase_init(1000);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=115200});
+  hal_uart_write_string(HAL_UART_2, "\n\r--- NavHAL SDIO Init Sample ---\n\r");
 
   /* SDIO Configuration:
    * Clock Div = 118 (for 400kHz from 48MHz SDIO Clock)
@@ -41,25 +41,25 @@ int main(void) {
    */
   hal_sdio_config_t sd_config = {.clock_div = 118, .bus_width = 0};
 
-  uart2_write_string("Initializing SDIO peripheral...\n\r");
-  if (sdio_init(&sd_config) == HAL_SDIO_OK) {
-    uart2_write_string("SDIO peripheral initialized.\n\r");
+  hal_uart_write_string(HAL_UART_2, "Initializing SDIO peripheral...\n\r");
+  if (hal_sdio_init(&sd_config) == HAL_SDIO_OK) {
+    hal_uart_write_string(HAL_UART_2, "SDIO peripheral initialized.\n\r");
   } else {
-    uart2_write_string("SDIO initialization failed!\n\r");
+    hal_uart_write_string(HAL_UART_2, "SDIO initialization failed!\n\r");
   }
 
   /* Send CMD0: GO_IDLE_STATE (Reset) */
-  uart2_write_string("Sending CMD0 (Reset)...\n\r");
+  hal_uart_write_string(HAL_UART_2, "Sending CMD0 (Reset)...\n\r");
   hal_sdio_error_t err =
-      sdio_send_command(0, 0x00, 0); // CMD0, Arg 0, No response
+      hal_sdio_send_command(0, 0x00, 0); // CMD0, Arg 0, No response
 
   if (err == HAL_SDIO_OK) {
-    uart2_write_string("CMD0 sent successfully.\n\r");
+    hal_uart_write_string(HAL_UART_2, "CMD0 sent successfully.\n\r");
   } else {
-    uart2_write_string("CMD0 failed or timed out.\n\r");
+    hal_uart_write_string(HAL_UART_2, "CMD0 failed or timed out.\n\r");
   }
 
-  uart2_write_string("SDIO test finished.\n\r");
+  hal_uart_write_string(HAL_UART_2, "SDIO test finished.\n\r");
 
   while (1) {
     /* Loop forever */

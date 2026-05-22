@@ -20,45 +20,45 @@ int main(void) {
   hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
   hal_clock_init(&clk_cfg, &pll_cfg);
-  systick_init(1000);
-  uart2_init(115200);
+  hal_timebase_init(1000);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=115200});
 
-  uart2_write_string("\n\r--- NavHAL FatFS/POSIX Test ---\n\r");
+  hal_uart_write_string(HAL_UART_2, "\n\r--- NavHAL FatFS/POSIX Test ---\n\r");
 
   /* 2. Initialize SDIO */
   hal_sdio_config_t sd_config = {.clock_div = 118, .bus_width = 1};
-  if (sdio_init(&sd_config) != HAL_SDIO_OK) {
-    uart2_write_string("SDIO Peripheral Init Failed!\n\r");
+  if (hal_sdio_init(&sd_config) != HAL_SDIO_OK) {
+    hal_uart_write_string(HAL_UART_2, "SDIO Peripheral Init Failed!\n\r");
     while (1)
       ;
   }
 
   /* 3. Perform SD Card Handshake */
-  if (sdio_card_init() != HAL_SDIO_OK) {
-    uart2_write_string("SD Card Handshake Failed!\n\r");
+  if (hal_sdio_card_init() != HAL_SDIO_OK) {
+    hal_uart_write_string(HAL_UART_2, "SD Card Handshake Failed!\n\r");
     while (1)
       ;
   }
-  uart2_write_string("SD Card Ready.\n\r");
+  hal_uart_write_string(HAL_UART_2, "SD Card Ready.\n\r");
 
   /* 4. Initialize Filesystem */
   if (v_fs_init() != 0) {
-    uart2_write_string("Filesystem Mount Failed!\n\r");
+    hal_uart_write_string(HAL_UART_2, "Filesystem Mount Failed!\n\r");
     while (1)
       ;
   }
-  uart2_write_string("Filesystem Mounted.\n\r");
+  hal_uart_write_string(HAL_UART_2, "Filesystem Mounted.\n\r");
 
   /* 5. Create and write to a file */
-  uart2_write_string("Creating test.txt...\n\r");
+  hal_uart_write_string(HAL_UART_2, "Creating test.txt...\n\r");
   uint32_t size = 1 * 1024;
-  timer_init_freq(TIM1, 1000000);
+  hal_timer_init_freq(TIM1, 1000000);
   v_fd_t fd;
 
   for (; size < 1024 * 10; size <<= 1) {
     fd = v_open("test.txt", V_O_CREAT | V_O_RDWR | V_O_TRUNC);
     if (fd < 0) {
-      uart2_write_string("Failed to open test.txt for writing.\n\r");
+      hal_uart_write_string(HAL_UART_2, "Failed to open test.txt for writing.\n\r");
       while (1)
         ;
     }
@@ -67,32 +67,32 @@ int main(void) {
     for (int i = 0; i < size; i++) {
       str[i] = i;
     }
-    timer_start(TIM1);
-    timer_reset(TIM1);
+    hal_timer_start(TIM1);
+    hal_timer_reset(TIM1);
     int written = v_write(fd, str, size);
-    timer_stop(TIM1);
-    uint32_t time = timer_get_count(TIM1);
-    uart2_write_string("Write Time: ");
-    uart2_write(time);
-    uart2_write_string(" ticks\n\r");
+    hal_timer_stop(TIM1);
+    uint32_t time = hal_timer_get_count(TIM1);
+    hal_uart_write_string(HAL_UART_2, "Write Time: ");
+    hal_uart_print(HAL_UART_2, time);
+    hal_uart_write_string(HAL_UART_2, " ticks\n\r");
     if (written > 0) {
-      uart2_write_string("Write Success (");
-      uart2_write(written);
-      uart2_write_string(" bytes).\n\r");
+      hal_uart_write_string(HAL_UART_2, "Write Success (");
+      hal_uart_print(HAL_UART_2, written);
+      hal_uart_write_string(HAL_UART_2, " bytes).\n\r");
     } else {
-      uart2_write_string("Write Error (Code: ");
-      uart2_write(-written);
-      uart2_write_string(").\n\r");
+      hal_uart_write_string(HAL_UART_2, "Write Error (Code: ");
+      hal_uart_print(HAL_UART_2, -written);
+      hal_uart_write_string(HAL_UART_2, ").\n\r");
     }
     v_sync(fd);
     v_close(fd);
   }
 
   /* 6. Read back from the file */
-  uart2_write_string("Reading back test.txt...\n\r");
+  hal_uart_write_string(HAL_UART_2, "Reading back test.txt...\n\r");
   fd = v_open("test.txt", V_O_RDONLY);
   if (fd < 0) {
-    uart2_write_string("Failed to open test.txt for reading.\n\r");
+    hal_uart_write_string(HAL_UART_2, "Failed to open test.txt for reading.\n\r");
     while (1)
       ;
   }
@@ -101,20 +101,20 @@ int main(void) {
   hal_memset(read_buf, 0, sizeof(read_buf));
   int read_bytes = v_read(fd, read_buf, 1024 * 6);
   if (read_bytes > 0) {
-    uart2_write_string("Read Success (");
-    uart2_write(read_bytes);
-    uart2_write_string(" bytes).\n\r");
-    uart2_write_string("Data: ");
-    uart2_write_string((char *)read_buf);
-    uart2_write_string("\n\r");
+    hal_uart_write_string(HAL_UART_2, "Read Success (");
+    hal_uart_print(HAL_UART_2, read_bytes);
+    hal_uart_write_string(HAL_UART_2, " bytes).\n\r");
+    hal_uart_write_string(HAL_UART_2, "Data: ");
+    hal_uart_write_string(HAL_UART_2, (char *)read_buf);
+    hal_uart_write_string(HAL_UART_2, "\n\r");
   } else {
-    uart2_write_string("Read Error (Code: ");
-    uart2_write(-read_bytes);
-    uart2_write_string(").\n\r");
+    hal_uart_write_string(HAL_UART_2, "Read Error (Code: ");
+    hal_uart_print(HAL_UART_2, -read_bytes);
+    hal_uart_write_string(HAL_UART_2, ").\n\r");
   }
   v_close(fd);
 
-  uart2_write_string("Test Finished Success.\n\r");
+  hal_uart_write_string(HAL_UART_2, "Test Finished Success.\n\r");
 
   while (1)
     ;

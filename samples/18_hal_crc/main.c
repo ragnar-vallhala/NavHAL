@@ -24,9 +24,9 @@ void delay(volatile uint32_t count) {
  */
 static void uart2_write_hex32(uint32_t val) {
   const char hex_digits[] = "0123456789ABCDEF";
-  uart2_write("0x");
+  hal_uart_print(HAL_UART_2, "0x");
   for (int i = 28; i >= 0; i -= 4) {
-    uart2_write_char(hex_digits[(val >> i) & 0xF]);
+    hal_uart_write_char(HAL_UART_2, hex_digits[(val >> i) & 0xF]);
   }
 }
 
@@ -48,44 +48,44 @@ int main(void) {
   };
 
   hal_clock_init(&clock_cfg, &pll_cfg);
-  uart2_init(9600);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
 
-  uart2_write("\r\n\r\n================================\r\n");
-  uart2_write("NavHAL CRC Module Example\r\n");
-  uart2_write("================================\r\n");
+  hal_uart_print(HAL_UART_2, "\r\n\r\n================================\r\n");
+  hal_uart_print(HAL_UART_2, "NavHAL CRC Module Example\r\n");
+  hal_uart_print(HAL_UART_2, "================================\r\n");
 
   // 2. Initialize CRC Unit
   crc_config_t crc_cfg = {.polynomial = CRC_POLY_CRC32, // Standard 0x04C11DB7
                           .init_value = 0xFFFFFFFF};
 
 #ifdef _CRC_HW_ENABLED
-  uart2_write("Mode: Hardware Accelerated\r\n\r\n");
+  hal_uart_print(HAL_UART_2, "Mode: Hardware Accelerated\r\n\r\n");
 #else
-  uart2_write("Mode: Software Fallback\r\n\r\n");
+  hal_uart_print(HAL_UART_2, "Mode: Software Fallback\r\n\r\n");
 #endif
 
   hal_crc_init(&crc_cfg);
 
   // 3. Single-shot computation
-  uart2_write("1. Single-Shot Computation\r\n");
+  hal_uart_print(HAL_UART_2, "1. Single-Shot Computation\r\n");
   const uint8_t message[] = "123456789";
 
-  uart2_write("   Message: '123456789'\r\n");
+  hal_uart_print(HAL_UART_2, "   Message: '123456789'\r\n");
 
   uint32_t single_crc = hal_crc_compute(message, 9);
 
-  uart2_write("   CRC32 Result:   ");
+  hal_uart_print(HAL_UART_2, "   CRC32 Result:   ");
   uart2_write_hex32(single_crc);
-  uart2_write("\r\n   Expected:       0x0376E6E7\r\n");
+  hal_uart_print(HAL_UART_2, "\r\n   Expected:       0x0376E6E7\r\n");
 
   if (single_crc == 0x0376E6E7) {
-    uart2_write("   Status:         PASS\r\n\r\n");
+    hal_uart_print(HAL_UART_2, "   Status:         PASS\r\n\r\n");
   } else {
-    uart2_write("   Status:         FAIL\r\n\r\n");
+    hal_uart_print(HAL_UART_2, "   Status:         FAIL\r\n\r\n");
   }
 
   // 4. Incremental / Chunked computation
-  uart2_write("2. Incremental Computation (Chunked)\r\n");
+  hal_uart_print(HAL_UART_2, "2. Incremental Computation (Chunked)\r\n");
 
   const uint8_t chunk1[] = "1234";
   const uint8_t chunk2[] = "567";
@@ -97,24 +97,24 @@ int main(void) {
   uint32_t part2 = hal_crc_accumulate(chunk2, 3);
   uint32_t final_crc = hal_crc_accumulate(chunk3, 2);
 
-  uart2_write("   Parts appended: '1234', '567', '89'\r\n");
-  uart2_write("   Intermediate 1: ");
+  hal_uart_print(HAL_UART_2, "   Parts appended: '1234', '567', '89'\r\n");
+  hal_uart_print(HAL_UART_2, "   Intermediate 1: ");
   uart2_write_hex32(part1);
-  uart2_write("\r\n");
-  uart2_write("   Intermediate 2: ");
+  hal_uart_print(HAL_UART_2, "\r\n");
+  hal_uart_print(HAL_UART_2, "   Intermediate 2: ");
   uart2_write_hex32(part2);
-  uart2_write("\r\n");
-  uart2_write("   Final CRC32:    ");
+  hal_uart_print(HAL_UART_2, "\r\n");
+  hal_uart_print(HAL_UART_2, "   Final CRC32:    ");
   uart2_write_hex32(final_crc);
-  uart2_write("\r\n");
+  hal_uart_print(HAL_UART_2, "\r\n");
 
   if (final_crc == 0x0376E6E7) {
-    uart2_write("   Status:         PASS\r\n\r\n");
+    hal_uart_print(HAL_UART_2, "   Status:         PASS\r\n\r\n");
   } else {
-    uart2_write("   Status:         FAIL\r\n\r\n");
+    hal_uart_print(HAL_UART_2, "   Status:         FAIL\r\n\r\n");
   }
 
-  uart2_write("CRC Example Finished Successfully. Halting.\r\n");
+  hal_uart_print(HAL_UART_2, "CRC Example Finished Successfully. Halting.\r\n");
 
   while (1) {
     // Main application loop

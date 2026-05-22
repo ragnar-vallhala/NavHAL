@@ -28,17 +28,17 @@ static volatile uint32_t cpu_work_done;
  * Called from run_dma_iter() in the window after a DMA transfer completes.
  */
 static void do_cpu_work(uint32_t deadline_tick) {
-  while (hal_get_tick() < deadline_tick)
+  while (hal_timebase_get_tick() < deadline_tick)
     cpu_work_done++;
 }
 
 /* Blocking polling TX — CPU cannot do anything else while transmitting */
 static uint32_t run_polling(int iters) {
   cpu_work_done = 0;
-  uint32_t t0 = hal_get_tick();
+  uint32_t t0 = hal_timebase_get_tick();
   for (int i = 0; i < iters; i++)
-    uart2_write_string(MSG);
-  return hal_get_tick() - t0;
+    hal_uart_write_string(HAL_UART_2, MSG);
+  return hal_timebase_get_tick() - t0;
 }
 
 #if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
@@ -49,55 +49,55 @@ static uint32_t run_polling(int iters) {
  */
 static uint32_t run_dma_iter(int iters) {
   cpu_work_done = 0;
-  uint32_t t0 = hal_get_tick();
+  uint32_t t0 = hal_timebase_get_tick();
   for (int i = 0; i < iters; i++) {
-    uint32_t deadline = hal_get_tick() + 14; /* expected end of this msg */
-    uart2_write_dma((const uint8_t *)MSG, MSG_LEN);
+    uint32_t deadline = hal_timebase_get_tick() + 14; /* expected end of this msg */
+    hal_uart_write_dma(HAL_UART_2, (const uint8_t *)MSG, MSG_LEN);
     do_cpu_work(deadline); /* use any remaining time in the window */
   }
-  return hal_get_tick() - t0;
+  return hal_timebase_get_tick() - t0;
 }
 #endif
 
 int main(void) {
-  systick_init(1000);
-  uart2_init(9600);
+  hal_timebase_init(1000);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
 
-  uart2_write_string("\r\n=== DMA vs Polling Comparison ===\r\n\r\n");
+  hal_uart_write_string(HAL_UART_2, "\r\n=== DMA vs Polling Comparison ===\r\n\r\n");
 
   const int ITERS = 100;
 
   /* ---- Polling ---- */
-  uart2_write_string("[POLLING] Running...\r\n");
+  hal_uart_write_string(HAL_UART_2, "[POLLING] Running...\r\n");
   uint32_t poll_ticks = run_polling(ITERS);
   uint32_t poll_work = cpu_work_done;
-  uart2_write_string("[POLLING] Time=");
-  uart2_write(poll_ticks);
-  uart2_write_string(" ticks | CPU work=");
-  uart2_write(poll_work);
-  uart2_write_string("\r\n\r\n");
+  hal_uart_write_string(HAL_UART_2, "[POLLING] Time=");
+  hal_uart_print(HAL_UART_2, poll_ticks);
+  hal_uart_write_string(HAL_UART_2, " ticks | CPU work=");
+  hal_uart_print(HAL_UART_2, poll_work);
+  hal_uart_write_string(HAL_UART_2, "\r\n\r\n");
 
 #if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
   /* ---- DMA ---- */
-  uart2_write_string("[DMA]     Running...\r\n");
+  hal_uart_write_string(HAL_UART_2, "[DMA]     Running...\r\n");
   uint32_t dma_ticks = run_dma_iter(ITERS);
   uint32_t dma_work = cpu_work_done;
-  uart2_write_string("[DMA]     Time=");
-  uart2_write(dma_ticks);
-  uart2_write_string(" ticks | CPU work=");
-  uart2_write(dma_work);
-  uart2_write_string("\r\n\r\n");
+  hal_uart_write_string(HAL_UART_2, "[DMA]     Time=");
+  hal_uart_print(HAL_UART_2, dma_ticks);
+  hal_uart_write_string(HAL_UART_2, " ticks | CPU work=");
+  hal_uart_print(HAL_UART_2, dma_work);
+  hal_uart_write_string(HAL_UART_2, "\r\n\r\n");
 
   /* ---- Result ---- */
-  uart2_write_string("=== Result ===\r\n");
-  uart2_write_string("Wall time : similar (baud-limited)\r\n");
-  uart2_write_string("Poll work : ");
-  uart2_write(poll_work);
-  uart2_write_string("\r\nDMA work  : ");
-  uart2_write(dma_work);
-  uart2_write_string("\r\nDMA frees CPU: YES\r\n");
+  hal_uart_write_string(HAL_UART_2, "=== Result ===\r\n");
+  hal_uart_write_string(HAL_UART_2, "Wall time : similar (baud-limited)\r\n");
+  hal_uart_write_string(HAL_UART_2, "Poll work : ");
+  hal_uart_print(HAL_UART_2, poll_work);
+  hal_uart_write_string(HAL_UART_2, "\r\nDMA work  : ");
+  hal_uart_print(HAL_UART_2, dma_work);
+  hal_uart_write_string(HAL_UART_2, "\r\nDMA frees CPU: YES\r\n");
 #else
-  uart2_write_string("[DMA] Not enabled. Set _DMA_ENABLED in config.h\r\n");
+  hal_uart_write_string(HAL_UART_2, "[DMA] Not enabled. Set _DMA_ENABLED in config.h\r\n");
 #endif
   return 0;
 }

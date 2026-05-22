@@ -16,15 +16,15 @@
 
 int main(void)
 {
-    systick_init(1000);
-    hal_gpio_setmode(GPIO_PA05, GPIO_OUTPUT, 0);
-    hal_gpio_setmode(GPIO_PC13, GPIO_INPUT, GPIO_PULLUP);
+    hal_timebase_init(1000);
+    hal_gpio_set_mode(GPIO_PA05, HAL_GPIO_MODE_OUTPUT, 0);
+    hal_gpio_set_mode(GPIO_PC13, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_UP);
 
     while (1)
     {
-        if (hal_gpio_digitalread(GPIO_PC13))
-            hal_gpio_digitalwrite(GPIO_PA05, GPIO_LOW);
+        if (hal_gpio_read(GPIO_PC13))
+            hal_gpio_write(GPIO_PA05, HAL_GPIO_LOW);
         else
-            hal_gpio_digitalwrite(GPIO_PA05, GPIO_HIGH);
+            hal_gpio_write(GPIO_PA05, HAL_GPIO_HIGH);
     }
 }

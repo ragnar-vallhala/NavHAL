@@ -12,7 +12,7 @@
 #include "navhal.h"
 
 // Wait for a number of ms using systick
-static void delay(uint32_t ms) { delay_ms(ms); }
+static void delay(uint32_t ms) { hal_delay_ms(ms); }
 
 // Calculate performance in KB/s
 static void print_perf(const char *op, uint32_t bytes, uint32_t ms) {
@@ -23,12 +23,12 @@ static void print_perf(const char *op, uint32_t bytes, uint32_t ms) {
 
   uint32_t kb_per_sec = (kb * 1000) / ms;
 
-  uart2_write_string(op);
-  uart2_write_string(" Perf: ");
-  uart2_write_uint(kb_per_sec);
-  uart2_write_string(" KB/s (");
-  uart2_write_uint(ms);
-  uart2_write_string(" ms)\n\r");
+  hal_uart_write_string(HAL_UART_2, op);
+  hal_uart_write_string(HAL_UART_2, " Perf: ");
+  hal_uart_write_uint(HAL_UART_2, kb_per_sec);
+  hal_uart_write_string(HAL_UART_2, " KB/s (");
+  hal_uart_write_uint(HAL_UART_2, ms);
+  hal_uart_write_string(HAL_UART_2, " ms)\n\r");
 }
 
 #define TEST_SECTORS 4096 // 2MB
@@ -45,42 +45,42 @@ int main(void) {
   hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
   hal_clock_init(&clk_cfg, &pll_cfg);
-  systick_init(1000);
-  uart2_init(115200);
+  hal_timebase_init(1000);
+  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=115200});
 
   delay(100);
 
-  uart2_write_string("\n\r--- NavHAL SDIO Perf Test ---\n\r");
+  hal_uart_write_string(HAL_UART_2, "\n\r--- NavHAL SDIO Perf Test ---\n\r");
 #ifdef _DMA_ENABLED
-  uart2_write_string("DMA Mode: ENABLED\n\r");
+  hal_uart_write_string(HAL_UART_2, "DMA Mode: ENABLED\n\r");
 #else
-  uart2_write_string("DMA Mode: DISABLED (Polling)\n\r");
+  hal_uart_write_string(HAL_UART_2, "DMA Mode: DISABLED (Polling)\n\r");
 #endif
 
   /* 2. Initialize SDIO */
   hal_sdio_config_t sd_config = {.clock_div = 118,
                                  .bus_width = 1}; // 4-bit mode requested
-  if (sdio_init(&sd_config) != HAL_SDIO_OK) {
-    uart2_write_string("SDIO Peripheral Init Failed!\n\r");
+  if (hal_sdio_init(&sd_config) != HAL_SDIO_OK) {
+    hal_uart_write_string(HAL_UART_2, "SDIO Peripheral Init Failed!\n\r");
     while (1)
       ;
   }
 
   /* 3. Perform SD Card Handshake */
-  uart2_write_string("Starting SD Card Handshake...\n\r");
-  if (sdio_card_init() != HAL_SDIO_OK) {
-    uart2_write_string("SD Card Handshake Failed!\n\r");
+  hal_uart_write_string(HAL_UART_2, "Starting SD Card Handshake...\n\r");
+  if (hal_sdio_card_init() != HAL_SDIO_OK) {
+    hal_uart_write_string(HAL_UART_2, "SD Card Handshake Failed!\n\r");
     while (1)
       ;
   }
-  uart2_write_string("SD Card Ready.\n\r");
+  hal_uart_write_string(HAL_UART_2, "SD Card Ready.\n\r");
 
   if (hal_disk_initialize(0) != HAL_DISK_STATUS_OK) {
-    uart2_write_string("Disk Init Failed!\n\r");
+    hal_uart_write_string(HAL_UART_2, "Disk Init Failed!\n\r");
     while (1)
       ;
   }
-  uart2_write_string("Disk Initialized.\n\r");
+  hal_uart_write_string(HAL_UART_2, "Disk Initialized.\n\r");
 
   /* 4. Prepare Test Data */
   // Use a 64KB buffer (128 sectors) to test multi-block performance
@@ -93,11 +93,11 @@ int main(void) {
   hal_disk_result_t res;
 
   /* 5. Write Performance Test */
-  uart2_write_string("Starting Write Test (");
-  uart2_write_uint(TEST_SECTORS / 2);
-  uart2_write_string(" KB)...\n\r");
+  hal_uart_write_string(HAL_UART_2, "Starting Write Test (");
+  hal_uart_write_uint(HAL_UART_2, TEST_SECTORS / 2);
+  hal_uart_write_string(HAL_UART_2, " KB)...\n\r");
 
-  start_time = hal_get_tick();
+  start_time = hal_timebase_get_tick();
 
   // Note: Using a single block write loop to match current diskio
   // implementation. Multi-block commands would be much faster but
@@ -108,22 +108,22 @@ int main(void) {
       break;
   }
 
-  end_time = hal_get_tick();
+  end_time = hal_timebase_get_tick();
   elapsed = end_time - start_time;
 
   if (res == HAL_DISK_RES_OK) {
-    uart2_write_string("Write Success.\n\r");
+    hal_uart_write_string(HAL_UART_2, "Write Success.\n\r");
     print_perf("Write", TEST_SECTORS * 512, elapsed);
   } else {
-    uart2_write_string("Write FAILED! Code: ");
-    uart2_write_int((int)res);
-    uart2_write_string("\n\r");
+    hal_uart_write_string(HAL_UART_2, "Write FAILED! Code: ");
+    hal_uart_write_int(HAL_UART_2, (int)res);
+    hal_uart_write_string(HAL_UART_2, "\n\r");
   }
 
   /* 6. Read Performance Test */
-  uart2_write_string("Starting Read Test...\n\r");
+  hal_uart_write_string(HAL_UART_2, "Starting Read Test...\n\r");
 
-  start_time = hal_get_tick();
+  start_time = hal_timebase_get_tick();
 
   for (int i = 0; i < TEST_SECTORS; i += CHUNK_SIZE) {
     res = hal_disk_read(0, buf, TEST_START_SECTOR + i, CHUNK_SIZE);
@@ -131,19 +131,19 @@ int main(void) {
       break;
   }
 
-  end_time = hal_get_tick();
+  end_time = hal_timebase_get_tick();
   elapsed = end_time - start_time;
 
   if (res == HAL_DISK_RES_OK) {
-    uart2_write_string("Read Success.\n\r");
+    hal_uart_write_string(HAL_UART_2, "Read Success.\n\r");
     print_perf("Read", TEST_SECTORS * 512, elapsed);
   } else {
-    uart2_write_string("Read FAILED! Code: ");
-    uart2_write_int((int)res);
-    uart2_write_string("\n\r");
+    hal_uart_write_string(HAL_UART_2, "Read FAILED! Code: ");
+    hal_uart_write_int(HAL_UART_2, (int)res);
+    hal_uart_write_string(HAL_UART_2, "\n\r");
   }
 
-  uart2_write_string("Test Complete.\n\r");
+  hal_uart_write_string(HAL_UART_2, "Test Complete.\n\r");
 
   while (1)
     ;

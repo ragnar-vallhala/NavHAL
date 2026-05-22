@@ -2,27 +2,27 @@
 #include "navhal.h"
 
 int main() {
-  systick_init(1000); /**< Initialize SysTick for 1ms ticks */
-  uart6_init(9600);
+  hal_timebase_init(1000); /**< Initialize SysTick for 1ms ticks */
+  hal_uart_init(HAL_UART_6, &(hal_uart_config_t){.baudrate=9600});
 
   /* --- DMA benchmark --- */
 #if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
-  int n = hal_get_tick();
+  int n = hal_timebase_get_tick();
   int iter = 100;
   while (iter--)
-    uart6_write_string_dma("Hello World\n\r"); /**< DMA transfer */
-  uart6_write_string("DMA done: ");
-  uart6_write(hal_get_tick() - n);
-  uart6_write_string(" ticks\n\r");
+    hal_uart_write_string_dma(HAL_UART_6, "Hello World\n\r"); /**< DMA transfer */
+  hal_uart_write_string(HAL_UART_6, "DMA done: ");
+  hal_uart_print(HAL_UART_6, hal_timebase_get_tick() - n);
+  hal_uart_write_string(HAL_UART_6, " ticks\n\r");
 #else
   /* --- Polling benchmark (fallback) --- */
-  int n = hal_get_tick();
+  int n = hal_timebase_get_tick();
   int iter = 100;
   while (iter--)
-    uart2_write_string("Hello World\n\r"); /**< Polling transfer */
-  uart2_write_string("Poll done: ");
-  uart2_write(hal_get_tick() - n);
-  uart2_write_string(" ticks\n\r");
+    hal_uart_write_string(HAL_UART_2, "Hello World\n\r"); /**< Polling transfer */
+  hal_uart_write_string(HAL_UART_2, "Poll done: ");
+  hal_uart_print(HAL_UART_2, hal_timebase_get_tick() - n);
+  hal_uart_write_string(HAL_UART_2, " ticks\n\r");
 #endif
   return 0;
 }

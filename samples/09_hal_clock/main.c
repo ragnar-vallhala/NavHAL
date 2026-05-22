@@ -1,11 +1,11 @@
 /**
  * @file main.c
- * @brief Print system clock and bus clocks over UART2.
+ * @brief Print system clock and bus clocks over HAL_UART_2.
  *
  * This example demonstrates:
  * - Initializing the PLL for system clock configuration.
  * - Initializing SysTick timer.
- * - Initializing UART2 at 9600 baud for console output.
+ * - Initializing HAL_UART_2 at 9600 baud for console output.
  * - Printing SYSCLK, AHBCLK, APB1CLK, and APB2CLK periodically.
  *
  * © 2025 NAVROBOTEC PVT. LTD. All rights reserved.
@@ -30,20 +30,20 @@ hal_clock_config_t cfg = {
 
 int main(void) {
     hal_clock_init(&cfg, &pll_cfg); /**< Initialize system clock with PLL */
-    systick_init(40);               /**< Initialize SysTick with 40 µs tick */
-    uart2_init(9600);               /**< Initialize UART2 at 9600 baud */
+    hal_timebase_init(40);               /**< Initialize SysTick with 40 µs tick */
+    hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});               /**< Initialize HAL_UART_2 at 9600 baud */
 
     while (1) {
-        uart2_write("sysclk=");           /**< Print SYSCLK label */
-        uart2_write(hal_clock_get_sysclk()); /**< Print system clock */
-        uart2_write(", apb1clk=");        /**< Print APB1CLK label */
-        uart2_write(hal_clock_get_apb1clk()); /**< Print APB1 clock */
-        uart2_write(", apb2clk=");        /**< Print APB2CLK label */
-        uart2_write(hal_clock_get_apb2clk()); /**< Print APB2 clock */
-        uart2_write(", ahbclk=");         /**< Print AHBCLK label */
-        uart2_write(hal_clock_get_ahbclk()); /**< Print AHB clock */
-        uart2_write("\n");                /**< Newline */
+        hal_uart_print(HAL_UART_2, "sysclk=");           /**< Print SYSCLK label */
+        hal_uart_print(HAL_UART_2, hal_clock_get_sysclk()); /**< Print system clock */
+        hal_uart_print(HAL_UART_2, ", apb1clk=");        /**< Print APB1CLK label */
+        hal_uart_print(HAL_UART_2, hal_clock_get_apb1clk()); /**< Print APB1 clock */
+        hal_uart_print(HAL_UART_2, ", apb2clk=");        /**< Print APB2CLK label */
+        hal_uart_print(HAL_UART_2, hal_clock_get_apb2clk()); /**< Print APB2 clock */
+        hal_uart_print(HAL_UART_2, ", ahbclk=");         /**< Print AHBCLK label */
+        hal_uart_print(HAL_UART_2, hal_clock_get_ahbclk()); /**< Print AHB clock */
+        hal_uart_print(HAL_UART_2, "\n");                /**< Newline */
 
-        delay_ms(1000);                   /**< Wait 1 second */
+        hal_delay_ms(1000);                   /**< Wait 1 second */
     }
 }

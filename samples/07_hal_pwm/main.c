@@ -1,13 +1,13 @@
 /**
  * @file main.c
- * @brief Example application: Generate PWM on PB10 using TIM2 and print duty cycle over UART2.
+ * @brief Example application: Generate PWM on PB10 using TIM2 and print duty cycle over HAL_UART_2.
  *
  * @details
  * - Initializes SysTick timer with 40 µs tick.
- * - Initializes UART2 at 9600 baud.
+ * - Initializes HAL_UART_2 at 9600 baud.
  * - Configures PB10 as alternate function (AF1) for TIM2_CH3.
  * - Initializes TIM2 for PWM output using HAL PWM driver.
- * - Continuously ramps the duty cycle from 0% to 100% and prints it over UART2.
+ * - Continuously ramps the duty cycle from 0% to 100% and prints it over HAL_UART_2.
  *
  * @copyright © NAVROBOTEC PVT. LTD.
  */
@@ -17,12 +17,12 @@
 
 int main(void)
 {
-    systick_init(40);                                /**< Initialize SysTick with 40 µs tick */
-    uart2_init(9600);                                /**< Initialize UART2 at 9600 baud */
-    hal_gpio_setmode(GPIO_PB10, GPIO_AF, GPIO_PUPD_NONE); /**< Set PB10 as alternate function */
-    hal_gpio_set_alternate_function(GPIO_PB10, GPIO_AF01); /**< AF1 for TIM2_CH3 */
+    hal_timebase_init(40);                                /**< Initialize SysTick with 40 µs tick */
+    hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});                                /**< Initialize HAL_UART_2 at 9600 baud */
+    hal_gpio_set_mode(GPIO_PB10, HAL_GPIO_MODE_AF, HAL_GPIO_PULL_NONE); /**< Set PB10 as alternate function */
+    hal_gpio_set_alternate_function(GPIO_PB10, HAL_GPIO_AF1); /**< AF1 for TIM2_CH3 */
 
-    PWM_Handle pwm = {TIM2, 3};                      /**< Initialize PWM handle on TIM2, channel 3 */
+    hal_pwm_handle_t pwm = {TIM2, 3};                      /**< Initialize PWM handle on TIM2, channel 3 */
     hal_pwm_init(&pwm, 15000, 0.10f);                /**< Init PWM at 15 kHz, 10% duty cycle */
     hal_pwm_start(&pwm);                             /**< Start PWM output */
 
@@ -35,8 +35,8 @@ int main(void)
         if (value >= 1.0f)                           /**< Reset to 0% after 100% */
             value = 0.0f;
 
-        uart2_write(value);                           /**< Print current duty cycle over UART2 */
-        uart2_write("\n\r");                          /**< Newline and carriage return */
-        delay_ms(10);                                 /**< Delay 10 ms */
+        hal_uart_print(HAL_UART_2, value);                           /**< Print current duty cycle over HAL_UART_2 */
+        hal_uart_print(HAL_UART_2, "\n\r");                          /**< Newline and carriage return */
+        hal_delay_ms(10);                                 /**< Delay 10 ms */
     }
 }

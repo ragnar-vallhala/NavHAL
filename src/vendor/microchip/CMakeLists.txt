@@ -2,8 +2,7 @@
 # one `hal` static library (mirrors src/vendor/stm32/CMakeLists.txt). avr-libc
 # supplies the C runtime and startup, so there is no startup.s to link.
 #
-# The acceptance-slice drivers (gpio, clock, timebase, uart) are in place;
-# timer/i2c/spi/pwm/crc follow in a later M6 pass.
+# Vendor IP drivers, gated on their CONFIG_DRV_* symbols.
 
 set(HAL_SOURCES)
 
@@ -21,9 +20,12 @@ if(CONFIG_DRV_CLOCK)
 endif()
 if(CONFIG_DRV_TIMER)
     # The ATmega328P timebase is Timer0-backed (a vendor peripheral, unlike
-    # the Cortex-M SysTick). The general-purpose timer driver is not in the
-    # acceptance slice yet.
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/timebase/timebase.c)
+    # the Cortex-M SysTick); the general-purpose timer driver uses Timer1
+    # and Timer2.
+    list(APPEND HAL_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/timebase/timebase.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/timer/timer.c
+    )
 endif()
 if(CONFIG_DRV_UART)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)

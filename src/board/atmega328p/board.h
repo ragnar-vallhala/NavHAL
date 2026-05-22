@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include "utils/gpio_types.h"
+#include "utils/timer_types.h"
 #include "utils/uart_types.h"
 
 /* On-board indicator */
@@ -53,6 +54,9 @@ extern "C" {
 
 /* Board console UART — the ATmega328P has a single USART. */
 #define BOARD_CONSOLE_UART  HAL_UART_0
+
+/* General-purpose timer — Timer1 (16-bit); Timer0 backs the timebase. */
+#define BOARD_GP_TIMER  TIM1
 
 /* On-board oscillator (Hz) — the Arduino Uno uses a 16 MHz crystal. */
 #define BOARD_XTAL_FREQ_HZ  16000000U

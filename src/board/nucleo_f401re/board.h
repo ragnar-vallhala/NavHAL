@@ -25,6 +25,7 @@ extern "C" {
 #endif
 
 #include "utils/gpio_types.h"
+#include "utils/timer_types.h"
 #include "utils/uart_types.h"
 
 /* On-board indicators / inputs */
@@ -33,6 +34,9 @@ extern "C" {
 
 /* Board console UART — USART2 is wired to the ST-LINK virtual COM port. */
 #define BOARD_CONSOLE_UART  HAL_UART_2
+
+/* General-purpose timer. */
+#define BOARD_GP_TIMER  TIM5
 
 /* Arduino-compatible digital headers (CN5/CN9 on the Nucleo-64) */
 #define D0   GPIO_PA03  /**< USART2 RX on the Arduino header. */

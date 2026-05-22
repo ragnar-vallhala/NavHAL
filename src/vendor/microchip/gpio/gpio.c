@@ -3,9 +3,11 @@
  * @brief ATmega328P GPIO HAL driver.
  *
  * @details
- * Implements the portable GPIO API (@c common/hal_gpio.h) and the hot-path
- * accessors declared in @c navhal_port_gpio.h for the ATmega328P ports B, C
- * and D. A ::hal_gpio_pin_t is encoded 8 per port: @c port = pin >> 3
+ * Implements the portable GPIO API (@c common/hal_gpio.h) for the
+ * ATmega328P ports B, C and D — the configuration calls (init, set_mode,
+ * …). The hot-path accessors (write / read / toggle) are @c static
+ * @c inline in @c navhal_port_gpio.h so a constant pin folds to `sbi`/`cbi`.
+ * A ::hal_gpio_pin_t is encoded 8 per port: @c port = pin >> 3
  * (0 = B, 1 = C, 2 = D), @c bit = pin & 7.
  *
  * ATmega328P GPIO has no clock gate, no slew-rate control, no open-drain
@@ -36,14 +38,6 @@ static volatile uint8_t *port_out_reg(uint8_t port) {
   case 0:  return &PORTB;
   case 1:  return &PORTC;
   default: return &PORTD;
-  }
-}
-
-static volatile uint8_t *pin_in_reg(uint8_t port) {
-  switch (port) {
-  case 0:  return &PINB;
-  case 1:  return &PINC;
-  default: return &PIND;
   }
 }
 
@@ -111,27 +105,4 @@ hal_status_t hal_gpio_set_output_speed(hal_gpio_pin_t pin,
   (void)pin;
   (void)speed;
   return HAL_OK;
-}
-
-void hal_gpio_write(hal_gpio_pin_t pin, hal_gpio_state_t state) {
-  uint8_t p = (uint8_t)pin >> 3;
-  uint8_t m = (uint8_t)(1u << ((uint8_t)pin & 7u));
-  volatile uint8_t *out = port_out_reg(p);
-  if (state == HAL_GPIO_LOW)
-    *out &= (uint8_t)~m;
-  else
-    *out |= m;
-}
-
-hal_gpio_state_t hal_gpio_read(hal_gpio_pin_t pin) {
-  uint8_t p = (uint8_t)pin >> 3;
-  uint8_t m = (uint8_t)(1u << ((uint8_t)pin & 7u));
-  return (*pin_in_reg(p) & m) ? HAL_GPIO_HIGH : HAL_GPIO_LOW;
-}
-
-void hal_gpio_toggle(hal_gpio_pin_t pin) {
-  uint8_t p = (uint8_t)pin >> 3;
-  uint8_t m = (uint8_t)(1u << ((uint8_t)pin & 7u));
-  /* Writing 1 to a PINx bit toggles the matching PORTx bit (ATmega328P). */
-  *pin_in_reg(p) = m;
 }

@@ -287,6 +287,7 @@ config SAMPLE_06_HAL_BLINK_DELAY
 
 config SAMPLE_07_HAL_PWM
     bool "07_hal_pwm"
+    select DRV_PWM
 
 config SAMPLE_08_NO_HAL_PWM
     bool "08_no_hal_pwm"

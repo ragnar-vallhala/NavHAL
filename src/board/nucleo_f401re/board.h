@@ -38,6 +38,11 @@ extern "C" {
 /* General-purpose timer. */
 #define BOARD_GP_TIMER  TIM5
 
+/* PWM output — TIM2 channel 3 on PB10 (alternate function AF1). */
+#define BOARD_PWM_TIMER    TIM2
+#define BOARD_PWM_CHANNEL  3
+#define BOARD_PWM_PIN      GPIO_PB10
+
 /* Arduino-compatible digital headers (CN5/CN9 on the Nucleo-64) */
 #define D0   GPIO_PA03  /**< USART2 RX on the Arduino header. */
 #define D1   GPIO_PA02  /**< USART2 TX on the Arduino header. */

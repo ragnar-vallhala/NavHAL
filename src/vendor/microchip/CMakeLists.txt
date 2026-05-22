@@ -30,6 +30,9 @@ endif()
 if(CONFIG_DRV_UART)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
 endif()
+if(CONFIG_DRV_PWM)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/pwm/pwm.c)
+endif()
 
 add_library(hal STATIC
     ${HAL_SOURCES}

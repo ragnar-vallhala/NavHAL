@@ -58,6 +58,11 @@ extern "C" {
 /* General-purpose timer — Timer1 (16-bit); Timer0 backs the timebase. */
 #define BOARD_GP_TIMER  TIM1
 
+/* PWM output — Timer1 channel 1 emits on OC1A (PB1). */
+#define BOARD_PWM_TIMER    TIM1
+#define BOARD_PWM_CHANNEL  1
+#define BOARD_PWM_PIN      GPIO_PB01
+
 /* On-board oscillator (Hz) — the Arduino Uno uses a 16 MHz crystal. */
 #define BOARD_XTAL_FREQ_HZ  16000000U
 

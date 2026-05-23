@@ -17,8 +17,18 @@
 #ifndef NAVTEST_H
 #define NAVTEST_H
 
-#include "core/cortex-m4/uart.h"
+#include <stddef.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Sink for all test output. Backends:
+ *   - target (default): writes via uart2_write (see tests/navtest_state.c)
+ *   - host  (-DNAVTEST_HOST): writes to stdout (see tests/host/host_backend.c)
+ */
+void navtest_write(const char *s);
 
 /* -------------------------------------------------------------------------
  * ANSI color escapes  (define NAVTEST_NO_COLOR before including to disable)
@@ -73,29 +83,29 @@ static inline void _navtest_print_uint32(uint32_t v) {
     buf[--i] = '0' + (v % 10);
     v /= 10;
   }
-  uart2_write(buf + i);
+  navtest_write(buf + i);
 }
 
 static inline void _navtest_fail(const char *file, uint32_t line,
                                  const char *msg) {
-  uart2_write(_NT_RED "  FAIL: " _NT_RST);
-  uart2_write(file);
-  uart2_write(":");
+  navtest_write(_NT_RED "  FAIL: " _NT_RST);
+  navtest_write(file);
+  navtest_write(":");
   _navtest_print_uint32(line);
-  uart2_write(" -- ");
-  uart2_write(msg);
-  uart2_write("\r\n");
+  navtest_write(" -- ");
+  navtest_write(msg);
+  navtest_write("\r\n");
   _navtest.failures++;
 }
 
 static inline int _navtest_end_impl(void) {
-  uart2_write("  [");
+  navtest_write("  [");
   _navtest_print_uint32(_navtest.tests);
-  uart2_write(" tests | ");
+  navtest_write(" tests | ");
   _navtest_print_uint32(_navtest.failures);
-  uart2_write(" failed | ");
+  navtest_write(" failed | ");
   _navtest_print_uint32(_navtest.passes);
-  uart2_write(" passed]\r\n");
+  navtest_write(" passed]\r\n");
   return (int)_navtest.failures;
 }
 
@@ -126,14 +136,41 @@ static inline uint32_t navtest_get_test_count(void) { return _navtest.tests; }
     _navtest.tests++;                                                          \
     uint32_t _prev_failures = _navtest.failures;                               \
     setUp();                                                                   \
-    uart2_write(_NT_CYAN "  >> " _NT_BOLD #fn _NT_RST "\r\n");                 \
+    navtest_write(_NT_CYAN "  >> " _NT_BOLD #fn _NT_RST "\r\n");                 \
     fn();                                                                      \
     if (_navtest.failures == _prev_failures) {                                 \
       _navtest.passes++;                                                       \
-      uart2_write(_NT_BOLD _NT_GREEN "  PASS" _NT_RST "\r\n");                 \
+      navtest_write(_NT_BOLD _NT_GREEN "  PASS" _NT_RST "\r\n");                 \
     }                                                                          \
     tearDown();                                                                \
   } while (0)
+
+/* -------------------------------------------------------------------------
+ * Suite registry — replaces per-driver RUN_TEST boilerplate in main.c.
+ *
+ * Each driver test file declares a `const navtest_suite_t test_<x>_suite`
+ * pointing at its case table; `tests/main.c` walks an array of suite ptrs.
+ * ---------------------------------------------------------------------- */
+
+typedef void (*navtest_fn_t)(void);
+typedef void (*navtest_hook_t)(void);
+
+typedef struct {
+  navtest_fn_t fn;
+  const char *name;
+} navtest_case_t;
+
+typedef struct {
+  const char *name;
+  const navtest_case_t *cases;
+  size_t count;
+  navtest_hook_t between; /* optional: runs between cases; NULL for none */
+} navtest_suite_t;
+
+#define NAVTEST_CASE(f) {(f), #f}
+
+/** Run every case in @p suite, printing a banner + summary. Returns failures. */
+int navtest_run_suite(const navtest_suite_t *suite);
 
 /* -------------------------------------------------------------------------
  * Assertion macros
@@ -144,11 +181,11 @@ static inline uint32_t navtest_get_test_count(void) { return _navtest.tests; }
     uint32_t _e = (uint32_t)(expected);                                        \
     uint32_t _a = (uint32_t)(actual);                                          \
     if (_e != _a) {                                                            \
-      uart2_write("  Expected: ");                                             \
+      navtest_write("  Expected: ");                                             \
       _navtest_print_uint32(_e);                                               \
-      uart2_write("  Got: ");                                                  \
+      navtest_write("  Got: ");                                                  \
       _navtest_print_uint32(_a);                                               \
-      uart2_write("\r\n");                                                     \
+      navtest_write("\r\n");                                                     \
       _navtest_fail(__FILE__, __LINE__, "TEST_ASSERT_EQUAL_UINT32");           \
     }                                                                          \
   } while (0)
@@ -180,11 +217,11 @@ static inline uint32_t navtest_get_test_count(void) { return _navtest.tests; }
     uint32_t _m = (uint32_t)(mask);                                            \
     uint32_t _v = (uint32_t)(val);                                             \
     if ((_v & _m) != _m) {                                                     \
-      uart2_write("  Mask: ");                                                 \
+      navtest_write("  Mask: ");                                                 \
       _navtest_print_uint32(_m);                                               \
-      uart2_write("  Val:  ");                                                 \
+      navtest_write("  Val:  ");                                                 \
       _navtest_print_uint32(_v);                                               \
-      uart2_write("\r\n");                                                     \
+      navtest_write("\r\n");                                                     \
       _navtest_fail(__FILE__, __LINE__,                                        \
                     "TEST_ASSERT_BITS_HIGH: bits not set");                    \
     }                                                                          \
@@ -196,14 +233,18 @@ static inline uint32_t navtest_get_test_count(void) { return _navtest.tests; }
     uint32_t _m = (uint32_t)(mask);                                            \
     uint32_t _v = (uint32_t)(val);                                             \
     if ((_v & _m) != 0) {                                                      \
-      uart2_write("  Mask: ");                                                 \
+      navtest_write("  Mask: ");                                                 \
       _navtest_print_uint32(_m);                                               \
-      uart2_write("  Val:  ");                                                 \
+      navtest_write("  Val:  ");                                                 \
       _navtest_print_uint32(_v);                                               \
-      uart2_write("\r\n");                                                     \
+      navtest_write("\r\n");                                                     \
       _navtest_fail(__FILE__, __LINE__,                                        \
                     "TEST_ASSERT_BITS_LOW: bits not cleared");                 \
     }                                                                          \
   } while (0)
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* NAVTEST_H */

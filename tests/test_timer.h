@@ -1,8 +1,13 @@
 #ifndef TEST_TIMER_H
 #define TEST_TIMER_H
 
+#include "navtest/navtest.h"
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 // -------------------- Timer Init --------------------
 void test_timer_init_sets_prescaler_and_arr(void);
 
@@ -29,10 +34,20 @@ void test_timer_set_arr_and_get_arr(void);
 // -------------------- Timer Counter --------------------
 void test_timer_get_count_returns_correct_value(void);
 
-// -------------------- Tick Tests --------------------
-void test_systick_tick_increments(void);
-
 // -------------------- Frequency Calculation --------------------
 void test_timer_get_frequency_returns_correct_value(void);
 
+// -------------------- Additional Coverage --------------------
+void test_hal_timer_init_rejects_null_config(void);
+void test_hal_timer_init_freq_returns_ok(void);
+void test_hal_timer_set_prescaler_round_trip(void);
+void test_hal_timer_set_get_auto_reload(void);
+void test_hal_timer_attach_then_detach_callback(void);
+
+extern const navtest_suite_t test_timer_suite;
+
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // TEST_TIMER_H

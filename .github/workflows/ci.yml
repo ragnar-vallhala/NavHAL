@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Fast pure-logic tests with the host gcc. Self-contained — no toolchain
+  # download, no emulator.
+  host-tests:
+    name: Host tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure host build
+        run: cmake -B build-host -S tests/host
+      - name: Build host tests
+        run: cmake --build build-host -j
+      - name: Run host tests
+        run: ./build-host/tests_host
+
+  # Cross-compile the on-target navtest ELF. Uploads the binary as a
+  # workflow artifact so the (separate) renode.yml workflow can consume
+  # it without rebuilding.
+  build-on-target:
+    name: Build on-target ELF
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arm-none-eabi toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+      - name: Configure
+        run: cmake -B build-test -DTEST=ON
+      - name: Build tests
+        run: cmake --build build-test --target tests -j
+      - name: Report ELF size
+        run: arm-none-eabi-size build-test/tests
+      - name: Upload tests.elf
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-elf
+          path: build-test/tests
+          retention-days: 7
+
+  # NOTE: PIL (Renode) runs are too slow per PR — the full M2+ suite takes
+  # ~90 min wall-clock because the firmware's clock-init busy-waits on
+  # PLL/HSE flags that Renode's RCC model is slow to assert. That job
+  # lives in `.github/workflows/renode.yml` and runs on a nightly
+  # schedule + `workflow_dispatch` instead.
+
+  # Capability-gated drivers (DMA/FPU/SDIO/DWT) must compile out cleanly
+  # when disabled — proves M2+'s NAVHAL_HAS_* contract for the future
+  # AVR port (M6).
+  build-no-cap:
+    name: Build with caps disabled
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arm-none-eabi toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+      - name: Strip capability flags from .config
+        run: |
+          sed -i \
+            -e 's/^CONFIG_DRV_DMA=y/# CONFIG_DRV_DMA is not set/' \
+            -e 's/^CONFIG_DRV_FPU=y/# CONFIG_DRV_FPU is not set/' \
+            -e 's/^CONFIG_DRV_SDIO=y/# CONFIG_DRV_SDIO is not set/' \
+            -e 's/^CONFIG_DRV_DWT=y/# CONFIG_DRV_DWT is not set/' \
+            -e 's/^CONFIG_USE_FPU=y/# CONFIG_USE_FPU is not set/' \
+            .config
+          grep -E 'DMA|FPU|SDIO|DWT' .config || true
+      - name: Configure (no-cap)
+        run: cmake -B build-nocap -DTEST=ON
+      - name: Build tests (no-cap)
+        run: cmake --build build-nocap --target tests -j
+      - name: Confirm capability-gated symbols are absent
+        run: |
+          set -e
+          ELF=build-nocap/tests
+          # The DMA/SDIO/DWT drivers must not have linked in.
+          for sym in hal_dma_init hal_sdio_init hal_dwt_init hal_fpu_enable; do
+            if arm-none-eabi-nm -gC "$ELF" | grep -qE "\b${sym}\b"; then
+              echo "error: capability-gated symbol $sym is present in no-cap build" >&2
+              exit 1
+            fi
+          done
+          echo "ok: no capability-gated symbols linked"

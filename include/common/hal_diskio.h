@@ -11,6 +11,10 @@
 
 #include <stdint.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Disk Status bitmask
  */
@@ -60,4 +64,8 @@ hal_disk_write(uint8_t pdrv,        /**< Physical drive number */
 
 hal_disk_result_t hal_disk_ioctl(uint8_t pdrv, uint8_t cmd, void *buff);
 
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 #endif // !HAL_DISKIO_H

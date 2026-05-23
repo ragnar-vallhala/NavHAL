@@ -1,7 +1,13 @@
+#define CORTEX_M4
 #include "test_fpu_accel.h"
-#include "core/cortex-m4/dwt.h"
+#include "common/hal_features.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
 #include <stdint.h>
+
+#if NAVHAL_HAS_FPU
+#include "navhal_port_dwt.h"
+#include "navhal_port_fpu.h"
 
 static volatile float f1 = 1.23456f;
 static volatile float f2 = 2.34567f;
@@ -17,17 +23,19 @@ void test_fpu_basic_arithmetic(void) {
 }
 
 void test_fpu_benchmark_cycles(void) {
+  /* Depends on DWT cycles advancing; PIL silences the DWT range. */
+  NAVTEST_SKIP_ON_PIL();
   uint32_t start, end;
   const int iterations = 1000;
 
-  dwt_init();
-  dwt_reset_cycles();
+  hal_cycle_counter_init();
+  hal_cycle_counter_reset();
 
-  start = dwt_get_cycles();
+  start = hal_cycle_counter_get();
   for (int i = 0; i < iterations; i++) {
     f3 = f1 * f2 + f1;
   }
-  end = dwt_get_cycles();
+  end = hal_cycle_counter_get();
 
   uint32_t total_cycles = end - start;
 
@@ -38,3 +46,22 @@ void test_fpu_benchmark_cycles(void) {
   TEST_ASSERT_TRUE(total_cycles < 50000);
   TEST_ASSERT_TRUE(total_cycles > 0);
 }
+
+void test_hal_fpu_enable_returns_ok(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_fpu_enable());
+}
+
+static const navtest_case_t fpu_cases[] = {
+    NAVTEST_CASE(test_fpu_basic_arithmetic),
+    NAVTEST_CASE(test_fpu_benchmark_cycles),
+    NAVTEST_CASE(test_hal_fpu_enable_returns_ok),
+};
+
+const navtest_suite_t test_fpu_suite = {
+    .name = "FPU",
+    .cases = fpu_cases,
+    .count = sizeof(fpu_cases) / sizeof(fpu_cases[0]),
+    .between = NULL,
+};
+
+#endif /* NAVHAL_HAS_FPU */

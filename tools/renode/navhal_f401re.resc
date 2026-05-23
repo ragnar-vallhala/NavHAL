@@ -1,0 +1,71 @@
+:name: NavHAL F401RE test runner
+:description: Boots a Renode STM32F4 machine model, loads the navtest ELF,
+:             routes USART2 to a log file, and runs the suite to completion.
+:
+:             Variables (set by the caller via the Monitor before `include`):
+:               $bin     — absolute path to the test ELF
+:               $logfile — absolute path for the captured UART log
+:
+:             tools/renode/run_tests.sh wires these up with:
+:               renode --console --disable-xwt \
+:                 -e "$bin = @<elf>; $logfile = @<log>; i @<this-file>"
+
+using sysbus
+
+# The Nucleo-F401RE shares its silicon family with the STM32F4 Discovery
+# board; Renode ships a mainline `stm32f4_discovery` platform model that
+# exposes the same USART2/GPIO/timer set used by the navtest binary.
+mach create "navhal"
+machine LoadPlatformDescription @platforms/boards/stm32f4_discovery.repl
+
+# Silence Cortex-M private-peripheral warnings. The `stm32f4_discovery`
+# Renode model omits the DWT block (0xE0001000–0xE0001FFF — read by every
+# `hal_cycle_counter_get`) and the ITM/TPIU/ETM cluster at 0xE0000000.
+# Without these silenced, the cycle-counter tests flood the log with
+# "ReadDoubleWord from non existing peripheral at 0xE0001004" once per
+# iteration. The cycle-counter suite is a HIL-only test in practice
+# (see docs/testing/findings.md §4); silencing the range keeps the
+# Renode log readable without changing test outcomes.
+sysbus SilenceRange <0xE0000000, 0xE0001FFF>
+
+# Silence model-tag warnings on peripherals that Renode does model but
+# tags certain bits as "known but not implemented." These bits *are*
+# correctly written by the firmware — Renode just doesn't simulate
+# their secondary effects. The warnings would otherwise flood the log
+# once per write. Suppressing at level 3 (error-only) for these
+# peripherals keeps real errors visible but drops the noise.
+logLevel 3 gpioPortC
+logLevel 3 rcc
+logLevel 3 timer1
+logLevel 3 timer2
+logLevel 3 timer3
+logLevel 3 timer4
+logLevel 3 dma1
+logLevel 3 dma2
+logLevel 3 nvic
+
+# Send USART2 traffic to the log file; CI greps the file for the navtest
+# summary. `flushAfterWrite` keeps the log usable even if the emulation
+# is killed mid-run.
+sysbus.usart2 CreateFileBackend $logfile true
+
+sysbus LoadELF $bin
+
+# Renode is slow per emulated second when the firmware busy-waits — and
+# our clock-init paths busy-wait on PLL/HSE ready flags that the Renode
+# RCC model doesn't always assert promptly. Empirically the full 142-test
+# suite consumes ~90 minutes wall-clock on this rig; 3 emulated hours is
+# a comfortable cap that finishes well inside that.
+#
+# This RunFor is the *hang backstop*, not the success-path exit. The
+# firmware enters an idle loop after the last test, so it never naturally
+# stops — and `RunFor` would otherwise keep emulating those NOPs for the
+# full 3 emulated hours. tools/renode/run_tests.sh watches the UART log
+# and SIGTERMs Renode the moment "Total failures:" appears, so the budget
+# only matters when the suite genuinely hangs.
+#
+# `emulation RunFor` starts emulation itself — do NOT pair it with a
+# separate `start` line (Renode 1.16 errors with "This action is not
+# available when emulation is already started").
+emulation RunFor "03:00:00"
+quit

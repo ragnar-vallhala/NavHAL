@@ -21,8 +21,9 @@
 
  #include "utils/conversion.h"
 
- /**
+ /*
   * @brief Convert string to 32-bit signed integer
+  * (API doc lives in utils/conversion.h; this is an implementation note.)
   *
   * Parses the input string character by character to construct the integer value:
   * 1. Skips any leading whitespace (spaces/tabs)
@@ -72,8 +73,9 @@
      return sign * result;
  }
  
- /**
+ /*
   * @brief Convert string to floating-point number
+  * (API doc lives in utils/conversion.h; this is an implementation note.)
   *
   * Parses the input string to construct a float value:
   * 1. Skips leading whitespace

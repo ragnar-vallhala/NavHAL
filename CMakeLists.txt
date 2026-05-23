@@ -14,6 +14,7 @@ set(KCONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Kconfig")
 set(CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.config")
 set(GENERATED_CMAKE "${CMAKE_BINARY_DIR}/config.cmake")
 set(GENERATED_HEADER "${CMAKE_BINARY_DIR}/autoconf.h")
+set(GENERATED_NAVHAL_TARGET "${CMAKE_BINARY_DIR}/navhal_target.h")
 
 message(STATUS "Running Kconfig configuration generation...")
 execute_process(
@@ -22,6 +23,7 @@ execute_process(
             --config ${CONFIG_FILE}
             --cmake-out ${GENERATED_CMAKE}
             --header-out ${GENERATED_HEADER}
+            --navhal-target-out ${GENERATED_NAVHAL_TARGET}
             --sample-override "${SAMPLE}"
     RESULT_VARIABLE KCONFIG_RESULT
 )
@@ -39,6 +41,7 @@ if(NOT DEFINED TOOLCHAIN_PREFIX)
 endif()
 set(TOOLCHAIN_PREFIX "${TOOLCHAIN_PREFIX}" CACHE STRING "Toolchain prefix for compiler binaries")
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
 set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
 set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
 set(CMAKE_BINARY_SIZE ${TOOLCHAIN_PREFIX}size)
@@ -47,7 +50,14 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
 # set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
 # extern/NavHAL/CMakeLists.txt
-if(NOT DEFINED CMAKE_PROJECT_NAME)
+#
+# project() enables the C/ASM languages and must run on EVERY configure.
+# Guarding it on CMAKE_PROJECT_NAME (a cache variable) made it run only on the
+# first configure of a build directory — every later reconfigure skipped it,
+# leaving the languages unenabled ("Cannot determine link language for
+# target ..."). Detect the top-level build via a path comparison instead, which
+# is re-evaluated fresh each configure and is true only for a standalone build.
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(NavHAL C ASM)
 endif()
 
@@ -60,13 +70,22 @@ message(STATUS "Building for board: ${BOARD}")
 message(STATUS "Building for vendor: ${VENDOR}")
 message(STATUS "Building for processor: ${CMAKE_SYSTEM_PROCESSOR}")
 
-# Paths
+# Paths — driven by the resolved Kconfig output (ARCH_ISA / VENDOR /
+# FAMILY / BOARD / CMAKE_SYSTEM_PROCESSOR), not hardcoded slugs. M6's
+# AVR port will populate src/arch/avr/, src/vendor/microchip/, etc.
+# without further CMake edits.
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(SRC_BOARD ${CMAKE_CURRENT_SOURCE_DIR}/src/board/${BOARD})
-set(SRC_CORE ${CMAKE_CURRENT_SOURCE_DIR}/src/core)
+set(SRC_ARCH ${CMAKE_CURRENT_SOURCE_DIR}/src/arch/${ARCH_ISA})
 set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
+set(INCLUDE_PORT ${CMAKE_CURRENT_SOURCE_DIR}/include/port/${CMAKE_SYSTEM_PROCESSOR})
+set(INCLUDE_FAMILY ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR}/family/${FAMILY}/include)
 set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
-# FPU Configuration
+# ---- Architecture-specific compiler / linker flags ------------------------
+# Cortex-M and AVR need entirely different flag sets: -mcpu/-mthumb + a custom
+# linker script + -nostdlib for the bare-metal ARM build, versus -mmcu and the
+# startup/linker that the avr-libc toolchain supplies itself. Everything below
+# branches on the resolved CMAKE_SYSTEM_PROCESSOR.
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
     if(USE_FPU)
         set(FPU_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED -D_DMA_ENABLED")
@@ -75,53 +94,51 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
         set(FPU_FLAGS "-mfloat-abi=soft")
         message(STATUS "FPU: Software emulation (Cortex-M4)")
     endif()
-else()
-    # Unsupported/Generic core default
+    set(ARCH_C_FLAGS    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS} -O0 -g")
+    set(ARCH_ASM_FLAGS  "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
+    set(ARCH_LINK_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}")
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
+    # FAMILY is the avr-gcc -mmcu device name (atmega328p). F_CPU drives the
+    # avr-libc timing routines; 16 MHz matches the ATmega328P reference board.
     set(FPU_FLAGS "")
-    message(WARNING "FPU Configuration not predefined for core '${CMAKE_SYSTEM_PROCESSOR}'")
-endif()
-
-# Architecture Flags
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
-    set(ARCH_FLAGS "-mthumb")
+    set(AVR_MCU "${FAMILY}")
+    set(AVR_F_CPU "16000000UL")
+    message(STATUS "AVR: -mmcu=${AVR_MCU}, F_CPU=${AVR_F_CPU}")
+    set(ARCH_C_FLAGS    "-mmcu=${AVR_MCU} -DF_CPU=${AVR_F_CPU} -Os -g")
+    set(ARCH_ASM_FLAGS  "-mmcu=${AVR_MCU}")
+    set(ARCH_LINK_FLAGS "-mmcu=${AVR_MCU}")
 else()
-    set(ARCH_FLAGS "")
+    set(FPU_FLAGS "")
+    set(ARCH_C_FLAGS "")
+    set(ARCH_ASM_FLAGS "")
+    set(ARCH_LINK_FLAGS "")
+    message(WARNING "No architecture flags predefined for core '${CMAKE_SYSTEM_PROCESSOR}'")
 endif()
 
-# Compiler Flags
-set(CMAKE_C_FLAGS
-"-mcpu=${CMAKE_SYSTEM_PROCESSOR} ${ARCH_FLAGS} -Wall -O0 -g -std=c11 ${FPU_FLAGS}")
- # C++
-# standard
-# 11
-
-
-
-set(CMAKE_ASM_FLAGS "-mcpu=${CMAKE_SYSTEM_PROCESSOR} ${ARCH_FLAGS} ${FPU_FLAGS}")
-
-if(NOT STANDALONE)
-  set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}") # can be
-                                                                   # later
-                                                                   # modified to
-                                                                   # use
-                                                                   # multiple
-                                                                   # linker
-                                                                   # scripts
-                                                                   # dynamically
-endif()
-if(STANDALONE)
-set(CMAKE_EXE_LINKER_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}") # can be
-endif()
+set(CMAKE_C_FLAGS "${ARCH_C_FLAGS} -Wall -std=c11")
+set(CMAKE_ASM_FLAGS "${ARCH_ASM_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${ARCH_LINK_FLAGS}")
+# C++ shares the arch flags; a C++ TU only appears in the C++ sample, which
+# does enable_language(CXX). Bare-metal: no exceptions / RTTI / cxa-atexit.
+set(CMAKE_CXX_FLAGS
+    "${ARCH_C_FLAGS} -Wall -std=c++17 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics")
 # subdirectories are commented, they will be added as code is added
 if(NOT STANDALONE)
 add_subdirectory(${SRC_DIR})
 endif()
 
-if(SAMPLE AND NOT STANDALONE)
+# TEST mode is exclusive: it builds its own `tests` executable from a GLOB of
+# HAL sources (see the if(TEST) block below) and adds a `flash_tests` custom
+# target. Pulling in samples/ here would also register each sample's own
+# `flash` custom target (samples/*/CMakeLists.txt), conflicting with the test
+# build. So when -DTEST=ON, skip samples/ and src/vendor/ entirely.
+if(TEST)
+  message(STATUS "TEST=ON — skipping samples/ and src/vendor/ (test build is self-contained)")
+elseif(SAMPLE AND NOT STANDALONE)
   message(STATUS "Sample selected: ${SAMPLE} (with HAL)")
   message(STATUS  "Linker flag: ${CMAKE_EXE_LINKER_FLAGS}")
   # add_subdirectory(${SRC_BOARD})
-  add_subdirectory(${SRC_CORE})
+  add_subdirectory(${SRC_VENDOR})
   # add_subdirectory(${SRC_VENDOR})
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/samples)
   # Sources
@@ -132,7 +149,7 @@ elseif(SAMPLE AND STANDALONE)
 else()
   message(STATUS "No SAMPLE defined. Building HAL only.")
   # add_subdirectory(${SRC_BOARD})
-  add_subdirectory(${SRC_CORE})
+  add_subdirectory(${SRC_VENDOR})
   # add_subdirectory(${SRC_VENDOR})
 endif()
 
@@ -165,8 +182,13 @@ add_custom_target(copy_compile_commands ALL
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-# Define startup file path
-set(STARTUP_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/core/${CMAKE_SYSTEM_PROCESSOR}/startup/startup.s")
+# Startup file (arch layer). The Cortex-M port ships an explicit startup.s;
+# the AVR port relies on the avr-libc C runtime and has none.
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
+    set(STARTUP_FILE "")
+else()
+    set(STARTUP_FILE "${SRC_ARCH}/startup/startup.s")
+endif()
 # Export path to parent project if included via add_subdirectory()
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     set(STARTUP_FILE "${STARTUP_FILE}" PARENT_SCOPE)
@@ -174,9 +196,17 @@ endif()
 # Tests
 if(TEST)
   message("Tests enabled")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+  include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${INCLUDE_PORT}
+    ${INCLUDE_FAMILY}
+    ${SRC_BOARD}
+  )
   file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
-  file(GLOB_RECURSE HAL_SRC ${SRC_CORE}/*.c )
+  file(GLOB_RECURSE HAL_SRC
+    ${SRC_VENDOR}/*.c
+    ${SRC_ARCH}/*.c
+  )
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
   add_executable(tests ${TEST_SRC} ${STARTUP_FILE})
@@ -184,9 +214,9 @@ if(TEST)
   set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib ${FPU_FLAGS}")
   
   # Dynamic architecture options for test compiler flags
-  set(TEST_FLAGS "-fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables")
+  set(TEST_FLAGS "-fno-exceptions" "-fno-unwind-tables" "-fno-asynchronous-unwind-tables")
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
-      set(TEST_FLAGS "-march=armv7e-m ${TEST_FLAGS}")
+      list(APPEND TEST_FLAGS "-march=armv7e-m")
   endif()
   
   target_compile_options(tests PRIVATE ${TEST_FLAGS})
@@ -208,9 +238,9 @@ if(TEST)
    message(STATUS "Selected flasher: ${FLASHER}")
    message(STATUS "Selected flash address: ${FLASH_ADDRESS}")
    
-  add_custom_target(flash
+  add_custom_target(flash_tests
      COMMAND ${CMAKE_OBJCOPY} -O binary tests tests.bin
-     COMMAND ${FLASHER} write tests.bin ${FLASH_ADDRESS}
+     COMMAND ${FLASHER} --reset write tests.bin ${FLASH_ADDRESS}
      DEPENDS tests
      COMMENT "Converting ELF to BIN and flashing to board"
    )

@@ -12,54 +12,116 @@ choice
 config ARCH_CORTEX_M4
     bool "Cortex-M4"
 
+config ARCH_AVR8
+    bool "AVR8 (8-bit)"
+    help
+      8-bit AVR architecture (ATmega / ATtiny). Implemented by the M6
+      port; arch sources live under src/arch/avr/.
+
 endchoice
 
 config CMAKE_SYSTEM_PROCESSOR
     string
     default "cortex-m4" if ARCH_CORTEX_M4
+    default "avr"       if ARCH_AVR8
+
+# Source-tree slug for the ISA / arch layer (src/arch/<ARCH_ISA>/).
+# A single ISA covers multiple processors (Cortex-M3/M4/M7 all share
+# armv7e-m startup, NVIC, SysTick), so this is a distinct axis from
+# CMAKE_SYSTEM_PROCESSOR which names a specific core.
+config ARCH_ISA
+    string
+    default "armv7e-m" if ARCH_CORTEX_M4
+    default "avr"      if ARCH_AVR8
 
 choice
     prompt "Vendor"
-    default VENDOR_STM32
+    default VENDOR_STM32     if ARCH_CORTEX_M4
+    default VENDOR_MICROCHIP if ARCH_AVR8
     help
       Select the silicon vendor.
 
 config VENDOR_STM32
     bool "STM32"
+    depends on ARCH_CORTEX_M4
+
+config VENDOR_MICROCHIP
+    bool "Microchip"
+    depends on ARCH_AVR8
+    help
+      Microchip (formerly Atmel) AVR silicon.
 
 endchoice
 
 config VENDOR
     string
-    default "stm32" if VENDOR_STM32
+    default "stm32"     if VENDOR_STM32
+    default "microchip" if VENDOR_MICROCHIP
+
+choice
+    prompt "Vendor Device Family"
+    default FAMILY_STM32F4     if VENDOR_STM32
+    default FAMILY_ATMEGA328P  if VENDOR_MICROCHIP
+    help
+      Select the device family within the selected vendor. This is the
+      register-layout axis: a single vendor can ship multiple families
+      with different register maps (STM32F4 vs STM32F0 vs ...).
+
+config FAMILY_STM32F4
+    bool "STM32F4 (Cortex-M4)"
+    depends on VENDOR_STM32
+
+config FAMILY_ATMEGA328P
+    bool "ATmega328P"
+    depends on VENDOR_MICROCHIP
+
+endchoice
+
+config FAMILY
+    string
+    default "stm32f4"     if FAMILY_STM32F4
+    default "atmega328p"  if FAMILY_ATMEGA328P
 
 choice
     prompt "Target Board"
-    default BOARD_NUCLEO_F401RE
+    default BOARD_NUCLEO_F401RE if FAMILY_STM32F4
+    default BOARD_ATMEGA328P    if FAMILY_ATMEGA328P
     help
       Select the target development board.
 
 config BOARD_NUCLEO_F401RE
     bool "nucleo_f401re"
+    depends on FAMILY_STM32F4
+
+config BOARD_ATMEGA328P
+    bool "atmega328p"
+    depends on FAMILY_ATMEGA328P
 
 endchoice
 
 config BOARD
     string
     default "nucleo_f401re" if BOARD_NUCLEO_F401RE
+    default "atmega328p"    if BOARD_ATMEGA328P
 
 endmenu
 
 menu "System & Features Configuration"
 
+# DMA, the hardware FPU and the DWT cycle counter are Cortex-M
+# peripherals with no ATmega328P equivalent — gated to ARCH_CORTEX_M4
+# so they cannot be selected on AVR.
+
 config USE_FPU
     bool "Enable Hardware FPU Compiler Flags"
+    depends on ARCH_CORTEX_M4
     default n
     help
       Enable hardware Floating Point Unit compiler and linker flags.
 
 config DRV_DMA
     bool "Enable Direct Memory Access (DMA)"
+    depends on ARCH_CORTEX_M4
     default n
     select DRV_INTERRUPT
     help
@@ -73,12 +135,14 @@ config DRV_CRC
 
 config DRV_DWT
     bool "Enable Debug Watchpoint and Trace (DWT)"
+    depends on ARCH_CORTEX_M4
     default n
     help
       Enables the DWT counter for high-resolution timing.
 
 config DRV_FPU
     bool "Enable FPU Driver Extension"
+    depends on ARCH_CORTEX_M4
     default n
     help
       Enables compilation of hardware FPU runtime setup files.
@@ -86,7 +150,7 @@ config DRV_FPU
 endmenu
 
 menu "HAL Drivers Configuration"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_AVR8
 
 config DRV_CLOCK
     bool "Enable Clock Driver"
@@ -112,14 +176,31 @@ config DRV_UART
     select DRV_GPIO
     select DRV_CLOCK
     select DRV_INTERRUPT
-    select DRV_DMA
+    select DRV_DMA if ARCH_CORTEX_M4
+
+config DRV_UART_DMA
+    bool "Enable DMA-backed UART API"
+    default y if DRV_UART && DRV_DMA
+    depends on DRV_UART && DRV_DMA
+    help
+      Compile the hal_uart_write_dma / init_dma_rx variants. Disable to
+      drop the DMA backend from a DMA-enabled build (e.g. to save flash
+      when DMA is only used by other drivers).
 
 config DRV_I2C
     bool "Enable I2C Driver"
     default n
     select DRV_CLOCK
     select DRV_INTERRUPT
-    select DRV_DMA
+    select DRV_DMA if ARCH_CORTEX_M4
+
+config DRV_I2C_DMA
+    bool "Enable DMA-backed I2C API"
+    default y if DRV_I2C && DRV_DMA
+    depends on DRV_I2C && DRV_DMA
+    help
+      Compile hal_i2c_read_regs_dma. Disable to drop the DMA backend
+      from a DMA-enabled I2C build.
 
 config DRV_SPI
     bool "Enable SPI Driver"
@@ -135,11 +216,20 @@ config DRV_PWM
 
 config DRV_SDIO
     bool "Enable SDIO Driver"
+    depends on ARCH_CORTEX_M4
     default n
     select DRV_CLOCK
     select DRV_GPIO
     select DRV_INTERRUPT
     select DRV_TIMER
+
+config DRV_SDIO_DMA
+    bool "Enable DMA-backed SDIO async API"
+    default y if DRV_SDIO && DRV_DMA
+    depends on DRV_SDIO && DRV_DMA
+    help
+      Compile the hal_sdio_*_async block-transfer variants. Disable to
+      restrict SDIO to the polled (synchronous) API.
 
 config DRV_FLASH
     bool "Enable Flash Driver"
@@ -151,9 +241,10 @@ menu "Build Options"
 
 config TOOLCHAIN_PREFIX
     string "Toolchain Binary Prefix"
-    default "arm-none-eabi-"
+    default "arm-none-eabi-" if ARCH_CORTEX_M4
+    default "avr-"           if ARCH_AVR8
     help
-      Prefix for the toolchain binaries (e.g., arm-none-eabi-).
+      Prefix for the toolchain binaries (e.g. arm-none-eabi-, avr-).
 
 config STANDALONE
     bool "Build Standalone Samples (without full HAL)"
@@ -168,14 +259,12 @@ choice
 config SAMPLE_NONE
     bool "None"
 
-config SAMPLE_00_TEST_SAMPLE
-    bool "00_test_sample"
-
 config SAMPLE_01_HAL_BLINK
     bool "01_hal_blink"
 
 config SAMPLE_01_NO_HAL_BLINK
     bool "01_no_hal_blink"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_02_HAL_PUPD
     bool "02_hal_pupd"
@@ -185,75 +274,96 @@ config SAMPLE_03_HAL_UART_TX
 
 config SAMPLE_03_NO_HAL_UART_TX
     bool "03_no_hal_uart_tx"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_04_HAL_TIMER
     bool "04_hal_timer"
 
 config SAMPLE_05_HAL_SYSTICK
     bool "05_hal_systick"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_06_HAL_BLINK_DELAY
     bool "06_hal_blink_delay"
 
 config SAMPLE_07_HAL_PWM
     bool "07_hal_pwm"
+    select DRV_PWM
 
 config SAMPLE_08_NO_HAL_PWM
     bool "08_no_hal_pwm"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_09_HAL_CLOCK
     bool "09_hal_clock"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_10_NO_HAL_I2C
     bool "10_no_hal_i2c"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_11_HAL_I2C
     bool "11_hal_i2c"
+    select DRV_I2C
 
 config SAMPLE_12_NO_HAL_FLASH
     bool "12_no_hal_flash"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_13_HAL_FLASH
     bool "13_hal_flash"
+    select DRV_FLASH
 
 config SAMPLE_14_HAL_UART_INT
     bool "14_hal_uart_int"
 
 config SAMPLE_15_HAL_UART_DMA
     bool "15_hal_uart_dma"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_16_HAL_DMA_POLLING_UART
     bool "16_hal_dma_polling_uart"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_17_HAL_FPU
     bool "17_hal_fpu"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_18_HAL_CRC
     bool "18_hal_crc"
+    select DRV_CRC
 
 config SAMPLE_19_HAL_DMA_I2C
     bool "19_hal_dma_i2c"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_20_HAL_SDIO
     bool "20_hal_sdio"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_21_HAL_SDIO_BLOCK
     bool "21_hal_sdio_block"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_22_HAL_FATFS_POSIX
     bool "22_hal_fatfs_posix"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_23_HAL_SDIO_PERF
     bool "23_hal_sdio_perf"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_24_HAL_UART_DMA_BRIDGE
     bool "24_hal_uart_dma_bridge"
+    depends on ARCH_CORTEX_M4
 
 config SAMPLE_25_HAL_SPI_ESP_BRIDGE
     bool "25_hal_spi_esp_bridge"
+    select DRV_SPI
 
 config SAMPLE_26_HAL_DWT
     bool "26_hal_dwt"
+    depends on ARCH_CORTEX_M4
     select DRV_DWT
     select DRV_UART
     select DRV_FPU
@@ -264,7 +374,6 @@ endchoice
 config SAMPLE
     string
     default "" if SAMPLE_NONE
-    default "test_sample" if SAMPLE_00_TEST_SAMPLE
     default "hal_blink" if SAMPLE_01_HAL_BLINK
     default "no_hal_blink" if SAMPLE_01_NO_HAL_BLINK
     default "hal_pupd" if SAMPLE_02_HAL_PUPD
@@ -300,10 +409,12 @@ config TEST
 
 config FLASHER
     string "Binary Flasher Tool"
-    default "st-flash"
+    default "st-flash" if ARCH_CORTEX_M4
+    default "avrdude"  if ARCH_AVR8
 
 config FLASH_ADDRESS
     string "Flash Target Address"
-    default "0x8000000"
+    default "0x8000000" if ARCH_CORTEX_M4
+    default "0x0"       if ARCH_AVR8
 
 endmenu

@@ -1,5 +1,13 @@
+# Sample selector. Samples are organised into three tiers (see
+# samples/README.md):
+#   portable/  — build on every port (Cortex-M4 and AVR);
+#   cortex-m/  — need DMA / FPU / DWT / SDIO, Cortex-M only;
+#   no_hal/    — register-level, no-HAL teaching code (per-MCU).
+#
+# AVAILABLE_SAMPLES holds the selectable short names; SAMPLE_DIRS holds the
+# matching tier-relative directory for each (the two lists are parallel).
+
 set(AVAILABLE_SAMPLES
-test_sample
 no_hal_blink
 hal_blink
 hal_pupd
@@ -28,37 +36,38 @@ hal_sdio_perf
 hal_uart_dma_bridge
 hal_spi_esp_bridge
 hal_dwt
+hal_blink_cpp
 )
 set(SAMPLE_DIRS
-00_test_sample
-01_no_hal_blink
-01_hal_blink
-02_hal_pupd
-03_no_hal_uart_tx
-03_hal_uart_tx
-04_hal_timer
-05_hal_systick
-06_hal_blink_delay
-07_hal_pwm
-08_no_hal_pwm
-09_hal_clock
-10_no_hal_i2c
-11_hal_i2c
-19_hal_dma_i2c
-12_no_hal_flash
-13_hal_flash
-14_hal_uart_int
-15_hal_uart_dma
-16_hal_dma_polling_uart
-17_hal_fpu
-18_hal_crc
-20_hal_sdio
-21_hal_sdio_block
-22_hal_fatfs_posix
-23_hal_sdio_perf
-24_hal_uart_dma_bridge
-25_hal_spi_esp_bridge
-26_hal_dwt
+no_hal/01_no_hal_blink
+portable/01_hal_blink
+portable/02_hal_pupd
+no_hal/03_no_hal_uart_tx
+portable/03_hal_uart_tx
+portable/04_hal_timer
+cortex-m/05_hal_systick
+portable/06_hal_blink_delay
+portable/07_hal_pwm
+no_hal/08_no_hal_pwm
+cortex-m/09_hal_clock
+no_hal/10_no_hal_i2c
+portable/11_hal_i2c
+cortex-m/19_hal_dma_i2c
+no_hal/12_no_hal_flash
+portable/13_hal_flash
+portable/14_hal_uart_int
+cortex-m/15_hal_uart_dma
+cortex-m/16_hal_dma_polling_uart
+cortex-m/17_hal_fpu
+portable/18_hal_crc
+cortex-m/20_hal_sdio
+cortex-m/21_hal_sdio_block
+cortex-m/22_hal_fatfs_posix
+cortex-m/23_hal_sdio_perf
+cortex-m/24_hal_uart_dma_bridge
+portable/25_hal_spi_esp_bridge
+cortex-m/26_hal_dwt
+portable/27_hal_blink_cpp
 )
 
 # Check if sample is defined
@@ -70,7 +79,8 @@ endif()
 # Check for the sample asked to build
 list(FIND AVAILABLE_SAMPLES ${SAMPLE} SAMPLE_INDEX)
 if(${SAMPLE_INDEX} EQUAL -1)
-  # Fallback: allow selecting by the full directory name (e.g. "01_hal_blink")
+  # Fallback: allow selecting by the tier-relative directory name
+  # (e.g. "portable/01_hal_blink").
   list(FIND SAMPLE_DIRS ${SAMPLE} SAMPLE_INDEX)
 endif()
 

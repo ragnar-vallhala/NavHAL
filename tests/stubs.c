@@ -2,7 +2,7 @@
 #include "navhal.h"
 
 int putchar(int ch) {
-  uart2_write_char(ch);
+  hal_uart_write_char(HAL_UART_2, ch);
   return ch;
 }
 

@@ -121,59 +121,9 @@ Other docs in this repository:
 
 ## Contributing
 
-Contributions, bug reports, and feature requests are welcome. Please follow the coding style and submit pull requests. By participating you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
+Bug reports, feature ideas, and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the dev environment, local-check setup, commit message format, and PR workflow.
 
-### Commit message format
-
-Commits follow [Conventional Commits](https://www.conventionalcommits.org/). Subject line:
-
-```
-<type>[(<scope>)][!]: <subject>
-```
-
-* **type** is one of: `feat fix docs style refactor perf test build ci chore revert`.
-* **scope** (optional) names the affected area, e.g. `(uart)`, `(caps)`, `(samples)`.
-* **!** marks a breaking change.
-* Subject is ≤ 72 chars, imperative mood preferred, no trailing period.
-
-Examples:
-
-```
-feat(uart): add hal_uart_write_dma_async
-fix(caps): hal_fpu_enable absent when DRV_FPU=n
-docs: link CoC from README
-chore!: drop AVR sub-cap fallback (breaking)
-```
-
-Enforced locally by `.githooks/commit-msg` and on PRs by the `Commit message lint` CI job.
-
-### Setting up local checks
-
-After cloning, install the repo's git hooks so the same checks CI runs gate every commit and push:
-
-```bash
-tools/install-hooks.sh
-```
-
-This sets `core.hooksPath` to `.githooks/`, installing:
-
-* **`commit-msg`** (~instant): rejects commit messages that don't match the
-  Conventional Commits format above.
-* **`pre-commit`** (~1–2 s): host tests + cmake configure. Catches Kconfig
-  syntax errors and breakage in `tools/kconfig.py`.
-* **`pre-push`** (~30–60 s): capability contract (`tools/test_cap_contract.sh`)
-  + sample matrix (`tools/build_all_samples.sh`). Catches Kconfig/driver
-  changes that would let an "off" capability leak symbols into the ELF, and
-  catches samples that forgot to `select` their driver dependencies.
-
-Both can be bypassed with `--no-verify` for emergencies, but the same checks
-gate PR merges via GitHub Actions (`.github/workflows/ci.yml`), so a bypassed
-commit will be caught upstream.
-
-To enforce CI on the server too, enable branch protection on `main` in the
-repo settings (Settings → Branches → Branch protection rules) and require
-the `Host tests`, `Build on-target ELF`, `Capability contract`, and
-`Build all samples` checks.
+By participating you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 

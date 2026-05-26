@@ -19,13 +19,14 @@ Search existing issues and discussions before opening a new one.
 
 You'll need:
 
-* `arm-none-eabi-gcc` toolchain (`gcc-arm-none-eabi`, `binutils-arm-none-eabi`, `libnewlib-arm-none-eabi` on Debian/Ubuntu)
+* `arm-none-eabi-gcc` toolchain (`gcc-arm-none-eabi`, `binutils-arm-none-eabi`, `libnewlib-arm-none-eabi` on Debian/Ubuntu) — for the Cortex-M4 / STM32 port.
+* `avr-gcc` toolchain (`gcc-avr`, `avr-libc`, `binutils-avr` on Debian/Ubuntu) — for the AVR / ATmega328P port. Required if you touch the portable-sample tier or AVR-port code; the `pre-push` hook warns and skips AVR checks if it's missing.
 * `cmake` ≥ 3.20
 * Python 3 with `kconfiglib` (`pip install kconfiglib`)
 * `make` or `ninja`
 * For host-only checks: the system `gcc` is sufficient
 
-Optional: `st-flash` for flashing the Nucleo-F401RE, `renode` for PIL runs.
+Optional: `st-flash` for flashing the Nucleo-F401RE, `avrdude` for flashing the ATmega328P, `renode` for PIL runs.
 
 ## One-time setup
 
@@ -41,7 +42,7 @@ This points `core.hooksPath` at `.githooks/` and installs three hooks:
 |---|---|---|
 | `commit-msg` | Every commit. Rejects messages that don't match the Conventional Commits format. | instant |
 | `pre-commit` | Every commit. Host tests + cmake configure (catches Kconfig syntax / `tools/kconfig.py` breakage). | ~1–2 s |
-| `pre-push` | Every push. Capability contract (`tools/test_cap_contract.sh`) + sample matrix (`tools/build_all_samples.sh`). Skips docs-only pushes. | ~30–60 s |
+| `pre-push` | Every push. Capability contract + Cortex-M4 sample matrix + AVR sample matrix (if `avr-gcc` is installed; otherwise skipped with a warning). Skips entirely for docs-only pushes. | ~60–90 s |
 
 The same checks gate PR merges in CI, so bypassing locally with `--no-verify` only delays the rejection.
 
@@ -76,8 +77,9 @@ This is what CI runs and what `pre-push` runs locally:
 
 ```bash
 tools/run_host_tests.sh         # pure-logic tests under host gcc
-tools/test_cap_contract.sh      # NAVHAL_HAS_* link-time gating
-tools/build_all_samples.sh      # every sample declared in Kconfig
+tools/test_cap_contract.sh      # NAVHAL_HAS_* link-time gating (Cortex-M4)
+tools/build_all_samples.sh      # every sample declared in Kconfig (Cortex-M4)
+tools/build_all_avr_samples.sh  # every portable sample under the AVR config
 ```
 
 A green run of all three is a strong predictor that CI will be green.
@@ -117,11 +119,12 @@ Enforced by `.githooks/commit-msg` locally and the `Commit message lint` job in 
 2. **Make focused commits.** One logical change per commit; rebase to clean up WIP commits before opening the PR.
 3. **Run local checks**: `pre-commit` and `pre-push` will run automatically, but you can run the full suite manually first if you want.
 4. **Push and open a PR**: `git push -u origin <branch>` then `gh pr create --fill`.
-5. **Wait for CI.** Five required checks gate the merge:
+5. **Wait for CI.** Six required checks gate the merge:
    * Host tests
    * Build on-target ELF
    * Capability contract
    * Build all samples
+   * Build all AVR samples
    * Commit message lint
 6. **Address review comments** as additional commits (don't force-push during review; squash on merge).
 7. **Squash-merge** when green (`gh pr merge --squash --auto` queues the merge for when CI passes).
@@ -140,9 +143,10 @@ See `docs/api_standardization.md` for the API contract.
 
 ## Adding a new sample
 
-1. Create `samples/<tier>/<NN>_<name>/main.c` and `CMakeLists.txt`.
-2. Add the matching `config SAMPLE_<NN>_<NAME>` entry to `Kconfig`. **Use `select DRV_<X>` for every driver your sample uses** — relying on Kconfig defaults breaks samples for users with stripped configs. The `Build all samples` CI job will catch this.
-3. Add the `default "<sample_name>" if SAMPLE_<NN>_<NAME>` line to the `config SAMPLE` block in `Kconfig`.
+1. Decide the tier — `samples/portable/` if it must run on every supported arch, `samples/cortex-m/` if it's Cortex-M-only, `samples/no_hal/` for bare-metal "without HAL" demos. Portable samples are built on **both** the Cortex-M4 and AVR matrices in CI; everything else only on Cortex-M4.
+2. Create `samples/<tier>/<NN>_<name>/main.c` and `CMakeLists.txt`.
+3. Add the matching `config SAMPLE_<NN>_<NAME>` entry to `Kconfig`. **Use `select DRV_<X>` for every driver your sample uses** — relying on Kconfig defaults breaks samples for users with stripped configs. The `Build all samples` CI job will catch this. Add `depends on ARCH_CORTEX_M4` for Cortex-M-only samples.
+4. Add the `default "<sample_name>" if SAMPLE_<NN>_<NAME>` line to the `config SAMPLE` block in `Kconfig`.
 
 ## Adding a new port (e.g. new MCU family)
 

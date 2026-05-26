@@ -1,0 +1,14 @@
+# NavHAL defconfig — ARM Cortex-M4 / STM32F4 / Nucleo-F401RE.
+#
+# Minimal Kconfig fragment: selects the arch / vendor / family / board.
+# Everything else (drivers, sample selection, capability flags) cascades
+# from Kconfig defaults.
+#
+# Used by cmake/toolchains/arm-none-eabi-toolchain.cmake — when that
+# toolchain file is active, CMakeLists.txt copies this into .config before
+# running tools/kconfig.py.
+
+CONFIG_ARCH_CORTEX_M4=y
+CONFIG_VENDOR_STM32=y
+CONFIG_FAMILY_STM32F4=y
+CONFIG_BOARD_NUCLEO_F401RE=y

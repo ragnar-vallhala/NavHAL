@@ -56,7 +56,16 @@ fi
 echo "[pre-push] cap contract..."
 tools/test_cap_contract.sh
 
-echo "[pre-push] sample matrix..."
+echo "[pre-push] sample matrix (cortex-m)..."
 tools/build_all_samples.sh
+
+echo "[pre-push] sample matrix (avr)..."
+if command -v avr-gcc >/dev/null; then
+  tools/build_all_avr_samples.sh
+else
+  echo "  WARN: avr-gcc not installed; skipping AVR sample matrix."
+  echo "        CI will run it on the PR. Install locally with:"
+  echo "          sudo apt install gcc-avr avr-libc binutils-avr"
+fi
 
 echo "[pre-push] ok"

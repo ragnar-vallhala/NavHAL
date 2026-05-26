@@ -1,0 +1,13 @@
+# NavHAL defconfig — AVR / ATmega328P (e.g. Arduino Uno).
+#
+# Minimal Kconfig fragment: selects the arch / vendor / family / board.
+# Everything else cascades from Kconfig defaults (drivers, samples, etc.).
+#
+# Used by cmake/toolchains/avr-toolchain.cmake — when that toolchain file
+# is active, CMakeLists.txt copies this into .config before running
+# tools/kconfig.py.
+
+CONFIG_ARCH_AVR8=y
+CONFIG_VENDOR_MICROCHIP=y
+CONFIG_FAMILY_ATMEGA328P=y
+CONFIG_BOARD_ATMEGA328P=y

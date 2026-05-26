@@ -115,3 +115,21 @@ jobs:
         run: pip install kconfiglib
       - name: Build every sample
         run: tools/build_all_samples.sh
+
+  # Same idea but on the AVR (ATmega328P) port. Builds only samples in
+  # samples/portable/ — those are the contract for "runs on both arches".
+  # Catches AVR-port regressions and breakage in the portable-sample tier.
+  sample-matrix-avr:
+    name: Build all AVR samples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install avr toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-avr avr-libc binutils-avr
+      - name: Install kconfiglib
+        run: pip install kconfiglib
+      - name: Build every portable sample under AVR config
+        run: tools/build_all_avr_samples.sh

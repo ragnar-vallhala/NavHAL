@@ -6,6 +6,15 @@ set(CMAKE_OSX_ARCHITECTURES "" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS_INIT "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_INIT "" CACHE STRING "" FORCE)
 
+# Load the toolchain file early. CMake normally loads it at project(),
+# which is well below the Kconfig invocation, but we need its variables
+# (notably NAVHAL_DEFCONFIG) visible to the seeding logic below. CMake
+# will load it again at project(); toolchain files are idempotent so the
+# re-load is harmless.
+if(CMAKE_TOOLCHAIN_FILE)
+    include("${CMAKE_TOOLCHAIN_FILE}")
+endif()
+
 # Kconfig Integration
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
@@ -15,6 +24,19 @@ set(CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.config")
 set(GENERATED_CMAKE "${CMAKE_BINARY_DIR}/config.cmake")
 set(GENERATED_HEADER "${CMAKE_BINARY_DIR}/autoconf.h")
 set(GENERATED_NAVHAL_TARGET "${CMAKE_BINARY_DIR}/navhal_target.h")
+
+# Defconfig seeding. A toolchain file (cmake/toolchains/*.cmake) can set
+# NAVHAL_DEFCONFIG to a Kconfig fragment naming the target arch / vendor /
+# family / board. When .config doesn't already exist, copy the fragment in
+# so the kconfig.py run below resolves the right target. This replaces
+# ad-hoc .config patching in cross-target build scripts.
+if(DEFINED NAVHAL_DEFCONFIG AND NOT EXISTS "${CONFIG_FILE}")
+    if(NOT EXISTS "${NAVHAL_DEFCONFIG}")
+        message(FATAL_ERROR "NAVHAL_DEFCONFIG points to '${NAVHAL_DEFCONFIG}' which does not exist")
+    endif()
+    message(STATUS "Seeding .config from ${NAVHAL_DEFCONFIG}")
+    configure_file("${NAVHAL_DEFCONFIG}" "${CONFIG_FILE}" COPYONLY)
+endif()
 
 message(STATUS "Running Kconfig configuration generation...")
 execute_process(
@@ -40,19 +62,24 @@ include(${GENERATED_CMAKE})
 # hardcoded defaults.
 include_directories(${CMAKE_BINARY_DIR})
 
-# Toolchain settings
-# Allow configuration from KConfig (via GENERATED_CMAKE) to override the default.
-if(NOT DEFINED TOOLCHAIN_PREFIX)
-    set(TOOLCHAIN_PREFIX "arm-none-eabi-")
+# Toolchain settings.
+# Preferred path: caller passes -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/<arch>.cmake
+# and the toolchain file sets the compiler. Legacy path: no toolchain file,
+# derive the compiler from CONFIG_TOOLCHAIN_PREFIX in .config. This keeps
+# `cmake -B build -DSAMPLE=hal_blink` working without a toolchain file for
+# Cortex-M4 / arm-none-eabi.
+if(NOT CMAKE_TOOLCHAIN_FILE)
+    if(NOT DEFINED TOOLCHAIN_PREFIX)
+        set(TOOLCHAIN_PREFIX "arm-none-eabi-")
+    endif()
+    set(TOOLCHAIN_PREFIX "${TOOLCHAIN_PREFIX}" CACHE STRING "Toolchain prefix for compiler binaries")
+    set(CMAKE_C_COMPILER   ${TOOLCHAIN_PREFIX}gcc)
+    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
+    set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+    set(CMAKE_OBJCOPY      ${TOOLCHAIN_PREFIX}objcopy)
+    set(CMAKE_BINARY_SIZE  ${TOOLCHAIN_PREFIX}size)
 endif()
-set(TOOLCHAIN_PREFIX "${TOOLCHAIN_PREFIX}" CACHE STRING "Toolchain prefix for compiler binaries")
-set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
-set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
-set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
-set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
-set(CMAKE_BINARY_SIZE ${TOOLCHAIN_PREFIX}size)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
 # set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
 # extern/NavHAL/CMakeLists.txt

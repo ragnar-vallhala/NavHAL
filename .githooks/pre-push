@@ -2,15 +2,21 @@
 # Heavier checks that run before `git push`. Matches the gating CI does on
 # the remote, so a green pre-push almost guarantees a green CI run.
 #
-# Runs:
-#   1. Capability contract — three on-target builds verifying NAVHAL_HAS_*
-#      gates symbols at link time (tools/test_cap_contract.sh).
-#   2. Sample matrix — every sample declared in Kconfig must build
-#      (tools/build_all_samples.sh).
+# Per arch, each block runs only if the corresponding cross-compiler is
+# installed. Missing toolchains print a WARN and the block is skipped —
+# the push still goes through, and the same checks run on the server
+# (where the toolchains are installed unconditionally), so a missing
+# local toolchain only delays the failure to PR time, never hides it.
 #
-# Total wall-clock: ~30-60s (28 sample builds + 3 test builds).
+#   1. arm-none-eabi-gcc present → cap contract + cortex-m sample matrix
+#      (tools/test_cap_contract.sh + tools/build_all_samples.sh).
+#   2. avr-gcc present → AVR portable-sample matrix
+#      (tools/build_all_avr_samples.sh).
 #
-# Skips itself if the push only touches docs/ or other non-build paths.
+# Total wall-clock when both toolchains are installed: ~60-90s.
+#
+# Skips itself entirely if the push only touches docs/ or other
+# non-build paths.
 #
 # Bypass with: git push --no-verify (do this only if you know CI will pass).
 
@@ -53,19 +59,34 @@ if [ "$DOCS_ONLY" = "1" ]; then
   exit 0
 fi
 
-echo "[pre-push] cap contract..."
-tools/test_cap_contract.sh
+ran_any=0
 
-echo "[pre-push] sample matrix (cortex-m)..."
-tools/build_all_samples.sh
+if command -v arm-none-eabi-gcc >/dev/null; then
+  echo "[pre-push] cap contract..."
+  tools/test_cap_contract.sh
+  echo "[pre-push] sample matrix (cortex-m)..."
+  tools/build_all_samples.sh
+  ran_any=1
+else
+  echo "  WARN: arm-none-eabi-gcc not installed; skipping cap contract"
+  echo "        and Cortex-M sample matrix. CI will run them on the PR."
+  echo "        Install locally with:"
+  echo "          sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi"
+fi
 
-echo "[pre-push] sample matrix (avr)..."
 if command -v avr-gcc >/dev/null; then
+  echo "[pre-push] sample matrix (avr)..."
   tools/build_all_avr_samples.sh
+  ran_any=1
 else
   echo "  WARN: avr-gcc not installed; skipping AVR sample matrix."
   echo "        CI will run it on the PR. Install locally with:"
   echo "          sudo apt install gcc-avr avr-libc binutils-avr"
+fi
+
+if [ "$ran_any" = "0" ]; then
+  echo "[pre-push] NOTE: no embedded toolchains present locally;"
+  echo "                 nothing was verified pre-push. Server CI gates the push."
 fi
 
 echo "[pre-push] ok"

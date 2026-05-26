@@ -1,3 +1,5 @@
+@page cap_stm32f401re Nucleo-F401RE (STM32F4)
+
 # Nucleo-F401RE (STM32F4 / Cortex-M4)
 
 The reference target for NavHAL v1. Everything in the public API has a working implementation here; the cap-contract CI runs against this build.

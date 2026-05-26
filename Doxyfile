@@ -944,7 +944,6 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = mainpage.md \
-                         README.md \
                          CONTRIBUTING.md \
                          CODE_OF_CONDUCT.md \
                          include \
@@ -1021,7 +1020,8 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */family/* \
                          */compat/* \
-                         */port/*/utils/*
+                         */port/*/utils/* \
+                         */_template.md
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

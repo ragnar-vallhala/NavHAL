@@ -1,6 +1,10 @@
+@page capabilities Capability Matrix
+
 # NavHAL — capability matrix
 
 What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro definitions and the contract semantics live in [`../api_standardization.md`](../api_standardization.md); this directory only tracks per-target availability and implementation status.
+
+**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_atmega328p
 
 ## Symbol legend
 

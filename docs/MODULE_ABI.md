@@ -1,3 +1,5 @@
+@page module_abi Module ABI (v1 draft)
+
 # Nav Module ABI — v1 (draft)
 
 > Mirrored in the `nav` repo at `docs/MODULE_ABI.md`. Keep both copies

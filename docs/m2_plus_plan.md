@@ -1,3 +1,5 @@
+@page m2_plus_plan M2+ Comprehensive Test Suite
+
 # M2+ — Comprehensive test suite
 
 **Status:** Approved 2026-05-21

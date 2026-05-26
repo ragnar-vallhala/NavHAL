@@ -1,3 +1,5 @@
+@page contributing Contributing
+
 # Contributing to NavHAL
 
 Thanks for your interest in NavHAL. This document covers how to file issues, set up a dev environment, and submit changes.

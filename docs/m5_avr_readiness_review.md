@@ -1,3 +1,5 @@
+@page m5_avr_readiness M5 AVR Readiness Review
+
 # M5 milestone gate — AVR readiness review
 
 The M5→M6 gate (`docs/execution_plan.md` §8): before starting the AVR /

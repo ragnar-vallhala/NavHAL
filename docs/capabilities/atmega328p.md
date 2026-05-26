@@ -1,3 +1,5 @@
+@page cap_atmega328p ATmega328P (AVR8)
+
 # ATmega328P (AVR8)
 
 The M6 target. An 8-bit AVR — none of the optional Cortex-M caps (DMA, FPU, DWT, SDIO) exist; the cap-gated symbols are absent from any AVR build by construction.

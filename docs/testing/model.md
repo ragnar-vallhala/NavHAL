@@ -1,3 +1,5 @@
+@page test_model Test Model — SIL / PIL / HIL
+
 # Test Model — SIL / PIL / HIL for NavHAL
 
 The classical verification ladder for embedded / control systems has

@@ -34,6 +34,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+      - name: Install kconfiglib
+        run: pip install kconfiglib
       - name: Build on-target ELF
         run: |
           cmake -B build-test -DTEST=ON

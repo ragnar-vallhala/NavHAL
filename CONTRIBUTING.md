@@ -152,6 +152,14 @@ See `docs/api_standardization.md` for the API contract.
 
 See `docs/api_standardization.md` and the existing AVR port under `src/arch/avr/` and `include/port/avr/` for the layered structure. New ports add directories, not build-system changes — the Kconfig schema already models per-arch / per-vendor / per-family / per-board state.
 
+Concretely, a new MCU needs:
+
+1. Source tree: `src/arch/<arch>/`, `src/vendor/<vendor>/`, `include/port/<arch>/`.
+2. Kconfig entries: `ARCH_<X>`, `VENDOR_<X>`, `FAMILY_<X>`, `BOARD_<X>` cascading defaults.
+3. Build glue: `cmake/toolchains/<slug>-toolchain.cmake` and `cmake/defconfigs/<slug>.defconfig` (the toolchain file points at the defconfig via `NAVHAL_DEFCONFIG`).
+4. CI job: a `Build all <arch> samples` job in `.github/workflows/ci.yml` (mirror the existing `sample-matrix-avr` job).
+5. Capability matrix page: copy [`docs/capabilities/_template.md`](docs/capabilities/_template.md) → `docs/capabilities/<board_slug>.md`, fill it in, and add a column to [`docs/capabilities/README.md`](docs/capabilities/README.md). The matrix should match what `navhal_target.h` actually emits for the target — verify with `grep NAVHAL_HAS_ build-<arch>/navhal_target.h`.
+
 ## Licensing of contributions
 
 By submitting a contribution, you agree that your work is licensed under the [Apache License 2.0](LICENSE.md). Apache 2.0 Section 5 makes this implicit for inbound contributions; no separate CLA is required.

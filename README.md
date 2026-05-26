@@ -1,7 +1,7 @@
 
 # NavHAL — NAVRobotec Hardware Abstraction Layer
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE.md)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/ragnar-vallhala/NavHAL/ci.yml?branch=main)](https://github.com/ragnar-vallhala/NavHAL/actions)
 [![Coverage](https://img.shields.io/codecov/c/github/ragnar-vallhala/NavHAL/main)](https://codecov.io/gh/ragnar-vallhala/NavHAL)
 [![Docs](https://img.shields.io/badge/docs-Doxygen-blue)](docs/html/index.html)
@@ -153,7 +153,9 @@ the `Host tests`, `Build on-target ELF`, `Capability contract`, and
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+Apache License 2.0 — see [LICENSE.md](LICENSE.md) for details.
+
+Copyright © 2025 NAVRobotec Pvt Ltd.
 
 ---
 

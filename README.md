@@ -121,7 +121,7 @@ Other docs in this repository:
 
 ## Contributing
 
-Contributions, bug reports, and feature requests are welcome. Please follow the coding style and submit pull requests.
+Contributions, bug reports, and feature requests are welcome. Please follow the coding style and submit pull requests. By participating you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ### Setting up local checks
 

@@ -99,6 +99,10 @@ if ! grep -q "Total failures:" "$LOGFILE"; then
   exit 1
 fi
 
-FAILURES=$(grep "Total failures:" "$LOGFILE" | tail -1 | awk '{print $3}')
+## The on-target firmware prints via UART with \r\n line endings, so awk's
+## third field ends in a stray CR. `$(...)` strips trailing LF but not CR,
+## which would make `exit "0\r"` fail with "numeric argument required" (exit
+## 2) — masking a 128/128 pass as a CI red. tr -d '\r' strips it.
+FAILURES=$(grep "Total failures:" "$LOGFILE" | tail -1 | awk '{print $3}' | tr -d '\r')
 echo ">> failures reported: $FAILURES"
 exit "$FAILURES"

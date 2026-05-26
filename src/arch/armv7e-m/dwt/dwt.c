@@ -28,8 +28,13 @@
 #include "navhal_port_config.h"
 #ifdef _DWT_ENABLED
 
+#include "navhal_port_clock.h"
 #include "navhal_port_dwt.h"
 #include "family/dwt_reg.h"
+
+// Cached at init time from hal_clock_get_sysclk(). Stale if sysclk is
+// reconfigured after init — call hal_cycle_counter_init again to refresh.
+static uint32_t _cycles_per_us = 0;
 
 hal_status_t hal_cycle_counter_init(void) {
   // 1. Enable CoreDebug TRCENA
@@ -40,6 +45,13 @@ hal_status_t hal_cycle_counter_init(void) {
 
   // 3. Enable CYCCNTENA
   DWT->CTRL |= DWT_CTRL_CYCCNTENA_BIT;
+
+  // 4. Cache cycles-per-microsecond. hal_clock_init must run before this.
+  uint32_t hz = hal_clock_get_sysclk();
+  _cycles_per_us = hz / 1000000U;
+  if (_cycles_per_us == 0) {
+    _cycles_per_us = 1; // sysclk < 1 MHz: clamp so delay_us still ticks
+  }
   return HAL_OK;
 }
 
@@ -55,6 +67,16 @@ void hal_cycle_counter_delay(uint32_t cycles) {
   while ((hal_cycle_counter_get() - start) < cycles) {
     __asm__ volatile("nop");
   }
+}
+
+uint32_t hal_cycle_counter_cycles_per_us(void) { return _cycles_per_us; }
+
+uint32_t hal_cycle_counter_get_us(void) {
+  return _cycles_per_us ? (DWT->CYCCNT / _cycles_per_us) : 0;
+}
+
+void hal_cycle_counter_delay_us(uint32_t us) {
+  hal_cycle_counter_delay(us * _cycles_per_us);
 }
 
 #endif /* _DWT_ENABLED */

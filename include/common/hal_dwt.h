@@ -61,6 +61,33 @@ hal_status_t hal_cycle_counter_reset(void);
  */
 void hal_cycle_counter_delay(uint32_t cycles);
 
+/**
+ * @brief Cycles per microsecond at the current sysclk.
+ *
+ * @details Cached at ::hal_cycle_counter_init time from
+ * ::hal_clock_get_sysclk — call @c hal_clock_init first. Returns 0 if
+ * ::hal_cycle_counter_init has not run yet.
+ */
+uint32_t hal_cycle_counter_cycles_per_us(void);
+
+/**
+ * @brief Microseconds since the last counter reset.
+ *
+ * @details Derived from the 32-bit cycle counter. Wraps at
+ * `UINT32_MAX / cycles_per_us` microseconds (≈51 s at 84 MHz). Use
+ * unsigned subtraction for delta math.
+ */
+uint32_t hal_cycle_counter_get_us(void);
+
+/**
+ * @brief Busy-wait for the given number of microseconds.
+ *
+ * @details Internally `us * cycles_per_us` must fit in a 32-bit value;
+ * at 84 MHz the largest single-call wait is ≈51 s. Split longer waits
+ * across multiple calls.
+ */
+void hal_cycle_counter_delay_us(uint32_t us);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

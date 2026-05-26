@@ -53,19 +53,17 @@ driver that has a software fallback.
 |---|---|
 | **Substrate** | The on-target ELF (cross-compiled with `arm-none-eabi-gcc`) running inside Renode against a modeled STM32F4 machine. |
 | **What runs** | The full `tests/` suite — the same binary that flashes to a real board. |
-| **Entry point** | `tools/renode/run_tests.sh build/tests` (locally), `Full suite in Renode` job in `.github/workflows/renode.yml` (CI — nightly + on demand). |
-| **Speed** | Slow. The full 142-test suite takes ~90 min wall-clock. Renode advances emulated time slower than wall-clock when the firmware busy-waits, and our `hal_clock_init` paths busy-wait on PLL/HSE ready flags that the Renode RCC model is slow to assert. |
+| **Entry point** | `tools/renode/run_tests.sh build/tests` (locally), `Full suite in Renode` job in `.github/workflows/renode.yml` (CI — push + pull_request to main, plus a nightly schedule and on demand). |
+| **Speed** | Acceptable for per-PR. Earlier estimates of ~90 min were dominated by Renode advancing emulated time slower than wall-clock when firmware busy-waits on PLL/HSE ready flags; that turned out to be much faster in practice on the current Renode build, so the job now gates PRs alongside `ci.yml`. The 150-min workflow timeout is a safety cap, not a typical runtime. |
 | **Output** | USART2 captured to a file by Renode's `CreateFileBackend`; the wrapper greps for `Total failures:` and exits with that count. |
 | **What it catches** | Register-write logic (does `hal_gpio_set_mode` actually flip the right bits in MODER?), ISA-level math (32-bit cycle counter wraparound, byte order), build-time integration (does the linker script + startup code actually run the suite to completion?). |
 | **What it can't catch** | Peripheral edge cases the model glosses over — e.g. real I²C arbitration timing, true SPI clock-data alignment, ADC noise, electrical issues, current draw, the exact NVIC pending-write behavior on real silicon. |
 
-Renode is intentionally **not** wired as a per-PR gate — the
-wall-clock cost is too high. Instead, it runs on a nightly schedule
-and on-demand via `workflow_dispatch`. Per-PR CI (`ci.yml`) still
-catches build breaks via `build-on-target` and the host subset via
-`host-tests`; the nightly Renode run is the slower follow-up that
-provides the "M3 refactor was behavior-preserving" signal M2+ planned
-for, just on a less aggressive cadence.
+Renode is wired as a per-PR gate (push + pull_request to main), with
+a nightly schedule kept as belt-and-suspenders. Together with
+`ci.yml`'s host-tests, build-on-target, cap-contract, and sample-matrix
+jobs, this gives every PR a "the refactor was behavior-preserving"
+signal before merge.
 
 The Renode `.resc` script (`tools/renode/navhal_f401re.resc`) currently
 loads the `stm32f4_discovery` board model. The F401RE shares its silicon

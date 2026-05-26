@@ -1,19 +1,18 @@
 name: Renode (PIL)
 
-# PIL (Processor-in-the-Loop) — the full M2+ on-target suite in a
-# Renode-emulated STM32F4. Empirically takes ~90 min wall-clock (the
-# firmware's clock-init busy-waits on PLL/HSE flags that the Renode
-# RCC model is slow to assert). Too expensive to gate every PR on, so
-# this lives in a separate workflow that runs:
+# PIL (Processor-in-the-Loop) — runs the on-target ELF in a
+# Renode-emulated STM32F4. Wired as a per-PR gate: triggers on push +
+# pull_request to main, plus the nightly schedule (belt-and-suspenders)
+# and workflow_dispatch for ad-hoc runs.
 #
-#   - nightly at 02:30 UTC,
-#   - on demand via the Actions tab (`workflow_dispatch`).
-#
-# CI gating per PR is handled by `.github/workflows/ci.yml`, which
-# does host-tests + build-on-target + build-no-cap (each ~minute).
-# See docs/testing/model.md §"PIL" for the cost/benefit reasoning.
+# The 150-min timeout below is a safety cap, not a typical-runtime
+# guess. See docs/testing/model.md §"PIL" for what the run covers.
 
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   schedule:
     - cron: "30 2 * * *"
   workflow_dispatch:
@@ -49,5 +48,5 @@ jobs:
             "https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/${RENODE_DEB}"
           sudo apt-get install -y "./${RENODE_DEB}"
           renode --version
-      - name: Run navtest in Renode (slow — ~90 min)
+      - name: Run navtest in Renode
         run: tools/renode/run_tests.sh build-test/tests

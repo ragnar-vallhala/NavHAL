@@ -68,11 +68,9 @@ jobs:
           path: build-test/tests
           retention-days: 7
 
-  # NOTE: PIL (Renode) runs are too slow per PR — the full M2+ suite takes
-  # ~90 min wall-clock because the firmware's clock-init busy-waits on
-  # PLL/HSE flags that Renode's RCC model is slow to assert. That job
-  # lives in `.github/workflows/renode.yml` and runs on a nightly
-  # schedule + `workflow_dispatch` instead.
+  # NOTE: PIL (Renode) runs live in `.github/workflows/renode.yml`,
+  # gated on the same push + pull_request events. The `Full suite in
+  # Renode` job there should also be a required-status-check.
 
   # NAVHAL_HAS_* capability contract — verifies that disabling a cap in
   # Kconfig actually drops its driver symbols from the test ELF, AND that

@@ -42,7 +42,7 @@ A `✓` here is a statement about both *hardware presence* and *current driver c
 
 ## Adding a new MCU
 
-1. Copy [`_template.md`](_template.md) → `docs/capabilities/<board>.md`. Fill in the metadata, the per-capability rows, and any caveats. Each capability row must justify its symbol — link to the datasheet section, name the driver file, or cite the limitation.
+1. Copy `_template.md` → `docs/capabilities/<board>.md`. Fill in the metadata, the per-capability rows, and any caveats. Each capability row must justify its symbol — link to the datasheet section, name the driver file, or cite the limitation.
 2. Add a column to the matrix above (right of the existing columns).
 3. Reference the new page from any existing rows that gain a status (e.g. partial-implementation footnotes).
 4. Add the MCU's defconfig under `cmake/defconfigs/` and the toolchain file under `cmake/toolchains/` (see [CONTRIBUTING.md](../../CONTRIBUTING.md#adding-a-new-port-eg-new-mcu-family)).

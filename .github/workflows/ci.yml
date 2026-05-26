@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, stable]   # `stable` so the release-gate PR also runs the per-PR suite
   workflow_dispatch:
 
 concurrency:

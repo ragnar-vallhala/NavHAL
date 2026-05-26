@@ -946,6 +946,7 @@ WARN_LOGFILE           =
 INPUT                  = mainpage.md \
                          CONTRIBUTING.md \
                          CODE_OF_CONDUCT.md \
+                         LICENSE.md \
                          include \
                          docs
 
@@ -1020,7 +1021,6 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */family/* \
                          */compat/* \
-                         */port/*/utils/* \
                          */_template.md
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
@@ -2388,7 +2388,31 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             =
+PREDEFINED             = _DMA_ENABLED \
+                         _FPU_ENABLED \
+                         _CRC_HW_ENABLED \
+                         _DWT_ENABLED \
+                         _SDIO_ENABLED \
+                         _UART_BACKEND_DMA \
+                         _I2C_BACKEND_DMA \
+                         _SDIO_BACKEND_DMA \
+                         NAVHAL_HAS_DMA=1 \
+                         NAVHAL_HAS_FPU=1 \
+                         NAVHAL_HAS_CRC_HW=1 \
+                         NAVHAL_HAS_CYCLE_COUNTER=1 \
+                         NAVHAL_HAS_SDIO=1 \
+                         NAVHAL_HAS_GPIO=1 \
+                         NAVHAL_HAS_UART=1 \
+                         NAVHAL_HAS_I2C=1 \
+                         NAVHAL_HAS_SPI=1 \
+                         NAVHAL_HAS_TIMER=1 \
+                         NAVHAL_HAS_PWM=1 \
+                         NAVHAL_HAS_CLOCK=1 \
+                         NAVHAL_HAS_INTERRUPT=1 \
+                         NAVHAL_HAS_FLASH=1 \
+                         NAVHAL_HAS_UART_DMA=1 \
+                         NAVHAL_HAS_I2C_DMA=1 \
+                         NAVHAL_HAS_SDIO_DMA=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

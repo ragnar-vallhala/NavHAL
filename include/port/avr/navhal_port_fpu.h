@@ -19,7 +19,7 @@
  * @file port/avr/navhal_port_fpu.h
  * @brief AVR / ATmega328P FPU port header.
  *
- * The ATmega328P has no hardware FPU (::NAVHAL_HAS_FPU is 0). @c hal_fpu_enable
+ * The ATmega328P has no hardware FPU (@c NAVHAL_HAS_FPU is 0). @c hal_fpu_enable
  * returns ::HAL_ERR_NOT_SUPPORTED on this target. No port-specific
  * declarations here.
  */

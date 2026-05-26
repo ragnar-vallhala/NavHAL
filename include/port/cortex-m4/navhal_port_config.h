@@ -21,9 +21,10 @@
  *
  * @details
  * Bridges the Kconfig-generated @c NAVHAL_HAS_* macros (in @c navhal_target.h)
- * into the legacy @c _*_ENABLED flags that the driver tree #ifdefs on. When a
- * capability is off in Kconfig, the corresponding @c _*_ENABLED flag is not
- * defined and the matching driver source compiles to nothing — matching the
+ * into the legacy @c _*_ENABLED flags that the driver tree's preprocessor
+ * guards check. When a capability is off in Kconfig, the corresponding
+ * @c _*_ENABLED flag is not defined and the matching driver source compiles
+ * to nothing — matching the
  * AVR port's behaviour, where this header is empty.
  */
 #ifndef NAVHAL_PORT_CONFIG_H

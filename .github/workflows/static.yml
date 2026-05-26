@@ -1,15 +1,14 @@
 # Builds the Doxygen API site and publishes it to GitHub Pages.
 #
-# Triggered on push to `docs` (the branch convention is that `docs`
-# mirrors `main`). Runs Doxygen against the source tree at the pushed
-# revision — the rendered HTML is NOT checked into the repo (docs/html/
-# stays gitignored to avoid churning the diff with generated output and
-# bloating clones).
+# Triggered on every push to `main`. Runs Doxygen against the source
+# tree at the pushed revision — the rendered HTML is NOT checked into
+# the repo (docs/html/ stays gitignored to avoid churning the diff with
+# generated output and bloating clones).
 name: Deploy Doxygen site to Pages
 
 on:
   push:
-    branches: ["docs"]
+    branches: ["main"]
   workflow_dispatch:
 
 # Token scopes needed by the upload + deploy actions.

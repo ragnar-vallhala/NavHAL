@@ -123,17 +123,28 @@ Enforced by `.githooks/commit-msg` locally and the `Commit message lint` job in 
 2. **Make focused commits.** One logical change per commit; rebase to clean up WIP commits before opening the PR.
 3. **Run local checks**: `pre-commit` and `pre-push` will run automatically, but you can run the full suite manually first if you want.
 4. **Push and open a PR**: `git push -u origin <branch>` then `gh pr create --fill`.
-5. **Wait for CI.** Six required checks gate the merge:
+5. **Wait for CI.** Required checks for PRs to `main`:
    * Host tests
    * Build on-target ELF
    * Capability contract
    * Build all samples
    * Build all AVR samples
    * Commit message lint
+   * Full suite in Renode (PIL)
 6. **Address review comments** as additional commits (don't force-push during review; squash on merge).
 7. **Squash-merge** when green (`gh pr merge --squash --auto` queues the merge for when CI passes).
 
 `main` is a protected branch — direct pushes are blocked. Every change goes through a PR.
+
+## Promoting main → stable (release gate)
+
+`stable` is the release branch. Promoting `main` into it requires the heavier release-gate suite to pass. Open a PR from `main` to `stable`; the per-PR jobs above all fire (`pull_request.branches` includes `stable`), **plus** the heavier checks in `.github/workflows/release-gate.yml`:
+
+* **License header on every source file** — every `.c` / `.h` / `.cpp` / `.hpp` / `.s` must carry the Apache 2.0 header.
+* **Doxygen builds warning-free** (`WARN_AS_ERROR=YES`) — strict doc-quality gate; catches broken `@ref`, undocumented public symbols, malformed groups.
+* **Host tests under ASan + UBSan** — catches use-after-free / signed overflow / null deref classes of bugs that plain host tests miss.
+* **Reproducible build** (soft today) — builds the test ELF twice; will become a hard gate once `-fdebug-prefix-map` / `SOURCE_DATE_EPOCH` plumbing lands.
+* **`Release gate complete`** — aggregator job. Add this single name to `stable`'s branch protection `contexts` along with the per-PR check names.
 
 ## Code style
 
@@ -162,7 +173,12 @@ Concretely, a new MCU needs:
 2. Kconfig entries: `ARCH_<X>`, `VENDOR_<X>`, `FAMILY_<X>`, `BOARD_<X>` cascading defaults.
 3. Build glue: `cmake/toolchains/<slug>-toolchain.cmake` and `cmake/defconfigs/<slug>.defconfig` (the toolchain file points at the defconfig via `NAVHAL_DEFCONFIG`).
 4. CI job: a `Build all <arch> samples` job in `.github/workflows/ci.yml` (mirror the existing `sample-matrix-avr` job).
-5. Capability matrix page: copy [`docs/capabilities/_template.md`](docs/capabilities/_template.md) → `docs/capabilities/<board_slug>.md`, fill it in, and add a column to [`docs/capabilities/README.md`](docs/capabilities/README.md). The matrix should match what `navhal_target.h` actually emits for the target — verify with `grep NAVHAL_HAS_ build-<arch>/navhal_target.h`.
+5. Capability matrix page: copy `docs/capabilities/_template.md` → `docs/capabilities/<board_slug>.md`, fill it in, and add a column to [`docs/capabilities/README.md`](docs/capabilities/README.md). The matrix should match what `navhal_target.h` actually emits for the target — verify with `grep NAVHAL_HAS_ build-<arch>/navhal_target.h`.
+6. Test-suite portability: any test under `tests/` that pokes target-specific registers must be wrapped in `#if defined(__<arch>__)` so it compiles out on other arches. Add a branch to `tests/navtest_target.h` that maps `NAVTEST_UART` to whichever HAL UART instance the board routes to its serial console. Cap-gated tests (DMA / FPU / SDIO / DWT) compile out automatically via `NAVHAL_HAS_*`.
+7. PIL (Processor-in-the-Loop) integration:
+   * Add `tools/pil/boards/<board>.conf` with the toolchain file, build dir, runner script, and apt deps. See `tools/pil/boards/atmega328p.conf` as the minimal example or `nucleo_f401re.conf` as the full one (with `SETUP_SCRIPT=` for non-apt installs like Renode).
+   * Pick the emulator and provide a runner under `tools/<emulator>/run_tests.sh` (mirror `tools/simavr/run_tests.sh` — it's <100 lines).
+   * Add the board to the matrix in `.github/workflows/renode.yml`'s `strategy.matrix.board` list. The dispatcher `tools/pil/run.sh <board>` handles everything else.
 
 ## Licensing of contributions
 

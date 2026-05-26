@@ -1,52 +1,42 @@
-name: Renode (PIL)
+name: PIL (per-arch)
 
-# PIL (Processor-in-the-Loop) — runs the on-target ELF in a
-# Renode-emulated STM32F4. Wired as a per-PR gate: triggers on push +
-# pull_request to main, plus the nightly schedule (belt-and-suspenders)
-# and workflow_dispatch for ad-hoc runs.
+# Per-arch PIL (Processor-in-the-Loop). One matrix job per board defined
+# under tools/pil/boards/<name>.conf. Adding a new MCU is:
 #
-# The 150-min timeout below is a safety cap, not a typical-runtime
-# guess. See docs/testing/model.md §"PIL" for what the run covers.
+#   1. tools/pil/boards/<name>.conf  (arch, toolchain file, runner, deps)
+#   2. optional tools/pil/setup/<name>.sh  (non-apt deps; install-renode.sh
+#      is the example)
+#   3. add the board name to the matrix list below
+#
+# That's it — no per-board step blocks. tools/pil/run.sh dispatches.
 
 on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, stable]
   schedule:
     - cron: "30 2 * * *"
   workflow_dispatch:
 
 concurrency:
-  group: renode-${{ github.ref }}
+  group: pil-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  renode:
-    name: Full suite in Renode
+  pil:
+    name: PIL ${{ matrix.board }}
     runs-on: ubuntu-latest
-    timeout-minutes: 150  # Renode RunFor cap is 3h emulated; wall-clock is shorter.
+    timeout-minutes: 150  # generous cap; AVR finishes in seconds, Renode in minutes
+    strategy:
+      fail-fast: false
+      matrix:
+        board: [nucleo_f401re, atmega328p]
     steps:
       - uses: actions/checkout@v4
-      - name: Install arm-none-eabi toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
       - name: Install kconfiglib
         run: pip install kconfiglib
-      - name: Build on-target ELF
-        run: |
-          cmake -B build-test -DTEST=ON
-          cmake --build build-test --target tests -j
-          arm-none-eabi-size build-test/tests
-      - name: Install Renode
-        run: |
-          RENODE_VERSION=1.16.1
-          RENODE_DEB=renode_${RENODE_VERSION}_amd64.deb
-          curl -sSL -o "$RENODE_DEB" \
-            "https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/${RENODE_DEB}"
-          sudo apt-get install -y "./${RENODE_DEB}"
-          renode --version
-      - name: Run navtest in Renode
-        run: tools/renode/run_tests.sh build-test/tests
+      - name: Install ${{ matrix.board }} deps
+        run: tools/pil/run.sh ${{ matrix.board }} --install-deps
+      - name: Build + run PIL for ${{ matrix.board }}
+        run: tools/pil/run.sh ${{ matrix.board }}

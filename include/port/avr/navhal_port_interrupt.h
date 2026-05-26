@@ -21,7 +21,7 @@
  *
  * @details
  * Standardized interrupt API (see `docs/api_standardization.md`). IRQs are
- * identified by ::hal_irq_t. The ATmega328P has no NVIC: there is no
+ * identified by @c hal_irq_t. The ATmega328P has no NVIC: there is no
  * per-vector priority and no per-vector pending/enable register, so the AVR
  * backend (src/arch/avr/) maps this API onto `sei`/`cli`, the per-peripheral
  * enable bits, and a callback table. The @p priority argument is accepted and

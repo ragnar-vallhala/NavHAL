@@ -62,13 +62,19 @@ extern "C" {
  * within a single firmware run.
  */
 static inline bool navtest_in_pil(void) {
+#if !defined(__arm__) && !defined(__thumb__)
+  /* Non-Cortex targets (e.g. AVR) have no DWT / SCS — the PIL probe is
+   * meaningless there. Return false; emulator-vs-real-board distinction
+   * on those targets is handled by the per-arch runner script. */
+  return false;
+#else
   static int _cached = -1; /* -1 = unknown, 0 = HIL, 1 = PIL */
   if (_cached >= 0)
     return _cached != 0;
 
   /* Enable TRCENA and CYCCNTENA. On Renode these writes are silenced. */
-  *_NAVTEST_DEMCR |= (1U << 24);
-  *_NAVTEST_DWT_CTRL |= 1U;
+  *_NAVTEST_DEMCR |= (1UL << 24);
+  *_NAVTEST_DWT_CTRL |= 1UL;
 
   uint32_t a = *_NAVTEST_DWT_CYCCNT;
   for (volatile int i = 0; i < 1000; i++)
@@ -77,6 +83,7 @@ static inline bool navtest_in_pil(void) {
 
   _cached = (a == b) ? 1 : 0;
   return _cached != 0;
+#endif
 }
 
 /**

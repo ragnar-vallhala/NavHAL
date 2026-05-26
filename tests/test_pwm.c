@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+
+/* Cortex-M only: includes STM32 family/X_reg.h for white-box checks. */
+#if defined(__arm__) || defined(__thumb__)
+
 #include "navhal_port_clock.h"
 #include "navhal_port_pwm.h"
 #include "family/rcc_reg.h"
@@ -170,3 +174,5 @@ const navtest_suite_t test_pwm_suite = {
     .count = sizeof(pwm_cases) / sizeof(pwm_cases[0]),
     .between = NULL,
 };
+
+#endif /* __arm__ || __thumb__ */

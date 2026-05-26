@@ -27,10 +27,12 @@
 #include "navtest/navtest.h"
 
 #ifndef NAVTEST_HOST
-/* Target backend: route navtest output to UART2. The host backend lives in
- * tests/host/host_backend.c and routes to stdout. */
+/* Target backend: route navtest output to the per-target console UART
+ * (NAVTEST_UART, defined in tests/navtest_target.h per arch). The host
+ * backend lives in tests/host/host_backend.c and routes to stdout. */
 #include "navhal_port_uart.h"
-void navtest_write(const char *s) { uart2_write(s); }
+#include "navtest_target.h"
+void navtest_write(const char *s) { hal_uart_print(NAVTEST_UART, (char *)s); }
 #endif
 
 /* Global state */

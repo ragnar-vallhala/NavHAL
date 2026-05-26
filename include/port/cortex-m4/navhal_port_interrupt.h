@@ -23,7 +23,7 @@
  * Standardized interrupt API (see `docs/api_standardization.md`). All public
  * functions use the `hal_interrupt_` prefix and `snake_case` verbs. Per-IRQ
  * control operations return ::hal_status_t; queries return their value
- * directly. IRQs are identified by ::hal_irq_t.
+ * directly. IRQs are identified by @c hal_irq_t.
  */
 
 #ifndef NAVHAL_PORT_INTERRUPT_H

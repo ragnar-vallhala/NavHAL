@@ -17,9 +17,10 @@
 
 #define CORTEX_M4
 #include "navhal.h"
+#include "navtest_target.h"
 
 int putchar(int ch) {
-  hal_uart_write_char(HAL_UART_2, ch);
+  hal_uart_write_char(NAVTEST_UART, ch);
   return ch;
 }
 

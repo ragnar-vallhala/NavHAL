@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+
+/* Cortex-M only: this file pokes STM32 registers directly. */
+#if defined(__arm__) || defined(__thumb__)
+
 /**
  * @file tests/test_gpio.c
  * @brief Standardized hal_gpio_* API tests (success + error paths).
@@ -192,3 +196,5 @@ const navtest_suite_t test_gpio_suite = {
     .count = sizeof(gpio_cases) / sizeof(gpio_cases[0]),
     .between = NULL,
 };
+
+#endif /* __arm__ || __thumb__ */

@@ -21,6 +21,7 @@
 #include "navhal_port_uart.h"
 #include "navhal.h"
 #include "navtest/navtest.h"
+#include "navtest_target.h"
 
 #include "test_clock.h"
 #include "test_crc.h"
@@ -39,12 +40,21 @@
 #include "test_uart_protocol.h"
 
 static const navtest_suite_t *const all_suites[] = {
+/* Cortex-M-only white-box suites — the underlying .c files are gated
+ * the same way; this branch keeps the symbol references out of the
+ * AVR-targeted link. Portable HAL-only test suites (timebase, crc,
+ * flash) stay outside the gate so they run on every supported arch. */
+#if defined(__arm__) || defined(__thumb__)
     &test_gpio_suite,
     &test_interrupt_suite,
-    &test_timebase_suite,
     &test_timer_suite,
     &test_clock_suite,
     &test_pwm_suite,
+    &test_uart_protocol_suite,
+    &test_i2c_suite,
+    &test_spi_suite,
+#endif
+    &test_timebase_suite,
 #if NAVHAL_HAS_DMA
     &test_dma_suite,
 #endif
@@ -55,9 +65,6 @@ static const navtest_suite_t *const all_suites[] = {
 #if NAVHAL_HAS_FPU
     &test_fpu_suite,
 #endif
-    &test_uart_protocol_suite,
-    &test_i2c_suite,
-    &test_spi_suite,
     &test_flash_suite,
 #if NAVHAL_HAS_SDIO
     &test_sdio_suite,
@@ -65,14 +72,14 @@ static const navtest_suite_t *const all_suites[] = {
 };
 
 static void print_startup_message(void) {
-  hal_uart_write_char(HAL_UART_2, 0x1B); // ESC
-  hal_uart_write_char(HAL_UART_2, '[');
-  hal_uart_write_char(HAL_UART_2, '2');
-  hal_uart_write_char(HAL_UART_2, 'J');
+  hal_uart_write_char(NAVTEST_UART, 0x1B); // ESC
+  hal_uart_write_char(NAVTEST_UART, '[');
+  hal_uart_write_char(NAVTEST_UART, '2');
+  hal_uart_write_char(NAVTEST_UART, 'J');
 
-  hal_uart_write_char(HAL_UART_2, 0x1B); // ESC
-  hal_uart_write_char(HAL_UART_2, '[');
-  hal_uart_write_char(HAL_UART_2, 'H');
+  hal_uart_write_char(NAVTEST_UART, 0x1B); // ESC
+  hal_uart_write_char(NAVTEST_UART, '[');
+  hal_uart_write_char(NAVTEST_UART, 'H');
   const char *msg = "\r\n"
                     "|========================================|\r\n"
                     "|    NAVrobotec Private Limited          |\r\n"
@@ -81,12 +88,12 @@ static void print_startup_message(void) {
                     "|========================================|\r\n";
 
   for (const char *p = msg; *p != '\0'; p++) {
-    hal_uart_write_char(HAL_UART_2, *p);
+    hal_uart_write_char(NAVTEST_UART, *p);
   }
 }
 
 int main(void) {
-  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
+  hal_uart_init(NAVTEST_UART, &(hal_uart_config_t){.baudrate=9600});
 #if NAVHAL_HAS_FPU
   hal_fpu_enable();
 #endif
@@ -100,12 +107,12 @@ int main(void) {
     total_tests += all_suites[i]->count;
   }
 
-  hal_uart_print(HAL_UART_2, "\n\n=========== FINAL RESULTS ===========\n\n");
-  hal_uart_print(HAL_UART_2, "Total tests run: ");
+  hal_uart_print(NAVTEST_UART, "\n\n=========== FINAL RESULTS ===========\n\n");
+  hal_uart_print(NAVTEST_UART, "Total tests run: ");
   _navtest_print_uint32(total_tests);
-  hal_uart_print(HAL_UART_2, "\nTotal failures:  ");
+  hal_uart_print(NAVTEST_UART, "\nTotal failures:  ");
   _navtest_print_uint32((uint32_t)failed);
-  hal_uart_print(HAL_UART_2, "\n");
+  hal_uart_print(NAVTEST_UART, "\n");
 
   return failed;
 }

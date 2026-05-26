@@ -243,13 +243,19 @@ if(TEST)
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
   add_executable(tests ${TEST_SRC} ${STARTUP_FILE})
-  target_link_libraries(tests PRIVATE c gcc)
-  set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib ${FPU_FLAGS}")
-  
-  # Dynamic architecture options for test compiler flags
+
+  # Per-arch test linker + flags.
+  # Cortex-M4: custom linker script with our own startup, -nostdlib so
+  #   newlib's _exit / _sbrk etc. don't get pulled in.
+  # AVR: avr-libc supplies startup + crt0; no custom linker script,
+  #   and `-mmcu=` (already in ARCH_C_FLAGS) selects the target part.
   set(TEST_FLAGS "-fno-exceptions" "-fno-unwind-tables" "-fno-asynchronous-unwind-tables")
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
       list(APPEND TEST_FLAGS "-march=armv7e-m")
+      set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib ${FPU_FLAGS}")
+      target_link_libraries(tests PRIVATE c gcc)
+  elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
+      set(CMAKE_EXE_LINKER_FLAGS "-mmcu=${AVR_MCU}")
   endif()
   
   target_compile_options(tests PRIVATE ${TEST_FLAGS})

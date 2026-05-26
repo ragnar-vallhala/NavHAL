@@ -123,6 +123,30 @@ Other docs in this repository:
 
 Contributions, bug reports, and feature requests are welcome. Please follow the coding style and submit pull requests. By participating you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
+### Commit message format
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/). Subject line:
+
+```
+<type>[(<scope>)][!]: <subject>
+```
+
+* **type** is one of: `feat fix docs style refactor perf test build ci chore revert`.
+* **scope** (optional) names the affected area, e.g. `(uart)`, `(caps)`, `(samples)`.
+* **!** marks a breaking change.
+* Subject is ≤ 72 chars, imperative mood preferred, no trailing period.
+
+Examples:
+
+```
+feat(uart): add hal_uart_write_dma_async
+fix(caps): hal_fpu_enable absent when DRV_FPU=n
+docs: link CoC from README
+chore!: drop AVR sub-cap fallback (breaking)
+```
+
+Enforced locally by `.githooks/commit-msg` and on PRs by the `Commit message lint` CI job.
+
 ### Setting up local checks
 
 After cloning, install the repo's git hooks so the same checks CI runs gate every commit and push:
@@ -133,6 +157,8 @@ tools/install-hooks.sh
 
 This sets `core.hooksPath` to `.githooks/`, installing:
 
+* **`commit-msg`** (~instant): rejects commit messages that don't match the
+  Conventional Commits format above.
 * **`pre-commit`** (~1–2 s): host tests + cmake configure. Catches Kconfig
   syntax errors and breakage in `tools/kconfig.py`.
 * **`pre-push`** (~30–60 s): capability contract (`tools/test_cap_contract.sh`)

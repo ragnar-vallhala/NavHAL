@@ -29,6 +29,15 @@
 #ifndef HAL_CONFIG_H
 #define HAL_CONFIG_H
 
+/**
+ * @defgroup HAL_CONFIG Config
+ * @ingroup HAL_CORE
+ * @brief Build-time capability flag entry point.
+ * @{
+ */
+
 #include "navhal_port_config.h"
 
+
+/** @} */ /* end of group HAL_CONFIG */
 #endif /* HAL_CONFIG_H */

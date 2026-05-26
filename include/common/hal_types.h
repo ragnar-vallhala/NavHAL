@@ -29,6 +29,13 @@
 #ifndef HAL_TYPES_H
 #define HAL_TYPES_H
 
+/**
+ * @defgroup HAL_TYPES Types
+ * @ingroup HAL_CORE
+ * @brief Cross-driver shared type aliases.
+ * @{
+ */
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -67,4 +74,6 @@ extern "C" {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_TYPES */
 #endif /* HAL_TYPES_H */

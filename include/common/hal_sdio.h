@@ -37,6 +37,13 @@
 #ifndef HAL_SDIO_H
 #define HAL_SDIO_H
 
+/**
+ * @defgroup HAL_SDIO Sdio
+ * @ingroup HAL_DRIVERS
+ * @brief Secure Digital I/O controller for SD-card access.
+ * @{
+ */
+
 #include "common/hal_config.h" /* sources the _SDIO_ENABLED capability flag */
 #include <stdint.h>
 
@@ -173,4 +180,6 @@ uint32_t hal_sdio_get_sector_count(void);
 /* Port-specific bits: register-bit defines, async/DMA prototypes, compat. */
 #include "navhal_port_sdio.h"
 
+
+/** @} */ /* end of group HAL_SDIO */
 #endif /* HAL_SDIO_H */

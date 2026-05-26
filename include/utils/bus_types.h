@@ -18,6 +18,13 @@
 #ifndef BUS_TYPES_H
 #define BUS_TYPES_H
 
+/**
+ * @defgroup HAL_UTIL_BUS_TYPES Bus Types
+ * @ingroup HAL_UTILS
+ * @brief Generic bus-address aliases.
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,4 +40,6 @@ typedef enum
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_UTIL_BUS_TYPES */
 #endif // !BUS_TYPES_H

@@ -29,6 +29,13 @@
 #ifndef HAL_DWT_H
 #define HAL_DWT_H
 
+/**
+ * @defgroup HAL_CYCLE_COUNTER Cycle Counter
+ * @ingroup HAL_DRIVERS
+ * @brief High-resolution cycle counter (DWT or equivalent).
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include <stdint.h>
 
@@ -95,4 +102,6 @@ void hal_cycle_counter_delay_us(uint32_t us);
 /* Port-specific bits (compat shim, deprecated names). */
 #include "navhal_port_dwt.h"
 
+
+/** @} */ /* end of group HAL_CYCLE_COUNTER */
 #endif /* HAL_DWT_H */

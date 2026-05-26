@@ -49,6 +49,13 @@
 #define HAL_DMA_H
 
 
+/**
+ * @defgroup HAL_DMA Dma
+ * @ingroup HAL_DRIVERS
+ * @brief Direct Memory Access controller.
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -206,4 +213,6 @@ typedef hal_dma_config_t dma_config_t NAVHAL_DEPRECATED("use hal_dma_config_t");
 /* Port-specific bits: register map, deprecated-function compat shim. */
 #include "navhal_port_dma.h"
 
+
+/** @} */ /* end of group HAL_DMA */
 #endif /* HAL_DMA_H */

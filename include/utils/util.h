@@ -17,6 +17,13 @@
 
 #ifndef HAL_UTIL_H
 #define HAL_UTIL_H
+/**
+ * @defgroup HAL_UTIL_GENERIC Util Generic
+ * @ingroup HAL_UTILS
+ * @brief Miscellaneous utility macros.
+ * @{
+ */
+
 #include <stdint.h>
 
 
@@ -33,4 +40,6 @@ char *hal_strchr(const char *s, int c);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_UTIL_GENERIC */
 #endif // !HAL_UTIL_H

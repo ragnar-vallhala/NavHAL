@@ -26,6 +26,13 @@
 #ifndef CRC_TYPES_H
 #define CRC_TYPES_H
 
+/**
+ * @defgroup HAL_UTIL_CRC_TYPES Crc Types
+ * @ingroup HAL_UTILS
+ * @brief CRC polynomial / parameter type definitions.
+ * @{
+ */
+
 #include "common/navhal_compiler.h"
 #include <stdint.h>
 
@@ -66,4 +73,6 @@ typedef hal_crc_config_t crc_config_t NAVHAL_DEPRECATED("use hal_crc_config_t");
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_UTIL_CRC_TYPES */
 #endif /* CRC_TYPES_H */

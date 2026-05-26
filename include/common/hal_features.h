@@ -45,6 +45,13 @@
 #ifndef HAL_FEATURES_H
 #define HAL_FEATURES_H
 
+/**
+ * @defgroup HAL_FEATURES Features
+ * @ingroup HAL_CORE
+ * @brief NAVHAL_HAS_* capability macros for portable feature detection.
+ * @{
+ */
+
 #include "common/hal_config.h" /* pulls in the target's _<feature>_ENABLED flags */
 
 
@@ -96,4 +103,6 @@ extern "C" {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_FEATURES */
 #endif /* HAL_FEATURES_H */

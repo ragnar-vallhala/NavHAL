@@ -29,6 +29,13 @@
 #ifndef HAL_CLOCK_H
 #define HAL_CLOCK_H
 
+/**
+ * @defgroup HAL_CLOCK Clock
+ * @ingroup HAL_DRIVERS
+ * @brief System clock configuration and queries.
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include "utils/clock_types.h"
 #include <stdint.h>
@@ -84,4 +91,6 @@ uint32_t hal_clock_get_apb2clk(void);
 
 #include "navhal_port_clock.h"
 
+
+/** @} */ /* end of group HAL_CLOCK */
 #endif /* HAL_CLOCK_H */

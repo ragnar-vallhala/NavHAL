@@ -26,6 +26,13 @@
 #ifndef HAL_DISKIO_H
 #define HAL_DISKIO_H
 
+/**
+ * @defgroup HAL_DISKIO Diskio
+ * @ingroup HAL_DRIVERS
+ * @brief Block-device disk I/O interface (read/write/ioctl).
+ * @{
+ */
+
 #include <stdint.h>
 
 
@@ -85,4 +92,6 @@ hal_disk_result_t hal_disk_ioctl(uint8_t pdrv, uint8_t cmd, void *buff);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_DISKIO */
 #endif // !HAL_DISKIO_H

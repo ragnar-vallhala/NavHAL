@@ -29,6 +29,13 @@
 #ifndef HAL_FLASH_H
 #define HAL_FLASH_H
 
+/**
+ * @defgroup HAL_FLASH Flash
+ * @ingroup HAL_DRIVERS
+ * @brief Embedded-flash read / erase / program.
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include "common/hal_types.h"
 #include "common/navhal_compiler.h"
@@ -108,4 +115,6 @@ typedef hal_status_t FlashStatus_t NAVHAL_DEPRECATED("use hal_status_t");
 /* Port-specific bits (compat shim with deprecated function names). */
 #include "navhal_port_flash.h"
 
+
+/** @} */ /* end of group HAL_FLASH */
 #endif /* HAL_FLASH_H */

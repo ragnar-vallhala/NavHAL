@@ -30,6 +30,13 @@
 #ifndef HAL_UART_H
 #define HAL_UART_H
 
+/**
+ * @defgroup HAL_UART Uart
+ * @ingroup HAL_DRIVERS
+ * @brief Universal Asynchronous Receiver/Transmitter.
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 #include "utils/uart_types.h" /* port-resolved ::hal_uart_t instance enum */
@@ -147,4 +154,6 @@ uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,
 /* Port-specific bits: DMA-backed API behind @c _DMA_ENABLED, compat shim. */
 #include "navhal_port_uart.h"
 
+
+/** @} */ /* end of group HAL_UART */
 #endif /* HAL_UART_H */

@@ -44,6 +44,13 @@
 #ifndef HAL_CRC_H
 #define HAL_CRC_H
 
+/**
+ * @defgroup HAL_CRC Crc
+ * @ingroup HAL_DRIVERS
+ * @brief Cyclic Redundancy Check — hardware path and software fallback.
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include "utils/crc_types.h"
 #include <stdint.h>
@@ -101,4 +108,6 @@ hal_status_t hal_crc_reset(void);
  * existing @c #include "navhal_port_crc.h" path). */
 #include "navhal_port_crc.h"
 
+
+/** @} */ /* end of group HAL_CRC */
 #endif /* HAL_CRC_H */

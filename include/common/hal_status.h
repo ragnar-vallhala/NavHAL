@@ -34,6 +34,13 @@
 #define HAL_STATUS_H
 
 
+/**
+ * @defgroup HAL_STATUS Status
+ * @ingroup HAL_CORE
+ * @brief Standard hal_status_t error code type.
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -89,4 +96,6 @@ typedef enum {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_STATUS */
 #endif /* HAL_STATUS_H */

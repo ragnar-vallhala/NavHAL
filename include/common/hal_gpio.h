@@ -31,6 +31,13 @@
 #ifndef HAL_GPIO_H
 #define HAL_GPIO_H
 
+/**
+ * @defgroup HAL_GPIO Gpio
+ * @ingroup HAL_DRIVERS
+ * @brief Digital I/O configuration and pin access.
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include "utils/gpio_types.h"
 
@@ -121,4 +128,6 @@ hal_status_t hal_gpio_set_output_speed(hal_gpio_pin_t pin,
 /* Port-specific hot-path inlines + register-backed defines. */
 #include "navhal_port_gpio.h"
 
+
+/** @} */ /* end of group HAL_GPIO */
 #endif /* HAL_GPIO_H */

@@ -23,6 +23,13 @@
 #ifndef HAL_FPU_H
 #define HAL_FPU_H
 
+/**
+ * @defgroup HAL_FPU Fpu
+ * @ingroup HAL_DRIVERS
+ * @brief Hardware Floating-Point Unit enable.
+ * @{
+ */
+
 #include "common/hal_status.h"
 
 
@@ -47,4 +54,6 @@ hal_status_t hal_fpu_enable(void);
 
 #include "navhal_port_fpu.h"
 
+
+/** @} */ /* end of group HAL_FPU */
 #endif /* HAL_FPU_H */

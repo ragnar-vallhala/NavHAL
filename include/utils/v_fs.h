@@ -23,6 +23,13 @@
 #ifndef V_FS_H
 #define V_FS_H
 
+/**
+ * @defgroup HAL_UTIL_VFS Vfs
+ * @ingroup HAL_UTILS
+ * @brief Lightweight virtual filesystem glue.
+ * @{
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -128,4 +135,6 @@ int v_preallocate(const char *path, uint32_t size);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_UTIL_VFS */
 #endif // V_FS_H

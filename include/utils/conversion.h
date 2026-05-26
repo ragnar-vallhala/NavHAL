@@ -38,6 +38,13 @@
  #ifndef CONVERSION_H
  #define CONVERSION_H
  
+/**
+ * @defgroup HAL_UTIL_CONVERSION Conversion
+ * @ingroup HAL_UTILS
+ * @brief Numeric conversion helpers (string ↔ int, etc.).
+ * @{
+ */
+
  #include <stdint.h>
  
 
@@ -70,4 +77,6 @@ extern "C" {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_UTIL_CONVERSION */
  #endif // CONVERSION_H

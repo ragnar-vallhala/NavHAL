@@ -29,6 +29,13 @@
 #ifndef HAL_I2C_H
 #define HAL_I2C_H
 
+/**
+ * @defgroup HAL_I2C I2C
+ * @ingroup HAL_DRIVERS
+ * @brief Inter-Integrated Circuit (I²C) bus master.
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 #include "utils/gpio_types.h"
@@ -136,4 +143,6 @@ typedef hal_status_t hal_i2c_status_t NAVHAL_DEPRECATED("use hal_status_t");
 /* Port-specific bits: DMA-backed I²C API behind @c _DMA_ENABLED. */
 #include "navhal_port_i2c.h"
 
+
+/** @} */ /* end of group HAL_I2C */
 #endif /* HAL_I2C_H */

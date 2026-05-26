@@ -29,6 +29,13 @@
 #ifndef HAL_PWM_H
 #define HAL_PWM_H
 
+/**
+ * @defgroup HAL_PWM Pwm
+ * @ingroup HAL_DRIVERS
+ * @brief Pulse-Width Modulation output.
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 #include "utils/timer_types.h"
@@ -96,4 +103,6 @@ typedef hal_pwm_handle_t PWM_Handle NAVHAL_DEPRECATED("use hal_pwm_handle_t");
 
 #include "navhal_port_pwm.h"
 
+
+/** @} */ /* end of group HAL_PWM */
 #endif /* HAL_PWM_H */

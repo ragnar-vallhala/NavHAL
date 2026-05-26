@@ -28,6 +28,13 @@
 #ifndef HAL_SPI_H
 #define HAL_SPI_H
 
+/**
+ * @defgroup HAL_SPI Spi
+ * @ingroup HAL_DRIVERS
+ * @brief Serial Peripheral Interface (SPI) master.
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 #include "utils/spi_types.h" /* port-resolved ::hal_spi_instance_t enum */
@@ -175,4 +182,6 @@ typedef hal_status_t hal_spi_status_t NAVHAL_DEPRECATED("use hal_status_t");
  * existing @c #include "navhal_port_spi.h" path). */
 #include "navhal_port_spi.h"
 
+
+/** @} */ /* end of group HAL_SPI */
 #endif /* HAL_SPI_H */

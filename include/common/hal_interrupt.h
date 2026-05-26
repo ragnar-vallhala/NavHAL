@@ -18,6 +18,13 @@
 #ifndef HAL_INTERRUPT_H
 #define HAL_INTERRUPT_H
 
+/**
+ * @defgroup HAL_INTERRUPT Interrupt
+ * @ingroup HAL_DRIVERS
+ * @brief Interrupt enable, priority, and callback registration.
+ * @{
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,4 +48,6 @@ extern "C" {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_INTERRUPT */
 #endif // !HAL_INTERRUPT_H

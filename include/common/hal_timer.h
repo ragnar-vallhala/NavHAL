@@ -30,6 +30,13 @@
 #ifndef HAL_TIMER_H
 #define HAL_TIMER_H
 
+/**
+ * @defgroup HAL_TIMER Timer
+ * @ingroup HAL_DRIVERS
+ * @brief Periodic timer with callback dispatch.
+ * @{
+ */
+
 #include "common/hal_status.h"
 #include "common/hal_types.h"
 #include "utils/timer_types.h"
@@ -146,4 +153,6 @@ uint32_t hal_timer_get_auto_reload(hal_timer_t timer);
 /* Port-specific bits: SysTick / RCC register defines, vector-table entries. */
 #include "navhal_port_timer.h"
 
+
+/** @} */ /* end of group HAL_TIMER */
 #endif /* HAL_TIMER_H */

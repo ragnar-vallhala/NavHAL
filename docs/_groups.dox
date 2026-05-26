@@ -1,0 +1,31 @@
+/**
+ * @file _groups.dox
+ * @brief Top-level Doxygen group definitions for the Modules tab.
+ *
+ * This file only contains @defgroup declarations — no code. Each public
+ * header in include/common/ and include/utils/ declares @ingroup for one
+ * of these, so the Modules sidebar groups the API by subsystem rather
+ * than the flat alphabetical file index.
+ */
+
+/**
+ * @defgroup HAL_DRIVERS HAL Drivers
+ * @brief Standardized hardware driver APIs (GPIO, UART, I²C, SPI, Timer,
+ *        PWM, DMA, Clock, Interrupt, Flash, CRC, FPU, SDIO, cycle counter).
+ *
+ * These are the @c hal_* APIs application code calls. Each is gated on
+ * a NAVHAL_HAS_* capability — see the Capability Matrix for what's
+ * available per target.
+ */
+
+/**
+ * @defgroup HAL_CORE HAL Core
+ * @brief Cross-driver foundations: status type, capability flags,
+ *        configuration entry point, shared types.
+ */
+
+/**
+ * @defgroup HAL_UTILS HAL Utilities
+ * @brief Generic helpers used by multiple drivers — numeric conversion,
+ *        bus address types, filesystem glue, CRC type definitions.
+ */

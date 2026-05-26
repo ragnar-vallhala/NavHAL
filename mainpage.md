@@ -1,4 +1,3 @@
-/**
  @mainpage NavHAL Documentation
  
  NavHAL is a hardware abstraction layer for embedded systems,

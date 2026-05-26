@@ -12,6 +12,8 @@
  * @brief SDIO driver implementation for STM32F4.
  */
 
+#ifdef _SDIO_ENABLED
+
 static uint32_t sd_rca = 0;
 static uint8_t card_is_sdhc = 0;
 static uint8_t desired_bus_width = 0;
@@ -86,7 +88,7 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config) {
   hal_interrupt_enable(SDIO_IRQn);
   hal_interrupt_set_priority(SDIO_IRQn, 5);
 
-#ifdef _DMA_ENABLED
+#ifdef _SDIO_BACKEND_DMA
   hal_interrupt_enable(DMA2_Stream3_IRQn);
   hal_interrupt_enable(DMA2_Stream6_IRQn);
   hal_interrupt_set_priority(DMA2_Stream3_IRQn, 5);
@@ -451,7 +453,7 @@ uint32_t hal_sdio_get_sector_count(void) {
   return 0;
 }
 
-#ifdef _DMA_ENABLED
+#ifdef _SDIO_BACKEND_DMA
 #include "navhal_port_dma.h"
 // #include "navhal_port_uart.h"
 
@@ -624,7 +626,7 @@ hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
 
   if (hal_sdio_send_command(SD_CMD_READ_MULT_BLOCK, addr, 1)) {
     hal_dma_stop((const hal_dma_config_t *)&dma2_stream3_cfg);
-#ifdef _DMA_ENABLED
+#ifdef _SDIO_BACKEND_DMA
 //    hal_uart_write_string(HAL_UART_2, "Read Multi CMD18 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
@@ -689,7 +691,7 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
 
   if (hal_sdio_send_command(SD_CMD_WRITE_MULT_BLOCK, addr, 1)) {
     hal_dma_stop((const hal_dma_config_t *)&dma2_stream6_cfg);
-#ifdef _DMA_ENABLED
+#ifdef _SDIO_BACKEND_DMA
 //    hal_uart_write_string(HAL_UART_2, "Write Multi CMD25 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
@@ -810,3 +812,5 @@ hal_sdio_error_t hal_sdio_wait_sync(hal_sdio_error_t result) {
   return sd_last_error;
 }
 #endif
+
+#endif /* _SDIO_ENABLED */

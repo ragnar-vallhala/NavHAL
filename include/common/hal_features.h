@@ -37,24 +37,30 @@
 extern "C" {
 #endif
 /** @brief 1 if a DMA controller and the DMA-mode API are available. */
-#if defined(_DMA_ENABLED)
-#define NAVHAL_HAS_DMA 1
-#else
-#define NAVHAL_HAS_DMA 0
+#ifndef NAVHAL_HAS_DMA
+#  if defined(_DMA_ENABLED)
+#    define NAVHAL_HAS_DMA 1
+#  else
+#    define NAVHAL_HAS_DMA 0
+#  endif
 #endif
 
 /** @brief 1 if a hardware floating-point unit is available. */
-#if defined(_FPU_ENABLED)
-#define NAVHAL_HAS_FPU 1
-#else
-#define NAVHAL_HAS_FPU 0
+#ifndef NAVHAL_HAS_FPU
+#  if defined(_FPU_ENABLED)
+#    define NAVHAL_HAS_FPU 1
+#  else
+#    define NAVHAL_HAS_FPU 0
+#  endif
 #endif
 
 /** @brief 1 if a hardware CRC peripheral is available. */
-#if defined(_CRC_HW_ENABLED)
-#define NAVHAL_HAS_CRC_HW 1
-#else
-#define NAVHAL_HAS_CRC_HW 0
+#ifndef NAVHAL_HAS_CRC_HW
+#  if defined(_CRC_HW_ENABLED)
+#    define NAVHAL_HAS_CRC_HW 1
+#  else
+#    define NAVHAL_HAS_CRC_HW 0
+#  endif
 #endif
 
 /** @brief 1 if a cycle counter (Cortex DWT, or equivalent) is available. */

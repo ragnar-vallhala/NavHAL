@@ -10,6 +10,9 @@
  * @copyright © NAVROBOTEC PVT. LTD.
  */
 
+#include "navhal_port_config.h"
+#ifdef _DWT_ENABLED
+
 #include "navhal_port_dwt.h"
 #include "family/dwt_reg.h"
 
@@ -38,3 +41,5 @@ void hal_cycle_counter_delay(uint32_t cycles) {
     __asm__ volatile("nop");
   }
 }
+
+#endif /* _DWT_ENABLED */

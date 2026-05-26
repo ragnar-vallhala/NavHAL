@@ -176,28 +176,30 @@ config DRV_UART
     select DRV_GPIO
     select DRV_CLOCK
     select DRV_INTERRUPT
-    select DRV_DMA if ARCH_CORTEX_M4
 
 config DRV_UART_DMA
     bool "Enable DMA-backed UART API"
-    default y if DRV_UART && DRV_DMA
-    depends on DRV_UART && DRV_DMA
+    default y if DRV_UART && ARCH_CORTEX_M4
+    depends on DRV_UART
+    select DRV_DMA if ARCH_CORTEX_M4
     help
       Compile the hal_uart_write_dma / init_dma_rx variants. Disable to
       drop the DMA backend from a DMA-enabled build (e.g. to save flash
-      when DMA is only used by other drivers).
+      when DMA is only used by other drivers). Enabling this is what pulls
+      DRV_DMA in for the UART driver on Cortex-M4 — DRV_UART itself does
+      not require DMA.
 
 config DRV_I2C
     bool "Enable I2C Driver"
     default n
     select DRV_CLOCK
     select DRV_INTERRUPT
-    select DRV_DMA if ARCH_CORTEX_M4
 
 config DRV_I2C_DMA
     bool "Enable DMA-backed I2C API"
-    default y if DRV_I2C && DRV_DMA
-    depends on DRV_I2C && DRV_DMA
+    default y if DRV_I2C && ARCH_CORTEX_M4
+    depends on DRV_I2C
+    select DRV_DMA if ARCH_CORTEX_M4
     help
       Compile hal_i2c_read_regs_dma. Disable to drop the DMA backend
       from a DMA-enabled I2C build.
@@ -225,8 +227,9 @@ config DRV_SDIO
 
 config DRV_SDIO_DMA
     bool "Enable DMA-backed SDIO async API"
-    default y if DRV_SDIO && DRV_DMA
-    depends on DRV_SDIO && DRV_DMA
+    default y if DRV_SDIO && ARCH_CORTEX_M4
+    depends on DRV_SDIO
+    select DRV_DMA if ARCH_CORTEX_M4
     help
       Compile the hal_sdio_*_async block-transfer variants. Disable to
       restrict SDIO to the polled (synchronous) API.
@@ -336,22 +339,27 @@ config SAMPLE_18_HAL_CRC
 config SAMPLE_19_HAL_DMA_I2C
     bool "19_hal_dma_i2c"
     depends on ARCH_CORTEX_M4
+    select DRV_I2C
 
 config SAMPLE_20_HAL_SDIO
     bool "20_hal_sdio"
     depends on ARCH_CORTEX_M4
+    select DRV_SDIO
 
 config SAMPLE_21_HAL_SDIO_BLOCK
     bool "21_hal_sdio_block"
     depends on ARCH_CORTEX_M4
+    select DRV_SDIO
 
 config SAMPLE_22_HAL_FATFS_POSIX
     bool "22_hal_fatfs_posix"
     depends on ARCH_CORTEX_M4
+    select DRV_SDIO
 
 config SAMPLE_23_HAL_SDIO_PERF
     bool "23_hal_sdio_perf"
     depends on ARCH_CORTEX_M4
+    select DRV_SDIO
 
 config SAMPLE_24_HAL_UART_DMA_BRIDGE
     bool "24_hal_uart_dma_bridge"

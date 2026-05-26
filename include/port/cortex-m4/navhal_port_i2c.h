@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 
-#ifdef _DMA_ENABLED
+#ifdef _I2C_BACKEND_DMA
 #include "navhal_port_dma.h"
 
 /**

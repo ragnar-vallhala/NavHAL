@@ -30,7 +30,7 @@ extern "C" {
 #define SDIO_CMD_WAITPEND (1 << 9)
 #define SDIO_CMD_CPSMEN (1 << 10)
 
-#ifdef _DMA_ENABLED
+#ifdef _SDIO_BACKEND_DMA
 /** @brief Asynchronous (DMA) single-block read. */
 hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buffer);
 /** @brief Asynchronous (DMA) single-block write. */
@@ -43,7 +43,7 @@ hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buffer,
 hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr,
                                              const uint8_t *buffer,
                                              uint32_t count);
-#endif /* _DMA_ENABLED */
+#endif /* _SDIO_BACKEND_DMA */
 
 #endif /* _SDIO_ENABLED */
 

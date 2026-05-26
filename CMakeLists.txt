@@ -34,6 +34,12 @@ endif()
 # Include the generated CMake configuration which may provide TOOLCHAIN_PREFIX, BOARD, VENDOR, etc.
 include(${GENERATED_CMAKE})
 
+# Make the Kconfig-generated navhal_target.h reachable to every translation
+# unit so port headers can bridge NAVHAL_HAS_* into the legacy _*_ENABLED
+# flags. Without this the cap macros silently fall back to the port header's
+# hardcoded defaults.
+include_directories(${CMAKE_BINARY_DIR})
+
 # Toolchain settings
 # Allow configuration from KConfig (via GENERATED_CMAKE) to override the default.
 if(NOT DEFINED TOOLCHAIN_PREFIX)

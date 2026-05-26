@@ -22,10 +22,9 @@
 extern "C" {
 #endif
 
-/** @brief Selects the DMA transmit/receive backend when DMA is available. */
-#ifdef _DMA_ENABLED
-#define _UART_BACKEND_DMA
-#endif
+/* The _UART_BACKEND_DMA selector is derived in navhal_port_config.h from
+   NAVHAL_HAS_UART_DMA so that the UART driver's DMA paths can be disabled
+   independently of other DMA users. */
 
 /* -------------------------------------------------------------------------- *
  * DMA-backed UART API — available only when the DMA backend is enabled.

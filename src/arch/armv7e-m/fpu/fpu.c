@@ -24,6 +24,4 @@ hal_status_t hal_fpu_enable(void) {
   __asm volatile("isb");
   return HAL_OK;
 }
-#else
-hal_status_t hal_fpu_enable(void) { return HAL_ERR_NOT_SUPPORTED; }
 #endif

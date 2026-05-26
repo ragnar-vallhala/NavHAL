@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Fast checks that run before every commit. Heavier checks live in pre-push.
+#
+# Runs:
+#   1. Host tests — pure-logic suite, no cross-compiler needed.
+#   2. cmake configure — catches Kconfig syntax errors and broken
+#      tools/kconfig.py invocations before they're committed.
+#
+# Total wall-clock: ~1-2 seconds.
+#
+# Bypass for a WIP commit with: git commit --no-verify
+# (Don't make a habit of it — pre-push will catch what you skipped.)
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+echo "[pre-commit] host tests..."
+tools/run_host_tests.sh >/dev/null
+
+echo "[pre-commit] kconfig configure..."
+BUILD=$(mktemp -d)
+trap 'rm -rf "$BUILD"' EXIT
+cmake -B "$BUILD" -DTEST=ON >/dev/null
+
+echo "[pre-commit] ok"

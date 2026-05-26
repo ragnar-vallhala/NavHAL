@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Heavier checks that run before `git push`. Matches the gating CI does on
+# the remote, so a green pre-push almost guarantees a green CI run.
+#
+# Runs:
+#   1. Capability contract — three on-target builds verifying NAVHAL_HAS_*
+#      gates symbols at link time (tools/test_cap_contract.sh).
+#   2. Sample matrix — every sample declared in Kconfig must build
+#      (tools/build_all_samples.sh).
+#
+# Total wall-clock: ~30-60s (28 sample builds + 3 test builds).
+#
+# Skips itself if the push only touches docs/ or other non-build paths.
+#
+# Bypass with: git push --no-verify (do this only if you know CI will pass).
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+# Read refs from stdin (git push hook protocol) to figure out what's being
+# pushed. If the diff is docs-only, skip the heavy checks.
+remote_sha_or_default() {
+  local sha=$1
+  if [ "$sha" = "0000000000000000000000000000000000000000" ]; then
+    git rev-parse origin/main 2>/dev/null || git rev-parse HEAD~1 2>/dev/null || echo ""
+  else
+    echo "$sha"
+  fi
+}
+
+DOCS_ONLY=1
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ -z "$local_sha" ] && continue
+  [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
+  base=$(remote_sha_or_default "$remote_sha")
+  if [ -z "$base" ]; then
+    DOCS_ONLY=0
+    break
+  fi
+  changed=$(git diff --name-only "$base" "$local_sha")
+  for f in $changed; do
+    case "$f" in
+      docs/*|*.md|LICENSE|.gitignore) ;;
+      *) DOCS_ONLY=0 ;;
+    esac
+  done
+done
+
+if [ "$DOCS_ONLY" = "1" ]; then
+  echo "[pre-push] docs-only push, skipping cap contract and sample matrix"
+  exit 0
+fi
+
+echo "[pre-push] cap contract..."
+tools/test_cap_contract.sh
+
+echo "[pre-push] sample matrix..."
+tools/build_all_samples.sh
+
+echo "[pre-push] ok"

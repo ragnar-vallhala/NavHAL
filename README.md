@@ -123,6 +123,32 @@ Other docs in this repository:
 
 Contributions, bug reports, and feature requests are welcome. Please follow the coding style and submit pull requests.
 
+### Setting up local checks
+
+After cloning, install the repo's git hooks so the same checks CI runs gate every commit and push:
+
+```bash
+tools/install-hooks.sh
+```
+
+This sets `core.hooksPath` to `.githooks/`, installing:
+
+* **`pre-commit`** (~1–2 s): host tests + cmake configure. Catches Kconfig
+  syntax errors and breakage in `tools/kconfig.py`.
+* **`pre-push`** (~30–60 s): capability contract (`tools/test_cap_contract.sh`)
+  + sample matrix (`tools/build_all_samples.sh`). Catches Kconfig/driver
+  changes that would let an "off" capability leak symbols into the ELF, and
+  catches samples that forgot to `select` their driver dependencies.
+
+Both can be bypassed with `--no-verify` for emergencies, but the same checks
+gate PR merges via GitHub Actions (`.github/workflows/ci.yml`), so a bypassed
+commit will be caught upstream.
+
+To enforce CI on the server too, enable branch protection on `main` in the
+repo settings (Settings → Branches → Branch protection rules) and require
+the `Host tests`, `Build on-target ELF`, `Capability contract`, and
+`Build all samples` checks.
+
 ---
 
 ## License

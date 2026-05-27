@@ -31,6 +31,7 @@
 #include "portable/test_crc.h"
 #include "portable/test_flash_raw.h"
 #include "portable/test_timebase.h"
+#include "portable/conformance/test_conformance.h"
 
 #include "cap/dma/test_dma.h"
 #include "cap/cycle_counter/test_dwt.h"
@@ -60,6 +61,11 @@ static const navtest_suite_t *const all_suites[] = {
     &test_uart_protocol_suite,
     &test_i2c_suite,
     &test_spi_suite,
+#endif
+#if !defined(__AVR__)
+    &test_conformance_suite,   /* portable HAL-contract assertions; gated
+                                  on AVR pending PROGMEM-string support
+                                  in navtest (see test_conformance.h). */
 #endif
     &test_timebase_suite,
 #if NAVHAL_HAS_DMA

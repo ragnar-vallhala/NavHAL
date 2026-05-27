@@ -247,10 +247,10 @@ if(TEST)
   #                             is off — globbing them all is safe.
   #   tests/arch/<arch>/*.c   — white-box per-arch tests; only the matching
   #                             arch's directory is compiled in.
-  file(GLOB TEST_FRAMEWORK_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
-  file(GLOB TEST_PORTABLE_SRC  ${CMAKE_CURRENT_SOURCE_DIR}/tests/portable/*.c)
-  file(GLOB_RECURSE TEST_CAP_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/cap/*.c)
-  file(GLOB TEST_ARCH_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/*.c)
+  file(GLOB          TEST_FRAMEWORK_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
+  file(GLOB_RECURSE  TEST_PORTABLE_SRC  ${CMAKE_CURRENT_SOURCE_DIR}/tests/portable/*.c)
+  file(GLOB_RECURSE  TEST_CAP_SRC       ${CMAKE_CURRENT_SOURCE_DIR}/tests/cap/*.c)
+  file(GLOB          TEST_ARCH_SRC      ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/*.c)
   set(TEST_SRC ${TEST_FRAMEWORK_SRC} ${TEST_PORTABLE_SRC} ${TEST_CAP_SRC} ${TEST_ARCH_SRC})
 
   file(GLOB_RECURSE HAL_SRC

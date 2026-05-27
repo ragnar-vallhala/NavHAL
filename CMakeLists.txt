@@ -115,38 +115,17 @@ set(INCLUDE_PORT ${CMAKE_CURRENT_SOURCE_DIR}/include/port/${CMAKE_SYSTEM_PROCESS
 set(INCLUDE_FAMILY ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR}/family/${FAMILY}/include)
 set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
 # ---- Architecture-specific compiler / linker flags ------------------------
-# Cortex-M and AVR need entirely different flag sets: -mcpu/-mthumb + a custom
-# linker script + -nostdlib for the bare-metal ARM build, versus -mmcu and the
-# startup/linker that the avr-libc toolchain supplies itself. Everything below
-# branches on the resolved CMAKE_SYSTEM_PROCESSOR.
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
-    if(USE_FPU)
-        set(FPU_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED -D_DMA_ENABLED")
-        message(STATUS "FPU: Hardware enabled (Cortex-M4)")
-    else()
-        set(FPU_FLAGS "-mfloat-abi=soft")
-        message(STATUS "FPU: Software emulation (Cortex-M4)")
-    endif()
-    set(ARCH_C_FLAGS    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS} -O0 -g")
-    set(ARCH_ASM_FLAGS  "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
-    set(ARCH_LINK_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}")
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
-    # FAMILY is the avr-gcc -mmcu device name (atmega328p). F_CPU drives the
-    # avr-libc timing routines; 16 MHz matches the ATmega328P reference board.
-    set(FPU_FLAGS "")
-    set(AVR_MCU "${FAMILY}")
-    set(AVR_F_CPU "16000000UL")
-    message(STATUS "AVR: -mmcu=${AVR_MCU}, F_CPU=${AVR_F_CPU}")
-    set(ARCH_C_FLAGS    "-mmcu=${AVR_MCU} -DF_CPU=${AVR_F_CPU} -Os -g")
-    set(ARCH_ASM_FLAGS  "-mmcu=${AVR_MCU}")
-    set(ARCH_LINK_FLAGS "-mmcu=${AVR_MCU}")
-else()
-    set(FPU_FLAGS "")
-    set(ARCH_C_FLAGS "")
-    set(ARCH_ASM_FLAGS "")
-    set(ARCH_LINK_FLAGS "")
-    message(WARNING "No architecture flags predefined for core '${CMAKE_SYSTEM_PROCESSOR}'")
+# Each supported ISA owns a fragment under cmake/arch/<ARCH_ISA>.cmake that
+# fills in ARCH_C_FLAGS / ARCH_ASM_FLAGS / ARCH_LINK_FLAGS / FPU_FLAGS plus
+# the NAVHAL_TEST_* slots the if(TEST) block consumes. Adding a new ISA is
+# one file there — this root CMakeLists.txt has no per-arch ladder.
+set(_NAVHAL_ARCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/arch/${ARCH_ISA}.cmake")
+if(NOT EXISTS "${_NAVHAL_ARCH_FILE}")
+    message(FATAL_ERROR
+        "No CMake arch fragment for ARCH_ISA='${ARCH_ISA}'. "
+        "Expected: ${_NAVHAL_ARCH_FILE}")
 endif()
+include("${_NAVHAL_ARCH_FILE}")
 
 set(CMAKE_C_FLAGS "${ARCH_C_FLAGS} -Wall -std=c11")
 set(CMAKE_ASM_FLAGS "${ARCH_ASM_FLAGS}")
@@ -261,21 +240,16 @@ if(TEST)
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
   add_executable(tests ${TEST_SRC} ${STARTUP_FILE})
 
-  # Per-arch test linker + flags.
-  # Cortex-M4: custom linker script with our own startup, -nostdlib so
-  #   newlib's _exit / _sbrk etc. don't get pulled in. The linker
-  #   script now lives under tests/arch/cortex-m4/ alongside the
-  #   arch-specific tests it serves.
-  # AVR: avr-libc supplies startup + crt0; no custom linker script,
-  #   and `-mmcu=` (already in ARCH_C_FLAGS) selects the target part.
+  # Per-arch test linker + flags. NAVHAL_TEST_LINKER_FLAGS,
+  # NAVHAL_TEST_EXTRA_FLAGS, NAVHAL_TEST_NEEDS_LIBGCC all come from the
+  # cmake/arch/<ARCH_ISA>.cmake fragment included above. No arch ladder here.
   set(TEST_FLAGS "-fno-exceptions" "-fno-unwind-tables" "-fno-asynchronous-unwind-tables")
-  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
-      list(APPEND TEST_FLAGS "-march=armv7e-m")
-      set(CMAKE_EXE_LINKER_FLAGS
-          "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/cortex-m4/linker.ld -nostdlib ${FPU_FLAGS}")
+  if(NAVHAL_TEST_EXTRA_FLAGS)
+      list(APPEND TEST_FLAGS ${NAVHAL_TEST_EXTRA_FLAGS})
+  endif()
+  set(CMAKE_EXE_LINKER_FLAGS "${NAVHAL_TEST_LINKER_FLAGS}")
+  if(NAVHAL_TEST_NEEDS_LIBGCC)
       target_link_libraries(tests PRIVATE c gcc)
-  elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
-      set(CMAKE_EXE_LINKER_FLAGS "-mmcu=${AVR_MCU}")
   endif()
   
   target_compile_options(tests PRIVATE ${TEST_FLAGS})

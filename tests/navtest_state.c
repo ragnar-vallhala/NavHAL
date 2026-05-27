@@ -32,8 +32,27 @@
  * backend lives in tests/host/host_backend.c and routes to stdout. */
 #include "navhal_port_uart.h"
 #include "navtest_target.h"
+
 void navtest_write(const char *s) { hal_uart_print(NAVTEST_UART, (char *)s); }
+
+#if defined(__AVR__)
+/* PROGMEM-aware variant. Reads bytes from program flash one at a time
+ * and feeds them to the UART — avoids the .data copy that plain
+ * literals incur on AVR (Harvard architecture). On non-AVR targets
+ * navtest_write_P is `#define`d to navtest_write in navtest.h, so this
+ * symbol only exists on AVR. */
+#include <avr/pgmspace.h>
+void navtest_write_P(const char *p) {
+  for (;;) {
+    char c = (char)pgm_read_byte(p++);
+    if (c == '\0') {
+      break;
+    }
+    hal_uart_write_char(NAVTEST_UART, (uint8_t)c);
+  }
+}
 #endif
+#endif /* !NAVTEST_HOST */
 
 /* Global state */
 _NavTestState _navtest = {0, 0, 0};
@@ -43,11 +62,17 @@ __attribute__((weak)) void setUp(void) {}
 __attribute__((weak)) void tearDown(void) {}
 
 /* Walk a suite's case table, printing per-suite banners + summary.
- * Identical per-case output to RUN_TEST. */
+ * Identical per-case output to RUN_TEST.
+ *
+ * Suite + case names come from test files' static initializers and
+ * are RAM-resident on every arch (NAVTEST_CASE uses plain #f
+ * stringification — see comment in navtest.h). The literals
+ * bracketing the names DO go through navtest_write_P + _NT_PSTR so
+ * they land in PROGMEM on AVR. */
 int navtest_run_suite(const navtest_suite_t *suite) {
-  navtest_write("\n=========== ");
+  navtest_write_P(_NT_PSTR("\n=========== "));
   navtest_write(suite->name);
-  navtest_write(" TEST START ===========\n");
+  navtest_write_P(_NT_PSTR(" TEST START ===========\n"));
 
   _navtest.tests = 0;
   _navtest.failures = 0;
@@ -58,13 +83,13 @@ int navtest_run_suite(const navtest_suite_t *suite) {
     _navtest.tests++;
     uint32_t prev = _navtest.failures;
     setUp();
-    navtest_write(_NT_CYAN "  >> " _NT_BOLD);
+    navtest_write_P(_NT_PSTR(_NT_CYAN "  >> " _NT_BOLD));
     navtest_write(c->name);
-    navtest_write(_NT_RST "\r\n");
+    navtest_write_P(_NT_PSTR(_NT_RST "\r\n"));
     c->fn();
     if (_navtest.failures == prev) {
       _navtest.passes++;
-      navtest_write(_NT_BOLD _NT_GREEN "  PASS" _NT_RST "\r\n");
+      navtest_write_P(_NT_PSTR(_NT_BOLD _NT_GREEN "  PASS" _NT_RST "\r\n"));
     }
     tearDown();
     if (suite->between)
@@ -72,9 +97,9 @@ int navtest_run_suite(const navtest_suite_t *suite) {
   }
 
   _navtest_end_impl();
-  navtest_write("=========== ");
+  navtest_write_P(_NT_PSTR("=========== "));
   navtest_write(suite->name);
-  navtest_write(" TEST END ===========\n");
+  navtest_write_P(_NT_PSTR(" TEST END ===========\n"));
 
   return (int)_navtest.failures;
 }

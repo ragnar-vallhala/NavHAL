@@ -62,11 +62,9 @@ static const navtest_suite_t *const all_suites[] = {
     &test_i2c_suite,
     &test_spi_suite,
 #endif
-#if !defined(__AVR__)
-    &test_conformance_suite,   /* portable HAL-contract assertions; gated
-                                  on AVR pending PROGMEM-string support
-                                  in navtest (see test_conformance.h). */
-#endif
+    &test_conformance_suite,   /* portable HAL-contract assertions; runs
+                                  on every arch (navtest PROGMEM keeps
+                                  __FILE__/msg strings out of AVR .data). */
     &test_timebase_suite,
 #if NAVHAL_HAS_DMA
     &test_dma_suite,

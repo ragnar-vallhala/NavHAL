@@ -17,8 +17,6 @@
 
 #include "test_conformance.h"
 
-#if !defined(__AVR__)   /* see test_conformance.h — AVR SRAM doesn't fit yet */
-
 #include "common/hal_features.h"
 #include "common/hal_status.h"
 #include "common/hal_gpio.h"
@@ -172,5 +170,3 @@ const navtest_suite_t test_conformance_suite = {
     .count = sizeof(conformance_cases) / sizeof(conformance_cases[0]),
     .between = NULL,
 };
-
-#endif /* !defined(__AVR__) */

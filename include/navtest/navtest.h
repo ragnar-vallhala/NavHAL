@@ -42,10 +42,40 @@ extern "C" {
 #endif
 
 /* Sink for all test output. Backends:
- *   - target (default): writes via uart2_write (see tests/navtest_state.c)
+ *   - target (default): writes via the per-port console UART
+ *     (NAVTEST_UART, see tests/navtest_target.h)
  *   - host  (-DNAVTEST_HOST): writes to stdout (see tests/host/host_backend.c)
  */
 void navtest_write(const char *s);
+
+/* PROGMEM support — assertion source strings and test names land in
+ * flash on AVR instead of being copied to .data at startup. ATmega328P
+ * has 2 KB SRAM; the conformance suite alone needs ~780 bytes of
+ * strings and would push past the limit otherwise.
+ *
+ * On AVR:
+ *   _NT_PSTR(s)          builds a static const char[] in PROGMEM and
+ *                        returns its address.
+ *   navtest_write_P(p)   reads bytes from PROGMEM one at a time and
+ *                        feeds them to the UART (implemented in
+ *                        navtest_state.c).
+ *
+ * On every other arch both collapse to no-ops: _NT_PSTR(s) is just
+ * (s), navtest_write_P is #defined to navtest_write. Code below uses
+ * the _P form uniformly so the same source compiles on both.
+ */
+#if defined(__AVR__)
+#  include <avr/pgmspace.h>
+   /* GCC statement-expression — works on every embedded GCC we target. */
+#  define _NT_PSTR(s) (__extension__({                          \
+       static const char _navtest_pstr[] __attribute__((__progmem__)) = (s); \
+       _navtest_pstr;                                           \
+     }))
+   void navtest_write_P(const char *progmem_str);
+#else
+#  define _NT_PSTR(s) (s)
+#  define navtest_write_P navtest_write
+#endif
 
 /* -------------------------------------------------------------------------
  * ANSI color escapes  (define NAVTEST_NO_COLOR before including to disable)
@@ -103,26 +133,30 @@ static inline void _navtest_print_uint32(uint32_t v) {
   navtest_write(buf + i);
 }
 
+/* _navtest_fail receives PROGMEM-tagged pointers on AVR (assertion
+ * macros wrap __FILE__ and the assertion message in _NT_PSTR before
+ * calling). On non-AVR, navtest_write_P aliases navtest_write so the
+ * same source path runs everywhere. */
 static inline void _navtest_fail(const char *file, uint32_t line,
                                  const char *msg) {
-  navtest_write(_NT_RED "  FAIL: " _NT_RST);
-  navtest_write(file);
-  navtest_write(":");
+  navtest_write_P(_NT_PSTR(_NT_RED "  FAIL: " _NT_RST));
+  navtest_write_P(file);
+  navtest_write_P(_NT_PSTR(":"));
   _navtest_print_uint32(line);
-  navtest_write(" -- ");
-  navtest_write(msg);
-  navtest_write("\r\n");
+  navtest_write_P(_NT_PSTR(" -- "));
+  navtest_write_P(msg);
+  navtest_write_P(_NT_PSTR("\r\n"));
   _navtest.failures++;
 }
 
 static inline int _navtest_end_impl(void) {
-  navtest_write("  [");
+  navtest_write_P(_NT_PSTR("  ["));
   _navtest_print_uint32(_navtest.tests);
-  navtest_write(" tests | ");
+  navtest_write_P(_NT_PSTR(" tests | "));
   _navtest_print_uint32(_navtest.failures);
-  navtest_write(" failed | ");
+  navtest_write_P(_NT_PSTR(" failed | "));
   _navtest_print_uint32(_navtest.passes);
-  navtest_write(" passed]\r\n");
+  navtest_write_P(_NT_PSTR(" passed]\r\n"));
   return (int)_navtest.failures;
 }
 
@@ -153,11 +187,11 @@ static inline uint32_t navtest_get_test_count(void) { return _navtest.tests; }
     _navtest.tests++;                                                          \
     uint32_t _prev_failures = _navtest.failures;                               \
     setUp();                                                                   \
-    navtest_write(_NT_CYAN "  >> " _NT_BOLD #fn _NT_RST "\r\n");                 \
+    navtest_write_P(_NT_PSTR(_NT_CYAN "  >> " _NT_BOLD #fn _NT_RST "\r\n"));   \
     fn();                                                                      \
     if (_navtest.failures == _prev_failures) {                                 \
       _navtest.passes++;                                                       \
-      navtest_write(_NT_BOLD _NT_GREEN "  PASS" _NT_RST "\r\n");                 \
+      navtest_write_P(_NT_PSTR(_NT_BOLD _NT_GREEN "  PASS" _NT_RST "\r\n"));   \
     }                                                                          \
     tearDown();                                                                \
   } while (0)
@@ -184,6 +218,18 @@ typedef struct {
   navtest_hook_t between; /* optional: runs between cases; NULL for none */
 } navtest_suite_t;
 
+/* Plain stringification — case.name stays in RAM on AVR.
+ *
+ * Wrapping #f in _NT_PSTR would have put case names in PROGMEM (~440
+ * bytes saved for the conformance suite), but _NT_PSTR expands to a
+ * GCC statement-expression and those aren't allowed in file-scope
+ * static const initializers, where NAVTEST_CASE is used. The
+ * workaround (predeclare a named PROGMEM array per case) would
+ * require every test file to add NAVTEST_CASE_DECL(test_xxx) for
+ * each case — verbose enough to defer until it actually pinches.
+ * The assertion macros above PROGMEM their __FILE__ and message
+ * strings; together with __FILE__ deduplication within a TU that
+ * saves ~330 bytes of .data on AVR — enough to fit conformance. */
 #define NAVTEST_CASE(f) {(f), #f}
 
 /** Run every case in @p suite, printing a banner + summary. Returns failures. */
@@ -198,34 +244,35 @@ int navtest_run_suite(const navtest_suite_t *suite);
     uint32_t _e = (uint32_t)(expected);                                        \
     uint32_t _a = (uint32_t)(actual);                                          \
     if (_e != _a) {                                                            \
-      navtest_write("  Expected: ");                                             \
+      navtest_write_P(_NT_PSTR("  Expected: "));                               \
       _navtest_print_uint32(_e);                                               \
-      navtest_write("  Got: ");                                                  \
+      navtest_write_P(_NT_PSTR("  Got: "));                                    \
       _navtest_print_uint32(_a);                                               \
-      navtest_write("\r\n");                                                     \
-      _navtest_fail(__FILE__, __LINE__, "TEST_ASSERT_EQUAL_UINT32");           \
+      navtest_write_P(_NT_PSTR("\r\n"));                                       \
+      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
+                    _NT_PSTR("TEST_ASSERT_EQUAL_UINT32"));                     \
     }                                                                          \
   } while (0)
 
 #define TEST_ASSERT_NOT_NULL(ptr)                                              \
   do {                                                                         \
     if ((void *)(ptr) == (void *)0)                                            \
-      _navtest_fail(__FILE__, __LINE__,                                        \
-                    "TEST_ASSERT_NOT_NULL: pointer is NULL");                  \
+      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
+                    _NT_PSTR("TEST_ASSERT_NOT_NULL: pointer is NULL"));        \
   } while (0)
 
 #define TEST_ASSERT_TRUE(cond)                                                 \
   do {                                                                         \
     if (!(cond))                                                               \
-      _navtest_fail(__FILE__, __LINE__,                                        \
-                    "TEST_ASSERT_TRUE: condition is false");                   \
+      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
+                    _NT_PSTR("TEST_ASSERT_TRUE: condition is false"));         \
   } while (0)
 
 #define TEST_ASSERT_FALSE(cond)                                                \
   do {                                                                         \
     if ((cond))                                                                \
-      _navtest_fail(__FILE__, __LINE__,                                        \
-                    "TEST_ASSERT_FALSE: condition is true");                   \
+      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
+                    _NT_PSTR("TEST_ASSERT_FALSE: condition is true"));         \
   } while (0)
 
 /** Assert that all bits set in @p mask are also set in @p val */
@@ -234,13 +281,13 @@ int navtest_run_suite(const navtest_suite_t *suite);
     uint32_t _m = (uint32_t)(mask);                                            \
     uint32_t _v = (uint32_t)(val);                                             \
     if ((_v & _m) != _m) {                                                     \
-      navtest_write("  Mask: ");                                                 \
+      navtest_write_P(_NT_PSTR("  Mask: "));                                   \
       _navtest_print_uint32(_m);                                               \
-      navtest_write("  Val:  ");                                                 \
+      navtest_write_P(_NT_PSTR("  Val:  "));                                   \
       _navtest_print_uint32(_v);                                               \
-      navtest_write("\r\n");                                                     \
-      _navtest_fail(__FILE__, __LINE__,                                        \
-                    "TEST_ASSERT_BITS_HIGH: bits not set");                    \
+      navtest_write_P(_NT_PSTR("\r\n"));                                       \
+      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
+                    _NT_PSTR("TEST_ASSERT_BITS_HIGH: bits not set"));          \
     }                                                                          \
   } while (0)
 
@@ -250,13 +297,13 @@ int navtest_run_suite(const navtest_suite_t *suite);
     uint32_t _m = (uint32_t)(mask);                                            \
     uint32_t _v = (uint32_t)(val);                                             \
     if ((_v & _m) != 0) {                                                      \
-      navtest_write("  Mask: ");                                                 \
+      navtest_write_P(_NT_PSTR("  Mask: "));                                   \
       _navtest_print_uint32(_m);                                               \
-      navtest_write("  Val:  ");                                                 \
+      navtest_write_P(_NT_PSTR("  Val:  "));                                   \
       _navtest_print_uint32(_v);                                               \
-      navtest_write("\r\n");                                                     \
-      _navtest_fail(__FILE__, __LINE__,                                        \
-                    "TEST_ASSERT_BITS_LOW: bits not cleared");                 \
+      navtest_write_P(_NT_PSTR("\r\n"));                                       \
+      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
+                    _NT_PSTR("TEST_ASSERT_BITS_LOW: bits not cleared"));       \
     }                                                                          \
   } while (0)
 

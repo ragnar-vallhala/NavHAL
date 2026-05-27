@@ -29,18 +29,18 @@
  * vendor-specific includes. The whole file lives under
  * tests/portable/ for exactly that reason.
  *
- * AVR gating: the navtest framework stores assertion source
- * strings in .data, not flash. The conformance suite's ~770 bytes
- * of test-name + file-path strings push past the ATmega328P's 2 KB
- * SRAM. Until navtest grows PROGMEM-string support, this suite is
- * Cortex-M only. TODO(M8.4-followup): PROGMEM macro in navtest.h.
+ * Runs on AVR too as of the navtest PROGMEM-string support (M7
+ * follow-up): TEST_ASSERT_* macros now route __FILE__ + assertion
+ * messages through `_NT_PSTR()` so those strings live in flash on
+ * AVR rather than .data, freeing ~440 bytes of SRAM. Case names
+ * (`#fn` stringification inside file-scope NAVTEST_CASE) stay in
+ * RAM because GCC statement-expressions aren't allowed in static
+ * initializers — see the NAVTEST_CASE comment in navtest.h.
  */
 #ifndef TEST_CONFORMANCE_H
 #define TEST_CONFORMANCE_H
 
 #include "navtest/navtest.h"
-
-#if !defined(__AVR__)
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,7 +72,5 @@ extern const navtest_suite_t test_conformance_suite;
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-
-#endif /* !defined(__AVR__) */
 
 #endif /* TEST_CONFORMANCE_H */

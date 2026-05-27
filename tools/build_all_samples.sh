@@ -24,7 +24,7 @@ SAMPLES=$(awk '
       if (name != "") print name;
     }
   }
-' Kconfig | sort -u)
+' Kconfig samples/Kconfig 2>/dev/null | sort -u)
 
 [ -n "$SAMPLES" ] || { echo "error: no SAMPLE names parsed from Kconfig" >&2; exit 2; }
 

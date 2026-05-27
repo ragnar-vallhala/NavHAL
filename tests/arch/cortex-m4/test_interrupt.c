@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-
-/* Cortex-M only: this file pokes STM32 registers directly. */
-#if defined(__arm__) || defined(__thumb__)
-
 /**
  * @file tests/test_interrupt.c
  * @brief Standardized hal_interrupt_* (NVIC) tests.
@@ -188,5 +184,3 @@ const navtest_suite_t test_interrupt_suite = {
     .count = sizeof(interrupt_cases) / sizeof(interrupt_cases[0]),
     .between = NULL,
 };
-
-#endif /* __arm__ || __thumb__ */

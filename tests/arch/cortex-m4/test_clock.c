@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-
-/* Cortex-M only: this file pokes STM32 registers directly. */
-#if defined(__arm__) || defined(__thumb__)
-
 #include "test_clock.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
@@ -214,5 +210,3 @@ const navtest_suite_t test_clock_suite = {
     /* Reconfiguring the clock corrupts the UART baud — flush after each. */
     .between = wait_uart_empty,
 };
-
-#endif /* __arm__ || __thumb__ */

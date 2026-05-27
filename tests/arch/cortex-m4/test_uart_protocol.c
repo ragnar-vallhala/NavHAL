@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-
-/* Cortex-M only: includes STM32 family/X_reg.h for white-box checks. */
-#if defined(__arm__) || defined(__thumb__)
-
 /**
  * @file tests/test_uart_protocol.c
  * @brief Standardized hal_uart_* API tests.
@@ -166,5 +162,3 @@ const navtest_suite_t test_uart_protocol_suite = {
     .count = sizeof(uart_protocol_cases) / sizeof(uart_protocol_cases[0]),
     .between = NULL,
 };
-
-#endif /* __arm__ || __thumb__ */

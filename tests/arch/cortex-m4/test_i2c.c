@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-
-/* Cortex-M only: includes STM32 family/X_reg.h for white-box checks. */
-#if defined(__arm__) || defined(__thumb__)
-
 #include "test_i2c.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_i2c.h"
@@ -122,5 +118,3 @@ const navtest_suite_t test_i2c_suite = {
     .count = sizeof(i2c_cases) / sizeof(i2c_cases[0]),
     .between = NULL,
 };
-
-#endif /* __arm__ || __thumb__ */

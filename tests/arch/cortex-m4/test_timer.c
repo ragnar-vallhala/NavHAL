@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-
-/* Cortex-M only: this file pokes STM32 registers directly. */
-#if defined(__arm__) || defined(__thumb__)
-
 #include "navhal_port_clock.h"
 #include "navhal_port_timer.h"
 #include "family/timer_reg.h"
@@ -249,5 +245,3 @@ const navtest_suite_t test_timer_suite = {
     .count = sizeof(timer_cases) / sizeof(timer_cases[0]),
     .between = NULL,
 };
-
-#endif /* __arm__ || __thumb__ */

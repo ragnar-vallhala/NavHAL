@@ -23,21 +23,28 @@
 #include "navtest/navtest.h"
 #include "navtest_target.h"
 
-#include "test_clock.h"
-#include "test_crc.h"
-#include "test_dma.h"
-#include "test_dwt.h"
-#include "test_flash_raw.h"
-#include "test_fpu_accel.h"
-#include "test_gpio.h"
-#include "test_i2c.h"
-#include "test_interrupt.h"
-#include "test_pwm.h"
-#include "test_sdio.h"
-#include "test_spi.h"
-#include "test_timebase.h"
-#include "test_timer.h"
-#include "test_uart_protocol.h"
+/* Test suite headers, grouped by tier:
+ *   portable/   — run on every supported arch
+ *   cap/<X>/    — run wherever NAVHAL_HAS_<X> is 1
+ *   arch/<X>/   — run only on the matching arch (white-box, register pokes)
+ */
+#include "portable/test_crc.h"
+#include "portable/test_flash_raw.h"
+#include "portable/test_timebase.h"
+
+#include "cap/dma/test_dma.h"
+#include "cap/cycle_counter/test_dwt.h"
+#include "cap/fpu/test_fpu_accel.h"
+#include "cap/sdio/test_sdio.h"
+
+#include "arch/cortex-m4/test_clock.h"
+#include "arch/cortex-m4/test_gpio.h"
+#include "arch/cortex-m4/test_i2c.h"
+#include "arch/cortex-m4/test_interrupt.h"
+#include "arch/cortex-m4/test_pwm.h"
+#include "arch/cortex-m4/test_spi.h"
+#include "arch/cortex-m4/test_timer.h"
+#include "arch/cortex-m4/test_uart_protocol.h"
 
 static const navtest_suite_t *const all_suites[] = {
 /* Cortex-M-only white-box suites — the underlying .c files are gated

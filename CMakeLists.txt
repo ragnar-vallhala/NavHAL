@@ -229,13 +229,30 @@ endif()
 # Tests
 if(TEST)
   message("Tests enabled")
+  # tests/ is added so #include "portable/test_x.h" / "cap/x/test_x.h" /
+  # "arch/<arch>/test_x.h" resolves naturally from main.c.
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests
     ${INCLUDE_PORT}
     ${INCLUDE_FAMILY}
     ${SRC_BOARD}
   )
-  file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
+
+  # Test sources split into tiers (see tests/main.c for the rationale):
+  #   tests/*.c               — framework files (main, navtest_state, stubs)
+  #   tests/portable/*.c      — HAL-only black-box tests; every arch builds these
+  #   tests/cap/*/*.c         — capability-gated; each file is wrapped in #if
+  #                             NAVHAL_HAS_<cap>, so it self-omits when the cap
+  #                             is off — globbing them all is safe.
+  #   tests/arch/<arch>/*.c   — white-box per-arch tests; only the matching
+  #                             arch's directory is compiled in.
+  file(GLOB TEST_FRAMEWORK_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
+  file(GLOB TEST_PORTABLE_SRC  ${CMAKE_CURRENT_SOURCE_DIR}/tests/portable/*.c)
+  file(GLOB_RECURSE TEST_CAP_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/cap/*.c)
+  file(GLOB TEST_ARCH_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/*.c)
+  set(TEST_SRC ${TEST_FRAMEWORK_SRC} ${TEST_PORTABLE_SRC} ${TEST_CAP_SRC} ${TEST_ARCH_SRC})
+
   file(GLOB_RECURSE HAL_SRC
     ${SRC_VENDOR}/*.c
     ${SRC_ARCH}/*.c
@@ -246,13 +263,16 @@ if(TEST)
 
   # Per-arch test linker + flags.
   # Cortex-M4: custom linker script with our own startup, -nostdlib so
-  #   newlib's _exit / _sbrk etc. don't get pulled in.
+  #   newlib's _exit / _sbrk etc. don't get pulled in. The linker
+  #   script now lives under tests/arch/cortex-m4/ alongside the
+  #   arch-specific tests it serves.
   # AVR: avr-libc supplies startup + crt0; no custom linker script,
   #   and `-mmcu=` (already in ARCH_C_FLAGS) selects the target part.
   set(TEST_FLAGS "-fno-exceptions" "-fno-unwind-tables" "-fno-asynchronous-unwind-tables")
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
       list(APPEND TEST_FLAGS "-march=armv7e-m")
-      set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib ${FPU_FLAGS}")
+      set(CMAKE_EXE_LINKER_FLAGS
+          "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/cortex-m4/linker.ld -nostdlib ${FPU_FLAGS}")
       target_link_libraries(tests PRIVATE c gcc)
   elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
       set(CMAKE_EXE_LINKER_FLAGS "-mmcu=${AVR_MCU}")

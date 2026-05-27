@@ -69,6 +69,12 @@ void test_gpio_get_port_number_skips_to_h(void) {
   TEST_ASSERT_EQUAL_UINT32(7, GPIO_GET_PORT_NUMBER(GPIO_PH00));
   TEST_ASSERT_EQUAL_UINT32(7, GPIO_GET_PORT_NUMBER(GPIO_PH09));
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_gpio_pin_encoding_layout);
+NAVTEST_CASE_DECL(test_gpio_get_pin_returns_low_nibble);
+NAVTEST_CASE_DECL(test_gpio_get_port_number_for_a_through_e);
+NAVTEST_CASE_DECL(test_gpio_get_port_number_skips_to_h);
+
 
 static const navtest_case_t gpio_encoding_cases[] = {
     NAVTEST_CASE(test_gpio_pin_encoding_layout),

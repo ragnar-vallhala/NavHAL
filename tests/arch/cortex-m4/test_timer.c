@@ -218,6 +218,23 @@ void test_hal_timer_attach_then_detach_callback(void) {
   TEST_ASSERT_EQUAL_UINT32(
       (uint32_t)HAL_OK, (uint32_t)hal_timer_detach_callback(TEST_TIMER));
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_timer_init_sets_prescaler_and_arr);
+NAVTEST_CASE_DECL(test_timer_start_sets_CEN_bit);
+NAVTEST_CASE_DECL(test_timer_stop_clears_CEN_bit);
+NAVTEST_CASE_DECL(test_timer_reset_clears_count);
+NAVTEST_CASE_DECL(test_timer_set_compare_and_get_compare);
+NAVTEST_CASE_DECL(test_timer_enable_and_disable_channel);
+NAVTEST_CASE_DECL(test_timer_clear_interrupt_flag_clears_UIF);
+NAVTEST_CASE_DECL(test_timer_set_arr_and_get_arr);
+NAVTEST_CASE_DECL(test_timer_get_count_returns_correct_value);
+NAVTEST_CASE_DECL(test_timer_get_frequency_returns_correct_value);
+NAVTEST_CASE_DECL(test_hal_timer_init_rejects_null_config);
+NAVTEST_CASE_DECL(test_hal_timer_init_freq_returns_ok);
+NAVTEST_CASE_DECL(test_hal_timer_set_prescaler_round_trip);
+NAVTEST_CASE_DECL(test_hal_timer_set_get_auto_reload);
+NAVTEST_CASE_DECL(test_hal_timer_attach_then_detach_callback);
+
 
 static const navtest_case_t timer_cases[] = {
     NAVTEST_CASE(test_timer_init_sets_prescaler_and_arr),

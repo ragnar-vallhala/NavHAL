@@ -84,6 +84,14 @@ void test_crc_sw_reset_restores_init(void) {
   /* After reset, accumulating nothing yields the init value. */
   TEST_ASSERT_EQUAL_UINT32(0xFFFFFFFFu, hal_crc_accumulate(NULL, 0));
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_crc_sw_init_rejects_null);
+NAVTEST_CASE_DECL(test_crc_sw_empty_returns_init);
+NAVTEST_CASE_DECL(test_crc_sw_single_byte);
+NAVTEST_CASE_DECL(test_crc_sw_mpeg2_reference_vector);
+NAVTEST_CASE_DECL(test_crc_sw_accumulate_matches_compute);
+NAVTEST_CASE_DECL(test_crc_sw_reset_restores_init);
+
 
 static const navtest_case_t crc_sw_cases[] = {
     NAVTEST_CASE(test_crc_sw_init_rejects_null),

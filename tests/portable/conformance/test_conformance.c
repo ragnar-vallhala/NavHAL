@@ -149,6 +149,19 @@ void test_conformance_cap_macros_are_defined(void) {
   TEST_ASSERT_TRUE(NAVHAL_HAS_CYCLE_COUNTER  == 0 || NAVHAL_HAS_CYCLE_COUNTER  == 1);
   TEST_ASSERT_TRUE(NAVHAL_HAS_SDIO           == 0 || NAVHAL_HAS_SDIO           == 1);
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_conformance_status_ok_is_zero);
+NAVTEST_CASE_DECL(test_conformance_status_errors_distinct);
+NAVTEST_CASE_DECL(test_conformance_gpio_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_clock_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_uart_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_dma_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_i2c_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_spi_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_pwm_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_sdio_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_cap_macros_are_defined);
+
 
 static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_status_ok_is_zero),

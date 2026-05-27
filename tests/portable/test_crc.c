@@ -120,6 +120,15 @@ void test_hal_crc_compute_mpeg2_reference_vector(void) {
   const uint8_t s[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
   TEST_ASSERT_EQUAL_UINT32(0x0376E6E7u, hal_crc_compute(s, sizeof(s)));
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_crc_empty_returns_init);
+NAVTEST_CASE_DECL(test_crc_single_byte);
+NAVTEST_CASE_DECL(test_crc_known_vector);
+NAVTEST_CASE_DECL(test_crc_accumulate_matches_compute);
+NAVTEST_CASE_DECL(test_crc_reset_restores_init);
+NAVTEST_CASE_DECL(test_hal_crc_init_rejects_null_config);
+NAVTEST_CASE_DECL(test_hal_crc_compute_mpeg2_reference_vector);
+
 
 static const navtest_case_t crc_cases[] = {
     NAVTEST_CASE(test_crc_empty_returns_init),

@@ -94,6 +94,29 @@ distinguish "the model says my code is right" from "the silicon agrees."
 
 ---
 
+## CI runner tiers
+
+The same three-level test triangle runs across two GitHub-Actions
+runner tiers. Picking the right one is mostly a question of cost and
+who owns the physical hardware:
+
+| Tier | Where it runs | Used for |
+|---|---|---|
+| **GitHub-hosted** (free, ephemeral, ubuntu-latest) | every per-PR job and the release-gate jobs | host tests, sample matrices, cap-contract, doxygen-strict, sanitizer host, both PIL jobs (Renode + simavr) — i.e. anything that finishes in single-digit minutes on a stock Ubuntu image |
+| **Self-hosted** (a runner the maintainer owns, with a physical board attached) | reserved for HIL | the wishlist "Extended HIL" suite, soak / fault-injection, any future per-vendor HIL on a real Nucleo / Arduino board |
+
+The split is intentional. GitHub-hosted runners are good enough for
+SIL + PIL and the build-side matrices, and parallelism is effectively
+free there. HIL has to be self-hosted because the runner needs the
+peripheral on its USB bus; that runner pool is also where any
+long-running soak job would land so it doesn't starve PR-time
+runners.
+
+When a new PIL backend lands (e.g. simulavr for an extra AVR variant,
+or QEMU for a future Cortex-A port) it stays on the GitHub-hosted
+tier as long as the wall-clock fits. If it grows past ~10 min, move
+that single job to self-hosted and keep the per-PR jobs hosted.
+
 ## What sits *above* this triangle
 
 A few classes of test are still on the wishlist and don't fit any of

@@ -12,6 +12,69 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # M8 §8.1 — Changed-files dispatch. Classifies the PR diff into
+  # cortex-m-only / avr-only / mixed and emits run-cortex-m / run-avr
+  # booleans the downstream jobs gate on. Any change that touches
+  # common code (headers, tools, build glue, portable tests, samples,
+  # workflows) is treated as mixed and runs both arches.
+  #
+  # On push and workflow_dispatch we don't have a diff base — fall back
+  # to "run everything" so cron / manual runs keep the full matrix.
+  dispatch:
+    name: Dispatch
+    runs-on: ubuntu-latest
+    outputs:
+      run-cortex-m: ${{ steps.compute.outputs.run-cortex-m }}
+      run-avr:      ${{ steps.compute.outputs.run-avr }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Classify the diff
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            cortex-m-only:
+              - 'src/arch/armv7e-m/**'
+              - 'src/vendor/stm32/**'
+              - 'include/port/cortex-m4/**'
+              - 'tests/arch/cortex-m4/**'
+              - 'samples/cortex-m/**'
+              - 'cmake/toolchains/arm-none-eabi-toolchain.cmake'
+              - 'cmake/defconfigs/cortex-m4_*'
+              - 'tools/renode/**'
+              - 'tools/pil/boards/nucleo_f401re.conf'
+            avr-only:
+              - 'src/arch/avr/**'
+              - 'src/vendor/microchip/**'
+              - 'include/port/avr/**'
+              - 'tests/arch/avr/**'
+              - 'cmake/toolchains/avr-toolchain.cmake'
+              - 'cmake/defconfigs/avr_*'
+              - 'tools/simavr/**'
+              - 'tools/pil/boards/atmega328p.conf'
+      - name: Compute run flags
+        id: compute
+        run: |
+          # Defaults: run everything (push / dispatch / cron / safety).
+          run_cm=true
+          run_avr=true
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            cm_only="${{ steps.filter.outputs.cortex-m-only }}"
+            avr_only="${{ steps.filter.outputs.avr-only }}"
+            # If only cortex-m-only matched (no other path), AVR jobs can sit out.
+            if [ "$cm_only" = "true" ] && [ "$avr_only" = "false" ]; then
+              run_avr=false
+            elif [ "$avr_only" = "true" ] && [ "$cm_only" = "false" ]; then
+              run_cm=false
+            fi
+            # Both false → diff was common (headers/tools/etc.) → run both.
+            # Both true → mixed PR → run both.
+          fi
+          echo "run-cortex-m=$run_cm" >> "$GITHUB_OUTPUT"
+          echo "run-avr=$run_avr"     >> "$GITHUB_OUTPUT"
+          echo "dispatch: run-cortex-m=$run_cm run-avr=$run_avr"
+
   # Enforce Conventional Commits on every commit added in a PR. Catches
   # --no-verify bypasses of the local .githooks/commit-msg hook. Only runs
   # on pull_request; main's history is treated as immutable.
@@ -27,7 +90,7 @@ jobs:
         run: tools/lint_commits.sh origin/${{ github.base_ref }}..HEAD
 
   # Fast pure-logic tests with the host gcc. Self-contained — no toolchain
-  # download, no emulator.
+  # download, no emulator. Always runs (arch-independent).
   host-tests:
     name: Host tests
     runs-on: ubuntu-latest
@@ -42,10 +105,12 @@ jobs:
 
   # Cross-compile the on-target navtest ELF. Uploads the binary as a
   # workflow artifact so the (separate) renode.yml workflow can consume
-  # it without rebuilding.
+  # it without rebuilding. Cortex-M specific.
   build-on-target:
     name: Build on-target ELF
     runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-cortex-m == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: Install arm-none-eabi toolchain
@@ -68,21 +133,19 @@ jobs:
           path: build-test/tests
           retention-days: 7
 
-  # NOTE: PIL (Renode) runs live in `.github/workflows/renode.yml`,
-  # gated on the same push + pull_request events. The `Full suite in
-  # Renode` job there should also be a required-status-check.
+  # NOTE: PIL (Renode + simavr) runs live in `.github/workflows/renode.yml`,
+  # gated on the same push + pull_request events. Those jobs run their
+  # own dispatch and pick the boards matrix accordingly.
 
   # NAVHAL_HAS_* capability contract — verifies that disabling a cap in
   # Kconfig actually drops its driver symbols from the test ELF, AND that
   # sub-cap flags (DRV_UART_DMA / DRV_I2C_DMA / DRV_SDIO_DMA) isolate per
-  # driver. Catches regressions in:
-  #   - navhal_port_config.h (hardcoded _X_ENABLED defines)
-  #   - Kconfig select cascades
-  #   - missing #ifdef guards in driver .c files
-  #   - fpu.c-style #else stubs that leak the symbol when the cap is off
+  # driver. Cortex-M specific (the contract is tested on STM32).
   cap-contract:
     name: Capability contract
     runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-cortex-m == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: Install arm-none-eabi toolchain
@@ -102,6 +165,8 @@ jobs:
   sample-matrix:
     name: Build all samples
     runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-cortex-m == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: Install arm-none-eabi toolchain
@@ -120,6 +185,8 @@ jobs:
   sample-matrix-avr:
     name: Build all AVR samples
     runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-avr == 'true'
     steps:
       - uses: actions/checkout@v4
       - name: Install avr toolchain
@@ -131,3 +198,44 @@ jobs:
         run: pip install kconfiglib
       - name: Build every portable sample under AVR config
         run: tools/build_all_avr_samples.sh
+
+  # M8 §8.1 — Single required-status-check name to put on branch
+  # protection. Succeeds if every per-PR job either passed or was
+  # legitimately skipped by the dispatcher. GitHub doesn't treat
+  # "skipped" as "passed" for individual branch-protection contexts,
+  # so without this aggregator a PR touching only AVR code would be
+  # blocked forever waiting on the skipped Cortex jobs.
+  ci-required:
+    name: CI required
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - dispatch
+      - commit-lint
+      - host-tests
+      - build-on-target
+      - cap-contract
+      - sample-matrix
+      - sample-matrix-avr
+    steps:
+      - name: Aggregate per-job results (success or skipped == ok)
+        run: |
+          fail=0
+          check() {
+            local name=$1 result=$2
+            case "$result" in
+              success|skipped) printf '  \033[32m%-7s\033[0m  %s\n' "$result" "$name" ;;
+              *)               printf '  \033[31m%-7s\033[0m  %s\n' "$result" "$name"; fail=1 ;;
+            esac
+          }
+          check dispatch          "${{ needs.dispatch.result }}"
+          check commit-lint       "${{ needs.commit-lint.result }}"
+          check host-tests        "${{ needs.host-tests.result }}"
+          check build-on-target   "${{ needs.build-on-target.result }}"
+          check cap-contract      "${{ needs.cap-contract.result }}"
+          check sample-matrix     "${{ needs.sample-matrix.result }}"
+          check sample-matrix-avr "${{ needs.sample-matrix-avr.result }}"
+          if [ "$fail" -eq 0 ]; then
+            echo "CI green."
+          fi
+          exit $fail

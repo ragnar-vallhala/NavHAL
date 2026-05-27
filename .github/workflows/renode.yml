@@ -6,9 +6,11 @@ name: PIL (per-arch)
 #   1. tools/pil/boards/<name>.conf  (arch, toolchain file, runner, deps)
 #   2. optional tools/pil/setup/<name>.sh  (non-apt deps; install-renode.sh
 #      is the example)
-#   3. add the board name to the matrix list below
+#   3. add the board name to the matrix-source below
 #
-# That's it — no per-board step blocks. tools/pil/run.sh dispatches.
+# M8 §8.1 — dispatch filters the matrix by changed files. A PR that
+# touches only AVR-port code skips the Renode (nucleo_f401re) job, and
+# vice versa. Common-code changes (or push/cron/dispatch) run both.
 
 on:
   push:
@@ -24,14 +26,63 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  dispatch:
+    name: Dispatch
+    runs-on: ubuntu-latest
+    outputs:
+      boards: ${{ steps.compute.outputs.boards }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Classify the diff
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            cortex-m-only:
+              - 'src/arch/armv7e-m/**'
+              - 'src/vendor/stm32/**'
+              - 'include/port/cortex-m4/**'
+              - 'tests/arch/cortex-m4/**'
+              - 'samples/cortex-m/**'
+              - 'cmake/toolchains/arm-none-eabi-toolchain.cmake'
+              - 'cmake/defconfigs/cortex-m4_*'
+              - 'tools/renode/**'
+              - 'tools/pil/boards/nucleo_f401re.conf'
+            avr-only:
+              - 'src/arch/avr/**'
+              - 'src/vendor/microchip/**'
+              - 'include/port/avr/**'
+              - 'tests/arch/avr/**'
+              - 'cmake/toolchains/avr-toolchain.cmake'
+              - 'cmake/defconfigs/avr_*'
+              - 'tools/simavr/**'
+              - 'tools/pil/boards/atmega328p.conf'
+      - name: Compute boards matrix
+        id: compute
+        run: |
+          boards='["nucleo_f401re","atmega328p"]'   # default: both
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            cm_only="${{ steps.filter.outputs.cortex-m-only }}"
+            avr_only="${{ steps.filter.outputs.avr-only }}"
+            if [ "$cm_only" = "true" ] && [ "$avr_only" = "false" ]; then
+              boards='["nucleo_f401re"]'
+            elif [ "$avr_only" = "true" ] && [ "$cm_only" = "false" ]; then
+              boards='["atmega328p"]'
+            fi
+          fi
+          echo "boards=$boards" >> "$GITHUB_OUTPUT"
+          echo "dispatch: boards=$boards"
+
   pil:
     name: PIL ${{ matrix.board }}
     runs-on: ubuntu-latest
+    needs: dispatch
     timeout-minutes: 150  # generous cap; AVR finishes in seconds, Renode in minutes
     strategy:
       fail-fast: false
       matrix:
-        board: [nucleo_f401re, atmega328p]
+        board: ${{ fromJson(needs.dispatch.outputs.boards) }}
     steps:
       - uses: actions/checkout@v4
       - name: Install kconfiglib
@@ -40,3 +91,25 @@ jobs:
         run: tools/pil/run.sh ${{ matrix.board }} --install-deps
       - name: Build + run PIL for ${{ matrix.board }}
         run: tools/pil/run.sh ${{ matrix.board }}
+
+  # M8 §8.1 — single required-status-check name for stable branch
+  # protection. Succeeds if every PIL job that ran passed (or all were
+  # legitimately filtered out by the dispatcher).
+  pil-required:
+    name: PIL required
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [dispatch, pil]
+    steps:
+      - name: Aggregate PIL matrix
+        run: |
+          # `needs.pil.result` collapses the whole matrix to one value:
+          # success / failure / cancelled / skipped.
+          result="${{ needs.pil.result }}"
+          dispatch="${{ needs.dispatch.result }}"
+          echo "dispatch: $dispatch"
+          echo "pil matrix: $result"
+          case "$result" in
+            success|skipped) echo "PIL gate green."; exit 0 ;;
+            *)               echo "PIL gate failed."; exit 1 ;;
+          esac

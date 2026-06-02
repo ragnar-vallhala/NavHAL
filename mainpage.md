@@ -1,6 +1,6 @@
-@mainpage NavHAL Documentation
+@mainpage NavHAL™ Documentation
 
-**NavHAL** is a hardware abstraction layer for embedded systems, offering a standardized, frozen C interface for GPIO, UART, I²C, SPI, timers, PWM, DMA, flash, CRC, SDIO, FPU and a cycle counter. The public `hal_*` API is at `HAL_API_VERSION 1`.
+**NavHAL™** is a hardware abstraction layer for embedded systems, offering a standardized, frozen C interface for GPIO, UART, I²C, SPI, timers, PWM, DMA, flash, CRC, SDIO, FPU and a cycle counter. The public `hal_*` API is at `HAL_API_VERSION 1`.
 
 The codebase is laid out so adding a new MCU adds directories, not build-system changes — arch / vendor / family / board are explicit Kconfig axes. v1 ships two implemented ports: **STM32F401RE (Cortex-M4)** and **ATmega328P (AVR)**.
 

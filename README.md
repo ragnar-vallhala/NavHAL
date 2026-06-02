@@ -1,5 +1,5 @@
 
-# NavHAL — NAVRobotec Hardware Abstraction Layer
+# NavHAL™ — NAVRobotec Hardware Abstraction Layer
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE.md)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/ragnar-vallhala/NavHAL/ci.yml?branch=main)](https://github.com/ragnar-vallhala/NavHAL/actions)
@@ -13,7 +13,7 @@
 
 ## Overview
 
-**NavHAL** is a hardware abstraction layer (HAL) written in C for embedded
+**NavHAL™** is a hardware abstraction layer (HAL) written in C for embedded
 systems. Its API is architecture-agnostic *by design* — the layered
 arch / vendor / family / board structure and the Kconfig-driven build are
 built to host multiple targets — but the v1 release ships **one implemented
@@ -133,6 +133,8 @@ Apache License 2.0 — see [LICENSE.md](LICENSE.md) for details.
 
 Copyright © 2025 NAVRobotec Pvt Ltd.
 
+NavHAL™ is a trademark of NAVRobotec Pvt Ltd. All rights reserved.
+
 ---
 
 ## Contact
@@ -145,4 +147,4 @@ Website: [https://navrobotec.com](https://navrobotec.com)
 
 ---
 
-Thank you for exploring NavHAL — the future of portable embedded hardware abstraction!
+Thank you for exploring NavHAL™ — the future of portable embedded hardware abstraction!

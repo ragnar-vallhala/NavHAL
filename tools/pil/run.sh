@@ -6,7 +6,7 @@
 #
 # Usage:
 #   tools/pil/run.sh <board>                  # build + run
-#   tools/pil/run.sh <board> --install-deps   # apt-install the deps first
+#   tools/pil/run.sh <board> --install-deps   # install this board's deps, then exit
 #   tools/pil/run.sh --list                   # list known boards
 #
 # Adding a new MCU is one new file under tools/pil/boards/<name>.conf
@@ -68,6 +68,13 @@ done
 # Optional dep installation pass (CI uses this; humans typically don't).
 # Two stages: apt for distro-packaged deps, then an optional SETUP_SCRIPT
 # for things that aren't apt-packaged (e.g. Renode).
+#
+# --install-deps is install-ONLY and exits when done: the CI workflow runs
+# it as a separate "Install deps" stage before the "Build + run" stage, so
+# falling through to build+run here would run the suite twice. The second,
+# back-to-back Renode boot races the dotnet child the first run leaves
+# behind and intermittently writes an empty UART log — a spurious CI red.
+# Humans wanting one shot run `--install-deps` once, then the plain form.
 if [ "$INSTALL_DEPS" = "1" ]; then
   if [ -n "${APT_DEPS:-}" ]; then
     echo ">> apt install ($BOARD): $APT_DEPS"
@@ -83,6 +90,8 @@ if [ "$INSTALL_DEPS" = "1" ]; then
     echo ">> running $SETUP_SCRIPT"
     "$SETUP_SCRIPT"
   fi
+  echo ">> deps installed for $BOARD"
+  exit 0
 fi
 
 echo ">> board=$BOARD arch=$ARCH toolchain=$TOOLCHAIN_FILE"

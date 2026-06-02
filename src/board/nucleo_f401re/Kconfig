@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Board identity string for Nucleo-F401RE (M7 §7.2). Sourced at top level.
+
+config BOARD
+    string
+    default "nucleo_f401re" if BOARD_NUCLEO_F401RE

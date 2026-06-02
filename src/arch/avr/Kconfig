@@ -1,0 +1,21 @@
+# vim: ft=kconfig
+# Per-arch identity + build defaults for the AVR8 ISA (M7 §7.2).
+# See src/arch/armv7e-m/Kconfig for the conventions; the prompted build
+# knobs are declared in the root and only get their per-arch default here.
+
+config CMAKE_SYSTEM_PROCESSOR
+    string
+    default "avr" if ARCH_AVR8
+
+config ARCH_ISA
+    string
+    default "avr" if ARCH_AVR8
+
+config TOOLCHAIN_PREFIX
+    default "avr-" if ARCH_AVR8
+
+config FLASHER
+    default "avrdude" if ARCH_AVR8
+
+config FLASH_ADDRESS
+    default "0x0" if ARCH_AVR8

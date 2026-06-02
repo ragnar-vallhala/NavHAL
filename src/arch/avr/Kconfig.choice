@@ -1,0 +1,9 @@
+# vim: ft=kconfig
+# Processor Architecture choice entry for the AVR8 ISA (M7 §7.2).
+# Sourced inside the root "Processor Architecture" choice.
+
+config ARCH_AVR8
+    bool "AVR8 (8-bit)"
+    help
+      8-bit AVR architecture (ATmega / ATtiny). Implemented by the M6
+      port; arch sources live under src/arch/avr/.

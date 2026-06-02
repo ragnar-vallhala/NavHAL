@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Family identity string for ATmega328P (M7 §7.2). Sourced at top level.
+
+config FAMILY
+    string
+    default "atmega328p" if FAMILY_ATMEGA328P

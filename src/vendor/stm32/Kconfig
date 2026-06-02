@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Vendor identity string for STM32 (M7 §7.2). Sourced at top level.
+
+config VENDOR
+    string
+    default "stm32" if VENDOR_STM32

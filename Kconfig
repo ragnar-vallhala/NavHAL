@@ -1,6 +1,17 @@
 # vim: ft=kconfig
 mainmenu "NavHAL Configuration System"
 
+# Platform selection (arch / vendor / family / board) is contributed by
+# per-port Kconfig fragments under each port's own source tree (M7 §7.2),
+# glob-sourced below. Adding an MCU is purely additive: drop the fragment
+# files into src/arch, src/vendor, src/board — no edits to this file.
+#
+# Each choice sources the ports' "Kconfig.choice" members. Their
+# mutual-exclusion default falls out of the `depends on` chain
+# (arch ▶ vendor ▶ family ▶ board): exactly one member is visible per
+# parent selection, and a choice auto-selects its single visible member,
+# so no per-port "default X if PARENT" lines are needed here.
+
 menu "Target Platform Configuration"
 
 choice
@@ -8,144 +19,53 @@ choice
     default ARCH_CORTEX_M4
     help
       Select the target processor architecture.
-
-config ARCH_CORTEX_M4
-    bool "Cortex-M4"
-
-config ARCH_AVR8
-    bool "AVR8 (8-bit)"
-    help
-      8-bit AVR architecture (ATmega / ATtiny). Implemented by the M6
-      port; arch sources live under src/arch/avr/.
-
+source "src/arch/*/Kconfig.choice"
 endchoice
-
-config CMAKE_SYSTEM_PROCESSOR
-    string
-    default "cortex-m4" if ARCH_CORTEX_M4
-    default "avr"       if ARCH_AVR8
-
-# Source-tree slug for the ISA / arch layer (src/arch/<ARCH_ISA>/).
-# A single ISA covers multiple processors (Cortex-M3/M4/M7 all share
-# armv7e-m startup, NVIC, SysTick), so this is a distinct axis from
-# CMAKE_SYSTEM_PROCESSOR which names a specific core.
-config ARCH_ISA
-    string
-    default "armv7e-m" if ARCH_CORTEX_M4
-    default "avr"      if ARCH_AVR8
 
 choice
     prompt "Vendor"
-    default VENDOR_STM32     if ARCH_CORTEX_M4
-    default VENDOR_MICROCHIP if ARCH_AVR8
     help
       Select the silicon vendor.
-
-config VENDOR_STM32
-    bool "STM32"
-    depends on ARCH_CORTEX_M4
-
-config VENDOR_MICROCHIP
-    bool "Microchip"
-    depends on ARCH_AVR8
-    help
-      Microchip (formerly Atmel) AVR silicon.
-
+source "src/vendor/*/Kconfig.choice"
 endchoice
-
-config VENDOR
-    string
-    default "stm32"     if VENDOR_STM32
-    default "microchip" if VENDOR_MICROCHIP
 
 choice
     prompt "Vendor Device Family"
-    default FAMILY_STM32F4     if VENDOR_STM32
-    default FAMILY_ATMEGA328P  if VENDOR_MICROCHIP
     help
       Select the device family within the selected vendor. This is the
       register-layout axis: a single vendor can ship multiple families
       with different register maps (STM32F4 vs STM32F0 vs ...).
-
-config FAMILY_STM32F4
-    bool "STM32F4 (Cortex-M4)"
-    depends on VENDOR_STM32
-
-config FAMILY_ATMEGA328P
-    bool "ATmega328P"
-    depends on VENDOR_MICROCHIP
-
+source "src/vendor/*/family/*/Kconfig.choice"
 endchoice
-
-config FAMILY
-    string
-    default "stm32f4"     if FAMILY_STM32F4
-    default "atmega328p"  if FAMILY_ATMEGA328P
 
 choice
     prompt "Target Board"
-    default BOARD_NUCLEO_F401RE if FAMILY_STM32F4
-    default BOARD_ATMEGA328P    if FAMILY_ATMEGA328P
     help
       Select the target development board.
-
-config BOARD_NUCLEO_F401RE
-    bool "nucleo_f401re"
-    depends on FAMILY_STM32F4
-
-config BOARD_ATMEGA328P
-    bool "atmega328p"
-    depends on FAMILY_ATMEGA328P
-
+source "src/board/*/Kconfig.choice"
 endchoice
 
-config BOARD
-    string
-    default "nucleo_f401re" if BOARD_NUCLEO_F401RE
-    default "atmega328p"    if BOARD_ATMEGA328P
+# Per-port identity strings (ARCH_ISA / VENDOR / FAMILY / BOARD /
+# CMAKE_SYSTEM_PROCESSOR) and per-arch build defaults.
+source "src/arch/*/Kconfig"
+source "src/vendor/*/Kconfig"
+source "src/vendor/*/family/*/Kconfig"
+source "src/board/*/Kconfig"
 
 endmenu
 
 menu "System & Features Configuration"
 
-# DMA, the hardware FPU and the DWT cycle counter are Cortex-M
-# peripherals with no ATmega328P equivalent — gated to ARCH_CORTEX_M4
-# so they cannot be selected on AVR.
-
-config USE_FPU
-    bool "Enable Hardware FPU Compiler Flags"
-    depends on ARCH_CORTEX_M4
-    default n
-    help
-      Enable hardware Floating Point Unit compiler and linker flags.
-
-config DRV_DMA
-    bool "Enable Direct Memory Access (DMA)"
-    depends on ARCH_CORTEX_M4
-    default n
-    select DRV_INTERRUPT
-    help
-      Enables support for the DMA hardware controller.
+# Arch-specific peripheral toggles (FPU, DMA, DWT, ...) ship with their
+# arch under src/arch/<isa>/Kconfig.features. osource: not every arch has
+# arch-specific features.
+osource "src/arch/*/Kconfig.features"
 
 config DRV_CRC
     bool "Enable Hardware CRC Unit"
     default n
     help
       Enables hardware cyclic redundancy check unit support.
-
-config DRV_DWT
-    bool "Enable Debug Watchpoint and Trace (DWT)"
-    depends on ARCH_CORTEX_M4
-    default n
-    help
-      Enables the DWT counter for high-resolution timing.
-
-config DRV_FPU
-    bool "Enable FPU Driver Extension"
-    depends on ARCH_CORTEX_M4
-    default n
-    help
-      Enables compilation of hardware FPU runtime setup files.
 
 endmenu
 
@@ -242,10 +162,11 @@ endmenu
 
 menu "Build Options"
 
+# Per-arch toolchain identity: the prompt lives here (shared, overridable
+# in menuconfig); each arch contributes its "default ... if ARCH_*" under
+# src/arch/<isa>/Kconfig.
 config TOOLCHAIN_PREFIX
     string "Toolchain Binary Prefix"
-    default "arm-none-eabi-" if ARCH_CORTEX_M4
-    default "avr-"           if ARCH_AVR8
     help
       Prefix for the toolchain binaries (e.g. arm-none-eabi-, avr-).
 
@@ -264,12 +185,8 @@ config TEST
 
 config FLASHER
     string "Binary Flasher Tool"
-    default "st-flash" if ARCH_CORTEX_M4
-    default "avrdude"  if ARCH_AVR8
 
 config FLASH_ADDRESS
     string "Flash Target Address"
-    default "0x8000000" if ARCH_CORTEX_M4
-    default "0x0"       if ARCH_AVR8
 
 endmenu

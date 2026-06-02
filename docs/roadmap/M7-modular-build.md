@@ -2,8 +2,8 @@
 
 # M7 — Modular build system
 
-> Status: **partial** — §7.1 (CMake fragments) and §7.3 (sample Kconfig)
-> landed; §7.2 (per-port Kconfig fragments) deferred. See "What landed"
+> Status: **done** — §7.1 (CMake fragments), §7.2 (per-port Kconfig
+> fragments) and §7.3 (sample Kconfig) all landed. See "What landed"
 > at the bottom.
 > Scope: split monolithic `CMakeLists.txt` + `Kconfig` into per-port fragments.
 > Predecessor: M6 (AVR port). No external dependencies.
@@ -127,25 +127,72 @@ runs unchanged.
 ## What landed (M7 v1)
 
 §7.1 (CMake) and §7.3 (sample Kconfig) shipped — the high-leverage
-work. §7.2 (per-port Kconfig fragments for arch / vendor / family /
-board choices) was deferred because:
+work. §7.2 (per-port Kconfig fragments) was initially deferred over
+one concern:
 
-* The choice blocks in root Kconfig have interdependent defaults
-  (`default FAMILY_STM32F4 if VENDOR_STM32`) that don't cleanly factor
-  into per-port files without each port knowing about every other
-  port's choices.
-* Per-port fragments are most valuable when there are many ports
-  pulling at the schema — at two MCUs the root Kconfig is still
-  readable.
+* The choice blocks in root Kconfig appeared to have interdependent
+  defaults (`default FAMILY_STM32F4 if VENDOR_STM32`) that didn't
+  cleanly factor into per-port files without each port knowing about
+  every other port's choices.
 
-§7.2 picks back up under **M7 v2** when either:
-1. A third MCU is being added and the choice-block clutter
-   actually starts to hurt review, or
-2. M10 (port-as-package) is in progress and ports need to ship
-   their Kconfig fragment in their own repo.
+## What landed (M7 v2 — §7.2)
 
-Until then, the M7 v1 wins:
-* Adding an arch is one new `cmake/arch/<ARCH_ISA>.cmake` file —
-  no edits to root `CMakeLists.txt`.
+§7.2 shipped, and the "interdependent defaults" blocker dissolved on
+closer inspection: **those conditional defaults are redundant with the
+`depends on` chain.** Each vendor `depends on` its arch, each family on
+its vendor, each board on its family. So under any parent selection
+exactly one child member is *visible*, and a Kconfig `choice`
+auto-selects its single visible member — the `default X if PARENT`
+lines never actually decided anything. Dropping them removes the
+cross-port coupling entirely.
+
+Mechanism:
+
+* Each port axis owns fragments under its own source tree:
+  * `src/arch/<isa>/Kconfig.choice` — the arch's entry in the
+    "Processor Architecture" choice; `…/Kconfig` — its identity
+    strings (`ARCH_ISA`, `CMAKE_SYSTEM_PROCESSOR`) and per-arch build
+    defaults (toolchain prefix, flasher, flash address);
+    `…/Kconfig.features` — arch-only peripheral toggles (FPU, DMA,
+    DWT — Cortex-M only).
+  * `src/vendor/<vendor>/Kconfig{,.choice}` and
+    `src/vendor/<vendor>/family/<family>/Kconfig{,.choice}` —
+    vendor / family choice entries and their `VENDOR` / `FAMILY`
+    identity strings.
+  * `src/board/<board>/Kconfig{,.choice}` — board choice entry and
+    its `BOARD` identity string.
+* The root `Kconfig` glob-sources these: each `choice` block does
+  `source "src/.../Kconfig.choice"` (kconfiglib supports `source`
+  inside a choice and glob patterns), and the identity/feature
+  fragments are sourced outside the choices. The prompted build knobs
+  (`TOOLCHAIN_PREFIX` etc.) keep their single prompt in root; each arch
+  only contributes a `default … if ARCH_*`.
+
+Verification (all four target × sample combinations):
+
+* `tools/kconfig.py` produces the **identical** symbol set and values
+  (`.config`, `config.cmake`, `autoconf.h`, `navhal_target.h`) before
+  and after — the only delta is emission order, which is irrelevant to
+  object-like `#define`s and `set(... CACHE)` lines.
+* `hal_blink` links to a **byte-identical ELF** on both arches
+  (Cortex-M4 and AVR) when built from the same path.
+* Dropping a throwaway `src/arch/rv32/Kconfig.choice` makes `ARCH_RV32`
+  appear in the arch choice with **zero edits to root `Kconfig`** —
+  the "purely additive" goal.
+
+Note on the original `< 50 lines` exit target: it conflicted with the
+same section's "common driver caps stay here," and the latter wins. The
+*platform-selection ladder* (arch / vendor / family / board, ~90 lines)
+is fully externalized and no per-port option remains in root; the
+common driver / feature / build menus legitimately stay inline, so the
+root is ~190 lines. The scaling pain the milestone targeted — the
+per-port choice ladder — is gone.
+
+The M7 wins:
+* Adding an arch is one new `cmake/arch/<ARCH_ISA>.cmake` file plus a
+  fragment under `src/arch/<isa>/` — no edits to root `CMakeLists.txt`
+  or root `Kconfig`.
+* Adding a vendor / family / board is a fragment under its source
+  tree — no edits to root `Kconfig`.
 * Adding a sample is one edit to `samples/Kconfig` — no edits to
   root `Kconfig`.

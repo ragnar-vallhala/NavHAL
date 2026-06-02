@@ -1,0 +1,8 @@
+# vim: ft=kconfig
+# Device-family choice entry for ATmega328P (M7 §7.2).
+# Sourced inside the root "Vendor Device Family" choice. Visible only
+# when its vendor is selected, so it auto-selects then.
+
+config FAMILY_ATMEGA328P
+    bool "ATmega328P"
+    depends on VENDOR_MICROCHIP

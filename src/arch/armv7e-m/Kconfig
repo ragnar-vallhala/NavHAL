@@ -1,0 +1,29 @@
+# vim: ft=kconfig
+# Per-arch identity + build defaults for the armv7e-m ISA (M7 §7.2).
+# Sourced unconditionally at top level. Every "default ... if ARCH_*"
+# is gated on this arch's choice symbol, so only the selected arch
+# contributes a value. Several arches defining the same string symbol
+# is intentional — kconfiglib merges the defaults; the prompted build
+# knobs (TOOLCHAIN_PREFIX / FLASHER / FLASH_ADDRESS) are declared once
+# in the root and only have their per-arch default added here.
+
+# CMAKE_SYSTEM_PROCESSOR names a specific core; ARCH_ISA is the
+# source-tree slug for the ISA layer (src/arch/<ARCH_ISA>/). A single
+# ISA covers multiple processors (Cortex-M3/M4/M7 share armv7e-m
+# startup, NVIC, SysTick), so the two are distinct axes.
+config CMAKE_SYSTEM_PROCESSOR
+    string
+    default "cortex-m4" if ARCH_CORTEX_M4
+
+config ARCH_ISA
+    string
+    default "armv7e-m" if ARCH_CORTEX_M4
+
+config TOOLCHAIN_PREFIX
+    default "arm-none-eabi-" if ARCH_CORTEX_M4
+
+config FLASHER
+    default "st-flash" if ARCH_CORTEX_M4
+
+config FLASH_ADDRESS
+    default "0x8000000" if ARCH_CORTEX_M4

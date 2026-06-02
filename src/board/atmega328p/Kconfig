@@ -1,0 +1,7 @@
+# vim: ft=kconfig
+# Board identity string for the bare ATmega328P board (M7 §7.2).
+# Sourced at top level.
+
+config BOARD
+    string
+    default "atmega328p" if BOARD_ATMEGA328P

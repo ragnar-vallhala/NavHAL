@@ -38,7 +38,7 @@ This roadmap is the work to get there, factored into five milestones.
 
 | Milestone        | Status      | Scope                                       | Unlocks                                              |
 |---|---|---|---|
-| @ref roadmap_m7  | partial — v1 done, v2 deferred | Modular build system | 5–15 MCUs without CMakeLists/Kconfig becoming a swamp |
+| @ref roadmap_m7  | **done**    | Modular build system | 5–15 MCUs without CMakeLists/Kconfig becoming a swamp |
 | @ref roadmap_m8  | **done**    | CI tiering + portable test framework        | Per-arch CI scaling; HAL-only tests run on every arch |
 | @ref roadmap_m9  | planned     | Driver vtable / vendor-backend abstraction  | ~80 % less per-vendor boilerplate; conformance enforced by interface |
 | @ref roadmap_m10 | planned     | Port as a registry package                  | Strategic shift away from monorepo. Vendors publish ports independently. |

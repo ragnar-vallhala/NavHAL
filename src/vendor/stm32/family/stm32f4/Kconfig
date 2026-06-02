@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Family identity string for STM32F4 (M7 §7.2). Sourced at top level.
+
+config FAMILY
+    string
+    default "stm32f4" if FAMILY_STM32F4

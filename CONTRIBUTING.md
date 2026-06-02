@@ -178,7 +178,7 @@ Concretely, a new MCU needs:
 7. PIL (Processor-in-the-Loop) integration:
    * Add `tools/pil/boards/<board>.conf` with the toolchain file, build dir, runner script, and apt deps. See `tools/pil/boards/atmega328p.conf` as the minimal example or `nucleo_f401re.conf` as the full one (with `SETUP_SCRIPT=` for non-apt installs like Renode).
    * Pick the emulator and provide a runner under `tools/<emulator>/run_tests.sh` (mirror `tools/simavr/run_tests.sh` — it's <100 lines).
-   * Add the board to the matrix in `.github/workflows/renode.yml`'s `strategy.matrix.board` list. The dispatcher `tools/pil/run.sh <board>` handles everything else.
+   * Add the board to the matrix in `.github/workflows/renode.yml`'s `strategy.matrix.board` list. The dispatcher (`tools/pil/run.sh BOARD`) handles everything else.
 
 ## Licensing of contributions
 

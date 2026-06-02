@@ -25,11 +25,25 @@ RESC="$REPO_ROOT/tools/renode/navhal_f401re.resc"
 LOGFILE="$(mktemp -t navhal-uart-XXXXXX.log)"
 
 RENODE_PID=""
+RENODE_PGID=""
 WATCHER_PID=""
 TAIL_PID=""
+
+# Stop Renode and the dotnet/mono child it spawns. When we launched it under
+# its own process group (setsid) we signal the whole group, so the child can't
+# be orphaned (a lingering 'dotnet' otherwise survives into CI teardown);
+# otherwise we fall back to signalling just the launcher pid.
+stop_renode() {
+  if [[ -n "$RENODE_PGID" ]]; then
+    kill -TERM -- "-$RENODE_PGID" 2>/dev/null || true
+  elif [[ -n "$RENODE_PID" ]]; then
+    kill -TERM "$RENODE_PID" 2>/dev/null || true
+  fi
+}
+
 cleanup() {
   [[ -n "$WATCHER_PID" ]] && kill "$WATCHER_PID" 2>/dev/null || true
-  [[ -n "$RENODE_PID"  ]] && kill "$RENODE_PID"  2>/dev/null || true
+  stop_renode
   [[ -n "$TAIL_PID"    ]] && kill "$TAIL_PID"    2>/dev/null || true
   rm -f "$LOGFILE"
 }
@@ -56,12 +70,26 @@ TAIL_PID=$!
 # reports its summary. Without that, the `RunFor` budget inside the .resc
 # keeps Renode emulating the firmware's post-main idle loop until the full
 # 3 emulated hours elapse — looking exactly like "Renode hangs at the end."
-renode \
-  --disable-xwt \
-  --hide-log \
-  -e "\$bin = @$ELF; \$logfile = @$LOGFILE; i @$RESC" \
-  >/dev/null 2>&1 &
-RENODE_PID=$!
+# Run Renode in its own process group (setsid) so the cleanup above can reap
+# the whole tree — the launcher plus its dotnet/mono child. setsid ships with
+# util-linux on every CI runner and dev box we target; degrade to a plain
+# background run (launcher-pid signalling only) if it is somehow unavailable.
+if command -v setsid >/dev/null 2>&1; then
+  setsid renode \
+    --disable-xwt \
+    --hide-log \
+    -e "\$bin = @$ELF; \$logfile = @$LOGFILE; i @$RESC" \
+    >/dev/null 2>&1 &
+  RENODE_PID=$!
+  RENODE_PGID=$RENODE_PID   # setsid makes Renode its own process-group leader
+else
+  renode \
+    --disable-xwt \
+    --hide-log \
+    -e "\$bin = @$ELF; \$logfile = @$LOGFILE; i @$RESC" \
+    >/dev/null 2>&1 &
+  RENODE_PID=$!
+fi
 
 # Watcher: poll the UART log for the navtest summary line. When it shows
 # up, give tail a beat to flush the last few lines, then SIGTERM Renode.
@@ -71,7 +99,7 @@ RENODE_PID=$!
   while kill -0 "$RENODE_PID" 2>/dev/null; do
     if grep -q "Total failures:" "$LOGFILE" 2>/dev/null; then
       sleep 0.5
-      kill -TERM "$RENODE_PID" 2>/dev/null || true
+      stop_renode
       break
     fi
     sleep 0.5

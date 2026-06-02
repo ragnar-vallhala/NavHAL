@@ -186,6 +186,20 @@ void test_hal_clock_init_pll_rejects_null_pll_cfg(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
                            (uint32_t)hal_clock_init(&cfg, NULL));
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_hal_clock_init_hsi);
+NAVTEST_CASE_DECL(test_hal_clock_init_hse);
+NAVTEST_CASE_DECL(test_hal_clock_init_pll);
+NAVTEST_CASE_DECL(test_hal_clock_get_sysclk_returns_correct_value_hsi);
+NAVTEST_CASE_DECL(test_hal_clock_get_sysclk_returns_correct_value_hse);
+NAVTEST_CASE_DECL(test_hal_clock_get_sysclk_returns_correct_value_pll);
+NAVTEST_CASE_DECL(test_hal_clock_get_ahbclk_returns_correct_value);
+NAVTEST_CASE_DECL(test_hal_clock_get_apb1clk_returns_correct_value);
+NAVTEST_CASE_DECL(test_hal_clock_get_apb2clk_returns_correct_value);
+NAVTEST_CASE_DECL(test_hal_clock_init_returns_ok_for_hsi);
+NAVTEST_CASE_DECL(test_hal_clock_init_rejects_null_cfg);
+NAVTEST_CASE_DECL(test_hal_clock_init_pll_rejects_null_pll_cfg);
+
 
 static const navtest_case_t clock_cases[] = {
     NAVTEST_CASE(test_hal_clock_init_hsi),

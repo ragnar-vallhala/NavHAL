@@ -64,11 +64,13 @@ __attribute__((weak)) void tearDown(void) {}
 /* Walk a suite's case table, printing per-suite banners + summary.
  * Identical per-case output to RUN_TEST.
  *
- * Suite + case names come from test files' static initializers and
- * are RAM-resident on every arch (NAVTEST_CASE uses plain #f
- * stringification — see comment in navtest.h). The literals
- * bracketing the names DO go through navtest_write_P + _NT_PSTR so
- * they land in PROGMEM on AVR. */
+ * Case names live in PROGMEM on AVR (NAVTEST_CASE_DECL declares each
+ * one as a static const char[] __progmem__) and in .rodata everywhere
+ * else. navtest_write_P aliases navtest_write on non-AVR, so reading
+ * c->name through it is portable.
+ *
+ * Suite names are still RAM string literals — short, few per build,
+ * not worth a parallel _DECL macro. */
 int navtest_run_suite(const navtest_suite_t *suite) {
   navtest_write_P(_NT_PSTR("\n=========== "));
   navtest_write(suite->name);
@@ -84,7 +86,7 @@ int navtest_run_suite(const navtest_suite_t *suite) {
     uint32_t prev = _navtest.failures;
     setUp();
     navtest_write_P(_NT_PSTR(_NT_CYAN "  >> " _NT_BOLD));
-    navtest_write(c->name);
+    navtest_write_P(c->name);
     navtest_write_P(_NT_PSTR(_NT_RST "\r\n"));
     c->fn();
     if (_navtest.failures == prev) {

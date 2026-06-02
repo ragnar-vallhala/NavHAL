@@ -94,6 +94,16 @@ void test_hal_timebase_returns_uint32(void) {
   (void)u;
   TEST_ASSERT_TRUE(1);
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_hal_timebase_init_returns_ok);
+NAVTEST_CASE_DECL(test_hal_timebase_tick_increments);
+NAVTEST_CASE_DECL(test_hal_timebase_get_tick_duration_us_matches_init);
+NAVTEST_CASE_DECL(test_hal_timebase_get_millis_is_monotonic);
+NAVTEST_CASE_DECL(test_hal_timebase_get_micros_is_monotonic);
+NAVTEST_CASE_DECL(test_hal_timebase_get_reload_value_nonzero);
+NAVTEST_CASE_DECL(test_hal_timebase_set_callback_rejects_null);
+NAVTEST_CASE_DECL(test_hal_timebase_returns_uint32);
+
 
 static const navtest_case_t timebase_cases[] = {
     NAVTEST_CASE(test_hal_timebase_init_returns_ok),

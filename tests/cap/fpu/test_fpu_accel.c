@@ -67,6 +67,11 @@ void test_fpu_benchmark_cycles(void) {
 void test_hal_fpu_enable_returns_ok(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_fpu_enable());
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_fpu_basic_arithmetic);
+NAVTEST_CASE_DECL(test_fpu_benchmark_cycles);
+NAVTEST_CASE_DECL(test_hal_fpu_enable_returns_ok);
+
 
 static const navtest_case_t fpu_cases[] = {
     NAVTEST_CASE(test_fpu_basic_arithmetic),

@@ -52,13 +52,71 @@ void test_conformance_status_ok_is_zero(void) {
 void test_conformance_status_errors_distinct(void) {
   /* No two error codes share a value. A port that aliases
    * HAL_ERR_INVALID_ARG to HAL_ERR_TIMEOUT would silently lose
-   * caller-meaningful information. */
-  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_INVALID_ARG    != (uint32_t)HAL_OK);
-  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_TIMEOUT        != (uint32_t)HAL_OK);
-  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_NOT_SUPPORTED  != (uint32_t)HAL_OK);
-  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_INVALID_ARG    != (uint32_t)HAL_ERR_TIMEOUT);
-  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_INVALID_ARG    != (uint32_t)HAL_ERR_NOT_SUPPORTED);
-  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_TIMEOUT        != (uint32_t)HAL_ERR_NOT_SUPPORTED);
+   * caller-meaningful information. Walks the full enum pairwise so
+   * adding a code without updating this test still catches collisions. */
+  const uint32_t codes[] = {
+      (uint32_t)HAL_OK,
+      (uint32_t)HAL_ERR,
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)HAL_ERR_TIMEOUT,
+      (uint32_t)HAL_ERR_BUSY,
+      (uint32_t)HAL_ERR_NOT_INITIALIZED,
+      (uint32_t)HAL_ERR_NOT_SUPPORTED,
+      (uint32_t)HAL_ERR_IO,
+      (uint32_t)HAL_ERR_NO_MEM,
+  };
+  const uint8_t n = (uint8_t)(sizeof(codes) / sizeof(codes[0]));
+  for (uint8_t i = 0; i < n; i++) {
+    for (uint8_t j = (uint8_t)(i + 1); j < n; j++) {
+      TEST_ASSERT_TRUE(codes[i] != codes[j]);
+    }
+  }
+}
+
+void test_conformance_status_fits_uint8(void) {
+  /* Wire-format / RPC ABI guarantee: a port-package may serialize a
+   * status as a single byte. A new code that grew past 255 would
+   * silently truncate on the wire. */
+  TEST_ASSERT_TRUE((uint32_t)HAL_OK                  <= 0xFFu);
+  TEST_ASSERT_TRUE((uint32_t)HAL_ERR                 <= 0xFFu);
+  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_INVALID_ARG     <= 0xFFu);
+  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_TIMEOUT         <= 0xFFu);
+  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_BUSY            <= 0xFFu);
+  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_NOT_INITIALIZED <= 0xFFu);
+  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_NOT_SUPPORTED   <= 0xFFu);
+  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_IO              <= 0xFFu);
+  TEST_ASSERT_TRUE((uint32_t)HAL_ERR_NO_MEM          <= 0xFFu);
+}
+
+/* HAL_OK_OR_RETURN macro contract — already covered by the host SIL
+ * suite, repeated here so every PIL run on every port exercises it
+ * against the port's real codegen (catches a port that redefined
+ * HAL_OK_OR_RETURN or shadowed _navhal_status). */
+static hal_status_t _conf_returns(hal_status_t s) {
+  HAL_OK_OR_RETURN(s);
+  return HAL_OK;
+}
+
+static int _conf_eval_counter = 0;
+static hal_status_t _conf_count_and_return(hal_status_t s) {
+  _conf_eval_counter++;
+  return s;
+}
+
+void test_conformance_hal_ok_or_return_passes_through(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)_conf_returns(HAL_OK));
+  _conf_eval_counter = 0;
+  (void)_conf_returns(_conf_count_and_return(HAL_OK));
+  /* The macro is documented as evaluating its argument exactly once
+   * (the do-while wrapper holds the value in a local). */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)1, (uint32_t)_conf_eval_counter);
+}
+
+void test_conformance_hal_ok_or_return_short_circuits(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_TIMEOUT,
+                           (uint32_t)_conf_returns(HAL_ERR_TIMEOUT));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)_conf_returns(HAL_ERR_INVALID_ARG));
 }
 
 /* -------------------------------------------------------------------------- *
@@ -118,6 +176,34 @@ void test_conformance_sdio_init_rejects_null(void) {
 #endif
 }
 
+/* Idempotency on the error path: calling init with NULL twice in a
+ * row must return the same status both times. A port that flips an
+ * internal "initialised" flag on the NULL branch would fail this. */
+void test_conformance_null_init_is_idempotent(void) {
+  hal_status_t a = hal_gpio_init((hal_gpio_pin_t)0, NULL);
+  hal_status_t b = hal_gpio_init((hal_gpio_pin_t)0, NULL);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)a, (uint32_t)b);
+
+#if NAVHAL_HAS_DMA
+  hal_status_t da = hal_dma_init(NULL);
+  hal_status_t db = hal_dma_init(NULL);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)da, (uint32_t)db);
+#endif
+
+#if NAVHAL_HAS_I2C
+  hal_status_t ia = hal_i2c_init((hal_i2c_bus_t)0, NULL);
+  hal_status_t ib = hal_i2c_init((hal_i2c_bus_t)0, NULL);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)ia, (uint32_t)ib);
+#endif
+
+#if NAVHAL_HAS_UART
+  hal_uart_t inst = (hal_uart_t)0;
+  hal_status_t ua = hal_uart_init(inst, NULL);
+  hal_status_t ub = hal_uart_init(inst, NULL);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)ua, (uint32_t)ub);
+#endif
+}
+
 /* -------------------------------------------------------------------------- *
  * Capability-flag contract — every NAVHAL_HAS_* macro must be defined
  * as a numeric 0 or 1. Source code that does `#if NAVHAL_HAS_X` relies
@@ -149,10 +235,30 @@ void test_conformance_cap_macros_are_defined(void) {
   TEST_ASSERT_TRUE(NAVHAL_HAS_CYCLE_COUNTER  == 0 || NAVHAL_HAS_CYCLE_COUNTER  == 1);
   TEST_ASSERT_TRUE(NAVHAL_HAS_SDIO           == 0 || NAVHAL_HAS_SDIO           == 1);
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_conformance_status_ok_is_zero);
+NAVTEST_CASE_DECL(test_conformance_status_errors_distinct);
+NAVTEST_CASE_DECL(test_conformance_status_fits_uint8);
+NAVTEST_CASE_DECL(test_conformance_hal_ok_or_return_passes_through);
+NAVTEST_CASE_DECL(test_conformance_hal_ok_or_return_short_circuits);
+NAVTEST_CASE_DECL(test_conformance_gpio_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_clock_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_uart_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_dma_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_i2c_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_spi_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_pwm_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_sdio_init_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_null_init_is_idempotent);
+NAVTEST_CASE_DECL(test_conformance_cap_macros_are_defined);
+
 
 static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_status_ok_is_zero),
     NAVTEST_CASE(test_conformance_status_errors_distinct),
+    NAVTEST_CASE(test_conformance_status_fits_uint8),
+    NAVTEST_CASE(test_conformance_hal_ok_or_return_passes_through),
+    NAVTEST_CASE(test_conformance_hal_ok_or_return_short_circuits),
     NAVTEST_CASE(test_conformance_gpio_init_rejects_null),
     NAVTEST_CASE(test_conformance_clock_init_rejects_null),
     NAVTEST_CASE(test_conformance_uart_init_rejects_null),
@@ -161,6 +267,7 @@ static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_spi_init_rejects_null),
     NAVTEST_CASE(test_conformance_pwm_init_rejects_null),
     NAVTEST_CASE(test_conformance_sdio_init_rejects_null),
+    NAVTEST_CASE(test_conformance_null_init_is_idempotent),
     NAVTEST_CASE(test_conformance_cap_macros_are_defined),
 };
 

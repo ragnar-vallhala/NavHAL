@@ -159,6 +159,22 @@ void test_hal_interrupt_detach_rejects_out_of_range(void) {
 }
 
 /* -------------------- Suite -------------------- */
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_hal_interrupt_enable_sets_iser_bit);
+NAVTEST_CASE_DECL(test_hal_interrupt_disable_sets_icer_bit);
+NAVTEST_CASE_DECL(test_hal_interrupt_clear_pending_clears_ispr_bit);
+NAVTEST_CASE_DECL(test_hal_interrupt_set_get_priority_round_trip);
+NAVTEST_CASE_DECL(test_hal_interrupt_is_pending_after_set);
+NAVTEST_CASE_DECL(test_hal_interrupt_attach_then_dispatch_runs_callback);
+NAVTEST_CASE_DECL(test_hal_interrupt_detach_clears_callback);
+NAVTEST_CASE_DECL(test_hal_interrupt_disable_then_restore_global);
+NAVTEST_CASE_DECL(test_hal_interrupt_clear_all_pending_zeros_icpr);
+NAVTEST_CASE_DECL(test_hal_interrupt_enable_rejects_negative_irq);
+NAVTEST_CASE_DECL(test_hal_interrupt_disable_rejects_negative_irq);
+NAVTEST_CASE_DECL(test_hal_interrupt_clear_pending_rejects_negative_irq);
+NAVTEST_CASE_DECL(test_hal_interrupt_attach_rejects_out_of_range);
+NAVTEST_CASE_DECL(test_hal_interrupt_detach_rejects_out_of_range);
+
 
 static const navtest_case_t interrupt_cases[] = {
     NAVTEST_CASE(test_hal_interrupt_enable_sets_iser_bit),

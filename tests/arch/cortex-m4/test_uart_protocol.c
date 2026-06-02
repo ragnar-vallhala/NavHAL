@@ -140,6 +140,20 @@ void test_hal_uart_available_after_init_is_false(void) {
   init_test_uart(115200);
   TEST_ASSERT_FALSE(hal_uart_available(TEST_UART));
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_uart_baudrate_9600);
+NAVTEST_CASE_DECL(test_uart_baudrate_115200);
+NAVTEST_CASE_DECL(test_hal_uart_init_returns_ok);
+NAVTEST_CASE_DECL(test_hal_uart_init_rejects_null_config);
+NAVTEST_CASE_DECL(test_hal_uart_write_returns_ok);
+NAVTEST_CASE_DECL(test_hal_uart_write_char_returns_ok);
+NAVTEST_CASE_DECL(test_hal_uart_write_int_returns_ok);
+NAVTEST_CASE_DECL(test_hal_uart_write_uint_returns_ok);
+NAVTEST_CASE_DECL(test_hal_uart_write_float_returns_ok);
+NAVTEST_CASE_DECL(test_hal_uart_write_string_returns_ok);
+NAVTEST_CASE_DECL(test_hal_uart_print_generic_dispatch);
+NAVTEST_CASE_DECL(test_hal_uart_available_after_init_is_false);
+
 
 static const navtest_case_t uart_protocol_cases[] = {
     NAVTEST_CASE(test_uart_baudrate_9600),

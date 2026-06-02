@@ -218,19 +218,37 @@ typedef struct {
   navtest_hook_t between; /* optional: runs between cases; NULL for none */
 } navtest_suite_t;
 
-/* Plain stringification — case.name stays in RAM on AVR.
+/* On AVR, case names live in PROGMEM: each test file declares one
+ * static const char[] per case via NAVTEST_CASE_DECL(fn), and
+ * NAVTEST_CASE(fn) points at it. Two-macro split is forced by the
+ * language — _NT_PSTR expands to a statement-expression and can't
+ * appear in a file-scope initializer, so the PROGMEM slot has to be
+ * a named array declared at file scope first.
  *
- * Wrapping #f in _NT_PSTR would have put case names in PROGMEM (~440
- * bytes saved for the conformance suite), but _NT_PSTR expands to a
- * GCC statement-expression and those aren't allowed in file-scope
- * static const initializers, where NAVTEST_CASE is used. The
- * workaround (predeclare a named PROGMEM array per case) would
- * require every test file to add NAVTEST_CASE_DECL(test_xxx) for
- * each case — verbose enough to defer until it actually pinches.
- * The assertion macros above PROGMEM their __FILE__ and message
- * strings; together with __FILE__ deduplication within a TU that
- * saves ~330 bytes of .data on AVR — enough to fit conformance. */
-#define NAVTEST_CASE(f) {(f), #f}
+ * On every other arch, NAVTEST_CASE_DECL collapses to an inert
+ * declaration (so the trailing ';' is still valid) and NAVTEST_CASE
+ * uses plain stringification.
+ *
+ * navtest_run_suite reads c->name via navtest_write_P, which is the
+ * AVR PROGMEM reader on AVR and #defined to navtest_write everywhere
+ * else — so the suite walker is portable as-is.
+ *
+ * Usage:
+ *   NAVTEST_CASE_DECL(test_foo);
+ *   NAVTEST_CASE_DECL(test_bar);
+ *   static const navtest_case_t cases[] = {
+ *     NAVTEST_CASE(test_foo),
+ *     NAVTEST_CASE(test_bar),
+ *   };
+ */
+#if defined(__AVR__)
+#  define NAVTEST_CASE_DECL(fn)                                                \
+     static const char _navtest_name_##fn[] __attribute__((__progmem__)) = #fn
+#  define NAVTEST_CASE(fn) {(fn), _navtest_name_##fn}
+#else
+#  define NAVTEST_CASE_DECL(fn) extern const char _navtest_unused_##fn[]
+#  define NAVTEST_CASE(fn) {(fn), #fn}
+#endif
 
 /** Run every case in @p suite, printing a banner + summary. Returns failures. */
 int navtest_run_suite(const navtest_suite_t *suite);

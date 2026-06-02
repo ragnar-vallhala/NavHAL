@@ -100,6 +100,16 @@ void test_hal_i2c_typed_id_compiles(void) {
   (void)hal_i2c_write(bus, 0x50, &data, 0);
   TEST_ASSERT_TRUE(1);
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_i2c_init_config);
+NAVTEST_CASE_DECL(test_i2c_fast_mode_config);
+NAVTEST_CASE_DECL(test_hal_i2c_init_returns_ok);
+NAVTEST_CASE_DECL(test_hal_i2c_init_rejects_null_config);
+NAVTEST_CASE_DECL(test_hal_i2c_write_rejects_null_data);
+NAVTEST_CASE_DECL(test_hal_i2c_read_rejects_null_data);
+NAVTEST_CASE_DECL(test_hal_i2c_write_read_rejects_null_data);
+NAVTEST_CASE_DECL(test_hal_i2c_typed_id_compiles);
+
 
 static const navtest_case_t i2c_cases[] = {
     NAVTEST_CASE(test_i2c_init_config),

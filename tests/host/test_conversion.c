@@ -71,6 +71,17 @@ void test_str_to_float_with_decimal(void) {
 void test_str_to_float_negative(void) {
   TEST_ASSERT_TRUE(float_near(-2.5f, str_to_float("-2.5")));
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_str_to_int_basic);
+NAVTEST_CASE_DECL(test_str_to_int_negative);
+NAVTEST_CASE_DECL(test_str_to_int_plus_sign);
+NAVTEST_CASE_DECL(test_str_to_int_leading_whitespace);
+NAVTEST_CASE_DECL(test_str_to_int_stops_at_non_digit);
+NAVTEST_CASE_DECL(test_str_to_int_empty_string);
+NAVTEST_CASE_DECL(test_str_to_float_basic);
+NAVTEST_CASE_DECL(test_str_to_float_with_decimal);
+NAVTEST_CASE_DECL(test_str_to_float_negative);
+
 
 static const navtest_case_t conversion_cases[] = {
     NAVTEST_CASE(test_str_to_int_basic),

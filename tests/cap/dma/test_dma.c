@@ -189,6 +189,25 @@ void test_hal_dma_stop_rejects_null_config(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
                            (uint32_t)hal_dma_stop(NULL));
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_dma_clock_enable_dma1);
+NAVTEST_CASE_DECL(test_dma_clock_enable_dma2);
+NAVTEST_CASE_DECL(test_dma_init_sets_channel);
+NAVTEST_CASE_DECL(test_dma_init_sets_direction_m2p);
+NAVTEST_CASE_DECL(test_dma_init_sets_direction_p2m);
+NAVTEST_CASE_DECL(test_dma_init_sets_minc);
+NAVTEST_CASE_DECL(test_dma_init_sets_priority);
+NAVTEST_CASE_DECL(test_dma_init_sets_ndtr);
+NAVTEST_CASE_DECL(test_dma_init_sets_peripheral_address);
+NAVTEST_CASE_DECL(test_dma_init_sets_memory_address);
+NAVTEST_CASE_DECL(test_dma_start_enables_stream);
+NAVTEST_CASE_DECL(test_dma_stop_disables_stream);
+NAVTEST_CASE_DECL(test_dma_transfer_complete_returns_zero_before_start);
+NAVTEST_CASE_DECL(test_dma_clear_flags_clears_isr);
+NAVTEST_CASE_DECL(test_hal_dma_init_rejects_null_config);
+NAVTEST_CASE_DECL(test_hal_dma_start_rejects_null_config);
+NAVTEST_CASE_DECL(test_hal_dma_stop_rejects_null_config);
+
 
 static const navtest_case_t dma_cases[] = {
     NAVTEST_CASE(test_dma_clock_enable_dma1),

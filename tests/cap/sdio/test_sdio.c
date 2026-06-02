@@ -73,6 +73,13 @@ void test_hal_sdio_set_callback_smoke(void) {
   hal_sdio_set_callback(NULL); /* re-clear */
   TEST_ASSERT_TRUE(1);
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_hal_sdio_init_rejects_null_config);
+NAVTEST_CASE_DECL(test_hal_sdio_read_block_rejects_null_buffer);
+NAVTEST_CASE_DECL(test_hal_sdio_write_block_rejects_null_buffer);
+NAVTEST_CASE_DECL(test_hal_sdio_get_sector_count_returns_value);
+NAVTEST_CASE_DECL(test_hal_sdio_set_callback_smoke);
+
 
 static const navtest_case_t sdio_cases[] = {
     NAVTEST_CASE(test_hal_sdio_init_rejects_null_config),

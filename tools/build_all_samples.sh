@@ -33,7 +33,25 @@ FAIL=0
 FAIL_LIST=""
 BUILD=build-sample-matrix
 
-cleanup() { rm -rf "$BUILD"; }
+# Build from a clean, Kconfig-default .config rather than whatever target a
+# previous local build left in the repo root. A leftover AVR .config (e.g.
+# from an atmega build) points every no-toolchain sample build at avr-gcc,
+# which then chokes on the Cortex-M startup .s files — a false red that only
+# reproduces on the polluted machine, never in clean CI. Stash and restore.
+SAVED_CONFIG=""
+if [ -f .config ]; then
+  SAVED_CONFIG=$(mktemp)
+  mv .config "$SAVED_CONFIG"
+fi
+
+cleanup() {
+  rm -rf "$BUILD"
+  if [ -n "$SAVED_CONFIG" ] && [ -f "$SAVED_CONFIG" ]; then
+    mv -f "$SAVED_CONFIG" .config
+  else
+    rm -f .config
+  fi
+}
 trap cleanup EXIT
 
 for sample in $SAMPLES; do

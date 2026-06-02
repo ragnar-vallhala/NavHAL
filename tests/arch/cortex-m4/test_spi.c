@@ -98,6 +98,15 @@ void test_hal_spi_init_cpol_low_cpha_1edge(void) {
   TEST_ASSERT_FALSE(S1->CR1 & SPI_CR1_DFF);
   TEST_ASSERT_FALSE(S1->CR1 & SPI_CR1_LSBFIRST);
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_spi_init_config);
+NAVTEST_CASE_DECL(test_hal_spi_init_returns_ok);
+NAVTEST_CASE_DECL(test_hal_spi_init_rejects_null_config);
+NAVTEST_CASE_DECL(test_hal_spi_transmit_rejects_null_data);
+NAVTEST_CASE_DECL(test_hal_spi_receive_rejects_null_data);
+NAVTEST_CASE_DECL(test_hal_spi_transmit_receive_rejects_null_data);
+NAVTEST_CASE_DECL(test_hal_spi_init_cpol_low_cpha_1edge);
+
 
 static const navtest_case_t spi_cases[] = {
     NAVTEST_CASE(test_spi_init_config),

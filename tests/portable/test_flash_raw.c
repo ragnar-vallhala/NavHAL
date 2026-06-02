@@ -86,6 +86,14 @@ void test_hal_flash_needs_compaction_returns_bool(void) {
 void test_hal_flash_erase_returns_ok(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_flash_erase());
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_flash_storage_integration);
+NAVTEST_CASE_DECL(test_hal_flash_save_rejects_null_value);
+NAVTEST_CASE_DECL(test_hal_flash_read_rejects_null_pointers);
+NAVTEST_CASE_DECL(test_hal_flash_delete_then_read_returns_error);
+NAVTEST_CASE_DECL(test_hal_flash_needs_compaction_returns_bool);
+NAVTEST_CASE_DECL(test_hal_flash_erase_returns_ok);
+
 
 static const navtest_case_t flash_cases[] = {
     NAVTEST_CASE(test_flash_storage_integration),

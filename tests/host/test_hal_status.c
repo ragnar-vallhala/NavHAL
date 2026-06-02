@@ -86,6 +86,13 @@ void test_hal_ok_or_return_short_circuits(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_TIMEOUT, (uint32_t)got);
   TEST_ASSERT_EQUAL_UINT32(1, (uint32_t)s); /* stopped after the OK call */
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_hal_status_ok_is_zero);
+NAVTEST_CASE_DECL(test_hal_status_err_is_one);
+NAVTEST_CASE_DECL(test_hal_status_distinct_codes);
+NAVTEST_CASE_DECL(test_hal_ok_or_return_passes_through);
+NAVTEST_CASE_DECL(test_hal_ok_or_return_short_circuits);
+
 
 static const navtest_case_t hal_status_cases[] = {
     NAVTEST_CASE(test_hal_status_ok_is_zero),

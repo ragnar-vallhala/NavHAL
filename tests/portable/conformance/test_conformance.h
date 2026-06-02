@@ -29,13 +29,10 @@
  * vendor-specific includes. The whole file lives under
  * tests/portable/ for exactly that reason.
  *
- * Runs on AVR too as of the navtest PROGMEM-string support (M7
- * follow-up): TEST_ASSERT_* macros now route __FILE__ + assertion
- * messages through `_NT_PSTR()` so those strings live in flash on
- * AVR rather than .data, freeing ~440 bytes of SRAM. Case names
- * (`#fn` stringification inside file-scope NAVTEST_CASE) stay in
- * RAM because GCC statement-expressions aren't allowed in static
- * initializers — see the NAVTEST_CASE comment in navtest.h.
+ * Runs on AVR too: TEST_ASSERT_* macros and case names both land in
+ * PROGMEM on AVR (assertion strings via `_NT_PSTR()`, case names via
+ * the `NAVTEST_CASE_DECL` predeclaration trick), keeping the suite
+ * well under the ATmega328P's 2 KB SRAM ceiling.
  */
 #ifndef TEST_CONFORMANCE_H
 #define TEST_CONFORMANCE_H
@@ -47,12 +44,20 @@ extern "C" {
 #endif
 
 /* Status type contract — error codes are non-zero, HAL_OK is zero,
- * codes are distinct from each other. */
+ * codes are pairwise distinct, and each fits in 8 bits (RPC ABI). */
 void test_conformance_status_ok_is_zero(void);
 void test_conformance_status_errors_distinct(void);
+void test_conformance_status_fits_uint8(void);
+
+/* HAL_OK_OR_RETURN macro contract — passes the status through on OK,
+ * short-circuits on non-OK, and evaluates its argument exactly once. */
+void test_conformance_hal_ok_or_return_passes_through(void);
+void test_conformance_hal_ok_or_return_short_circuits(void);
 
 /* Null-pointer contract — every public init function that takes a
- * pointer must reject NULL with HAL_ERR_INVALID_ARG, not crash. */
+ * pointer must reject NULL with HAL_ERR_INVALID_ARG, not crash; and
+ * calling the NULL path twice in a row must return the same status
+ * both times (no state corruption on the error branch). */
 void test_conformance_uart_init_rejects_null(void);
 void test_conformance_clock_init_rejects_null(void);
 void test_conformance_dma_init_rejects_null(void);
@@ -61,6 +66,7 @@ void test_conformance_spi_init_rejects_null(void);
 void test_conformance_pwm_init_rejects_null(void);
 void test_conformance_sdio_init_rejects_null(void);
 void test_conformance_gpio_init_rejects_null(void);
+void test_conformance_null_init_is_idempotent(void);
 
 /* Capability-flag contract — NAVHAL_HAS_X is always 0 or 1, never
  * unset (#ifdef NAVHAL_HAS_X yields a value; the macro is a contract,

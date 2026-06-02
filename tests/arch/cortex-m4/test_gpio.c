@@ -170,6 +170,19 @@ void test_hal_gpio_init_rejects_null_config(void) {
 }
 
 /* -------------------- Suite -------------------- */
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_hal_gpio_init_applies_config);
+NAVTEST_CASE_DECL(test_hal_gpio_set_mode_writes_moder);
+NAVTEST_CASE_DECL(test_hal_gpio_get_mode_round_trip);
+NAVTEST_CASE_DECL(test_hal_gpio_enable_clock_sets_ahb1_bit);
+NAVTEST_CASE_DECL(test_hal_gpio_set_alternate_function_writes_af);
+NAVTEST_CASE_DECL(test_hal_gpio_set_alternate_function_switches_mode_to_af);
+NAVTEST_CASE_DECL(test_hal_gpio_set_output_type_writes_otyper);
+NAVTEST_CASE_DECL(test_hal_gpio_set_output_speed_writes_ospeedr);
+NAVTEST_CASE_DECL(test_hal_gpio_write_high_then_low);
+NAVTEST_CASE_DECL(test_hal_gpio_toggle_flips_state);
+NAVTEST_CASE_DECL(test_hal_gpio_init_rejects_null_config);
+
 
 static const navtest_case_t gpio_cases[] = {
     NAVTEST_CASE(test_hal_gpio_init_applies_config),

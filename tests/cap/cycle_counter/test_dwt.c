@@ -88,6 +88,14 @@ void test_hal_cycle_counter_reset_returns_ok(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
                            (uint32_t)hal_cycle_counter_reset());
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_dwt_init_enables_counters);
+NAVTEST_CASE_DECL(test_dwt_get_cycles_increments);
+NAVTEST_CASE_DECL(test_dwt_reset_cycles_zeros_counter);
+NAVTEST_CASE_DECL(test_dwt_delay_cycles_elapses_time);
+NAVTEST_CASE_DECL(test_hal_cycle_counter_init_returns_ok);
+NAVTEST_CASE_DECL(test_hal_cycle_counter_reset_returns_ok);
+
 
 static const navtest_case_t dwt_cases[] = {
     NAVTEST_CASE(test_dwt_init_enables_counters),

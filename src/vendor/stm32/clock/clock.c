@@ -28,7 +28,7 @@
  * @date 2025-07-21
  */
 
-#include "navhal_port_clock.h"
+#include "internal/hal_clock_ops.h"
 #include "family/flash_reg.h"
 #include "family/rcc_reg.h"
 #include <stdint.h>
@@ -92,10 +92,9 @@ static hal_status_t _toggle_pll_clock(uint8_t state) {
  * @param pll_cfg PLL configuration; must not be NULL when the source is PLL.
  * @return ::HAL_OK on success, ::HAL_ERR_INVALID_ARG on a missing argument.
  */
-hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
-                            const hal_pll_config_t *pll_cfg) {
-  if (cfg == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg,
+                                     const hal_pll_config_t *pll_cfg) {
+  /* cfg is non-NULL: the public layer validated it before dispatching. */
   if (cfg->source == HAL_CLOCK_SOURCE_PLL && pll_cfg == NULL)
     return HAL_ERR_INVALID_ARG;
 
@@ -193,7 +192,7 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
  *
  * @return SYSCLK frequency in Hertz.
  */
-uint32_t hal_clock_get_sysclk(void) {
+static uint32_t stm32_clock_get_sysclk(void) {
   uint32_t sysclk;
   uint8_t sws = ((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3;
 
@@ -286,9 +285,9 @@ static uint32_t _decode_apb_prescaler(uint32_t val) {
  *
  * @return AHB bus clock frequency in Hertz.
  */
-uint32_t hal_clock_get_ahbclk(void) {
+static uint32_t stm32_clock_get_ahbclk(void) {
   uint32_t prescaler = ((RCC->CFGR) >> RCC_CFGR_HPRE_BIT) & 0xF;
-  return hal_clock_get_sysclk() / _decode_prescaler(prescaler);
+  return stm32_clock_get_sysclk() / _decode_prescaler(prescaler);
 }
 
 /**
@@ -298,9 +297,9 @@ uint32_t hal_clock_get_ahbclk(void) {
  *
  * @return APB1 bus clock frequency in Hertz.
  */
-uint32_t hal_clock_get_apb1clk(void) {
+static uint32_t stm32_clock_get_apb1clk(void) {
   uint32_t prescaler = ((RCC->CFGR) >> RCC_CFGR_PPRE1_BIT) & 0x7;
-  return hal_clock_get_sysclk() / _decode_apb_prescaler(prescaler);
+  return stm32_clock_get_sysclk() / _decode_apb_prescaler(prescaler);
 }
 
 /**
@@ -310,7 +309,15 @@ uint32_t hal_clock_get_apb1clk(void) {
  *
  * @return APB2 bus clock frequency in Hertz.
  */
-uint32_t hal_clock_get_apb2clk(void) {
+static uint32_t stm32_clock_get_apb2clk(void) {
   uint32_t prescaler = ((RCC->CFGR) >> RCC_CFGR_PPRE2_BIT) & 0x7;
-  return hal_clock_get_sysclk() / _decode_apb_prescaler(prescaler);
+  return stm32_clock_get_sysclk() / _decode_apb_prescaler(prescaler);
 }
+
+const hal_clock_ops_t _hal_clock_ops = {
+    .init = stm32_clock_init,
+    .get_sysclk = stm32_clock_get_sysclk,
+    .get_ahbclk = stm32_clock_get_ahbclk,
+    .get_apb1clk = stm32_clock_get_apb1clk,
+    .get_apb2clk = stm32_clock_get_apb2clk,
+};

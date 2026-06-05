@@ -29,7 +29,7 @@
  * are enabled here, though a real bus still needs external pull-ups.
  */
 
-#include "common/hal_i2c.h"
+#include "internal/hal_i2c_ops.h"
 
 #include <avr/io.h>
 #include <stddef.h>
@@ -83,8 +83,10 @@ static bool twi_read(uint8_t *out, bool ack) {
   return true;
 }
 
-hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config) {
-  if (bus != HAL_I2C_0 || config == NULL)
+static hal_status_t avr_i2c_init(hal_i2c_bus_t bus,
+                                 const hal_i2c_config_t *config) {
+  /* config non-NULL: validated by the public layer. */
+  if (bus != HAL_I2C_0)
     return HAL_ERR_INVALID_ARG;
   if (config->own_address != I2C_MASTER)
     return HAL_ERR_IO; /* slave mode is not supported. */
@@ -104,9 +106,10 @@ hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config) {
   return HAL_OK;
 }
 
-hal_status_t hal_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
-                           const uint8_t *data, uint16_t len) {
-  if (bus != HAL_I2C_0 || data == NULL)
+static hal_status_t avr_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                  const uint8_t *data, uint16_t len) {
+  /* data non-NULL: validated by the public layer. */
+  if (bus != HAL_I2C_0)
     return HAL_ERR_INVALID_ARG;
   if (!twi_start()) {
     twi_stop();
@@ -128,9 +131,10 @@ hal_status_t hal_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
   return HAL_OK;
 }
 
-hal_status_t hal_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr, uint8_t *data,
-                          uint16_t len) {
-  if (bus != HAL_I2C_0 || data == NULL)
+static hal_status_t avr_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                 uint8_t *data, uint16_t len) {
+  /* data non-NULL: validated by the public layer. */
+  if (bus != HAL_I2C_0)
     return HAL_ERR_INVALID_ARG;
   if (!twi_start()) {
     twi_stop();
@@ -152,10 +156,11 @@ hal_status_t hal_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr, uint8_t *data,
   return HAL_OK;
 }
 
-hal_status_t hal_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
-                                const uint8_t *tx_data, uint16_t tx_len,
-                                uint8_t *rx_data, uint16_t rx_len) {
-  if (bus != HAL_I2C_0 || tx_data == NULL || rx_data == NULL)
+static hal_status_t avr_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                       const uint8_t *tx_data, uint16_t tx_len,
+                                       uint8_t *rx_data, uint16_t rx_len) {
+  /* tx_data and rx_data non-NULL: validated by the public layer. */
+  if (bus != HAL_I2C_0)
     return HAL_ERR_INVALID_ARG;
 
   /* Write phase. */
@@ -193,4 +198,12 @@ hal_status_t hal_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
   return HAL_OK;
 }
 
-uint8_t hal_i2c_get_init_status(void) { return s_init_mask; }
+static uint8_t avr_i2c_get_init_status(void) { return s_init_mask; }
+
+const hal_i2c_ops_t _hal_i2c_ops = {
+    .init = avr_i2c_init,
+    .write = avr_i2c_write,
+    .read = avr_i2c_read,
+    .write_read = avr_i2c_write_read,
+    .get_init_status = avr_i2c_get_init_status,
+};

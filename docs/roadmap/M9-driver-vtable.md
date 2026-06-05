@@ -62,36 +62,41 @@ typedef struct {
     /* …one entry per public hal_gpio_* function… */
 } hal_gpio_ops_t;
 
-extern const hal_gpio_ops_t *const _hal_gpio_ops;   /* set by the port */
+/* Embedded directly (a const object, NOT a pointer-to-table) — drops one
+ * indirection and lets -flto devirtualise the dispatch. Defined by the
+ * active vendor. */
+extern const hal_gpio_ops_t _hal_gpio_ops;
 ```
 
-`include/common/hal_gpio.c` (new!) provides the public implementation,
+`src/common/hal_gpio.c` (new!) provides the public implementation,
 which validates and dispatches:
 
 ```c
 hal_status_t hal_gpio_init(hal_gpio_pin_t pin, const hal_gpio_config_t *cfg) {
     if (!cfg) return HAL_ERR_INVALID_ARG;
-    if (cfg->mode == HAL_GPIO_MODE_AF && cfg->alternate == HAL_GPIO_AF_NONE)
-        return HAL_ERR_INVALID_ARG;
-    return _hal_gpio_ops->init(pin, cfg);
+    return _hal_gpio_ops.init(pin, cfg);
 }
 ```
+
+> The illustrative `cfg->alternate == HAL_GPIO_AF_NONE` rule from earlier
+> drafts is deferred: the current port API has no `HAL_GPIO_AF_NONE`
+> sentinel, so the first GPIO migration hoists only the genuinely
+> duplicated check (the NULL `cfg`) to stay behaviour-preserving. Richer
+> shared validation can follow once the sentinel exists.
 
 Vendor `src/vendor/stm32/gpio/gpio.c` becomes:
 
 ```c
-static hal_status_t stm32_gpio_init_impl(hal_gpio_pin_t pin, const hal_gpio_config_t *cfg) {
+static hal_status_t stm32_gpio_init(hal_gpio_pin_t pin, const hal_gpio_config_t *cfg) {
     /* register-poking only — validation already happened upstream */
     ...
 }
 
-static const hal_gpio_ops_t stm32_gpio_ops = {
-    .init     = stm32_gpio_init_impl,
-    .set_mode = stm32_gpio_set_mode_impl,
+const hal_gpio_ops_t _hal_gpio_ops = {
+    .init     = stm32_gpio_init,
+    .set_mode = stm32_gpio_set_mode,
     /* … */
 };
-
-const hal_gpio_ops_t *const _hal_gpio_ops = &stm32_gpio_ops;
 ```
 
 ### 9.2 — Per-subsystem migration
@@ -100,7 +105,7 @@ Roll this out one subsystem at a time so each step is reviewable:
 
 | Order | Subsystem      | Why this order |
 |---|---|---|
-| 1 | GPIO           | Smallest stable surface, most heavily duplicated, lowest risk |
+| 1 | GPIO ✅ done    | Smallest stable surface, most heavily duplicated, lowest risk |
 | 2 | UART           | Second-smallest surface; sets the pattern for "options struct" |
 | 3 | INTERRUPT      | Architecture-touching but the pattern is similar |
 | 4 | TIMER + PWM    | Closely related, do them together |
@@ -166,10 +171,13 @@ implement the HAL" gate that's missing today.
 
 ## Open questions
 
-* Should the vtable be a `const struct` at fixed address (Zephyr's
+* ~~Should the vtable be a `const struct` at fixed address (Zephyr's
   pattern, devirtualises under LTO) or function-pointer-via-getter
-  (more flexible, slower)? Probably the former — embedded targets
-  prize the perf.
+  (more flexible, slower)?~~ **Resolved (GPIO migration):** a `const`
+  table embedded directly — `extern const hal_gpio_ops_t _hal_gpio_ops;`,
+  not a pointer-to-table. This drops one indirection and devirtualises
+  under `-flto`. The hot paths (write/read/toggle) stay `static inline`
+  in the port header and never enter the table.
 * What about subsystems where vendor implementations are *wildly*
   different — e.g., a chip with hardware multi-master I²C arbitration
   that needs APIs the rest don't have? Two options: extend the ops

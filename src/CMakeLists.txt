@@ -6,10 +6,20 @@ set(COMMON_SOURCES
 )
 
 # Shared public driver layers (M9 driver vtable): validate + dispatch to the
-# active vendor's ops table. Gated on the same CONFIG_DRV_* symbols as the
-# vendor backends so a firmware that omits a driver omits its public layer too.
-if(CONFIG_DRV_GPIO)
-    list(APPEND COMMON_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/common/hal_gpio.c)
+# active backend's ops table. In a normal (sample/firmware) build these are
+# gated on the same CONFIG_DRV_* symbols as the backends, so a firmware that
+# omits a driver omits its public layer too. The TEST build instead globs every
+# backend regardless of config (it exercises all drivers on the arch), so it
+# picks these layers up the same way — via file(GLOB src/common/*.c) in the
+# root CMakeLists TEST block — and must NOT also get them here, or the public
+# symbols would be defined twice.
+if(NOT TEST)
+    if(CONFIG_DRV_GPIO)
+        list(APPEND COMMON_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/common/hal_gpio.c)
+    endif()
+    if(CONFIG_DRV_CRC)
+        list(APPEND COMMON_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/common/hal_crc.c)
+    endif()
 endif()
 
 if(CONFIG_DRV_SDIO)

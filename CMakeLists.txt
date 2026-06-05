@@ -232,9 +232,17 @@ if(TEST)
   file(GLOB          TEST_ARCH_SRC      ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/*.c)
   set(TEST_SRC ${TEST_FRAMEWORK_SRC} ${TEST_PORTABLE_SRC} ${TEST_CAP_SRC} ${TEST_ARCH_SRC})
 
+  # The test ELF exercises every driver on the arch, so it globs all backend
+  # sources regardless of CONFIG_DRV_* (the gating only shapes firmware
+  # builds). The M9 shared public layers (src/common/hal_*.c) are part of the
+  # same HAL surface, so glob them here too — they are excluded from the
+  # `common` OBJECT library under TEST (see src/CMakeLists.txt) to avoid a
+  # double definition. Capability-gated single-arch layers self-omit via their
+  # NAVHAL_HAS_* guard when the backend is absent on this arch.
   file(GLOB_RECURSE HAL_SRC
     ${SRC_VENDOR}/*.c
     ${SRC_ARCH}/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/hal_*.c
   )
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)

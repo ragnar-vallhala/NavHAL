@@ -49,6 +49,10 @@ add_executable(tests_host
 
   # source under test — pure-logic only (no register access)
   ${NAVHAL_ROOT}/src/utils/conversion.c
+  # CRC: shared public layer (validate + dispatch) + the STM32 software backend
+  # that defines _hal_crc_ops. Both are needed now the public hal_crc_* symbols
+  # live in the common layer rather than the vendor driver.
+  ${NAVHAL_ROOT}/src/common/hal_crc.c
   ${NAVHAL_ROOT}/src/vendor/stm32/crc/crc.c
 )
 

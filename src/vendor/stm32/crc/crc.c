@@ -17,13 +17,16 @@
 
 /**
  * @file crc.c
- * @brief CRC peripheral driver for STM32F4.
+ * @brief CRC vendor backend for STM32F4 (the driver vtable).
  *
- * Provides CRC-32/MPEG-2 calculation. Uses the STM32F4 hardware CRC unit
- * when _CRC_HW_ENABLED is defined, otherwise uses a software lookup table.
+ * Provides CRC-32/MPEG-2 calculation behind ::hal_crc_ops_t. Uses the STM32F4
+ * hardware CRC unit when _CRC_HW_ENABLED is defined, otherwise a software
+ * lookup table. Argument validation (NULL cfg) lives in the shared public
+ * layer src/common/hal_crc.c; the active table is published as ::_hal_crc_ops
+ * at the bottom of this file.
  */
 
-#include "navhal_port_crc.h"
+#include "internal/hal_crc_ops.h"
 #include <stddef.h>
 
 /* Keep track of configured init value */
@@ -34,20 +37,7 @@ static uint32_t s_crc_init_value = 0xFFFFFFFF;
 #include "family/crc_reg.h"
 #include "family/rcc_reg.h"
 
-hal_status_t hal_crc_init(const hal_crc_config_t *cfg) {
-  if (cfg == NULL)
-    return HAL_ERR_INVALID_ARG;
-  s_crc_init_value = cfg->init_value;
-
-  /* Enable CRC clock */
-  RCC->AHB1ENR |= RCC_AHB1ENR_CRCEN;
-
-  /* Issue reset */
-  hal_crc_reset();
-  return HAL_OK;
-}
-
-hal_status_t hal_crc_reset(void) {
+static hal_status_t stm32_crc_reset(void) {
   CRC->CR = CRC_CR_RESET;
   /* Hardware always resets to 0xFFFFFFFF. If a different init value
      was requested, we would ideally write it here, but STM32F4 CRC
@@ -58,7 +48,19 @@ hal_status_t hal_crc_reset(void) {
   return HAL_OK;
 }
 
-uint32_t hal_crc_accumulate(const uint8_t *data, uint32_t len) {
+static hal_status_t stm32_crc_init(const hal_crc_config_t *cfg) {
+  /* cfg is non-NULL: the public layer validated it before dispatching. */
+  s_crc_init_value = cfg->init_value;
+
+  /* Enable CRC clock */
+  RCC->AHB1ENR |= RCC_AHB1ENR_CRCEN;
+
+  /* Issue reset */
+  stm32_crc_reset();
+  return HAL_OK;
+}
+
+static uint32_t stm32_crc_accumulate(const uint8_t *data, uint32_t len) {
   if (data == NULL || len == 0) {
     return CRC->DR;
   }
@@ -106,9 +108,9 @@ uint32_t hal_crc_accumulate(const uint8_t *data, uint32_t len) {
   return CRC->DR;
 }
 
-uint32_t hal_crc_compute(const uint8_t *data, uint32_t len) {
-  hal_crc_reset();
-  return hal_crc_accumulate(data, len);
+static uint32_t stm32_crc_compute(const uint8_t *data, uint32_t len) {
+  stm32_crc_reset();
+  return stm32_crc_accumulate(data, len);
 }
 
 #else
@@ -162,20 +164,19 @@ static const uint32_t crc32_mpeg2_table[256] = {
 
 static uint32_t s_current_crc = 0xFFFFFFFF;
 
-hal_status_t hal_crc_init(const hal_crc_config_t *cfg) {
-  if (cfg == NULL)
-    return HAL_ERR_INVALID_ARG;
-  s_crc_init_value = cfg->init_value;
-  hal_crc_reset();
-  return HAL_OK;
-}
-
-hal_status_t hal_crc_reset(void) {
+static hal_status_t stm32_crc_reset(void) {
   s_current_crc = s_crc_init_value;
   return HAL_OK;
 }
 
-uint32_t hal_crc_accumulate(const uint8_t *data, uint32_t len) {
+static hal_status_t stm32_crc_init(const hal_crc_config_t *cfg) {
+  /* cfg is non-NULL: the public layer validated it before dispatching. */
+  s_crc_init_value = cfg->init_value;
+  stm32_crc_reset();
+  return HAL_OK;
+}
+
+static uint32_t stm32_crc_accumulate(const uint8_t *data, uint32_t len) {
   if (data == NULL || len == 0) {
     return s_current_crc;
   }
@@ -189,9 +190,16 @@ uint32_t hal_crc_accumulate(const uint8_t *data, uint32_t len) {
   return crc;
 }
 
-uint32_t hal_crc_compute(const uint8_t *data, uint32_t len) {
-  hal_crc_reset();
-  return hal_crc_accumulate(data, len);
+static uint32_t stm32_crc_compute(const uint8_t *data, uint32_t len) {
+  stm32_crc_reset();
+  return stm32_crc_accumulate(data, len);
 }
 
 #endif /* _CRC_HW_ENABLED */
+
+const hal_crc_ops_t _hal_crc_ops = {
+    .init = stm32_crc_init,
+    .compute = stm32_crc_compute,
+    .accumulate = stm32_crc_accumulate,
+    .reset = stm32_crc_reset,
+};

@@ -17,22 +17,22 @@
 
 /**
  * @file src/vendor/microchip/crc/crc.c
- * @brief ATmega328P CRC HAL driver — software CRC-32/MPEG-2.
+ * @brief ATmega328P CRC vendor backend — software CRC-32/MPEG-2.
  *
  * @details
- * Implements @c common/hal_crc.h for the ATmega328P. The ATmega328P has no
- * hardware CRC unit, so this is a bitwise software implementation of
- * CRC-32/MPEG-2 (polynomial 0x04C11DB7, non-reflected, no final XOR) — the
- * variant @c utils/crc_types.h documents, so the result matches the STM32F4
- * hardware unit. A bitwise loop is used rather than a 1 KiB lookup table to
- * keep the flash footprint small.
+ * Provides the ATmega328P implementations behind ::hal_crc_ops_t. The part has
+ * no hardware CRC unit, so this is a bitwise software CRC-32/MPEG-2 (polynomial
+ * 0x04C11DB7, non-reflected, no final XOR) — matching the STM32F4 hardware
+ * result. A bitwise loop is used rather than a 1 KiB lookup table to keep the
+ * flash footprint small. Argument validation (NULL cfg) lives in the shared
+ * public layer src/common/hal_crc.c; the table is published as ::_hal_crc_ops.
  */
 
-#include "common/hal_crc.h"
+#include "internal/hal_crc_ops.h"
 
 #include <stddef.h>
 
-/** @brief Configured init value, applied by ::hal_crc_reset. */
+/** @brief Configured init value, applied by the reset op. */
 static uint32_t s_init = 0xFFFFFFFFu;
 /** @brief Running accumulator. */
 static uint32_t s_acc = 0xFFFFFFFFu;
@@ -51,26 +51,32 @@ static uint32_t crc32_mpeg2(uint32_t crc, const uint8_t *data, uint32_t len) {
   return crc;
 }
 
-hal_status_t hal_crc_init(const hal_crc_config_t *cfg) {
-  if (cfg == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t avr_crc_init(const hal_crc_config_t *cfg) {
+  /* cfg is non-NULL: the public layer validated it before dispatching. */
   s_init = cfg->init_value;
   s_acc = s_init;
   return HAL_OK;
 }
 
-hal_status_t hal_crc_reset(void) {
+static hal_status_t avr_crc_reset(void) {
   s_acc = s_init;
   return HAL_OK;
 }
 
-uint32_t hal_crc_accumulate(const uint8_t *data, uint32_t len) {
+static uint32_t avr_crc_accumulate(const uint8_t *data, uint32_t len) {
   if (data != NULL)
     s_acc = crc32_mpeg2(s_acc, data, len);
   return s_acc;
 }
 
-uint32_t hal_crc_compute(const uint8_t *data, uint32_t len) {
+static uint32_t avr_crc_compute(const uint8_t *data, uint32_t len) {
   s_acc = s_init;
-  return hal_crc_accumulate(data, len);
+  return avr_crc_accumulate(data, len);
 }
+
+const hal_crc_ops_t _hal_crc_ops = {
+    .init = avr_crc_init,
+    .compute = avr_crc_compute,
+    .accumulate = avr_crc_accumulate,
+    .reset = avr_crc_reset,
+};

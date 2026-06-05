@@ -38,20 +38,6 @@
 /** @brief Reject any UART id other than the one USART0. */
 static inline bool uart_valid(hal_uart_t uart) { return uart == HAL_UART_0; }
 
-/** @brief Render an unsigned 32-bit value as a decimal string. */
-static void u32_to_str(uint32_t v, char *buf) {
-  char tmp[10];
-  uint8_t n = 0;
-  do {
-    tmp[n++] = (char)('0' + (v % 10u));
-    v /= 10u;
-  } while (v != 0u);
-  uint8_t j = 0;
-  while (n != 0u)
-    buf[j++] = tmp[--n];
-  buf[j] = '\0';
-}
-
 static hal_status_t avr_uart_init(hal_uart_t uart,
                                   const hal_uart_config_t *cfg) {
   /* cfg non-NULL: validated by the public layer. */
@@ -101,65 +87,6 @@ static hal_status_t avr_uart_write_char(hal_uart_t uart, char c) {
   return HAL_OK;
 }
 
-static hal_status_t avr_uart_write(hal_uart_t uart, const uint8_t *data,
-                                   uint16_t length) {
-  /* data non-NULL: validated by the public layer. */
-  if (!uart_valid(uart))
-    return HAL_ERR_INVALID_ARG;
-  for (uint16_t i = 0; i < length; i++)
-    (void)avr_uart_write_char(uart, (char)data[i]);
-  return HAL_OK;
-}
-
-static hal_status_t avr_uart_write_string(hal_uart_t uart, const char *s) {
-  /* s non-NULL: validated by the public layer. */
-  if (!uart_valid(uart))
-    return HAL_ERR_INVALID_ARG;
-  while (*s != '\0')
-    (void)avr_uart_write_char(uart, *s++);
-  return HAL_OK;
-}
-
-static hal_status_t avr_uart_write_uint(hal_uart_t uart, uint32_t num) {
-  if (!uart_valid(uart))
-    return HAL_ERR_INVALID_ARG;
-  char buf[11];
-  u32_to_str(num, buf);
-  return avr_uart_write_string(uart, buf);
-}
-
-static hal_status_t avr_uart_write_int(hal_uart_t uart, int32_t num) {
-  if (!uart_valid(uart))
-    return HAL_ERR_INVALID_ARG;
-  uint32_t mag;
-  if (num < 0) {
-    (void)avr_uart_write_char(uart, '-');
-    /* Two's-complement magnitude — correct even for INT32_MIN. */
-    mag = (uint32_t)0 - (uint32_t)num;
-  } else {
-    mag = (uint32_t)num;
-  }
-  return avr_uart_write_uint(uart, mag);
-}
-
-static hal_status_t avr_uart_write_float(hal_uart_t uart, float num) {
-  if (!uart_valid(uart))
-    return HAL_ERR_INVALID_ARG;
-  if (num < 0.0f) {
-    (void)avr_uart_write_char(uart, '-');
-    num = -num;
-  }
-  uint32_t ip = (uint32_t)num;
-  uint32_t fp = (uint32_t)((num - (float)ip) * 1000.0f + 0.5f);
-  (void)avr_uart_write_uint(uart, ip);
-  (void)avr_uart_write_char(uart, '.');
-  if (fp < 100u)
-    (void)avr_uart_write_char(uart, '0');
-  if (fp < 10u)
-    (void)avr_uart_write_char(uart, '0');
-  return avr_uart_write_uint(uart, fp);
-}
-
 static char avr_uart_read_char(hal_uart_t uart) {
   if (!uart_valid(uart))
     return 0;
@@ -174,34 +101,12 @@ static bool avr_uart_available(hal_uart_t uart) {
   return (UCSR0A & (1u << RXC0)) != 0u;
 }
 
-static uint32_t avr_uart_read_until(hal_uart_t uart, char *buffer,
-                                    uint32_t maxlen, char delimiter) {
-  /* buffer non-NULL and maxlen != 0: validated by the public layer. */
-  if (!uart_valid(uart))
-    return 0;
-  uint32_t n = 0;
-  while (n < maxlen - 1u) {
-    char c = avr_uart_read_char(uart);
-    if (c == delimiter)
-      break;
-    buffer[n++] = c;
-  }
-  buffer[n] = '\0';
-  return n;
-}
-
 const hal_uart_ops_t _hal_uart_ops = {
     .init = avr_uart_init,
     .enable_interrupt = avr_uart_enable_interrupt,
-    .write = avr_uart_write,
     .write_char = avr_uart_write_char,
-    .write_int = avr_uart_write_int,
-    .write_uint = avr_uart_write_uint,
-    .write_float = avr_uart_write_float,
-    .write_string = avr_uart_write_string,
     .read_char = avr_uart_read_char,
     .available = avr_uart_available,
-    .read_until = avr_uart_read_until,
 };
 
 /* USART0 receive-complete interrupt — routed to the callback registered via

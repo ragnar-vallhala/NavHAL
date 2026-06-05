@@ -25,6 +25,7 @@
  * transmit / receive / full-duplex transfers.
  */
 
+#include "internal/hal_spi_ops.h"
 #include "navhal_port_spi.h"
 #include "navhal_port_gpio.h"
 #include "family/rcc_reg.h"
@@ -79,11 +80,9 @@ static void _configure_spi_gpio(hal_spi_instance_t spi) {
   }
 }
 
-hal_status_t hal_spi_init(hal_spi_instance_t spi,
-                          const hal_spi_config_t *config) {
-  if (!config)
-    return HAL_ERR_INVALID_ARG;
-
+static hal_status_t stm32_spi_init(hal_spi_instance_t spi,
+                                   const hal_spi_config_t *config) {
+  /* config non-NULL: validated by the public layer. */
   volatile SPI_Reg_Typedef *spi_reg = _get_spi(spi);
   if (!spi_reg)
     return HAL_ERR_INVALID_ARG;
@@ -128,10 +127,12 @@ hal_status_t hal_spi_init(hal_spi_instance_t spi,
   return HAL_OK;
 }
 
-hal_status_t hal_spi_transmit(hal_spi_instance_t spi, const uint8_t *data,
-                              uint16_t size, uint32_t timeout) {
+static hal_status_t stm32_spi_transmit(hal_spi_instance_t spi,
+                                       const uint8_t *data, uint16_t size,
+                                       uint32_t timeout) {
+  /* data non-NULL: validated by the public layer. */
   volatile SPI_Reg_Typedef *spi_reg = _get_spi(spi);
-  if (!spi_reg || !data)
+  if (!spi_reg)
     return HAL_ERR_INVALID_ARG;
 
   uint32_t start_tick = hal_timebase_get_millis();
@@ -162,10 +163,11 @@ hal_status_t hal_spi_transmit(hal_spi_instance_t spi, const uint8_t *data,
   return HAL_OK;
 }
 
-hal_status_t hal_spi_receive(hal_spi_instance_t spi, uint8_t *data,
-                             uint16_t size, uint32_t timeout) {
+static hal_status_t stm32_spi_receive(hal_spi_instance_t spi, uint8_t *data,
+                                      uint16_t size, uint32_t timeout) {
+  /* data non-NULL: validated by the public layer. */
   volatile SPI_Reg_Typedef *spi_reg = _get_spi(spi);
-  if (!spi_reg || !data)
+  if (!spi_reg)
     return HAL_ERR_INVALID_ARG;
 
   uint32_t start_tick = hal_timebase_get_millis();
@@ -189,11 +191,13 @@ hal_status_t hal_spi_receive(hal_spi_instance_t spi, uint8_t *data,
   return HAL_OK;
 }
 
-hal_status_t hal_spi_transmit_receive(hal_spi_instance_t spi,
-                                      const uint8_t *tx_data, uint8_t *rx_data,
-                                      uint16_t size, uint32_t timeout) {
+static hal_status_t stm32_spi_transmit_receive(hal_spi_instance_t spi,
+                                               const uint8_t *tx_data,
+                                               uint8_t *rx_data, uint16_t size,
+                                               uint32_t timeout) {
+  /* tx_data and rx_data non-NULL: validated by the public layer. */
   volatile SPI_Reg_Typedef *spi_reg = _get_spi(spi);
-  if (!spi_reg || !tx_data || !rx_data)
+  if (!spi_reg)
     return HAL_ERR_INVALID_ARG;
 
   uint32_t start_tick = hal_timebase_get_millis();
@@ -216,3 +220,10 @@ hal_status_t hal_spi_transmit_receive(hal_spi_instance_t spi,
 
   return HAL_OK;
 }
+
+const hal_spi_ops_t _hal_spi_ops = {
+    .init = stm32_spi_init,
+    .transmit = stm32_spi_transmit,
+    .receive = stm32_spi_receive,
+    .transmit_receive = stm32_spi_transmit_receive,
+};

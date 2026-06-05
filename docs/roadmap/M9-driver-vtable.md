@@ -2,7 +2,9 @@
 
 # M9 — Driver vtable + vendor-backend abstraction
 
-> Status: **planned**
+> Status: **in progress** — GPIO landed as the reference; the HAL-wide
+> rollout, the LTO release config, and the conformance/perf harness are
+> tracked in the execution plan: @ref roadmap_m9_plan.
 > Scope: introduce a HAL-internal interface between the public
 > `hal_*` API and per-vendor implementations, so adding a new vendor
 > means filling in a vtable, not re-writing every driver from scratch.

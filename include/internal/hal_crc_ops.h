@@ -54,6 +54,14 @@ typedef struct {
 /** @brief The active port's CRC operations table (defined by one backend). */
 extern const hal_crc_ops_t _hal_crc_ops;
 
+/* Portable software CRC-32/MPEG-2 backend (implemented in src/common/hal_crc.c).
+ * A port without a hardware CRC unit points its ops table at these instead of
+ * carrying its own copy of the algorithm. */
+hal_status_t hal_crc_sw_init(const hal_crc_config_t *cfg);
+hal_status_t hal_crc_sw_reset(void);
+uint32_t hal_crc_sw_accumulate(const uint8_t *data, uint32_t len);
+uint32_t hal_crc_sw_compute(const uint8_t *data, uint32_t len);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

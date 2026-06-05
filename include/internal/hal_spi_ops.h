@@ -17,13 +17,18 @@
 
 /**
  * @file internal/hal_spi_ops.h
- * @brief HAL-internal SPI vendor-backend interface (the driver vtable).
+ * @brief HAL-internal SPI vendor-backend interface (hardware primitives).
  *
  * @details
  * Not part of the public API — application code includes @c common/hal_spi.h.
- * Declares the per-backend operations table the shared public layer
- * (@c src/common/hal_spi.c) dispatches through. See @c internal/hal_gpio_ops.h
- * for the embedded-table rationale.
+ *
+ * SPI is full-duplex: every transfer is a sequence of single-byte exchanges.
+ * The vtable therefore exposes just two primitives — configure the peripheral
+ * and exchange one byte — and the shared public layer @c src/common/hal_spi.c
+ * builds transmit / receive / transmit_receive as loops over @c xfer_byte. A
+ * new SPI port supplies these two and inherits all three transfer directions.
+ *
+ * See @c internal/hal_gpio_ops.h for the embedded-table / LTO rationale.
  */
 
 #ifndef NAVHAL_INTERNAL_HAL_SPI_OPS_H
@@ -38,23 +43,22 @@
 extern "C" {
 #endif
 
-/** @brief Per-backend SPI operations table. */
+/** @brief Per-backend SPI hardware primitives. */
 typedef struct {
-  /** Backend for ::hal_spi_init. NULL @p config rejected upstream. */
+  /** Configure the SPI master. NULL @p config rejected upstream. */
   hal_status_t (*init)(hal_spi_instance_t spi, const hal_spi_config_t *config);
-  /** Backend for ::hal_spi_transmit. NULL @p data rejected upstream. */
-  hal_status_t (*transmit)(hal_spi_instance_t spi, const uint8_t *data,
-                           uint16_t size, uint32_t timeout);
-  /** Backend for ::hal_spi_receive. NULL @p data rejected upstream. */
-  hal_status_t (*receive)(hal_spi_instance_t spi, uint8_t *data, uint16_t size,
-                          uint32_t timeout);
-  /** Backend for ::hal_spi_transmit_receive. NULL tx/rx buffer rejected upstream. */
-  hal_status_t (*transmit_receive)(hal_spi_instance_t spi,
-                                   const uint8_t *tx_data, uint8_t *rx_data,
-                                   uint16_t size, uint32_t timeout);
+  /**
+   * @brief Exchange one byte full-duplex (blocking).
+   * @param out Byte clocked out on MOSI.
+   * @param in  Receives the byte clocked in on MISO; may be NULL to discard.
+   * @return ::HAL_OK; ::HAL_ERR_INVALID_ARG for an invalid instance;
+   *         ::HAL_ERR_TIMEOUT if the peripheral never becomes ready (an
+   *         internal iteration guard bounds a stuck transfer).
+   */
+  hal_status_t (*xfer_byte)(hal_spi_instance_t spi, uint8_t out, uint8_t *in);
 } hal_spi_ops_t;
 
-/** @brief The active port's SPI operations table (defined by one backend). */
+/** @brief The active port's SPI primitives (defined by one backend). */
 extern const hal_spi_ops_t _hal_spi_ops;
 
 #ifdef __cplusplus

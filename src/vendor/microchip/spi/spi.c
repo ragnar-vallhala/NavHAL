@@ -42,18 +42,20 @@
 static const uint8_t k_spr[8] = {0, 0, 1, 1, 2, 2, 3, 3};
 static const uint8_t k_spi2x[8] = {1, 0, 1, 0, 1, 0, 0, 0};
 
-/** @brief Exchange one byte; false on a (guarded) timeout. */
-static bool spi_xfer(uint8_t out, uint8_t *in) {
+static hal_status_t avr_spi_xfer_byte(hal_spi_instance_t spi, uint8_t out,
+                                      uint8_t *in) {
+  if (spi != HAL_SPI_0)
+    return HAL_ERR_INVALID_ARG;
   SPDR = out;
   uint16_t guard = 0;
   while (!(SPSR & (1u << SPIF))) {
     if (++guard == 0u)
-      return false;
+      return HAL_ERR_TIMEOUT;
   }
   uint8_t r = SPDR;
   if (in != NULL)
     *in = r;
-  return true;
+  return HAL_OK;
 }
 
 static hal_status_t avr_spi_init(hal_spi_instance_t spi,
@@ -88,51 +90,7 @@ static hal_status_t avr_spi_init(hal_spi_instance_t spi,
   return HAL_OK;
 }
 
-static hal_status_t avr_spi_transmit(hal_spi_instance_t spi,
-                                     const uint8_t *data, uint16_t size,
-                                     uint32_t timeout) {
-  /* data non-NULL: validated by the public layer. */
-  (void)timeout; /* AVR SPI uses a coarse iteration guard, not a ms timeout. */
-  if (spi != HAL_SPI_0)
-    return HAL_ERR_INVALID_ARG;
-  for (uint16_t i = 0; i < size; i++) {
-    if (!spi_xfer(data[i], NULL))
-      return HAL_ERR_TIMEOUT;
-  }
-  return HAL_OK;
-}
-
-static hal_status_t avr_spi_receive(hal_spi_instance_t spi, uint8_t *data,
-                                    uint16_t size, uint32_t timeout) {
-  /* data non-NULL: validated by the public layer. */
-  (void)timeout;
-  if (spi != HAL_SPI_0)
-    return HAL_ERR_INVALID_ARG;
-  for (uint16_t i = 0; i < size; i++) {
-    if (!spi_xfer(0xFFu, &data[i])) /* clock out a dummy frame to read. */
-      return HAL_ERR_TIMEOUT;
-  }
-  return HAL_OK;
-}
-
-static hal_status_t avr_spi_transmit_receive(hal_spi_instance_t spi,
-                                             const uint8_t *tx_data,
-                                             uint8_t *rx_data, uint16_t size,
-                                             uint32_t timeout) {
-  /* tx_data and rx_data non-NULL: validated by the public layer. */
-  (void)timeout;
-  if (spi != HAL_SPI_0)
-    return HAL_ERR_INVALID_ARG;
-  for (uint16_t i = 0; i < size; i++) {
-    if (!spi_xfer(tx_data[i], &rx_data[i]))
-      return HAL_ERR_TIMEOUT;
-  }
-  return HAL_OK;
-}
-
 const hal_spi_ops_t _hal_spi_ops = {
     .init = avr_spi_init,
-    .transmit = avr_spi_transmit,
-    .receive = avr_spi_receive,
-    .transmit_receive = avr_spi_transmit_receive,
+    .xfer_byte = avr_spi_xfer_byte,
 };

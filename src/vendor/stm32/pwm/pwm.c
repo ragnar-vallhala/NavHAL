@@ -26,17 +26,15 @@
  * delegates to the standardized timer driver.
  */
 
-#include "navhal_port_pwm.h"
+#include "internal/hal_pwm_ops.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
 #include "navhal_port_timer.h"
 #include <stdint.h>
 
-hal_status_t hal_pwm_init(hal_pwm_handle_t *pwm, uint32_t frequency,
-                          float duty_cycle) {
-  if (pwm == NULL || frequency == 0)
-    return HAL_ERR_INVALID_ARG;
-
+static hal_status_t stm32_pwm_init(hal_pwm_handle_t *pwm, uint32_t frequency,
+                                   float duty_cycle) {
+  /* pwm non-NULL and frequency != 0: validated by the public layer. */
   // 1. Get clock
   uint32_t bus_clk = hal_clock_get_apb1clk(); // default for TIM2-TIM5
   uint32_t ppre = ((RCC->CFGR) >> RCC_CFGR_PPRE1_BIT) & 0x7;
@@ -65,24 +63,22 @@ hal_status_t hal_pwm_init(hal_pwm_handle_t *pwm, uint32_t frequency,
   return HAL_OK;
 }
 
-hal_status_t hal_pwm_start(hal_pwm_handle_t *pwm) {
-  if (pwm == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t stm32_pwm_start(hal_pwm_handle_t *pwm) {
+  /* pwm non-NULL: validated by the public layer. */
   hal_timer_start(pwm->timer);
   return HAL_OK;
 }
 
-hal_status_t hal_pwm_stop(hal_pwm_handle_t *pwm) {
-  if (pwm == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t stm32_pwm_stop(hal_pwm_handle_t *pwm) {
+  /* pwm non-NULL: validated by the public layer. */
   hal_timer_disable_channel(pwm->timer, pwm->channel);
   hal_timer_stop(pwm->timer);
   return HAL_OK;
 }
 
-hal_status_t hal_pwm_set_duty_cycle(hal_pwm_handle_t *pwm, float duty_cycle) {
-  if (pwm == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t stm32_pwm_set_duty_cycle(hal_pwm_handle_t *pwm,
+                                             float duty_cycle) {
+  /* pwm non-NULL: validated by the public layer. */
   uint32_t arr = hal_timer_get_auto_reload(pwm->timer);
   uint32_t ccr = (uint32_t)((float)(arr + 1) * duty_cycle + 0.5f);
   if (ccr > arr)
@@ -91,9 +87,18 @@ hal_status_t hal_pwm_set_duty_cycle(hal_pwm_handle_t *pwm, float duty_cycle) {
   return HAL_OK;
 }
 
-hal_status_t hal_pwm_set_frequency(hal_pwm_handle_t *pwm, uint32_t frequency) {
-  if (pwm == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t stm32_pwm_set_frequency(hal_pwm_handle_t *pwm,
+                                            uint32_t frequency) {
+  /* pwm non-NULL: validated by the public layer. */
+  (void)pwm;
   (void)frequency;
   return HAL_ERR_NOT_SUPPORTED; // not yet implemented
 }
+
+const hal_pwm_ops_t _hal_pwm_ops = {
+    .init = stm32_pwm_init,
+    .start = stm32_pwm_start,
+    .stop = stm32_pwm_stop,
+    .set_duty_cycle = stm32_pwm_set_duty_cycle,
+    .set_frequency = stm32_pwm_set_frequency,
+};

@@ -34,7 +34,7 @@
  * pin's direction. Channels 3 and 4 do not exist on these timers.
  */
 
-#include "common/hal_pwm.h"
+#include "internal/hal_pwm_ops.h"
 
 #include <avr/io.h>
 #include <stddef.h>
@@ -81,10 +81,9 @@ static void write_duty(hal_timer_t timer, uint32_t channel, float duty) {
   }
 }
 
-hal_status_t hal_pwm_init(hal_pwm_handle_t *pwm, uint32_t frequency,
-                          float duty_cycle) {
-  if (pwm == NULL || frequency == 0u)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t avr_pwm_init(hal_pwm_handle_t *pwm, uint32_t frequency,
+                                 float duty_cycle) {
+  /* pwm non-NULL and frequency != 0: validated by the public layer. */
   int8_t i = pwm_index(pwm->timer);
   if (i < 0 || pwm->channel < 1u || pwm->channel > 2u)
     return HAL_ERR_INVALID_ARG;
@@ -135,9 +134,8 @@ hal_status_t hal_pwm_init(hal_pwm_handle_t *pwm, uint32_t frequency,
   return HAL_OK;
 }
 
-hal_status_t hal_pwm_start(hal_pwm_handle_t *pwm) {
-  if (pwm == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t avr_pwm_start(hal_pwm_handle_t *pwm) {
+  /* pwm non-NULL: validated by the public layer. */
   int8_t i = pwm_index(pwm->timer);
   if (i < 0 || pwm->channel < 1u || pwm->channel > 2u)
     return HAL_ERR_INVALID_ARG;
@@ -149,9 +147,8 @@ hal_status_t hal_pwm_start(hal_pwm_handle_t *pwm) {
   return HAL_OK;
 }
 
-hal_status_t hal_pwm_stop(hal_pwm_handle_t *pwm) {
-  if (pwm == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t avr_pwm_stop(hal_pwm_handle_t *pwm) {
+  /* pwm non-NULL: validated by the public layer. */
   int8_t i = pwm_index(pwm->timer);
   if (i < 0 || pwm->channel < 1u || pwm->channel > 2u)
     return HAL_ERR_INVALID_ARG;
@@ -163,9 +160,9 @@ hal_status_t hal_pwm_stop(hal_pwm_handle_t *pwm) {
   return HAL_OK;
 }
 
-hal_status_t hal_pwm_set_duty_cycle(hal_pwm_handle_t *pwm, float duty_cycle) {
-  if (pwm == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t avr_pwm_set_duty_cycle(hal_pwm_handle_t *pwm,
+                                           float duty_cycle) {
+  /* pwm non-NULL: validated by the public layer. */
   int8_t i = pwm_index(pwm->timer);
   if (i < 0 || pwm->channel < 1u || pwm->channel > 2u)
     return HAL_ERR_INVALID_ARG;
@@ -173,8 +170,18 @@ hal_status_t hal_pwm_set_duty_cycle(hal_pwm_handle_t *pwm, float duty_cycle) {
   return HAL_OK;
 }
 
-hal_status_t hal_pwm_set_frequency(hal_pwm_handle_t *pwm, uint32_t frequency) {
+static hal_status_t avr_pwm_set_frequency(hal_pwm_handle_t *pwm,
+                                          uint32_t frequency) {
+  /* pwm non-NULL: validated by the public layer. */
   (void)pwm;
   (void)frequency;
   return HAL_ERR_NOT_SUPPORTED;
 }
+
+const hal_pwm_ops_t _hal_pwm_ops = {
+    .init = avr_pwm_init,
+    .start = avr_pwm_start,
+    .stop = avr_pwm_stop,
+    .set_duty_cycle = avr_pwm_set_duty_cycle,
+    .set_frequency = avr_pwm_set_frequency,
+};

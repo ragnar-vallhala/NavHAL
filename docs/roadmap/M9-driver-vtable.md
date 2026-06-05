@@ -114,9 +114,15 @@ behaviour-preservation property.
 
 ### 9.3 — Cost-of-abstraction defence
 
-The vtable adds one indirect call per HAL invocation. On Cortex-M
-that's ~3 cycles; on AVR with ~16 MHz it's measurable on tight
-loops. Mitigation:
+> Deep dive (current model, this proposal, five other HALs, measured
+> per-arch costs, and the compiler mechanics that make it free):
+> @ref roadmap_abstraction.
+
+The vtable adds one indirect call per HAL invocation. Measured on a
+faithful model with the project's real flags: ~3–6 cycles on Cortex-M4
+at `-O0`, ~+8 cycles on AVR at `-Os` (~0.5 µs @ 16 MHz), and **zero**
+under `-O2 -flto` (the indirect call devirtualises to a direct call and
+inlines — verified by disassembly on both arches). Mitigation:
 
 * For known hot paths (GPIO `set` / `clear` / `toggle`), keep the
   inline accessors in the port header (today's pattern). The vtable

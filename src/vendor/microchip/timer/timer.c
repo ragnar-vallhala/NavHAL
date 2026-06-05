@@ -35,7 +35,7 @@
  * ::HAL_ERR_NOT_SUPPORTED.
  */
 
-#include "common/hal_timer.h"
+#include "internal/hal_timer_ops.h"
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -119,9 +119,11 @@ static void apply(hal_timer_t timer, uint8_t cs, uint16_t top) {
   }
 }
 
-hal_status_t hal_timer_init(hal_timer_t timer, const hal_timer_config_t *cfg) {
+static hal_status_t avr_timer_init(hal_timer_t timer,
+                                   const hal_timer_config_t *cfg) {
+  /* cfg is non-NULL: the public layer validated it before dispatching. */
   int8_t i = timer_index(timer);
-  if (i < 0 || cfg == NULL)
+  if (i < 0)
     return HAL_ERR_INVALID_ARG;
 
   uint8_t cs;
@@ -143,7 +145,7 @@ hal_status_t hal_timer_init(hal_timer_t timer, const hal_timer_config_t *cfg) {
   return HAL_OK;
 }
 
-hal_status_t hal_timer_init_freq(hal_timer_t timer, uint32_t freq) {
+static hal_status_t avr_timer_init_freq(hal_timer_t timer, uint32_t freq) {
   int8_t i = timer_index(timer);
   if (i < 0 || freq == 0u)
     return HAL_ERR_INVALID_ARG;
@@ -163,7 +165,7 @@ hal_status_t hal_timer_init_freq(hal_timer_t timer, uint32_t freq) {
   return HAL_OK;
 }
 
-hal_status_t hal_timer_start(hal_timer_t timer) {
+static hal_status_t avr_timer_start(hal_timer_t timer) {
   int8_t i = timer_index(timer);
   if (i < 0)
     return HAL_ERR_INVALID_ARG;
@@ -174,7 +176,7 @@ hal_status_t hal_timer_start(hal_timer_t timer) {
   return HAL_OK;
 }
 
-hal_status_t hal_timer_stop(hal_timer_t timer) {
+static hal_status_t avr_timer_stop(hal_timer_t timer) {
   int8_t i = timer_index(timer);
   if (i < 0)
     return HAL_ERR_INVALID_ARG;
@@ -185,7 +187,7 @@ hal_status_t hal_timer_stop(hal_timer_t timer) {
   return HAL_OK;
 }
 
-hal_status_t hal_timer_reset(hal_timer_t timer) {
+static hal_status_t avr_timer_reset(hal_timer_t timer) {
   int8_t i = timer_index(timer);
   if (i < 0)
     return HAL_ERR_INVALID_ARG;
@@ -196,7 +198,7 @@ hal_status_t hal_timer_reset(hal_timer_t timer) {
   return HAL_OK;
 }
 
-uint32_t hal_timer_get_count(hal_timer_t timer) {
+static uint32_t avr_timer_get_count(hal_timer_t timer) {
   if (timer == TIM1)
     return TCNT1;
   if (timer == TIM2)
@@ -204,7 +206,7 @@ uint32_t hal_timer_get_count(hal_timer_t timer) {
   return 0;
 }
 
-hal_status_t hal_timer_enable_interrupt(hal_timer_t timer) {
+static hal_status_t avr_timer_enable_interrupt(hal_timer_t timer) {
   int8_t i = timer_index(timer);
   if (i < 0)
     return HAL_ERR_INVALID_ARG;
@@ -216,7 +218,7 @@ hal_status_t hal_timer_enable_interrupt(hal_timer_t timer) {
   return HAL_OK;
 }
 
-hal_status_t hal_timer_disable_interrupt(hal_timer_t timer) {
+static hal_status_t avr_timer_disable_interrupt(hal_timer_t timer) {
   int8_t i = timer_index(timer);
   if (i < 0)
     return HAL_ERR_INVALID_ARG;
@@ -227,7 +229,7 @@ hal_status_t hal_timer_disable_interrupt(hal_timer_t timer) {
   return HAL_OK;
 }
 
-hal_status_t hal_timer_clear_interrupt_flag(hal_timer_t timer) {
+static hal_status_t avr_timer_clear_interrupt_flag(hal_timer_t timer) {
   int8_t i = timer_index(timer);
   if (i < 0)
     return HAL_ERR_INVALID_ARG;
@@ -239,7 +241,7 @@ hal_status_t hal_timer_clear_interrupt_flag(hal_timer_t timer) {
   return HAL_OK;
 }
 
-hal_status_t hal_timer_attach_callback(hal_timer_t timer,
+static hal_status_t avr_timer_attach_callback(hal_timer_t timer,
                                        hal_timer_callback_t callback) {
   int8_t i = timer_index(timer);
   if (i < 0)
@@ -248,7 +250,7 @@ hal_status_t hal_timer_attach_callback(hal_timer_t timer,
   return HAL_OK;
 }
 
-hal_status_t hal_timer_detach_callback(hal_timer_t timer) {
+static hal_status_t avr_timer_detach_callback(hal_timer_t timer) {
   int8_t i = timer_index(timer);
   if (i < 0)
     return HAL_ERR_INVALID_ARG;
@@ -256,14 +258,14 @@ hal_status_t hal_timer_detach_callback(hal_timer_t timer) {
   return HAL_OK;
 }
 
-uint32_t hal_timer_get_frequency(hal_timer_t timer) {
+static uint32_t avr_timer_get_frequency(hal_timer_t timer) {
   int8_t i = timer_index(timer);
   if (i < 0 || s_state[i].divider == 0u)
     return 0;
   return F_CPU / ((uint32_t)s_state[i].divider * (s_state[i].reload + 1u));
 }
 
-hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
+static hal_status_t avr_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
   int8_t i = timer_index(timer);
   if (i < 0)
     return HAL_ERR_INVALID_ARG;
@@ -275,10 +277,10 @@ hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
     snap(prescaler, k_t2_div, k_t2_cs, 7, &cs, &divider);
   s_state[i].cs = cs;
   s_state[i].divider = divider;
-  return hal_timer_start(timer); /* re-apply the clock select. */
+  return avr_timer_start(timer); /* re-apply the clock select. */
 }
 
-hal_status_t hal_timer_set_auto_reload(hal_timer_t timer,
+static hal_status_t avr_timer_set_auto_reload(hal_timer_t timer,
                                        uint32_t auto_reload) {
   int8_t i = timer_index(timer);
   uint32_t max_top = (timer == TIM1) ? 65535u : 255u;
@@ -292,14 +294,14 @@ hal_status_t hal_timer_set_auto_reload(hal_timer_t timer,
   return HAL_OK;
 }
 
-uint32_t hal_timer_get_auto_reload(hal_timer_t timer) {
+static uint32_t avr_timer_get_auto_reload(hal_timer_t timer) {
   int8_t i = timer_index(timer);
   return (i < 0) ? 0 : s_state[i].reload;
 }
 
 /* ---- Output-compare / PWM channels: handled by the PWM driver --------- */
 
-hal_status_t hal_timer_set_compare(hal_timer_t timer, uint8_t channel,
+static hal_status_t avr_timer_set_compare(hal_timer_t timer, uint8_t channel,
                                    uint32_t compare_value) {
   (void)timer;
   (void)channel;
@@ -307,19 +309,19 @@ hal_status_t hal_timer_set_compare(hal_timer_t timer, uint8_t channel,
   return HAL_ERR_NOT_SUPPORTED; /* use hal_pwm_* */
 }
 
-uint32_t hal_timer_get_compare(hal_timer_t timer, uint32_t channel) {
+static uint32_t avr_timer_get_compare(hal_timer_t timer, uint32_t channel) {
   (void)timer;
   (void)channel;
   return 0;
 }
 
-hal_status_t hal_timer_enable_channel(hal_timer_t timer, uint32_t channel) {
+static hal_status_t avr_timer_enable_channel(hal_timer_t timer, uint32_t channel) {
   (void)timer;
   (void)channel;
   return HAL_ERR_NOT_SUPPORTED; /* use hal_pwm_* */
 }
 
-hal_status_t hal_timer_disable_channel(hal_timer_t timer, uint32_t channel) {
+static hal_status_t avr_timer_disable_channel(hal_timer_t timer, uint32_t channel) {
   (void)timer;
   (void)channel;
   return HAL_ERR_NOT_SUPPORTED; /* use hal_pwm_* */
@@ -336,3 +338,25 @@ ISR(TIMER2_COMPA_vect) {
   if (s_state[1].cb != NULL)
     s_state[1].cb();
 }
+
+const hal_timer_ops_t _hal_timer_ops = {
+    .init = avr_timer_init,
+    .init_freq = avr_timer_init_freq,
+    .start = avr_timer_start,
+    .stop = avr_timer_stop,
+    .reset = avr_timer_reset,
+    .get_count = avr_timer_get_count,
+    .enable_interrupt = avr_timer_enable_interrupt,
+    .disable_interrupt = avr_timer_disable_interrupt,
+    .clear_interrupt_flag = avr_timer_clear_interrupt_flag,
+    .attach_callback = avr_timer_attach_callback,
+    .detach_callback = avr_timer_detach_callback,
+    .set_compare = avr_timer_set_compare,
+    .get_compare = avr_timer_get_compare,
+    .enable_channel = avr_timer_enable_channel,
+    .disable_channel = avr_timer_disable_channel,
+    .get_frequency = avr_timer_get_frequency,
+    .set_prescaler = avr_timer_set_prescaler,
+    .set_auto_reload = avr_timer_set_auto_reload,
+    .get_auto_reload = avr_timer_get_auto_reload,
+};

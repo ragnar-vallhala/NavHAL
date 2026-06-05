@@ -17,23 +17,27 @@
 
 /**
  * @file src/vendor/microchip/gpio/gpio.c
- * @brief ATmega328P GPIO HAL driver.
+ * @brief ATmega328P GPIO vendor backend.
  *
  * @details
- * Implements the portable GPIO API (@c common/hal_gpio.h) for the
- * ATmega328P ports B, C and D — the configuration calls (init, set_mode,
- * …). The hot-path accessors (write / read / toggle) are @c static
- * @c inline in @c navhal_port_gpio.h so a constant pin folds to `sbi`/`cbi`.
- * A ::hal_gpio_pin_t is encoded 8 per port: @c port = pin >> 3
- * (0 = B, 1 = C, 2 = D), @c bit = pin & 7.
+ * Provides the ATmega328P implementations behind the GPIO driver vtable
+ * (::hal_gpio_ops_t). Argument validation (the NULL-config check) lives once
+ * in the shared public layer @c src/common/hal_gpio.c, so these operations do
+ * register work only. The active table is published as ::_hal_gpio_ops at the
+ * bottom of this file.
  *
- * ATmega328P GPIO has no clock gate, no slew-rate control, no open-drain
+ * Ports B, C and D are addressed 8 pins each: @c port = pin >> 3
+ * (0 = B, 1 = C, 2 = D), @c bit = pin & 7. The hot-path accessors (write /
+ * read / toggle) are @c static @c inline in @c navhal_port_gpio.h so a
+ * constant pin folds to `sbi`/`cbi`.
+ *
+ * The ATmega328P GPIO has no clock gate, no slew-rate control, no open-drain
  * mode and no alternate-function multiplexer in the STM32 sense, so the
- * corresponding config knobs are accepted as no-ops (or, for alternate
- * function, reported unsupported).
+ * corresponding knobs are accepted as no-ops (or, for alternate function,
+ * reported unsupported).
  */
 
-#include "navhal_port_gpio.h"
+#include "internal/hal_gpio_ops.h"
 
 #include <avr/io.h>
 #include <stddef.h>
@@ -56,8 +60,8 @@ static volatile uint8_t *port_out_reg(uint8_t port) {
   }
 }
 
-hal_status_t hal_gpio_set_mode(hal_gpio_pin_t pin, hal_gpio_mode_t mode,
-                               hal_gpio_pull_t pull) {
+static hal_status_t avr_gpio_set_mode(hal_gpio_pin_t pin, hal_gpio_mode_t mode,
+                                      hal_gpio_pull_t pull) {
   uint8_t p = (uint8_t)pin >> 3;
   uint8_t m = (uint8_t)(1u << ((uint8_t)pin & 7u));
   volatile uint8_t *ddr = ddr_reg(p);
@@ -78,27 +82,27 @@ hal_status_t hal_gpio_set_mode(hal_gpio_pin_t pin, hal_gpio_mode_t mode,
   return HAL_OK;
 }
 
-hal_status_t hal_gpio_init(hal_gpio_pin_t pin, const hal_gpio_config_t *cfg) {
-  if (cfg == NULL)
-    return HAL_ERR_INVALID_ARG;
-  /* output_type, output_speed and alternate have no ATmega328P effect. */
-  return hal_gpio_set_mode(pin, cfg->mode, cfg->pull);
+static hal_status_t avr_gpio_init(hal_gpio_pin_t pin,
+                                  const hal_gpio_config_t *cfg) {
+  /* cfg is non-NULL: the public layer validated it before dispatching.
+   * output_type, output_speed and alternate have no ATmega328P effect. */
+  return avr_gpio_set_mode(pin, cfg->mode, cfg->pull);
 }
 
-hal_gpio_mode_t hal_gpio_get_mode(hal_gpio_pin_t pin) {
+static hal_gpio_mode_t avr_gpio_get_mode(hal_gpio_pin_t pin) {
   uint8_t p = (uint8_t)pin >> 3;
   uint8_t m = (uint8_t)(1u << ((uint8_t)pin & 7u));
   return (*ddr_reg(p) & m) ? HAL_GPIO_MODE_OUTPUT : HAL_GPIO_MODE_INPUT;
 }
 
-hal_status_t hal_gpio_enable_clock(hal_gpio_pin_t pin) {
+static hal_status_t avr_gpio_enable_clock(hal_gpio_pin_t pin) {
   /* ATmega328P GPIO ports are always clocked — nothing to enable. */
   (void)pin;
   return HAL_OK;
 }
 
-hal_status_t hal_gpio_set_alternate_function(hal_gpio_pin_t pin,
-                                             hal_gpio_af_t af) {
+static hal_status_t avr_gpio_set_alternate_function(hal_gpio_pin_t pin,
+                                                    hal_gpio_af_t af) {
   /* The ATmega328P has no GPIO alternate-function multiplexer; peripheral
    * pin functions are fixed in silicon. */
   (void)pin;
@@ -106,18 +110,28 @@ hal_status_t hal_gpio_set_alternate_function(hal_gpio_pin_t pin,
   return HAL_ERR_NOT_SUPPORTED;
 }
 
-hal_status_t hal_gpio_set_output_type(hal_gpio_pin_t pin,
-                                      hal_gpio_output_type_t type) {
+static hal_status_t avr_gpio_set_output_type(hal_gpio_pin_t pin,
+                                             hal_gpio_output_type_t type) {
   /* ATmega328P outputs are push-pull only; accepted as a no-op. */
   (void)pin;
   (void)type;
   return HAL_OK;
 }
 
-hal_status_t hal_gpio_set_output_speed(hal_gpio_pin_t pin,
-                                       hal_gpio_output_speed_t speed) {
+static hal_status_t avr_gpio_set_output_speed(hal_gpio_pin_t pin,
+                                              hal_gpio_output_speed_t speed) {
   /* No slew-rate control on the ATmega328P; accepted as a no-op. */
   (void)pin;
   (void)speed;
   return HAL_OK;
 }
+
+const hal_gpio_ops_t _hal_gpio_ops = {
+    .init = avr_gpio_init,
+    .set_mode = avr_gpio_set_mode,
+    .get_mode = avr_gpio_get_mode,
+    .enable_clock = avr_gpio_enable_clock,
+    .set_alternate_function = avr_gpio_set_alternate_function,
+    .set_output_type = avr_gpio_set_output_type,
+    .set_output_speed = avr_gpio_set_output_speed,
+};

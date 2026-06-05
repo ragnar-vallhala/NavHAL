@@ -40,7 +40,7 @@ This roadmap is the work to get there, factored into five milestones.
 |---|---|---|---|
 | @ref roadmap_m7  | **done**    | Modular build system | 5–15 MCUs without CMakeLists/Kconfig becoming a swamp |
 | @ref roadmap_m8  | **done**    | CI tiering + portable test framework        | Per-arch CI scaling; HAL-only tests run on every arch |
-| @ref roadmap_m9  | planned     | Driver vtable / vendor-backend abstraction  | ~80 % less per-vendor boilerplate; conformance enforced by interface |
+| @ref roadmap_m9  | in progress | Driver vtable / vendor-backend abstraction (@ref roadmap_m9_plan) | ~80 % less per-vendor boilerplate; conformance enforced by interface |
 | @ref roadmap_m10 | planned     | Port as a registry package                  | Strategic shift away from monorepo. Vendors publish ports independently. |
 | @ref roadmap_m11 | planned     | `HAL_API_VERSION 2`                         | Subsystem namespaces v1 couldn't anticipate — USB, Ethernet, BLE, AI accelerators |
 

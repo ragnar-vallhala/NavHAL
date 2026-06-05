@@ -29,6 +29,7 @@
  * not vendor-bound, so it lives with the other ARMv7E-M arch code.
  */
 
+#include "internal/hal_timer_ops.h"
 #include "navhal_port_timer.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_interrupt.h"
@@ -36,6 +37,10 @@
 #include "family/timer_reg.h"
 #include "utils/timer_types.h"
 #include <stdint.h>
+
+/* Forward declaration: set_compare calls enable_channel, defined further down. */
+static hal_status_t stm32_timer_enable_channel(hal_timer_t timer,
+                                               uint32_t channel);
 
 /**
  * @internal
@@ -81,9 +86,9 @@ static void _enable_timer_rcc(hal_timer_t timer) {
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p cfg is NULL or the timer
  *         is invalid.
  */
-hal_status_t hal_timer_init(hal_timer_t timer, const hal_timer_config_t *cfg) {
-  if (cfg == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t stm32_timer_init(hal_timer_t timer,
+                                     const hal_timer_config_t *cfg) {
+  /* cfg is non-NULL: the public layer validated it before dispatching. */
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return HAL_ERR_INVALID_ARG;
@@ -113,7 +118,7 @@ hal_status_t hal_timer_init(hal_timer_t timer, const hal_timer_config_t *cfg) {
  * @note Computes the optimal PSC and ARR to achieve the target frequency,
  *       handling both 16-bit and 32-bit timers.
  */
-hal_status_t hal_timer_init_freq(hal_timer_t timer, uint32_t freq) {
+static hal_status_t stm32_timer_init_freq(hal_timer_t timer, uint32_t freq) {
   if (freq == 0)
     return HAL_ERR_INVALID_ARG;
 
@@ -180,7 +185,7 @@ hal_status_t hal_timer_init_freq(hal_timer_t timer, uint32_t freq) {
   }
 
   hal_timer_config_t cfg = {.prescaler = psc, .auto_reload = arr};
-  return hal_timer_init(timer, &cfg);
+  return stm32_timer_init(timer, &cfg);
 }
 
 /**
@@ -188,7 +193,7 @@ hal_status_t hal_timer_init_freq(hal_timer_t timer, uint32_t freq) {
  * @param timer Timer identifier.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-hal_status_t hal_timer_start(hal_timer_t timer) {
+static hal_status_t stm32_timer_start(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return HAL_ERR_INVALID_ARG;
@@ -201,7 +206,7 @@ hal_status_t hal_timer_start(hal_timer_t timer) {
  * @param timer Timer identifier.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-hal_status_t hal_timer_stop(hal_timer_t timer) {
+static hal_status_t stm32_timer_stop(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return HAL_ERR_INVALID_ARG;
@@ -214,7 +219,7 @@ hal_status_t hal_timer_stop(hal_timer_t timer) {
  * @param timer Timer identifier.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-hal_status_t hal_timer_reset(hal_timer_t timer) {
+static hal_status_t stm32_timer_reset(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return HAL_ERR_INVALID_ARG;
@@ -227,7 +232,7 @@ hal_status_t hal_timer_reset(hal_timer_t timer) {
  * @param timer Timer identifier.
  * @return Current counter value, or 0 for an invalid timer.
  */
-uint32_t hal_timer_get_count(hal_timer_t timer) {
+static uint32_t stm32_timer_get_count(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return 0;
@@ -239,7 +244,7 @@ uint32_t hal_timer_get_count(hal_timer_t timer) {
  * @param timer Timer identifier.
  * @return Timer frequency in Hz, or 0 for an invalid timer.
  */
-uint32_t hal_timer_get_frequency(hal_timer_t timer) {
+static uint32_t stm32_timer_get_frequency(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return 0;
@@ -276,7 +281,7 @@ uint32_t hal_timer_get_frequency(hal_timer_t timer) {
  * @param prescaler Prescaler value.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
+static hal_status_t stm32_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return HAL_ERR_INVALID_ARG;
@@ -290,17 +295,17 @@ hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
  * @param auto_reload Auto-reload value (clamped to 16 bits for 16-bit timers).
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-hal_status_t hal_timer_set_auto_reload(hal_timer_t timer,
+static hal_status_t stm32_timer_set_auto_reload(hal_timer_t timer,
                                        uint32_t auto_reload) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return HAL_ERR_INVALID_ARG;
 
-  hal_timer_stop(timer);
+  stm32_timer_stop(timer);
   if (!(timer == TIM2 || timer == TIM5))
     auto_reload = (uint16_t)auto_reload;
   tim->ARR = auto_reload;
-  hal_timer_start(timer);
+  stm32_timer_start(timer);
   return HAL_OK;
 }
 
@@ -309,7 +314,7 @@ hal_status_t hal_timer_set_auto_reload(hal_timer_t timer,
  * @param timer Timer identifier.
  * @return Auto-reload value, or 0 for an invalid timer.
  */
-uint32_t hal_timer_get_auto_reload(hal_timer_t timer) {
+static uint32_t stm32_timer_get_auto_reload(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return 0;
@@ -321,7 +326,7 @@ uint32_t hal_timer_get_auto_reload(hal_timer_t timer) {
  * @param timer Timer identifier.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-hal_status_t hal_timer_clear_interrupt_flag(hal_timer_t timer) {
+static hal_status_t stm32_timer_clear_interrupt_flag(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return HAL_ERR_INVALID_ARG;
@@ -331,25 +336,25 @@ hal_status_t hal_timer_clear_interrupt_flag(hal_timer_t timer) {
 
 /** @brief IRQ handler wrapper for TIM2. */
 void TIM2_IRQHandler(void) {
-  hal_timer_clear_interrupt_flag(TIM2);
+  stm32_timer_clear_interrupt_flag(TIM2);
   hal_interrupt_dispatch(TIM2_IRQn);
 }
 
 /** @brief IRQ handler wrapper for TIM3. */
 void TIM3_IRQHandler(void) {
-  hal_timer_clear_interrupt_flag(TIM3);
+  stm32_timer_clear_interrupt_flag(TIM3);
   hal_interrupt_dispatch(TIM3_IRQn);
 }
 
 /** @brief IRQ handler wrapper for TIM4. */
 void TIM4_IRQHandler(void) {
-  hal_timer_clear_interrupt_flag(TIM4);
+  stm32_timer_clear_interrupt_flag(TIM4);
   hal_interrupt_dispatch(TIM4_IRQn);
 }
 
 /** @brief IRQ handler wrapper for TIM5. */
 void TIM5_IRQHandler(void) {
-  hal_timer_clear_interrupt_flag(TIM5);
+  stm32_timer_clear_interrupt_flag(TIM5);
   hal_interrupt_dispatch(TIM5_IRQn);
 }
 
@@ -358,7 +363,7 @@ void TIM5_IRQHandler(void) {
  * @note Clears TIM9's flag and dispatches using the shared IRQn.
  */
 void TIM1BRK_TIM9_IRQHandler(void) {
-  hal_timer_clear_interrupt_flag(TIM9);
+  stm32_timer_clear_interrupt_flag(TIM9);
   hal_interrupt_dispatch(TIM1_BRK_TIM9_IRQn); // shared with TIM1 BRK
 }
 
@@ -380,7 +385,7 @@ static void _set_interrupt_enable_bit(hal_timer_t timer) {
  * @return ::HAL_OK.
  * @note TIM1's more complex interrupt options are not yet implemented.
  */
-hal_status_t hal_timer_enable_interrupt(hal_timer_t timer) {
+static hal_status_t stm32_timer_enable_interrupt(hal_timer_t timer) {
   switch (timer) {
   case TIM1:
     break; // [TODO] Implement the complex interrupt options
@@ -411,7 +416,7 @@ hal_status_t hal_timer_enable_interrupt(hal_timer_t timer) {
  * @param timer Timer identifier.
  * @return ::HAL_OK.
  */
-hal_status_t hal_timer_disable_interrupt(hal_timer_t timer) {
+static hal_status_t stm32_timer_disable_interrupt(hal_timer_t timer) {
   switch (timer) {
   case TIM1:
     break; // [TODO] Implement the complex interrupt options
@@ -445,7 +450,7 @@ hal_status_t hal_timer_disable_interrupt(hal_timer_t timer) {
  * @param callback Callback to invoke, or NULL to clear.
  * @return ::HAL_OK.
  */
-hal_status_t hal_timer_attach_callback(hal_timer_t timer,
+static hal_status_t stm32_timer_attach_callback(hal_timer_t timer,
                                        hal_timer_callback_t callback) {
   switch (timer) {
   case TIM1:
@@ -476,7 +481,7 @@ hal_status_t hal_timer_attach_callback(hal_timer_t timer,
  * @param timer Timer identifier.
  * @return ::HAL_OK.
  */
-hal_status_t hal_timer_detach_callback(hal_timer_t timer) {
+static hal_status_t stm32_timer_detach_callback(hal_timer_t timer) {
   switch (timer) {
   case TIM1:
     break; // [TODO] Implement the complex interrupt options
@@ -509,7 +514,7 @@ hal_status_t hal_timer_detach_callback(hal_timer_t timer) {
  * @param compare_value Value to write into CCRx.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer/channel.
  */
-hal_status_t hal_timer_set_compare(hal_timer_t timer, uint8_t channel,
+static hal_status_t stm32_timer_set_compare(hal_timer_t timer, uint8_t channel,
                                    uint32_t compare_value) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
@@ -546,7 +551,7 @@ hal_status_t hal_timer_set_compare(hal_timer_t timer, uint8_t channel,
     tim->CCMR2 |= TIMx_CCMRy_OCzM_PWM_MODE1_MASK(channel);
     tim->CCMR2 |= TIMx_CCMRy_OCxPE(channel);
   }
-  hal_timer_enable_channel(timer, channel);
+  stm32_timer_enable_channel(timer, channel);
   return HAL_OK;
 }
 
@@ -556,7 +561,7 @@ hal_status_t hal_timer_set_compare(hal_timer_t timer, uint8_t channel,
  * @param channel Channel number (1-4).
  * @return Compare value, or 0 for an invalid timer/channel.
  */
-uint32_t hal_timer_get_compare(hal_timer_t timer, uint32_t channel) {
+static uint32_t stm32_timer_get_compare(hal_timer_t timer, uint32_t channel) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL || channel < 1 || channel > 4)
     return 0;
@@ -580,7 +585,7 @@ uint32_t hal_timer_get_compare(hal_timer_t timer, uint32_t channel) {
  * @param channel Channel number (1-4).
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer/channel.
  */
-hal_status_t hal_timer_enable_channel(hal_timer_t timer, uint32_t channel) {
+static hal_status_t stm32_timer_enable_channel(hal_timer_t timer, uint32_t channel) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL || channel < 1 || channel > 4)
     return HAL_ERR_INVALID_ARG;
@@ -597,10 +602,32 @@ hal_status_t hal_timer_enable_channel(hal_timer_t timer, uint32_t channel) {
  * @param channel Channel number (1-4).
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer/channel.
  */
-hal_status_t hal_timer_disable_channel(hal_timer_t timer, uint32_t channel) {
+static hal_status_t stm32_timer_disable_channel(hal_timer_t timer, uint32_t channel) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL || channel < 1 || channel > 4)
     return HAL_ERR_INVALID_ARG;
   tim->CCER &= (~TIMx_CCER_CCxE_MASK(channel));
   return HAL_OK;
 }
+
+const hal_timer_ops_t _hal_timer_ops = {
+    .init = stm32_timer_init,
+    .init_freq = stm32_timer_init_freq,
+    .start = stm32_timer_start,
+    .stop = stm32_timer_stop,
+    .reset = stm32_timer_reset,
+    .get_count = stm32_timer_get_count,
+    .enable_interrupt = stm32_timer_enable_interrupt,
+    .disable_interrupt = stm32_timer_disable_interrupt,
+    .clear_interrupt_flag = stm32_timer_clear_interrupt_flag,
+    .attach_callback = stm32_timer_attach_callback,
+    .detach_callback = stm32_timer_detach_callback,
+    .set_compare = stm32_timer_set_compare,
+    .get_compare = stm32_timer_get_compare,
+    .enable_channel = stm32_timer_enable_channel,
+    .disable_channel = stm32_timer_disable_channel,
+    .get_frequency = stm32_timer_get_frequency,
+    .set_prescaler = stm32_timer_set_prescaler,
+    .set_auto_reload = stm32_timer_set_auto_reload,
+    .get_auto_reload = stm32_timer_get_auto_reload,
+};

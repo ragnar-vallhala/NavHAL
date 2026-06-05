@@ -31,7 +31,7 @@
  * slot whose magic byte is not ::KV_MAGIC marks the end of the store.
  */
 
-#include "common/hal_flash.h"
+#include "internal/hal_flash_ops.h"
 
 #include <avr/eeprom.h>
 #include <stddef.h>
@@ -82,10 +82,9 @@ static uint8_t kv_crc(const uint8_t *value, uint8_t size) {
   return crc;
 }
 
-hal_status_t hal_flash_save(uint8_t key, const uint8_t *value, uint8_t size) {
-  if (value == NULL || size == 0u)
-    return HAL_ERR_INVALID_ARG;
-
+static hal_status_t avr_flash_save(uint8_t key, const uint8_t *value,
+                                   uint8_t size) {
+  /* value non-NULL and size != 0: validated by the public layer. */
   /* Supersede any existing live record for this key. */
   uint16_t old = kv_find(key, KV_VALID);
   if (old != 0xFFFFu)
@@ -106,10 +105,8 @@ hal_status_t hal_flash_save(uint8_t key, const uint8_t *value, uint8_t size) {
   return HAL_OK;
 }
 
-hal_status_t hal_flash_read(uint8_t key, uint8_t *value, uint8_t *size) {
-  if (value == NULL || size == NULL)
-    return HAL_ERR_INVALID_ARG;
-
+static hal_status_t avr_flash_read(uint8_t key, uint8_t *value, uint8_t *size) {
+  /* value and size non-NULL: validated by the public layer. */
   uint16_t off = kv_find(key, KV_VALID);
   if (off == 0xFFFFu)
     return HAL_ERR; /* key not found. */
@@ -122,7 +119,7 @@ hal_status_t hal_flash_read(uint8_t key, uint8_t *value, uint8_t *size) {
   return (kv_crc(value, rsize) == rcrc) ? HAL_OK : HAL_ERR;
 }
 
-hal_status_t hal_flash_delete(uint8_t key) {
+static hal_status_t avr_flash_delete(uint8_t key) {
   uint16_t off = kv_find(key, KV_VALID);
   if (off == 0xFFFFu)
     return HAL_ERR;
@@ -130,13 +127,21 @@ hal_status_t hal_flash_delete(uint8_t key) {
   return HAL_OK;
 }
 
-hal_status_t hal_flash_erase(void) {
+static hal_status_t avr_flash_erase(void) {
   for (uint16_t off = 0; off < KV_SIZE; off++)
     ee_put(off, 0xFFu);
   return HAL_OK;
 }
 
-bool hal_flash_needs_compaction(void) {
+static bool avr_flash_needs_compaction(void) {
   /* True once too little contiguous free space remains to be useful. */
   return (uint32_t)kv_end() + KV_HDR + 16u >= KV_SIZE;
 }
+
+const hal_flash_ops_t _hal_flash_ops = {
+    .save = avr_flash_save,
+    .read = avr_flash_read,
+    .del = avr_flash_delete,
+    .erase = avr_flash_erase,
+    .needs_compaction = avr_flash_needs_compaction,
+};

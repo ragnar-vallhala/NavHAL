@@ -18,13 +18,26 @@
 #define MAX_IRQ 128
 static hal_interrupt_callback_t irq_callbacks[MAX_IRQ] = {0};
 
-hal_status_t hal_interrupt_enable(hal_irq_t irq) {
+hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq,
+                                                uint8_t priority) {
   if (irq < 0)
     return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
+
+  // Set the priority BEFORE enabling so the line can never fire at the
+  // reset-default priority 0 (unmaskable) in the window before it is set.
+  hal_interrupt_set_priority(irq, priority);
 
   uint32_t irq_num = (uint32_t)irq;
   NVIC->ISER[irq_num / 32] |= (1U << (irq_num % 32));
   return HAL_OK;
+}
+
+hal_status_t hal_interrupt_enable(hal_irq_t irq) {
+  // Default to a maskable mid-range priority rather than the NVIC reset
+  // default of 0 (most urgent, unmaskable by an RTOS BASEPRI critical
+  // section, which makes a *_from_isr call from such an IRQ able to corrupt
+  // the kernel). See HAL_IRQ_PRIORITY_DEFAULT.
+  return hal_interrupt_enable_with_priority(irq, HAL_IRQ_PRIORITY_DEFAULT);
 }
 
 hal_status_t hal_interrupt_disable(hal_irq_t irq) {

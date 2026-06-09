@@ -118,13 +118,23 @@ uint32_t hal_timebase_get_micros(void) {
 }
 
 /**
- * @brief SysTick exception handler — increments the tick counter and
- *        invokes the registered timebase callback, if any.
+ * @brief Advance the timebase by one tick and run the registered callback.
+ *
+ * This is the body of the SysTick ISR, factored out so an embedding RTOS that
+ * owns the SysTick vector (SUBMODULE builds, where the handler below is
+ * compiled out) can keep the NavHAL timebase alive by calling this from its
+ * own SysTick_Handler. Without it `systick_ticks` never advances and every
+ * hal_delay_*() busy-wait spins forever.
  */
-#ifndef SUBMODULE
-void SysTick_Handler(void) {
+void hal_timebase_tick(void) {
   systick_ticks++;
   if (timebase_callback)
     timebase_callback();
 }
+
+/**
+ * @brief SysTick exception handler — drives the timebase tick.
+ */
+#ifndef SUBMODULE
+void SysTick_Handler(void) { hal_timebase_tick(); }
 #endif

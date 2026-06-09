@@ -58,7 +58,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 # disagree: bumping one without the other is a release-process bug, not
 # something we want to silently build. This check runs on every configure,
 # including when NavHAL is consumed as a submodule.
-set(NAVHAL_VERSION 0.1.0) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
+set(NAVHAL_VERSION 0.1.1) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/navhal.h" _navhal_h)
 string(REGEX MATCH "#define[ \t]+VERSION_MAJOR[ \t]+([0-9]+)" _ "${_navhal_h}")
 set(_navhal_h_major "${CMAKE_MATCH_1}")

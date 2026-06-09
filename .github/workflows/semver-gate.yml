@@ -6,13 +6,15 @@
 # PR head and compares it to the version currently on `stable`. The job fails
 # unless the head version is a valid SemVer strictly greater than the base.
 #
-# Why pull_request_target (not pull_request): for `pull_request`, GitHub runs
-# the workflow file from the PR's head, so a contributor could weaken or delete
-# this gate in their own PR. `pull_request_target` always uses the copy on the
-# base branch (`stable`), so the gate cannot be bypassed from a PR. We never
-# check out or execute the PR's code — we only read one file via `git show` —
-# so the usual pull_request_target code-execution risk does not apply, and the
-# token is restricted to contents:read.
+# Trigger note: this uses `pull_request`, not `pull_request_target`. GitHub only
+# honors `pull_request_target` workflows that live on the repository's DEFAULT
+# branch (a security rule, since they run with elevated permissions in the base
+# context); this file lives on `stable`, not the default branch, so a
+# `pull_request_target` trigger would silently never fire. `pull_request` runs
+# from the PR's merge ref, which works for any branch's copy — the same model as
+# stable-ci.yml. Deleting this file in a PR does not bypass the gate: the
+# required "Semver bump required" check then never reports and the merge stays
+# blocked. We only read one file via `git show` (token is contents:read).
 #
 # Make the "Semver bump required" check a REQUIRED status check on the `stable`
 # branch protection rule so a PR cannot merge without it passing.
@@ -20,7 +22,7 @@
 name: Semver gate
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [stable]
 
 permissions:

@@ -1,0 +1,87 @@
+# Semver gate — every merge into `stable` must raise the release version.
+#
+# Runs on PRs targeting `stable`. Parses the SemVer release version from
+# include/navhal.h (VERSION_MAJOR/MINOR/PATCH — the single source of truth;
+# CMakeLists.txt refuses to build if its mirror and navhal.h disagree) on the
+# PR head and compares it to the version currently on `stable`. The job fails
+# unless the head version is a valid SemVer strictly greater than the base.
+#
+# Why pull_request_target (not pull_request): for `pull_request`, GitHub runs
+# the workflow file from the PR's head, so a contributor could weaken or delete
+# this gate in their own PR. `pull_request_target` always uses the copy on the
+# base branch (`stable`), so the gate cannot be bypassed from a PR. We never
+# check out or execute the PR's code — we only read one file via `git show` —
+# so the usual pull_request_target code-execution risk does not apply, and the
+# token is restricted to contents:read.
+#
+# Make the "Semver bump required" check a REQUIRED status check on the `stable`
+# branch protection rule so a PR cannot merge without it passing.
+
+name: Semver gate
+
+on:
+  pull_request_target:
+    branches: [stable]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: semver-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  semver-bump:
+    name: Semver bump required
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out base (stable)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+
+      - name: Require a SemVer bump in include/navhal.h
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+
+          # Bring the PR head commit into a local ref WITHOUT merging or running
+          # any of its code. Works for same-repo and fork PRs alike, since
+          # GitHub publishes the head at refs/pull/<n>/head on the base repo.
+          git fetch --no-tags --depth 1 origin "refs/pull/${PR_NUMBER}/head:pr-head"
+
+          # Parse "x.y.z" from VERSION_MAJOR/MINOR/PATCH in navhal.h at a ref.
+          extract() {
+            local ref=$1 blob maj min pat
+            blob=$(git show "${ref}:include/navhal.h")
+            maj=$(printf '%s\n' "$blob" | sed -nE 's/^#define[[:space:]]+VERSION_MAJOR[[:space:]]+([0-9]+).*/\1/p' | head -1)
+            min=$(printf '%s\n' "$blob" | sed -nE 's/^#define[[:space:]]+VERSION_MINOR[[:space:]]+([0-9]+).*/\1/p' | head -1)
+            pat=$(printf '%s\n' "$blob" | sed -nE 's/^#define[[:space:]]+VERSION_PATCH[[:space:]]+([0-9]+).*/\1/p' | head -1)
+            if [ -z "$maj" ] || [ -z "$min" ] || [ -z "$pat" ]; then
+              echo "::error::could not parse VERSION_MAJOR/MINOR/PATCH from include/navhal.h at ${ref}" >&2
+              return 1
+            fi
+            printf '%s.%s.%s\n' "$maj" "$min" "$pat"
+          }
+
+          BASE_VER=$(extract "${BASE_SHA}")
+          HEAD_VER=$(extract "pr-head")
+          echo "stable (base) version : ${BASE_VER}"
+          echo "PR     (head) version : ${HEAD_VER}"
+
+          # Strict SemVer greater-than on the numeric triple.
+          IFS=. read -r bM bm bp <<<"$BASE_VER"
+          IFS=. read -r hM hm hp <<<"$HEAD_VER"
+          newer=0
+          if   [ "$hM" -gt "$bM" ]; then newer=1
+          elif [ "$hM" -eq "$bM" ] && [ "$hm" -gt "$bm" ]; then newer=1
+          elif [ "$hM" -eq "$bM" ] && [ "$hm" -eq "$bm" ] && [ "$hp" -gt "$bp" ]; then newer=1
+          fi
+
+          if [ "$newer" -ne 1 ]; then
+            echo "::error::Merging into stable requires a SemVer bump in include/navhal.h (base=${BASE_VER}, head=${HEAD_VER}; head must be strictly greater)."
+            exit 1
+          fi
+          echo "OK: ${BASE_VER} -> ${HEAD_VER} is a valid SemVer bump."

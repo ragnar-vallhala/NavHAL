@@ -98,12 +98,16 @@ hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
 
   // Register our internal handler for the chosen stream
   if (_active_i2c_dma_config.controller == HAL_DMA_CONTROLLER_1) {
+    // Maskable priority: the DMA completion ISR may call an RTOS *_from_isr
+    // API, which is only safe if a BASEPRI critical section can mask this line.
     if (_active_i2c_dma_config.stream == 0) {
       hal_interrupt_attach_callback(DMA1_Stream0_IRQn, _i2c_dma_irq_handler);
-      hal_interrupt_enable(DMA1_Stream0_IRQn);
+      hal_interrupt_enable_with_priority(DMA1_Stream0_IRQn,
+                                         HAL_IRQ_PRIORITY_DEFAULT);
     } else if (_active_i2c_dma_config.stream == 5) {
       hal_interrupt_attach_callback(DMA1_Stream5_IRQn, _i2c_dma_irq_handler);
-      hal_interrupt_enable(DMA1_Stream5_IRQn);
+      hal_interrupt_enable_with_priority(DMA1_Stream5_IRQn,
+                                         HAL_IRQ_PRIORITY_DEFAULT);
     }
   }
 

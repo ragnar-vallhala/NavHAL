@@ -42,6 +42,7 @@
 .global TIM4_IRQHandler 
 .global Default_Handler
 .global USART2_IRQHandler
+.global USART6_IRQHandler
 .global DMA1_Stream0_IRQHandler
 .global DMA1_Stream1_IRQHandler
 .global DMA1_Stream2_IRQHandler
@@ -156,7 +157,7 @@
     .word  DMA2_Stream5_IRQHandler /* 85. DMA2 Stream 5 */
     .word  DMA2_Stream6_IRQHandler /* 86. DMA2 Stream 6 */
     .word  DMA2_Stream7_IRQHandler /* 87. DMA2 Stream 7 */
-    .word  Default_Handler /* 88. USART6 */
+    .word  USART6_IRQHandler /* 88. USART6 */
     .word  Default_Handler /* 89. I2C3 Event */
     .word  Default_Handler /* 90. I2C3 Error */
     .word  0                       /* 91. Reserved */
@@ -230,6 +231,7 @@ loop_forever:
 .weak DMA2_Stream7_IRQHandler
 .weak SDIO_IRQHandler
 .weak USART2_IRQHandler
+.weak USART6_IRQHandler
 .weak TIM1BRK_TIM9_IRQHandler
 .weak TIM2_IRQHandler
 .weak TIM3_IRQHandler
@@ -254,6 +256,7 @@ loop_forever:
 .set DMA2_Stream7_IRQHandler, Default_Handler
 .set SDIO_IRQHandler, Default_Handler
 .set USART2_IRQHandler, Default_Handler
+.set USART6_IRQHandler, Default_Handler
 .set TIM1BRK_TIM9_IRQHandler, Default_Handler
 .set TIM2_IRQHandler, Default_Handler
 .set TIM3_IRQHandler, Default_Handler

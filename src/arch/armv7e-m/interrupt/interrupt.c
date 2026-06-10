@@ -198,3 +198,4 @@ __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 #endif
 
 void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }
+void USART6_IRQHandler(void) { hal_interrupt_dispatch(USART6_IRQn); }

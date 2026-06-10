@@ -41,6 +41,7 @@
 .global TIM3_IRQHandler 
 .global TIM4_IRQHandler 
 .global Default_Handler
+.global USART1_IRQHandler
 .global USART2_IRQHandler
 .global USART6_IRQHandler
 .global DMA1_Stream0_IRQHandler
@@ -122,7 +123,7 @@
     .word  Default_Handler            /* 34. I2C2 Error */
     .word  Default_Handler            /* 35. SPI1 */
     .word  Default_Handler            /* 36. SPI2 */
-    .word  Default_Handler            /* 37. USART1 */
+    .word  USART1_IRQHandler          /* 37. USART1 */
     .word  USART2_IRQHandler            /* 38. USART2 */
     .word  0                        /* 39. Reserved */
     .word  Default_Handler            /* 40. EXTI Line[15:10] */
@@ -230,6 +231,7 @@ loop_forever:
 .weak DMA2_Stream6_IRQHandler
 .weak DMA2_Stream7_IRQHandler
 .weak SDIO_IRQHandler
+.weak USART1_IRQHandler
 .weak USART2_IRQHandler
 .weak USART6_IRQHandler
 .weak TIM1BRK_TIM9_IRQHandler
@@ -255,6 +257,7 @@ loop_forever:
 .set DMA2_Stream6_IRQHandler, Default_Handler
 .set DMA2_Stream7_IRQHandler, Default_Handler
 .set SDIO_IRQHandler, Default_Handler
+.set USART1_IRQHandler, Default_Handler
 .set USART2_IRQHandler, Default_Handler
 .set USART6_IRQHandler, Default_Handler
 .set TIM1BRK_TIM9_IRQHandler, Default_Handler
@@ -265,4 +268,10 @@ loop_forever:
 
 .section .text.Default_Handler, "ax", %progbits
 Default_Handler:
-    b .
+    /* Generic fallback for any vector with no dedicated handler. Tail-branch to
+       the C dispatcher, which reads IPSR and invokes the registered callback
+       for the active IRQ (so an enabled peripheral line with an attached
+       callback works without a hand-written vector entry), or traps on a
+       genuinely unexpected exception. The C epilogue performs the exception
+       return. */
+    b hal_irq_default_dispatch

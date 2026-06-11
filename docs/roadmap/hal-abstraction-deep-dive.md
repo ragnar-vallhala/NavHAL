@@ -367,8 +367,8 @@ Arduino deliberately *mixes* mechanisms based on call frequency.
   ~5 µs vs ~2 cycles at 16 MHz — exact numbers vary by source). The
   abstraction's cost is the lookups + safety, not any single op. Advanced
   users drop to direct register writes or compile-time-resolved
-  `digitalWriteFast` macros. **It is a *runtime table lookup*, not a
-  function-pointer vtable.**
+  `digitalWriteFast` macros. It is a runtime table lookup, not a
+  function-pointer vtable.
 
 * **Boards = compile-time "variants".** Each board ships a
   `pins_arduino.h` (the PROGMEM tables); `boards.txt` selects the variant

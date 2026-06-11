@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file tests/host/test_gpio_encoding.c
  * @brief Host-runnable tests for the GPIO pin encoding contract.
@@ -52,6 +69,12 @@ void test_gpio_get_port_number_skips_to_h(void) {
   TEST_ASSERT_EQUAL_UINT32(7, GPIO_GET_PORT_NUMBER(GPIO_PH00));
   TEST_ASSERT_EQUAL_UINT32(7, GPIO_GET_PORT_NUMBER(GPIO_PH09));
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_gpio_pin_encoding_layout);
+NAVTEST_CASE_DECL(test_gpio_get_pin_returns_low_nibble);
+NAVTEST_CASE_DECL(test_gpio_get_port_number_for_a_through_e);
+NAVTEST_CASE_DECL(test_gpio_get_port_number_skips_to_h);
+
 
 static const navtest_case_t gpio_encoding_cases[] = {
     NAVTEST_CASE(test_gpio_pin_encoding_layout),

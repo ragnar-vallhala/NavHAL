@@ -1,3 +1,5 @@
+@page api_standardization API Standardization
+
 # NavHAL API Standardization & Long-Term Structure
 
 **Status:** Draft v1

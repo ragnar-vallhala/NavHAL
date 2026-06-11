@@ -1,3 +1,5 @@
+@page exec_plan Standardization Execution Plan
+
 # NavHAL Standardization — Execution Plan
 
 **Status:** Draft v1

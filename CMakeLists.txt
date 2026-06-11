@@ -6,6 +6,15 @@ set(CMAKE_OSX_ARCHITECTURES "" CACHE STRING "" FORCE)
 set(CMAKE_C_FLAGS_INIT "" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_INIT "" CACHE STRING "" FORCE)
 
+# Load the toolchain file early. CMake normally loads it at project(),
+# which is well below the Kconfig invocation, but we need its variables
+# (notably NAVHAL_DEFCONFIG) visible to the seeding logic below. CMake
+# will load it again at project(); toolchain files are idempotent so the
+# re-load is harmless.
+if(CMAKE_TOOLCHAIN_FILE)
+    include("${CMAKE_TOOLCHAIN_FILE}")
+endif()
+
 # Kconfig Integration
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
@@ -15,6 +24,19 @@ set(CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.config")
 set(GENERATED_CMAKE "${CMAKE_BINARY_DIR}/config.cmake")
 set(GENERATED_HEADER "${CMAKE_BINARY_DIR}/autoconf.h")
 set(GENERATED_NAVHAL_TARGET "${CMAKE_BINARY_DIR}/navhal_target.h")
+
+# Defconfig seeding. A toolchain file (cmake/toolchains/*.cmake) can set
+# NAVHAL_DEFCONFIG to a Kconfig fragment naming the target arch / vendor /
+# family / board. When .config doesn't already exist, copy the fragment in
+# so the kconfig.py run below resolves the right target. This replaces
+# ad-hoc .config patching in cross-target build scripts.
+if(DEFINED NAVHAL_DEFCONFIG AND NOT EXISTS "${CONFIG_FILE}")
+    if(NOT EXISTS "${NAVHAL_DEFCONFIG}")
+        message(FATAL_ERROR "NAVHAL_DEFCONFIG points to '${NAVHAL_DEFCONFIG}' which does not exist")
+    endif()
+    message(STATUS "Seeding .config from ${NAVHAL_DEFCONFIG}")
+    configure_file("${NAVHAL_DEFCONFIG}" "${CONFIG_FILE}" COPYONLY)
+endif()
 
 message(STATUS "Running Kconfig configuration generation...")
 execute_process(
@@ -34,19 +56,30 @@ endif()
 # Include the generated CMake configuration which may provide TOOLCHAIN_PREFIX, BOARD, VENDOR, etc.
 include(${GENERATED_CMAKE})
 
-# Toolchain settings
-# Allow configuration from KConfig (via GENERATED_CMAKE) to override the default.
-if(NOT DEFINED TOOLCHAIN_PREFIX)
-    set(TOOLCHAIN_PREFIX "arm-none-eabi-")
+# Make the Kconfig-generated navhal_target.h reachable to every translation
+# unit so port headers can bridge NAVHAL_HAS_* into the legacy _*_ENABLED
+# flags. Without this the cap macros silently fall back to the port header's
+# hardcoded defaults.
+include_directories(${CMAKE_BINARY_DIR})
+
+# Toolchain settings.
+# Preferred path: caller passes -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/<arch>.cmake
+# and the toolchain file sets the compiler. Legacy path: no toolchain file,
+# derive the compiler from CONFIG_TOOLCHAIN_PREFIX in .config. This keeps
+# `cmake -B build -DSAMPLE=hal_blink` working without a toolchain file for
+# Cortex-M4 / arm-none-eabi.
+if(NOT CMAKE_TOOLCHAIN_FILE)
+    if(NOT DEFINED TOOLCHAIN_PREFIX)
+        set(TOOLCHAIN_PREFIX "arm-none-eabi-")
+    endif()
+    set(TOOLCHAIN_PREFIX "${TOOLCHAIN_PREFIX}" CACHE STRING "Toolchain prefix for compiler binaries")
+    set(CMAKE_C_COMPILER   ${TOOLCHAIN_PREFIX}gcc)
+    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
+    set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
+    set(CMAKE_OBJCOPY      ${TOOLCHAIN_PREFIX}objcopy)
+    set(CMAKE_BINARY_SIZE  ${TOOLCHAIN_PREFIX}size)
 endif()
-set(TOOLCHAIN_PREFIX "${TOOLCHAIN_PREFIX}" CACHE STRING "Toolchain prefix for compiler binaries")
-set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc)
-set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}g++)
-set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}gcc)
-set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
-set(CMAKE_BINARY_SIZE ${TOOLCHAIN_PREFIX}size)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 
 # set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
 # extern/NavHAL/CMakeLists.txt
@@ -105,38 +138,17 @@ set(INCLUDE_PORT ${CMAKE_CURRENT_SOURCE_DIR}/include/port/${CMAKE_SYSTEM_PROCESS
 set(INCLUDE_FAMILY ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR}/family/${FAMILY}/include)
 set(DIR_SAMPLES ${CMAKE_CURRENT_SOURCE_DIR}/samples)
 # ---- Architecture-specific compiler / linker flags ------------------------
-# Cortex-M and AVR need entirely different flag sets: -mcpu/-mthumb + a custom
-# linker script + -nostdlib for the bare-metal ARM build, versus -mmcu and the
-# startup/linker that the avr-libc toolchain supplies itself. Everything below
-# branches on the resolved CMAKE_SYSTEM_PROCESSOR.
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
-    if(USE_FPU)
-        set(FPU_FLAGS "-mfloat-abi=hard -mfpu=fpv4-sp-d16 -D_FPU_ENABLED -D_DMA_ENABLED")
-        message(STATUS "FPU: Hardware enabled (Cortex-M4)")
-    else()
-        set(FPU_FLAGS "-mfloat-abi=soft")
-        message(STATUS "FPU: Software emulation (Cortex-M4)")
-    endif()
-    set(ARCH_C_FLAGS    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS} -O0 -g")
-    set(ARCH_ASM_FLAGS  "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
-    set(ARCH_LINK_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}")
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
-    # FAMILY is the avr-gcc -mmcu device name (atmega328p). F_CPU drives the
-    # avr-libc timing routines; 16 MHz matches the ATmega328P reference board.
-    set(FPU_FLAGS "")
-    set(AVR_MCU "${FAMILY}")
-    set(AVR_F_CPU "16000000UL")
-    message(STATUS "AVR: -mmcu=${AVR_MCU}, F_CPU=${AVR_F_CPU}")
-    set(ARCH_C_FLAGS    "-mmcu=${AVR_MCU} -DF_CPU=${AVR_F_CPU} -Os -g")
-    set(ARCH_ASM_FLAGS  "-mmcu=${AVR_MCU}")
-    set(ARCH_LINK_FLAGS "-mmcu=${AVR_MCU}")
-else()
-    set(FPU_FLAGS "")
-    set(ARCH_C_FLAGS "")
-    set(ARCH_ASM_FLAGS "")
-    set(ARCH_LINK_FLAGS "")
-    message(WARNING "No architecture flags predefined for core '${CMAKE_SYSTEM_PROCESSOR}'")
+# Each supported ISA owns a fragment under cmake/arch/<ARCH_ISA>.cmake that
+# fills in ARCH_C_FLAGS / ARCH_ASM_FLAGS / ARCH_LINK_FLAGS / FPU_FLAGS plus
+# the NAVHAL_TEST_* slots the if(TEST) block consumes. Adding a new ISA is
+# one file there — this root CMakeLists.txt has no per-arch ladder.
+set(_NAVHAL_ARCH_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/arch/${ARCH_ISA}.cmake")
+if(NOT EXISTS "${_NAVHAL_ARCH_FILE}")
+    message(FATAL_ERROR
+        "No CMake arch fragment for ARCH_ISA='${ARCH_ISA}'. "
+        "Expected: ${_NAVHAL_ARCH_FILE}")
 endif()
+include("${_NAVHAL_ARCH_FILE}")
 
 set(CMAKE_C_FLAGS "${ARCH_C_FLAGS} -Wall -std=c11")
 set(CMAKE_ASM_FLAGS "${ARCH_ASM_FLAGS}")
@@ -219,13 +231,30 @@ endif()
 # Tests
 if(TEST)
   message("Tests enabled")
+  # tests/ is added so #include "portable/test_x.h" / "cap/x/test_x.h" /
+  # "arch/<arch>/test_x.h" resolves naturally from main.c.
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests
     ${INCLUDE_PORT}
     ${INCLUDE_FAMILY}
     ${SRC_BOARD}
   )
-  file(GLOB TEST_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
+
+  # Test sources split into tiers (see tests/main.c for the rationale):
+  #   tests/*.c               — framework files (main, navtest_state, stubs)
+  #   tests/portable/*.c      — HAL-only black-box tests; every arch builds these
+  #   tests/cap/*/*.c         — capability-gated; each file is wrapped in #if
+  #                             NAVHAL_HAS_<cap>, so it self-omits when the cap
+  #                             is off — globbing them all is safe.
+  #   tests/arch/<arch>/*.c   — white-box per-arch tests; only the matching
+  #                             arch's directory is compiled in.
+  file(GLOB          TEST_FRAMEWORK_SRC ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c)
+  file(GLOB_RECURSE  TEST_PORTABLE_SRC  ${CMAKE_CURRENT_SOURCE_DIR}/tests/portable/*.c)
+  file(GLOB_RECURSE  TEST_CAP_SRC       ${CMAKE_CURRENT_SOURCE_DIR}/tests/cap/*.c)
+  file(GLOB          TEST_ARCH_SRC      ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/*.c)
+  set(TEST_SRC ${TEST_FRAMEWORK_SRC} ${TEST_PORTABLE_SRC} ${TEST_CAP_SRC} ${TEST_ARCH_SRC})
+
   file(GLOB_RECURSE HAL_SRC
     ${SRC_VENDOR}/*.c
     ${SRC_ARCH}/*.c
@@ -233,13 +262,17 @@ if(TEST)
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
   add_executable(tests ${TEST_SRC} ${STARTUP_FILE})
-  target_link_libraries(tests PRIVATE c gcc)
-  set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/linker.ld -nostdlib ${FPU_FLAGS}")
-  
-  # Dynamic architecture options for test compiler flags
+
+  # Per-arch test linker + flags. NAVHAL_TEST_LINKER_FLAGS,
+  # NAVHAL_TEST_EXTRA_FLAGS, NAVHAL_TEST_NEEDS_LIBGCC all come from the
+  # cmake/arch/<ARCH_ISA>.cmake fragment included above. No arch ladder here.
   set(TEST_FLAGS "-fno-exceptions" "-fno-unwind-tables" "-fno-asynchronous-unwind-tables")
-  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
-      list(APPEND TEST_FLAGS "-march=armv7e-m")
+  if(NAVHAL_TEST_EXTRA_FLAGS)
+      list(APPEND TEST_FLAGS ${NAVHAL_TEST_EXTRA_FLAGS})
+  endif()
+  set(CMAKE_EXE_LINKER_FLAGS "${NAVHAL_TEST_LINKER_FLAGS}")
+  if(NAVHAL_TEST_NEEDS_LIBGCC)
+      target_link_libraries(tests PRIVATE c gcc)
   endif()
   
   target_compile_options(tests PRIVATE ${TEST_FLAGS})

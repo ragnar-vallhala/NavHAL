@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file diskio.c
  * @brief SDIO implementation of the Disk I/O interface.
@@ -5,6 +22,8 @@
 
 #include "common/hal_diskio.h"
 #include "navhal_port_sdio.h"
+
+#ifdef _SDIO_ENABLED
 
 static hal_disk_status_t disk_stat = HAL_DISK_STATUS_NOINIT;
 
@@ -32,7 +51,7 @@ hal_disk_result_t hal_disk_read(uint8_t pdrv, uint8_t *buff, uint32_t sector,
   if (disk_stat & HAL_DISK_STATUS_NOINIT)
     return HAL_DISK_RES_NOTRDY;
 
-#ifdef _DMA_ENABLED
+#ifdef _SDIO_BACKEND_DMA
   if (count == 1) {
     if (hal_sdio_wait_sync(hal_sdio_read_block_async(sector, buff)) != HAL_SDIO_OK) {
       return HAL_DISK_RES_ERROR;
@@ -63,7 +82,7 @@ hal_disk_result_t hal_disk_write(uint8_t pdrv, const uint8_t *buff,
   if (disk_stat & HAL_DISK_STATUS_NOINIT)
     return HAL_DISK_RES_NOTRDY;
 
-#ifdef _DMA_ENABLED
+#ifdef _SDIO_BACKEND_DMA
   if (count <= 4) {
     /* Small writes — safer to use single block */
     while (count--) {
@@ -113,3 +132,5 @@ hal_disk_result_t hal_disk_ioctl(uint8_t pdrv, uint8_t cmd, void *buff) {
     return HAL_DISK_RES_PARERR;
   }
 }
+
+#endif /* _SDIO_ENABLED */

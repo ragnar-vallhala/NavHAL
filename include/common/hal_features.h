@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file hal_features.h
  * @brief NavHAL capability (feature) macros.
@@ -23,12 +40,17 @@
  * - `NAVHAL_HAS_CRC_HW`         &larr; `CONFIG_DRV_CRC`
  * - `NAVHAL_HAS_CYCLE_COUNTER`  &larr; `CONFIG_DRV_DWT`
  * - `NAVHAL_HAS_SDIO`           &larr; `CONFIG_DRV_SDIO`
- *
- * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #ifndef HAL_FEATURES_H
 #define HAL_FEATURES_H
+
+/**
+ * @defgroup HAL_FEATURES Features
+ * @ingroup HAL_CORE
+ * @brief NAVHAL_HAS_* capability macros for portable feature detection.
+ * @{
+ */
 
 #include "common/hal_config.h" /* pulls in the target's _<feature>_ENABLED flags */
 
@@ -37,24 +59,30 @@
 extern "C" {
 #endif
 /** @brief 1 if a DMA controller and the DMA-mode API are available. */
-#if defined(_DMA_ENABLED)
-#define NAVHAL_HAS_DMA 1
-#else
-#define NAVHAL_HAS_DMA 0
+#ifndef NAVHAL_HAS_DMA
+#  if defined(_DMA_ENABLED)
+#    define NAVHAL_HAS_DMA 1
+#  else
+#    define NAVHAL_HAS_DMA 0
+#  endif
 #endif
 
 /** @brief 1 if a hardware floating-point unit is available. */
-#if defined(_FPU_ENABLED)
-#define NAVHAL_HAS_FPU 1
-#else
-#define NAVHAL_HAS_FPU 0
+#ifndef NAVHAL_HAS_FPU
+#  if defined(_FPU_ENABLED)
+#    define NAVHAL_HAS_FPU 1
+#  else
+#    define NAVHAL_HAS_FPU 0
+#  endif
 #endif
 
 /** @brief 1 if a hardware CRC peripheral is available. */
-#if defined(_CRC_HW_ENABLED)
-#define NAVHAL_HAS_CRC_HW 1
-#else
-#define NAVHAL_HAS_CRC_HW 0
+#ifndef NAVHAL_HAS_CRC_HW
+#  if defined(_CRC_HW_ENABLED)
+#    define NAVHAL_HAS_CRC_HW 1
+#  else
+#    define NAVHAL_HAS_CRC_HW 0
+#  endif
 #endif
 
 /** @brief 1 if a cycle counter (Cortex DWT, or equivalent) is available. */
@@ -75,4 +103,6 @@ extern "C" {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_FEATURES */
 #endif /* HAL_FEATURES_H */

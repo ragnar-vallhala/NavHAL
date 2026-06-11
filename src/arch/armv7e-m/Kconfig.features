@@ -1,0 +1,37 @@
+# vim: ft=kconfig
+# Arch-specific peripheral toggles for the armv7e-m ISA (M7 §7.2).
+# Sourced inside the root "System & Features Configuration" menu.
+#
+# DMA, the hardware FPU, the DWT cycle counter and the FPU runtime are
+# Cortex-M peripherals with no ATmega328P equivalent, so they live with
+# the arch rather than in the common root. (AVR ships no Kconfig.features
+# fragment — there is nothing arch-specific to toggle there yet.)
+
+config USE_FPU
+    bool "Enable Hardware FPU Compiler Flags"
+    depends on ARCH_CORTEX_M4
+    default n
+    help
+      Enable hardware Floating Point Unit compiler and linker flags.
+
+config DRV_DMA
+    bool "Enable Direct Memory Access (DMA)"
+    depends on ARCH_CORTEX_M4
+    default n
+    select DRV_INTERRUPT
+    help
+      Enables support for the DMA hardware controller.
+
+config DRV_DWT
+    bool "Enable Debug Watchpoint and Trace (DWT)"
+    depends on ARCH_CORTEX_M4
+    default n
+    help
+      Enables the DWT counter for high-resolution timing.
+
+config DRV_FPU
+    bool "Enable FPU Driver Extension"
+    depends on ARCH_CORTEX_M4
+    default n
+    help
+      Enables compilation of hardware FPU runtime setup files.

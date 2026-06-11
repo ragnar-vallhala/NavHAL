@@ -1,3 +1,5 @@
+@page naming_conventions Naming Conventions
+
 # NavHAL Naming Conventions — Quick Reference
 
 A one-page cheat-sheet for contributors. The full rationale lives in

@@ -1,3 +1,5 @@
+@page test_howto Testing Guide
+
 # NavHAL — Testing Guide
 
 **Companion to:** `docs/api_standardization.md`, `docs/execution_plan.md`,

@@ -14,14 +14,16 @@
 # script does not care which tier a sample is in. A cortex-m / no_hal sample
 # is not selectable for the avr target — that build will fail by design.
 #
-# When `target` is given the script swaps in a minimal .config for that
-# architecture (your existing .config is backed up and restored on exit);
-# default drivers are used, which covers the portable acceptance samples.
-# For a sample needing non-default drivers, configure .config yourself and
-# run without the `target` argument.
+# When `target` is given the script picks the matching CMake toolchain
+# file under cmake/toolchains/ — the toolchain file points at a defconfig
+# fragment that seeds .config (arch / vendor / family / board). Your
+# existing .config is moved aside and restored on exit. Default drivers
+# are used, which covers the portable acceptance samples; for a sample
+# needing non-default drivers, configure .config yourself and run
+# without the `target` argument.
 #
-# Each target builds in its own directory (build/ for stm32, build-avr/ for
-# avr) and the flash step uses the arch-aware `flash` CMake target —
+# Each target builds in its own directory (build/ for stm32, build-avr/
+# for avr) and the flash step uses the arch-aware `flash` CMake target —
 # st-flash for Cortex-M, avrdude for AVR.
 
 set -euo pipefail
@@ -37,7 +39,7 @@ CMAKE_ARGS=(-DSTANDALONE=OFF -DSAMPLE="$SAMPLE" -DTEST=OFF -G "Unix Makefiles")
 BUILD_DIR="build"
 CONFIG_BACKUP=""
 
-# Restore the user's .config if we swapped it out.
+# Restore the user's .config if we moved it out of the way.
 restore_config() {
   if [[ -n "$CONFIG_BACKUP" && -f "$CONFIG_BACKUP" ]]; then
     mv -f "$CONFIG_BACKUP" "$REPO_ROOT/.config"
@@ -45,19 +47,27 @@ restore_config() {
 }
 trap restore_config EXIT
 
+# When swapping arch, the toolchain file's NAVHAL_DEFCONFIG only seeds
+# .config when none exists — so we move any existing .config aside first.
+stash_config() {
+  if [[ -f .config ]]; then
+    CONFIG_BACKUP="$(mktemp)"
+    mv .config "$CONFIG_BACKUP"
+  fi
+}
+
 case "$TARGET" in
   stm32)
     BUILD_DIR="build"
     PORT="${PORT:-/dev/ttyACM0}"
-    [[ -f .config ]] && CONFIG_BACKUP="$(mktemp)" && cp .config "$CONFIG_BACKUP"
-    printf 'CONFIG_ARCH_CORTEX_M4=y\n' > .config
+    CMAKE_ARGS+=(-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi-toolchain.cmake)
+    stash_config
     ;;
   avr)
     BUILD_DIR="build-avr"
     PORT="${PORT:-/dev/ttyUSB0}"
-    CMAKE_ARGS+=(-DAVR_PORT="$PORT")
-    [[ -f .config ]] && CONFIG_BACKUP="$(mktemp)" && cp .config "$CONFIG_BACKUP"
-    printf 'CONFIG_ARCH_AVR8=y\n' > .config
+    CMAKE_ARGS+=(-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/avr-toolchain.cmake -DAVR_PORT="$PORT")
+    stash_config
     ;;
   "")
     # No target given — flash whatever the current .config selects.

@@ -1,0 +1,11 @@
+# vim: ft=kconfig
+# Vendor choice entry for Microchip (M7 §7.2).
+# Sourced inside the root "Vendor" choice. Visible only on AVR8, so it
+# auto-selects when that arch is active — no explicit choice default
+# needed.
+
+config VENDOR_MICROCHIP
+    bool "Microchip"
+    depends on ARCH_AVR8
+    help
+      Microchip (formerly Atmel) AVR silicon.

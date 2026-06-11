@@ -1,7 +1,7 @@
 
-# NavHAL — NAVRobotec Hardware Abstraction Layer
+# NavHAL™ — NAVRobotec Hardware Abstraction Layer
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE.md)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/ragnar-vallhala/NavHAL/ci.yml?branch=main)](https://github.com/ragnar-vallhala/NavHAL/actions)
 [![Coverage](https://img.shields.io/codecov/c/github/ragnar-vallhala/NavHAL/main)](https://codecov.io/gh/ragnar-vallhala/NavHAL)
 [![Docs](https://img.shields.io/badge/docs-Doxygen-blue)](docs/html/index.html)
@@ -13,7 +13,7 @@
 
 ## Overview
 
-**NavHAL** is a hardware abstraction layer (HAL) written in C for embedded
+**NavHAL™** is a hardware abstraction layer (HAL) written in C for embedded
 systems. Its API is architecture-agnostic *by design* — the layered
 arch / vendor / family / board structure and the Kconfig-driven build are
 built to host multiple targets — but the v1 release ships **one implemented
@@ -121,13 +121,19 @@ Other docs in this repository:
 
 ## Contributing
 
-Contributions, bug reports, and feature requests are welcome. Please follow the coding style and submit pull requests.
+Bug reports, feature ideas, and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the dev environment, local-check setup, commit message format, and PR workflow.
+
+By participating you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+Apache License 2.0 — see [LICENSE.md](LICENSE.md) for details.
+
+Copyright © 2025 NAVRobotec Pvt Ltd.
+
+NavHAL™ is a trademark of NAVRobotec Pvt Ltd. All rights reserved.
 
 ---
 
@@ -141,4 +147,4 @@ Website: [https://navrobotec.com](https://navrobotec.com)
 
 ---
 
-Thank you for exploring NavHAL — the future of portable embedded hardware abstraction!
+Thank you for exploring NavHAL™ — the future of portable embedded hardware abstraction!

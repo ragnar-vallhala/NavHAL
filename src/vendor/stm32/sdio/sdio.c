@@ -101,15 +101,18 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config) {
 
   SDIO->CLKCR = clkcr;
 
-  /* Enable SDIO Interrupts in NVIC */
+  /* Enable SDIO Interrupts in NVIC. Priority is kept in the maskable band
+   * (>= a typical RTOS syscall threshold) rather than the old level 5, which
+   * was numerically more urgent than BASEPRI and so unmaskable by a kernel
+   * critical section. */
   hal_interrupt_enable(SDIO_IRQn);
-  hal_interrupt_set_priority(SDIO_IRQn, 5);
+  hal_interrupt_set_priority(SDIO_IRQn, HAL_IRQ_PRIORITY_DEFAULT);
 
 #ifdef _SDIO_BACKEND_DMA
   hal_interrupt_enable(DMA2_Stream3_IRQn);
   hal_interrupt_enable(DMA2_Stream6_IRQn);
-  hal_interrupt_set_priority(DMA2_Stream3_IRQn, 5);
-  hal_interrupt_set_priority(DMA2_Stream6_IRQn, 5);
+  hal_interrupt_set_priority(DMA2_Stream3_IRQn, HAL_IRQ_PRIORITY_DEFAULT);
+  hal_interrupt_set_priority(DMA2_Stream6_IRQn, HAL_IRQ_PRIORITY_DEFAULT);
 #endif
 
   return HAL_SDIO_OK;

@@ -51,6 +51,28 @@ typedef void (*hal_interrupt_callback_t)(void);
 hal_status_t hal_interrupt_enable(hal_irq_t irq);
 
 /**
+ * @brief Default NVIC priority level applied by ::hal_interrupt_enable.
+ *
+ * A mid-range level (range 0-15) rather than the NVIC reset default of 0.
+ * Priority 0 is the most urgent and is NOT maskable by an RTOS `BASEPRI`
+ * critical section, so an IRQ left at 0 whose handler calls a `*_from_isr`
+ * kernel API can preempt and corrupt the scheduler. This default keeps enabled
+ * lines maskable by typical RTOS syscall thresholds. Use
+ * ::hal_interrupt_enable_with_priority or ::hal_interrupt_set_priority for
+ * explicit control.
+ */
+#define HAL_IRQ_PRIORITY_DEFAULT 8u
+
+/**
+ * @brief Enable a specific interrupt at an explicit priority.
+ * @param irq      IRQ number.
+ * @param priority Priority level (0-15, 0 = most urgent); normalized to the
+ *                 implemented priority bits. Set before the line is enabled.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a non-NVIC (negative) IRQ.
+ */
+hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq, uint8_t priority);
+
+/**
  * @brief Disable a specific interrupt in the NVIC.
  * @param irq IRQ number.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a non-NVIC (negative) IRQ.

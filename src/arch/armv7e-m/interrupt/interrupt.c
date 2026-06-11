@@ -33,13 +33,26 @@
 #define MAX_IRQ 128
 static hal_interrupt_callback_t irq_callbacks[MAX_IRQ] = {0};
 
-hal_status_t hal_interrupt_enable(hal_irq_t irq) {
+hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq,
+                                                uint8_t priority) {
   if (irq < 0)
     return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
+
+  // Set the priority BEFORE enabling so the line can never fire at the
+  // reset-default priority 0 (unmaskable) in the window before it is set.
+  hal_interrupt_set_priority(irq, priority);
 
   uint32_t irq_num = (uint32_t)irq;
   NVIC->ISER[irq_num / 32] |= (1U << (irq_num % 32));
   return HAL_OK;
+}
+
+hal_status_t hal_interrupt_enable(hal_irq_t irq) {
+  // Default to a maskable mid-range priority rather than the NVIC reset
+  // default of 0 (most urgent, unmaskable by an RTOS BASEPRI critical
+  // section, which makes a *_from_isr call from such an IRQ able to corrupt
+  // the kernel). See HAL_IRQ_PRIORITY_DEFAULT.
+  return hal_interrupt_enable_with_priority(irq, HAL_IRQ_PRIORITY_DEFAULT);
 }
 
 hal_status_t hal_interrupt_disable(hal_irq_t irq) {
@@ -88,6 +101,36 @@ void hal_interrupt_dispatch(hal_irq_t irq) {
     return;
   if (irq_callbacks[(uint32_t)irq])
     irq_callbacks[(uint32_t)irq]();
+}
+
+// Generic vector fallback. The startup vector table routes EVERY IRQ slot that
+// has no dedicated <PERIPH>_IRQHandler here (instead of the old silent
+// infinite-loop trap). We read the active exception number from IPSR and
+// dispatch the registered callback for that IRQ — so any peripheral whose
+// driver attaches a callback and enables its line works even without a
+// hand-written vector entry. This closes the "driver enables an IRQ but nobody
+// wired its handler -> CPU hangs in Default_Handler on the first interrupt"
+// class of bug for good (USART1/USART6 were instances of it).
+//
+// A genuinely unexpected exception — a system fault with no dedicated handler,
+// or an enabled IRQ with no registered callback — still traps; the active
+// exception number is live in IPSR for a debugger. Runs in handler mode,
+// entered via a tail-branch from Default_Handler, so its epilogue performs the
+// exception return.
+void hal_irq_default_dispatch(void) {
+  uint32_t ipsr;
+  __asm volatile("mrs %0, ipsr" : "=r"(ipsr));
+  uint32_t exc = ipsr & 0x1FFu; // active exception number (0 = thread)
+  if (exc >= 16u) {             // external IRQ: exc = 16 + IRQn
+    uint32_t irq = exc - 16u;
+    if (irq < MAX_IRQ && irq_callbacks[irq]) {
+      irq_callbacks[irq]();
+      return;
+    }
+  }
+  for (;;) {
+    /* unexpected exception — IPSR holds the number */
+  }
 }
 
 #define SCB_SHPR1                                                              \
@@ -199,4 +242,6 @@ void Default_Handler(void) {}
 __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 #endif
 
+void USART1_IRQHandler(void) { hal_interrupt_dispatch(USART1_IRQn); }
 void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }
+void USART6_IRQHandler(void) { hal_interrupt_dispatch(USART6_IRQn); }

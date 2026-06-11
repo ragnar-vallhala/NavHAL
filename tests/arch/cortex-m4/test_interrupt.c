@@ -158,6 +158,56 @@ void test_hal_interrupt_detach_rejects_out_of_range(void) {
                                (hal_irq_t)-99));
 }
 
+/* -------------------- Vector-table wiring test --------------------
+ *
+ * test_hal_interrupt_attach_then_dispatch_runs_callback above calls
+ * hal_interrupt_dispatch() DIRECTLY, so it never exercises the NVIC vector
+ * table — which is exactly how a missing/trapping vector entry (the
+ * USART1/USART6 "driver enables the IRQ but there is no <PERIPH>_IRQHandler ->
+ * CPU hangs in Default_Handler on the first interrupt" bug) slipped past the
+ * suite. This reads the LIVE vector table (via VTOR) and asserts that each
+ * peripheral IRQ a NavHAL driver enables resolves to its dedicated handler
+ * rather than the generic Default_Handler trap fallback — catching the exact
+ * class of bug, with no need to fire (and risk hanging on) a real interrupt.
+ *
+ * The supported UARTs (USART1/2/6) are the concrete instances that bit us; the
+ * timer/SDIO handlers are checked too. (DMA stream handlers are macro-generated
+ * and so always present.) */
+
+/* Handler symbols (the dedicated vector entries). */
+extern void USART1_IRQHandler(void);
+extern void USART2_IRQHandler(void);
+extern void USART6_IRQHandler(void);
+extern void TIM2_IRQHandler(void);
+extern void TIM5_IRQHandler(void);
+extern void SDIO_IRQHandler(void);
+extern void Default_Handler(void);
+
+/* Live vector-table word for exception number `exc` (= 16 + IRQn), via VTOR. */
+static uint32_t vector_word(uint32_t exc) {
+  const uint32_t *vtor = *(volatile uint32_t *const *)0xE000ED08UL; /* SCB->VTOR */
+  return vtor[exc];
+}
+/* Compare ignoring the Thumb bit (LSB) the linker sets on both the vector word
+ * and a C function pointer. */
+#define ASSERT_VECTOR_IS(handler, irqn)                                        \
+  TEST_ASSERT_EQUAL_UINT32(((uint32_t)(uintptr_t)(handler)) & ~1u,             \
+                           vector_word(16u + (uint32_t)(irqn)) & ~1u)
+
+void test_driver_enabled_irqs_have_dedicated_handlers(void) {
+  /* The bug we hit: these UART vectors used to point at Default_Handler. */
+  ASSERT_VECTOR_IS(USART1_IRQHandler, USART1_IRQn);
+  ASSERT_VECTOR_IS(USART2_IRQHandler, USART2_IRQn);
+  ASSERT_VECTOR_IS(USART6_IRQHandler, USART6_IRQn);
+  ASSERT_VECTOR_IS(TIM2_IRQHandler, TIM2_IRQn);
+  ASSERT_VECTOR_IS(TIM5_IRQHandler, TIM5_IRQn);
+  ASSERT_VECTOR_IS(SDIO_IRQHandler, SDIO_IRQn);
+  /* Belt-and-braces: the UART vector must NOT silently resolve to the generic
+   * Default_Handler fallback (which is what the original bug looked like). */
+  TEST_ASSERT_TRUE((vector_word(16u + (uint32_t)USART1_IRQn) & ~1u) !=
+                   (((uint32_t)(uintptr_t)Default_Handler) & ~1u));
+}
+
 /* -------------------- Suite -------------------- */
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
 NAVTEST_CASE_DECL(test_hal_interrupt_enable_sets_iser_bit);
@@ -183,6 +233,7 @@ static const navtest_case_t interrupt_cases[] = {
     NAVTEST_CASE(test_hal_interrupt_set_get_priority_round_trip),
     NAVTEST_CASE(test_hal_interrupt_is_pending_after_set),
     NAVTEST_CASE(test_hal_interrupt_attach_then_dispatch_runs_callback),
+    NAVTEST_CASE(test_driver_enabled_irqs_have_dedicated_handlers),
     NAVTEST_CASE(test_hal_interrupt_detach_clears_callback),
     NAVTEST_CASE(test_hal_interrupt_disable_then_restore_global),
     NAVTEST_CASE(test_hal_interrupt_clear_all_pending_zeros_icpr),

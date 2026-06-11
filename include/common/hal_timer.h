@@ -75,6 +75,16 @@ uint32_t hal_timebase_get_millis(void);
 uint32_t hal_timebase_get_micros(void);
 
 /**
+ * @brief Advance the timebase by one tick (the SysTick ISR body).
+ *
+ * Call this once per tick from the SysTick ISR. NavHAL installs its own
+ * SysTick_Handler in standalone builds; in SUBMODULE builds (embedded under an
+ * RTOS that owns the SysTick vector) the RTOS handler MUST call this, or
+ * hal_delay_*() will hang.
+ */
+void hal_timebase_tick(void);
+
+/**
  * @brief Register a callback invoked on every timebase tick.
  * @param cb Callback function, or NULL to clear.
  * @return ::HAL_OK.

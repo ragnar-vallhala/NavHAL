@@ -84,6 +84,29 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # set(SYSROOT "/opt/homebrew/Cellar/arm-none-eabi-gcc/15.1.0/lib/gcc/arm-none-eabi/15.1.0")
 # extern/NavHAL/CMakeLists.txt
 #
+# ---- Release version --------------------------------------------------------
+# include/navhal.h is the single source of truth for the SemVer release version
+# (it is the header applications include). We mirror it here so the build and
+# tooling can use ${PROJECT_VERSION}, and we FATAL_ERROR if the two ever
+# disagree: bumping one without the other is a release-process bug, not
+# something we want to silently build. This check runs on every configure,
+# including when NavHAL is consumed as a submodule.
+set(NAVHAL_VERSION 0.3.0) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/navhal.h" _navhal_h)
+string(REGEX MATCH "#define[ \t]+VERSION_MAJOR[ \t]+([0-9]+)" _ "${_navhal_h}")
+set(_navhal_h_major "${CMAKE_MATCH_1}")
+string(REGEX MATCH "#define[ \t]+VERSION_MINOR[ \t]+([0-9]+)" _ "${_navhal_h}")
+set(_navhal_h_minor "${CMAKE_MATCH_1}")
+string(REGEX MATCH "#define[ \t]+VERSION_PATCH[ \t]+([0-9]+)" _ "${_navhal_h}")
+set(_navhal_h_patch "${CMAKE_MATCH_1}")
+set(_navhal_h_version "${_navhal_h_major}.${_navhal_h_minor}.${_navhal_h_patch}")
+if(NOT NAVHAL_VERSION STREQUAL _navhal_h_version)
+    message(FATAL_ERROR
+        "NavHAL version mismatch: CMakeLists NAVHAL_VERSION='${NAVHAL_VERSION}' but "
+        "include/navhal.h declares '${_navhal_h_version}'. navhal.h is the source of "
+        "truth — bump VERSION_MAJOR/MINOR/PATCH and NAVHAL_VERSION together.")
+endif()
+#
 # project() enables the C/ASM languages and must run on EVERY configure.
 # Guarding it on CMAKE_PROJECT_NAME (a cache variable) made it run only on the
 # first configure of a build directory — every later reconfigure skipped it,
@@ -91,7 +114,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # target ..."). Detect the top-level build via a path comparison instead, which
 # is re-evaluated fresh each configure and is true only for a standalone build.
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    project(NavHAL C ASM)
+    project(NavHAL VERSION ${NAVHAL_VERSION} LANGUAGES C ASM)
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

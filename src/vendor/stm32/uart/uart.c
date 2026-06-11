@@ -125,12 +125,10 @@ hal_status_t hal_uart_write_char(hal_uart_t uart, char c) {
   if (!usart)
     return HAL_ERR_INVALID_ARG;
 
-  if (c == '\n') {
-    while (!(usart->SR & USART_SR_TXE))
-      ;
-    usart->DR = '\r';
-  }
-
+  // NOTE: this is a RAW byte primitive — no '\n'->"\r\n" translation. The old
+  // CRLF injection corrupted any BINARY stream containing a 0x0A byte (e.g.
+  // vayu's framed telemetry over a blocking-write UART), inserting a stray
+  // 0x0D and breaking framing/CRC. Text callers that want CRLF must emit it.
   while (!(usart->SR & USART_SR_TXE))
     ;
   usart->DR = c;

@@ -1,0 +1,8 @@
+# vim: ft=kconfig
+# Target-board choice entry for the bare ATmega328P board (M7 §7.2).
+# Sourced inside the root "Target Board" choice. Visible only when its
+# family is selected, so it auto-selects then.
+
+config BOARD_ATMEGA328P
+    bool "atmega328p"
+    depends on FAMILY_ATMEGA328P

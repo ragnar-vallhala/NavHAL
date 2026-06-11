@@ -1,3 +1,5 @@
+@page m2_plus_plan M2+ Comprehensive Test Suite
+
 # M2+ — Comprehensive test suite
 
 **Status:** Approved 2026-05-21
@@ -107,7 +109,7 @@ Files: `tests/test_pwm.{c,h}`, `tests/test_crc.{c,h}`, `tests/test_flash.{c,h}` 
 
 All four are capability-gated. For each:
 
-- The driver's `tests/test_{driver}.c` is wrapped in `#if NAVHAL_HAS_{X}` so the suite still links when the capability is off.
+- The driver's `tests/test_{driver}.c` is wrapped in `NAVHAL_HAS_{X}` so the suite still links when the capability is off.
 - The Wave E suite is registered into `tests/main.c`'s suite table only when its `NAVHAL_HAS_*` is on.
 - PR3's `build-no-cap` job proves the absence by building with these capabilities disabled and checking no symbol from the disabled driver landed in the ELF.
 - `dwt` → `cycle_counter` rename completes the M2 work; remove the legacy `test_dwt.{c,h}` once `test_cycle_counter.{c,h}` lands.
@@ -121,7 +123,7 @@ Concise (one page) document covering:
 1. **On-target run** — `cmake -B build -DTEST=ON && make -C build tests && make -C build flash_tests`. Connect a USB-TTL to UART2 and watch the navtest output.
 2. **Host subset run** — `cmake -B build-host -DTEST_HOST=ON && cmake --build build-host && build-host/tests_host`.
 3. **Renode run** — `tools/renode/run_tests.sh build/tests` → loads the ELF in the F401RE machine model and prints the captured UART log.
-4. **Adding a test for a new driver** — pattern: `tests/test_{x}.{c,h}` with a `navtest_case_t test_{x}_cases[]` table; register in `tests/main.c`'s suite array; if the driver is capability-gated, wrap in `#if NAVHAL_HAS_{X}`.
+4. **Adding a test for a new driver** — pattern: `tests/test_{x}.{c,h}` with a `navtest_case_t test_{x}_cases[]` table; register in `tests/main.c`'s suite array; if the driver is capability-gated, wrap in `NAVHAL_HAS_{X}`.
 5. **CI matrix** — what each job covers, when each one runs.
 
 Files: `docs/testing.md`, `README.md` (link in).

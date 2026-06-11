@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file tests/host/test_hal_status.c
  * @brief Host-runnable tests for the hal_status_t contract.
@@ -69,6 +86,13 @@ void test_hal_ok_or_return_short_circuits(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_TIMEOUT, (uint32_t)got);
   TEST_ASSERT_EQUAL_UINT32(1, (uint32_t)s); /* stopped after the OK call */
 }
+/* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_hal_status_ok_is_zero);
+NAVTEST_CASE_DECL(test_hal_status_err_is_one);
+NAVTEST_CASE_DECL(test_hal_status_distinct_codes);
+NAVTEST_CASE_DECL(test_hal_ok_or_return_passes_through);
+NAVTEST_CASE_DECL(test_hal_ok_or_return_short_circuits);
+
 
 static const navtest_case_t hal_status_cases[] = {
     NAVTEST_CASE(test_hal_status_ok_is_zero),

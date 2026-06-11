@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file hal_flash.h
  * @brief Portable HAL interface for Flash key/value storage.
@@ -7,12 +24,17 @@
  * simple key/value store backed by the on-chip Flash, with wear-levelling
  * compaction between a primary and secondary sector. All functions use the
  * @c hal_flash_ prefix and return ::hal_status_t.
- *
- * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #ifndef HAL_FLASH_H
 #define HAL_FLASH_H
+
+/**
+ * @defgroup HAL_FLASH Flash
+ * @ingroup HAL_DRIVERS
+ * @brief Embedded-flash read / erase / program.
+ * @{
+ */
 
 #include "common/hal_status.h"
 #include "common/hal_types.h"
@@ -93,4 +115,6 @@ typedef hal_status_t FlashStatus_t NAVHAL_DEPRECATED("use hal_status_t");
 /* Port-specific bits (compat shim with deprecated function names). */
 #include "navhal_port_flash.h"
 
+
+/** @} */ /* end of group HAL_FLASH */
 #endif /* HAL_FLASH_H */

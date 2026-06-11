@@ -1,15 +1,37 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file crc_types.h
  * @brief CRC type definitions for NavHAL.
  *
  * Defines enumerations and configuration structures shared between
  * the common CRC HAL interface and the architecture-specific driver.
- *
- * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #ifndef CRC_TYPES_H
 #define CRC_TYPES_H
+
+/**
+ * @defgroup HAL_UTIL_CRC_TYPES Crc Types
+ * @ingroup HAL_UTILS
+ * @brief CRC polynomial / parameter type definitions.
+ * @{
+ */
 
 #include "common/navhal_compiler.h"
 #include <stdint.h>
@@ -51,4 +73,6 @@ typedef hal_crc_config_t crc_config_t NAVHAL_DEPRECATED("use hal_crc_config_t");
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+/** @} */ /* end of group HAL_UTIL_CRC_TYPES */
 #endif /* CRC_TYPES_H */

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file hal_clock.h
  * @brief Portable HAL interface for clock management.
@@ -7,12 +24,17 @@
  * the system-clock initialization function live here; bus-frequency queries
  * are also portable. Any target-specific extensions live in the port header
  * (@c port/cortex-m4/navhal_port_clock.h on the Cortex-M4 port), included at the bottom.
- *
- * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #ifndef HAL_CLOCK_H
 #define HAL_CLOCK_H
+
+/**
+ * @defgroup HAL_CLOCK Clock
+ * @ingroup HAL_DRIVERS
+ * @brief System clock configuration and queries.
+ * @{
+ */
 
 #include "common/hal_status.h"
 #include "utils/clock_types.h"
@@ -69,4 +91,6 @@ uint32_t hal_clock_get_apb2clk(void);
 
 #include "navhal_port_clock.h"
 
+
+/** @} */ /* end of group HAL_CLOCK */
 #endif /* HAL_CLOCK_H */

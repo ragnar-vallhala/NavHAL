@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file hal_i2c.h
  * @brief Portable HAL interface for I²C communication.
@@ -7,12 +24,17 @@
  * functions use the @c hal_i2c_ prefix, take the I²C bus as their first
  * argument (typed ::hal_i2c_bus_t), and return ::hal_status_t. Master-mode
  * standard/fast-speed operation.
- *
- * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #ifndef HAL_I2C_H
 #define HAL_I2C_H
+
+/**
+ * @defgroup HAL_I2C I2C
+ * @ingroup HAL_DRIVERS
+ * @brief Inter-Integrated Circuit (I²C) bus master.
+ * @{
+ */
 
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
@@ -121,4 +143,6 @@ typedef hal_status_t hal_i2c_status_t NAVHAL_DEPRECATED("use hal_status_t");
 /* Port-specific bits: DMA-backed I²C API behind @c _DMA_ENABLED. */
 #include "navhal_port_i2c.h"
 
+
+/** @} */ /* end of group HAL_I2C */
 #endif /* HAL_I2C_H */

@@ -1,3 +1,5 @@
+@page test_findings Findings — What Tests Caught
+
 # Findings — What the Test Suite Has Caught
 
 This page records what the M2+ test suite found when first exercised

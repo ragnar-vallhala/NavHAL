@@ -12,6 +12,8 @@ total_files=$(find . \
   \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp"  -o -name "*.txt"\
      -o -name "*.s" -o -name "*.S" -o -name "*.py" -o -name "*.sh" \) \
   ! -path "./build/*" \
+  ! -path "./build-avr/*" \
+  ! -path "./build-host/*" \
   ! -path "./.git/*" \
   ! -path "./extern/*" \
   | wc -l)
@@ -24,6 +26,8 @@ find . \
   \( -name "*.c" -o -name "*.h" -o -name "*.cpp" -o -name "*.hpp" -o -name "*.txt" \
      -o -name "*.s" -o -name "*.S" -o -name "*.py" -o -name "*.sh" \) \
   ! -path "./build/*" \
+  ! -path "./build-avr/*" \
+  ! -path "./build-host/*" \
   ! -path "./.git/*" \
   ! -path "./extern/*" \
   -print0 |

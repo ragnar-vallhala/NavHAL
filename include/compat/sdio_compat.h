@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file sdio_compat.h
  * @brief Deprecated pre-standardization SDIO API shim.
@@ -8,8 +25,6 @@
  * `port/cortex-m4/navhal_port_sdio.h`.
  *
  * Retained as a backward-compat alias behind NAVHAL_DEPRECATED. New code MUST use the standardized names directly.
- *
- * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #ifndef NAVHAL_SDIO_COMPAT_H
@@ -86,7 +101,7 @@ static inline uint32_t sdio_get_sector_count(void) {
   return hal_sdio_get_sector_count();
 }
 
-#ifdef _DMA_ENABLED
+#ifdef _SDIO_BACKEND_DMA
 /** @deprecated Use hal_sdio_read_block_async(). */
 NAVHAL_DEPRECATED("use hal_sdio_read_block_async")
 static inline hal_sdio_error_t sdio_read_block_async(uint32_t addr,
@@ -114,7 +129,7 @@ static inline hal_sdio_error_t
 sdio_write_blocks_async(uint32_t addr, const uint8_t *buffer, uint32_t count) {
   return hal_sdio_write_blocks_async(addr, buffer, count);
 }
-#endif /* _DMA_ENABLED */
+#endif /* _SDIO_BACKEND_DMA */
 
 
 #ifdef __cplusplus

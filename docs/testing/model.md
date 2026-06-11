@@ -1,3 +1,5 @@
+@page test_model Test Model — SIL / PIL / HIL
+
 # Test Model — SIL / PIL / HIL for NavHAL
 
 The classical verification ladder for embedded / control systems has
@@ -53,19 +55,17 @@ driver that has a software fallback.
 |---|---|
 | **Substrate** | The on-target ELF (cross-compiled with `arm-none-eabi-gcc`) running inside Renode against a modeled STM32F4 machine. |
 | **What runs** | The full `tests/` suite — the same binary that flashes to a real board. |
-| **Entry point** | `tools/renode/run_tests.sh build/tests` (locally), `Full suite in Renode` job in `.github/workflows/renode.yml` (CI — nightly + on demand). |
-| **Speed** | Slow. The full 142-test suite takes ~90 min wall-clock. Renode advances emulated time slower than wall-clock when the firmware busy-waits, and our `hal_clock_init` paths busy-wait on PLL/HSE ready flags that the Renode RCC model is slow to assert. |
+| **Entry point** | `tools/renode/run_tests.sh build/tests` (locally), `Full suite in Renode` job in `.github/workflows/renode.yml` (CI — push + pull_request to main, plus a nightly schedule and on demand). |
+| **Speed** | Acceptable for per-PR. Earlier estimates of ~90 min were dominated by Renode advancing emulated time slower than wall-clock when firmware busy-waits on PLL/HSE ready flags; that turned out to be much faster in practice on the current Renode build, so the job now gates PRs alongside `ci.yml`. The 150-min workflow timeout is a safety cap, not a typical runtime. |
 | **Output** | USART2 captured to a file by Renode's `CreateFileBackend`; the wrapper greps for `Total failures:` and exits with that count. |
 | **What it catches** | Register-write logic (does `hal_gpio_set_mode` actually flip the right bits in MODER?), ISA-level math (32-bit cycle counter wraparound, byte order), build-time integration (does the linker script + startup code actually run the suite to completion?). |
 | **What it can't catch** | Peripheral edge cases the model glosses over — e.g. real I²C arbitration timing, true SPI clock-data alignment, ADC noise, electrical issues, current draw, the exact NVIC pending-write behavior on real silicon. |
 
-Renode is intentionally **not** wired as a per-PR gate — the
-wall-clock cost is too high. Instead, it runs on a nightly schedule
-and on-demand via `workflow_dispatch`. Per-PR CI (`ci.yml`) still
-catches build breaks via `build-on-target` and the host subset via
-`host-tests`; the nightly Renode run is the slower follow-up that
-provides the "M3 refactor was behavior-preserving" signal M2+ planned
-for, just on a less aggressive cadence.
+Renode is wired as a per-PR gate (push + pull_request to main), with
+a nightly schedule kept as belt-and-suspenders. Together with
+`ci.yml`'s host-tests, build-on-target, cap-contract, and sample-matrix
+jobs, this gives every PR a "the refactor was behavior-preserving"
+signal before merge.
 
 The Renode `.resc` script (`tools/renode/navhal_f401re.resc`) currently
 loads the `stm32f4_discovery` board model. The F401RE shares its silicon
@@ -93,6 +93,29 @@ narrow top — most expensive per run, but the only level that can
 distinguish "the model says my code is right" from "the silicon agrees."
 
 ---
+
+## CI runner tiers
+
+The same three-level test triangle runs across two GitHub-Actions
+runner tiers. Picking the right one is mostly a question of cost and
+who owns the physical hardware:
+
+| Tier | Where it runs | Used for |
+|---|---|---|
+| **GitHub-hosted** (free, ephemeral, ubuntu-latest) | every per-PR job and the release-gate jobs | host tests, sample matrices, cap-contract, doxygen-strict, sanitizer host, both PIL jobs (Renode + simavr) — i.e. anything that finishes in single-digit minutes on a stock Ubuntu image |
+| **Self-hosted** (a runner the maintainer owns, with a physical board attached) | reserved for HIL | the wishlist "Extended HIL" suite, soak / fault-injection, any future per-vendor HIL on a real Nucleo / Arduino board |
+
+The split is intentional. GitHub-hosted runners are good enough for
+SIL + PIL and the build-side matrices, and parallelism is effectively
+free there. HIL has to be self-hosted because the runner needs the
+peripheral on its USB bus; that runner pool is also where any
+long-running soak job would land so it doesn't starve PR-time
+runners.
+
+When a new PIL backend lands (e.g. simulavr for an extra AVR variant,
+or QEMU for a future Cortex-A port) it stays on the GitHub-hosted
+tier as long as the wall-clock fits. If it grows past ~10 min, move
+that single job to self-hosted and keep the per-PR jobs hosted.
 
 ## What sits *above* this triangle
 

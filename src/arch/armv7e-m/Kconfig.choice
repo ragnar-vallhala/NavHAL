@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Processor Architecture choice entry for the armv7e-m ISA (M7 §7.2).
+# Sourced inside the root "Processor Architecture" choice.
+
+config ARCH_CORTEX_M4
+    bool "Cortex-M4"

@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# Heavier checks that run before `git push`. Matches the gating CI does on
+# the remote, so a green pre-push almost guarantees a green CI run.
+#
+# Per arch, each block runs only if the corresponding cross-compiler is
+# installed. Missing toolchains print a WARN and the block is skipped —
+# the push still goes through, and the same checks run on the server
+# (where the toolchains are installed unconditionally), so a missing
+# local toolchain only delays the failure to PR time, never hides it.
+#
+#   1. arm-none-eabi-gcc present → cap contract + cortex-m sample matrix
+#      (tools/test_cap_contract.sh + tools/build_all_samples.sh).
+#   2. avr-gcc present → AVR portable-sample matrix
+#      (tools/build_all_avr_samples.sh).
+#
+# Total wall-clock when both toolchains are installed: ~60-90s.
+#
+# Skips itself entirely if the push only touches docs/ or other
+# non-build paths.
+#
+# Bypass with: git push --no-verify (do this only if you know CI will pass).
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+# Read refs from stdin (git push hook protocol) to figure out what's being
+# pushed. If the diff is docs-only, skip the heavy checks.
+remote_sha_or_default() {
+  local sha=$1
+  if [ "$sha" = "0000000000000000000000000000000000000000" ]; then
+    git rev-parse origin/main 2>/dev/null || git rev-parse HEAD~1 2>/dev/null || echo ""
+  else
+    echo "$sha"
+  fi
+}
+
+DOCS_ONLY=1
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ -z "$local_sha" ] && continue
+  [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
+  base=$(remote_sha_or_default "$remote_sha")
+  if [ -z "$base" ]; then
+    DOCS_ONLY=0
+    break
+  fi
+  changed=$(git diff --name-only "$base" "$local_sha")
+  for f in $changed; do
+    case "$f" in
+      docs/*|*.md|LICENSE|.gitignore) ;;
+      *) DOCS_ONLY=0 ;;
+    esac
+  done
+done
+
+if [ "$DOCS_ONLY" = "1" ]; then
+  echo "[pre-push] docs-only push, skipping cap contract and sample matrix"
+  exit 0
+fi
+
+ran_any=0
+
+if command -v arm-none-eabi-gcc >/dev/null; then
+  echo "[pre-push] cap contract..."
+  tools/test_cap_contract.sh
+  echo "[pre-push] sample matrix (cortex-m)..."
+  tools/build_all_samples.sh
+  ran_any=1
+else
+  echo "  WARN: arm-none-eabi-gcc not installed; skipping cap contract"
+  echo "        and Cortex-M sample matrix. CI will run them on the PR."
+  echo "        Install locally with:"
+  echo "          sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi"
+fi
+
+if command -v avr-gcc >/dev/null; then
+  echo "[pre-push] sample matrix (avr)..."
+  tools/build_all_avr_samples.sh
+  ran_any=1
+else
+  echo "  WARN: avr-gcc not installed; skipping AVR sample matrix."
+  echo "        CI will run it on the PR. Install locally with:"
+  echo "          sudo apt install gcc-avr avr-libc binutils-avr"
+fi
+
+if [ "$ran_any" = "0" ]; then
+  echo "[pre-push] NOTE: no embedded toolchains present locally;"
+  echo "                 nothing was verified pre-push. Server CI gates the push."
+fi
+
+echo "[pre-push] ok"

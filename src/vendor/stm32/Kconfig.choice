@@ -1,0 +1,9 @@
+# vim: ft=kconfig
+# Vendor choice entry for STM32 (M7 §7.2).
+# Sourced inside the root "Vendor" choice. Visible only on Cortex-M4,
+# so it auto-selects when that arch is active — no explicit choice
+# default needed.
+
+config VENDOR_STM32
+    bool "STM32"
+    depends on ARCH_CORTEX_M4

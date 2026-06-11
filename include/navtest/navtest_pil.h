@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file navtest_pil.h
  * @brief PIL (emulator) detection helper for navtest cases.
@@ -45,13 +62,19 @@ extern "C" {
  * within a single firmware run.
  */
 static inline bool navtest_in_pil(void) {
+#if !defined(__arm__) && !defined(__thumb__)
+  /* Non-Cortex targets (e.g. AVR) have no DWT / SCS — the PIL probe is
+   * meaningless there. Return false; emulator-vs-real-board distinction
+   * on those targets is handled by the per-arch runner script. */
+  return false;
+#else
   static int _cached = -1; /* -1 = unknown, 0 = HIL, 1 = PIL */
   if (_cached >= 0)
     return _cached != 0;
 
   /* Enable TRCENA and CYCCNTENA. On Renode these writes are silenced. */
-  *_NAVTEST_DEMCR |= (1U << 24);
-  *_NAVTEST_DWT_CTRL |= 1U;
+  *_NAVTEST_DEMCR |= (1UL << 24);
+  *_NAVTEST_DWT_CTRL |= 1UL;
 
   uint32_t a = *_NAVTEST_DWT_CYCCNT;
   for (volatile int i = 0; i < 1000; i++)
@@ -60,6 +83,7 @@ static inline bool navtest_in_pil(void) {
 
   _cached = (a == b) ? 1 : 0;
   return _cached != 0;
+#endif
 }
 
 /**

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2025 NAVRobotec Pvt Ltd
+ * Author: Ragnar Vallhala
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
  * @file hal_sdio.h
  * @brief Portable HAL interface for SDIO.
@@ -8,19 +25,24 @@
  * and (when the port's DMA backend is enabled) asynchronous block transfers.
  *
  * The entire API is compiled only when @c _SDIO_ENABLED is defined (see
- * ::NAVHAL_HAS_SDIO) — on a target without an SDIO peripheral the header
+ * @c NAVHAL_HAS_SDIO) — on a target without an SDIO peripheral the header
  * collapses to nothing, exactly as @c hal_dma.h does for DMA.
  *
  * @note SDIO returns the driver-specific ::hal_sdio_error_t rather than
  *       ::hal_status_t — its asynchronous model needs ::HAL_SDIO_PENDING,
  *       which the standard status enum cannot express. Flagged for the M5
  *       conformance review.
- *
- * @copyright © NAVROBOTEC PVT. LTD.
  */
 
 #ifndef HAL_SDIO_H
 #define HAL_SDIO_H
+
+/**
+ * @defgroup HAL_SDIO Sdio
+ * @ingroup HAL_DRIVERS
+ * @brief Secure Digital I/O controller for SD-card access.
+ * @{
+ */
 
 #include "common/hal_config.h" /* sources the _SDIO_ENABLED capability flag */
 #include <stdint.h>
@@ -158,4 +180,6 @@ uint32_t hal_sdio_get_sector_count(void);
 /* Port-specific bits: register-bit defines, async/DMA prototypes, compat. */
 #include "navhal_port_sdio.h"
 
+
+/** @} */ /* end of group HAL_SDIO */
 #endif /* HAL_SDIO_H */

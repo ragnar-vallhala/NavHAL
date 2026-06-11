@@ -140,6 +140,29 @@ void test_hal_uart_available_after_init_is_false(void) {
   init_test_uart(115200);
   TEST_ASSERT_FALSE(hal_uart_available(TEST_UART));
 }
+
+/* -------------------- idle-line callback surface -------------------- */
+
+static void _idle_noop_cb(void) {}
+
+void test_hal_uart_attach_idle_rejects_null_cb(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_attach_idle_callback(TEST_UART, NULL));
+}
+
+void test_hal_uart_attach_idle_sets_and_clears_idleie(void) {
+  init_test_uart(115200);
+  volatile UARTx_Reg_Typedef *u = GET_USARTx_BASE(1);
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_uart_attach_idle_callback(TEST_UART, _idle_noop_cb));
+  TEST_ASSERT_TRUE((u->CR1 & USART_CR1_IDLEIE) != 0u);
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK, (uint32_t)hal_uart_detach_idle_callback(TEST_UART));
+  TEST_ASSERT_TRUE((u->CR1 & USART_CR1_IDLEIE) == 0u);
+}
+
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
 NAVTEST_CASE_DECL(test_uart_baudrate_9600);
 NAVTEST_CASE_DECL(test_uart_baudrate_115200);
@@ -153,6 +176,8 @@ NAVTEST_CASE_DECL(test_hal_uart_write_float_returns_ok);
 NAVTEST_CASE_DECL(test_hal_uart_write_string_returns_ok);
 NAVTEST_CASE_DECL(test_hal_uart_print_generic_dispatch);
 NAVTEST_CASE_DECL(test_hal_uart_available_after_init_is_false);
+NAVTEST_CASE_DECL(test_hal_uart_attach_idle_rejects_null_cb);
+NAVTEST_CASE_DECL(test_hal_uart_attach_idle_sets_and_clears_idleie);
 
 
 static const navtest_case_t uart_protocol_cases[] = {
@@ -168,6 +193,8 @@ static const navtest_case_t uart_protocol_cases[] = {
     NAVTEST_CASE(test_hal_uart_write_string_returns_ok),
     NAVTEST_CASE(test_hal_uart_print_generic_dispatch),
     NAVTEST_CASE(test_hal_uart_available_after_init_is_false),
+    NAVTEST_CASE(test_hal_uart_attach_idle_rejects_null_cb),
+    NAVTEST_CASE(test_hal_uart_attach_idle_sets_and_clears_idleie),
 };
 
 const navtest_suite_t test_uart_protocol_suite = {

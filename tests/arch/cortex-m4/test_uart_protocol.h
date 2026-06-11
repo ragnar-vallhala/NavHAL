@@ -50,6 +50,10 @@ void test_hal_uart_print_generic_dispatch(void);
 /* read surface */
 void test_hal_uart_available_after_init_is_false(void);
 
+/* idle-line callback surface */
+void test_hal_uart_attach_idle_rejects_null_cb(void);
+void test_hal_uart_attach_idle_sets_and_clears_idleie(void);
+
 extern const navtest_suite_t test_uart_protocol_suite;
 
 

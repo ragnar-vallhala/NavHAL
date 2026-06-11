@@ -42,6 +42,31 @@ extern "C" {
    independently of other DMA users. */
 
 /* -------------------------------------------------------------------------- *
+ * IDLE-line interrupt → callback (DMA-independent).
+ *
+ * Lets a consumer wake on the inter-frame gap of a byte-oriented protocol
+ * (SBUS/iBUS/etc.) instead of polling. Typically paired with circular DMA RX:
+ * arm DMA, then attach an idle callback that signals a task to drain the ring.
+ * -------------------------------------------------------------------------- */
+
+/**
+ * @brief Enable the UART IDLE-line interrupt and route it to @p callback.
+ *
+ * The IDLE flag is cleared inside the driver before @p callback runs. The line
+ * is enabled at a maskable (BASEPRI-managed) NVIC priority, so @p callback may
+ * call an RTOS @c *_from_isr primitive (e.g. give a semaphore).
+ *
+ * @param uart      Target UART.
+ * @param callback  Invoked from ISR context on each detected idle frame-gap.
+ * @return HAL_OK, or HAL_ERR_INVALID_ARG for an unknown UART / NULL callback.
+ */
+hal_status_t hal_uart_attach_idle_callback(hal_uart_t uart,
+                                           void (*callback)(void));
+
+/** @brief Disable the IDLE-line interrupt and clear the registered callback. */
+hal_status_t hal_uart_detach_idle_callback(hal_uart_t uart);
+
+/* -------------------------------------------------------------------------- *
  * DMA-backed UART API — available only when the DMA backend is enabled.
  * -------------------------------------------------------------------------- */
 #if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
@@ -52,6 +77,18 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
 /** @brief Set up a UART for DMA-based circular reception. */
 hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
                                   uint16_t length);
+/**
+ * @brief Current circular RX write index for a UART set up via
+ *        ::hal_uart_init_dma_rx (i.e. @c length-NDTR on the correct stream).
+ *
+ * Lets consumers track how far the DMA has filled the ring without touching
+ * DMA registers themselves. Valid range is [0, length).
+ *
+ * @param uart       UART previously initialised for DMA RX.
+ * @param out_index  Receives the next-write index.
+ * @return HAL_OK, or HAL_ERR_INVALID_ARG if RX DMA isn't configured / NULL out.
+ */
+hal_status_t hal_uart_dma_rx_index(hal_uart_t uart, uint16_t *out_index);
 /** @brief Transmit a null-terminated string using DMA. */
 hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 

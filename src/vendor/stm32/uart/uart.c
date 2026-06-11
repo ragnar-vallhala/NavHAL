@@ -120,6 +120,85 @@ hal_status_t hal_uart_enable_interrupt(hal_uart_t uart, uint8_t rx_en,
   return HAL_OK;
 }
 
+/* -------------------------------------------------------------------------- *
+ * IDLE-line interrupt → user callback.
+ *
+ * The IDLE line fires at the inter-frame gap of a byte-oriented protocol
+ * (e.g. SBUS/iBUS), letting a consumer block until a whole frame has arrived
+ * instead of polling. Pairs naturally with circular DMA RX: the DMA fills the
+ * ring, and IDLE signals "a burst just ended — go drain it".
+ * -------------------------------------------------------------------------- */
+
+/** UART -> index into the per-UART tables (UART1=0, UART2=1, UART6=2). */
+static inline int _uart_idx(hal_uart_t uart) {
+  return (uart == HAL_UART_1) ? 0 : (uart == HAL_UART_6) ? 2 : 1;
+}
+
+static void (*_uart_idle_cb[3])(void) = {0};
+
+/* Demux + clear: on the shared USART IRQ, run only if the IDLE flag is set.
+ * F4 has no IDLE-clear bit — the flag is cleared by a read of SR followed by a
+ * read of DR. At IDLE time the line is quiet and DMA has already drained DR, so
+ * the dummy DR read steals no in-flight byte. */
+static void _uart_idle_handle(hal_uart_t uart) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  if (!usart)
+    return;
+  if (usart->SR & USART_SR_IDLE) {
+    (void)usart->DR; /* SR was just read above; DR read clears IDLE */
+    void (*cb)(void) = _uart_idle_cb[_uart_idx(uart)];
+    if (cb)
+      cb();
+  }
+}
+
+/* The interrupt registry takes a void(void) callback, so one thin trampoline
+ * per USART line carries the UART identity. */
+static void _uart_idle_irq_usart1(void) { _uart_idle_handle(HAL_UART_1); }
+static void _uart_idle_irq_usart2(void) { _uart_idle_handle(HAL_UART_2); }
+static void _uart_idle_irq_usart6(void) { _uart_idle_handle(HAL_UART_6); }
+
+hal_status_t hal_uart_attach_idle_callback(hal_uart_t uart,
+                                           void (*callback)(void)) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  if (!usart || !callback)
+    return HAL_ERR_INVALID_ARG;
+
+  hal_irq_t irq;
+  void (*trampoline)(void);
+  if (uart == HAL_UART_1) {
+    irq = USART1_IRQn;
+    trampoline = _uart_idle_irq_usart1;
+  } else if (uart == HAL_UART_6) {
+    irq = USART6_IRQn;
+    trampoline = _uart_idle_irq_usart6;
+  } else {
+    irq = USART2_IRQn;
+    trampoline = _uart_idle_irq_usart2;
+  }
+
+  _uart_idle_cb[_uart_idx(uart)] = callback;
+  hal_interrupt_attach_callback(irq, trampoline);
+
+  (void)usart->SR; /* clear any stale IDLE (SR then DR) before arming */
+  (void)usart->DR;
+  usart->CR1 |= USART_CR1_IDLEIE;
+
+  /* Maskable (BASEPRI-managed) priority so the callback may call an RTOS
+   * *_from_isr primitive — same contract as the DMA-completion ISRs. */
+  hal_interrupt_enable_with_priority(irq, HAL_IRQ_PRIORITY_DEFAULT);
+  return HAL_OK;
+}
+
+hal_status_t hal_uart_detach_idle_callback(hal_uart_t uart) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  if (!usart)
+    return HAL_ERR_INVALID_ARG;
+  usart->CR1 &= ~USART_CR1_IDLEIE;
+  _uart_idle_cb[_uart_idx(uart)] = NULL;
+  return HAL_OK;
+}
+
 hal_status_t hal_uart_write_char(hal_uart_t uart, char c) {
   volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
   if (!usart)
@@ -307,6 +386,10 @@ static _uart_dma_params_t _get_uart_dma_params(hal_uart_t uart, int is_tx) {
  */
 static uint8_t _uart_dma_initialized[6] = {0};
 
+/** Configured circular RX-buffer length per UART (UART1=0, UART2=1, UART6=2);
+ *  0 until hal_uart_init_dma_rx() runs. Used to turn NDTR into a write index. */
+static uint16_t _uart_rx_dma_len[3] = {0};
+
 hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
                                 uint16_t length) {
   if (!data || length == 0)
@@ -386,6 +469,23 @@ hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
 
   int idx = (uart == HAL_UART_1) ? 1 : (uart == HAL_UART_2) ? 3 : 5;
   _uart_dma_initialized[idx] = 1;
+  _uart_rx_dma_len[_uart_idx(uart)] = length;
+  return HAL_OK;
+}
+
+hal_status_t hal_uart_dma_rx_index(hal_uart_t uart, uint16_t *out_index) {
+  if (!out_index)
+    return HAL_ERR_INVALID_ARG;
+  _uart_dma_params_t p = _get_uart_dma_params(uart, 0);
+  uint16_t len = _uart_rx_dma_len[_uart_idx(uart)];
+  if (!p.controller || len == 0)
+    return HAL_ERR_INVALID_ARG; /* RX DMA not configured for this UART */
+
+  /* NDTR counts down from `len` to 0 as the DMA fills the circular buffer, so
+   * the next-write index is len - NDTR. Reading the correct stream's NDTR is
+   * the whole point — callers must not guess the stream themselves. */
+  uint16_t ndtr = (uint16_t)(p.controller->STREAM[p.stream].NDTR & 0xFFFFu);
+  *out_index = (uint16_t)(len - ndtr);
   return HAL_OK;
 }
 

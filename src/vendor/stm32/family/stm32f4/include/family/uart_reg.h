@@ -81,10 +81,14 @@ typedef struct {
   (1                                                                           \
    << 5) ///< RXNE interrupt enable 0: Interrupt is inhibited 1: An USART
          ///< interrupt is generated whenever RXNE=1 in the USART_SR register
+#define USART_CR1_IDLEIE                                                       \
+  (1 << 4) ///< IDLE line interrupt enable: USART interrupt generated whenever
+           ///< IDLE=1 in the USART_SR register
 
 /* Status register bits */
 #define USART_SR_TXE (1 << 7)  ///< Transmit Data Register Empty
 #define USART_SR_RXNE (1 << 5) ///< Read Data Register Not Empty
+#define USART_SR_IDLE (1 << 4) ///< IDLE line detected (cleared by SR then DR read)
 #define USART_SR_TC (1 << 6)   ///< Transmission Complete
 #define USART_SR_PE (1 << 0)   ///< Parity Error
 #define USART_SR_FE (1 << 1)   ///< Framing Error

@@ -24,6 +24,7 @@
 #include "navhal_port_interrupt.h"
 #include "family/interrupt_reg.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
 #include "test_interrupt.h"
 
 #include <stdbool.h>
@@ -125,6 +126,29 @@ void test_hal_interrupt_clear_all_pending_zeros_icpr(void) {
   TEST_ASSERT_EQUAL_UINT32(0u, NVIC->ISPR[1]);
 }
 
+void test_hal_cpu_idle_returns_on_pending_irq(void) {
+  /* A wakeup event already pending at WFI entry must make hal_cpu_idle()
+   * return immediately rather than halt — so this exercises the no-deadlock
+   * guarantee. Pend an *enabled* IRQ (a valid wake source) while PRIMASK masks
+   * it (so the handler doesn't actually run), call hal_cpu_idle(), and clear it
+   * before unmasking. Reaching the assert proves WFI returned.
+   *
+   * WFI modelling under Renode can stall the run, so validate on HIL only. */
+  NAVTEST_SKIP_ON_PIL();
+
+  hal_interrupt_clear_pending(TEST_IRQ);
+  hal_interrupt_enable(TEST_IRQ);
+  uint32_t pm = hal_interrupt_disable_global();
+  NVIC->ISPR[iser_word(TEST_IRQ)] = iser_bit(TEST_IRQ); /* pend a wake event */
+
+  hal_cpu_idle(); /* must return (pending event => no halt) */
+
+  hal_interrupt_clear_pending(TEST_IRQ); /* clear before unmasking */
+  hal_interrupt_disable(TEST_IRQ);
+  hal_interrupt_enable_global(pm);
+  TEST_ASSERT_TRUE(1);
+}
+
 /* -------------------- Error-path tests -------------------- */
 
 void test_hal_interrupt_enable_rejects_negative_irq(void) {
@@ -219,6 +243,7 @@ NAVTEST_CASE_DECL(test_hal_interrupt_attach_then_dispatch_runs_callback);
 NAVTEST_CASE_DECL(test_hal_interrupt_detach_clears_callback);
 NAVTEST_CASE_DECL(test_hal_interrupt_disable_then_restore_global);
 NAVTEST_CASE_DECL(test_hal_interrupt_clear_all_pending_zeros_icpr);
+NAVTEST_CASE_DECL(test_hal_cpu_idle_returns_on_pending_irq);
 NAVTEST_CASE_DECL(test_hal_interrupt_enable_rejects_negative_irq);
 NAVTEST_CASE_DECL(test_hal_interrupt_disable_rejects_negative_irq);
 NAVTEST_CASE_DECL(test_hal_interrupt_clear_pending_rejects_negative_irq);
@@ -237,6 +262,7 @@ static const navtest_case_t interrupt_cases[] = {
     NAVTEST_CASE(test_hal_interrupt_detach_clears_callback),
     NAVTEST_CASE(test_hal_interrupt_disable_then_restore_global),
     NAVTEST_CASE(test_hal_interrupt_clear_all_pending_zeros_icpr),
+    NAVTEST_CASE(test_hal_cpu_idle_returns_on_pending_irq),
     /* error paths */
     NAVTEST_CASE(test_hal_interrupt_enable_rejects_negative_irq),
     NAVTEST_CASE(test_hal_interrupt_disable_rejects_negative_irq),

@@ -149,6 +149,18 @@ uint32_t hal_interrupt_disable_global(void);
  */
 void hal_interrupt_clear_all_pending(void);
 
+/**
+ * @brief Put the CPU to sleep until the next interrupt (WFI).
+ *
+ * Executes a Wait-For-Interrupt: the core stops the CPU clock and resumes on
+ * the next wakeup event (any enabled interrupt, including SysTick), cutting
+ * idle power instead of spinning. A wakeup event already pending at entry makes
+ * WFI return immediately, so it never deadlocks. Intended for an RTOS idle
+ * task — call once per idle pass so the core sleeps between interrupts rather
+ * than busy-looping.
+ */
+void hal_cpu_idle(void);
+
 /* Deprecated pre-standardization interrupt names — retained as a backward-compat alias. */
 #include "compat/interrupt_compat.h"
 

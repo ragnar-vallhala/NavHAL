@@ -220,6 +220,14 @@ uint32_t hal_interrupt_disable_global(void) {
   return state;
 }
 
+void hal_cpu_idle(void) {
+  /* DSB before WFI so prior memory writes (e.g. clearing a wake flag) retire
+   * first; WFI sleeps the core until a wakeup event. A pending wakeup event at
+   * entry returns immediately, so this cannot deadlock. */
+  __asm volatile("dsb 0xf" : : : "memory");
+  __asm volatile("wfi" : : : "memory");
+}
+
 void hal_interrupt_clear_all_pending(void) {
   /* STM32F401RE wires IRQs 0..81 (NVIC ICPR words 0..2). Writing past
    * that range is a no-op on real silicon but produces "unhandled

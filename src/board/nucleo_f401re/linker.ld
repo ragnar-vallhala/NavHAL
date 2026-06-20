@@ -45,7 +45,7 @@ SECTIONS {
     _ebss = .;
     __bss_end__ = .;
     _heap_start = .;
-  } > RAM
+  } > RAM AT > RAM
   _heap_end   = ORIGIN(RAM) + LENGTH(RAM);
   _sidata = LOADADDR(.data);
   _estack = ORIGIN(RAM) + LENGTH(RAM);

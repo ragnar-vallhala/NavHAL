@@ -211,6 +211,20 @@ hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config) {
   }
 }
 
+hal_status_t hal_i2c_deinit(hal_i2c_bus_t bus) {
+  I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
+
+  // Disable the peripheral and assert/release the software reset so the next
+  // hal_i2c_init() reconfigures from a clean state.
+  I2C->CR1 &= ~I2C_CR1_PE_MASK;
+  I2C->CR1 |= I2C_CR1_SWRST_MASK;
+  I2C->CR1 &= ~I2C_CR1_SWRST_MASK;
+
+  // Clear this bus's init-status bit (mirrors the per-bus bits set in init).
+  __i2c_init_status &= (uint8_t)~(1u << bus);
+  return HAL_OK;
+}
+
 static int _wait_flag(volatile uint32_t *reg, uint32_t mask) {
   int timeout = TIMEOUT;
   while (((*reg & mask) == 0) && --timeout) {

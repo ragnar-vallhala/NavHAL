@@ -24,10 +24,13 @@
 #include "fatfs/ff.h"
 
 #define MAX_OPEN_FILES 4
+#define MAX_OPEN_DIRS 2
 
 static FATFS fs_obj;
 static FIL open_files[MAX_OPEN_FILES];
 static uint8_t file_in_use[MAX_OPEN_FILES] = {0};
+static DIR dir_objs[MAX_OPEN_DIRS];
+static uint8_t dir_in_use[MAX_OPEN_DIRS] = {0};
 
 int v_fs_init(void) {
   FRESULT res = f_mount(&fs_obj, "0:", 1);
@@ -186,4 +189,67 @@ int v_preallocate(const char *path, uint32_t size) {
   f_sync(&fil);
   f_close(&fil);
   return 0;
+}
+
+int v_stat(const char *path, v_stat_t *st) {
+  if (st == NULL)
+    return -1;
+  FILINFO fno;
+  FRESULT res = f_stat(path, &fno);
+  if (res != FR_OK) {
+    st->exists = 0;
+    return -(int)res;
+  }
+  st->exists = 1;
+  st->size = (uint32_t)fno.fsize;
+  st->is_dir = (fno.fattrib & AM_DIR) ? 1 : 0;
+  st->mtime = ((uint32_t)fno.fdate << 16) | (uint32_t)fno.ftime;
+  return 0;
+}
+
+v_dir_t v_opendir(const char *path) {
+  int d = -1;
+  for (int i = 0; i < MAX_OPEN_DIRS; i++) {
+    if (!dir_in_use[i]) {
+      d = i;
+      break;
+    }
+  }
+  if (d == -1)
+    return -1;
+
+  FRESULT res = f_opendir(&dir_objs[d], path);
+  if (res != FR_OK)
+    return -(int)res;
+
+  dir_in_use[d] = 1;
+  return d;
+}
+
+int v_readdir(v_dir_t d, v_dirent_t *ent) {
+  if (d < 0 || d >= MAX_OPEN_DIRS || !dir_in_use[d] || ent == NULL)
+    return -1;
+
+  FILINFO fno;
+  FRESULT res = f_readdir(&dir_objs[d], &fno);
+  if (res != FR_OK)
+    return -(int)res;
+  if (fno.fname[0] == 0)
+    return 0; /* end of directory */
+
+  int i = 0;
+  for (; i < V_NAME_MAX - 1 && fno.fname[i] != 0; i++)
+    ent->name[i] = (char)fno.fname[i];
+  ent->name[i] = '\0';
+  ent->size = (uint32_t)fno.fsize;
+  ent->is_dir = (fno.fattrib & AM_DIR) ? 1 : 0;
+  return 1;
+}
+
+int v_closedir(v_dir_t d) {
+  if (d < 0 || d >= MAX_OPEN_DIRS || !dir_in_use[d])
+    return -1;
+  FRESULT res = f_closedir(&dir_objs[d]);
+  dir_in_use[d] = 0;
+  return (res == FR_OK) ? 0 : -(int)res;
 }

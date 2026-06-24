@@ -147,6 +147,28 @@ typedef struct {
 #define SDIO_ICR_DBCKENDC (1 << 10)
 #define SDIO_ICR_SDIOITC (1 << 22)
 
+/* Grouped ICR clear masks.
+ *
+ * The SDIO status flags split into two families: COMMAND-path flags, set around a
+ * CPSM command (CMDREND/CMDSENT/CTIMEOUT/CCRCFAIL), and DATA-path flags, set around
+ * a DPSM transfer (DATAEND/DBCKEND/DCRCFAIL/DTIMEOUT/RXOVERR/TXUNDERR/STBITERR).
+ *
+ * These two families must be cleared INDEPENDENTLY. The data-completion ISR clears
+ * its transfer with SDIO_ICR_DATA_FLAGS and must NEVER touch SDIO_ICR_CMD_FLAGS:
+ * the synchronous send_command() poll spins waiting on CMDREND, and for a fast
+ * single-block read the data phase can finish (firing the ISR) before a preempted
+ * poll has observed CMDREND. A blanket ICR = 0xFFFFFFFF in the ISR clears CMDREND
+ * out from under that poll, which then times out on a command that actually
+ * succeeded — a false HAL_SDIO_TIMEOUT that surfaces as FR_DISK_ERR and stalls the
+ * transfer. Keeping the two masks disjoint is the invariant the SDIO tests pin. */
+#define SDIO_ICR_DATA_FLAGS                                                    \
+  (SDIO_ICR_DCRCFAILC | SDIO_ICR_DTIMEOUTC | SDIO_ICR_TXUNDERRC |             \
+   SDIO_ICR_RXOVERRC | SDIO_ICR_DATAENDC | SDIO_ICR_STBITERRC |              \
+   SDIO_ICR_DBCKENDC)
+#define SDIO_ICR_CMD_FLAGS                                                     \
+  (SDIO_ICR_CCRCFAILC | SDIO_ICR_CTIMEOUTC | SDIO_ICR_CMDRENDC |              \
+   SDIO_ICR_CMDSENTC)
+
 /* MASK Register */
 #define SDIO_MASK_CCRCFAILIE (1 << 0)
 #define SDIO_MASK_DCRCFAILIE (1 << 1)

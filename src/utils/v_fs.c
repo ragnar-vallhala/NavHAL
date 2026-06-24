@@ -80,11 +80,12 @@ int v_close(v_fd_t fd) {
   if (fd < 0 || fd >= MAX_OPEN_FILES || !file_in_use[fd])
     return -1;
   FRESULT res = f_close(&open_files[fd]);
-  if (res == FR_OK) {
-    file_in_use[fd] = 0;
-    return 0;
-  }
-  return -(int)res;
+  /* Free the slot UNCONDITIONALLY: f_close invalidates the FIL even on an error
+   * (e.g. a sync write fault), so keeping file_in_use[fd]=1 would leak the slot
+   * permanently and, after MAX_OPEN_FILES such errors, make every subsequent
+   * open fail. Report the error, but never strand the descriptor. */
+  file_in_use[fd] = 0;
+  return (res == FR_OK) ? 0 : -(int)res;
 }
 
 int v_read(v_fd_t fd, void *buf, size_t count) {

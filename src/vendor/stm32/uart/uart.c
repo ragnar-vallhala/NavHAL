@@ -366,9 +366,15 @@ static _uart_dma_params_t _get_uart_dma_params(hal_uart_t uart, int is_tx) {
     p.controller = DMA2;
     p.periph_addr = USART6_BASE + 0x04;
     if (is_tx) {
-      p.stream = 6;
+      /* USART6_TX uses the Stream7/Ch5 alternate mapping, NOT Stream6/Ch5: DMA2
+       * Stream6 is owned by the SDIO write-DMA (vendor/stm32/sdio/sdio.c), so
+       * sharing Stream6 makes the SDIO IRQ steal USART6_TX completions and wedges
+       * telemetry (e.g. dead after the first calibration/log SD write). Stream7 is
+       * conflict-free. Consumers attach their TX-complete callback to
+       * DMA2_Stream7_IRQn (see vayu src/comm/channel.c). */
+      p.stream = 7;
       p.channel = 5;
-      p.irq = DMA2_Stream6_IRQn;
+      p.irq = DMA2_Stream7_IRQn;
     } else {
       p.stream = 1;
       p.channel = 5;

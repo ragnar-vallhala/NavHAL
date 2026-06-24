@@ -39,7 +39,10 @@ static volatile uint8_t sd_busy = 0;
 static volatile uint8_t dma_done = 0;
 static volatile uint8_t sdio_done = 0;
 static volatile uint8_t is_multi_block = 0;
+static volatile uint8_t sd_last_was_write = 0; /* gate the post-op card-ready wait */
 static hal_sdio_error_t sd_last_error = HAL_SDIO_OK;
+static uint32_t sd_csd[4] = {0}; /* CSD cached during init (STANDBY window) */
+static uint8_t sd_csd_valid = 0;
 
 /* ------------------------------------------------------------- */
 /* INIT */
@@ -258,6 +261,18 @@ hal_sdio_error_t hal_sdio_card_init(void) {
   hal_sdio_send_command(SD_CMD_SEND_REL_ADDR, 0, 1);
   sd_rca = hal_sdio_get_response(1) & 0xFFFF0000;
 
+  /* Read the CSD NOW, while the card is in STANDBY (after CMD3, before the CMD7
+   * select moves it to TRANSFER). CMD9 (SEND_CSD) is only legal in STANDBY; issuing
+   * it after selection returns garbage, which is why hal_sdio_get_sector_count()
+   * reported 0 sectors (and f_mkfs aborted with FR_MKFS_ABORTED). Cache it here. */
+  if (hal_sdio_send_command(9, sd_rca, 3) == HAL_SDIO_OK) {
+    sd_csd[0] = SDIO->RESP1;
+    sd_csd[1] = SDIO->RESP2;
+    sd_csd[2] = SDIO->RESP3;
+    sd_csd[3] = SDIO->RESP4;
+    sd_csd_valid = 1;
+  }
+
   hal_sdio_send_command(SD_CMD_SELECT_DESELECT_CARD, sd_rca, 1);
   if (!card_is_sdhc)
     hal_sdio_send_command(SD_CMD_SET_BLOCKLEN, 512, 1);
@@ -436,20 +451,14 @@ hal_sdio_error_t hal_sdio_write_block(uint32_t addr, const uint8_t *buf) {
 }
 
 uint32_t hal_sdio_get_sector_count(void) {
-  uint32_t csd[4];
-
-  /* Send CMD9 (SEND_CSD) to get card capacity. Long response (R2) */
-  if (hal_sdio_send_command(9, sd_rca, 3) != HAL_SDIO_OK) {
+  /* Use the CSD cached at init (STANDBY window). Re-issuing CMD9 here would fail:
+   * the card is in TRANSFER state now and SEND_CSD is only legal in STANDBY. */
+  if (!sd_csd_valid) {
     return 0;
   }
+  const uint32_t *csd = sd_csd;
 
-  /* RESP1 contains bits [127:96], RESP2 [95:64], RESP3 [63:32], RESP4 [31:0]
-   */
-  csd[0] = SDIO->RESP1;
-  csd[1] = SDIO->RESP2;
-  csd[2] = SDIO->RESP3;
-  csd[3] = SDIO->RESP4;
-
+  /* RESP1 contains bits [127:96], RESP2 [95:64], RESP3 [63:32], RESP4 [31:0] */
   /* CSD Structure depends on CSD_STRUCTURE field [127:126] */
   uint8_t csd_struct = (csd[0] >> 30) & 0x3;
 
@@ -486,6 +495,7 @@ static void _sdio_dma_tx_irq_handler(void);
 hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buf) {
   if (sd_busy)
     return HAL_SDIO_BUSY;
+  sd_last_was_write = 0;
 
   if (!card_is_sdhc)
     addr *= 512;
@@ -520,27 +530,34 @@ hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buf) {
 
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512;
+
+  /* Arm the completion rendezvous + SDIO IRQs BEFORE the trigger. The DMA
+   * stream IRQ is already enabled, so once hal_dma_start()/the command runs a
+   * completion can fire immediately; if dma_done/sdio_done/sd_busy were set
+   * afterwards, that early IRQ is erased and sd_busy stays 1 forever. */
+  dma_done = 0;
+  sdio_done = 0;
+  is_multi_block = 0;
+  sd_last_error = HAL_SDIO_OK;
+  sd_busy = 1;
+  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
+                SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
+                SDIO_MASK_RXOVERRIE | SDIO_MASK_STBITERRIE;
+
   SDIO->DCTRL = (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DTDIR |
                 SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
 
   hal_dma_start((const hal_dma_config_t *)&dma2_stream3_cfg);
 
   if (hal_sdio_send_command(SD_CMD_READ_SINGLE_BLOCK, addr, 1)) {
+    SDIO->MASK &= ~(SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
+                    SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
+                    SDIO_MASK_RXOVERRIE | SDIO_MASK_STBITERRIE);
     SDIO->DCTRL = 0;
+    sd_busy = 0;
     hal_dma_stop((const hal_dma_config_t *)&dma2_stream3_cfg);
     return HAL_SDIO_ERROR;
   }
-
-  sd_busy = 1;
-  dma_done = 0;
-  sdio_done = 0;
-  is_multi_block = 0;
-  sd_last_error = HAL_SDIO_OK;
-
-  /* Enable SDIO interrupts: DATAEND, DBCKEND, and error flags */
-  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
-                SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
-                SDIO_MASK_RXOVERRIE;
 
   return HAL_SDIO_PENDING;
 }
@@ -548,6 +565,7 @@ hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buf) {
 hal_sdio_error_t hal_sdio_write_block_async(uint32_t addr, const uint8_t *buf) {
   if (sd_busy)
     return HAL_SDIO_BUSY;
+  sd_last_was_write = 1;
 
   if (!card_is_sdhc)
     addr *= 512;
@@ -582,31 +600,40 @@ hal_sdio_error_t hal_sdio_write_block_async(uint32_t addr, const uint8_t *buf) {
 
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512;
+
+  /* Arm rendezvous + IRQs BEFORE the trigger (see read_block_async). is_multi_block
+   * MUST be reset here too, else a stale 1 from a prior errored multi-block op makes
+   * wait_sync send a spurious CMD12 STOP after this write and report ERROR. */
+  dma_done = 0;
+  sdio_done = 0;
+  is_multi_block = 0;
+  sd_last_error = HAL_SDIO_OK;
+  sd_busy = 1;
+  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
+                SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
+                SDIO_MASK_TXUNDERRIE;
+
+  /* ST single-block flow: DTEN before the command. */
   SDIO->DCTRL =
       (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
 
   if (hal_sdio_send_command(SD_CMD_WRITE_SINGLE_BLOCK, addr, 1)) {
+    SDIO->MASK &= ~(SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
+                    SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
+                    SDIO_MASK_TXUNDERRIE);
     SDIO->DCTRL = 0;
+    sd_busy = 0;
     hal_dma_stop((const hal_dma_config_t *)&dma2_stream6_cfg);
     return HAL_SDIO_ERROR;
   }
   hal_dma_start((const hal_dma_config_t *)&dma2_stream6_cfg);
-
-  sd_busy = 1;
-  dma_done = 0;
-  sdio_done = 0;
-  sd_last_error = HAL_SDIO_OK;
-
-  /* Enable SDIO interrupts: DATAEND, DBCKEND, and error flags */
-  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
-                SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
-                SDIO_MASK_TXUNDERRIE;
 
   return HAL_SDIO_PENDING;
 }
 
 hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
                                         uint32_t count) {
+  sd_last_was_write = 0;
   if (sd_busy)
     return HAL_SDIO_BUSY;
 
@@ -644,30 +671,42 @@ hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
   SDIO->DTIMER = 0xFFFFFFFF;
   SDIO->DLEN = 512 * count;
 
-  if (hal_sdio_send_command(SD_CMD_READ_MULT_BLOCK, addr, 1)) {
-    hal_dma_stop((const hal_dma_config_t *)&dma2_stream3_cfg);
-#ifdef _SDIO_BACKEND_DMA
-//    hal_uart_write_string(HAL_UART_2, "Read Multi CMD18 failed\r\n");
-#endif
-    return HAL_SDIO_ERROR;
-  }
+  /* Arm rendezvous + IRQs BEFORE the trigger (see read_block_async). STBITERRIE
+   * is included so a 4-bit-mode start-bit error is reported instead of stalling
+   * the DPSM in Idle with no DATAEND. */
+  dma_done = 0;
+  sdio_done = 0;
+  is_multi_block = 1;
+  sd_last_error = HAL_SDIO_OK;
+  sd_busy = 1;
+  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
+                SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
+                SDIO_MASK_RXOVERRIE | SDIO_MASK_STBITERRIE;
 
-  /* Enable DPSM AFTER command per spec */
+  /* READ: enable the DPSM (DTEN) and arm DMA BEFORE issuing CMD18, so the DPSM is
+   * parked in Wait_R ready to catch the card's start bit. The card streams the
+   * first block a few SDIO_CK cycles after its CMD18 response; if DTEN is set
+   * AFTER the command (the old order) the DPSM is still in Idle and the start bit
+   * is missed -> CRC fail / lost data / no DATAEND (silent stall until the
+   * wait_sync timeout fires CMD12). RM0368 §21.3 DPSM: receive requires the data
+   * control register written (DTEN=1) so the DPSM is in Wait_R before data
+   * arrives. The single-block read path (read_block_async) already does this;
+   * the multi-block path was the lone exception and raced non-deterministically. */
   SDIO->DCTRL = (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DTDIR |
                 SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
 
   hal_dma_start((const hal_dma_config_t *)&dma2_stream3_cfg);
 
-  sd_busy = 1;
-  dma_done = 0;
-  sdio_done = 0;
-  is_multi_block = 1;
-  sd_last_error = HAL_SDIO_OK;
-
-  /* Enable SDIO interrupts: DATAEND, DBCKEND, and error flags */
-  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
-                SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
-                SDIO_MASK_RXOVERRIE;
+  if (hal_sdio_send_command(SD_CMD_READ_MULT_BLOCK, addr, 1)) {
+    SDIO->MASK &= ~(SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE |
+                    SDIO_MASK_DCRCFAILIE | SDIO_MASK_DTIMEOUTIE |
+                    SDIO_MASK_RXOVERRIE | SDIO_MASK_STBITERRIE);
+    SDIO->DCTRL = 0;
+    sd_busy = 0;
+    is_multi_block = 0;
+    hal_dma_stop((const hal_dma_config_t *)&dma2_stream3_cfg);
+    return HAL_SDIO_ERROR;
+  }
 
   return HAL_SDIO_PENDING;
 }
@@ -676,9 +715,16 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
                                          uint32_t count) {
   if (sd_busy)
     return HAL_SDIO_BUSY;
+  sd_last_was_write = 1;
 
   if (!card_is_sdhc)
     addr *= 512;
+
+  /* Wait for the card to be in TRANSFER state before issuing CMD25. Every other
+   * async entry does this; the multi-block write was the lone exception, so a
+   * CMD25 could collide with a card still PROGRAMMING from a previous write. */
+  if (sdio_wait_card_ready())
+    return HAL_SDIO_TIMEOUT;
 
   SDIO->ICR = 0xFFFFFFFF;
 
@@ -717,22 +763,24 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
     return HAL_SDIO_ERROR;
   }
 
+  /* Arm rendezvous + IRQs BEFORE the data-phase trigger (dma_start / DTEN), so a
+   * fast or preemption-delayed completion IRQ can't be erased (see
+   * read_block_async). CMD25 already succeeded above; the data phase has not
+   * started yet, so this is the correct window. */
+  dma_done = 0;
+  sdio_done = 0;
+  is_multi_block = 1;
+  sd_last_error = HAL_SDIO_OK;
+  sd_busy = 1;
+  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DCRCFAILIE |
+                SDIO_MASK_DTIMEOUTIE | SDIO_MASK_TXUNDERRIE;
+
   /* FIX: Start DMA FIRST so it pre-fills the SDIO FIFO */
   hal_dma_start((const hal_dma_config_t *)&dma2_stream6_cfg);
 
   /* FIX: Enable DPSM AFTER DMA is running to avoid TXUNDERRUN */
   SDIO->DCTRL =
       (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DMAEN | SDIO_DCTRL_DTEN;
-
-  sd_busy = 1;
-  dma_done = 0;
-  sdio_done = 0;
-  is_multi_block = 1;
-  sd_last_error = HAL_SDIO_OK;
-
-  /* Enable SDIO interrupts: DATAEND and error flags */
-  SDIO->MASK |= SDIO_MASK_DATAENDIE | SDIO_MASK_DCRCFAILIE |
-                SDIO_MASK_DTIMEOUTIE | SDIO_MASK_TXUNDERRIE;
 
   return HAL_SDIO_PENDING;
 }
@@ -745,6 +793,8 @@ void SDIO_IRQHandler(void) {
     err = HAL_SDIO_CRC_FAIL;
   else if (sta & SDIO_STA_DTIMEOUT)
     err = HAL_SDIO_TIMEOUT;
+  else if (sta & SDIO_STA_STBITERR)
+    err = HAL_SDIO_ERROR; /* start-bit error: DPSM missed the data start bit */
   else if (sta & SDIO_STA_RXOVERR)
     err = HAL_SDIO_RX_OVERRUN;
   else if (sta & SDIO_STA_TXUNDERR)
@@ -754,8 +804,17 @@ void SDIO_IRQHandler(void) {
   if (err != HAL_SDIO_OK || (sta & SDIO_STA_DATAEND)) {
     SDIO->MASK &=
         ~(SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE | SDIO_MASK_DCRCFAILIE |
-          SDIO_MASK_DTIMEOUTIE | SDIO_MASK_RXOVERRIE | SDIO_MASK_TXUNDERRIE);
-    SDIO->ICR = 0xFFFFFFFF;
+          SDIO_MASK_DTIMEOUTIE | SDIO_MASK_RXOVERRIE | SDIO_MASK_TXUNDERRIE |
+          SDIO_MASK_STBITERRIE);
+    /* Clear ONLY the data-path flags — NOT the command flags. A single-block
+     * read's data phase can finish (DATAEND) while the synchronous CMD17
+     * send_command() poll, preempted by the RTOS, has not yet observed CMDREND.
+     * A blanket ICR=0xFFFFFFFF here wiped CMDREND out from under that poll → the
+     * poll exhausted its budget and returned a FALSE HAL_SDIO_TIMEOUT (STA read
+     * back as 0x0) → disk_read RES_ERROR → FR_DISK_ERR → the FIL latched the
+     * error and the download stalled. Leaving CMDREND set lets the poll succeed
+     * whenever it resumes; the next command's ICR=0xFFFFFFFF clears it. */
+    SDIO->ICR = SDIO_ICR_DATA_FLAGS;
     SDIO->DCTRL = 0;
     sd_last_error = err;
     sdio_done = 1;
@@ -810,25 +869,69 @@ hal_sdio_error_t hal_sdio_wait_sync(hal_sdio_error_t result) {
     __asm volatile("nop");
   }
 
-  if (hal_timebase_get_millis() - start >= timeout_ms) {
+  /* Decide "did the transfer wedge?" by the COMPLETION FLAG (sd_busy), NOT by
+   * wall-clock elapsed time. The SDIO/DMA completion is IRQ-driven and clears
+   * sd_busy regardless of which task is running; under a preemptive RTOS the
+   * caller (FS task) can be descheduled mid-wait for longer than timeout_ms while
+   * the op completes perfectly in the background. Keying the "timeout" off elapsed
+   * wall-clock then force-aborts a transfer that already SUCCEEDED — returning a
+   * spurious HAL_SDIO_TIMEOUT that truncates uploads / corrupts downloads. This is
+   * exactly why the bug vanished bare-metal / single-task (no preemption -> elapsed
+   * ~= real op time) but struck under the FC's scheduler. The while-loop only
+   * breaks with sd_busy still set (a genuine hang); a normal completion exits with
+   * sd_busy == 0, so `if (sd_busy)` is the correct wedged-transfer discriminator. */
+  if (sd_busy) {
+    /* The transfer wedged (a DMA/SDIO completion IRQ never arrived). Force the
+     * driver back to a clean idle state, otherwise sd_busy stays 1 forever and
+     * EVERY subsequent op returns HAL_SDIO_BUSY — the file silently freezes at
+     * the current offset. Tear down the DPSM, stop any open multi-block stream,
+     * and clear the rendezvous flags so the next request starts fresh. */
+    SDIO->MASK &=
+        ~(SDIO_MASK_DATAENDIE | SDIO_MASK_DBCKENDIE | SDIO_MASK_DCRCFAILIE |
+          SDIO_MASK_DTIMEOUTIE | SDIO_MASK_RXOVERRIE | SDIO_MASK_TXUNDERRIE |
+          SDIO_MASK_STBITERRIE);
+    SDIO->ICR = 0xFFFFFFFF;
+    SDIO->DCTRL = 0;
+    if (is_multi_block)
+      hal_sdio_send_command(SD_CMD_STOP_TRANSMISSION, sd_rca, 1);
+    is_multi_block = 0;
+    dma_done = 0;
+    sdio_done = 0;
+    sd_busy = 0;
+    sd_last_error = HAL_SDIO_TIMEOUT;
     return HAL_SDIO_TIMEOUT;
   }
 
-  if (sd_last_error == HAL_SDIO_OK && is_multi_block) {
-    if (hal_sdio_send_command(SD_CMD_STOP_TRANSMISSION, sd_rca, 1) != HAL_SDIO_OK) {
-      return HAL_SDIO_ERROR;
+  if (sd_last_error == HAL_SDIO_OK) {
+    /* Multi-block transfers need an explicit STOP (CMD12) first. */
+    if (is_multi_block) {
+      if (hal_sdio_send_command(SD_CMD_STOP_TRANSMISSION, sd_rca, 1) != HAL_SDIO_OK) {
+        return HAL_SDIO_ERROR;
+      }
+      is_multi_block = 0;
     }
 
-    uint32_t start = hal_timebase_get_millis();
-    while (sdio_wait_card_ready() != HAL_SDIO_OK) {
-      if ((uint32_t)(hal_timebase_get_millis() - start) >= 500) {
-        return HAL_SDIO_TIMEOUT;
+    /* After a WRITE, wait for the card to leave PROGRAMMING/busy and return to
+     * TRANSFER before the next SDIO op — REQUIRED for single-block writes too, not
+     * just multi-block. A single-block write's DATAEND fires when the block
+     * reaches the card, but the card then holds D0 low while it programs flash;
+     * issuing the next command in that window collides and corrupts the FAT under
+     * sustained writes (e.g. a file upload — low-rate logging to preallocated
+     * files had idle gaps that hid this). Writes only: a read needs no programming
+     * wait, and an extra CMD13 there disrupts the read flow. */
+    if (sd_last_was_write) {
+      uint32_t cr_start = hal_timebase_get_millis();
+      while (sdio_wait_card_ready() != HAL_SDIO_OK) {
+        if ((uint32_t)(hal_timebase_get_millis() - cr_start) >= 500) {
+          return HAL_SDIO_TIMEOUT;
+        }
       }
     }
-
-    is_multi_block = 0;
   }
 
+  /* Always clear: if the transfer errored, the OK-guarded block above was
+   * skipped, so a stuck is_multi_block=1 would poison the next single-block op. */
+  is_multi_block = 0;
   return sd_last_error;
 }
 #endif

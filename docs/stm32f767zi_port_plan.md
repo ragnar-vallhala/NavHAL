@@ -73,7 +73,7 @@ they diverge, the driver needs a family-conditional path.
 |---|---|---|
 | **GPIO** | Identical IP; same base `0x40020000`. F7 exposes contiguous ports A–G (+H), F401 jumps PE→PH. | Reuse `gpio.c`. F7 `gpio_reg.h` uses contiguous `n>>4` port indexing and lists all bases. ✅ done |
 | **CLOCK / RCC** | Same `CR`/`PLLCFGR`/`CFGR` layout and base `0x40023800`. F7 adds over-drive (`PWR_CR1` ODEN/ODSWEN) + VOS scaling for >180 MHz, frequency-scaled flash wait states, and APB bus limits (APB1 ≤54, APB2 ≤108 MHz). | Implemented in `src/vendor/stm32/clock/clock_f7.c` (family-selected): VOS Scale 1, over-drive >180 MHz, WS by HCLK, ART+prefetch, bus-limit prescalers. Verified at **216 MHz** on hardware. ✅ done |
-| **FLASH** | Base `0x40023C00`, same `ACR`/`KEYR`/`CR`/`SR`. Wait-state count and **sector map differ** (F767: 32 KB×4, 128 KB×1, 256 KB×3 = 2 MB single bank). ART accelerator + prefetch. | F7 `flash_reg.h` carries the F767 sector map. `flash.c` reuse pending sector-map verification. ⏳ follow-up |
+| **FLASH** | Base `0x40023C00`, same `ACR`/`KEYR`/`CR`/`SR`; 5-bit `SNB`. **Sector map differs** (F767: 32 KB×4, 128 KB×1, 256 KB×7 = 2 MB single bank, 12 sectors). | F7 `flash_reg.h` carries the real F767 sector map (KV store on sectors 6/7); shared `flash.c` reused. Bring-up surfaced two real-hardware bugs in `flash.c` (M7 write-buffer needs a `DSB`; missing NULL guard faulted on M7) — both fixed. `test_flash_raw` (6) passes. ✅ done |
 | **USART** | **Major divergence.** F4 uses `SR`/`DR`; F7 uses the modern IP: `ISR` (RO) / `ICR` / `RDR` / `TDR`, plus `BRR` oversampling differences. `uart.c` writes `usart->SR`/`->DR` directly. | Implemented as a separate `src/vendor/stm32/uart/uart_f7.c`, selected by the vendor CMakeLists when `CONFIG_FAMILY_STM32F7` (frozen F4 `uart.c` untouched). Polling TX/RX verified on USART3. DMA backend still pending (F7-5). ✅ done (polling) |
 | **TIMER** | General-purpose timers (TIM2–5, TIM1/9/10/11) identical layout and bases. | Reuse `timer.c` with F7 `timer_reg.h` (copy of F4). ✅ done |
 | **INTERRUPT / NVIC** | Core peripheral, identical. F7 has more IRQ lines; vector table grows. | Reuse arch `interrupt.c` + `startup.s`. ✅ |
@@ -182,9 +182,9 @@ build and run for cortex-m7:
    F4 `PE→PH` skip (`test_gpio_get_port_number_skips_to_h` encodes the M4
    behaviour and is M4-specific).
 5. **Portable + cap tiers** — ✅ run unchanged on F767 (HAL black-box, self-gate
-   on `NAVHAL_HAS_*`). The raw-flash suite is held off on M7 (gated
-   `!NAVTEST_ARCH_CORTEX_M7`) because `flash_reg.h` still has the F4 placeholder
-   sector map — it would erase the wrong physical sector (re-enable with F7-4).
+   on `NAVHAL_HAS_*`). The raw-flash suite is now **re-enabled** on M7 (F7-4
+   corrected the sector map and fixed two `flash.c` hardware bugs) and passes
+   (6/6).
 6. **PIL / CI** — ⏳
    - `tools/pil/boards/nucleo_f767zi.conf` (mirror `nucleo_f401re.conf`),
    - a Renode platform / `.resc` for F767 (mirror `tools/renode/navhal_f401re.resc`),
@@ -198,7 +198,7 @@ build and run for cortex-m7:
 | F7-1 | Build wiring + GPIO/CLOCK/TIMER/INTERRUPT + flashable blink on HSI | **done** |
 | F7-2 | UART (USART3 console) — `uart_f7.c` for the F7 ISR/RDR/TDR IP; polling TX/RX verified on hardware | **done** |
 | F7-3 | High-frequency clock — PWR over-drive + VOS + flash wait-states + APB limits, in `clock_f7.c`; verified at 216 MHz on hardware | **done** |
-| F7-4 | FLASH driver — verify F767 sector map, adapt `flash.c` | follow |
+| F7-4 | FLASH — real F767 sector map in `flash_reg.h`; fixed two `flash.c` bugs found on hardware (DSB after program, NULL guard); flash test re-enabled and passing (36/36) | **done** |
 | F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT — all verified on hardware (56-test run). No new code needed: register-compatible with M4 and the `fpv5-d16` flag landed in F7-1. D-cache stays off (DMA coherent); enabling it + a DMA UART backend remain. | **done** (cache off) |
 | F7-6 | I2C (new timing-register IP), SPI, PWM, CRC, SDIO | follow |
 | F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness, on-target portable+conformance+cap tiers passing on hardware (30/0). **Remaining:** `tests/arch/cortex-m7/` white-box tier, PIL board profile (`tools/pil/boards/nucleo_f767zi.conf`) + Renode F767 platform, sample-matrix defconfig, CI jobs. See [Testing](#testing). | partial |
@@ -216,6 +216,11 @@ build and run for cortex-m7:
 - The **L1 D-cache is kept off**, which is what makes the verified DMA path
   coherent. Turning the D-cache on later (for performance) needs cache
   clean/invalidate around any DMA/peripheral-shared buffer.
-- `flash_reg.h` sector sizes/addresses are still the **F4 placeholder** map;
-  `flash.c`'s storage-sector selection must be re-reviewed against the F767's
-  256 KB sectors before `DRV_FLASH` is enabled (F7-4).
+- The flash KV store uses the two 256 KB sectors 6/7. They are far from code
+  (safe), but 256 KB is a coarse erase granularity for a small key/value store,
+  so compaction erases are slow (~seconds). A future tweak could move storage to
+  the 32 KB sectors when the application image is known to be small.
+- `flash.c` now issues a `DSB` after each program store (required on Cortex-M7;
+  harmless on M4) and NULL-guards `hal_flash_read`. Both were latent bugs that
+  only manifested on real M7 silicon — worth knowing if porting the driver
+  elsewhere.

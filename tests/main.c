@@ -81,13 +81,7 @@ static const navtest_suite_t *const all_suites[] = {
 #if NAVHAL_HAS_FPU
     &test_fpu_suite,
 #endif
-    /* The raw-flash suite erases/programs the storage sector via the family
-     * flash_reg.h sector map. On STM32F7 that map is still the F4 placeholder
-     * (port plan F7-4), so the suite would target the wrong physical sector —
-     * skip it until the F767 sector map is corrected. */
-#if !defined(NAVTEST_ARCH_CORTEX_M7)
     &test_flash_suite,
-#endif
 #if NAVHAL_HAS_SDIO
     &test_sdio_suite,
 #endif

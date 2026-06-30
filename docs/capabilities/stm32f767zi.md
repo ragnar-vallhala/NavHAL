@@ -37,7 +37,7 @@ by adding a board layer.
 | I2C               | ✗ | (pending)                                 | F7 uses the timing-register I2C IP (like F0/L4); needs a new driver path. |
 | SPI               | ✗ | (pending)                                 | Register-compatible with F4; bring-up after UART. |
 | PWM               | ✗ | (pending)                                 | Depends on the shared timer driver; enable after timer validation. |
-| FLASH             | ✗ | (pending)                                 | F7 sector map differs (32 KB×4, 128 KB×1, 256 KB×3 single 2 MB bank); `flash_reg.h` carries a placeholder F4 map. |
+| FLASH             | ✓ | `src/vendor/stm32/flash/flash.c`        | Key/value store on sectors 6/7 (256 KB each) of the real F767 12-sector 2 MB map. Opt-in via `CONFIG_DRV_FLASH`; `test_flash_raw` (6) passes on hardware. Bring-up fixed two `flash.c` bugs (M7 write-buffer `DSB`; NULL guard). |
 | CRC_HW            | ✗ | (pending)                                 | F7 CRC unit present; driver not validated. |
 | CYCLE_COUNTER     | ✓ | `src/arch/armv7e-m/dwt/dwt.c`            | DWT-backed; shared ARMv7E-M arch code. Opt-in via `CONFIG_DRV_DWT`; `test_dwt` (6) passes on hardware. |
 | FPU               | ✓ | `src/arch/armv7e-m/fpu/fpu.c`            | Hardware **double-precision** FPU (`-mfpu=fpv5-d16`, hard float) via `CONFIG_USE_FPU` + `CONFIG_DRV_FPU`. `test_fpu_accel` (3) passes on hardware. |
@@ -62,7 +62,8 @@ NAVHAL_HAS_UART          1   (uart_f7.c — polling; DMA backend off)
 NAVHAL_HAS_DMA           0   (opt-in via CONFIG_DRV_DMA — verified working)
 NAVHAL_HAS_FPU           0   (opt-in via CONFIG_USE_FPU+DRV_FPU — verified working)
 NAVHAL_HAS_CYCLE_COUNTER 0   (opt-in via CONFIG_DRV_DWT — verified working)
-NAVHAL_HAS_I2C/SPI/PWM/FLASH/CRC_HW/SDIO  0
+NAVHAL_HAS_FLASH         0   (opt-in via CONFIG_DRV_FLASH — verified working)
+NAVHAL_HAS_I2C/SPI/PWM/CRC_HW/SDIO  0
 ```
 
 DMA / FPU / DWT are off in the *default* config (opt-in), but all three are
@@ -87,6 +88,10 @@ implemented and pass their on-target test suites — see the bring-up record.
 * Test ELF rebuilt with `CONFIG_USE_FPU` + `DRV_FPU` + `DRV_DWT` + `DRV_DMA`
   (hard-float `fpv5-d16`); on-target run reported **56 tests, 0 failures** —
   adds DMA (17), CYCLE_COUNTER/DWT (6) and FPU (3) to the 30 above.
+* Flash KV store (F7-4): after correcting the sector map and fixing the M7
+  write-buffer `DSB` + NULL-guard bugs, the `test_flash_raw` suite (6) passes —
+  a clean-boot run reports **36 tests, 0 failures**. A probe confirmed
+  erase→save→read round-trips real data on sector 6 (0x08080000).
 
 ## Caveats and known limitations
 

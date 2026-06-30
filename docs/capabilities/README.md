@@ -28,7 +28,7 @@ What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro def
 | PWM               | `PWM`                  | ✓ | ✓ | ✗ |
 | Clock subsystem   | `CLOCK`                | ✓ | ◐ | ✓ |
 | Interrupt ctrl    | `INTERRUPT`            | ✓ | ✓ | ✓ |
-| Flash             | `FLASH`                | ✓ | ◐ | ✗ |
+| Flash             | `FLASH`                | ✓ | ◐ | ✓ |
 | Hardware CRC      | `CRC_HW`               | ✓ | s/w | ✗ |
 | Cycle counter     | `CYCLE_COUNTER`        | ✓ | — | ✓ |
 | FPU               | `FPU`                  | ✓ | — | ✓ |

@@ -32,6 +32,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* Data synchronization barrier — flush the Cortex-M7 write buffer so a flash
+ * store reaches the controller before BSY is polled. Portable to the host
+ * driver test build (where there is no flash controller to order against). */
+#if defined(__arm__) || defined(__thumb__)
+#define NAVHAL_FLASH_DSB() __asm volatile("dsb 0xF" ::: "memory")
+#else
+#define NAVHAL_FLASH_DSB() __atomic_signal_fence(__ATOMIC_SEQ_CST)
+#endif
+
 /* ---- Internal low-level flash primitives -------------------------------- */
 
 static void _flash_wait_(void) {
@@ -72,7 +81,7 @@ static NAVHAL_UNUSED void _flash_program_word_(uint32_t addr, uint32_t data) {
    * returns immediately, and PG is cleared before the write commits — the
    * write is silently lost. A DSB forces the store to reach the flash
    * controller first. Harmless on Cortex-M4. */
-  __asm volatile("dsb 0xF" ::: "memory");
+  NAVHAL_FLASH_DSB();
 
   _flash_wait_();
   FLASH_CR &= ~FLASH_CR_PG;
@@ -89,7 +98,7 @@ static void _flash_program_half_word_(uint32_t addr, uint16_t data) {
   *(volatile uint16_t *)addr = data;
   /* Flush the Cortex-M7 write buffer before polling BSY (see the word-program
    * variant above for why this is required). Harmless on Cortex-M4. */
-  __asm volatile("dsb 0xF" ::: "memory");
+  NAVHAL_FLASH_DSB();
 
   _flash_wait_();
   FLASH_CR &= ~FLASH_CR_PG;

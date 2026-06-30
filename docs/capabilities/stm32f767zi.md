@@ -1,21 +1,25 @@
-@page cap_stm32f767ze Nucleo-F767ZI (STM32F7)
+@page cap_stm32f767zi STM32F767ZI (Cortex-M7)
 
-# Nucleo-F767ZI (STM32F7 / Cortex-M7)
+# STM32F767ZI (STM32F7 / Cortex-M7)
 
 The third NavHAL port, in **initial bring-up**. The build system, GPIO, clock,
 timer and interrupt layers are implemented and verified on real hardware (a
-flashed `hal_blink` toggles LD1). The remaining peripherals are scoped
+flashed `hal_blink` toggles the LED). The remaining peripherals are scoped
 follow-ups — see [`../stm32f767zi_port_plan.md`](../stm32f767zi_port_plan.md).
+The reference board used for bring-up is the ST Nucleo-F767ZI, but the port
+targets the STM32F767ZI MCU; other boards built on the same MCU are supported
+by adding a board layer.
 
 ## Target identity
 
 | | |
 |---|---|
+| MCU                             | `STM32F767ZI` (2 MB flash, 512 KB SRAM) |
 | Arch (`NAVHAL_TARGET_ARCH`)     | `cortex-m7` |
 | ISA layer (`ARCH_ISA`)          | `armv7e-m` (shared with Cortex-M4) |
 | Vendor (`NAVHAL_TARGET_VENDOR`) | `stm32` |
 | Family (`NAVHAL_TARGET_FAMILY`) | `stm32f7` |
-| Board (`NAVHAL_TARGET_BOARD`)   | `nucleo_f767zi` |
+| Reference board (`NAVHAL_TARGET_BOARD`) | `nucleo_f767zi` |
 | Toolchain                       | `arm-none-eabi-` (`gcc-arm-none-eabi`) |
 | Defconfig                       | [`cmake/defconfigs/cortex-m7_stm32f7_nucleo_f767zi.defconfig`](../../cmake/defconfigs/cortex-m7_stm32f7_nucleo_f767zi.defconfig) |
 | Toolchain file                  | [`cmake/toolchains/arm-none-eabi-f767-toolchain.cmake`](../../cmake/toolchains/arm-none-eabi-f767-toolchain.cmake) |

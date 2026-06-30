@@ -4,7 +4,7 @@
 
 What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro definitions and the contract semantics live in [`../api_standardization.md`](../api_standardization.md); this directory only tracks per-target availability and implementation status.
 
-**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_atmega328p &nbsp;·&nbsp; @subpage cap_stm32f767ze
+**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_atmega328p &nbsp;·&nbsp; @subpage cap_stm32f767zi
 
 ## Symbol legend
 
@@ -18,7 +18,7 @@ What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro def
 
 ## Matrix
 
-| Capability        | `NAVHAL_HAS_*`        | [STM32F401RE](stm32f401re.md) | [ATmega328P](atmega328p.md) | [Nucleo-F767ZI](stm32f767zi.md) |
+| Capability        | `NAVHAL_HAS_*`        | [STM32F401RE](stm32f401re.md) | [ATmega328P](atmega328p.md) | [STM32F767ZI](stm32f767zi.md) |
 |---|---|---|---|---|
 | GPIO              | `GPIO`                 | ✓ | ✓ | ✓ |
 | UART              | `UART`                 | ✓ | ✓ | ◐ |

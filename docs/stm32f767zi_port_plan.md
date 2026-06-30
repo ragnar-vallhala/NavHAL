@@ -1,4 +1,4 @@
-# STM32F767ZI Port Plan (Nucleo-F767ZI)
+# STM32F767ZI Port Plan
 
 > Status: **in progress** — build wiring + GPIO/CLOCK/TIMER/INTERRUPT bring-up
 > landed; UART / FLASH / hardware-FPU / DMA / high-frequency clock are scoped
@@ -6,7 +6,8 @@
 
 ## Goal
 
-Add a third implemented NavHAL port: **ARM Cortex-M7 / STM32F7 / Nucleo-F767ZI**,
+Add a third implemented NavHAL port: **ARM Cortex-M7 / STM32F7 / STM32F767ZI**
+(reference board: ST Nucleo-F767ZI),
 alongside the existing Cortex-M4 / STM32F4 / Nucleo-F401RE and AVR / ATmega328P
 ports. The port is purely additive — it drops fragment files into `src/arch`,
 `src/vendor`, `src/board`, `include/port`, `cmake/` per the M7 modular-build
@@ -81,7 +82,8 @@ they diverge, the driver needs a family-conditional path.
 
 ## What this lands now (basic bring-up)
 
-A flashable **`01_hal_blink`** on the Nucleo-F767ZI driving LD1 (PB0), running on
+A flashable **`01_hal_blink`** on the STM32F767ZI driving the user LED (PB0, LD1
+on the Nucleo), running on
 the reset-default HSI (16 MHz, 0 flash wait-states), using:
 
 - `DRV_GPIO` → `src/vendor/stm32/gpio/gpio.c` + F7 `gpio_reg.h`
@@ -148,7 +150,7 @@ cmake --build build-f767 --target flash      # st-flash write to 0x08000000
   software CRC, GPIO pin encoding), so it confirms the port edits did not regress
   the shared HAL / `common` code.
 - **On-target suite passes on real F767 hardware** — the TEST ELF builds for
-  cortex-m7, flashes to the Nucleo-F767ZI, and reports over USART3 @9600:
+  cortex-m7, flashes to the STM32F767ZI, and reports over USART3 @9600:
   **30 tests, 0 failures** (conformance 15, timebase 8, CRC 7). The F4 white-box
   tier and the raw-flash suite are intentionally skipped (see below); the F4 TEST
   ELF still builds unchanged (no reference-target regression).

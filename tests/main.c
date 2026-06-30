@@ -63,6 +63,7 @@
 #include "arch/cortex-m7/test_uart_protocol.h"
 #include "arch/cortex-m7/test_pwm.h"
 #include "arch/cortex-m7/test_spi.h"
+#include "arch/cortex-m7/test_i2c.h"
 #endif
 
 static const navtest_suite_t *const all_suites[] = {
@@ -88,6 +89,7 @@ static const navtest_suite_t *const all_suites[] = {
     &test_uart_protocol_suite,
     &test_pwm_suite,
     &test_spi_suite,
+    &test_i2c_suite,
 #endif
     &test_conformance_suite,   /* portable HAL-contract assertions; runs
                                   on every arch (navtest PROGMEM keeps

@@ -52,7 +52,13 @@ if(CONFIG_DRV_PWM)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/pwm/pwm.c)
 endif()
 if(CONFIG_DRV_I2C)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c)
+    # F7 I²C is a different IP (TIMINGR / ISR-ICR / CR2-framed), so a full
+    # rewrite. Selected by family; the F4 legacy i2c.c stays untouched.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c)
+    endif()
 endif()
 if(CONFIG_DRV_SPI)
     # F7 SPI puts the frame size in CR2.DS (+ FRXTH for byte FIFO access), not

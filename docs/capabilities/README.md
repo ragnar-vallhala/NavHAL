@@ -22,7 +22,7 @@ What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro def
 |---|---|---|---|---|
 | GPIO              | `GPIO`                 | ✓ | ✓ | ✓ |
 | UART              | `UART`                 | ✓ | ✓ | ◐ |
-| I²C               | `I2C`                  | ✓ | ✓ | ✗ |
+| I²C               | `I2C`                  | ✓ | ✓ | ◐ |
 | SPI               | `SPI`                  | ✓ | ✓ | ◐ |
 | Timer             | `TIMER`                | ✓ | ✓ | ✓ |
 | PWM               | `PWM`                  | ✓ | ✓ | ✓ |

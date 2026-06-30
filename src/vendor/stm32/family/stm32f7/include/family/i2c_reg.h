@@ -17,138 +17,87 @@
 
 /**
  * @file family/i2c_reg.h
- * @brief Cortex-M4 I²C peripheral register definitions and bit masks.
+ * @brief STM32F7 I²C peripheral register map (RM0410 §33).
  *
  * @details
- * This header defines the memory-mapped structure of I²C registers
- * and related macros for accessing and configuring the I²C peripheral
- * on Cortex-M4 microcontrollers.
- *
- * Structures:
- * - `I2C_Reg_Typedef` : Represents the layout of I²C registers.
- *
- * Macros:
- * - Base addresses and port access macros.
- * - Control (CR1, CR2), status (SR1, SR2), clock (CCR, TRISE), and filter
- * (FLTR) bits.
- *
- * These definitions allow the HAL and driver code to manipulate
- * I²C hardware registers in a readable and maintainable way.
+ * The F7 I²C is the **modern** ST IP (shared with F0/F3/F7/L4), unrelated to
+ * the F4's legacy block. Timing comes from a single `TIMINGR` (not CCR/TRISE),
+ * status is a read-only `ISR` cleared via `ICR`, transfers are framed by
+ * `CR2` (SADD / NBYTES / RD_WRN / AUTOEND / START / STOP), and data uses split
+ * `RXDR` / `TXDR`. Consumed by `src/vendor/stm32/i2c/i2c_f7.c`.
  */
 
-#ifndef CORTEX_M4_I2C_REG_H
-#define CORTEX_M4_I2C_REG_H
+#ifndef CORTEX_M7_I2C_REG_H
+#define CORTEX_M7_I2C_REG_H
 
 #include "common/hal_types.h"
-#include "utils/types.h"
 #include <stdint.h>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-/**
- * @brief I²C peripheral register map.
- *
- * @details
- * Represents all the I²C registers used to control and monitor the peripheral.
- */
+
 typedef struct {
-  __IO uint32_t CR1;   /**< Control register 1 (0x00) */
-  __IO uint32_t CR2;   /**< Control register 2 (0x04) */
-  __IO uint32_t OAR1;  /**< Own address register 1 (0x08) */
-  __IO uint32_t OAR2;  /**< Own address register 2 (0x0C) */
-  __IO uint32_t DR;    /**< Data register (0x10) */
-  __IO uint32_t SR1;   /**< Status register 1 (0x14) */
-  __IO uint32_t SR2;   /**< Status register 2 (0x18) */
-  __IO uint32_t CCR;   /**< Clock control register (0x1C) */
-  __IO uint32_t TRISE; /**< TRISE register (0x20) */
-  __IO uint32_t FLTR;  /**< Filter register (0x24) */
+  __IO uint32_t CR1;      /**< 0x00 Control register 1 */
+  __IO uint32_t CR2;      /**< 0x04 Control register 2 */
+  __IO uint32_t OAR1;     /**< 0x08 Own address 1 */
+  __IO uint32_t OAR2;     /**< 0x0C Own address 2 */
+  __IO uint32_t TIMINGR;  /**< 0x10 Timing register */
+  __IO uint32_t TIMEOUTR; /**< 0x14 Timeout register */
+  __IO uint32_t ISR;      /**< 0x18 Interrupt and status (read-only flags) */
+  __IO uint32_t ICR;      /**< 0x1C Interrupt clear */
+  __IO uint32_t PECR;     /**< 0x20 PEC register */
+  __IO uint32_t RXDR;     /**< 0x24 Receive data */
+  __IO uint32_t TXDR;     /**< 0x28 Transmit data */
 } I2C_Reg_Typedef;
 
-/** Base address for I²C peripheral */
-#define I2C_BASE_ADDR 0x40005400 /**< I²C base address */
+/* I²C1 0x40005400, I²C2 0x40005800, I²C3 0x40005C00 (same bases as F4). */
+#define I2C_BASE_ADDR 0x40005400UL
+#define I2C_GET_BASE(n) ((I2C_Reg_Typedef *)(I2C_BASE_ADDR + (0x400UL * (n))))
+/* APB1ENR: I2C1EN bit21, I2C2EN bit22, I2C3EN bit23. */
+#define I2C_APB1ENR_MASK(n) (1U << (21 + (n)))
 
-/** Get pointer to I²C peripheral instance */
-#define I2C_GET_BASE(n) ((I2C_Reg_Typedef *)(I2C_BASE_ADDR + (0x400 * n)))
+/* CR1 */
+#define I2C_CR1_PE (1U << 0)
 
-/** Enable mask for APB1 peripheral clock */
-#define I2C_APB1ENR_MASK(n) (1 << (21 + n))
+/* CR2 */
+#define I2C_CR2_SADD_Pos 0
+#define I2C_CR2_RD_WRN (1U << 10) /**< 1 = read transfer */
+#define I2C_CR2_START (1U << 13)
+#define I2C_CR2_STOP (1U << 14)
+#define I2C_CR2_NBYTES_Pos 16
+#define I2C_CR2_NBYTES_Msk (0xFFU << I2C_CR2_NBYTES_Pos)
+#define I2C_CR2_AUTOEND (1U << 25)
+/** @brief Build CR2 for a 7-bit-address transfer of @p n bytes. */
+#define I2C_CR2_SADD7(addr) (((uint32_t)(addr) << 1) & 0xFEU)
+#define I2C_CR2_NBYTES(n) (((uint32_t)(n) << I2C_CR2_NBYTES_Pos) & I2C_CR2_NBYTES_Msk)
 
-/** CR1 register bit positions and masks */
-#define I2C_CR1_PE_Pos 0
-#define I2C_CR1_PE_MASK (1U << I2C_CR1_PE_Pos)
-#define I2C_CR1_START_Pos 8
-#define I2C_CR1_START_MASK (1U << I2C_CR1_START_Pos)
-#define I2C_CR1_STOP_Pos 9
-#define I2C_CR1_STOP_MASK (1U << I2C_CR1_STOP_Pos)
-#define I2C_CR1_ACK_Pos 10
-#define I2C_CR1_ACK_MASK (1U << I2C_CR1_ACK_Pos)
-#define I2C_CR1_POS_Pos 11
-#define I2C_CR1_POS_MASK (1U << I2C_CR1_POS_Pos)
-#define I2C_CR1_SWRST_Pos 15
-#define I2C_CR1_SWRST_MASK (1U << I2C_CR1_SWRST_Pos)
+/* ISR (read-only status) */
+#define I2C_ISR_TXE (1U << 0)
+#define I2C_ISR_TXIS (1U << 1)
+#define I2C_ISR_RXNE (1U << 2)
+#define I2C_ISR_ADDR (1U << 3)
+#define I2C_ISR_NACKF (1U << 4)
+#define I2C_ISR_STOPF (1U << 5)
+#define I2C_ISR_TC (1U << 6)
+#define I2C_ISR_TCR (1U << 7)
+#define I2C_ISR_BERR (1U << 8)
+#define I2C_ISR_ARLO (1U << 9)
+#define I2C_ISR_BUSY (1U << 15)
 
-/** CR2 register bit positions and masks */
-#define I2C_CR2_FREQ_Pos 0
-#define I2C_CR2_FREQ_MASK (0x3FU << I2C_CR2_FREQ_Pos)
-#define I2C_CR2_ITERREN_Pos 8
-#define I2C_CR2_ITERREN (1U << I2C_CR2_ITERREN_Pos)
-#define I2C_CR2_ITEVTEN_Pos 9
-#define I2C_CR2_ITEVTEN (1U << I2C_CR2_ITEVTEN_Pos)
-#define I2C_CR2_ITBUFEN_Pos 10
-#define I2C_CR2_ITBUFEN (1U << I2C_CR2_ITBUFEN_Pos)
-#define I2C_CR2_DMAEN_Pos 11
-#define I2C_CR2_DMAEN (1U << I2C_CR2_DMAEN_Pos)
-#define I2C_CR2_LAST_Pos 12
-#define I2C_CR2_LAST (1U << I2C_CR2_LAST_Pos)
+/* ICR (write 1 to clear) */
+#define I2C_ICR_NACKCF (1U << 4)
+#define I2C_ICR_STOPCF (1U << 5)
 
-/** SR1 register bit positions and masks */
-#define I2C_SR1_SB_Pos 0
-#define I2C_SR1_SB_MASK (1U << I2C_SR1_SB_Pos)
-#define I2C_SR1_ADDR_Pos 1
-#define I2C_SR1_ADDR_MASK (1U << I2C_SR1_ADDR_Pos)
-#define I2C_SR1_BTF_Pos 2
-#define I2C_SR1_BTF_MASK (1U << I2C_SR1_BTF_Pos)
-#define I2C_SR1_STOPF_Pos 4
-#define I2C_SR1_STOPF (1U << I2C_SR1_STOPF_Pos)
-#define I2C_SR1_RXNE_Pos 6
-#define I2C_SR1_RXNE_MASK (1U << I2C_SR1_RXNE_Pos)
-#define I2C_SR1_TXE_Pos 7
-#define I2C_SR1_TXE_MASK (1U << I2C_SR1_TXE_Pos)
-#define I2C_SR1_BERR_Pos 8
-#define I2C_SR1_BERR (1U << I2C_SR1_BERR_Pos)
-#define I2C_SR1_ARLO_Pos 9
-#define I2C_SR1_ARLO (1U << I2C_SR1_ARLO_Pos)
-#define I2C_SR1_AF_Pos 10
-#define I2C_SR1_AF (1U << I2C_SR1_AF_Pos)
-#define I2C_SR1_OVR_Pos 11
-#define I2C_SR1_OVR (1U << I2C_SR1_OVR_Pos)
-#define I2C_SR1_TIMEOUT_Pos 14
-#define I2C_SR1_TIMEOUT (1U << I2C_SR1_TIMEOUT_Pos)
-
-/** SR2 register bit positions */
-#define I2C_SR2_MSL_Pos 0
-#define I2C_SR2_MSL (1U << I2C_SR2_MSL_Pos)
-#define I2C_SR2_BUSY_Pos 1
-#define I2C_SR2_BUSY (1U << I2C_SR2_BUSY_Pos)
-#define I2C_SR2_TRA_Pos 2
-#define I2C_SR2_TRA (1U << I2C_SR2_TRA_Pos)
-
-/** CCR register bit positions and masks */
-#define I2C_CCR_CCR_Pos 0
-#define I2C_CCR_CCR_MASK (0xFFFU << I2C_CCR_CCR_Pos)
-#define I2C_CCR_DUTY_Pos 14
-#define I2C_CCR_DUTY (1U << I2C_CCR_DUTY_Pos)
-#define I2C_CCR_FS_Pos 15
-#define I2C_CCR_FS_MASK (1U << I2C_CCR_FS_Pos)
-
-/** TRISE register bit positions and masks */
-#define I2C_TRISE_TRISE_Pos 0
-#define I2C_TRISE_TRISE_Msk (0x3FU << I2C_TRISE_TRISE_Pos)
+/* TIMINGR presets for I2CCLK = 16 MHz (reset HSI / APB1 default on F767).
+ * From the ST reference timing tables. At other I²C clocks these must be
+ * recomputed (CubeMX / the RM algorithm); i2c_f7.c documents this limit. */
+#define I2C_TIMINGR_SM_16MHZ 0x00303D5BUL /**< 100 kHz standard mode */
+#define I2C_TIMINGR_FM_16MHZ 0x0010061AUL /**< 400 kHz fast mode */
 
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-#endif // CORTEX_M4_I2C_REG_H
+#endif // !CORTEX_M7_I2C_REG_H

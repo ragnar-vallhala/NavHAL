@@ -21,7 +21,7 @@ What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro def
 | Capability        | `NAVHAL_HAS_*`        | [STM32F401RE](stm32f401re.md) | [ATmega328P](atmega328p.md) | [Nucleo-F767ZI](stm32f767zi.md) |
 |---|---|---|---|---|
 | GPIO              | `GPIO`                 | ✓ | ✓ | ✓ |
-| UART              | `UART`                 | ✓ | ✓ | ✗ |
+| UART              | `UART`                 | ✓ | ✓ | ◐ |
 | I²C               | `I2C`                  | ✓ | ✓ | ✗ |
 | SPI               | `SPI`                  | ✓ | ✓ | ✗ |
 | Timer             | `TIMER`                | ✓ | ✓ | ✓ |

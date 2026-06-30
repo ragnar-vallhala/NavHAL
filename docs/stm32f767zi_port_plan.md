@@ -73,7 +73,7 @@ they diverge, the driver needs a family-conditional path.
 | **GPIO** | Identical IP; same base `0x40020000`. F7 exposes contiguous ports A–G (+H), F401 jumps PE→PH. | Reuse `gpio.c`. F7 `gpio_reg.h` uses contiguous `n>>4` port indexing and lists all bases. ✅ done |
 | **CLOCK / RCC** | Same `CR`/`PLLCFGR`/`CFGR` layout and base `0x40023800`. F7 adds over-drive (`PWR_CR1` ODEN/ODSWEN) + VOS scaling for >180 MHz, and PLLSAI/DCKCFGR. | Reuse `clock.c` for HSI/HSE/PLL up to ~180 MHz. Over-drive to reach 216 MHz is a follow-up. ✅ basic |
 | **FLASH** | Base `0x40023C00`, same `ACR`/`KEYR`/`CR`/`SR`. Wait-state count and **sector map differ** (F767: 32 KB×4, 128 KB×1, 256 KB×3 = 2 MB single bank). ART accelerator + prefetch. | F7 `flash_reg.h` carries the F767 sector map. `flash.c` reuse pending sector-map verification. ⏳ follow-up |
-| **USART** | **Major divergence.** F4 uses `SR`/`DR`; F7 uses the modern IP: `ISR` (RO) / `ICR` / `RDR` / `TDR`, plus `BRR` oversampling differences. `uart.c` writes `usart->SR`/`->DR` directly. | Needs a family-conditional path in `uart.c` (or a vtable split). **Deferred** — `DRV_UART=n` in the F767 defconfig until done. ⏳ follow-up |
+| **USART** | **Major divergence.** F4 uses `SR`/`DR`; F7 uses the modern IP: `ISR` (RO) / `ICR` / `RDR` / `TDR`, plus `BRR` oversampling differences. `uart.c` writes `usart->SR`/`->DR` directly. | Implemented as a separate `src/vendor/stm32/uart/uart_f7.c`, selected by the vendor CMakeLists when `CONFIG_FAMILY_STM32F7` (frozen F4 `uart.c` untouched). Polling TX/RX verified on USART3. DMA backend still pending (F7-5). ✅ done (polling) |
 | **TIMER** | General-purpose timers (TIM2–5, TIM1/9/10/11) identical layout and bases. | Reuse `timer.c` with F7 `timer_reg.h` (copy of F4). ✅ done |
 | **INTERRUPT / NVIC** | Core peripheral, identical. F7 has more IRQ lines; vector table grows. | Reuse arch `interrupt.c` + `startup.s`. ✅ |
 | **DMA** | F7 DMA controller is stream/channel-compatible with F4 but cache coherency matters on M7. | Reuse pending; gated off by default. ⏳ follow-up |
@@ -105,7 +105,10 @@ src/vendor/stm32/Kconfig.choice                  (VENDOR_STM32 visible on M7)
 src/vendor/stm32/family/stm32f4/Kconfig.choice   (gate to ARCH_CORTEX_M4)
 src/vendor/stm32/family/stm32f7/Kconfig          (FAMILY="stm32f7")
 src/vendor/stm32/family/stm32f7/Kconfig.choice   (FAMILY_STM32F7, M7-gated)
-src/vendor/stm32/family/stm32f7/include/family/*_reg.h  (F7 register maps)
+src/vendor/stm32/family/stm32f7/include/family/*_reg.h  (F7 register maps;
+                                            uart_reg.h is the real F7 USART model)
+src/vendor/stm32/uart/uart_f7.c            (F7 USART driver — ISR/RDR/TDR)
+src/vendor/stm32/CMakeLists.txt            (select uart_f7.c for FAMILY_STM32F7)
 
 src/board/nucleo_f767zi/Kconfig            (BOARD="nucleo_f767zi")
 src/board/nucleo_f767zi/Kconfig.choice     (BOARD_NUCLEO_F767ZI)
@@ -146,17 +149,18 @@ cmake --build build-f767 --target flash      # st-flash write to 0x08000000
   host-buildable code, so there is nothing new for this tier to cover yet.
 - **No on-target or PIL tests for F767 yet.**
 
-### Why on-target tests are blocked
+### On-target test prerequisite (UART) — now satisfied
 
 The on-target test ELF reports its pass/fail results **exclusively over
 `NAVTEST_UART`** (`tests/navtest_state.c` → `hal_uart_print`; `tests/main.c`
-screen-clear + result print). UART is disabled for this port until **F7-2**, so
-there is no results channel — a test build would run on-chip but emit nothing.
-**On-target testing is therefore gated on F7-2 (UART).**
+screen-clear + result print). This made on-target testing gated on **F7-2
+(UART)**, which is now **done** (`uart_f7.c`, polling TX/RX verified on USART3).
+The remaining work to actually run the suite on F767 is the test-build
+generalization below (items 2–4) plus the PIL/CI wiring (item 6).
 
 ### Changes required to enable on-target + PIL tests (milestone F7-7)
 
-1. **UART (F7-2)** — prerequisite; provides the `NAVTEST_UART` output path.
+1. **UART (F7-2)** — ✅ done; provides the `NAVTEST_UART` output path.
 2. **Processor-generic test linker** — `cmake/arch/armv7e-m.cmake` hardcodes
    `NAVHAL_TEST_LINKER_FLAGS` to `tests/arch/cortex-m4/linker.ld`. Parametrize it
    to `tests/arch/${CMAKE_SYSTEM_PROCESSOR}/linker.ld` and add
@@ -185,25 +189,24 @@ there is no results channel — a test build would run on-chip but emit nothing.
 
 | # | Scope | Status |
 |---|---|---|
-| F7-1 | Build wiring + GPIO/CLOCK/TIMER/INTERRUPT + flashable blink on HSI | **this PR** |
-| F7-2 | UART (USART3 console) — family-conditional `uart.c` for the F7 ISR/RDR/TDR IP | next |
+| F7-1 | Build wiring + GPIO/CLOCK/TIMER/INTERRUPT + flashable blink on HSI | **done** |
+| F7-2 | UART (USART3 console) — `uart_f7.c` for the F7 ISR/RDR/TDR IP; polling TX/RX verified on hardware | **done** |
 | F7-3 | High-frequency clock — PWR over-drive + VOS + correct flash wait-states (up to 216 MHz) | next |
 | F7-4 | FLASH driver — verify F767 sector map, adapt `flash.c` | follow |
 | F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT + cache-coherent DMA buffers | follow |
 | F7-6 | I2C (new timing-register IP), SPI, PWM, CRC, SDIO | follow |
-| F7-7 | Test enablement + CI: processor-generic test linker/harness, `tests/arch/cortex-m7/`, run portable+cap tiers on-target, PIL board profile (`tools/pil/boards/nucleo_f767zi.conf`) + Renode F767 platform, sample-matrix defconfig, capability-doc parity. **Gated on F7-2** (on-target tests report over UART). See [Testing](#testing). | follow |
+| F7-7 | Test enablement + CI: processor-generic test linker/harness, `tests/arch/cortex-m7/`, run portable+cap tiers on-target, PIL board profile (`tools/pil/boards/nucleo_f767zi.conf`) + Renode F767 platform, sample-matrix defconfig, capability-doc parity. UART prerequisite (F7-2) is met; remaining work is the test-build generalization. See [Testing](#testing). | follow |
 
 ## Risks / notes
 
 - **HSI-only bring-up** keeps flash wait-states at 0 and avoids the over-drive
   sequence, so blink is safe before F7-3. Do **not** call `hal_clock_init` with
   a PLL target above 180 MHz until over-drive lands.
-- The F7 `uart_reg.h` is currently a placeholder copy of the F4 header; it must
-  be rewritten to the F7 USART register model before `DRV_UART` is enabled.
+- UART is **polling-only** on F7 today (`uart_f7.c`). The DMA backend
+  (`hal_uart_write_dma` etc.) is not yet ported — it needs Cortex-M7 cache
+  coherency handling (F7-5), so `DRV_UART_DMA` stays off.
 - L1 D-cache stays **off** until DMA work (F7-5); enabling it earlier would
   require cache maintenance around any DMA/peripheral-shared buffer.
-- `flash_reg.h` sector sizes/addresses are set for F767 but `flash.c`'s
-  storage-sector selection should be re-reviewed against the 256 KB sectors
-  before `DRV_FLASH` is enabled.
-</content>
-</invoke>
+- `flash_reg.h` sector sizes/addresses are still the **F4 placeholder** map;
+  `flash.c`'s storage-sector selection must be re-reviewed against the F767's
+  256 KB sectors before `DRV_FLASH` is enabled (F7-4).

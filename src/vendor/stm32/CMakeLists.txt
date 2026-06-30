@@ -13,7 +13,14 @@ if(CONFIG_DRV_CLOCK)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
 endif()
 if(CONFIG_DRV_UART)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
+    # The STM32F7 USART IP (ISR/RDR/TDR) differs from the F4 (SR/DR), so the F7
+    # port ships its own driver file. Selecting by family here keeps the frozen
+    # F4 uart.c untouched. (To be unified under the vendor-backend vtable in M9.)
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
+    endif()
 endif()
 if(CONFIG_DRV_TIMER)
     list(APPEND HAL_SOURCES

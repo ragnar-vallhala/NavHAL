@@ -29,7 +29,7 @@ follow-ups — see [`../stm32f767zi_port_plan.md`](../stm32f767zi_port_plan.md).
 | TIMER             | ✓ | `src/vendor/stm32/timer/timer.c`         | TIM2–5 / TIM1 / TIM9–11; same register layout as F4. |
 | CLOCK             | ◐ | `src/vendor/stm32/clock/clock.c`         | HSI / HSE / PLL up to ~180 MHz. Over-drive (`PWR_CR1` ODEN/ODSWEN) + VOS for 216 MHz **not yet** wired — do not target >180 MHz. |
 | INTERRUPT         | ✓ | `src/arch/armv7e-m/interrupt/interrupt.c`| NVIC; shared ARMv7E-M arch code. |
-| UART              | ✗ | (pending)                                 | Hardware present (USART3 on ST-LINK VCP). Driver pending: F7 USART IP uses `ISR`/`RDR`/`TDR`/`ICR`, not the F4 `SR`/`DR` that `uart.c` targets. Disabled in defconfig. |
+| UART              | ◐ | `src/vendor/stm32/uart/uart_f7.c`        | USART1/2/3/6, polling TX/RX. USART3 (ST-LINK VCP, PD8/PD9) verified on hardware at 115200. F7-specific driver (ISR/RDR/TDR), selected by `CONFIG_FAMILY_STM32F7`. DMA backend not yet ported (F7-5). |
 | I2C               | ✗ | (pending)                                 | F7 uses the timing-register I2C IP (like F0/L4); needs a new driver path. |
 | SPI               | ✗ | (pending)                                 | Register-compatible with F4; bring-up after UART. |
 | PWM               | ✗ | (pending)                                 | Depends on the shared timer driver; enable after timer validation. |
@@ -54,7 +54,7 @@ NAVHAL_HAS_GPIO          1
 NAVHAL_HAS_TIMER         1
 NAVHAL_HAS_CLOCK         1
 NAVHAL_HAS_INTERRUPT     1
-NAVHAL_HAS_UART          0   (held off — F7 USART IP differs; see port plan F7-2)
+NAVHAL_HAS_UART          1   (uart_f7.c — polling; DMA backend off)
 NAVHAL_HAS_DMA           0
 NAVHAL_HAS_FPU           0   (selectable via CONFIG_USE_FPU once validated)
 NAVHAL_HAS_I2C/SPI/PWM/FLASH/CRC_HW/CYCLE_COUNTER/SDIO  0
@@ -67,13 +67,16 @@ NAVHAL_HAS_I2C/SPI/PWM/FLASH/CRC_HW/CYCLE_COUNTER/SDIO  0
 * `hal_blink` (LD1 / PB0) built (`text 9892 / data 4 / bss 524`), flashed to
   `0x08000000` and verified by `st-flash`. Erase reported sector 0 = 0x8000
   (32 KB), confirming the F7 sector map differs from the F4's 16 KB sector 0.
+* `hal_uart_tx` flashed; USART3 output captured on `/dev/ttyACM0` at 115200 —
+  100×`Hello World` + `UART TX NO DMA Test finished: 115 ticks`, correctly
+  framed (confirms the F7 ISR/TDR path and the BRR baud calc from APB1=16 MHz).
 
 ## Caveats and known limitations
 
 * HSI-only by default; the over-drive/VOS sequence for >180 MHz is not yet
   implemented (port-plan milestone F7-3).
-* `uart_reg.h` is a placeholder copy of the F4 header and must be rewritten to
-  the F7 USART register model before `DRV_UART` is enabled.
+* UART is polling-only; the DMA backend (`hal_uart_write_dma`) is not yet ported
+  to F7 (needs M7 cache-coherency handling — F7-5), so `DRV_UART_DMA` stays off.
 * L1 caches are disabled; enabling them later requires DMA-buffer cache
   maintenance.
 * Not yet wired into CI (sample matrix / PIL) — milestone F7-7.

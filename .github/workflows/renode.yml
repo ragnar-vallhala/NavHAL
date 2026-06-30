@@ -9,8 +9,9 @@ name: PIL (per-arch)
 #   3. add the board name to the matrix-source below
 #
 # M8 §8.1 — dispatch filters the matrix by changed files. A PR that
-# touches only AVR-port code skips the Renode (nucleo_f401re) job, and
-# vice versa. Common-code changes (or push/cron/dispatch) run both.
+# touches only AVR-port code skips the Renode (nucleo_f401re / nucleo_f767zi)
+# jobs, and an AVR-only change skips them; a Cortex-M-only change skips the
+# AVR (atmega328p) job. Common-code changes (or push/cron/dispatch) run all.
 
 on:
   push:
@@ -42,13 +43,19 @@ jobs:
             cortex-m-only:
               - 'src/arch/armv7e-m/**'
               - 'src/vendor/stm32/**'
+              - 'src/board/nucleo_f767zi/**'
               - 'include/port/cortex-m4/**'
+              - 'include/port/cortex-m7/**'
               - 'tests/arch/cortex-m4/**'
+              - 'tests/arch/cortex-m7/**'
               - 'samples/cortex-m/**'
               - 'cmake/toolchains/arm-none-eabi-toolchain.cmake'
+              - 'cmake/toolchains/arm-none-eabi-f767-toolchain.cmake'
               - 'cmake/defconfigs/cortex-m4_*'
+              - 'cmake/defconfigs/cortex-m7_*'
               - 'tools/renode/**'
               - 'tools/pil/boards/nucleo_f401re.conf'
+              - 'tools/pil/boards/nucleo_f767zi.conf'
             avr-only:
               - 'src/arch/avr/**'
               - 'src/vendor/microchip/**'
@@ -61,12 +68,12 @@ jobs:
       - name: Compute boards matrix
         id: compute
         run: |
-          boards='["nucleo_f401re","atmega328p"]'   # default: both
+          boards='["nucleo_f401re","nucleo_f767zi","atmega328p"]'   # default: all
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             cm_only="${{ steps.filter.outputs.cortex-m-only }}"
             avr_only="${{ steps.filter.outputs.avr-only }}"
             if [ "$cm_only" = "true" ] && [ "$avr_only" = "false" ]; then
-              boards='["nucleo_f401re"]'
+              boards='["nucleo_f401re","nucleo_f767zi"]'
             elif [ "$avr_only" = "true" ] && [ "$cm_only" = "false" ]; then
               boards='["atmega328p"]'
             fi

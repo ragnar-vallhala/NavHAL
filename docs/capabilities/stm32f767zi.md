@@ -108,4 +108,8 @@ implemented and pass their on-target test suites — see the bring-up record.
   today. The DMA driver is verified in this configuration. Enabling the D-cache
   later for performance will require cache clean/invalidate around any
   DMA/peripheral-shared buffer (`SCB_CleanDCache_by_Addr` / `InvalidateDCache`).
-* Not yet wired into CI (sample matrix / PIL) — milestone F7-7.
+* Wired into CI: `sample-matrix-f767` (portable samples build under the F767
+  toolchain) and `build-on-target-f767` (test-ELF compile) in `ci.yml`, plus a
+  `nucleo_f767zi` job in the per-arch PIL matrix (`renode.yml`) that runs the
+  on-target suite under Renode — with `DRV_SDIO` enabled (board-conf
+  `TEST_EXTRA_CONFIG`) so the SDIO block round-trip runs there too.

@@ -115,6 +115,27 @@ restore() {
 trap restore EXIT
 
 rm -rf "$BUILD_DIR"
+
+# Optional per-board cap extension. By default the toolchain file's
+# NAVHAL_DEFCONFIG seeds a minimal .config (arch/vendor/family/board only), so
+# the PIL test ELF carries just the always-on drivers. A board may opt extra
+# opt-in caps into its PIL run by setting TEST_EXTRA_CONFIG (space-separated
+# `CONFIG_*=y` tokens) plus DEFCONFIG (the base fragment to extend). We pre-seed
+# .config = DEFCONFIG + those caps; CMake then uses it as-is (it only auto-seeds
+# when .config is absent) and kconfig.py resolves the `select` cascade. The
+# restore() trap above cleans this up. F767 uses it to exercise DRV_SDIO (and
+# its PIL block round-trip) which is off in the shipped default.
+if [ -n "${TEST_EXTRA_CONFIG:-}" ]; then
+  : "${DEFCONFIG:?TEST_EXTRA_CONFIG set but DEFCONFIG (base fragment) is not}"
+  if [ ! -f "$DEFCONFIG" ]; then
+    echo "error: DEFCONFIG '$DEFCONFIG' not found" >&2
+    exit 2
+  fi
+  cat "$DEFCONFIG" > .config
+  for kv in $TEST_EXTRA_CONFIG; do printf '%s\n' "$kv" >> .config; done
+  echo ">> PIL caps: seeded .config from $DEFCONFIG + [$TEST_EXTRA_CONFIG]"
+fi
+
 cmake -B "$BUILD_DIR" -DTEST=ON -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE" >/dev/null
 cmake --build "$BUILD_DIR" --target tests -j >/dev/null
 

@@ -139,9 +139,41 @@ jobs:
           path: build-test/tests
           retention-days: 7
 
+  # Same as build-on-target but for the STM32F767ZI (Cortex-M7) port: builds
+  # the on-target navtest ELF under the F767 toolchain so a break in the F7
+  # driver tree or its test build is caught independently of the PIL run.
+  build-on-target-f767:
+    name: Build on-target ELF (F767)
+    runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-cortex-m == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arm-none-eabi toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+      - name: Install kconfiglib
+        run: pip install kconfiglib
+      - name: Configure
+        run: cmake -B build-test-f767 -DTEST=ON -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi-f767-toolchain.cmake
+      - name: Build tests
+        run: cmake --build build-test-f767 --target tests -j
+      - name: Report ELF size
+        run: arm-none-eabi-size build-test-f767/tests
+      - name: Upload F767 tests.elf
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-elf-f767
+          path: build-test-f767/tests
+          retention-days: 7
+
   # NOTE: PIL (Renode + simavr) runs live in `.github/workflows/renode.yml`,
   # gated on the same push + pull_request events. Those jobs run their
-  # own dispatch and pick the boards matrix accordingly.
+  # own dispatch and pick the boards matrix accordingly. The F767 PIL job
+  # there enables DRV_SDIO (via the board conf's TEST_EXTRA_CONFIG) so the
+  # SDIO block round-trip runs in CI.
 
   # NAVHAL_HAS_* capability contract — verifies that disabling a cap in
   # Kconfig actually drops its driver symbols from the test ELF, AND that
@@ -241,6 +273,7 @@ jobs:
       - commit-lint
       - host-tests
       - build-on-target
+      - build-on-target-f767
       - cap-contract
       - sample-matrix
       - sample-matrix-avr
@@ -260,6 +293,7 @@ jobs:
           check commit-lint       "${{ needs.commit-lint.result }}"
           check host-tests        "${{ needs.host-tests.result }}"
           check build-on-target   "${{ needs.build-on-target.result }}"
+          check build-on-target-f767 "${{ needs.build-on-target-f767.result }}"
           check cap-contract      "${{ needs.cap-contract.result }}"
           check sample-matrix      "${{ needs.sample-matrix.result }}"
           check sample-matrix-avr  "${{ needs.sample-matrix-avr.result }}"

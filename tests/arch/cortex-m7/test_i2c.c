@@ -20,6 +20,7 @@
 #include "navhal_port_i2c.h"
 #include "family/i2c_reg.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -28,6 +29,8 @@
  * TRISE). Assert the standard-mode timing preset and that the peripheral is
  * enabled (PE). */
 void test_i2c_init_config(void) {
+  /* Renode's I²C model doesn't reflect the TIMINGR write-back; skip on PIL. */
+  NAVTEST_SKIP_ON_PIL();
   hal_i2c_config_t config = {.clock_speed = HAL_I2C_SPEED_STANDARD,
                              .own_address = I2C_MASTER,
                              .acknowledge = true};
@@ -39,6 +42,7 @@ void test_i2c_init_config(void) {
 }
 
 void test_i2c_fast_mode_config(void) {
+  NAVTEST_SKIP_ON_PIL();
   hal_i2c_config_t config = {.clock_speed = HAL_I2C_SPEED_FAST,
                              .own_address = I2C_MASTER,
                              .acknowledge = true};

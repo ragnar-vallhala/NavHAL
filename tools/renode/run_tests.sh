@@ -21,7 +21,11 @@ if [[ ! -f "$ELF" ]]; then
 fi
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-RESC="$REPO_ROOT/tools/renode/navhal_f401re.resc"
+# Per-board Renode script. Defaults to the F401RE; a board's PIL conf can
+# override via the RESC env var (e.g. tools/pil/boards/nucleo_f767zi.conf).
+# A relative override is resolved against the repo root.
+RESC="${RESC:-$REPO_ROOT/tools/renode/navhal_f401re.resc}"
+case "$RESC" in /*) ;; *) RESC="$REPO_ROOT/$RESC" ;; esac
 LOGFILE="$(mktemp -t navhal-uart-XXXXXX.log)"
 
 RENODE_PID=""

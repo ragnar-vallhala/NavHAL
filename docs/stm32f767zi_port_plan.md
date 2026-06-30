@@ -78,7 +78,11 @@ they diverge, the driver needs a family-conditional path.
 | **TIMER** | General-purpose timers (TIM2–5, TIM1/9/10/11) identical layout and bases. | Reuse `timer.c` with F7 `timer_reg.h` (copy of F4). ✅ done |
 | **INTERRUPT / NVIC** | NVIC programmer's model is identical, but the **peripheral vector table is MCU-specific**: the F767's USART3 sits at IRQ 39, which is a literal `0` ("Reserved") in the F401-based arch `startup.s`. Enabling an interrupt-driven peripheral the F401 lacks would vector to address 0 and fault. | Reuse arch `interrupt.c`; the F767 ships its **own** `src/board/nucleo_f767zi/startup.s` with the full STM32F767xx vector table (every usable IRQ → a dispatch-backed handler, no `0` traps). The build prefers a board `startup.s` when present. ✅ done |
 | **DMA** | F7 DMA controller is stream/channel-compatible with F4; cache coherency matters on M7 only when the D-cache is on (kept off here). | Reuses `dma.c` with the F7 `dma_reg.h`. Opt-in via `CONFIG_DRV_DMA`; `test_dma` (17) passes on hardware with the D-cache off. ✅ done |
-| **CRC / SDIO / SPI / I2C / PWM** | Mostly compatible register maps; I2C IP differs (F7 uses the timing-register I2C like F0/L4). | Bring up after UART. ⏳ follow-up |
+| **PWM** | Built on the shared timer IP. | Reuses `pwm.c`. `test_pwm` (11) passes on hardware. ✅ done |
+| **CRC** | Hardware CRC-32; default polynomial register-compatible with F4. | Reuses `crc.c`. CRC suite (7) passes via the HW unit. ✅ done |
+| **SPI** | F7 moved frame size to `CR2.DS` (+`FRXTH`, byte-`DR` FIFO); F4's `CR1.DFF` is gone. | Separate `spi_f7.c`. `test_spi` (7) passes — init register-verified; FIFO transfer untested (no device). ◐ |
+| **I2C** | **Different IP generation** — F7 `TIMINGR`/`ISR`-`ICR`/CR2-framed/`RXDR`-`TXDR` vs F4 legacy. | Separate `i2c_f7.c` + real F7 `i2c_reg.h`. `test_i2c` (8) passes — init register-verified; transfers untested (no device). ◐ |
+| **SDIO** | F767 has SDMMC (renamed/enhanced); `DRV_SDIO` is gated to Cortex-M4 in Kconfig. | Deferred — needs the SDMMC port + an SD card. ⏳ |
 
 ## What this lands now (basic bring-up)
 
@@ -191,14 +195,18 @@ build and run for cortex-m7:
    on `NAVHAL_HAS_*`). The raw-flash suite is now **re-enabled** on M7 (F7-4
    corrected the sector map and fixed two `flash.c` hardware bugs) and passes
    (6/6).
-6. **CI / PIL** — ◐
-   - ✅ Sample-matrix CI: `tools/build_all_f767_samples.sh` builds the portable
-     sample tier under the F767 toolchain (12/12 locally); wired into `ci.yml`
-     as the `sample-matrix-f767` job, the `ci-required` aggregate, and the
-     dispatch path filter.
-   - ⏳ PIL: `tools/pil/boards/nucleo_f767zi.conf` + a Renode platform / `.resc`
-     for F767 (mirror `tools/renode/navhal_f401re.resc`) so the on-target test
-     ELF runs in CI.
+6. **CI / PIL** — ✅
+   - Sample-matrix CI: `tools/build_all_f767_samples.sh` builds the portable
+     sample tier under the F767 toolchain (12/12); wired into `ci.yml` as the
+     `sample-matrix-f767` job, the `ci-required` aggregate, and the dispatch
+     path filter.
+   - PIL: `tools/pil/boards/nucleo_f767zi.conf` + `tools/renode/navhal_f767zi.resc`
+     (and `stm32f767zi.repl`, which reuses Renode's mainline STM32F746 CPU model
+     with SRAM widened to the F767's 512 KB). `run_tests.sh`/`run.sh` now take a
+     per-board `RESC` override. The F767 ELF boots and runs the full suite over
+     USART3 in Renode; the SPI `CR2.DS` and I²C `TIMINGR` register read-backs the
+     Renode models don't reflect are `NAVTEST_SKIP_ON_PIL()`-gated (they stay
+     strict on HIL), so PIL is green.
 
 ## Milestones
 
@@ -209,8 +217,8 @@ build and run for cortex-m7:
 | F7-3 | High-frequency clock — PWR over-drive + VOS + flash wait-states + APB limits, in `clock_f7.c`; verified at 216 MHz on hardware | **done** |
 | F7-4 | FLASH — real F767 sector map in `flash_reg.h`; fixed two `flash.c` bugs found on hardware (DSB after program, NULL guard); flash test re-enabled and passing (36/36) | **done** |
 | F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT — all verified on hardware (56-test run). No new code needed: register-compatible with M4 and the `fpv5-d16` flag landed in F7-1. D-cache stays off (DMA coherent); enabling it + a DMA UART backend remain. | **done** (cache off) |
-| F7-6 | I2C (new timing-register IP), SPI, PWM, CRC, SDIO | follow |
-| F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness; on-target portable+conformance+cap+flash tiers; white-box GPIO/TIMER/CLOCK/INTERRUPT/UART (100/0 on hardware); `sample-matrix-f767` CI job (12/12). **Remaining:** i2c/spi/pwm white-box (with F7-6); PIL board profile + Renode F767 platform. See [Testing](#testing). | partial |
+| F7-6 | Peripherals. **Done:** PWM + HW CRC (reuse, verified), SPI (`spi_f7.c`) + I2C (`i2c_f7.c`) rewrites (init register-verified; transfers untested — no bus devices). **Remaining:** SDIO/SDMMC (Kconfig-gated to M4, needs an SD card). | mostly done |
+| F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness; on-target tiers + white-box GPIO/TIMER/CLOCK/INTERRUPT/UART/PWM/SPI/I2C; `sample-matrix-f767` CI job; **PIL** — `tools/pil/boards/nucleo_f767zi.conf` + Renode `.resc`/`.repl` (F746 model, SRAM widened to 512 KB), boots & runs the suite over USART3. See [Testing](#testing). | **done** |
 
 ## Risks / notes
 

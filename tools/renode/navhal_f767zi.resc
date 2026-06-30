@@ -1,0 +1,51 @@
+:name: NavHAL F767ZI test runner
+:description: Boots a Renode STM32F7 machine model, loads the navtest ELF,
+:             routes USART3 (the F767 console) to a log file, and runs the
+:             suite to completion.
+:
+:             Variables (set by the caller via the Monitor before `include`):
+:               $bin     — absolute path to the test ELF
+:               $logfile — absolute path for the captured UART log
+:
+:             tools/renode/run_tests.sh wires these up (RESC override):
+:               RESC=tools/renode/navhal_f767zi.resc tools/renode/run_tests.sh <elf>
+
+using sysbus
+
+# The Nucleo-F767ZI is register-compatible with Renode's mainline STM32F746
+# CPU model for the peripherals the navtest binary touches (USART3, GPIO,
+# TIM, RCC, PWR over-drive, flash). It exposes the F7 USART IP (ISR/RDR/TDR)
+# that uart_f7.c drives, so the console output is captured correctly.
+mach create "navhal"
+# F746 CPU model with SRAM widened to the F767's 512 KB (see the .repl).
+machine LoadPlatformDescription @tools/renode/stm32f767zi.repl
+
+# Silence Cortex-M private-peripheral warnings: the model omits the DWT block
+# (0xE0001000, read by hal_cycle_counter_get) and the ITM/TPIU/ETM cluster.
+sysbus SilenceRange <0xE0000000, 0xE0001FFF>
+
+# Drop per-write "known but not implemented" noise on peripherals the
+# firmware legitimately writes; keeps real errors visible.
+logLevel 3 rcc
+logLevel 3 nvic
+logLevel 3 dma1
+logLevel 3 dma2
+logLevel 3 timer2
+logLevel 3 timer3
+logLevel 3 timer4
+logLevel 3 timer5
+logLevel 3 gpioPortB
+logLevel 3 gpioPortC
+logLevel 3 gpioPortD
+
+# Capture USART3 (ST-LINK VCP on the real board) to the log; CI greps it for
+# the navtest summary. flushAfterWrite keeps the log usable if killed mid-run.
+sysbus.usart3 CreateFileBackend $logfile true
+
+sysbus LoadELF $bin
+
+# Hang backstop only — tools/renode/run_tests.sh SIGTERMs Renode as soon as
+# "Total failures:" appears in the log. The firmware idles after the last
+# test, so it never stops on its own.
+emulation RunFor "03:00:00"
+quit

@@ -179,12 +179,14 @@ build and run for cortex-m7:
      CMakeLists now drops `uart.c` (F4) / `uart_f7.c` (F7) to keep only the one
      matching the target family — otherwise both define `hal_uart_*` and the F4
      file fails against the F7 register header.
-4. **White-box tier** — ◐ `tests/arch/cortex-m7/` now has GPIO (incl. a
-   contiguous-port-indexing assertion that is the F7's genuine difference) and
-   TIMER, registered under `NAVTEST_ARCH_CORTEX_M7` in `tests/main.c` and passing
-   on hardware (GPIO 12, TIMER 15 → 63/0 total). Still to port: clock,
-   uart-protocol and interrupt white-box (clock/uart need the F7 ISR/RDR/TDR
-   model and USART3); i2c/spi/pwm belong to F7-6.
+4. **White-box tier** — ✅ `tests/arch/cortex-m7/` has GPIO (incl. a
+   contiguous-port-indexing assertion), TIMER, CLOCK (`clock_f7`, HSI/PLL — HSE
+   omitted, board availability unconfirmed), INTERRUPT (NVIC + a vector-table
+   assertion that USART3/IRQ 39 resolves to a real handler, guarding the
+   startup fix) and UART PROTOCOL (F7 USART, `BRR` on UART1/6). Registered under
+   `NAVTEST_ARCH_CORTEX_M7`; all pass on hardware (GPIO 12, TIMER 15, CLOCK 10,
+   INTERRUPT 15, UART 12 → **100/0 total** with the portable tiers). i2c/spi/pwm
+   white-box belong to F7-6.
 5. **Portable + cap tiers** — ✅ run unchanged on F767 (HAL black-box, self-gate
    on `NAVHAL_HAS_*`). The raw-flash suite is now **re-enabled** on M7 (F7-4
    corrected the sector map and fixed two `flash.c` hardware bugs) and passes
@@ -208,7 +210,7 @@ build and run for cortex-m7:
 | F7-4 | FLASH — real F767 sector map in `flash_reg.h`; fixed two `flash.c` bugs found on hardware (DSB after program, NULL guard); flash test re-enabled and passing (36/36) | **done** |
 | F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT — all verified on hardware (56-test run). No new code needed: register-compatible with M4 and the `fpv5-d16` flag landed in F7-1. D-cache stays off (DMA coherent); enabling it + a DMA UART backend remain. | **done** (cache off) |
 | F7-6 | I2C (new timing-register IP), SPI, PWM, CRC, SDIO | follow |
-| F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness; on-target portable+conformance+cap+flash tiers passing on hardware; white-box GPIO+TIMER (63/0); `sample-matrix-f767` CI job (12/12 portable samples). **Remaining:** clock/uart-protocol/interrupt white-box; PIL board profile + Renode F767 platform. See [Testing](#testing). | partial |
+| F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness; on-target portable+conformance+cap+flash tiers; white-box GPIO/TIMER/CLOCK/INTERRUPT/UART (100/0 on hardware); `sample-matrix-f767` CI job (12/12). **Remaining:** i2c/spi/pwm white-box (with F7-6); PIL board profile + Renode F767 platform. See [Testing](#testing). | partial |
 
 ## Risks / notes
 

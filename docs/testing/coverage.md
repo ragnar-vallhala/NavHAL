@@ -33,6 +33,33 @@ What is tested where, mapped onto the SIL / PIL / HIL model from
 Pass column counts the **on-target** result. The host subset adds 24
 more (run at SIL only).
 
+The totals above are the **STM32F401RE** reference target. A second on-target
+target is now covered:
+
+## STM32F767ZI on-target run (HIL)
+
+The same harness runs on the Nucleo-F767ZI over USART3. Suites map onto the
+`NAVTEST_ARCH_CORTEX_M7` white-box tier plus the portable/conformance tiers (cap
+suites add DMA/DWT/FPU when their `CONFIG_*` are enabled — verified separately at
+56/0). Latest default-config run:
+
+| Suite | Cases | Pass | Notes |
+|-------|------:|-----:|-------|
+| GPIO              | 12 | 12 | M4 suite + an F7 contiguous-port-indexing assertion (no PE→PH skip). |
+| TIMER             | 15 | 15 | Same TIM IP as F4. |
+| CLOCK             | 10 | 10 | `clock_f7.c`; HSI + PLL-from-HSI. HSE cases omitted (board HSE-from-MCO availability unconfirmed). |
+| INTERRUPT         | 15 | 15 | NVIC + a vector-table assertion that USART3 (IRQ 39) resolves to a real handler — guards the F767 `startup.s` vector-table fix. |
+| UART PROTOCOL     | 12 | 12 | F7 USART (`uart_f7.c`); drives UART1/UART6, USART3 is the console. |
+| CONFORMANCE       | 15 | 15 | Portable HAL-contract. |
+| TIMEBASE          |  8 |  8 | Portable. |
+| CRC               |  7 |  7 | Portable. |
+| FLASH RELIABILITY |  6 |  6 | Real F767 sector map; surfaced + fixed the M7 write-buffer `DSB` and a NULL-guard bug. |
+| **Total** | **100** | **100** | default config; +DMA/DWT/FPU → 56 more when enabled. |
+
+Not yet on F767: I²C / SPI / PWM / SDIO white-box suites (with milestone F7-6),
+and PIL (no Renode F767 platform yet). The sample-matrix CI builds the 12
+portable samples under the F767 toolchain (`sample-matrix-f767`).
+
 ## Per-driver function coverage
 
 Standardized M2 drivers and how their public API maps to suites. A

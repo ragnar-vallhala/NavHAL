@@ -52,13 +52,15 @@
 #include "arch/cortex-m4/test_uart_protocol.h"
 #endif
 
-/* Cortex-M7 white-box suites. Only the register-compatible / F7-verified
- * peripherals are ported so far (GPIO incl. the contiguous-port-indexing
- * assertion, and TIMER); clock/uart-protocol/interrupt and the F7-6 buses
- * (i2c/spi/pwm) are still to come. */
+/* Cortex-M7 white-box suites: GPIO (incl. contiguous-port-indexing), TIMER,
+ * CLOCK (clock_f7, HSI/PLL), INTERRUPT (NVIC + the F767 USART3 vector slot),
+ * and UART PROTOCOL (F7 USART). The F7-6 buses (i2c/spi/pwm) are still to come. */
 #if defined(NAVTEST_ARCH_CORTEX_M7)
 #include "arch/cortex-m7/test_gpio.h"
 #include "arch/cortex-m7/test_timer.h"
+#include "arch/cortex-m7/test_clock.h"
+#include "arch/cortex-m7/test_interrupt.h"
+#include "arch/cortex-m7/test_uart_protocol.h"
 #endif
 
 static const navtest_suite_t *const all_suites[] = {
@@ -79,6 +81,9 @@ static const navtest_suite_t *const all_suites[] = {
 #if defined(NAVTEST_ARCH_CORTEX_M7)
     &test_gpio_suite,
     &test_timer_suite,
+    &test_clock_suite,
+    &test_interrupt_suite,
+    &test_uart_protocol_suite,
 #endif
     &test_conformance_suite,   /* portable HAL-contract assertions; runs
                                   on every arch (navtest PROGMEM keeps

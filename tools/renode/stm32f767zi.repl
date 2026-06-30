@@ -15,3 +15,19 @@ sram:
 // I2C1 @ 0x77. Its chip-ID register (0xD0 -> 0x55) gives a deterministic
 // read that exercises the i2c_f7 master transfer path end-to-end.
 bmp180: Sensors.BMP180 @ i2c1 0x77
+
+// SPI flash on SPI1 for the PIL-only SPI transfer test (test_spi.c). Its JEDEC
+// ID (read via 0x9F) is mfg/type/capacity below. spi_f7 uses software NSS, so
+// the chip-select is a GPIO the test drives — wired here from PD14 (the board's
+// BOARD_SPI_CS) into the flash's CS input.
+spiflash: SPI.GenericSpiFlash @ spi1
+    underlyingMemory: spiflashMem
+    manufacturerId: 0x20
+    memoryType: 0xBA
+    capacityCode: 0x18
+
+spiflashMem: Memory.MappedMemory @ sysbus 0x90000000
+    size: 0x100000
+
+gpioPortD:
+    14 -> spiflash@0

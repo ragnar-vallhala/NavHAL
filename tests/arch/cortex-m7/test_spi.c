@@ -17,6 +17,7 @@
 
 #include "test_spi.h"
 #include "navhal_port_spi.h"
+#include "navhal_port_gpio.h"
 #include "family/spi_reg.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"
@@ -102,8 +103,36 @@ void test_hal_spi_init_cpol_low_cpha_1edge(void) {
   TEST_ASSERT_EQUAL_UINT32(SPI_CR2_DS_8BIT, S1->CR2 & SPI_CR2_DS_Msk);
   TEST_ASSERT_FALSE(S1->CR1 & SPI_CR1_LSBFIRST);
 }
+
+/* PIL-only: read the JEDEC ID (0x9F) from the Renode GenericSpiFlash on SPI1
+ * (see tools/renode/stm32f767zi.repl). spi_f7 uses software NSS, so the test
+ * drives the chip-select GPIO (PD14, wired to the flash CS) around the
+ * transfer. Proves the spi_f7 transmit_receive FIFO path drives an attached
+ * device; skipped on HIL (no flash on the bench). */
+void test_spi_pil_flash_jedec_id(void) {
+  NAVTEST_PIL_ONLY();
+  hal_spi_init(HAL_SPI_1, &(hal_spi_config_t){.baudrate = HAL_SPI_BAUDRATE_DIV16,
+                                              .cpol = HAL_SPI_CPOL_LOW,
+                                              .cpha = HAL_SPI_CPHA_1EDGE,
+                                              .datasize = HAL_SPI_DATASIZE_8BIT,
+                                              .firstbit = HAL_SPI_FIRSTBIT_MSB});
+  hal_gpio_set_mode(GPIO_PD14, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_NONE);
+  hal_gpio_write(GPIO_PD14, HAL_GPIO_HIGH); /* CS idle */
+
+  uint8_t tx[4] = {0x9F, 0xFF, 0xFF, 0xFF};
+  uint8_t rx[4] = {0};
+  hal_gpio_write(GPIO_PD14, HAL_GPIO_LOW); /* CS assert */
+  hal_status_t s = hal_spi_transmit_receive(HAL_SPI_1, tx, rx, 4, 0);
+  hal_gpio_write(GPIO_PD14, HAL_GPIO_HIGH); /* CS deassert */
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)s);
+  TEST_ASSERT_EQUAL_UINT32(0x20u, (uint32_t)rx[1]); /* manufacturer ID */
+  TEST_ASSERT_EQUAL_UINT32(0xBAu, (uint32_t)rx[2]); /* memory type */
+  TEST_ASSERT_EQUAL_UINT32(0x18u, (uint32_t)rx[3]); /* capacity code */
+}
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
 NAVTEST_CASE_DECL(test_spi_init_config);
+NAVTEST_CASE_DECL(test_spi_pil_flash_jedec_id);
 NAVTEST_CASE_DECL(test_hal_spi_init_returns_ok);
 NAVTEST_CASE_DECL(test_hal_spi_init_rejects_null_config);
 NAVTEST_CASE_DECL(test_hal_spi_transmit_rejects_null_data);
@@ -120,6 +149,7 @@ static const navtest_case_t spi_cases[] = {
     NAVTEST_CASE(test_hal_spi_receive_rejects_null_data),
     NAVTEST_CASE(test_hal_spi_transmit_receive_rejects_null_data),
     NAVTEST_CASE(test_hal_spi_init_cpol_low_cpha_1edge),
+    NAVTEST_CASE(test_spi_pil_flash_jedec_id),
 };
 
 const navtest_suite_t test_spi_suite = {

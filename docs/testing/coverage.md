@@ -51,19 +51,25 @@ suites add DMA/DWT/FPU when their `CONFIG_*` are enabled — verified separately
 | INTERRUPT         | 15 | 15 | NVIC + a vector-table assertion that USART3 (IRQ 39) resolves to a real handler — guards the F767 `startup.s` vector-table fix. |
 | UART PROTOCOL     | 12 | 12 | F7 USART (`uart_f7.c`); drives UART1/UART6, USART3 is the console. |
 | PWM               | 11 | 11 | Reuses the shared timer-based driver. |
-| SPI               |  7 |  7 | `spi_f7.c` (CR2.DS/FRXTH). Init register-verified; CR2.DS read-back is `NAVTEST_SKIP_ON_PIL` (Renode doesn't model it). |
-| I2C               |  8 |  8 | `i2c_f7.c` (timing-register IP). Init register-verified; TIMINGR read-back is `NAVTEST_SKIP_ON_PIL`. |
+| SPI               |  8 |  8 | `spi_f7.c` (CR2.DS/FRXTH). Init register-verified (CR2.DS read-back `SKIP_ON_PIL`); a JEDEC-ID read vs a Renode `GenericSpiFlash` validates the transfer FIFO in PIL (`PIL_ONLY`). |
+| I2C               |  9 |  9 | `i2c_f7.c` (timing-register IP). Init register-verified (TIMINGR read-back `SKIP_ON_PIL`); a chip-ID read vs a Renode BMP180 validates the transfer FSM in PIL (`PIL_ONLY`). |
 | CONFORMANCE       | 15 | 15 | Portable HAL-contract. |
 | TIMEBASE          |  8 |  8 | Portable. |
 | CRC               |  7 |  7 | Portable; runs against the HW unit when `DRV_CRC` is on. |
 | FLASH RELIABILITY |  6 |  6 | Real F767 sector map; surfaced + fixed the M7 write-buffer `DSB` and a NULL-guard bug. |
-| **Total** | **126** | **126** | default config; +DMA/DWT/FPU → 56 more when enabled. |
+| **Total** | **128** | **128** | default config; +DMA/DWT/FPU → 56 more when enabled. |
 
 PIL: the suite also runs under Renode (mainline STM32F746 CPU model with SRAM
-widened to 512 KB; `tools/renode/navhal_f767zi.resc`) and is green — the SPI/I2C
-register read-backs the Renode models don't reflect are `NAVTEST_SKIP_ON_PIL`.
-Not yet on F767: SDIO (Kconfig-gated to M4, needs an SD card). The sample-matrix
-CI builds the 12 portable samples under the F767 toolchain (`sample-matrix-f767`).
+widened to 512 KB; `tools/renode/navhal_f767zi.resc`) and is green. The SPI/I2C
+register read-backs the Renode models don't reflect are `NAVTEST_SKIP_ON_PIL`;
+conversely, **device-attach transfer tests** (`NAVTEST_PIL_ONLY`) drive a real
+master transfer against modelled bus devices in the `.repl` — an I²C BMP180
+(chip-ID read) and an SPI `GenericSpiFlash` (JEDEC-ID read) — which exercises the
+`i2c_f7` / `spi_f7` transfer FSMs end-to-end in the emulator. These skip on HIL
+(no device wired). Not yet on F767: SDIO (Kconfig-gated to M4 and unported; an
+SD-card model would follow the same pattern once the SDMMC driver lands). The
+sample-matrix CI builds the 12 portable samples under the F767 toolchain
+(`sample-matrix-f767`).
 
 ## Per-driver function coverage
 

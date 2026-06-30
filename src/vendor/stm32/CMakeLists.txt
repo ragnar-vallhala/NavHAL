@@ -36,8 +36,14 @@ if(CONFIG_DRV_TIMER)
     )
 endif()
 
-# Startup is arch-layer code; always linked in.
-list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)
+# Startup glue is arch-layer, but the peripheral vector table is MCU-specific:
+# a board may override with its own startup.s (e.g. nucleo_f767zi, whose USART3
+# vector the F401-based arch table leaves empty). Prefer the board file.
+if(EXISTS ${SRC_BOARD}/startup.s)
+    list(APPEND HAL_SOURCES ${SRC_BOARD}/startup.s)
+else()
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)
+endif()
 
 if(CONFIG_DRV_INTERRUPT)
     list(APPEND HAL_SOURCES ${SRC_ARCH}/interrupt/interrupt.c)

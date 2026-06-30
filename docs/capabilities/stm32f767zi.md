@@ -82,6 +82,10 @@ implemented and pass their on-target test suites — see the bring-up record.
 * On-target test ELF (`-DTEST=ON`) flashed; results captured over USART3 @9600:
   **30 tests, 0 failures** (conformance 15, timebase 8, CRC 7). M4 white-box
   and raw-flash suites intentionally skipped on M7.
+* Vector table: the F767 ships its own `src/board/nucleo_f767zi/startup.s`
+  (STM32F767xx layout). Verified that vector slot 39 (USART3) resolves to the
+  dispatch handler `0x...2254` rather than the literal `0` the F401-based arch
+  table left there — so interrupt-driven USART3 dispatches instead of faulting.
 * Clock brought to **216 MHz** (HSI→PLL, over-drive engaged): captured
   `sysclk=216000000 ahb=216000000 apb1=54000000 apb2=108000000` over USART3 while
   the UART kept running — confirming VOS/over-drive/WS=7 and the APB prescalers.

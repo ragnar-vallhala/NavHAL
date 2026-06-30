@@ -221,6 +221,11 @@ add_custom_target(copy_compile_commands ALL
 # the AVR port relies on the avr-libc C runtime and has none.
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
     set(STARTUP_FILE "")
+elseif(EXISTS "${SRC_BOARD}/startup.s")
+    # The peripheral vector table is MCU-specific, so a board may ship its own
+    # startup.s (e.g. nucleo_f767zi, whose USART3 vector the F401-based arch
+    # table leaves as a literal 0). Prefer it over the arch default.
+    set(STARTUP_FILE "${SRC_BOARD}/startup.s")
 else()
     set(STARTUP_FILE "${SRC_ARCH}/startup/startup.s")
 endif()

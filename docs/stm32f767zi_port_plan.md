@@ -76,7 +76,7 @@ they diverge, the driver needs a family-conditional path.
 | **FLASH** | Base `0x40023C00`, same `ACR`/`KEYR`/`CR`/`SR`; 5-bit `SNB`. **Sector map differs** (F767: 32 KB×4, 128 KB×1, 256 KB×7 = 2 MB single bank, 12 sectors). | F7 `flash_reg.h` carries the real F767 sector map (KV store on sectors 6/7); shared `flash.c` reused. Bring-up surfaced two real-hardware bugs in `flash.c` (M7 write-buffer needs a `DSB`; missing NULL guard faulted on M7) — both fixed. `test_flash_raw` (6) passes. ✅ done |
 | **USART** | **Major divergence.** F4 uses `SR`/`DR`; F7 uses the modern IP: `ISR` (RO) / `ICR` / `RDR` / `TDR`, plus `BRR` oversampling differences. `uart.c` writes `usart->SR`/`->DR` directly. | Implemented as a separate `src/vendor/stm32/uart/uart_f7.c`, selected by the vendor CMakeLists when `CONFIG_FAMILY_STM32F7` (frozen F4 `uart.c` untouched). Polling TX/RX verified on USART3. DMA backend still pending (F7-5). ✅ done (polling) |
 | **TIMER** | General-purpose timers (TIM2–5, TIM1/9/10/11) identical layout and bases. | Reuse `timer.c` with F7 `timer_reg.h` (copy of F4). ✅ done |
-| **INTERRUPT / NVIC** | Core peripheral, identical. F7 has more IRQ lines; vector table grows. | Reuse arch `interrupt.c` + `startup.s`. ✅ |
+| **INTERRUPT / NVIC** | NVIC programmer's model is identical, but the **peripheral vector table is MCU-specific**: the F767's USART3 sits at IRQ 39, which is a literal `0` ("Reserved") in the F401-based arch `startup.s`. Enabling an interrupt-driven peripheral the F401 lacks would vector to address 0 and fault. | Reuse arch `interrupt.c`; the F767 ships its **own** `src/board/nucleo_f767zi/startup.s` with the full STM32F767xx vector table (every usable IRQ → a dispatch-backed handler, no `0` traps). The build prefers a board `startup.s` when present. ✅ done |
 | **DMA** | F7 DMA controller is stream/channel-compatible with F4; cache coherency matters on M7 only when the D-cache is on (kept off here). | Reuses `dma.c` with the F7 `dma_reg.h`. Opt-in via `CONFIG_DRV_DMA`; `test_dma` (17) passes on hardware with the D-cache off. ✅ done |
 | **CRC / SDIO / SPI / I2C / PWM** | Mostly compatible register maps; I2C IP differs (F7 uses the timing-register I2C like F0/L4). | Bring up after UART. ⏳ follow-up |
 
@@ -117,6 +117,8 @@ src/board/nucleo_f767zi/Kconfig            (BOARD="nucleo_f767zi")
 src/board/nucleo_f767zi/Kconfig.choice     (BOARD_NUCLEO_F767ZI)
 src/board/nucleo_f767zi/board.h            (pin aliases / oscillators)
 src/board/nucleo_f767zi/linker.ld          (2 MB flash / 512 KB RAM)
+src/board/nucleo_f767zi/startup.s          (STM32F767 vector table + reset)
+CMakeLists.txt + src/vendor/stm32/CMakeLists.txt  (prefer a board startup.s)
 
 include/port/cortex-m7/**                  (copied from cortex-m4; gpio_types
                                             contiguous ports, uart_types +HAL_UART_3)

@@ -4,7 +4,7 @@
 
 What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro definitions and the contract semantics live in [`../api_standardization.md`](../api_standardization.md); this directory only tracks per-target availability and implementation status.
 
-**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_atmega328p
+**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_atmega328p &nbsp;·&nbsp; @subpage cap_stm32f767ze
 
 ## Symbol legend
 
@@ -18,25 +18,25 @@ What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro def
 
 ## Matrix
 
-| Capability        | `NAVHAL_HAS_*`        | [STM32F401RE](stm32f401re.md) | [ATmega328P](atmega328p.md) |
-|---|---|---|---|
-| GPIO              | `GPIO`                 | ✓ | ✓ |
-| UART              | `UART`                 | ✓ | ✓ |
-| I²C               | `I2C`                  | ✓ | ✓ |
-| SPI               | `SPI`                  | ✓ | ✓ |
-| Timer             | `TIMER`                | ✓ | ✓ |
-| PWM               | `PWM`                  | ✓ | ✓ |
-| Clock subsystem   | `CLOCK`                | ✓ | ◐ |
-| Interrupt ctrl    | `INTERRUPT`            | ✓ | ✓ |
-| Flash             | `FLASH`                | ✓ | ◐ |
-| Hardware CRC      | `CRC_HW`               | ✓ | s/w |
-| Cycle counter     | `CYCLE_COUNTER`        | ✓ | — |
-| FPU               | `FPU`                  | ✓ | — |
-| DMA controller    | `DMA`                  | ✓ | — |
-| SDIO              | `SDIO`                 | ✓ | — |
-| UART → DMA backend| `UART_DMA`             | ✓ | — |
-| I²C → DMA backend | `I2C_DMA`              | ✓ | — |
-| SDIO async (DMA)  | `SDIO_DMA`             | ✓ | — |
+| Capability        | `NAVHAL_HAS_*`        | [STM32F401RE](stm32f401re.md) | [ATmega328P](atmega328p.md) | [Nucleo-F767ZI](stm32f767zi.md) |
+|---|---|---|---|---|
+| GPIO              | `GPIO`                 | ✓ | ✓ | ✓ |
+| UART              | `UART`                 | ✓ | ✓ | ✗ |
+| I²C               | `I2C`                  | ✓ | ✓ | ✗ |
+| SPI               | `SPI`                  | ✓ | ✓ | ✗ |
+| Timer             | `TIMER`                | ✓ | ✓ | ✓ |
+| PWM               | `PWM`                  | ✓ | ✓ | ✗ |
+| Clock subsystem   | `CLOCK`                | ✓ | ◐ | ◐ |
+| Interrupt ctrl    | `INTERRUPT`            | ✓ | ✓ | ✓ |
+| Flash             | `FLASH`                | ✓ | ◐ | ✗ |
+| Hardware CRC      | `CRC_HW`               | ✓ | s/w | ✗ |
+| Cycle counter     | `CYCLE_COUNTER`        | ✓ | — | ✗ |
+| FPU               | `FPU`                  | ✓ | — | ✗ |
+| DMA controller    | `DMA`                  | ✓ | — | ✗ |
+| SDIO              | `SDIO`                 | ✓ | — | ✗ |
+| UART → DMA backend| `UART_DMA`             | ✓ | — | ✗ |
+| I²C → DMA backend | `I2C_DMA`              | ✓ | — | ✗ |
+| SDIO async (DMA)  | `SDIO_DMA`             | ✓ | — | ✗ |
 
 A `✓` here is a statement about both *hardware presence* and *current driver completeness*. It does **not** mean the cap is on by default in the shipped Kconfig — most non-core caps default to `n` and must be selected explicitly. See `Kconfig` and each MCU's detail page for the default state and the `select` cascade.
 

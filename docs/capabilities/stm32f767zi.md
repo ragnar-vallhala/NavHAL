@@ -36,9 +36,9 @@ by adding a board layer.
 | UART              | ◐ | `src/vendor/stm32/uart/uart_f7.c`        | USART1/2/3/6, polling TX/RX. USART3 (ST-LINK VCP, PD8/PD9) verified on hardware at 115200. F7-specific driver (ISR/RDR/TDR), selected by `CONFIG_FAMILY_STM32F7`. DMA backend not yet ported (F7-5). |
 | I2C               | ✗ | (pending)                                 | F7 uses the timing-register I2C IP (like F0/L4); needs a new driver path. |
 | SPI               | ✗ | (pending)                                 | Register-compatible with F4; bring-up after UART. |
-| PWM               | ✗ | (pending)                                 | Depends on the shared timer driver; enable after timer validation. |
+| PWM               | ✓ | `src/vendor/stm32/pwm/pwm.c`             | Reuses the shared timer-based driver. Opt-in via `CONFIG_DRV_PWM`; `test_pwm` (11) passes on hardware. |
 | FLASH             | ✓ | `src/vendor/stm32/flash/flash.c`        | Key/value store on sectors 6/7 (256 KB each) of the real F767 12-sector 2 MB map. Opt-in via `CONFIG_DRV_FLASH`; `test_flash_raw` (6) passes on hardware. Bring-up fixed two `flash.c` bugs (M7 write-buffer `DSB`; NULL guard). |
-| CRC_HW            | ✗ | (pending)                                 | F7 CRC unit present; driver not validated. |
+| CRC_HW            | ✓ | `src/vendor/stm32/crc/crc.c`            | Hardware CRC-32; default polynomial is register-compatible with F4. Opt-in via `CONFIG_DRV_CRC`; the CRC suite (7) passes via the hardware unit on F767. |
 | CYCLE_COUNTER     | ✓ | `src/arch/armv7e-m/dwt/dwt.c`            | DWT-backed; shared ARMv7E-M arch code. Opt-in via `CONFIG_DRV_DWT`; `test_dwt` (6) passes on hardware. |
 | FPU               | ✓ | `src/arch/armv7e-m/fpu/fpu.c`            | Hardware **double-precision** FPU (`-mfpu=fpv5-d16`, hard float) via `CONFIG_USE_FPU` + `CONFIG_DRV_FPU`. `test_fpu_accel` (3) passes on hardware. |
 | DMA               | ✓ | `src/vendor/stm32/dma/dma.c`            | DMA1/DMA2 stream controller (register-compatible with F4). Opt-in via `CONFIG_DRV_DMA`; `test_dma` (17) passes on hardware. Coherent while the L1 D-cache stays off (see caveats); a DMA UART backend is still pending. |

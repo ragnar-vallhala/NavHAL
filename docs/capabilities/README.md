@@ -25,11 +25,11 @@ What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro def
 | I²C               | `I2C`                  | ✓ | ✓ | ✗ |
 | SPI               | `SPI`                  | ✓ | ✓ | ✗ |
 | Timer             | `TIMER`                | ✓ | ✓ | ✓ |
-| PWM               | `PWM`                  | ✓ | ✓ | ✗ |
+| PWM               | `PWM`                  | ✓ | ✓ | ✓ |
 | Clock subsystem   | `CLOCK`                | ✓ | ◐ | ✓ |
 | Interrupt ctrl    | `INTERRUPT`            | ✓ | ✓ | ✓ |
 | Flash             | `FLASH`                | ✓ | ◐ | ✓ |
-| Hardware CRC      | `CRC_HW`               | ✓ | s/w | ✗ |
+| Hardware CRC      | `CRC_HW`               | ✓ | s/w | ✓ |
 | Cycle counter     | `CYCLE_COUNTER`        | ✓ | — | ✓ |
 | FPU               | `FPU`                  | ✓ | — | ✓ |
 | DMA controller    | `DMA`                  | ✓ | — | ✓ |

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#define CORTEX_M4
 #include "common/hal_features.h"
 #include "navhal_port_fpu.h"
 #include "navhal_port_uart.h"
@@ -38,6 +37,11 @@
 #include "cap/fpu/test_fpu_accel.h"
 #include "cap/sdio/test_sdio.h"
 
+/* White-box, register-poke suites are per-processor. Only the Cortex-M4 set
+ * exists today; a cortex-m7 build skips this tier (its registers differ — e.g.
+ * the F7 USART) and runs the portable + cap + conformance tiers below. Add a
+ * parallel NAVTEST_ARCH_CORTEX_M7 block when tests/arch/cortex-m7/ lands. */
+#if defined(NAVTEST_ARCH_CORTEX_M4)
 #include "arch/cortex-m4/test_clock.h"
 #include "arch/cortex-m4/test_gpio.h"
 #include "arch/cortex-m4/test_i2c.h"
@@ -46,13 +50,14 @@
 #include "arch/cortex-m4/test_spi.h"
 #include "arch/cortex-m4/test_timer.h"
 #include "arch/cortex-m4/test_uart_protocol.h"
+#endif
 
 static const navtest_suite_t *const all_suites[] = {
 /* Cortex-M-only white-box suites — the underlying .c files are gated
  * the same way; this branch keeps the symbol references out of the
  * AVR-targeted link. Portable HAL-only test suites (timebase, crc,
  * flash) stay outside the gate so they run on every supported arch. */
-#if defined(__arm__) || defined(__thumb__)
+#if defined(NAVTEST_ARCH_CORTEX_M4)
     &test_gpio_suite,
     &test_interrupt_suite,
     &test_timer_suite,
@@ -76,7 +81,13 @@ static const navtest_suite_t *const all_suites[] = {
 #if NAVHAL_HAS_FPU
     &test_fpu_suite,
 #endif
+    /* The raw-flash suite erases/programs the storage sector via the family
+     * flash_reg.h sector map. On STM32F7 that map is still the F4 placeholder
+     * (port plan F7-4), so the suite would target the wrong physical sector —
+     * skip it until the F767 sector map is corrected. */
+#if !defined(NAVTEST_ARCH_CORTEX_M7)
     &test_flash_suite,
+#endif
 #if NAVHAL_HAS_SDIO
     &test_sdio_suite,
 #endif

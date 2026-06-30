@@ -34,6 +34,8 @@
 
 #if defined(__AVR__)
 #  define NAVTEST_UART HAL_UART_0   /* USART0 — only USART on ATmega328P */
+#elif defined(NAVTEST_ARCH_CORTEX_M7)
+#  define NAVTEST_UART HAL_UART_3   /* Nucleo-F767ZI → USART3 ST-LINK VCP */
 #elif defined(__arm__) || defined(__thumb__)
 #  define NAVTEST_UART HAL_UART_2   /* Nucleo-F401RE → ST-LINK virtual COM */
 #else

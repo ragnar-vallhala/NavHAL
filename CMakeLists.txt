@@ -259,8 +259,25 @@ if(TEST)
     ${SRC_VENDOR}/*.c
     ${SRC_ARCH}/*.c
   )
+  # The TEST build globs ALL vendor sources regardless of Kconfig, so the STM32
+  # tree contributes both the F4 uart.c and the F7 uart_f7.c — which define the
+  # same hal_uart_* symbols and each only compiles against its own family's
+  # register layout. Keep exactly the one matching the target family.
+  if(CONFIG_FAMILY_STM32F7)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/uart/uart.c)
+  else()
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/uart/uart_f7.c)
+  endif()
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
+  # Per-processor identity for the arch-generic test harness (tests/main.c,
+  # navtest_target.h). cortex-m4 and cortex-m7 share the ISA but differ in
+  # white-box register tests and console UART instance.
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
+    add_compile_definitions(NAVTEST_ARCH_CORTEX_M4)
+  elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m7")
+    add_compile_definitions(NAVTEST_ARCH_CORTEX_M7)
+  endif()
   add_executable(tests ${TEST_SRC} ${STARTUP_FILE})
 
   # Per-arch test linker + flags. NAVHAL_TEST_LINKER_FLAGS,

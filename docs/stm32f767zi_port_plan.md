@@ -140,46 +140,49 @@ cmake --build build-f767 --target flash      # st-flash write to 0x08000000
 
 ## Testing
 
-### Current state (this PR)
+### Current state
 
-- **Host suite passes** — `tools/run_host_tests.sh` reports **24/24** after the
-  port changes. It is arch-agnostic (system gcc, pure-logic HAL tests:
-  `hal_status`, conversion, software CRC, GPIO pin encoding), so it confirms the
-  port edits did not regress the shared HAL / `common` code. The port adds no
-  host-buildable code, so there is nothing new for this tier to cover yet.
-- **No on-target or PIL tests for F767 yet.**
+- **Host suite passes** — `tools/run_host_tests.sh` reports **24/24**. It is
+  arch-agnostic (system gcc, pure-logic HAL tests: `hal_status`, conversion,
+  software CRC, GPIO pin encoding), so it confirms the port edits did not regress
+  the shared HAL / `common` code.
+- **On-target suite passes on real F767 hardware** — the TEST ELF builds for
+  cortex-m7, flashes to the Nucleo-F767ZI, and reports over USART3 @9600:
+  **30 tests, 0 failures** (conformance 15, timebase 8, CRC 7). The F4 white-box
+  tier and the raw-flash suite are intentionally skipped (see below); the F4 TEST
+  ELF still builds unchanged (no reference-target regression).
+- **Not yet:** the M7 white-box arch tier and PIL/CI wiring (items 4 and 6).
 
-### On-target test prerequisite (UART) — now satisfied
+### How the test build was generalized for cortex-m7
 
-The on-target test ELF reports its pass/fail results **exclusively over
-`NAVTEST_UART`** (`tests/navtest_state.c` → `hal_uart_print`; `tests/main.c`
-screen-clear + result print). This made on-target testing gated on **F7-2
-(UART)**, which is now **done** (`uart_f7.c`, polling TX/RX verified on USART3).
-The remaining work to actually run the suite on F767 is the test-build
-generalization below (items 2–4) plus the PIL/CI wiring (item 6).
+The on-target test ELF reports results **exclusively over `NAVTEST_UART`**
+(`tests/navtest_state.c` → `hal_uart_print`), so on-target testing was gated on
+F7-2 (UART), now done. The following made the (previously M4-hardcoded) harness
+build and run for cortex-m7:
 
-### Changes required to enable on-target + PIL tests (milestone F7-7)
-
-1. **UART (F7-2)** — ✅ done; provides the `NAVTEST_UART` output path.
-2. **Processor-generic test linker** — `cmake/arch/armv7e-m.cmake` hardcodes
-   `NAVHAL_TEST_LINKER_FLAGS` to `tests/arch/cortex-m4/linker.ld`. Parametrize it
-   to `tests/arch/${CMAKE_SYSTEM_PROCESSOR}/linker.ld` and add
-   `tests/arch/cortex-m7/linker.ld` (2 MB flash / 512 KB RAM, like the board
-   script). Without this an M7 test ELF links against the F401's 512 KB/96 KB map.
-3. **Arch-generic harness** — `tests/main.c` hardcodes
-   `#include "arch/cortex-m4/test_uart_protocol.h"` and registers the M4
-   white-box suites by name. Gate the arch-specific includes / suite
-   registrations per `CMAKE_SYSTEM_PROCESSOR` (or route them through a
-   `tests/navtest_target.h` indirection) so a cortex-m7 build pulls the M7 suites.
-4. **White-box tier** — add `tests/arch/cortex-m7/` (start by adapting the M4
-   register tests). Note: the GPIO test must assert **contiguous** port indexing
-   for F7, not the F4 `PE→PH` skip — the existing host test
-   `test_gpio_get_port_number_skips_to_h` encodes the M4 behaviour and is
-   M4-specific.
-5. **Portable + cap tiers** — `tests/portable/*` and `tests/cap/*` are HAL
-   black-box and self-gate on `NAVHAL_HAS_*`, so they run on F767 unchanged once
-   UART exists; no per-test edits needed.
-6. **PIL / CI** —
+1. **UART (F7-2)** — ✅ done; provides the `NAVTEST_UART` output path
+   (`NAVTEST_UART = HAL_UART_3` for F767, added to `tests/navtest_target.h`).
+2. **Processor-generic test linker** — ✅ `cmake/arch/armv7e-m.cmake` now uses
+   `tests/arch/${CMAKE_SYSTEM_PROCESSOR}/linker.ld`, and
+   `tests/arch/cortex-m7/linker.ld` (2 MB / 512 KB) was added.
+3. **Arch-generic harness** — ✅ `tests/main.c` dropped its vestigial
+   `#define CORTEX_M4`; the `arch/cortex-m4/*` includes and white-box suite
+   registrations are now gated on `NAVTEST_ARCH_CORTEX_M4` (a per-processor
+   define set by the root `CMakeLists.txt` TEST block). A cortex-m7 build skips
+   that tier.
+   - The TEST build globs **all** vendor `.c` regardless of Kconfig, so the
+     CMakeLists now drops `uart.c` (F4) / `uart_f7.c` (F7) to keep only the one
+     matching the target family — otherwise both define `hal_uart_*` and the F4
+     file fails against the F7 register header.
+4. **White-box tier** — ⏳ add `tests/arch/cortex-m7/` (adapt the M4 register
+   tests). The GPIO test must assert **contiguous** port indexing for F7, not the
+   F4 `PE→PH` skip (`test_gpio_get_port_number_skips_to_h` encodes the M4
+   behaviour and is M4-specific).
+5. **Portable + cap tiers** — ✅ run unchanged on F767 (HAL black-box, self-gate
+   on `NAVHAL_HAS_*`). The raw-flash suite is held off on M7 (gated
+   `!NAVTEST_ARCH_CORTEX_M7`) because `flash_reg.h` still has the F4 placeholder
+   sector map — it would erase the wrong physical sector (re-enable with F7-4).
+6. **PIL / CI** — ⏳
    - `tools/pil/boards/nucleo_f767zi.conf` (mirror `nucleo_f401re.conf`),
    - a Renode platform / `.resc` for F767 (mirror `tools/renode/navhal_f401re.resc`),
    - extend the `.github/workflows/` sample-matrix and PIL jobs with the F767
@@ -195,7 +198,7 @@ generalization below (items 2–4) plus the PIL/CI wiring (item 6).
 | F7-4 | FLASH driver — verify F767 sector map, adapt `flash.c` | follow |
 | F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT + cache-coherent DMA buffers | follow |
 | F7-6 | I2C (new timing-register IP), SPI, PWM, CRC, SDIO | follow |
-| F7-7 | Test enablement + CI: processor-generic test linker/harness, `tests/arch/cortex-m7/`, run portable+cap tiers on-target, PIL board profile (`tools/pil/boards/nucleo_f767zi.conf`) + Renode F767 platform, sample-matrix defconfig, capability-doc parity. UART prerequisite (F7-2) is met; remaining work is the test-build generalization. See [Testing](#testing). | follow |
+| F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness, on-target portable+conformance+cap tiers passing on hardware (30/0). **Remaining:** `tests/arch/cortex-m7/` white-box tier, PIL board profile (`tools/pil/boards/nucleo_f767zi.conf`) + Renode F767 platform, sample-matrix defconfig, CI jobs. See [Testing](#testing). | partial |
 
 ## Risks / notes
 

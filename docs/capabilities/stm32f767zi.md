@@ -70,6 +70,9 @@ NAVHAL_HAS_I2C/SPI/PWM/FLASH/CRC_HW/CYCLE_COUNTER/SDIO  0
 * `hal_uart_tx` flashed; USART3 output captured on `/dev/ttyACM0` at 115200 —
   100×`Hello World` + `UART TX NO DMA Test finished: 115 ticks`, correctly
   framed (confirms the F7 ISR/TDR path and the BRR baud calc from APB1=16 MHz).
+* On-target test ELF (`-DTEST=ON`) flashed; results captured over USART3 @9600:
+  **30 tests, 0 failures** (conformance 15, timebase 8, CRC 7). M4 white-box
+  and raw-flash suites intentionally skipped on M7.
 
 ## Caveats and known limitations
 

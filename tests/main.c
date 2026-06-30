@@ -52,6 +52,15 @@
 #include "arch/cortex-m4/test_uart_protocol.h"
 #endif
 
+/* Cortex-M7 white-box suites. Only the register-compatible / F7-verified
+ * peripherals are ported so far (GPIO incl. the contiguous-port-indexing
+ * assertion, and TIMER); clock/uart-protocol/interrupt and the F7-6 buses
+ * (i2c/spi/pwm) are still to come. */
+#if defined(NAVTEST_ARCH_CORTEX_M7)
+#include "arch/cortex-m7/test_gpio.h"
+#include "arch/cortex-m7/test_timer.h"
+#endif
+
 static const navtest_suite_t *const all_suites[] = {
 /* Cortex-M-only white-box suites — the underlying .c files are gated
  * the same way; this branch keeps the symbol references out of the
@@ -66,6 +75,10 @@ static const navtest_suite_t *const all_suites[] = {
     &test_uart_protocol_suite,
     &test_i2c_suite,
     &test_spi_suite,
+#endif
+#if defined(NAVTEST_ARCH_CORTEX_M7)
+    &test_gpio_suite,
+    &test_timer_suite,
 #endif
     &test_conformance_suite,   /* portable HAL-contract assertions; runs
                                   on every arch (navtest PROGMEM keeps

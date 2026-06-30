@@ -177,19 +177,24 @@ build and run for cortex-m7:
      CMakeLists now drops `uart.c` (F4) / `uart_f7.c` (F7) to keep only the one
      matching the target family — otherwise both define `hal_uart_*` and the F4
      file fails against the F7 register header.
-4. **White-box tier** — ⏳ add `tests/arch/cortex-m7/` (adapt the M4 register
-   tests). The GPIO test must assert **contiguous** port indexing for F7, not the
-   F4 `PE→PH` skip (`test_gpio_get_port_number_skips_to_h` encodes the M4
-   behaviour and is M4-specific).
+4. **White-box tier** — ◐ `tests/arch/cortex-m7/` now has GPIO (incl. a
+   contiguous-port-indexing assertion that is the F7's genuine difference) and
+   TIMER, registered under `NAVTEST_ARCH_CORTEX_M7` in `tests/main.c` and passing
+   on hardware (GPIO 12, TIMER 15 → 63/0 total). Still to port: clock,
+   uart-protocol and interrupt white-box (clock/uart need the F7 ISR/RDR/TDR
+   model and USART3); i2c/spi/pwm belong to F7-6.
 5. **Portable + cap tiers** — ✅ run unchanged on F767 (HAL black-box, self-gate
    on `NAVHAL_HAS_*`). The raw-flash suite is now **re-enabled** on M7 (F7-4
    corrected the sector map and fixed two `flash.c` hardware bugs) and passes
    (6/6).
-6. **PIL / CI** — ⏳
-   - `tools/pil/boards/nucleo_f767zi.conf` (mirror `nucleo_f401re.conf`),
-   - a Renode platform / `.resc` for F767 (mirror `tools/renode/navhal_f401re.resc`),
-   - extend the `.github/workflows/` sample-matrix and PIL jobs with the F767
-     defconfig.
+6. **CI / PIL** — ◐
+   - ✅ Sample-matrix CI: `tools/build_all_f767_samples.sh` builds the portable
+     sample tier under the F767 toolchain (12/12 locally); wired into `ci.yml`
+     as the `sample-matrix-f767` job, the `ci-required` aggregate, and the
+     dispatch path filter.
+   - ⏳ PIL: `tools/pil/boards/nucleo_f767zi.conf` + a Renode platform / `.resc`
+     for F767 (mirror `tools/renode/navhal_f401re.resc`) so the on-target test
+     ELF runs in CI.
 
 ## Milestones
 
@@ -201,7 +206,7 @@ build and run for cortex-m7:
 | F7-4 | FLASH — real F767 sector map in `flash_reg.h`; fixed two `flash.c` bugs found on hardware (DSB after program, NULL guard); flash test re-enabled and passing (36/36) | **done** |
 | F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT — all verified on hardware (56-test run). No new code needed: register-compatible with M4 and the `fpv5-d16` flag landed in F7-1. D-cache stays off (DMA coherent); enabling it + a DMA UART backend remain. | **done** (cache off) |
 | F7-6 | I2C (new timing-register IP), SPI, PWM, CRC, SDIO | follow |
-| F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness, on-target portable+conformance+cap tiers passing on hardware (30/0). **Remaining:** `tests/arch/cortex-m7/` white-box tier, PIL board profile (`tools/pil/boards/nucleo_f767zi.conf`) + Renode F767 platform, sample-matrix defconfig, CI jobs. See [Testing](#testing). | partial |
+| F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness; on-target portable+conformance+cap+flash tiers passing on hardware; white-box GPIO+TIMER (63/0); `sample-matrix-f767` CI job (12/12 portable samples). **Remaining:** clock/uart-protocol/interrupt white-box; PIL board profile + Renode F767 platform. See [Testing](#testing). | partial |
 
 ## Risks / notes
 

@@ -57,7 +57,8 @@ suites add DMA/DWT/FPU when their `CONFIG_*` are enabled — verified separately
 | TIMEBASE          |  8 |  8 | Portable. |
 | CRC               |  7 |  7 | Portable; runs against the HW unit when `DRV_CRC` is on. |
 | FLASH RELIABILITY |  6 |  6 | Real F767 sector map; surfaced + fixed the M7 write-buffer `DSB` and a NULL-guard bug. |
-| **Total** | **128** | **128** | default config; +DMA/DWT/FPU → 56 more when enabled. |
+| SDIO              |  6 |  6 | Polled SD-card I/O (`sdio.c`, register-identical F4/F7 IP). Smoke + a card-init / block write-read round-trip vs a Renode `STM32FSDMMC` + card in PIL (`PIL_ONLY`). |
+| **Total** | **134** | **134** | representative driver config; +DMA/DWT/FPU → 160 with those on. |
 
 PIL: the suite also runs under Renode (mainline STM32F746 CPU model with SRAM
 widened to 512 KB; `tools/renode/navhal_f767zi.resc`) and is green. The SPI/I2C
@@ -65,9 +66,11 @@ register read-backs the Renode models don't reflect are `NAVTEST_SKIP_ON_PIL`;
 conversely, **device-attach transfer tests** (`NAVTEST_PIL_ONLY`) drive a real
 master transfer against modelled bus devices in the `.repl` — an I²C BMP180
 (chip-ID read) and an SPI `GenericSpiFlash` (JEDEC-ID read) — which exercises the
-`i2c_f7` / `spi_f7` transfer FSMs end-to-end in the emulator. These skip on HIL
-(no device wired). Not yet on F767: SDIO (Kconfig-gated to M4 and unported; an
-SD-card model would follow the same pattern once the SDMMC driver lands). The
+`i2c_f7` / `spi_f7` transfer FSMs end-to-end in the emulator. **SDIO** joins them:
+a Renode `SD.STM32FSDMMC` with an attached card lets the PIL run drive a real
+polled block write/read round-trip through the shared `sdio.c`. These all skip on
+HIL (no device wired). The only F767 SDIO gap left is the DMA-backed async API,
+still Cortex-M4-only (`DRV_SDIO_DMA`) pending L1-cache validation. The
 sample-matrix CI builds the 12 portable samples under the F767 toolchain
 (`sample-matrix-f767`).
 

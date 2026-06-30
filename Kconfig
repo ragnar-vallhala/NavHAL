@@ -138,7 +138,7 @@ config DRV_PWM
 
 config DRV_SDIO
     bool "Enable SDIO Driver"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     select DRV_CLOCK
     select DRV_GPIO
@@ -148,11 +148,16 @@ config DRV_SDIO
 config DRV_SDIO_DMA
     bool "Enable DMA-backed SDIO async API"
     default y if DRV_SDIO && ARCH_CORTEX_M4
-    depends on DRV_SDIO
-    select DRV_DMA if ARCH_CORTEX_M4
+    depends on DRV_SDIO && ARCH_CORTEX_M4
+    select DRV_DMA
     help
       Compile the hal_sdio_*_async block-transfer variants. Disable to
       restrict SDIO to the polled (synchronous) API.
+
+      Cortex-M7 (STM32F7) runs the SDIO peripheral in polled mode only:
+      the F7 SDMMC IP is register-identical to the F4 SDIO, but the
+      DMA-backed async path is not yet validated under the F7's L1 cache,
+      so this option is gated to Cortex-M4 for now.
 
 config DRV_FLASH
     bool "Enable Flash Driver"

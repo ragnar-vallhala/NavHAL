@@ -82,7 +82,7 @@ they diverge, the driver needs a family-conditional path.
 | **CRC** | Hardware CRC-32; default polynomial register-compatible with F4. | Reuses `crc.c`. CRC suite (7) passes via the HW unit. ✅ done |
 | **SPI** | F7 moved frame size to `CR2.DS` (+`FRXTH`, byte-`DR` FIFO); F4's `CR1.DFF` is gone. | Separate `spi_f7.c`. `test_spi` (7) passes — init register-verified; FIFO transfer untested (no device). ◐ |
 | **I2C** | **Different IP generation** — F7 `TIMINGR`/`ISR`-`ICR`/CR2-framed/`RXDR`-`TXDR` vs F4 legacy. | Separate `i2c_f7.c` + real F7 `i2c_reg.h`. `test_i2c` (8) passes — init register-verified; transfers untested (no device). ◐ |
-| **SDIO** | F767 has SDMMC (renamed/enhanced); `DRV_SDIO` is gated to Cortex-M4 in Kconfig. | Deferred — needs the SDMMC port + an SD card. ⏳ |
+| **SDIO** | F767 SDMMC1 is **register-identical** to the F4 SDIO (same base `0x40012C00`, APB2ENR bit 11, AF12 pinmux, vector slot 49). The "SDMMC rename" is cosmetic for the registers the driver touches. | Shared `sdio.c` runs unchanged once `DRV_SDIO` is un-gated for M7. `test_sdio` (6) passes; a polled block write/read round-trip is validated in PIL vs a Renode `STM32FSDMMC` + card. DMA async backend stays M4-only. ✅ done (polled) |
 
 ## What this lands now (basic bring-up)
 
@@ -217,7 +217,7 @@ build and run for cortex-m7:
 | F7-3 | High-frequency clock — PWR over-drive + VOS + flash wait-states + APB limits, in `clock_f7.c`; verified at 216 MHz on hardware | **done** |
 | F7-4 | FLASH — real F767 sector map in `flash_reg.h`; fixed two `flash.c` bugs found on hardware (DSB after program, NULL guard); flash test re-enabled and passing (36/36) | **done** |
 | F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT — all verified on hardware (56-test run). No new code needed: register-compatible with M4 and the `fpv5-d16` flag landed in F7-1. D-cache stays off (DMA coherent); enabling it + a DMA UART backend remain. | **done** (cache off) |
-| F7-6 | Peripherals. **Done:** PWM + HW CRC (reuse, verified), SPI (`spi_f7.c`) + I2C (`i2c_f7.c`) rewrites (init register-verified; transfers untested — no bus devices). **Remaining:** SDIO/SDMMC (Kconfig-gated to M4, needs an SD card). | mostly done |
+| F7-6 | Peripherals. **Done:** PWM + HW CRC (reuse, verified), SPI (`spi_f7.c`) + I2C (`i2c_f7.c`) rewrites (init register-verified; transfers PIL-validated against modelled devices), SDIO (shared `sdio.c`, polled; un-gated for M7; PIL block round-trip vs a Renode SD card). **Remaining:** SDIO DMA async backend (still M4-only, pending L1-cache validation). | done |
 | F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness; on-target tiers + white-box GPIO/TIMER/CLOCK/INTERRUPT/UART/PWM/SPI/I2C; `sample-matrix-f767` CI job; **PIL** — `tools/pil/boards/nucleo_f767zi.conf` + Renode `.resc`/`.repl` (F746 model, SRAM widened to 512 KB), boots & runs the suite over USART3. See [Testing](#testing). | **done** |
 
 ## Risks / notes

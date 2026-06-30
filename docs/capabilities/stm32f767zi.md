@@ -42,8 +42,8 @@ by adding a board layer.
 | CYCLE_COUNTER     | ✓ | `src/arch/armv7e-m/dwt/dwt.c`            | DWT-backed; shared ARMv7E-M arch code. Opt-in via `CONFIG_DRV_DWT`; `test_dwt` (6) passes on hardware. |
 | FPU               | ✓ | `src/arch/armv7e-m/fpu/fpu.c`            | Hardware **double-precision** FPU (`-mfpu=fpv5-d16`, hard float) via `CONFIG_USE_FPU` + `CONFIG_DRV_FPU`. `test_fpu_accel` (3) passes on hardware. |
 | DMA               | ✓ | `src/vendor/stm32/dma/dma.c`            | DMA1/DMA2 stream controller (register-compatible with F4). Opt-in via `CONFIG_DRV_DMA`; `test_dma` (17) passes on hardware. Coherent while the L1 D-cache stays off (see caveats); a DMA UART backend is still pending. |
-| SDIO              | ✗ | (pending)                                 | After DMA. |
-| UART_DMA / I2C_DMA / SDIO_DMA | ✗ | (pending)                     | Follow their base drivers. |
+| SDIO              | ◐ | `src/vendor/stm32/sdio/sdio.c`          | **Polled** SD-card block I/O. The F7 SDMMC1 IP is register-identical to the F4 SDIO (same base `0x40012C00`, same APB2ENR bit, same AF12 pinmux, same vector slot 49), so the shared driver runs unchanged. Opt-in via `CONFIG_DRV_SDIO`; `test_sdio` (6) passes, and a card-init + 512-byte block write/read round-trip is validated in PIL against a Renode `SD.STM32FSDMMC` + attached card (`NAVTEST_PIL_ONLY`). The DMA-backed async API stays Cortex-M4-only (`DRV_SDIO_DMA`) until validated under the F7 L1 cache. |
+| UART_DMA / I2C_DMA / SDIO_DMA | ✗ | (pending)                     | Follow their base drivers; DMA-backed peripheral APIs are M4-only on F7 so far. |
 
 `✗` here means the silicon has the peripheral but the NavHAL driver isn't
 validated for F7 yet — treated like `—` at link time.

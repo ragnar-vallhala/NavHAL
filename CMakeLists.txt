@@ -221,6 +221,11 @@ add_custom_target(copy_compile_commands ALL
 # the AVR port relies on the avr-libc C runtime and has none.
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
     set(STARTUP_FILE "")
+elseif(EXISTS "${SRC_BOARD}/startup.s")
+    # The peripheral vector table is MCU-specific, so a board may ship its own
+    # startup.s (e.g. nucleo_f767zi, whose USART3 vector the F401-based arch
+    # table leaves as a literal 0). Prefer it over the arch default.
+    set(STARTUP_FILE "${SRC_BOARD}/startup.s")
 else()
     set(STARTUP_FILE "${SRC_ARCH}/startup/startup.s")
 endif()
@@ -259,8 +264,31 @@ if(TEST)
     ${SRC_VENDOR}/*.c
     ${SRC_ARCH}/*.c
   )
+  # The TEST build globs ALL vendor sources regardless of Kconfig, so the STM32
+  # tree contributes both the F4 uart.c and the F7 uart_f7.c — which define the
+  # same hal_uart_* symbols and each only compiles against its own family's
+  # register layout. Keep exactly the one matching the target family.
+  if(CONFIG_FAMILY_STM32F7)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/uart/uart.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/clock/clock.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/spi/spi.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/i2c/i2c.c)
+  else()
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/uart/uart_f7.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/clock/clock_f7.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/spi/spi_f7.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/i2c/i2c_f7.c)
+  endif()
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
+  # Per-processor identity for the arch-generic test harness (tests/main.c,
+  # navtest_target.h). cortex-m4 and cortex-m7 share the ISA but differ in
+  # white-box register tests and console UART instance.
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
+    add_compile_definitions(NAVTEST_ARCH_CORTEX_M4)
+  elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m7")
+    add_compile_definitions(NAVTEST_ARCH_CORTEX_M7)
+  endif()
   add_executable(tests ${TEST_SRC} ${STARTUP_FILE})
 
   # Per-arch test linker + flags. NAVHAL_TEST_LINKER_FLAGS,

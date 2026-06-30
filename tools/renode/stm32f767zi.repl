@@ -1,0 +1,12 @@
+// Renode platform for the STM32F767ZI PIL run.
+//
+// Reuses Renode's mainline STM32F746 CPU model (register-compatible with the
+// F767 for the peripherals the navtest binary touches) and overrides SRAM:
+// the F746 model ships 384 KB (0x60000), but the F767 has 512 KB and the test
+// ELF's initial stack top is 0x20080000 — above the F746 model's RAM, so the
+// first stack push would fault before any output.
+
+using "platforms/cpus/stm32f746.repl"
+
+sram:
+    size: 0x80000

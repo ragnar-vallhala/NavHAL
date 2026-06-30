@@ -119,4 +119,5 @@ cmake -B "$BUILD_DIR" -DTEST=ON -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE" >/dev/n
 cmake --build "$BUILD_DIR" --target tests -j >/dev/null
 
 echo ">> running $RUNNER $BUILD_DIR/tests"
-"$RUNNER" "$BUILD_DIR/tests"
+# Forward the board's optional RESC (Renode script) override to the runner.
+env ${RESC:+RESC="$RESC"} "$RUNNER" "$BUILD_DIR/tests"

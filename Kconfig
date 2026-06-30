@@ -70,7 +70,7 @@ config DRV_CRC
 endmenu
 
 menu "HAL Drivers Configuration"
-    depends on ARCH_CORTEX_M4 || ARCH_AVR8
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
 
 config DRV_CLOCK
     bool "Enable Clock Driver"

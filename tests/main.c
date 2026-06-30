@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#define CORTEX_M4
 #include "common/hal_features.h"
 #include "navhal_port_fpu.h"
 #include "navhal_port_uart.h"
@@ -38,6 +37,11 @@
 #include "cap/fpu/test_fpu_accel.h"
 #include "cap/sdio/test_sdio.h"
 
+/* White-box, register-poke suites are per-processor. Only the Cortex-M4 set
+ * exists today; a cortex-m7 build skips this tier (its registers differ — e.g.
+ * the F7 USART) and runs the portable + cap + conformance tiers below. Add a
+ * parallel NAVTEST_ARCH_CORTEX_M7 block when tests/arch/cortex-m7/ lands. */
+#if defined(NAVTEST_ARCH_CORTEX_M4)
 #include "arch/cortex-m4/test_clock.h"
 #include "arch/cortex-m4/test_gpio.h"
 #include "arch/cortex-m4/test_i2c.h"
@@ -46,13 +50,28 @@
 #include "arch/cortex-m4/test_spi.h"
 #include "arch/cortex-m4/test_timer.h"
 #include "arch/cortex-m4/test_uart_protocol.h"
+#endif
+
+/* Cortex-M7 white-box suites: GPIO (incl. contiguous-port-indexing), TIMER,
+ * CLOCK (clock_f7, HSI/PLL), INTERRUPT (NVIC + the F767 USART3 vector slot),
+ * and UART PROTOCOL (F7 USART). The F7-6 buses (i2c/spi/pwm) are still to come. */
+#if defined(NAVTEST_ARCH_CORTEX_M7)
+#include "arch/cortex-m7/test_gpio.h"
+#include "arch/cortex-m7/test_timer.h"
+#include "arch/cortex-m7/test_clock.h"
+#include "arch/cortex-m7/test_interrupt.h"
+#include "arch/cortex-m7/test_uart_protocol.h"
+#include "arch/cortex-m7/test_pwm.h"
+#include "arch/cortex-m7/test_spi.h"
+#include "arch/cortex-m7/test_i2c.h"
+#endif
 
 static const navtest_suite_t *const all_suites[] = {
 /* Cortex-M-only white-box suites — the underlying .c files are gated
  * the same way; this branch keeps the symbol references out of the
  * AVR-targeted link. Portable HAL-only test suites (timebase, crc,
  * flash) stay outside the gate so they run on every supported arch. */
-#if defined(__arm__) || defined(__thumb__)
+#if defined(NAVTEST_ARCH_CORTEX_M4)
     &test_gpio_suite,
     &test_interrupt_suite,
     &test_timer_suite,
@@ -61,6 +80,16 @@ static const navtest_suite_t *const all_suites[] = {
     &test_uart_protocol_suite,
     &test_i2c_suite,
     &test_spi_suite,
+#endif
+#if defined(NAVTEST_ARCH_CORTEX_M7)
+    &test_gpio_suite,
+    &test_timer_suite,
+    &test_clock_suite,
+    &test_interrupt_suite,
+    &test_uart_protocol_suite,
+    &test_pwm_suite,
+    &test_spi_suite,
+    &test_i2c_suite,
 #endif
     &test_conformance_suite,   /* portable HAL-contract assertions; runs
                                   on every arch (navtest PROGMEM keeps

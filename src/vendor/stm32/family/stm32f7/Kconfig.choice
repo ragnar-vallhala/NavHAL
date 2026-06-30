@@ -1,0 +1,10 @@
+# vim: ft=kconfig
+# Device-family choice entry for STM32F7 (M7 §7.2).
+# Sourced inside the root "Vendor Device Family" choice. Gated on
+# ARCH_CORTEX_M7 so exactly one family is visible per arch selection
+# (STM32F4 on Cortex-M4, STM32F7 on Cortex-M7) — the choice then
+# auto-selects its single visible member.
+
+config FAMILY_STM32F7
+    bool "STM32F7 (Cortex-M7)"
+    depends on VENDOR_STM32 && ARCH_CORTEX_M7

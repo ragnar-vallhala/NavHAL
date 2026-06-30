@@ -10,10 +10,24 @@ if(CONFIG_DRV_GPIO)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/gpio/gpio.c)
 endif()
 if(CONFIG_DRV_CLOCK)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
+    # STM32F7 needs PWR over-drive + frequency-scaled flash wait states + APB
+    # bus-limit prescalers to run above the F4's ~84 MHz ceiling, so it ships a
+    # dedicated clock driver. Selected by family; F4 clock.c stays untouched.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
+    endif()
 endif()
 if(CONFIG_DRV_UART)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
+    # The STM32F7 USART IP (ISR/RDR/TDR) differs from the F4 (SR/DR), so the F7
+    # port ships its own driver file. Selecting by family here keeps the frozen
+    # F4 uart.c untouched. (To be unified under the vendor-backend vtable in M9.)
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
+    endif()
 endif()
 if(CONFIG_DRV_TIMER)
     list(APPEND HAL_SOURCES
@@ -22,8 +36,14 @@ if(CONFIG_DRV_TIMER)
     )
 endif()
 
-# Startup is arch-layer code; always linked in.
-list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)
+# Startup glue is arch-layer, but the peripheral vector table is MCU-specific:
+# a board may override with its own startup.s (e.g. nucleo_f767zi, whose USART3
+# vector the F401-based arch table leaves empty). Prefer the board file.
+if(EXISTS ${SRC_BOARD}/startup.s)
+    list(APPEND HAL_SOURCES ${SRC_BOARD}/startup.s)
+else()
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)
+endif()
 
 if(CONFIG_DRV_INTERRUPT)
     list(APPEND HAL_SOURCES ${SRC_ARCH}/interrupt/interrupt.c)
@@ -32,10 +52,22 @@ if(CONFIG_DRV_PWM)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/pwm/pwm.c)
 endif()
 if(CONFIG_DRV_I2C)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c)
+    # F7 I²C is a different IP (TIMINGR / ISR-ICR / CR2-framed), so a full
+    # rewrite. Selected by family; the F4 legacy i2c.c stays untouched.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c)
+    endif()
 endif()
 if(CONFIG_DRV_SPI)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spi/spi.c)
+    # F7 SPI puts the frame size in CR2.DS (+ FRXTH for byte FIFO access), not
+    # the F4's CR1.DFF — a separate driver. Selected by family; F4 spi.c stays.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spi/spi_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spi/spi.c)
+    endif()
 endif()
 if(CONFIG_DRV_FLASH)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/flash/flash.c)

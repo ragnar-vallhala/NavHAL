@@ -33,6 +33,38 @@ What is tested where, mapped onto the SIL / PIL / HIL model from
 Pass column counts the **on-target** result. The host subset adds 24
 more (run at SIL only).
 
+The totals above are the **STM32F401RE** reference target. A second on-target
+target is now covered:
+
+## STM32F767ZI on-target run (HIL)
+
+The same harness runs on the Nucleo-F767ZI over USART3. Suites map onto the
+`NAVTEST_ARCH_CORTEX_M7` white-box tier plus the portable/conformance tiers (cap
+suites add DMA/DWT/FPU when their `CONFIG_*` are enabled — verified separately at
+56/0). Latest default-config run:
+
+| Suite | Cases | Pass | Notes |
+|-------|------:|-----:|-------|
+| GPIO              | 12 | 12 | M4 suite + an F7 contiguous-port-indexing assertion (no PE→PH skip). |
+| TIMER             | 15 | 15 | Same TIM IP as F4. |
+| CLOCK             | 10 | 10 | `clock_f7.c`; HSI + PLL-from-HSI. HSE cases omitted (board HSE-from-MCO availability unconfirmed). |
+| INTERRUPT         | 15 | 15 | NVIC + a vector-table assertion that USART3 (IRQ 39) resolves to a real handler — guards the F767 `startup.s` vector-table fix. |
+| UART PROTOCOL     | 12 | 12 | F7 USART (`uart_f7.c`); drives UART1/UART6, USART3 is the console. |
+| PWM               | 11 | 11 | Reuses the shared timer-based driver. |
+| SPI               |  7 |  7 | `spi_f7.c` (CR2.DS/FRXTH). Init register-verified; CR2.DS read-back is `NAVTEST_SKIP_ON_PIL` (Renode doesn't model it). |
+| I2C               |  8 |  8 | `i2c_f7.c` (timing-register IP). Init register-verified; TIMINGR read-back is `NAVTEST_SKIP_ON_PIL`. |
+| CONFORMANCE       | 15 | 15 | Portable HAL-contract. |
+| TIMEBASE          |  8 |  8 | Portable. |
+| CRC               |  7 |  7 | Portable; runs against the HW unit when `DRV_CRC` is on. |
+| FLASH RELIABILITY |  6 |  6 | Real F767 sector map; surfaced + fixed the M7 write-buffer `DSB` and a NULL-guard bug. |
+| **Total** | **126** | **126** | default config; +DMA/DWT/FPU → 56 more when enabled. |
+
+PIL: the suite also runs under Renode (mainline STM32F746 CPU model with SRAM
+widened to 512 KB; `tools/renode/navhal_f767zi.resc`) and is green — the SPI/I2C
+register read-backs the Renode models don't reflect are `NAVTEST_SKIP_ON_PIL`.
+Not yet on F767: SDIO (Kconfig-gated to M4, needs an SD card). The sample-matrix
+CI builds the 12 portable samples under the F767 toolchain (`sample-matrix-f767`).
+
 ## Per-driver function coverage
 
 Standardized M2 drivers and how their public API maps to suites. A

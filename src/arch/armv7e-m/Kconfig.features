@@ -9,14 +9,14 @@
 
 config USE_FPU
     bool "Enable Hardware FPU Compiler Flags"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     help
       Enable hardware Floating Point Unit compiler and linker flags.
 
 config DRV_DMA
     bool "Enable Direct Memory Access (DMA)"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     select DRV_INTERRUPT
     help
@@ -24,14 +24,14 @@ config DRV_DMA
 
 config DRV_DWT
     bool "Enable Debug Watchpoint and Trace (DWT)"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     help
       Enables the DWT counter for high-resolution timing.
 
 config DRV_FPU
     bool "Enable FPU Driver Extension"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     help
       Enables compilation of hardware FPU runtime setup files.

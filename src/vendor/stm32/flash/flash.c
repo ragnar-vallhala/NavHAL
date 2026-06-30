@@ -67,6 +67,12 @@ static NAVHAL_UNUSED void _flash_program_word_(uint32_t addr, uint32_t data) {
   FLASH_CR |= FLASH_CR_PG;
 
   *(volatile uint32_t *)addr = data;
+  /* The store to flash (Normal memory) can sit in the Cortex-M7 write buffer;
+   * without a barrier, _flash_wait_ reads BSY before the program has started,
+   * returns immediately, and PG is cleared before the write commits — the
+   * write is silently lost. A DSB forces the store to reach the flash
+   * controller first. Harmless on Cortex-M4. */
+  __asm volatile("dsb 0xF" ::: "memory");
 
   _flash_wait_();
   FLASH_CR &= ~FLASH_CR_PG;
@@ -81,6 +87,9 @@ static void _flash_program_half_word_(uint32_t addr, uint16_t data) {
   FLASH_CR |= FLASH_CR_PG;
 
   *(volatile uint16_t *)addr = data;
+  /* Flush the Cortex-M7 write buffer before polling BSY (see the word-program
+   * variant above for why this is required). Harmless on Cortex-M4. */
+  __asm volatile("dsb 0xF" ::: "memory");
 
   _flash_wait_();
   FLASH_CR &= ~FLASH_CR_PG;
@@ -240,7 +249,7 @@ static hal_status_t _flash_compact_storage_(void) {
 /* ---- Public API --------------------------------------------------------- */
 
 hal_status_t hal_flash_save(uint8_t key, const uint8_t *value, uint8_t size) {
-  if (size == 0)
+  if (size == 0 || value == NULL)
     return HAL_ERR;
 
   __IO uint8_t *ptr = _flash_find_next_free();
@@ -283,6 +292,12 @@ hal_status_t hal_flash_save(uint8_t key, const uint8_t *value, uint8_t size) {
 }
 
 hal_status_t hal_flash_read(uint8_t key, uint8_t *value, uint8_t *size) {
+  /* NULL-guard before any dereference. Without this, a NULL `size` made the
+   * not-found path below write `*size = 0` to address 0 — harmless on the
+   * Cortex-M4 / Renode flash model, but a faulting store on real Cortex-M7. */
+  if (value == NULL || size == NULL)
+    return HAL_ERR_INVALID_ARG;
+
   __IO hal_flash_record_t *last_rec = _flash_find_first_valid_entry_(key);
   if (last_rec == NULL) {
     *size = 0;

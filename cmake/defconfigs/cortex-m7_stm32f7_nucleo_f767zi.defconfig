@@ -1,0 +1,19 @@
+# NavHAL defconfig — ARM Cortex-M7 / STM32F7 / Nucleo-F767ZI.
+#
+# Minimal Kconfig fragment: selects the arch / vendor / family / board.
+# Everything else (drivers, sample selection, capability flags) cascades
+# from Kconfig defaults.
+#
+# Used by cmake/toolchains/arm-none-eabi-f767-toolchain.cmake — when that
+# toolchain file is active, CMakeLists.txt copies this into .config before
+# running tools/kconfig.py.
+#
+# UART (USART3 console) is served by the F7-specific driver
+# src/vendor/stm32/uart/uart_f7.c, selected by the vendor CMakeLists when
+# CONFIG_FAMILY_STM32F7 is set (the F7 USART IP uses ISR/RDR/TDR, not the F4
+# SR/DR model). See docs/stm32f767zi_port_plan.md, milestone F7-2.
+
+CONFIG_ARCH_CORTEX_M7=y
+CONFIG_VENDOR_STM32=y
+CONFIG_FAMILY_STM32F7=y
+CONFIG_BOARD_NUCLEO_F767ZI=y

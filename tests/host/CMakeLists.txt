@@ -61,12 +61,20 @@ add_executable(tests_host_drivers
   main_drivers.c
   host_backend.c
   host_mmio.c
+  host_stubs.c
   test_gpio_driver.c
+  test_uart_driver.c
+  test_i2c_driver.c
+  test_spi_driver.c
 
   ${NAVHAL_ROOT}/tests/navtest_state.c
 
   # real driver sources under test
   ${NAVHAL_ROOT}/src/vendor/stm32/gpio/gpio.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/clock/clock_f7.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/uart/uart_f7.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/i2c/i2c_f7.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/spi/spi_f7.c
 )
 target_include_directories(tests_host_drivers PRIVATE
   ${NAVHAL_ROOT}/include

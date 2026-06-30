@@ -25,12 +25,17 @@
 
 #include "host_mmio.h"
 #include "navtest/navtest.h"
-#include "test_gpio_driver.h"
 
-#include <stdio.h>
+extern const navtest_suite_t test_gpio_driver_suite;
+extern const navtest_suite_t test_uart_driver_suite;
+extern const navtest_suite_t test_i2c_driver_suite;
+extern const navtest_suite_t test_spi_driver_suite;
 
 static const navtest_suite_t *const driver_suites[] = {
     &test_gpio_driver_suite,
+    &test_uart_driver_suite,
+    &test_i2c_driver_suite,
+    &test_spi_driver_suite,
 };
 
 int main(void) {

@@ -39,9 +39,9 @@ by adding a board layer.
 | PWM               | ✗ | (pending)                                 | Depends on the shared timer driver; enable after timer validation. |
 | FLASH             | ✗ | (pending)                                 | F7 sector map differs (32 KB×4, 128 KB×1, 256 KB×3 single 2 MB bank); `flash_reg.h` carries a placeholder F4 map. |
 | CRC_HW            | ✗ | (pending)                                 | F7 CRC unit present; driver not validated. |
-| CYCLE_COUNTER     | ✗ | `src/arch/armv7e-m/dwt/dwt.c`            | Arch code exists; not enabled/validated on M7 yet. |
-| FPU               | ✗ | `src/arch/armv7e-m/fpu/fpu.c`            | M7 is double-precision (`-mfpu=fpv5-d16`, wired in the cmake arch fragment); runtime enable not validated. |
-| DMA               | ✗ | (pending)                                 | M7 needs L1 D-cache coherency handling around DMA buffers; cache left off for bring-up. |
+| CYCLE_COUNTER     | ✓ | `src/arch/armv7e-m/dwt/dwt.c`            | DWT-backed; shared ARMv7E-M arch code. Opt-in via `CONFIG_DRV_DWT`; `test_dwt` (6) passes on hardware. |
+| FPU               | ✓ | `src/arch/armv7e-m/fpu/fpu.c`            | Hardware **double-precision** FPU (`-mfpu=fpv5-d16`, hard float) via `CONFIG_USE_FPU` + `CONFIG_DRV_FPU`. `test_fpu_accel` (3) passes on hardware. |
+| DMA               | ✓ | `src/vendor/stm32/dma/dma.c`            | DMA1/DMA2 stream controller (register-compatible with F4). Opt-in via `CONFIG_DRV_DMA`; `test_dma` (17) passes on hardware. Coherent while the L1 D-cache stays off (see caveats); a DMA UART backend is still pending. |
 | SDIO              | ✗ | (pending)                                 | After DMA. |
 | UART_DMA / I2C_DMA / SDIO_DMA | ✗ | (pending)                     | Follow their base drivers. |
 
@@ -59,10 +59,14 @@ NAVHAL_HAS_TIMER         1
 NAVHAL_HAS_CLOCK         1
 NAVHAL_HAS_INTERRUPT     1
 NAVHAL_HAS_UART          1   (uart_f7.c — polling; DMA backend off)
-NAVHAL_HAS_DMA           0
-NAVHAL_HAS_FPU           0   (selectable via CONFIG_USE_FPU once validated)
-NAVHAL_HAS_I2C/SPI/PWM/FLASH/CRC_HW/CYCLE_COUNTER/SDIO  0
+NAVHAL_HAS_DMA           0   (opt-in via CONFIG_DRV_DMA — verified working)
+NAVHAL_HAS_FPU           0   (opt-in via CONFIG_USE_FPU+DRV_FPU — verified working)
+NAVHAL_HAS_CYCLE_COUNTER 0   (opt-in via CONFIG_DRV_DWT — verified working)
+NAVHAL_HAS_I2C/SPI/PWM/FLASH/CRC_HW/SDIO  0
 ```
+
+DMA / FPU / DWT are off in the *default* config (opt-in), but all three are
+implemented and pass their on-target test suites — see the bring-up record.
 
 ## Hardware bring-up record
 
@@ -80,13 +84,19 @@ NAVHAL_HAS_I2C/SPI/PWM/FLASH/CRC_HW/CYCLE_COUNTER/SDIO  0
 * Clock brought to **216 MHz** (HSI→PLL, over-drive engaged): captured
   `sysclk=216000000 ahb=216000000 apb1=54000000 apb2=108000000` over USART3 while
   the UART kept running — confirming VOS/over-drive/WS=7 and the APB prescalers.
+* Test ELF rebuilt with `CONFIG_USE_FPU` + `DRV_FPU` + `DRV_DWT` + `DRV_DMA`
+  (hard-float `fpv5-d16`); on-target run reported **56 tests, 0 failures** —
+  adds DMA (17), CYCLE_COUNTER/DWT (6) and FPU (3) to the 30 above.
 
 ## Caveats and known limitations
 
 * Reset default is HSI 16 MHz; call `hal_clock_init` with a PLL config to scale
   up (up to 216 MHz — `clock_f7.c` does VOS/over-drive/wait-states for you).
-* UART is polling-only; the DMA backend (`hal_uart_write_dma`) is not yet ported
-  to F7 (needs M7 cache-coherency handling — F7-5), so `DRV_UART_DMA` stays off.
-* L1 caches are disabled; enabling them later requires DMA-buffer cache
-  maintenance.
+* UART is polling-only; the DMA-backed UART API (`hal_uart_write_dma`) is not yet
+  ported to F7, so `DRV_UART_DMA` stays off — even though the DMA driver itself
+  works. (Wiring `uart_f7.c` to DMA is the remaining UART-DMA task.)
+* The **L1 D-cache is kept disabled**, which is what makes DMA buffers coherent
+  today. The DMA driver is verified in this configuration. Enabling the D-cache
+  later for performance will require cache clean/invalidate around any
+  DMA/peripheral-shared buffer (`SCB_CleanDCache_by_Addr` / `InvalidateDCache`).
 * Not yet wired into CI (sample matrix / PIL) — milestone F7-7.

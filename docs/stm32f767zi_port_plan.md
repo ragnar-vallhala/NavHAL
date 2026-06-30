@@ -77,7 +77,7 @@ they diverge, the driver needs a family-conditional path.
 | **USART** | **Major divergence.** F4 uses `SR`/`DR`; F7 uses the modern IP: `ISR` (RO) / `ICR` / `RDR` / `TDR`, plus `BRR` oversampling differences. `uart.c` writes `usart->SR`/`->DR` directly. | Implemented as a separate `src/vendor/stm32/uart/uart_f7.c`, selected by the vendor CMakeLists when `CONFIG_FAMILY_STM32F7` (frozen F4 `uart.c` untouched). Polling TX/RX verified on USART3. DMA backend still pending (F7-5). ✅ done (polling) |
 | **TIMER** | General-purpose timers (TIM2–5, TIM1/9/10/11) identical layout and bases. | Reuse `timer.c` with F7 `timer_reg.h` (copy of F4). ✅ done |
 | **INTERRUPT / NVIC** | Core peripheral, identical. F7 has more IRQ lines; vector table grows. | Reuse arch `interrupt.c` + `startup.s`. ✅ |
-| **DMA** | F7 DMA controller is stream/channel-compatible with F4 but cache coherency matters on M7. | Reuse pending; gated off by default. ⏳ follow-up |
+| **DMA** | F7 DMA controller is stream/channel-compatible with F4; cache coherency matters on M7 only when the D-cache is on (kept off here). | Reuses `dma.c` with the F7 `dma_reg.h`. Opt-in via `CONFIG_DRV_DMA`; `test_dma` (17) passes on hardware with the D-cache off. ✅ done |
 | **CRC / SDIO / SPI / I2C / PWM** | Mostly compatible register maps; I2C IP differs (F7 uses the timing-register I2C like F0/L4). | Bring up after UART. ⏳ follow-up |
 
 ## What this lands now (basic bring-up)
@@ -199,7 +199,7 @@ build and run for cortex-m7:
 | F7-2 | UART (USART3 console) — `uart_f7.c` for the F7 ISR/RDR/TDR IP; polling TX/RX verified on hardware | **done** |
 | F7-3 | High-frequency clock — PWR over-drive + VOS + flash wait-states + APB limits, in `clock_f7.c`; verified at 216 MHz on hardware | **done** |
 | F7-4 | FLASH driver — verify F767 sector map, adapt `flash.c` | follow |
-| F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT + cache-coherent DMA buffers | follow |
+| F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT — all verified on hardware (56-test run). No new code needed: register-compatible with M4 and the `fpv5-d16` flag landed in F7-1. D-cache stays off (DMA coherent); enabling it + a DMA UART backend remain. | **done** (cache off) |
 | F7-6 | I2C (new timing-register IP), SPI, PWM, CRC, SDIO | follow |
 | F7-7 | Test enablement + CI. **Done:** processor-generic test linker/harness, on-target portable+conformance+cap tiers passing on hardware (30/0). **Remaining:** `tests/arch/cortex-m7/` white-box tier, PIL board profile (`tools/pil/boards/nucleo_f767zi.conf`) + Renode F767 platform, sample-matrix defconfig, CI jobs. See [Testing](#testing). | partial |
 
@@ -209,11 +209,13 @@ build and run for cortex-m7:
   bus limits automatically inside `hal_clock_init`, so a PLL target up to 216 MHz
   is safe. Samples that never call `hal_clock_init` simply run on the reset HSI
   (16 MHz, 0 wait states).
-- UART is **polling-only** on F7 today (`uart_f7.c`). The DMA backend
-  (`hal_uart_write_dma` etc.) is not yet ported — it needs Cortex-M7 cache
-  coherency handling (F7-5), so `DRV_UART_DMA` stays off.
-- L1 D-cache stays **off** until DMA work (F7-5); enabling it earlier would
-  require cache maintenance around any DMA/peripheral-shared buffer.
+- UART is **polling-only** on F7 today (`uart_f7.c`). The DMA-backed UART API
+  (`hal_uart_write_dma` etc.) is not yet ported, so `DRV_UART_DMA` stays off —
+  this is a `uart_f7.c` gap, not a DMA-driver one (the DMA driver itself is
+  verified working).
+- The **L1 D-cache is kept off**, which is what makes the verified DMA path
+  coherent. Turning the D-cache on later (for performance) needs cache
+  clean/invalidate around any DMA/peripheral-shared buffer.
 - `flash_reg.h` sector sizes/addresses are still the **F4 placeholder** map;
   `flash.c`'s storage-sector selection must be re-reviewed against the F767's
   256 KB sectors before `DRV_FLASH` is enabled (F7-4).

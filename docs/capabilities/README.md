@@ -30,9 +30,9 @@ What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro def
 | Interrupt ctrl    | `INTERRUPT`            | ✓ | ✓ | ✓ |
 | Flash             | `FLASH`                | ✓ | ◐ | ✗ |
 | Hardware CRC      | `CRC_HW`               | ✓ | s/w | ✗ |
-| Cycle counter     | `CYCLE_COUNTER`        | ✓ | — | ✗ |
-| FPU               | `FPU`                  | ✓ | — | ✗ |
-| DMA controller    | `DMA`                  | ✓ | — | ✗ |
+| Cycle counter     | `CYCLE_COUNTER`        | ✓ | — | ✓ |
+| FPU               | `FPU`                  | ✓ | — | ✓ |
+| DMA controller    | `DMA`                  | ✓ | — | ✓ |
 | SDIO              | `SDIO`                 | ✓ | — | ✗ |
 | UART → DMA backend| `UART_DMA`             | ✓ | — | ✗ |
 | I²C → DMA backend | `I2C_DMA`              | ✓ | — | ✗ |

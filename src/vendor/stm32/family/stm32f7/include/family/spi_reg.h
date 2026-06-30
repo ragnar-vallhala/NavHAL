@@ -74,9 +74,19 @@ typedef struct {
 #define SPI_CR1_SSI (1U << 8)
 #define SPI_CR1_SSM (1U << 9)
 #define SPI_CR1_RXONLY (1U << 10)
-#define SPI_CR1_DFF (1U << 11)
+/* NOTE: CR1 bit 11 is CRCL on the F7, not DFF — data size moved to CR2.DS
+ * below. SPI_CR1_DFF is intentionally absent for the F7; spi_f7.c uses CR2. */
 #define SPI_CR1_BIDIOE (1U << 14)
 #define SPI_CR1_BIDIMODE (1U << 15)
+
+/** CR2: F7 data size (DS) + RX-FIFO threshold (FRXTH). The F4's CR1.DFF is
+ *  replaced by these — DS selects the frame width and FRXTH lets RXNE assert on
+ *  an 8-bit boundary (so byte-at-a-time RX works). */
+#define SPI_CR2_DS_Pos 8
+#define SPI_CR2_DS_Msk (0xFU << SPI_CR2_DS_Pos)
+#define SPI_CR2_DS_8BIT (0x7U << SPI_CR2_DS_Pos)  /* 0111 = 8-bit frames */
+#define SPI_CR2_DS_16BIT (0xFU << SPI_CR2_DS_Pos) /* 1111 = 16-bit frames */
+#define SPI_CR2_FRXTH (1U << 12)                  /* RXNE on 8-bit (1/4 FIFO) */
 
 /** SR register bit positions and masks */
 #define SPI_SR_RXNE (1U << 0)

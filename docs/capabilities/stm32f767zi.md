@@ -27,7 +27,7 @@ follow-ups — see [`../stm32f767zi_port_plan.md`](../stm32f767zi_port_plan.md).
 |---|---|---|---|
 | GPIO              | ✓ | `src/vendor/stm32/gpio/gpio.c`            | Reuses the F4 driver; F7 `gpio_reg.h` uses contiguous port indexing (A–G + H). Verified on LD1 (PB0). |
 | TIMER             | ✓ | `src/vendor/stm32/timer/timer.c`         | TIM2–5 / TIM1 / TIM9–11; same register layout as F4. |
-| CLOCK             | ◐ | `src/vendor/stm32/clock/clock.c`         | HSI / HSE / PLL up to ~180 MHz. Over-drive (`PWR_CR1` ODEN/ODSWEN) + VOS for 216 MHz **not yet** wired — do not target >180 MHz. |
+| CLOCK             | ✓ | `src/vendor/stm32/clock/clock_f7.c`      | HSI / HSE / PLL up to **216 MHz**, verified on hardware. VOS Scale 1, PWR over-drive (>180 MHz), HCLK-scaled flash wait states + ART/prefetch, APB1 ≤54 / APB2 ≤108 MHz prescalers. |
 | INTERRUPT         | ✓ | `src/arch/armv7e-m/interrupt/interrupt.c`| NVIC; shared ARMv7E-M arch code. |
 | UART              | ◐ | `src/vendor/stm32/uart/uart_f7.c`        | USART1/2/3/6, polling TX/RX. USART3 (ST-LINK VCP, PD8/PD9) verified on hardware at 115200. F7-specific driver (ISR/RDR/TDR), selected by `CONFIG_FAMILY_STM32F7`. DMA backend not yet ported (F7-5). |
 | I2C               | ✗ | (pending)                                 | F7 uses the timing-register I2C IP (like F0/L4); needs a new driver path. |
@@ -73,11 +73,14 @@ NAVHAL_HAS_I2C/SPI/PWM/FLASH/CRC_HW/CYCLE_COUNTER/SDIO  0
 * On-target test ELF (`-DTEST=ON`) flashed; results captured over USART3 @9600:
   **30 tests, 0 failures** (conformance 15, timebase 8, CRC 7). M4 white-box
   and raw-flash suites intentionally skipped on M7.
+* Clock brought to **216 MHz** (HSI→PLL, over-drive engaged): captured
+  `sysclk=216000000 ahb=216000000 apb1=54000000 apb2=108000000` over USART3 while
+  the UART kept running — confirming VOS/over-drive/WS=7 and the APB prescalers.
 
 ## Caveats and known limitations
 
-* HSI-only by default; the over-drive/VOS sequence for >180 MHz is not yet
-  implemented (port-plan milestone F7-3).
+* Reset default is HSI 16 MHz; call `hal_clock_init` with a PLL config to scale
+  up (up to 216 MHz — `clock_f7.c` does VOS/over-drive/wait-states for you).
 * UART is polling-only; the DMA backend (`hal_uart_write_dma`) is not yet ported
   to F7 (needs M7 cache-coherency handling — F7-5), so `DRV_UART_DMA` stays off.
 * L1 caches are disabled; enabling them later requires DMA-buffer cache

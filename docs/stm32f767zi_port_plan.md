@@ -71,7 +71,7 @@ they diverge, the driver needs a family-conditional path.
 | Peripheral | F4 vs F7 | Reuse strategy |
 |---|---|---|
 | **GPIO** | Identical IP; same base `0x40020000`. F7 exposes contiguous ports A–G (+H), F401 jumps PE→PH. | Reuse `gpio.c`. F7 `gpio_reg.h` uses contiguous `n>>4` port indexing and lists all bases. ✅ done |
-| **CLOCK / RCC** | Same `CR`/`PLLCFGR`/`CFGR` layout and base `0x40023800`. F7 adds over-drive (`PWR_CR1` ODEN/ODSWEN) + VOS scaling for >180 MHz, and PLLSAI/DCKCFGR. | Reuse `clock.c` for HSI/HSE/PLL up to ~180 MHz. Over-drive to reach 216 MHz is a follow-up. ✅ basic |
+| **CLOCK / RCC** | Same `CR`/`PLLCFGR`/`CFGR` layout and base `0x40023800`. F7 adds over-drive (`PWR_CR1` ODEN/ODSWEN) + VOS scaling for >180 MHz, frequency-scaled flash wait states, and APB bus limits (APB1 ≤54, APB2 ≤108 MHz). | Implemented in `src/vendor/stm32/clock/clock_f7.c` (family-selected): VOS Scale 1, over-drive >180 MHz, WS by HCLK, ART+prefetch, bus-limit prescalers. Verified at **216 MHz** on hardware. ✅ done |
 | **FLASH** | Base `0x40023C00`, same `ACR`/`KEYR`/`CR`/`SR`. Wait-state count and **sector map differ** (F767: 32 KB×4, 128 KB×1, 256 KB×3 = 2 MB single bank). ART accelerator + prefetch. | F7 `flash_reg.h` carries the F767 sector map. `flash.c` reuse pending sector-map verification. ⏳ follow-up |
 | **USART** | **Major divergence.** F4 uses `SR`/`DR`; F7 uses the modern IP: `ISR` (RO) / `ICR` / `RDR` / `TDR`, plus `BRR` oversampling differences. `uart.c` writes `usart->SR`/`->DR` directly. | Implemented as a separate `src/vendor/stm32/uart/uart_f7.c`, selected by the vendor CMakeLists when `CONFIG_FAMILY_STM32F7` (frozen F4 `uart.c` untouched). Polling TX/RX verified on USART3. DMA backend still pending (F7-5). ✅ done (polling) |
 | **TIMER** | General-purpose timers (TIM2–5, TIM1/9/10/11) identical layout and bases. | Reuse `timer.c` with F7 `timer_reg.h` (copy of F4). ✅ done |
@@ -108,7 +108,8 @@ src/vendor/stm32/family/stm32f7/Kconfig.choice   (FAMILY_STM32F7, M7-gated)
 src/vendor/stm32/family/stm32f7/include/family/*_reg.h  (F7 register maps;
                                             uart_reg.h is the real F7 USART model)
 src/vendor/stm32/uart/uart_f7.c            (F7 USART driver — ISR/RDR/TDR)
-src/vendor/stm32/CMakeLists.txt            (select uart_f7.c for FAMILY_STM32F7)
+src/vendor/stm32/clock/clock_f7.c          (F7 clock — over-drive/WS/APB limits)
+src/vendor/stm32/CMakeLists.txt            (select *_f7.c for FAMILY_STM32F7)
 
 src/board/nucleo_f767zi/Kconfig            (BOARD="nucleo_f767zi")
 src/board/nucleo_f767zi/Kconfig.choice     (BOARD_NUCLEO_F767ZI)
@@ -194,7 +195,7 @@ build and run for cortex-m7:
 |---|---|---|
 | F7-1 | Build wiring + GPIO/CLOCK/TIMER/INTERRUPT + flashable blink on HSI | **done** |
 | F7-2 | UART (USART3 console) — `uart_f7.c` for the F7 ISR/RDR/TDR IP; polling TX/RX verified on hardware | **done** |
-| F7-3 | High-frequency clock — PWR over-drive + VOS + correct flash wait-states (up to 216 MHz) | next |
+| F7-3 | High-frequency clock — PWR over-drive + VOS + flash wait-states + APB limits, in `clock_f7.c`; verified at 216 MHz on hardware | **done** |
 | F7-4 | FLASH driver — verify F767 sector map, adapt `flash.c` | follow |
 | F7-5 | DMA + hardware FPU (`fpv5-d16`) + DWT + cache-coherent DMA buffers | follow |
 | F7-6 | I2C (new timing-register IP), SPI, PWM, CRC, SDIO | follow |
@@ -202,9 +203,10 @@ build and run for cortex-m7:
 
 ## Risks / notes
 
-- **HSI-only bring-up** keeps flash wait-states at 0 and avoids the over-drive
-  sequence, so blink is safe before F7-3. Do **not** call `hal_clock_init` with
-  a PLL target above 180 MHz until over-drive lands.
+- `clock_f7.c` handles VOS, over-drive (>180 MHz), flash wait states and APB
+  bus limits automatically inside `hal_clock_init`, so a PLL target up to 216 MHz
+  is safe. Samples that never call `hal_clock_init` simply run on the reset HSI
+  (16 MHz, 0 wait states).
 - UART is **polling-only** on F7 today (`uart_f7.c`). The DMA backend
   (`hal_uart_write_dma` etc.) is not yet ported — it needs Cortex-M7 cache
   coherency handling (F7-5), so `DRV_UART_DMA` stays off.

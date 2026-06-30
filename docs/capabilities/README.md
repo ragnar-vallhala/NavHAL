@@ -26,7 +26,7 @@ What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro def
 | SPI               | `SPI`                  | ✓ | ✓ | ✗ |
 | Timer             | `TIMER`                | ✓ | ✓ | ✓ |
 | PWM               | `PWM`                  | ✓ | ✓ | ✗ |
-| Clock subsystem   | `CLOCK`                | ✓ | ◐ | ◐ |
+| Clock subsystem   | `CLOCK`                | ✓ | ◐ | ✓ |
 | Interrupt ctrl    | `INTERRUPT`            | ✓ | ✓ | ✓ |
 | Flash             | `FLASH`                | ✓ | ◐ | ✗ |
 | Hardware CRC      | `CRC_HW`               | ✓ | s/w | ✗ |

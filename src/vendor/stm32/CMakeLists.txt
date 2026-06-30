@@ -10,7 +10,14 @@ if(CONFIG_DRV_GPIO)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/gpio/gpio.c)
 endif()
 if(CONFIG_DRV_CLOCK)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
+    # STM32F7 needs PWR over-drive + frequency-scaled flash wait states + APB
+    # bus-limit prescalers to run above the F4's ~84 MHz ceiling, so it ships a
+    # dedicated clock driver. Selected by family; F4 clock.c stays untouched.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
+    endif()
 endif()
 if(CONFIG_DRV_UART)
     # The STM32F7 USART IP (ISR/RDR/TDR) differs from the F4 (SR/DR), so the F7

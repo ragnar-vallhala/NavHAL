@@ -10,3 +10,8 @@ using "platforms/cpus/stm32f746.repl"
 
 sram:
     size: 0x80000
+
+// I2C device for the PIL-only bus transfer test (test_i2c.c): a BMP180 on
+// I2C1 @ 0x77. Its chip-ID register (0xD0 -> 0x55) gives a deterministic
+// read that exercises the i2c_f7 master transfer path end-to-end.
+bmp180: Sensors.BMP180 @ i2c1 0x77

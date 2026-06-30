@@ -20,5 +20,12 @@ cmake -B "$BUILD_DIR" -S "$REPO_ROOT/tests/host" >/dev/null
 echo ">> building"
 cmake --build "$BUILD_DIR" -j >/dev/null
 
-echo ">> running"
+echo ">> running pure-logic suite"
 "$BUILD_DIR/tests_host"
+rc=$?
+
+echo ">> running driver suite (real drivers vs simulated MMIO)"
+"$BUILD_DIR/tests_host_drivers"
+rc=$((rc + $?))
+
+exit $rc

@@ -34,29 +34,50 @@
 #include <stdint.h>
 
 /* Internal clock-source toggle helpers (file-local). */
-static void _toggle_hse_clock(uint8_t state) {
+/* Bound on the spin waiting for an RCC ready / status bit to settle. On real
+ * silicon HSI/HSE/PLL lock and the SYSCLK switch complete in well under a
+ * thousand cycles; the generous cap only stops an unbounded hang when a bit
+ * never sets — e.g. PLL/HSE not modelled under QEMU, or a board with no
+ * external crystal. On timeout the caller backs out and leaves the clock on the
+ * reset HSI rather than spinning forever. */
+#define CLOCK_READY_TIMEOUT 1000000UL
+
+/* Spin until `cond` is false or the timeout elapses; return HAL_ERR_TIMEOUT from
+ * the enclosing function on timeout. Used by helpers that return hal_status_t. */
+#define WAIT_OR_TIMEOUT(cond)                                                  \
+  do {                                                                         \
+    uint32_t _to = CLOCK_READY_TIMEOUT;                                        \
+    while (cond) {                                                             \
+      if (--_to == 0u)                                                         \
+        return HAL_ERR_TIMEOUT;                                                \
+    }                                                                          \
+  } while (0)
+
+/* Internal clock-source toggle helpers (file-local). Return HAL_ERR_TIMEOUT if
+ * the ready bit never reaches `state`. */
+static hal_status_t _toggle_hse_clock(uint8_t state) {
   if (state) {
     RCC->CR |= RCC_CR_HSEON;
   } else
     RCC->CR &= ~RCC_CR_HSEON;
-  while (((RCC->CR & RCC_CR_HSERDY) != 0) != (state))
-    ;
+  WAIT_OR_TIMEOUT(((RCC->CR & RCC_CR_HSERDY) != 0) != (state));
+  return HAL_OK;
 }
-static void _toggle_hsi_clock(uint8_t state) {
+static hal_status_t _toggle_hsi_clock(uint8_t state) {
   if (state)
     RCC->CR |= RCC_CR_HSION;
   else
     RCC->CR &= ~RCC_CR_HSION;
-  while (((RCC->CR & RCC_CR_HSIRDY) != 0) != (state))
-    ;
+  WAIT_OR_TIMEOUT(((RCC->CR & RCC_CR_HSIRDY) != 0) != (state));
+  return HAL_OK;
 }
-static void _toggle_pll_clock(uint8_t state) {
+static hal_status_t _toggle_pll_clock(uint8_t state) {
   if (state)
     RCC->CR |= RCC_CR_PLLON;
   else
     RCC->CR &= ~RCC_CR_PLLON;
-  while (((RCC->CR & RCC_CR_PLLRDY) != 0) != (state))
-    ;
+  WAIT_OR_TIMEOUT(((RCC->CR & RCC_CR_PLLRDY) != 0) != (state));
+  return HAL_OK;
 }
 
 /*
@@ -78,22 +99,31 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
   if (cfg->source == HAL_CLOCK_SOURCE_PLL && pll_cfg == NULL)
     return HAL_ERR_INVALID_ARG;
 
-  // Enable and wait for selected clock source
+  // Enable and wait for selected clock source. On a ready-bit timeout, bail out
+  // immediately: the system clock is left on the reset HSI rather than being
+  // switched onto a source that never came up (which would be a dead clock).
+  hal_status_t st;
   if (cfg->source == HAL_CLOCK_SOURCE_HSE) {
-    _toggle_hse_clock(RCC_ON);
+    if ((st = _toggle_hse_clock(RCC_ON)) != HAL_OK)
+      return st;
   } else if (cfg->source == HAL_CLOCK_SOURCE_HSI) {
-    _toggle_hsi_clock(RCC_ON);
+    if ((st = _toggle_hsi_clock(RCC_ON)) != HAL_OK)
+      return st;
   }
 
   // PLL configuration and enabling (if PLL is selected)
   else if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
     // Enable PLL input source clock and wait for readiness
-    if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSE)
-      _toggle_hse_clock(RCC_ON);
-    else if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSI)
-      _toggle_hsi_clock(RCC_ON);
+    if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSE) {
+      if ((st = _toggle_hse_clock(RCC_ON)) != HAL_OK)
+        return st;
+    } else if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSI) {
+      if ((st = _toggle_hsi_clock(RCC_ON)) != HAL_OK)
+        return st;
+    }
 
-    _toggle_pll_clock(RCC_OFF);
+    if ((st = _toggle_pll_clock(RCC_OFF)) != HAL_OK)
+      return st;
     RCC->PLLCFGR = 0;
     // Set PLL source (HSI=0, HSE=1)
     if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSI) {
@@ -107,7 +137,8 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
         RCC_PLLCFGR_PLLM(pll_cfg->pll_m) | RCC_PLLCFGR_PLLN(pll_cfg->pll_n) |
         RCC_PLLCFGR_PLLP(pll_cfg->pll_p) | RCC_PLLCFGR_PLLQ(pll_cfg->pll_q);
 
-    _toggle_pll_clock(RCC_ON);
+    if ((st = _toggle_pll_clock(RCC_ON)) != HAL_OK)
+      return st; // PLL never locked — stay on HSI instead of hanging.
   }
 
   // Configure flash latency based on target clock
@@ -130,21 +161,18 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
   (RCC->CFGR) |=
       (RCC_CFGR_PPRE_DIV2 << RCC_CFGR_PPRE2_BIT); // APB2 prescaler = 2
 
-  // Switch system clock source
+  // Switch system clock source (each switch-status wait is bounded too).
   if (cfg->source == HAL_CLOCK_SOURCE_HSI) {
     (RCC->CFGR) &= ~(0x3 << RCC_CFGR_SW_BIT); // Select HSI
-    while ((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 0)
-      ;
+    WAIT_OR_TIMEOUT((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 0);
   } else if (cfg->source == HAL_CLOCK_SOURCE_HSE) {
     (RCC->CFGR) &= ~(0x3 << RCC_CFGR_SW_BIT);
     (RCC->CFGR) |= (1 << RCC_CFGR_SW_BIT); // Select HSE
-    while ((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 1)
-      ;
+    WAIT_OR_TIMEOUT((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 1);
   } else if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
     (RCC->CFGR) &= ~(0x3 << RCC_CFGR_SW_BIT);
     (RCC->CFGR) |= (2 << RCC_CFGR_SW_BIT); // Select PLL
-    while ((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 2)
-      ;
+    WAIT_OR_TIMEOUT((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 2);
   }
 
   // When decreasing frequency (switching from PLL to HSI/HSE), decrease wait

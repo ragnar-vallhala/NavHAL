@@ -62,10 +62,12 @@ menu "System & Features Configuration"
 osource "src/arch/*/Kconfig.features"
 
 config DRV_CRC
-    bool "Enable Hardware CRC Unit"
+    bool "Enable CRC support"
     default n
     help
-      Enables hardware cyclic redundancy check unit support.
+      Provides the hal_crc_* API. Backed by the hardware CRC unit on STM32
+      (Cortex-M4/M7); on the ATmega328P, which has no CRC peripheral, it is a
+      bitwise software CRC-32 fallback.
 
 endmenu
 

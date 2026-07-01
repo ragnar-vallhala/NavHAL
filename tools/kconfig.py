@@ -115,6 +115,7 @@ NAVHAL_HAS_MAP = {
     "DRV_CLOCK":     "CLOCK",
     "DRV_INTERRUPT": "INTERRUPT",
     "DRV_FLASH":     "FLASH",
+    "DRV_MPU":       "MPU",
     # Per-driver capability sub-options (WI4.4).
     "DRV_UART_DMA":  "UART_DMA",
     "DRV_I2C_DMA":   "I2C_DMA",

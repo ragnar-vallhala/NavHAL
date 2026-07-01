@@ -35,3 +35,12 @@ config DRV_FPU
     default n
     help
       Enables compilation of hardware FPU runtime setup files.
+
+config DRV_MPU
+    bool "Enable Memory Protection Unit (MPU)"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    default n
+    help
+      Enables the ARMv7-M Memory Protection Unit driver (region-based
+      access control). Region count is silicon-dependent (8 on M4,
+      16 on M7) and read at runtime from MPU_TYPE.DREGION.

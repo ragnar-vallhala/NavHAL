@@ -30,7 +30,7 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | Core   | FPU                       | `FPU`           | ✓ † | — | ✓ † |
 | Core   | MPU (memory protection) § | `MPU`           | ✓ (8-region) | — | ✓ (16-region) |
 | Core   | L1 I-cache / D-cache      | `CACHE`         | — | — | ◐ |
-| Core   | DTCM / ITCM               | `TCM`           | — | — | ◐ |
+| Core   | DTCM / ITCM               | `TCM`           | — | — | ✓ |
 | System | Clock subsystem           | `CLOCK`         | ✓ | ◐ | ✓ |
 | System | Flash (KV store)          | `FLASH`         | ✓ | ◐ | ✓ |
 | System | DMA controller            | `DMA`           | ✓ | — | ✓ |
@@ -79,8 +79,10 @@ clean/invalidate maintenance), so the F767 cell is `◐`. Detail on the
 
 **DTCM / ITCM** (`TCM`) is Cortex-M7 only: `common/hal_tcm.h` exposes explicit
 placement attributes (`NAVHAL_ITCM` / `NAVHAL_DTCM` / `NAVHAL_DTCM_NOINIT`, opt-in
-`CONFIG_USE_TCM`) that pin code/data into the 0-wait TCMs; the cell is `◐` because
-there is no TCM allocator yet. Detail on the [STM32F767ZI page](stm32f767zi.md).
+`CONFIG_USE_TCM`) that pin code/data into the 0-wait TCMs, with the reset-time
+copy in the board startup — complete and hardware-validated. There is no dynamic
+TCM allocator / heap-in-TCM (placement is static, by attribute). Detail on the
+[STM32F767ZI page](stm32f767zi.md).
 
 > **Accuracy note:** the silicon-presence cells (MPU regions, ADC/DAC/CAN/SAI
 > counts, USB HS/FS, Ethernet, DCMI/LTDC/DMA2D, QUAD-SPI, FMC, SPDIFRX, RNG)

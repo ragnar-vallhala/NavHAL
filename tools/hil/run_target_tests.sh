@@ -18,7 +18,7 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 BUILD_DIR="$REPO_ROOT/build-test"
 PORT="${1:-/dev/ttyACM0}"
 BAUD="${2:-9600}"
@@ -42,7 +42,7 @@ stty -F "$PORT" "$BAUD" cs8 -cstopb -parenb raw -echo
 # Start the UART reader BEFORE the flash reset so we don't miss the
 # startup banner.
 echo ">> starting UART capture (timeout ${TIMEOUT}s)"
-python3 "$REPO_ROOT/tools/uart_capture.py" "$PORT" "$BAUD" "$TIMEOUT" &
+python3 "$REPO_ROOT/tools/hil/uart_capture.py" "$PORT" "$BAUD" "$TIMEOUT" &
 CAPTURE_PID=$!
 
 # Give the reader a moment to open the port, then flash. The flash

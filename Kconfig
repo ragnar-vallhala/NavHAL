@@ -100,8 +100,8 @@ config DRV_UART
 config DRV_UART_DMA
     bool "Enable DMA-backed UART API"
     default y if DRV_UART && ARCH_CORTEX_M4
-    depends on DRV_UART
-    select DRV_DMA if ARCH_CORTEX_M4
+    depends on DRV_UART && ARCH_CORTEX_M4
+    select DRV_DMA
     help
       Compile the hal_uart_write_dma / init_dma_rx variants. Disable to
       drop the DMA backend from a DMA-enabled build (e.g. to save flash
@@ -118,8 +118,8 @@ config DRV_I2C
 config DRV_I2C_DMA
     bool "Enable DMA-backed I2C API"
     default y if DRV_I2C && ARCH_CORTEX_M4
-    depends on DRV_I2C
-    select DRV_DMA if ARCH_CORTEX_M4
+    depends on DRV_I2C && ARCH_CORTEX_M4
+    select DRV_DMA
     help
       Compile hal_i2c_read_regs_dma. Disable to drop the DMA backend
       from a DMA-enabled I2C build.

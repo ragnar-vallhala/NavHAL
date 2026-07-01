@@ -54,6 +54,10 @@ extern "C" {
 #define _NAVTEST_DEMCR ((volatile uint32_t *)0xE000EDFCu)
 #define _NAVTEST_DWT_CTRL ((volatile uint32_t *)0xE0001000u)
 #define _NAVTEST_DWT_CYCCNT ((volatile uint32_t *)0xE0001004u)
+/* DWT CoreSight Lock Access Register (offset 0xFB0). Cortex-M7 ships the DWT
+ * software lock engaged out of reset; Cortex-M4 does not implement it. */
+#define _NAVTEST_DWT_LAR ((volatile uint32_t *)0xE0001FB0u)
+#define _NAVTEST_DWT_UNLOCK_KEY 0xC5ACCE55u
 
 /**
  * @brief True iff the cycle counter is not advancing (emulator without DWT).
@@ -72,8 +76,13 @@ static inline bool navtest_in_pil(void) {
   if (_cached >= 0)
     return _cached != 0;
 
-  /* Enable TRCENA and CYCCNTENA. On Renode these writes are silenced. */
+  /* Enable TRCENA, unlock the DWT, then enable CYCCNTENA. The LAR unlock is
+   * essential on Cortex-M7: its DWT ships with the software lock engaged, so
+   * without it CYCCNT never advances on real M7 silicon and this probe misreads
+   * HIL as PIL. The LAR is not implemented on Cortex-M4 (the write is ignored),
+   * so it is safe on both cores. On Renode the whole block is silenced. */
   *_NAVTEST_DEMCR |= (1UL << 24);
+  *_NAVTEST_DWT_LAR = _NAVTEST_DWT_UNLOCK_KEY;
   *_NAVTEST_DWT_CTRL |= 1UL;
 
   uint32_t a = *_NAVTEST_DWT_CYCCNT;

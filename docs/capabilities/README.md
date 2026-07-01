@@ -28,7 +28,7 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | Core   | Interrupt ctrl (NVIC)     | `INTERRUPT`     | ✓ | ✓ | ✓ |
 | Core   | Cycle counter (DWT)       | `CYCLE_COUNTER` | ✓ | — | ✓ |
 | Core   | FPU                       | `FPU`           | ✓ † | — | ✓ † |
-| Core   | MPU (memory protection) § | `MPU`           | ◐ (8-region) | — | ◐ (16-region) |
+| Core   | MPU (memory protection) § | `MPU`           | ✓ (8-region) | — | ✓ (16-region) |
 | Core   | L1 I/D-cache ‡            | *(none)*        | — | — | ◐ |
 | Core   | DTCM / ITCM ‡            | *(none)*        | — | — | ◐ |
 | System | Clock subsystem           | `CLOCK`         | ✓ | ◐ | ✓ |
@@ -78,9 +78,12 @@ no placement API). Detail on the [STM32F767ZI page](stm32f767zi.md#cortex-m7-onl
 
 `§` The **MPU** is driven by `hal_mpu` (`src/arch/armv7e-m/mpu/mpu.c`), a shared
 ARMv7-M core driver gated on `NAVHAL_CONFIG_DRV_MPU` (with `NAVHAL_HAS_MPU` as
-the deprecated alias). The driver is complete and validated on the host (the
-simulated-MMIO driver suite) and under Renode PIL; **on-silicon validation is
-still pending**, so the cell is `◐` rather than `✓`.
+the deprecated alias). The register-programming path — presence / region-count
+discovery, region encoding (bit-exact `RBAR`/`RASR`), configure/disable, and
+bulk apply — is validated on the host (simulated-MMIO suite), under Renode PIL,
+and on **real silicon**: `tests/cap/mpu` passes on both the Nucleo-F401RE
+(8 regions) and the Nucleo-F767ZI (16 regions). Fault-on-violation *enforcement*
+is not yet exercised by an automated test.
 
 > **Accuracy note:** the silicon-presence cells (MPU regions, ADC/DAC/CAN/SAI
 > counts, USB HS/FS, Ethernet, DCMI/LTDC/DMA2D, QUAD-SPI, FMC, SPDIFRX, RNG)

@@ -14,7 +14,7 @@ A one-page cheat-sheet for contributors. The full rationale lives in
 | Public type | `hal_<peripheral>_<noun>_t` | `hal_uart_config_t`, `hal_gpio_pin_t` |
 | Enum constant | `HAL_<PERIPH>_<NAME>`, UPPER snake_case | `HAL_UART_1`, `HAL_GPIO_MODE_OUTPUT` |
 | Public macro / constant | `HAL_<PERIPH>_<NAME>` | `HAL_TIMEOUT_FOREVER` |
-| Capability macro | `NAVHAL_HAS_<FEATURE>` (always defined; test with `#if`) | `NAVHAL_HAS_DMA` |
+| Capability macro | `NAVHAL_CONFIG_DRV_<X>` (always defined; test with `#if`; `NAVHAL_HAS_*` is a deprecated alias) | `NAVHAL_CONFIG_DRV_DMA` |
 | Generated config macro | `NAVHAL_CONFIG_<NAME>` | `NAVHAL_CONFIG_BOARD` |
 | Internal symbol | `navhal_` prefix, or `static`; lives under `src/` | `navhal_uart_isr_dispatch` |
 | Vendor / arch / family symbol | `<layer>_` prefix — never `hal_` | `stm32_usart_*`, `armv7em_nvic_*` |

@@ -36,6 +36,7 @@ hal_sdio_perf
 hal_uart_dma_bridge
 hal_spi_esp_bridge
 hal_dwt
+hal_mpu
 hal_blink_cpp
 )
 set(SAMPLE_DIRS
@@ -67,6 +68,7 @@ cortex-m/23_hal_sdio_perf
 cortex-m/24_hal_uart_dma_bridge
 portable/25_hal_spi_esp_bridge
 cortex-m/26_hal_dwt
+cortex-m/28_hal_mpu
 portable/27_hal_blink_cpp
 )
 

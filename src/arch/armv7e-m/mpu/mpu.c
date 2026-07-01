@@ -69,9 +69,20 @@ typedef struct {
 #define MPU_TYPE_DREGION_POS  8
 #define MPU_TYPE_DREGION_MASK 0xFFu
 
+/* Ordering barriers around MPU register writes so protection is live before the
+ * next access. Portable to the host driver-test build (no core to order
+ * against), matching the flash driver's approach. */
+#if defined(__arm__) || defined(__thumb__)
+#define NAVHAL_MPU_DSB() __asm volatile("dsb" ::: "memory")
+#define NAVHAL_MPU_ISB() __asm volatile("isb" ::: "memory")
+#else
+#define NAVHAL_MPU_DSB() __atomic_signal_fence(__ATOMIC_SEQ_CST)
+#define NAVHAL_MPU_ISB() __atomic_signal_fence(__ATOMIC_SEQ_CST)
+#endif
+
 static inline void mpu_barrier(void) {
-  __asm volatile("dsb");
-  __asm volatile("isb");
+  NAVHAL_MPU_DSB();
+  NAVHAL_MPU_ISB();
 }
 
 /* -------------------------------------------------------------------------- *
@@ -188,7 +199,7 @@ hal_status_t hal_mpu_disable(void) {
   if (!hal_mpu_present())
     return HAL_ERR_NOT_SUPPORTED;
 
-  __asm volatile("dsb"); /* complete outstanding accesses before dropping MPU */
+  NAVHAL_MPU_DSB(); /* complete outstanding accesses before dropping MPU */
   MPU->CTRL = 0u;
   mpu_barrier();
   return HAL_OK;

@@ -32,10 +32,11 @@
  * subregion-disable mask. Where two enabled regions overlap, the
  * highest-numbered region wins. A violation raises a MemManage fault.
  *
- * The capability is gated by @c NAVHAL_HAS_MPU (emitted into
- * @c navhal_target.h) which the port config bridges to the @c _MPU_ENABLED
- * driver guard. On a target without an MPU every entry point returns
- * ::HAL_ERR_NOT_SUPPORTED (and ::hal_mpu_present returns @c false).
+ * The capability is gated by @c NAVHAL_CONFIG_DRV_MPU — the 1:1 mirror of the
+ * @c DRV_MPU Kconfig symbol, force-included via @c navhal_target.h — which the
+ * driver source guards on with @c "#if NAVHAL_CONFIG_DRV_MPU". On a target
+ * without an MPU every entry point returns ::HAL_ERR_NOT_SUPPORTED (and
+ * ::hal_mpu_present returns @c false).
  */
 
 #ifndef HAL_MPU_H

@@ -31,6 +31,13 @@
 #define FLASH_BASE 0x08000000UL
 #define FLASH_SIZE 0x00200000UL
 
+/* System Control Space (0xE000E000..0xE000EFFF): the ARMv7-M core-private
+ * block. The MPU driver reads MPU_TYPE / programs MPU_RBAR/RASR at 0xE000ED90,
+ * so the host MPU suite needs this page backed to exercise mpu.c unmodified.
+ * One page covers the whole SCS. */
+#define SCS_BASE 0xE000E000UL
+#define SCS_SIZE 0x00001000UL
+
 static void map_fixed(uintptr_t addr, size_t size) {
   void *p = mmap((void *)addr, size, PROT_READ | PROT_WRITE,
                  MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -44,12 +51,14 @@ static void map_fixed(uintptr_t addr, size_t size) {
 void host_mmio_setup(void) {
   map_fixed(PERIPH_BASE, PERIPH_SIZE);
   map_fixed(FLASH_BASE, FLASH_SIZE);
+  map_fixed(SCS_BASE, SCS_SIZE);
   host_mmio_reset();
 }
 
 void host_mmio_reset(void) {
   memset((void *)PERIPH_BASE, 0, PERIPH_SIZE);
   memset((void *)FLASH_BASE, 0xFF, FLASH_SIZE); /* erased flash reads as 0xFF */
+  memset((void *)SCS_BASE, 0, SCS_SIZE);
 }
 
 void host_reg_set(uintptr_t addr, uint32_t bits) {

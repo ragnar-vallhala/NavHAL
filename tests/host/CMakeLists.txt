@@ -74,6 +74,7 @@ add_executable(tests_host_drivers
   test_spi_driver.c
   test_clock_driver.c
   test_flash_driver.c
+  test_mpu.c
 
   ${NAVHAL_ROOT}/tests/navtest_state.c
 
@@ -84,6 +85,7 @@ add_executable(tests_host_drivers
   ${NAVHAL_ROOT}/src/vendor/stm32/i2c/i2c_f7.c
   ${NAVHAL_ROOT}/src/vendor/stm32/spi/spi_f7.c
   ${NAVHAL_ROOT}/src/vendor/stm32/flash/flash.c
+  ${NAVHAL_ROOT}/src/arch/armv7e-m/mpu/mpu.c
   ${NAVHAL_ROOT}/src/utils/util.c
 )
 target_include_directories(tests_host_drivers PRIVATE

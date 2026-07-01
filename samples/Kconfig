@@ -133,6 +133,13 @@ config SAMPLE_26_HAL_DWT
     select DRV_FPU
     select USE_FPU
 
+config SAMPLE_28_HAL_MPU
+    bool "28_hal_mpu"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    select DRV_MPU
+    select DRV_UART
+    select DRV_CLOCK
+
 endchoice
 
 config SAMPLE
@@ -166,3 +173,4 @@ config SAMPLE
     default "hal_uart_dma_bridge" if SAMPLE_24_HAL_UART_DMA_BRIDGE
     default "hal_spi_esp_bridge" if SAMPLE_25_HAL_SPI_ESP_BRIDGE
     default "hal_dwt" if SAMPLE_26_HAL_DWT
+    default "hal_mpu" if SAMPLE_28_HAL_MPU

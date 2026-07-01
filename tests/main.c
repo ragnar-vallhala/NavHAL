@@ -35,6 +35,7 @@
 #include "cap/dma/test_dma.h"
 #include "cap/cycle_counter/test_dwt.h"
 #include "cap/fpu/test_fpu_accel.h"
+#include "cap/mpu/test_mpu.h"
 #include "cap/sdio/test_sdio.h"
 
 /* White-box, register-poke suites are per-processor. Only the Cortex-M4 set
@@ -104,6 +105,9 @@ static const navtest_suite_t *const all_suites[] = {
 #endif
 #if NAVHAL_CONFIG_USE_FPU
     &test_fpu_suite,
+#endif
+#if NAVHAL_CONFIG_DRV_MPU
+    &test_mpu_suite,
 #endif
     &test_flash_suite,
 #if NAVHAL_CONFIG_DRV_SDIO

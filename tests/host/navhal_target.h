@@ -50,6 +50,9 @@
 #define NAVHAL_CONFIG_DRV_UART_DMA  0
 #define NAVHAL_CONFIG_DRV_I2C_DMA   0
 #define NAVHAL_CONFIG_DRV_SDIO_DMA  0
+/* MPU ON: the driver suite exercises the real mpu.c against the SCS page that
+ * host_mmio maps (0xE000E000). The driver guards on NAVHAL_CONFIG_DRV_MPU. */
+#define NAVHAL_CONFIG_DRV_MPU       1
 
 /* ===== DEPRECATED capability aliases (NAVHAL_HAS_* -> NAVHAL_CONFIG_*) ===== */
 #define NAVHAL_HAS_GPIO          NAVHAL_CONFIG_DRV_GPIO
@@ -65,6 +68,7 @@
 #define NAVHAL_HAS_FPU           NAVHAL_CONFIG_USE_FPU
 #define NAVHAL_HAS_CYCLE_COUNTER NAVHAL_CONFIG_DRV_DWT
 #define NAVHAL_HAS_SDIO          NAVHAL_CONFIG_DRV_SDIO
+#define NAVHAL_HAS_MPU           NAVHAL_CONFIG_DRV_MPU
 #define NAVHAL_HAS_UART_DMA      NAVHAL_CONFIG_DRV_UART_DMA
 #define NAVHAL_HAS_I2C_DMA       NAVHAL_CONFIG_DRV_I2C_DMA
 #define NAVHAL_HAS_SDIO_DMA      NAVHAL_CONFIG_DRV_SDIO_DMA

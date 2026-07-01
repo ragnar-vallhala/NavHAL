@@ -88,6 +88,9 @@ endif()
 if(CONFIG_DRV_DWT)
     list(APPEND HAL_SOURCES ${SRC_ARCH}/dwt/dwt.c)
 endif()
+if(CONFIG_DRV_MPU)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/mpu/mpu.c)
+endif()
 
 add_library(hal STATIC
     ${HAL_SOURCES}

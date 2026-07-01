@@ -42,7 +42,7 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | Bus    | UART                      | `UART`          | ✓ | ✓ | ✓ |
 | Bus    | UART → DMA backend        | `UART_DMA`      | ✓ | — | ✓ |
 | Bus    | I²C                       | `I2C`           | ✓ | ✓ | ◐ |
-| Bus    | I²C → DMA backend         | `I2C_DMA`       | ✓ | — | ✗ |
+| Bus    | I²C → DMA backend         | `I2C_DMA`       | ✓ | — | ◐ ¶ |
 | Bus    | SPI                       | `SPI`           | ✓ | ✓ | ◐ |
 | Bus    | SDIO / SDMMC              | `SDIO`          | ✓ (1×) | — | ◐ (2×) |
 | Bus    | SDIO async (DMA)          | `SDIO_DMA`      | ✓ | — | ◐ ¶ |

@@ -183,3 +183,103 @@ hal_status_t hal_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
   I2C->ICR = I2C_ICR_STOPCF;
   return s;
 }
+
+/*===========================================================================
+ * DMA-backed I2C register read (STM32F7).
+ *
+ * Write the register pointer with the proven CR2 framing (as in
+ * hal_i2c_write_read), then read N bytes via DMA: enable CR1.RXDMAEN, point a
+ * P2M stream at RXDR, and start a repeated-START read with AUTOEND so the
+ * peripheral issues STOP after the last byte. On DMA transfer-complete the
+ * stream IRQ clears RXDMAEN and fires the caller's callback.
+ *
+ * NOTE: this path is register-correct by construction (the framing is the
+ * PIL-validated blocking sequence, the DMA hookup mirrors the hardware-
+ * validated UART backend) but is NOT yet exercised on hardware — the bench has
+ * no I2C device, and Renode does not model the I2C->DMA request path.
+ *===========================================================================*/
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+#include "navhal_port_dma.h"
+#include "navhal_port_interrupt.h"
+
+static void (*_i2c_dma_rx_callback)(void) = NULL;
+static hal_dma_config_t _active_i2c_dma_config;
+static hal_i2c_bus_t _active_i2c_dma_bus;
+static void _i2c_dma_irq_handler(void);
+
+/** Map a DMA1 stream index to its NVIC line (F7 I2C DMA requests are on DMA1). */
+static hal_irq_t _dma1_stream_irq(uint8_t s) {
+  switch (s) {
+  case 0: return DMA1_Stream0_IRQn;
+  case 1: return DMA1_Stream1_IRQn;
+  case 2: return DMA1_Stream2_IRQn;
+  case 3: return DMA1_Stream3_IRQn;
+  case 4: return DMA1_Stream4_IRQn;
+  case 5: return DMA1_Stream5_IRQn;
+  case 6: return DMA1_Stream6_IRQn;
+  default: return DMA1_Stream7_IRQn;
+  }
+}
+
+hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                   uint8_t reg, const hal_dma_config_t *dma_cfg,
+                                   void (*callback)(void)) {
+  if (dma_cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
+  volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
+  if (!I2C)
+    return HAL_ERR_NOT_INITIALIZED;
+
+  /* Write phase: send the register pointer (SOFTEND so a repeated START can
+   * follow) — identical framing to hal_i2c_write_read's write phase. */
+  I2C->CR2 = I2C_CR2_SADD7(dev_addr) | I2C_CR2_NBYTES(1) | I2C_CR2_START;
+  hal_status_t s = _wait_isr(I2C, I2C_ISR_TXIS);
+  if (s != HAL_OK)
+    return s;
+  I2C->TXDR = reg;
+  s = _wait_isr(I2C, I2C_ISR_TC);
+  if (s != HAL_OK)
+    return s;
+
+  /* Read phase via DMA. The driver owns the peripheral-side config (RXDR
+   * source, P2M, 8-bit); the caller supplies controller/stream/channel, the
+   * destination buffer, and the byte count. */
+  _i2c_dma_rx_callback = callback;
+  _active_i2c_dma_bus = bus;
+  _active_i2c_dma_config = *dma_cfg;
+  _active_i2c_dma_config.direction = HAL_DMA_DIR_P2M;
+  _active_i2c_dma_config.src_addr = (uint32_t)(uintptr_t)&I2C->RXDR;
+  _active_i2c_dma_config.src_inc = 0;
+  _active_i2c_dma_config.dst_inc = 1;
+  _active_i2c_dma_config.data_width = HAL_DMA_DATA_WIDTH_8;
+
+  I2C->CR1 |= I2C_CR1_RXDMAEN;
+
+  hal_dma_init(&_active_i2c_dma_config);
+  if (_active_i2c_dma_config.controller == HAL_DMA_CONTROLLER_1) {
+    hal_irq_t irq = _dma1_stream_irq(_active_i2c_dma_config.stream);
+    hal_interrupt_attach_callback(irq, _i2c_dma_irq_handler);
+    hal_interrupt_enable_with_priority(irq, HAL_IRQ_PRIORITY_DEFAULT);
+  }
+  hal_dma_start(&_active_i2c_dma_config);
+
+  /* Repeated START read with AUTOEND: the peripheral STOPs after NBYTES. */
+  I2C->CR2 = I2C_CR2_SADD7(dev_addr) |
+             I2C_CR2_NBYTES((uint8_t)_active_i2c_dma_config.data_count) |
+             I2C_CR2_RD_WRN | I2C_CR2_AUTOEND | I2C_CR2_START;
+  return HAL_OK;
+}
+
+static void _i2c_dma_irq_handler(void) {
+  if (!hal_dma_transfer_complete(&_active_i2c_dma_config))
+    return;
+  hal_dma_clear_flags(&_active_i2c_dma_config);
+  /* AUTOEND has already issued STOP; just drop the DMA request enable. */
+  volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(_active_i2c_dma_bus);
+  if (I2C)
+    I2C->CR1 &= ~I2C_CR1_RXDMAEN;
+  if (_i2c_dma_rx_callback)
+    _i2c_dma_rx_callback();
+}
+
+#endif /* NAVHAL_CONFIG_DRV_I2C_DMA */

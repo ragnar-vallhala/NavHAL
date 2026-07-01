@@ -60,6 +60,8 @@ typedef struct {
 
 /* CR1 */
 #define I2C_CR1_PE (1U << 0)
+#define I2C_CR1_TXDMAEN (1U << 14) /**< DMA TX request enable */
+#define I2C_CR1_RXDMAEN (1U << 15) /**< DMA RX request enable */
 
 /* CR2 */
 #define I2C_CR2_SADD_Pos 0

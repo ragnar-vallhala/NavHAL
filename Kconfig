@@ -119,12 +119,13 @@ config DRV_I2C
 
 config DRV_I2C_DMA
     bool "Enable DMA-backed I2C API"
-    default y if DRV_I2C && ARCH_CORTEX_M4
-    depends on DRV_I2C && ARCH_CORTEX_M4
+    default y if DRV_I2C && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    depends on DRV_I2C && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
     select DRV_DMA
     help
       Compile hal_i2c_read_regs_dma. Disable to drop the DMA backend
-      from a DMA-enabled I2C build.
+      from a DMA-enabled I2C build. On the F7 the read phase uses the
+      CR1.RXDMAEN request with AUTOEND framing.
 
 config DRV_SPI
     bool "Enable SPI Driver"

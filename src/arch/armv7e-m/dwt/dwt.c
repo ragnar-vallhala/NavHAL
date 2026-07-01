@@ -26,7 +26,7 @@
  */
 
 #include "navhal_port_config.h"
-#ifdef _DWT_ENABLED
+#if NAVHAL_CONFIG_DRV_DWT
 
 #include "navhal_port_clock.h"
 #include "navhal_port_dwt.h"
@@ -79,4 +79,4 @@ void hal_cycle_counter_delay_us(uint32_t us) {
   hal_cycle_counter_delay(us * _cycles_per_us);
 }
 
-#endif /* _DWT_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_DWT */

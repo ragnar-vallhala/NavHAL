@@ -150,13 +150,18 @@ if(NOT EXISTS "${_NAVHAL_ARCH_FILE}")
 endif()
 include("${_NAVHAL_ARCH_FILE}")
 
-set(CMAKE_C_FLAGS "${ARCH_C_FLAGS} -Wall -std=c11")
+# Force-include the Kconfig-generated navhal_target.h into every C/C++ TU
+# (Linux `-include autoconf.h` style). This makes NAVHAL_CONFIG_* (and the
+# deprecated NAVHAL_HAS_* aliases) ambient, so drivers gate on them without any
+# #include and without the old navhal_port_config.h -> _*_ENABLED bridge.
+set(NAVHAL_FORCE_INCLUDE "-include ${GENERATED_NAVHAL_TARGET}")
+set(CMAKE_C_FLAGS "${ARCH_C_FLAGS} -Wall -std=c11 ${NAVHAL_FORCE_INCLUDE}")
 set(CMAKE_ASM_FLAGS "${ARCH_ASM_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${ARCH_LINK_FLAGS}")
 # C++ shares the arch flags; a C++ TU only appears in the C++ sample, which
 # does enable_language(CXX). Bare-metal: no exceptions / RTTI / cxa-atexit.
 set(CMAKE_CXX_FLAGS
-    "${ARCH_C_FLAGS} -Wall -std=c++17 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics")
+    "${ARCH_C_FLAGS} -Wall -std=c++17 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics ${NAVHAL_FORCE_INCLUDE}")
 # subdirectories are commented, they will be added as code is added
 if(NOT STANDALONE)
 add_subdirectory(${SRC_DIR})

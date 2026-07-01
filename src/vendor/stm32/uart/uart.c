@@ -36,7 +36,7 @@
 #include "family/rcc_reg.h"
 #include "family/uart_reg.h"
 #include <stdint.h>
-#ifdef _UART_BACKEND_DMA
+#if NAVHAL_CONFIG_DRV_UART_DMA
 #include "navhal_port_dma.h"
 #endif
 
@@ -246,7 +246,7 @@ uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,
 /*===========================================================================
  * DMA-backed UART transmit/receive — compiled only when the DMA backend is on.
  *===========================================================================*/
-#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+#if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
 
 typedef struct {
   DMA_Typedef *controller;
@@ -398,4 +398,4 @@ hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s) {
   return hal_uart_write_dma(uart, (const uint8_t *)s, len);
 }
 
-#endif /* _DMA_ENABLED && _UART_BACKEND_DMA */
+#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */

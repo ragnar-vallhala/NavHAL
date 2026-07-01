@@ -27,7 +27,7 @@
  * Data must be written as 32-bit words.  For byte-oriented input the
  * driver packs bytes into words before writing.
  *
- * @note Only compiled when @c _CRC_HW_ENABLED is defined.
+ * @note Only compiled when @c NAVHAL_CONFIG_DRV_CRC is defined.
  */
 
 #ifndef CORTEX_M4_CRC_REG_H
@@ -37,7 +37,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifdef _CRC_HW_ENABLED
+#if NAVHAL_CONFIG_DRV_CRC
 
 #include "common/hal_types.h"
 #include <stdint.h>
@@ -78,7 +78,7 @@ typedef struct {
 #define CRC_CR_RESET                                                           \
   (1U << 0) /**< Reset CRC DR to initial value (0xFFFFFFFF) */
 
-#endif /* _CRC_HW_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_CRC */
 
 
 #ifdef __cplusplus

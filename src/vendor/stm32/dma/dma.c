@@ -23,11 +23,11 @@
  * Implements the standardized `hal_dma_*` API declared in
  * `port/cortex-m4/navhal_port_dma.h`: clock enable, stream configuration, start/stop,
  * flag polling and clearing for DMA1 and DMA2. Compiled only when
- * @c _DMA_ENABLED is defined.
+ * @c NAVHAL_CONFIG_DRV_DMA is defined.
  */
 
 #include "navhal_port_config.h"
-#ifdef _DMA_ENABLED
+#if NAVHAL_CONFIG_DRV_DMA
 
 #include "navhal_port_dma.h"
 #include "family/dma_reg.h"
@@ -238,4 +238,4 @@ DMA_ISR_GEN(DMA2, 5, DMA2_Stream5_IRQn)
 DMA_ISR_GEN(DMA2, 6, DMA2_Stream6_IRQn)
 DMA_ISR_GEN(DMA2, 7, DMA2_Stream7_IRQn)
 
-#endif /* _DMA_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_DMA */

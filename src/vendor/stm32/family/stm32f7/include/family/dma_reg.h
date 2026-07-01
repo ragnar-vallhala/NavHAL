@@ -26,7 +26,7 @@
  *
  * Both DMA1 (base: 0x40026000) and DMA2 (base: 0x40026400) are covered.
  *
- * @note Only available when _DMA_ENABLED is defined.
+ * @note Only available when NAVHAL_CONFIG_DRV_DMA is defined.
  */
 
 #ifndef CORTEX_M4_DMA_REG_H
@@ -36,7 +36,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifdef _DMA_ENABLED
+#if NAVHAL_CONFIG_DRV_DMA
 
 #include "common/hal_types.h"
 #include <stdint.h>
@@ -206,7 +206,7 @@ static const uint8_t _dma_isr_shift[4] = {0, 6, 16, 22};
 /** Pointer to the correct IFCR register (LIFCR/HIFCR) for stream n */
 #define DMA_IFCR_REG(dmax, n) (((n) < 4) ? &(dmax)->LIFCR : &(dmax)->HIFCR)
 
-#endif /* _DMA_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_DMA */
 
 
 #ifdef __cplusplus

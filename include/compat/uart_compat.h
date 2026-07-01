@@ -172,7 +172,7 @@ _NAVHAL_UART_INSTANCE_COMPAT(6, HAL_UART_6)
 #define uart_write(val) hal_uart_print(HAL_UART_2, (val))
 
 /* ---- DMA-backed legacy API ---------------------------------------------- */
-#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+#if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
 
 /** @deprecated Use hal_uart_write_dma(). */
 NAVHAL_DEPRECATED("use hal_uart_write_dma")
@@ -215,7 +215,7 @@ _NAVHAL_UART_INSTANCE_DMA_COMPAT(1, HAL_UART_1)
 _NAVHAL_UART_INSTANCE_DMA_COMPAT(2, HAL_UART_2)
 _NAVHAL_UART_INSTANCE_DMA_COMPAT(6, HAL_UART_6)
 
-#endif /* _DMA_ENABLED && _UART_BACKEND_DMA */
+#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
 
 
 #ifdef __cplusplus

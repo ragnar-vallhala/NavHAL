@@ -20,7 +20,7 @@
  * @brief AVR / ATmega328P DMA port header.
  *
  * The ATmega328P has no DMA controller. @c common/hal_dma.h gates its whole
- * body on @c _DMA_ENABLED, which the AVR port never defines, so the DMA API
+ * body on @c NAVHAL_CONFIG_DRV_DMA, which the AVR port never defines, so the DMA API
  * collapses to nothing. This header exists only to satisfy the include.
  */
 

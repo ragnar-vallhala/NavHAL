@@ -21,7 +21,7 @@
  *
  * @details
  * Standardized DMA API (see @c docs/api_standardization.md). Configures and
- * controls DMA streams. The entire API is compiled only when @c _DMA_ENABLED
+ * controls DMA streams. The entire API is compiled only when @c NAVHAL_CONFIG_DRV_DMA
  * is defined (see @c NAVHAL_HAS_DMA).
  *
  * ### Typical usage
@@ -60,7 +60,7 @@
 extern "C" {
 #endif
 
-#ifdef _DMA_ENABLED
+#if NAVHAL_CONFIG_DRV_DMA
 
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
@@ -204,7 +204,7 @@ typedef hal_dma_fifo_threshold_t dma_fifo_threshold_t
     NAVHAL_DEPRECATED("use hal_dma_fifo_threshold_t");
 typedef hal_dma_config_t dma_config_t NAVHAL_DEPRECATED("use hal_dma_config_t");
 
-#endif /* _DMA_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_DMA */
 
 #ifdef __cplusplus
 } /* extern "C" */

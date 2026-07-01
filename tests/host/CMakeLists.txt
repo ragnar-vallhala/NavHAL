@@ -26,6 +26,12 @@ set(NAVHAL_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 add_compile_options(-Wall -Wextra -Wno-unused-parameter -O0 -g)
 add_compile_definitions(NAVTEST_HOST)
 
+# Force-include the host capability stub into every TU, mirroring the root
+# build's force-include of the Kconfig-generated navhal_target.h. This makes
+# NAVHAL_CONFIG_DRV_* (and the deprecated NAVHAL_HAS_* aliases) ambient without
+# relying on any per-target include path.
+add_compile_options(-include ${CMAKE_CURRENT_SOURCE_DIR}/navhal_target.h)
+
 enable_testing()
 
 # -------------------------------------------------------------------------

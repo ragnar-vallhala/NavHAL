@@ -23,7 +23,7 @@
  * The public DMA API lives in @c common/hal_dma.h, which includes this
  * header. This file carries the STM32F4 DMA register map and the
  * deprecated-function-name compat shim. The entire body is compiled only
- * when @c _DMA_ENABLED is defined.
+ * when @c NAVHAL_CONFIG_DRV_DMA is defined.
  */
 
 #ifndef NAVHAL_PORT_DMA_H
@@ -36,7 +36,7 @@
 extern "C" {
 #endif
 
-#ifdef _DMA_ENABLED
+#if NAVHAL_CONFIG_DRV_DMA
 
 #include "family/dma_reg.h"
 
@@ -44,7 +44,7 @@ extern "C" {
  * backward-compat alias behind NAVHAL_DEPRECATED. */
 #include "compat/dma_compat.h"
 
-#endif /* _DMA_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_DMA */
 
 #ifdef __cplusplus
 } /* extern "C" */

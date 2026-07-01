@@ -142,8 +142,12 @@ def generate_navhal_target_header(kconfig_obj, output_path):
       * Target identity   — NAVHAL_TARGET_{ARCH,VENDOR,BOARD} (string literals).
       * NAVHAL_CONFIG_*   — one macro per Kconfig symbol, mirroring autoconf.h
                             with a NAVHAL_ prefix and 0/1 instead of undefined.
-      * NAVHAL_HAS_*      — capability flags (always 0 or 1) named per the
-                            HAS-suffix table in NAVHAL_HAS_MAP.
+                            This is the single source of truth guards key off
+                            (force-included into every TU, Linux autoconf-style).
+      * NAVHAL_HAS_*      — DEPRECATED thin aliases of the matching
+                            NAVHAL_CONFIG_* macro, kept only so out-of-tree
+                            consumers of the old capability contract keep
+                            building. New code MUST use NAVHAL_CONFIG_DRV_*.
     """
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
     with open(output_path, "w") as f:
@@ -171,9 +175,11 @@ def generate_navhal_target_header(kconfig_obj, output_path):
             else:
                 f.write(f"#define NAVHAL_CONFIG_{sym.name} {val}\n")
 
-        f.write("\n/* ===== Capability flags (NAVHAL_HAS_*) ===== */\n")
+        f.write("\n/* ===== DEPRECATED capability aliases (NAVHAL_HAS_* -> NAVHAL_CONFIG_*) =====\n"
+                " * Kept for backward compatibility only. Prefer NAVHAL_CONFIG_DRV_*.\n"
+                " */\n")
         for kconfig_sym, has_suffix in NAVHAL_HAS_MAP.items():
-            f.write(f"#define NAVHAL_HAS_{has_suffix} {_sym_y(kconfig_obj, kconfig_sym)}\n")
+            f.write(f"#define NAVHAL_HAS_{has_suffix} NAVHAL_CONFIG_{kconfig_sym}\n")
 
         f.write("\n#endif /* NAVHAL_TARGET_H */\n")
 

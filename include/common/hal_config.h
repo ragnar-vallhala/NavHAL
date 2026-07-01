@@ -20,7 +20,7 @@
  * @brief Portable HAL configuration-macro entry point.
  *
  * @details
- * Exposes the build-time feature flags (@c _FPU_ENABLED, @c _DMA_ENABLED,
+ * Exposes the build-time feature flags (@c NAVHAL_CONFIG_USE_FPU, @c NAVHAL_CONFIG_DRV_DMA,
  * etc.) used by the rest of the HAL. The actual macro definitions live in
  * the per-port @c config.h for now; they will be relocated to a Kconfig-
  * generated @c navhal_target.h in WI4.3.

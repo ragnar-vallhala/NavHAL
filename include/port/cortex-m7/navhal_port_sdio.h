@@ -24,7 +24,7 @@
  * header. This file carries the SDIO register-bit defines, the SDIO register
  * map include, the asynchronous (DMA-backed) prototypes, and the
  * deprecated-name shim. Like @c navhal_port_dma.h, the whole body is gated by
- * @c _SDIO_ENABLED so it collapses to nothing on a target without SDIO.
+ * @c NAVHAL_CONFIG_DRV_SDIO so it collapses to nothing on a target without SDIO.
  */
 
 #ifndef NAVHAL_PORT_SDIO_H
@@ -38,14 +38,14 @@
 extern "C" {
 #endif
 
-#ifdef _SDIO_ENABLED
+#if NAVHAL_CONFIG_DRV_SDIO
 
 #include "family/sdio_reg.h"
 
 #define SDIO_CMD_WAITPEND (1 << 9)
 #define SDIO_CMD_CPSMEN (1 << 10)
 
-#ifdef _SDIO_BACKEND_DMA
+#if NAVHAL_CONFIG_DRV_SDIO_DMA
 /** @brief Asynchronous (DMA) single-block read. */
 hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buffer);
 /** @brief Asynchronous (DMA) single-block write. */
@@ -58,18 +58,18 @@ hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buffer,
 hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr,
                                              const uint8_t *buffer,
                                              uint32_t count);
-#endif /* _SDIO_BACKEND_DMA */
+#endif /* NAVHAL_CONFIG_DRV_SDIO_DMA */
 
-#endif /* _SDIO_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_SDIO */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#ifdef _SDIO_ENABLED
+#if NAVHAL_CONFIG_DRV_SDIO
 /* Deprecated pre-standardization SDIO names — retained as a backward-compat
  * alias behind NAVHAL_DEPRECATED. */
 #include "compat/sdio_compat.h"
-#endif /* _SDIO_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_SDIO */
 
 #endif /* NAVHAL_PORT_SDIO_H */

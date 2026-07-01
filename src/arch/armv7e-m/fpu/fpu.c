@@ -26,7 +26,7 @@
 #define CPACR (*(volatile uint32_t *)0xE000ED88)
 #define FPCCR (*(volatile uint32_t *)0xE000EF34)
 
-#ifdef _FPU_ENABLED
+#if NAVHAL_CONFIG_USE_FPU
 hal_status_t hal_fpu_enable(void) {
   // CPACR: Enable full access to CP10 and CP11
   CPACR |= (0xF << 20);

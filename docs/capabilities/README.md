@@ -45,7 +45,7 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | Bus    | I²C → DMA backend         | `I2C_DMA`       | ✓ | — | ✗ |
 | Bus    | SPI                       | `SPI`           | ✓ | ✓ | ◐ |
 | Bus    | SDIO / SDMMC              | `SDIO`          | ✓ (1×) | — | ◐ (2×) |
-| Bus    | SDIO async (DMA)          | `SDIO_DMA`      | ✓ | — | ✗ |
+| Bus    | SDIO async (DMA)          | `SDIO_DMA`      | ✓ | — | ◐ ¶ |
 | Bus    | USB OTG FS                | *(none)*        | ✗ | — | ✗ |
 | Bus    | USB OTG HS                | *(none)*        | — | — | ✗ |
 | Bus    | Ethernet MAC (10/100)     | *(none)*        | — | — | ✗ |
@@ -71,6 +71,12 @@ Most `✗` rows are silicon NavHAL simply hasn't scoped a driver for yet (roadma
 `§` MPU support is a shared ARMv7-M core driver (`hal_mpu`), gated on
 `NAVHAL_CONFIG_DRV_MPU` (deprecated alias `NAVHAL_HAS_MPU`). Per-core region
 counts and validation status are on each MCU's page.
+
+`¶` **Implemented but not yet hardware-validated.** The DMA backend is compiled
+and register-correct by inspection, but the bench has no device to prove a
+transfer (no I²C sensor / SD card), and Renode does not model the peripheral→DMA
+request path (the polled path works there; the DMA path times out). It awaits
+validation on a wired rig.
 
 The **L1 cache** (`CACHE`) is Cortex-M7 only: `hal_cache` drives the instruction
 cache (`hal_icache_enable`); the data cache is a later phase (it needs

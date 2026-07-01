@@ -65,25 +65,17 @@ A `✓` is a statement about both *hardware presence* and *current driver comple
 
 Most `✗` rows are silicon NavHAL simply hasn't scoped a driver for yet (roadmap, not a commitment). The `HASH`/AES crypto block is intentionally absent from the table — none of these three MCUs carry it (it lives only on the STM32F777/F779 crypto parts).
 
-`†` The FPU **module** is shared across M4 and M7, but the M7 silicon is richer:
-double-precision `fpv5-d16` (chosen from `CMAKE_SYSTEM_PROCESSOR`) vs the M4's
-single-precision `fpv4-sp-d16`.
+`†` The FPU **module** is shared across the M4 and M7 ports; the FPU
+*precision/variant* differs by core — see each MCU's page.
 
-`‡` **Cortex-M7-only silicon** with no `NAVHAL_HAS_*` macro — the M7 and M4 ports
-expose an *identical set of driver modules*, so nothing is M7-exclusive at the
-module level. These are silicon features NavHAL knows about but does not yet wrap
-as a standalone driver: the L1 caches (16 KB each; D-cache kept **off** for DMA
-coherency) and DTCM/ITCM (128 KB / 16 KB; linker maps DTCM into contiguous RAM,
-no placement API). Detail on the [STM32F767ZI page](stm32f767zi.md#cortex-m7-only-silicon-delta-from-the-f4--cortex-m4-ports).
+`‡` **Cortex-M7-only silicon** that carries no `NAVHAL_HAS_*` macro: NavHAL knows
+about these blocks but does not yet wrap them as standalone drivers, and the M4
+and M7 ports otherwise expose an *identical* set of driver modules. See the
+[STM32F767ZI page](stm32f767zi.md#cortex-m7-only-silicon-delta-from-the-f4--cortex-m4-ports).
 
-`§` The **MPU** is driven by `hal_mpu` (`src/arch/armv7e-m/mpu/mpu.c`), a shared
-ARMv7-M core driver gated on `NAVHAL_CONFIG_DRV_MPU` (with `NAVHAL_HAS_MPU` as
-the deprecated alias). The register-programming path — presence / region-count
-discovery, region encoding (bit-exact `RBAR`/`RASR`), configure/disable, and
-bulk apply — is validated on the host (simulated-MMIO suite), under Renode PIL,
-and on **real silicon**: `tests/cap/mpu` passes on both the Nucleo-F401RE
-(8 regions) and the Nucleo-F767ZI (16 regions). Fault-on-violation *enforcement*
-is not yet exercised by an automated test.
+`§` MPU support is a shared ARMv7-M core driver (`hal_mpu`), gated on
+`NAVHAL_CONFIG_DRV_MPU` (deprecated alias `NAVHAL_HAS_MPU`). Per-core region
+counts and validation status are on each MCU's page.
 
 > **Accuracy note:** the silicon-presence cells (MPU regions, ADC/DAC/CAN/SAI
 > counts, USB HS/FS, Ethernet, DCMI/LTDC/DMA2D, QUAD-SPI, FMC, SPDIFRX, RNG)

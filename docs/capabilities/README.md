@@ -39,8 +39,8 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | I/O    | GPIO                      | `GPIO`          | ✓ | ✓ | ✓ |
 | I/O    | Timer                     | `TIMER`         | ✓ | ✓ | ✓ |
 | I/O    | PWM                       | `PWM`           | ✓ | ✓ | ✓ |
-| Bus    | UART                      | `UART`          | ✓ | ✓ | ◐ |
-| Bus    | UART → DMA backend        | `UART_DMA`      | ✓ | — | ✗ |
+| Bus    | UART                      | `UART`          | ✓ | ✓ | ✓ |
+| Bus    | UART → DMA backend        | `UART_DMA`      | ✓ | — | ✓ |
 | Bus    | I²C                       | `I2C`           | ✓ | ✓ | ◐ |
 | Bus    | I²C → DMA backend         | `I2C_DMA`       | ✓ | — | ✗ |
 | Bus    | SPI                       | `SPI`           | ✓ | ✓ | ◐ |

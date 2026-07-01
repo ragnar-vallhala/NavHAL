@@ -33,7 +33,7 @@ by adding a board layer.
 | TIMER             | ✓ | `src/vendor/stm32/timer/timer.c`         | TIM2–5 / TIM1 / TIM9–11; same register layout as F4. |
 | CLOCK             | ✓ | `src/vendor/stm32/clock/clock_f7.c`      | HSI / HSE / PLL up to **216 MHz**, verified on hardware. VOS Scale 1, PWR over-drive (>180 MHz), HCLK-scaled flash wait states + ART/prefetch, APB1 ≤54 / APB2 ≤108 MHz prescalers. |
 | INTERRUPT         | ✓ | `src/arch/armv7e-m/interrupt/interrupt.c`| NVIC; shared ARMv7E-M arch code. |
-| UART              | ◐ | `src/vendor/stm32/uart/uart_f7.c`        | USART1/2/3/6, polling TX/RX. USART3 (ST-LINK VCP, PD8/PD9) verified on hardware at 115200. F7-specific driver (ISR/RDR/TDR), selected by `CONFIG_FAMILY_STM32F7`. DMA backend not yet ported (F7-5). |
+| UART              | ✓ | `src/vendor/stm32/uart/uart_f7.c`        | USART1/2/3/6: polling, interrupt RX, and the **DMA-backed** API (`hal_uart_write_dma` / `init_dma_rx`, `DRV_UART_DMA`). F7-specific IP (ISR/RDR/TDR, DMA peripheral address = TDR/RDR not DR). USART3 (ST-LINK VCP, PD8/PD9) verified at 115200; DMA TX validated on hardware (`test_uart_dma` — the DMA-written marker reaches the VCP). |
 | I2C               | ◐ | `src/vendor/stm32/i2c/i2c_f7.c`         | Master; full rewrite for the F7 timing-register IP (`TIMINGR` / `ISR`-`ICR` / CR2-framed / `RXDR`-`TXDR`). Opt-in via `CONFIG_DRV_I2C`; `test_i2c` (8) passes — **init `TIMINGR`/`PE` register-verified** on hardware, but a `write_read` against a Renode-modelled BMP180 validates the transfer FSM in PIL (`TIMINGR` is preset for the 16 MHz reset clock). |
 | SPI               | ◐ | `src/vendor/stm32/spi/spi_f7.c`         | Master, 8/16-bit. F7-specific (`CR2.DS` frame size + `FRXTH`, byte-`DR` FIFO access) — the F4 `CR1.DFF` is gone. Opt-in via `CONFIG_DRV_SPI`; `test_spi` (8) passes; init is register-verified on HIL and a JEDEC-ID read against a Renode `GenericSpiFlash` validates the transmit/receive FIFO path in PIL. |
 | PWM               | ✓ | `src/vendor/stm32/pwm/pwm.c`             | Reuses the shared timer-based driver. Opt-in via `CONFIG_DRV_PWM`; `test_pwm` (11) passes on hardware. |
@@ -80,7 +80,7 @@ NAVHAL_HAS_GPIO          1
 NAVHAL_HAS_TIMER         1
 NAVHAL_HAS_CLOCK         1
 NAVHAL_HAS_INTERRUPT     1
-NAVHAL_HAS_UART          1   (uart_f7.c — polling; DMA backend off)
+NAVHAL_HAS_UART          1   (uart_f7.c — polling + IRQ + DMA backend)
 NAVHAL_HAS_DMA           0   (opt-in via CONFIG_DRV_DMA — verified working)
 NAVHAL_HAS_FPU           0   (opt-in via CONFIG_USE_FPU+DRV_FPU — verified working)
 NAVHAL_HAS_CYCLE_COUNTER 0   (opt-in via CONFIG_DRV_DWT — verified working)
@@ -123,9 +123,11 @@ implemented and pass their on-target test suites — see the bring-up record.
 
 * Reset default is HSI 16 MHz; call `hal_clock_init` with a PLL config to scale
   up (up to 216 MHz — `clock_f7.c` does VOS/over-drive/wait-states for you).
-* UART is polling-only; the DMA-backed UART API (`hal_uart_write_dma`) is not yet
-  ported to F7, so `DRV_UART_DMA` stays off — even though the DMA driver itself
-  works. (Wiring `uart_f7.c` to DMA is the remaining UART-DMA task.)
+* UART DMA TX is hardware-validated; the DMA **RX** path (`hal_uart_init_dma_rx`)
+  is implemented but not yet exercised on the bench (no serial input source
+  wired). DMA buffers are coherent while the L1 D-cache stays off; enabling the
+  D-cache later means clean/invalidate around them, or placing them in DTCM
+  (`NAVHAL_DTCM_NOINIT`).
 * The **L1 D-cache is kept disabled**, which is what makes DMA buffers coherent
   today. The DMA driver is verified in this configuration. Enabling the D-cache
   later for performance will require cache clean/invalidate around any

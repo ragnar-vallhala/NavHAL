@@ -32,8 +32,11 @@
  * driver moves to the vendor-backend vtable (roadmap M9).
  *
  * @note Default frame configuration: 8 data bits, no parity, 1 stop bit.
- * @note All blocking transfers are polling-mode. DMA backend is not yet wired
- *       for F7 (needs Cortex-M7 cache-coherency handling — port plan F7-5).
+ * @note Blocking transfers are polling-mode; the DMA-backed API
+ *       (hal_uart_write_dma / init_dma_rx) is at the bottom, gated by
+ *       NAVHAL_CONFIG_DRV_UART_DMA. DMA buffers are coherent while the L1
+ *       D-cache stays off (the current bring-up default); once it is enabled
+ *       they will need clean/invalidate or DTCM placement (NAVHAL_DTCM_NOINIT).
  */
 
 #include "navhal_port_uart.h"
@@ -43,6 +46,9 @@
 #include "family/rcc_reg.h"
 #include "family/uart_reg.h"
 #include <stdint.h>
+#if NAVHAL_CONFIG_DRV_UART_DMA
+#include "navhal_port_dma.h"
+#endif
 
 static inline volatile UARTx_Reg_Typedef *_get_usart(hal_uart_t uart) {
   return (volatile UARTx_Reg_Typedef *)GET_USARTx_BASE(uart);
@@ -255,3 +261,153 @@ uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,
   buffer[i] = '\0';
   return i;
 }
+
+/*===========================================================================
+ * DMA-backed UART transmit/receive (STM32F7).
+ *
+ * Same shape as the F4 backend in uart.c, adapted to the F7 USART IP: the DMA
+ * peripheral address is the split TDR (base+0x28) on TX and RDR (base+0x24) on
+ * RX, not the F4's single DR (base+0x04). USART1/2/6 keep the F4 DMA request
+ * map; USART3 (the Nucleo-F767ZI console) is the F7-specific addition.
+ *===========================================================================*/
+#if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
+
+typedef struct {
+  DMA_Typedef *controller;
+  uint8_t stream;
+  uint8_t channel;
+  uint8_t irq;
+  uint32_t periph_addr;
+} _uart_dma_params_t;
+
+/** @brief Resolve DMA controller/stream/channel/IRQ and the TDR|RDR address for
+ *  a UART and direction (RM0410 Tables 27/28). */
+static _uart_dma_params_t _get_uart_dma_params(hal_uart_t uart, int is_tx) {
+  _uart_dma_params_t p = {0};
+  uint32_t base = 0;
+  if (uart == HAL_UART_1) {
+    p.controller = DMA2;
+    base = USART1_BASE;
+    if (is_tx) { p.stream = 7; p.channel = 4; p.irq = DMA2_Stream7_IRQn; }
+    else       { p.stream = 2; p.channel = 4; p.irq = DMA2_Stream2_IRQn; }
+  } else if (uart == HAL_UART_2) {
+    p.controller = DMA1;
+    base = USART2_BASE;
+    if (is_tx) { p.stream = 6; p.channel = 4; p.irq = DMA1_Stream6_IRQn; }
+    else       { p.stream = 5; p.channel = 4; p.irq = DMA1_Stream5_IRQn; }
+  } else if (uart == HAL_UART_3) {
+    p.controller = DMA1;
+    base = USART3_BASE;
+    if (is_tx) { p.stream = 3; p.channel = 4; p.irq = DMA1_Stream3_IRQn; }
+    else       { p.stream = 1; p.channel = 4; p.irq = DMA1_Stream1_IRQn; }
+  } else if (uart == HAL_UART_6) {
+    p.controller = DMA2;
+    base = USART6_BASE;
+    if (is_tx) { p.stream = 6; p.channel = 5; p.irq = DMA2_Stream6_IRQn; }
+    else       { p.stream = 1; p.channel = 5; p.irq = DMA2_Stream1_IRQn; }
+  }
+  if (base)
+    p.periph_addr = base + (is_tx ? 0x28u : 0x24u); /* TDR : RDR */
+  return p;
+}
+
+/* Re-arm cache: index = USARTn*2 + (RX?1:0), n in {1:0, 2:1, 3:2, 6:3}. */
+static uint8_t _uart_dma_initialized[8] = {0};
+static int _uart_dma_idx(hal_uart_t uart, int is_tx) {
+  int n = (uart == HAL_UART_1)   ? 0
+          : (uart == HAL_UART_2) ? 1
+          : (uart == HAL_UART_3) ? 2
+                                 : 3;
+  return n * 2 + (is_tx ? 0 : 1);
+}
+
+hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
+                                uint16_t length) {
+  if (!data || length == 0)
+    return HAL_ERR_INVALID_ARG;
+
+  _uart_dma_params_t p = _get_uart_dma_params(uart, 1);
+  if (!p.controller)
+    return HAL_ERR_INVALID_ARG;
+
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  usart->CR3 |= USART_CR3_DMAT;
+
+  int idx = _uart_dma_idx(uart, 1);
+  hal_dma_config_t cfg = {
+      .controller =
+          (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2,
+      .stream = p.stream,
+      .channel = p.channel,
+      .direction = HAL_DMA_DIR_M2P,
+      .src_addr = (uint32_t)data,
+      .dst_addr = p.periph_addr,
+      .data_count = length,
+      .src_inc = 1,
+      .dst_inc = 0,
+      .data_width = HAL_DMA_DATA_WIDTH_8,
+      .priority = HAL_DMA_PRIORITY_HIGH,
+  };
+
+  if (!_uart_dma_initialized[idx]) {
+    hal_dma_init(&cfg);
+    _uart_dma_initialized[idx] = 1;
+  } else {
+    /* Re-arm: wait for the previous transfer, then repoint memory + count. */
+    DMA_Stream_Typedef *s = &p.controller->STREAM[p.stream];
+    while (s->CR & DMA_SxCR_EN)
+      ;
+    s->M0AR = (uint32_t)data;
+    s->NDTR = length;
+  }
+
+  hal_dma_clear_flags(&cfg);
+  hal_interrupt_enable((hal_irq_t)p.irq);
+  hal_dma_start(&cfg);
+  return HAL_OK;
+}
+
+hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
+                                  uint16_t length) {
+  if (!buffer || length == 0)
+    return HAL_ERR_INVALID_ARG;
+
+  _uart_dma_params_t p = _get_uart_dma_params(uart, 0);
+  if (!p.controller)
+    return HAL_ERR_INVALID_ARG;
+
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  usart->CR3 |= USART_CR3_DMAR;
+
+  hal_dma_config_t cfg = {
+      .controller =
+          (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2,
+      .stream = p.stream,
+      .channel = p.channel,
+      .direction = HAL_DMA_DIR_P2M,
+      .src_addr = p.periph_addr,
+      .dst_addr = (uint32_t)buffer,
+      .data_count = length,
+      .src_inc = 0,
+      .dst_inc = 1,
+      .data_width = HAL_DMA_DATA_WIDTH_8,
+      .priority = HAL_DMA_PRIORITY_MEDIUM,
+      .circular = 1,
+  };
+
+  hal_dma_init(&cfg);
+  hal_dma_start(&cfg);
+  _uart_dma_initialized[_uart_dma_idx(uart, 0)] = 1;
+  return HAL_OK;
+}
+
+hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s) {
+  if (!s)
+    return HAL_ERR_INVALID_ARG;
+  uint16_t len = 0;
+  while (s[len])
+    len++;
+  return hal_uart_write_dma(uart, (const uint8_t *)s, len);
+}
+
+#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */

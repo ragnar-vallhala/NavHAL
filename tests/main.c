@@ -39,6 +39,7 @@
 #include "cap/mpu/test_mpu.h"
 #include "cap/sdio/test_sdio.h"
 #include "cap/tcm/test_tcm.h"
+#include "cap/uart_dma/test_uart_dma.h"
 
 /* White-box, register-poke suites are per-processor. Only the Cortex-M4 set
  * exists today; a cortex-m7 build skips this tier (its registers differ — e.g.
@@ -100,6 +101,9 @@ static const navtest_suite_t *const all_suites[] = {
     &test_timebase_suite,
 #if NAVHAL_CONFIG_DRV_DMA
     &test_dma_suite,
+#endif
+#if NAVHAL_CONFIG_DRV_UART_DMA
+    &test_uart_dma_suite,
 #endif
     &test_crc_suite,
 #if NAVHAL_CONFIG_DRV_DWT

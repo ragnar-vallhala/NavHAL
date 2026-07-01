@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 set(EXECUTABLE_NAME "hal_dma_i2c")
 
-# Require DMA enabled for the sample
-add_definitions(-D_DMA_ENABLED)
+# DMA is enabled through Kconfig (CONFIG_DRV_DMA); the resulting
+# NAVHAL_CONFIG_DRV_DMA is force-included into every TU, so no -D is needed.
 
 # Define source files for this sample
 set(SAMPLE_SOURCES

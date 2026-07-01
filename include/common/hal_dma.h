@@ -22,7 +22,7 @@
  * @details
  * Standardized DMA API (see @c docs/api_standardization.md). Configures and
  * controls DMA streams. The entire API is compiled only when @c NAVHAL_CONFIG_DRV_DMA
- * is defined (see @c NAVHAL_HAS_DMA).
+ * is defined (see @c NAVHAL_CONFIG_DRV_DMA).
  *
  * ### Typical usage
  * @code

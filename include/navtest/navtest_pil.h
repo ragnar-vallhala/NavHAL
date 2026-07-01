@@ -49,7 +49,7 @@ extern "C" {
 #endif
 
 /* Direct DWT/SCS register pointers — independent of the cycle-counter
- * driver, so the probe still compiles when NAVHAL_HAS_CYCLE_COUNTER is
+ * driver, so the probe still compiles when NAVHAL_CONFIG_DRV_DWT is
  * off (the cap-disabled CI build). */
 #define _NAVTEST_DEMCR ((volatile uint32_t *)0xE000EDFCu)
 #define _NAVTEST_DWT_CTRL ((volatile uint32_t *)0xE0001000u)

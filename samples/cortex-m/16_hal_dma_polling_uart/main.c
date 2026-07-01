@@ -58,7 +58,7 @@ static uint32_t run_polling(int iters) {
   return hal_timebase_get_tick() - t0;
 }
 
-#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+#if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
 /*
  * DMA TX — after each transfer completes the CPU runs do_cpu_work()
  * for the remaining time in the transfer window.
@@ -94,7 +94,7 @@ int main(void) {
   hal_uart_print(HAL_UART_2, poll_work);
   hal_uart_write_string(HAL_UART_2, "\r\n\r\n");
 
-#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+#if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
   /* ---- DMA ---- */
   hal_uart_write_string(HAL_UART_2, "[DMA]     Running...\r\n");
   uint32_t dma_ticks = run_dma_iter(ITERS);
@@ -114,7 +114,7 @@ int main(void) {
   hal_uart_print(HAL_UART_2, dma_work);
   hal_uart_write_string(HAL_UART_2, "\r\nDMA frees CPU: YES\r\n");
 #else
-  hal_uart_write_string(HAL_UART_2, "[DMA] Not enabled. Set _DMA_ENABLED in config.h\r\n");
+  hal_uart_write_string(HAL_UART_2, "[DMA] Not enabled. Set CONFIG_DRV_DMA in Kconfig\r\n");
 #endif
   return 0;
 }

@@ -68,7 +68,7 @@ int main(void) {
   delay(100);
 
   hal_uart_write_string(HAL_UART_2, "\n\r--- NavHAL SDIO Perf Test ---\n\r");
-#ifdef _DMA_ENABLED
+#if NAVHAL_CONFIG_DRV_DMA
   hal_uart_write_string(HAL_UART_2, "DMA Mode: ENABLED\n\r");
 #else
   hal_uart_write_string(HAL_UART_2, "DMA Mode: DISABLED (Polling)\n\r");

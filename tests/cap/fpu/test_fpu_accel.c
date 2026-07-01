@@ -22,7 +22,7 @@
 #include "navtest/navtest_pil.h"
 #include <stdint.h>
 
-#if NAVHAL_HAS_FPU
+#if NAVHAL_CONFIG_USE_FPU
 #include "navhal_port_dwt.h"
 #include "navhal_port_fpu.h"
 
@@ -86,4 +86,4 @@ const navtest_suite_t test_fpu_suite = {
     .between = NULL,
 };
 
-#endif /* NAVHAL_HAS_FPU */
+#endif /* NAVHAL_CONFIG_USE_FPU */

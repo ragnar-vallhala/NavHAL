@@ -25,7 +25,7 @@
  * and (when the port's DMA backend is enabled) asynchronous block transfers.
  *
  * The entire API is compiled only when @c NAVHAL_CONFIG_DRV_SDIO is defined (see
- * @c NAVHAL_HAS_SDIO) — on a target without an SDIO peripheral the header
+ * @c NAVHAL_CONFIG_DRV_SDIO) — on a target without an SDIO peripheral the header
  * collapses to nothing, exactly as @c hal_dma.h does for DMA.
  *
  * @note SDIO returns the driver-specific ::hal_sdio_error_t rather than

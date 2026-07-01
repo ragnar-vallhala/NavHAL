@@ -19,7 +19,7 @@
  * @file tests/test_sdio.c
  * @brief Standardized hal_sdio_* API smoke tests.
  *
- * SDIO sits behind NAVHAL_HAS_SDIO. The actual card is rarely connected
+ * SDIO sits behind NAVHAL_CONFIG_DRV_SDIO. The actual card is rarely connected
  * on a bare Nucleo, so the tests cover argument validation, the typed
  * error-code surface, and ensure that mutating helpers don't crash on
  * smoke-test inputs.
@@ -28,7 +28,7 @@
 #define CORTEX_M4
 #include "test_sdio.h"
 
-#if NAVHAL_HAS_SDIO
+#if NAVHAL_CONFIG_DRV_SDIO
 
 #include "navhal_port_sdio.h"
 #include "navtest/navtest.h"
@@ -137,4 +137,4 @@ const navtest_suite_t test_sdio_suite = {
     .between = NULL,
 };
 
-#endif /* NAVHAL_HAS_SDIO */
+#endif /* NAVHAL_CONFIG_DRV_SDIO */

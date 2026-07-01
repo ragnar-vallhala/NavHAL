@@ -24,7 +24,7 @@
 
 /* Test suite headers, grouped by tier:
  *   portable/   — run on every supported arch
- *   cap/<X>/    — run wherever NAVHAL_HAS_<X> is 1
+ *   cap/<X>/    — run wherever NAVHAL_CONFIG_DRV_<X> is 1
  *   arch/<X>/   — run only on the matching arch (white-box, register pokes)
  */
 #include "portable/test_crc.h"
@@ -95,18 +95,18 @@ static const navtest_suite_t *const all_suites[] = {
                                   on every arch (navtest PROGMEM keeps
                                   __FILE__/msg strings out of AVR .data). */
     &test_timebase_suite,
-#if NAVHAL_HAS_DMA
+#if NAVHAL_CONFIG_DRV_DMA
     &test_dma_suite,
 #endif
     &test_crc_suite,
-#if NAVHAL_HAS_CYCLE_COUNTER
+#if NAVHAL_CONFIG_DRV_DWT
     &test_dwt_suite,
 #endif
-#if NAVHAL_HAS_FPU
+#if NAVHAL_CONFIG_USE_FPU
     &test_fpu_suite,
 #endif
     &test_flash_suite,
-#if NAVHAL_HAS_SDIO
+#if NAVHAL_CONFIG_DRV_SDIO
     &test_sdio_suite,
 #endif
 };
@@ -134,7 +134,7 @@ static void print_startup_message(void) {
 
 int main(void) {
   hal_uart_init(NAVTEST_UART, &(hal_uart_config_t){.baudrate=9600});
-#if NAVHAL_HAS_FPU
+#if NAVHAL_CONFIG_USE_FPU
   hal_fpu_enable();
 #endif
   print_startup_message();

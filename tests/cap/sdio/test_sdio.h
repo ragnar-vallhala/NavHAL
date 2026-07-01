@@ -34,7 +34,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#if NAVHAL_HAS_SDIO
+#if NAVHAL_CONFIG_DRV_SDIO
 
 void test_hal_sdio_init_rejects_null_config(void);
 void test_hal_sdio_read_block_rejects_null_buffer(void);
@@ -45,7 +45,7 @@ void test_hal_sdio_block_roundtrip_pil(void);
 
 extern const navtest_suite_t test_sdio_suite;
 
-#endif /* NAVHAL_HAS_SDIO */
+#endif /* NAVHAL_CONFIG_DRV_SDIO */
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -35,7 +35,7 @@ int main(void) {
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=115200});
   hal_uart_init(HAL_UART_6, &(hal_uart_config_t){.baudrate=115200});
 
-#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+#if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
   /* Start DMA circular reception for both UARTs */
   hal_uart_init_dma_rx(HAL_UART_2, u2_rx_buf, BUF_SIZE);
   hal_uart_init_dma_rx(HAL_UART_6, u6_rx_buf, BUF_SIZE);

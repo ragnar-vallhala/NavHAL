@@ -68,8 +68,8 @@ void test_conformance_sdio_init_rejects_null(void);
 void test_conformance_gpio_init_rejects_null(void);
 void test_conformance_null_init_is_idempotent(void);
 
-/* Capability-flag contract — NAVHAL_HAS_X is always 0 or 1, never
- * unset (#ifdef NAVHAL_HAS_X yields a value; the macro is a contract,
+/* Capability-flag contract — NAVHAL_CONFIG_DRV_X is always 0 or 1, never
+ * unset (#ifdef NAVHAL_CONFIG_DRV_X yields a value; the macro is a contract,
  * not a feature switch). */
 void test_conformance_cap_macros_are_defined(void);
 

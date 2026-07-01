@@ -48,6 +48,26 @@ by adding a board layer.
 `✗` here means the silicon has the peripheral but the NavHAL driver isn't
 validated for F7 yet — treated like `—` at link time.
 
+### Cortex-M7-only silicon (delta from the F4 / Cortex-M4 ports)
+
+Every capability above is shared ARMv7E-M arch code or a reused/ported F4
+driver — there is **no NavHAL driver module exclusive to M7**. The M7 delta
+is at the *silicon* level: features the Cortex-M4 / STM32F4 port has no
+equivalent for. NavHAL either folds these into an existing module or leaves
+them unwrapped for now.
+
+| M7-only feature | NavHAL status | Where | Notes |
+|---|---|---|---|
+| Double-precision FPU (`fpv5-d16`) | ✓ (in the FPU module) | `cmake/arch/armv7e-m.cmake` | M4 has only the single-precision `fpv4-sp-d16`. Same `hal_fpu` API; the `-mfpu` is picked from `CMAKE_SYSTEM_PROCESSOR` so M7 gets hardware `double`. |
+| L1 caches — 16 KB I-cache + 16 KB D-cache | ◐ (no module; D-cache **kept off**) | see *Caveats* | M4 has no cache at all. The D-cache is deliberately left disabled so DMA/peripheral buffers stay coherent without clean/invalidate. Enabling it later is a future `hal_cache`-style module. |
+| DTCM / ITCM tightly-coupled memory (128 KB / 16 KB) | ◐ (linker only) | `src/board/nucleo_f767zi/linker.ld` | DTCM is mapped address-contiguous with SRAM1/SRAM2 into one `RAM` region; there is no separate NavHAL API to place code/data in ITCM/DTCM yet. |
+
+`◐` here flags an M7 feature NavHAL is *aware* of but does not yet expose as a
+standalone driver; `✓` means it's already covered inside the listed module.
+
+(The flash ART accelerator + prefetch, enabled in `clock_f7.c`, is *not* listed
+here — it is an STM32F4 feature too, so it isn't part of the M7 delta.)
+
 ## Default Kconfig state
 
 What `navhal_target.h` contains after

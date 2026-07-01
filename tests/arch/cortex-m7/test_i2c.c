@@ -99,8 +99,28 @@ void test_hal_i2c_typed_id_compiles(void) {
   (void)hal_i2c_write(bus, 0x50, &data, 0);
   TEST_ASSERT_TRUE(1);
 }
+
+/* PIL-only: exercise a real master transfer against the Renode-modelled BMP180
+ * on I2C1 @ 0x77 (see tools/renode/stm32f767zi.repl). Reads the chip-ID
+ * register (0xD0 -> 0x55) via write_read, proving the i2c_f7 transfer FSM
+ * (CR2 framing, TXIS/TC/RXNE/STOPF) drives an attached device. Skipped on HIL
+ * (the bench has no sensor wired). */
+void test_i2c_pil_device_read_chip_id(void) {
+  NAVTEST_PIL_ONLY();
+  hal_i2c_config_t cfg = {.clock_speed = HAL_I2C_SPEED_STANDARD,
+                          .own_address = I2C_MASTER,
+                          .acknowledge = true};
+  hal_i2c_init(HAL_I2C_1, &cfg);
+  uint8_t reg = 0xD0;
+  uint8_t id = 0;
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_i2c_write_read(HAL_I2C_1, 0x77, &reg, 1, &id, 1));
+  TEST_ASSERT_EQUAL_UINT32(0x55u, (uint32_t)id);
+}
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
 NAVTEST_CASE_DECL(test_i2c_init_config);
+NAVTEST_CASE_DECL(test_i2c_pil_device_read_chip_id);
 NAVTEST_CASE_DECL(test_i2c_fast_mode_config);
 NAVTEST_CASE_DECL(test_hal_i2c_init_returns_ok);
 NAVTEST_CASE_DECL(test_hal_i2c_init_rejects_null_config);
@@ -119,6 +139,7 @@ static const navtest_case_t i2c_cases[] = {
     NAVTEST_CASE(test_hal_i2c_read_rejects_null_data),
     NAVTEST_CASE(test_hal_i2c_write_read_rejects_null_data),
     NAVTEST_CASE(test_hal_i2c_typed_id_compiles),
+    NAVTEST_CASE(test_i2c_pil_device_read_chip_id),
 };
 
 const navtest_suite_t test_i2c_suite = {

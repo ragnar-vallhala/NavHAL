@@ -32,6 +32,8 @@
 
 #include "navhal_port_sdio.h"
 #include "navtest/navtest.h"
+#include "navtest/navtest_pil.h"
+#include <stdint.h>
 
 void test_hal_sdio_init_rejects_null_config(void) {
   /* The contract is hal_sdio_error_t; HAL_SDIO_ERROR is the generic
@@ -73,12 +75,50 @@ void test_hal_sdio_set_callback_smoke(void) {
   hal_sdio_set_callback(NULL); /* re-clear */
   TEST_ASSERT_TRUE(1);
 }
+
+/* PIL-only: a real block write/read round-trip against the Renode SDMMC model
+ * with an SD card attached (see tools/renode/navhal_f767zi.resc). Exercises
+ * the full polled data path — card handshake (CMD0/8/ACMD41/2/3/7), the DPSM
+ * (DCTRL/DLEN), and the FIFO drain/fill loops — end-to-end. Skipped on HIL
+ * (NAVTEST_PIL_ONLY) and gracefully skipped under any emulator that has no
+ * card on the controller (card_init fails fast there). */
+void test_hal_sdio_block_roundtrip_pil(void) {
+  NAVTEST_PIL_ONLY();
+
+  hal_sdio_config_t cfg = {.clock_div = 0, .bus_width = 0 /* 1-bit */};
+  if (hal_sdio_init(&cfg) != HAL_SDIO_OK) {
+    TEST_ASSERT_TRUE(1); /* controller not modelled here */
+    return;
+  }
+  if (hal_sdio_card_init() != HAL_SDIO_OK) {
+    TEST_ASSERT_TRUE(1); /* no SD card attached in this environment */
+    return;
+  }
+
+  uint8_t wbuf[512];
+  uint8_t rbuf[512];
+  for (uint32_t i = 0; i < 512; i++) {
+    wbuf[i] = (uint8_t)(i * 7u + 0x3Bu);
+    rbuf[i] = 0;
+  }
+
+  const uint32_t sector = 0x40; /* arbitrary LBA inside the card */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_SDIO_OK,
+                           (uint32_t)hal_sdio_write_block(sector, wbuf));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_SDIO_OK,
+                           (uint32_t)hal_sdio_read_block(sector, rbuf));
+
+  for (uint32_t i = 0; i < 512; i++) {
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)wbuf[i], (uint32_t)rbuf[i]);
+  }
+}
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
 NAVTEST_CASE_DECL(test_hal_sdio_init_rejects_null_config);
 NAVTEST_CASE_DECL(test_hal_sdio_read_block_rejects_null_buffer);
 NAVTEST_CASE_DECL(test_hal_sdio_write_block_rejects_null_buffer);
 NAVTEST_CASE_DECL(test_hal_sdio_get_sector_count_returns_value);
 NAVTEST_CASE_DECL(test_hal_sdio_set_callback_smoke);
+NAVTEST_CASE_DECL(test_hal_sdio_block_roundtrip_pil);
 
 
 static const navtest_case_t sdio_cases[] = {
@@ -87,6 +127,7 @@ static const navtest_case_t sdio_cases[] = {
     NAVTEST_CASE(test_hal_sdio_write_block_rejects_null_buffer),
     NAVTEST_CASE(test_hal_sdio_get_sector_count_returns_value),
     NAVTEST_CASE(test_hal_sdio_set_callback_smoke),
+    NAVTEST_CASE(test_hal_sdio_block_roundtrip_pil),
 };
 
 const navtest_suite_t test_sdio_suite = {

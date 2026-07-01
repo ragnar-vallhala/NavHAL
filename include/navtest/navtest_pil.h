@@ -101,6 +101,22 @@ static inline bool navtest_in_pil(void) {
     }                                                                          \
   } while (0)
 
+/**
+ * @brief Run the enclosing test only under PIL/Renode; PASS-skip on real HW.
+ *
+ * The inverse of NAVTEST_SKIP_ON_PIL(). Use for tests that depend on a Renode
+ * device model attached to a bus (an I²C sensor, SPI flash, SD card) which the
+ * HIL bench may not have wired — the transfer path is exercised in the emulator
+ * while the real board skips.
+ */
+#define NAVTEST_PIL_ONLY()                                                     \
+  do {                                                                         \
+    if (!navtest_in_pil()) {                                                   \
+      TEST_ASSERT_TRUE(1);                                                     \
+      return;                                                                  \
+    }                                                                          \
+  } while (0)
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

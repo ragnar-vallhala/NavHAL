@@ -33,7 +33,7 @@ What the HAL contract (`NAVHAL_HAS_*`) reports for each supported MCU. Macro def
 | Cycle counter     | `CYCLE_COUNTER`        | ✓ | — | ✓ |
 | FPU               | `FPU`                  | ✓ | — | ✓ |
 | DMA controller    | `DMA`                  | ✓ | — | ✓ |
-| SDIO              | `SDIO`                 | ✓ | — | ✗ |
+| SDIO              | `SDIO`                 | ✓ | — | ◐ |
 | UART → DMA backend| `UART_DMA`             | ✓ | — | ✗ |
 | I²C → DMA backend | `I2C_DMA`              | ✓ | — | ✗ |
 | SDIO async (DMA)  | `SDIO_DMA`             | ✓ | — | ✗ |

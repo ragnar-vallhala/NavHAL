@@ -34,16 +34,16 @@ by adding a board layer.
 | CLOCK             | ✓ | `src/vendor/stm32/clock/clock_f7.c`      | HSI / HSE / PLL up to **216 MHz**, verified on hardware. VOS Scale 1, PWR over-drive (>180 MHz), HCLK-scaled flash wait states + ART/prefetch, APB1 ≤54 / APB2 ≤108 MHz prescalers. |
 | INTERRUPT         | ✓ | `src/arch/armv7e-m/interrupt/interrupt.c`| NVIC; shared ARMv7E-M arch code. |
 | UART              | ◐ | `src/vendor/stm32/uart/uart_f7.c`        | USART1/2/3/6, polling TX/RX. USART3 (ST-LINK VCP, PD8/PD9) verified on hardware at 115200. F7-specific driver (ISR/RDR/TDR), selected by `CONFIG_FAMILY_STM32F7`. DMA backend not yet ported (F7-5). |
-| I2C               | ◐ | `src/vendor/stm32/i2c/i2c_f7.c`         | Master; full rewrite for the F7 timing-register IP (`TIMINGR` / `ISR`-`ICR` / CR2-framed / `RXDR`-`TXDR`). Opt-in via `CONFIG_DRV_I2C`; `test_i2c` (8) passes — **init `TIMINGR`/`PE` register-verified** on hardware, but transfers are unexercised (no bus device, and `TIMINGR` is preset for the 16 MHz reset clock). |
-| SPI               | ◐ | `src/vendor/stm32/spi/spi_f7.c`         | Master, 8/16-bit. F7-specific (`CR2.DS` frame size + `FRXTH`, byte-`DR` FIFO access) — the F4 `CR1.DFF` is gone. Opt-in via `CONFIG_DRV_SPI`; `test_spi` (7) passes, but init config is **register-verified only** (no SPI device on the bench for a loopback transfer). |
+| I2C               | ◐ | `src/vendor/stm32/i2c/i2c_f7.c`         | Master; full rewrite for the F7 timing-register IP (`TIMINGR` / `ISR`-`ICR` / CR2-framed / `RXDR`-`TXDR`). Opt-in via `CONFIG_DRV_I2C`; `test_i2c` (8) passes — **init `TIMINGR`/`PE` register-verified** on hardware, but a `write_read` against a Renode-modelled BMP180 validates the transfer FSM in PIL (`TIMINGR` is preset for the 16 MHz reset clock). |
+| SPI               | ◐ | `src/vendor/stm32/spi/spi_f7.c`         | Master, 8/16-bit. F7-specific (`CR2.DS` frame size + `FRXTH`, byte-`DR` FIFO access) — the F4 `CR1.DFF` is gone. Opt-in via `CONFIG_DRV_SPI`; `test_spi` (8) passes; init is register-verified on HIL and a JEDEC-ID read against a Renode `GenericSpiFlash` validates the transmit/receive FIFO path in PIL. |
 | PWM               | ✓ | `src/vendor/stm32/pwm/pwm.c`             | Reuses the shared timer-based driver. Opt-in via `CONFIG_DRV_PWM`; `test_pwm` (11) passes on hardware. |
 | FLASH             | ✓ | `src/vendor/stm32/flash/flash.c`        | Key/value store on sectors 6/7 (256 KB each) of the real F767 12-sector 2 MB map. Opt-in via `CONFIG_DRV_FLASH`; `test_flash_raw` (6) passes on hardware. Bring-up fixed two `flash.c` bugs (M7 write-buffer `DSB`; NULL guard). |
 | CRC_HW            | ✓ | `src/vendor/stm32/crc/crc.c`            | Hardware CRC-32; default polynomial is register-compatible with F4. Opt-in via `CONFIG_DRV_CRC`; the CRC suite (7) passes via the hardware unit on F767. |
 | CYCLE_COUNTER     | ✓ | `src/arch/armv7e-m/dwt/dwt.c`            | DWT-backed; shared ARMv7E-M arch code. Opt-in via `CONFIG_DRV_DWT`; `test_dwt` (6) passes on hardware. |
 | FPU               | ✓ | `src/arch/armv7e-m/fpu/fpu.c`            | Hardware **double-precision** FPU (`-mfpu=fpv5-d16`, hard float) via `CONFIG_USE_FPU` + `CONFIG_DRV_FPU`. `test_fpu_accel` (3) passes on hardware. |
 | DMA               | ✓ | `src/vendor/stm32/dma/dma.c`            | DMA1/DMA2 stream controller (register-compatible with F4). Opt-in via `CONFIG_DRV_DMA`; `test_dma` (17) passes on hardware. Coherent while the L1 D-cache stays off (see caveats); a DMA UART backend is still pending. |
-| SDIO              | ✗ | (pending)                                 | After DMA. |
-| UART_DMA / I2C_DMA / SDIO_DMA | ✗ | (pending)                     | Follow their base drivers. |
+| SDIO              | ◐ | `src/vendor/stm32/sdio/sdio.c`          | **Polled** SD-card block I/O. The F7 SDMMC1 IP is register-identical to the F4 SDIO (same base `0x40012C00`, same APB2ENR bit, same AF12 pinmux, same vector slot 49), so the shared driver runs unchanged. Opt-in via `CONFIG_DRV_SDIO`; `test_sdio` (6) passes, and a card-init + 512-byte block write/read round-trip is validated in PIL against a Renode `SD.STM32FSDMMC` + attached card (`NAVTEST_PIL_ONLY`). The DMA-backed async API stays Cortex-M4-only (`DRV_SDIO_DMA`) until validated under the F7 L1 cache. |
+| UART_DMA / I2C_DMA / SDIO_DMA | ✗ | (pending)                     | Follow their base drivers; DMA-backed peripheral APIs are M4-only on F7 so far. |
 
 `✗` here means the silicon has the peripheral but the NavHAL driver isn't
 validated for F7 yet — treated like `—` at link time.
@@ -108,4 +108,8 @@ implemented and pass their on-target test suites — see the bring-up record.
   today. The DMA driver is verified in this configuration. Enabling the D-cache
   later for performance will require cache clean/invalidate around any
   DMA/peripheral-shared buffer (`SCB_CleanDCache_by_Addr` / `InvalidateDCache`).
-* Not yet wired into CI (sample matrix / PIL) — milestone F7-7.
+* Wired into CI: `sample-matrix-f767` (portable samples build under the F767
+  toolchain) and `build-on-target-f767` (test-ELF compile) in `ci.yml`, plus a
+  `nucleo_f767zi` job in the per-arch PIL matrix (`renode.yml`) that runs the
+  on-target suite under Renode — with `DRV_SDIO` enabled (board-conf
+  `TEST_EXTRA_CONFIG`) so the SDIO block round-trip runs there too.

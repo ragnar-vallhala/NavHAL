@@ -26,16 +26,11 @@ set(NAVHAL_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 add_compile_options(-Wall -Wextra -Wno-unused-parameter -O0 -g)
 add_compile_definitions(NAVTEST_HOST)
 
-include_directories(
-  ${NAVHAL_ROOT}/include
-  # The host build always targets the Cortex-M4 / STM32F4 port (it
-  # compiles a subset of those sources with the system compiler), so
-  # we don't drive these paths from Kconfig here — the embedded build
-  # in ${NAVHAL_ROOT}/CMakeLists.txt does, via ARCH_ISA / FAMILY.
-  ${NAVHAL_ROOT}/include/port/cortex-m4
-  ${NAVHAL_ROOT}/src/vendor/stm32/family/stm32f4/include
-)
+enable_testing()
 
+# -------------------------------------------------------------------------
+# tests_host — pure-logic SIL suite (Cortex-M4 / STM32F4 headers).
+# -------------------------------------------------------------------------
 add_executable(tests_host
   main.c
   host_backend.c
@@ -44,13 +39,56 @@ add_executable(tests_host
   test_gpio_encoding.c
   test_hal_status.c
 
-  # shared harness
   ${NAVHAL_ROOT}/tests/navtest_state.c
 
   # source under test — pure-logic only (no register access)
   ${NAVHAL_ROOT}/src/utils/conversion.c
   ${NAVHAL_ROOT}/src/vendor/stm32/crc/crc.c
 )
-
-enable_testing()
+target_include_directories(tests_host PRIVATE
+  ${NAVHAL_ROOT}/include
+  ${NAVHAL_ROOT}/include/port/cortex-m4
+  ${NAVHAL_ROOT}/src/vendor/stm32/family/stm32f4/include
+)
 add_test(NAME tests_host COMMAND tests_host)
+
+# -------------------------------------------------------------------------
+# tests_host_drivers — deep SIL suite that runs the *real* STM32F7 drivers
+# against a simulated MMIO backing store (host_mmio.c). Catches register/
+# control-flow bugs the pure-logic suite can't. Cortex-M7 / STM32F7 headers.
+# -------------------------------------------------------------------------
+add_executable(tests_host_drivers
+  main_drivers.c
+  host_backend.c
+  host_mmio.c
+  host_stubs.c
+  test_gpio_driver.c
+  test_uart_driver.c
+  test_i2c_driver.c
+  test_spi_driver.c
+  test_clock_driver.c
+  test_flash_driver.c
+
+  ${NAVHAL_ROOT}/tests/navtest_state.c
+
+  # real driver sources under test
+  ${NAVHAL_ROOT}/src/vendor/stm32/gpio/gpio.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/clock/clock_f7.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/uart/uart_f7.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/i2c/i2c_f7.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/spi/spi_f7.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/flash/flash.c
+  ${NAVHAL_ROOT}/src/utils/util.c
+)
+target_include_directories(tests_host_drivers PRIVATE
+  ${NAVHAL_ROOT}/include
+  ${NAVHAL_ROOT}/include/port/cortex-m7
+  ${NAVHAL_ROOT}/src/vendor/stm32/family/stm32f7/include
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+# The drivers cast 32-bit peripheral addresses to pointers; on a 64-bit host
+# that's an int<->pointer width mismatch (the mmap places them in low memory,
+# so the values are valid). Silence the expected host-only warnings.
+target_compile_options(tests_host_drivers PRIVATE
+  -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast)
+add_test(NAME tests_host_drivers COMMAND tests_host_drivers)

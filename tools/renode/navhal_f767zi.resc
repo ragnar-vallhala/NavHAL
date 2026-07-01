@@ -37,6 +37,15 @@ logLevel 3 timer5
 logLevel 3 gpioPortB
 logLevel 3 gpioPortC
 logLevel 3 gpioPortD
+logLevel 3 sdmmc
+
+# Attach an SD card to the SDMMC controller (SD.STM32FSDMMC @ 0x40012c00 in the
+# F746 base model — register-identical to the F767 SDIO IP). This backs the
+# PIL-only SDIO block round-trip test (tests/cap/sdio/test_sdio.c): the seed
+# image is a 512-byte blank that Renode zero-extends to the 2 MB card size, so
+# the test's CMD24 write / CMD17 read of sector 0x40 round-trips in the model.
+# persistent=False keeps the on-disk seed image read-only.
+machine SdCardFromFile @tools/renode/sdcard_blank.img sysbus.sdmmc 0x200000 False "sd"
 
 # Capture USART3 (ST-LINK VCP on the real board) to the log; CI greps it for
 # the navtest summary. flushAfterWrite keeps the log usable if killed mid-run.

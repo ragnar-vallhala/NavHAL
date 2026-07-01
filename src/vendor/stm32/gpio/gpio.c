@@ -62,7 +62,14 @@ hal_gpio_mode_t hal_gpio_get_mode(hal_gpio_pin_t pin) {
 
 hal_status_t hal_gpio_set_alternate_function(hal_gpio_pin_t pin,
                                              hal_gpio_af_t af) {
-  hal_gpio_set_mode(pin, HAL_GPIO_MODE_AF, HAL_GPIO_PULL_NONE);
+  /* Switch to alternate-function mode WITHOUT touching PUPDR. Calling
+   * hal_gpio_set_mode(.., PULL_NONE) here reset the pull, silently dropping a
+   * pull configured before/with the AF (e.g. hal_gpio_init(mode=AF,
+   * pull=PULL_UP), or I2C SDA/SCL pull-ups). Set only the clock + MODER. */
+  hal_gpio_enable_clock(pin);
+  uint32_t _mode_shift = GPIO_GET_PIN(pin) * 2;
+  GPIO_GET_PORT(pin)->MODER &= ~(0x3U << _mode_shift);
+  GPIO_GET_PORT(pin)->MODER |= ((uint32_t)HAL_GPIO_MODE_AF << _mode_shift);
 
   uint8_t pin_num = GPIO_GET_PIN(pin);
   uint32_t mask = 0xFU << (4 * (pin_num % 8));

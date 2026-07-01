@@ -32,6 +32,7 @@
 #include "portable/test_timebase.h"
 #include "portable/conformance/test_conformance.h"
 
+#include "cap/cache/test_cache.h"
 #include "cap/dma/test_dma.h"
 #include "cap/cycle_counter/test_dwt.h"
 #include "cap/fpu/test_fpu_accel.h"
@@ -109,6 +110,9 @@ static const navtest_suite_t *const all_suites[] = {
 #if NAVHAL_CONFIG_DRV_MPU
     &test_mpu_suite,
 #endif
+#if NAVHAL_CONFIG_DRV_CACHE
+    &test_cache_suite,
+#endif
     &test_flash_suite,
 #if NAVHAL_CONFIG_DRV_SDIO
     &test_sdio_suite,
@@ -137,6 +141,9 @@ static void print_startup_message(void) {
 }
 
 int main(void) {
+#if NAVHAL_CONFIG_DRV_CACHE
+  hal_icache_enable(); /* hazard-free perf win; do it before anything else */
+#endif
   hal_uart_init(NAVTEST_UART, &(hal_uart_config_t){.baudrate=9600});
 #if NAVHAL_CONFIG_USE_FPU
   hal_fpu_enable();

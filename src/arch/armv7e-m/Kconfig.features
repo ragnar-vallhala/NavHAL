@@ -44,3 +44,13 @@ config DRV_MPU
       Enables the ARMv7-M Memory Protection Unit driver (region-based
       access control). Region count is silicon-dependent (8 on M4,
       16 on M7) and read at runtime from MPU_TYPE.DREGION.
+
+config DRV_CACHE
+    bool "Enable L1 cache driver (Cortex-M7)"
+    depends on ARCH_CORTEX_M7
+    default n
+    help
+      Enables the hal_cache driver for the Cortex-M7 L1 caches. Phase 1
+      drives the instruction cache only (hal_icache_enable) — a hazard-free
+      performance win. The Cortex-M4 has no L1 cache, so this option is not
+      offered there.

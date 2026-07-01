@@ -91,6 +91,9 @@ endif()
 if(CONFIG_DRV_MPU)
     list(APPEND HAL_SOURCES ${SRC_ARCH}/mpu/mpu.c)
 endif()
+if(CONFIG_DRV_CACHE)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/cache/cache.c)
+endif()
 
 add_library(hal STATIC
     ${HAL_SOURCES}

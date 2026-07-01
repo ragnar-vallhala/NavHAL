@@ -86,6 +86,7 @@ extern "C" {
 
 #include "common/hal_config.h"
 
+#include "common/hal_cache.h"
 #include "common/hal_crc.h"
 #include "common/hal_diskio.h"
 #include "common/hal_dma.h"

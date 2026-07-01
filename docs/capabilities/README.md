@@ -29,7 +29,7 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | Core   | Cycle counter (DWT)       | `CYCLE_COUNTER` | ✓ | — | ✓ |
 | Core   | FPU                       | `FPU`           | ✓ † | — | ✓ † |
 | Core   | MPU (memory protection) § | `MPU`           | ✓ (8-region) | — | ✓ (16-region) |
-| Core   | L1 I/D-cache ‡            | *(none)*        | — | — | ◐ |
+| Core   | L1 I-cache / D-cache      | `CACHE`         | — | — | ◐ |
 | Core   | DTCM / ITCM ‡            | *(none)*        | — | — | ◐ |
 | System | Clock subsystem           | `CLOCK`         | ✓ | ◐ | ✓ |
 | System | Flash (KV store)          | `FLASH`         | ✓ | ◐ | ✓ |
@@ -68,14 +68,18 @@ Most `✗` rows are silicon NavHAL simply hasn't scoped a driver for yet (roadma
 `†` The FPU **module** is shared across the M4 and M7 ports; the FPU
 *precision/variant* differs by core — see each MCU's page.
 
-`‡` **Cortex-M7-only silicon** that carries no `NAVHAL_HAS_*` macro: NavHAL knows
-about these blocks but does not yet wrap them as standalone drivers, and the M4
-and M7 ports otherwise expose an *identical* set of driver modules. See the
+`‡` **Cortex-M7-only silicon that carries no `NAVHAL_HAS_*` macro** — NavHAL
+knows about it but does not yet wrap it as a standalone driver. See the
 [STM32F767ZI page](stm32f767zi.md#cortex-m7-only-silicon-delta-from-the-f4--cortex-m4-ports).
 
 `§` MPU support is a shared ARMv7-M core driver (`hal_mpu`), gated on
 `NAVHAL_CONFIG_DRV_MPU` (deprecated alias `NAVHAL_HAS_MPU`). Per-core region
 counts and validation status are on each MCU's page.
+
+The **L1 cache** (`CACHE`) is Cortex-M7 only: `hal_cache` drives the instruction
+cache (`hal_icache_enable`); the data cache is a later phase (it needs
+clean/invalidate maintenance), so the F767 cell is `◐`. Detail on the
+[STM32F767ZI page](stm32f767zi.md).
 
 > **Accuracy note:** the silicon-presence cells (MPU regions, ADC/DAC/CAN/SAI
 > counts, USB HS/FS, Ethernet, DCMI/LTDC/DMA2D, QUAD-SPI, FMC, SPDIFRX, RNG)

@@ -29,6 +29,14 @@ static volatile float f1 = 1.23456f;
 static volatile float f2 = 2.34567f;
 static volatile float f3;
 
+/* libgcc software float helpers, reached through volatile function pointers so
+ * the compiler cannot fold the calls back into inline VFP instructions. This
+ * gives a genuine soft-float baseline inside the hard-float test binary. */
+extern float __aeabi_fmul(float, float);
+extern float __aeabi_fadd(float, float);
+static float (*volatile soft_mul)(float, float) = __aeabi_fmul;
+static float (*volatile soft_add)(float, float) = __aeabi_fadd;
+
 void test_fpu_basic_arithmetic(void) {
   f3 = f1 + f2;
   TEST_ASSERT_TRUE(f3 > 3.0f && f3 < 4.0f);
@@ -45,22 +53,36 @@ void test_fpu_benchmark_cycles(void) {
   const int iterations = 1000;
 
   hal_cycle_counter_init();
-  hal_cycle_counter_reset();
 
+  /* 1) Software-float baseline: the same multiply-add run through the libgcc
+   *    helpers (no VFP). */
+  hal_cycle_counter_reset();
+  start = hal_cycle_counter_get();
+  for (int i = 0; i < iterations; i++) {
+    f3 = soft_add(soft_mul(f1, f2), f1);
+  }
+  end = hal_cycle_counter_get();
+  uint32_t soft_cycles = end - start;
+
+  /* 2) Hardware FPU: the compiler emits inline VFP for the identical work. */
+  hal_cycle_counter_reset();
   start = hal_cycle_counter_get();
   for (int i = 0; i < iterations; i++) {
     f3 = f1 * f2 + f1;
   }
   end = hal_cycle_counter_get();
+  uint32_t hw_cycles = end - start;
 
-  uint32_t total_cycles = end - start;
+  navtest_write("[fpu hw=");
+  _navtest_print_uint32(hw_cycles);
+  navtest_write(" soft=");
+  _navtest_print_uint32(soft_cycles);
+  navtest_write("]\r\n");
 
-  // A typical FADD/FMUL takes 1 cycle.
-  // With overhead (loop, volatile load/store), we expect ~10-20 cycles per
-  // iteration. Without FPU (soft-float), it would be hundreds of cycles per
-  // iteration. So 1000 iterations should take < 50,000 cycles.
-  TEST_ASSERT_TRUE(total_cycles < 50000);
-  TEST_ASSERT_TRUE(total_cycles > 0);
+  /* The hardware FPU must complete the workload in fewer cycles than the
+   * software path. Self-calibrating: no absolute, core-specific threshold. */
+  TEST_ASSERT_TRUE(hw_cycles > 0);
+  TEST_ASSERT_TRUE(hw_cycles < soft_cycles);
 }
 
 void test_hal_fpu_enable_returns_ok(void) {

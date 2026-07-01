@@ -54,3 +54,14 @@ config DRV_CACHE
       drives the instruction cache only (hal_icache_enable) — a hazard-free
       performance win. The Cortex-M4 has no L1 cache, so this option is not
       offered there.
+
+config USE_TCM
+    bool "Enable tightly-coupled memory placement (Cortex-M7)"
+    depends on ARCH_CORTEX_M7
+    default n
+    help
+      Activates the NAVHAL_ITCM / NAVHAL_DTCM / NAVHAL_DTCM_NOINIT placement
+      attributes (common/hal_tcm.h), letting code and data be pinned into the
+      Cortex-M7's 0-wait instruction/data TCMs. The board startup copies the
+      .itcm / .dtcm sections from flash at reset. M4 has no TCM, so this option
+      is not offered there; with it off, the attributes are no-ops.

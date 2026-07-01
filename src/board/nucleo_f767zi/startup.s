@@ -197,12 +197,42 @@
     .word  Default_Handler          /* 97 SPDIF_RX */
 
 /*
- * @brief Reset Handler — copy .data, zero .bss, call main(). Identical to the
- * arch startup; duplicated so this file is a self-contained chip startup.
+ * @brief Reset Handler — copy the TCM sections (.itcm, .dtcm) and .data from
+ * flash, zero .dtcm_bss and .bss, then call main(). The TCM copies are F767-
+ * specific (the Cortex-M7 tightly-coupled memories); the section symbols are
+ * defined by both the board and the test linker, so these loops copy nothing
+ * when TCM placement is unused.
  */
 .text
 .type Reset_Handler, %function
 Reset_Handler:
+    /* .itcm : flash -> ITCM (0-wait code) */
+    ldr r0, =_siitcm
+    ldr r1, =_sitcm
+    ldr r2, =_eitcm
+1:  cmp r1, r2
+    bcs 2f
+    ldr r3, [r0], #4
+    str r3, [r1], #4
+    b 1b
+2:  /* .dtcm : flash -> DTCM (0-wait initialized data) */
+    ldr r0, =_sidtcm
+    ldr r1, =_sdtcm
+    ldr r2, =_edtcm
+1:  cmp r1, r2
+    bcs 2f
+    ldr r3, [r0], #4
+    str r3, [r1], #4
+    b 1b
+2:  /* .dtcm_bss : zero */
+    ldr r0, =_sdtcm_bss
+    ldr r1, =_edtcm_bss
+1:  cmp r0, r1
+    bcs 2f
+    movs r2, #0
+    str r2, [r0], #4
+    b 1b
+2:  /* .data : flash -> RAM */
     ldr r0, =_sidata
     ldr r1, =_sdata
     ldr r2, =_edata

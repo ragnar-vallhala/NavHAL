@@ -32,7 +32,6 @@
  *   [DMA]     Time=~1373 ticks | CPU work=N  (N much greater than 0)
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 #define MSG "Hello World\n\r"

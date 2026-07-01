@@ -20,7 +20,6 @@
  * @brief Benchmark: 1000 Iteration BMX160 DMA fast-read.
  */
 
-#define CORTEX_M4
 #include "navhal_port_clock.h"
 #include "navhal.h"
 

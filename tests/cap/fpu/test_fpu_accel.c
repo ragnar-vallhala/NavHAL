@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#define CORTEX_M4
 #include "test_fpu_accel.h"
 #include "common/hal_features.h"
 #include "navtest/navtest.h"

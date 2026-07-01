@@ -25,7 +25,6 @@
  * - Reads it back and verifies the data integrity.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 int main(void) {

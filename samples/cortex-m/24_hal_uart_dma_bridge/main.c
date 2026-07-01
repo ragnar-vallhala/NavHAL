@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#define CORTEX_M4
 #include "navhal_port_config.h"
 #include "family/dma_reg.h"
 #include "navhal.h"

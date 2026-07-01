@@ -27,7 +27,6 @@
  */
 
 #include "navhal_port_uart.h"
-#define CORTEX_M4
 #include "navhal.h"
 
 #define MATRIX_DIM 20

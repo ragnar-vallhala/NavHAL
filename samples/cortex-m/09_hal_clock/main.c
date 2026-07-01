@@ -26,7 +26,6 @@
  * - Printing SYSCLK, AHBCLK, APB1CLK, and APB2CLK periodically.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 /** @brief PLL configuration: 8 MHz HSE -> 168 MHz system clock */

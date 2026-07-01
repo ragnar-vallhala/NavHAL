@@ -20,7 +20,6 @@
  * @brief DMA test function declarations for NavTest.
  */
 
-#define CORTEX_M4
 #ifndef TEST_DMA_H
 #define TEST_DMA_H
 #include "common/hal_config.h"

@@ -25,7 +25,6 @@
  * - Reads them back and profiles the time taken.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 // Wait for a number of ms using systick

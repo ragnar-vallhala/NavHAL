@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 int main() {

@@ -25,7 +25,6 @@
  * smoke-test inputs.
  */
 
-#define CORTEX_M4
 #include "test_sdio.h"
 
 #if NAVHAL_CONFIG_DRV_SDIO

@@ -26,7 +26,6 @@
  * workload.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 #include <stdint.h>
 

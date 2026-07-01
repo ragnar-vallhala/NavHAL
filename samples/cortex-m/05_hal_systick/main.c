@@ -27,7 +27,6 @@
  * - Attaching callbacks to each timer to print messages via HAL_UART_2.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 // System clock configuration

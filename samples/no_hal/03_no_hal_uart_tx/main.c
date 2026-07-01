@@ -16,7 +16,6 @@
  */
 
 #include <stdint.h>
-#define CORTEX_M4
 #include "navhal.h"
 
 // Peripheral base addresses

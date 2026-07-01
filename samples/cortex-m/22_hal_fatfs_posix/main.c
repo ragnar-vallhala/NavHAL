@@ -22,7 +22,6 @@
 
 #include "navhal_port_timer.h"
 #include <stdint.h>
-#define CORTEX_M4
 #include "navhal.h"
 #include "utils/util.h"
 #include "utils/v_fs.h"

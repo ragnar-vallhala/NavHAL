@@ -49,6 +49,12 @@
 .global HardFault_Handler
 .global PendSV_Handler
 .global SVCall_Handler
+/* System (internal) exceptions — named weak handlers, see interrupt.c. */
+.global NMI_Handler
+.global MemManage_Handler
+.global BusFault_Handler
+.global UsageFault_Handler
+.global DebugMon_Handler
 /* DMA stream handlers (macro-driven in the DMA driver). */
 .global DMA1_Stream0_IRQHandler
 .global DMA1_Stream1_IRQHandler
@@ -81,17 +87,17 @@
 .section .isr_vector, "a", %progbits
     .word  _estack                  /* Top of Stack */
     .word  Reset_Handler            /* Reset */
-    .word  Default_Handler          /* NMI */
+    .word  NMI_Handler              /* NMI */
     .word  HardFault_Handler        /* HardFault */
-    .word  Default_Handler          /* MemManage */
-    .word  Default_Handler          /* BusFault */
-    .word  Default_Handler          /* UsageFault */
+    .word  MemManage_Handler        /* MemManage */
+    .word  BusFault_Handler         /* BusFault */
+    .word  UsageFault_Handler       /* UsageFault */
     .word  0                        /* Reserved */
     .word  0                        /* Reserved */
     .word  0                        /* Reserved */
     .word  0                        /* Reserved */
     .word  SVCall_Handler           /* SVCall */
-    .word  Default_Handler          /* DebugMon */
+    .word  DebugMon_Handler         /* DebugMon */
     .word  0                        /* Reserved */
     .word  PendSV_Handler           /* PendSV */
     .word  SysTick_Handler          /* SysTick */

@@ -110,7 +110,12 @@ uint8_t hal_interrupt_get_priority(hal_irq_t irq);
 bool hal_interrupt_is_pending(hal_irq_t irq);
 
 /**
- * @brief Register a callback to be invoked for a specific IRQ.
+ * @brief Register a callback to be invoked for a specific NVIC interrupt.
+ *
+ * For ARMv7-M system exceptions (HardFault, MemManage, BusFault, UsageFault,
+ * ...) there is no callback: each has a named weak vector — define a strong
+ * @c <Name>_Handler to handle it.
+ *
  * @param irq      IRQ number.
  * @param callback Callback function, or NULL to clear.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an out-of-range IRQ.

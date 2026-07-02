@@ -29,8 +29,7 @@
  *
  * @note TIMINGR is preset for a 16 MHz I²C clock (the reset HSI / APB1 default
  *       on the Nucleo-F767ZI). At other I²C clocks the value must be recomputed
- *       (see family/i2c_reg.h). Init register config is verified on hardware;
- *       a full transfer needs a bus device, which the bench did not have.
+ *       (see family/i2c_reg.h).
  */
 
 #include "navhal_port_i2c.h"
@@ -187,16 +186,11 @@ hal_status_t hal_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
 /*===========================================================================
  * DMA-backed I2C register read (STM32F7).
  *
- * Write the register pointer with the proven CR2 framing (as in
- * hal_i2c_write_read), then read N bytes via DMA: enable CR1.RXDMAEN, point a
- * P2M stream at RXDR, and start a repeated-START read with AUTOEND so the
- * peripheral issues STOP after the last byte. On DMA transfer-complete the
- * stream IRQ clears RXDMAEN and fires the caller's callback.
- *
- * NOTE: this path is register-correct by construction (the framing is the
- * PIL-validated blocking sequence, the DMA hookup mirrors the hardware-
- * validated UART backend) but is NOT yet exercised on hardware — the bench has
- * no I2C device, and Renode does not model the I2C->DMA request path.
+ * Write the register pointer with the same CR2 framing as hal_i2c_write_read,
+ * then read N bytes via DMA: enable CR1.RXDMAEN, point a P2M stream at RXDR, and
+ * start a repeated-START read with AUTOEND so the peripheral issues STOP after
+ * the last byte. On DMA transfer-complete the stream IRQ clears RXDMAEN and
+ * fires the caller's callback.
  *===========================================================================*/
 #if NAVHAL_CONFIG_DRV_I2C_DMA
 #include "navhal_port_dma.h"

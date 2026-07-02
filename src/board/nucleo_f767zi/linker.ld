@@ -11,9 +11,13 @@
  */
 MEMORY
 {
-  FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 2048K
-  ITCM  (rwx) : ORIGIN = 0x00000000, LENGTH = 16K
-  RAM   (rwx) : ORIGIN = 0x20000000, LENGTH = 512K
+  FLASH  (rx)  : ORIGIN = 0x08000000, LENGTH = 2048K
+  ITCM   (rwx) : ORIGIN = 0x00000000, LENGTH = 16K
+  /* SRAM2 (top 16 KB) is carved off as ETHRAM: the Ethernet DMA master reaches
+   * SRAM but not DTCM, so its descriptors/buffers must live here, not in the
+   * DTCM-based RAM region below. */
+  RAM    (rwx) : ORIGIN = 0x20000000, LENGTH = 496K
+  ETHRAM (rw)  : ORIGIN = 0x2007C000, LENGTH = 16K
 }
 
 SECTIONS {
@@ -87,4 +91,12 @@ SECTIONS {
   } > RAM
   _heap_end   = ORIGIN(RAM) + LENGTH(RAM);
   _estack = ORIGIN(RAM) + LENGTH(RAM);
+
+  /* Ethernet DMA descriptors + buffers (NAVHAL_ETH_RAM), in DMA-reachable SRAM.
+   * Uninitialized: the driver populates the rings at init. */
+  .eth_ram (NOLOAD) : {
+    . = ALIGN(32);
+    *(.eth_ram*)
+    . = ALIGN(32);
+  } > ETHRAM
 }

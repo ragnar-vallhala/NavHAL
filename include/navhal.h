@@ -91,6 +91,7 @@ extern "C" {
 #include "common/hal_diskio.h"
 #include "common/hal_dma.h"
 #include "common/hal_dwt.h"
+#include "common/hal_eth.h"
 #include "common/hal_flash.h"
 #include "common/hal_mpu.h"
 #include "common/hal_sdio.h"

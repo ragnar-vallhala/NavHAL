@@ -167,6 +167,19 @@ config DRV_FLASH
     bool "Enable Flash Driver"
     default n
 
+config DRV_ETH
+    bool "Enable Ethernet MAC Driver"
+    depends on ARCH_CORTEX_M7
+    default n
+    select DRV_CLOCK
+    select DRV_GPIO
+    select DRV_INTERRUPT
+    help
+      Compile the frame-level Ethernet MAC API (hal_eth_*). The MAC uses its
+      own dedicated DMA with descriptor rings, independent of DRV_DMA. RMII/MII
+      GPIOs and the PHY (MDIO) are brought up by the driver. Cortex-M7 only
+      (the STM32F767 ETH IP).
+
 endmenu
 
 menu "Build Options"

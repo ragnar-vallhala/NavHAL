@@ -34,6 +34,8 @@
 
 #include "cap/cache/test_cache.h"
 #include "cap/dma/test_dma.h"
+#include "cap/eth/test_eth.h"
+#include "cap/i2c_dma/test_i2c_dma.h"
 #include "cap/cycle_counter/test_dwt.h"
 #include "cap/fpu/test_fpu_accel.h"
 #include "cap/mpu/test_mpu.h"
@@ -104,6 +106,12 @@ static const navtest_suite_t *const all_suites[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_UART_DMA
     &test_uart_dma_suite,
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+    &test_i2c_dma_suite,
+#endif
+#if NAVHAL_CONFIG_DRV_ETH
+    &test_eth_suite,
 #endif
     &test_crc_suite,
 #if NAVHAL_CONFIG_DRV_DWT

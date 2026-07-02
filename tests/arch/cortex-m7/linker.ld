@@ -9,9 +9,12 @@
  */
 MEMORY
 {
-  FLASH (rx)  : ORIGIN = 0x08000000, LENGTH = 2048K
-  ITCM  (rwx) : ORIGIN = 0x00000000, LENGTH = 16K
-  RAM   (rwx) : ORIGIN = 0x20000000, LENGTH = 512K
+  FLASH  (rx)  : ORIGIN = 0x08000000, LENGTH = 2048K
+  ITCM   (rwx) : ORIGIN = 0x00000000, LENGTH = 16K
+  /* SRAM2 (top 16 KB) carved off as ETHRAM: the Ethernet DMA reaches SRAM but
+   * not DTCM, so its descriptors/buffers live here (see the board linker). */
+  RAM    (rwx) : ORIGIN = 0x20000000, LENGTH = 496K
+  ETHRAM (rw)  : ORIGIN = 0x2007C000, LENGTH = 16K
 }
 
 SECTIONS {
@@ -78,6 +81,14 @@ SECTIONS {
     . = ALIGN(4);
     _ebss = .;
   } > RAM
+
+  /* Ethernet DMA descriptors + buffers (NAVHAL_ETH_RAM), in DMA-reachable SRAM
+   * (see the board linker). Uninitialized: the driver populates them at init. */
+  .eth_ram (NOLOAD) : {
+    . = ALIGN(32);
+    *(.eth_ram*)
+    . = ALIGN(32);
+  } > ETHRAM
 
   _sidata = LOADADDR(.data);
   _estack = ORIGIN(RAM) + LENGTH(RAM);

@@ -140,6 +140,34 @@ config SAMPLE_28_HAL_MPU
     select DRV_UART
     select DRV_CLOCK
 
+config SAMPLE_29_HAL_ETH
+    bool "29_hal_eth"
+    depends on ARCH_CORTEX_M7
+    select DRV_ETH
+    select DRV_UART
+    select DRV_CLOCK
+
+config SAMPLE_30_HAL_ETH_BRIDGE
+    bool "30_hal_eth_bridge"
+    depends on ARCH_CORTEX_M7
+    select DRV_ETH
+    select DRV_UART
+    select DRV_CLOCK
+
+config SAMPLE_31_HAL_ETH_ECHO
+    bool "31_hal_eth_echo"
+    depends on ARCH_CORTEX_M7
+    select DRV_ETH
+    select DRV_UART
+    select DRV_CLOCK
+
+config SAMPLE_32_HAL_MPU_FAULT
+    bool "32_hal_mpu_fault"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    select DRV_MPU
+    select DRV_UART
+    select DRV_INTERRUPT
+
 endchoice
 
 config SAMPLE
@@ -174,3 +202,7 @@ config SAMPLE
     default "hal_spi_esp_bridge" if SAMPLE_25_HAL_SPI_ESP_BRIDGE
     default "hal_dwt" if SAMPLE_26_HAL_DWT
     default "hal_mpu" if SAMPLE_28_HAL_MPU
+    default "hal_eth" if SAMPLE_29_HAL_ETH
+    default "hal_eth_bridge" if SAMPLE_30_HAL_ETH_BRIDGE
+    default "hal_eth_echo" if SAMPLE_31_HAL_ETH_ECHO
+    default "hal_mpu_fault" if SAMPLE_32_HAL_MPU_FAULT

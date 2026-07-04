@@ -133,6 +133,12 @@ config DRV_SPI
     select DRV_GPIO
     select DRV_TIMER
 
+config DRV_ADC
+    bool "Enable ADC Driver"
+    default n
+    select DRV_CLOCK
+    select DRV_GPIO
+
 config DRV_PWM
     bool "Enable PWM Driver"
     default n

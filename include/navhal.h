@@ -80,6 +80,8 @@ extern "C" {
 
 #include "common/hal_spi.h"
 
+#include "common/hal_adc.h"
+
 #include "common/hal_interrupt.h"
 
 #include "common/hal_fpu.h"

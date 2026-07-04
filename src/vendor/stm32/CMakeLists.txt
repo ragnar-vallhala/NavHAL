@@ -60,6 +60,11 @@ if(CONFIG_DRV_I2C)
         list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c)
     endif()
 endif()
+if(CONFIG_DRV_ADC)
+    # The classic STM32 SAR ADC IP is register-compatible across F4 and F7, so a
+    # single adc.c serves both (the family adc_reg.h supplies the unit count).
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/adc/adc.c)
+endif()
 if(CONFIG_DRV_SPI)
     # F7 SPI puts the frame size in CR2.DS (+ FRXTH for byte FIFO access), not
     # the F4's CR1.DFF — a separate driver. Selected by family; F4 spi.c stays.

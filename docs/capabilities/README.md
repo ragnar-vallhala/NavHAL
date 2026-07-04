@@ -54,7 +54,7 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | Bus    | FMC (ext-memory ctrl)     | *(none)*        | — | — | ✗ |
 | Bus    | SAI (serial audio)        | *(none)*        | — | — | ✗ (2×) |
 | Bus    | SPDIFRX                   | *(none)*        | — | — | ✗ |
-| Analog | ADC                       | *(none)*        | ✗ (1×12-bit) | ✗ (10-bit) | ✗ (3×12-bit) |
+| Analog | ADC                       | `ADC`           | ✓ (1×12-bit) | ✓ (10-bit) | ✓ (3×12-bit) |
 | Analog | DAC                       | *(none)*        | — | — | ✗ (2-ch) |
 | Video  | DCMI (camera)             | *(none)*        | — | — | ✗ |
 | Video  | LTDC (LCD-TFT)            | *(none)*        | — | — | ✗ |

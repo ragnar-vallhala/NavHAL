@@ -42,6 +42,7 @@ hal_eth
 hal_eth_bridge
 hal_eth_echo
 hal_mpu_fault
+hal_adc
 )
 set(SAMPLE_DIRS
 no_hal/01_no_hal_blink
@@ -78,6 +79,7 @@ cortex-m/29_hal_eth
 cortex-m/30_hal_eth_bridge
 cortex-m/31_hal_eth_echo
 cortex-m/32_hal_mpu_fault
+portable/33_hal_adc
 )
 
 # Check if sample is defined

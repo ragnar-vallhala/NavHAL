@@ -168,6 +168,11 @@ config SAMPLE_32_HAL_MPU_FAULT
     select DRV_UART
     select DRV_INTERRUPT
 
+config SAMPLE_33_HAL_ADC
+    bool "33_hal_adc"
+    select DRV_ADC
+    select DRV_UART
+
 endchoice
 
 config SAMPLE
@@ -206,3 +211,4 @@ config SAMPLE
     default "hal_eth_bridge" if SAMPLE_30_HAL_ETH_BRIDGE
     default "hal_eth_echo" if SAMPLE_31_HAL_ETH_ECHO
     default "hal_mpu_fault" if SAMPLE_32_HAL_MPU_FAULT
+    default "hal_adc" if SAMPLE_33_HAL_ADC

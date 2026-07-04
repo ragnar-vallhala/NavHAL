@@ -48,6 +48,7 @@
  * the F7 USART) and runs the portable + cap + conformance tiers below. Add a
  * parallel NAVTEST_ARCH_CORTEX_M7 block when tests/arch/cortex-m7/ lands. */
 #if defined(NAVTEST_ARCH_CORTEX_M4)
+#include "arch/cortex-m4/test_adc.h"
 #include "arch/cortex-m4/test_clock.h"
 #include "arch/cortex-m4/test_gpio.h"
 #include "arch/cortex-m4/test_i2c.h"
@@ -70,6 +71,7 @@
 #include "arch/cortex-m7/test_pwm.h"
 #include "arch/cortex-m7/test_spi.h"
 #include "arch/cortex-m7/test_i2c.h"
+#include "arch/cortex-m7/test_adc.h"
 #endif
 
 static const navtest_suite_t *const all_suites[] = {
@@ -86,6 +88,7 @@ static const navtest_suite_t *const all_suites[] = {
     &test_uart_protocol_suite,
     &test_i2c_suite,
     &test_spi_suite,
+    &test_adc_suite,
 #endif
 #if defined(NAVTEST_ARCH_CORTEX_M7)
     &test_gpio_suite,
@@ -96,6 +99,7 @@ static const navtest_suite_t *const all_suites[] = {
     &test_pwm_suite,
     &test_spi_suite,
     &test_i2c_suite,
+    &test_adc_suite,
 #endif
     &test_conformance_suite,   /* portable HAL-contract assertions; runs
                                   on every arch (navtest PROGMEM keeps

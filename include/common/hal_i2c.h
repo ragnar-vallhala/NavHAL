@@ -83,6 +83,20 @@ typedef struct {
 hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config);
 
 /**
+ * @brief De-initialize an I²C bus: software-reset the peripheral and clear its
+ *        init-status bit.
+ *
+ * hal_i2c_init() early-returns ::HAL_ERR_NOT_INITIALIZED on an already-init bus
+ * and so skips its SWRST. Recovery paths (bus stuck BUSY, DMA fail) call this
+ * first to clear the init bit and reset the peripheral, so the following
+ * hal_i2c_init() performs the full reset + reconfigure.
+ *
+ * @param bus I²C bus instance.
+ * @return ::HAL_OK.
+ */
+hal_status_t hal_i2c_deinit(hal_i2c_bus_t bus);
+
+/**
  * @brief Write a byte buffer to an I²C device (blocking).
  * @param bus      I²C bus instance.
  * @param dev_addr 7-bit device address.

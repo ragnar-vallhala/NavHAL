@@ -37,6 +37,7 @@ void test_hal_interrupt_is_pending_after_set(void);
 void test_hal_interrupt_attach_then_dispatch_runs_callback(void);
 void test_hal_interrupt_detach_clears_callback(void);
 void test_hal_interrupt_disable_then_restore_global(void);
+void test_hal_cpu_idle_returns_on_pending_irq(void);
 void test_hal_interrupt_clear_all_pending_zeros_icpr(void);
 
 /* error paths */

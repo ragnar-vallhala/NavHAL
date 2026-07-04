@@ -35,7 +35,7 @@ SECTIONS {
     *(.bss*)
     *(COMMON)
     _ebss = .;
-  } > RAM
+  } > RAM AT > RAM
 
   _sidata = LOADADDR(.data);
   _estack = ORIGIN(RAM) + LENGTH(RAM);

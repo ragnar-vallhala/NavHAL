@@ -46,10 +46,9 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | Bus    | SPI                       | `SPI`           | ✓ | ✓ | ◐ |
 | Bus    | SDIO / SDMMC              | `SDIO`          | ✓ (1×) | — | ◐ (2×) |
 | Bus    | SDIO async (DMA)          | `SDIO_DMA`      | ✓ | — | ◐ ¶ |
-| Bus    | Ethernet MAC (frame-level)| `ETH`           | ✗ | — | ✓ |
+| Bus    | Ethernet MAC (frame-level)| `ETH`           | — | — | ✓ |
 | Bus    | USB OTG FS                | *(none)*        | ✗ | — | ✗ |
 | Bus    | USB OTG HS                | *(none)*        | — | — | ✗ |
-| Bus    | Ethernet MAC (10/100)     | *(none)*        | — | — | ✗ |
 | Bus    | CAN (bxCAN)               | *(none)*        | — | — | ✗ (3×) |
 | Bus    | QUAD-SPI                  | *(none)*        | — | — | ✗ |
 | Bus    | FMC (ext-memory ctrl)     | *(none)*        | — | — | ✗ |

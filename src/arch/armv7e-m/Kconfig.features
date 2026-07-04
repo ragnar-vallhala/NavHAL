@@ -50,10 +50,11 @@ config DRV_CACHE
     depends on ARCH_CORTEX_M7
     default n
     help
-      Enables the hal_cache driver for the Cortex-M7 L1 caches. Phase 1
-      drives the instruction cache only (hal_icache_enable) — a hazard-free
-      performance win. The Cortex-M4 has no L1 cache, so this option is not
-      offered there.
+      Enables the hal_cache driver for the Cortex-M7 L1 caches: the
+      instruction cache (hal_icache_enable, a hazard-free performance win) and
+      the data cache (hal_dcache_enable plus the clean/invalidate maintenance
+      the DMA drivers use to stay coherent). The Cortex-M4 has no L1 cache, so
+      this option is not offered there.
 
 config USE_TCM
     bool "Enable tightly-coupled memory placement (Cortex-M7)"

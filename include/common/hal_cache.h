@@ -37,11 +37,18 @@
  * #endif
  * @endcode
  *
- * The **data cache** is intentionally left out of this phase. Turning it on
- * breaks the "D-cache off ⇒ DMA buffers are coherent for free" assumption the
- * DMA/SDIO drivers currently rely on, so it requires a clean/invalidate
- * maintenance API and a retrofit of every shared-buffer path — a separate,
- * carefully-validated change.
+ * **Phase 2 — data cache.** The D-cache is a coherency hazard, not a free win:
+ * with it on, CPU accesses go through the cache while DMA engines hit SRAM
+ * directly. Memory a DMA reads must be *cleaned* (::hal_dcache_clean) first;
+ * memory a DMA writes must be *invalidated* (::hal_dcache_invalidate) before the
+ * CPU reads it. Buffers must be ::NAVHAL_CACHE_LINE aligned and size-padded so a
+ * range invalidate never discards a neighbour sharing the line.
+ *
+ * Not every buffer needs maintenance: the Cortex-M7 DTCM is not cached, so a DMA
+ * buffer there is coherent for free — @c navhal_dma_mem_class classifies an
+ * address so a driver can skip maintenance for DTCM, reject un-DMA-able ITCM,
+ * and maintain only cached SRAM. Maintenance ops on an uncached address are
+ * hardware no-ops, so calling them unconditionally is also safe.
  */
 
 #ifndef HAL_CACHE_H
@@ -55,11 +62,21 @@
  */
 
 #include "common/hal_status.h"
+#include "common/navhal_compiler.h"
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/*
+ * The per-buffer DMA memory classifier (navhal_dma_mem_class) and its
+ * coherency helpers are *not* here: they need the chip's TCM memory map, which
+ * is not portable. They live in the per-arch DMA port header — see
+ * include/port/cortex-m7/navhal_port_dma.h — while this header keeps only the
+ * portable maintenance primitives below.
+ */
 
 /**
  * @brief Invalidate and enable the L1 instruction cache.
@@ -82,6 +99,89 @@ hal_status_t hal_icache_disable(void);
  * @return @c true if @c SCB_CCR.IC is set.
  */
 bool hal_icache_is_enabled(void);
+
+/**
+ * @brief Invalidate the whole D-cache, then enable it.
+ *
+ * The full invalidate (by set/way) clears any stale power-on lines before the
+ * cache goes live. Call *after* the MPU is configured and enabled, so the
+ * region attributes that govern cacheability are already in force. Not
+ * idempotent-cheap like the I-cache — enable it once during board bring-up.
+ *
+ * @return ::HAL_OK once the D-cache is enabled.
+ */
+hal_status_t hal_dcache_enable(void);
+
+/**
+ * @brief Clean, invalidate, then disable the L1 data cache.
+ * @return ::HAL_OK once the D-cache is disabled.
+ */
+hal_status_t hal_dcache_disable(void);
+
+/**
+ * @brief Whether the L1 data cache is currently enabled.
+ * @return @c true if @c SCB_CCR.DC is set.
+ */
+bool hal_dcache_is_enabled(void);
+
+#if NAVHAL_CONFIG_DRV_CACHE
+
+/**
+ * @brief Clean (flush) a buffer from the D-cache to main memory.
+ *
+ * Call before a memory→peripheral DMA so the engine reads the CPU's latest
+ * writes. Operates on whole cache lines spanning [@p addr, @p addr + @p size);
+ * the caller must ::NAVHAL_DMA_ALIGN the buffer and pad its size. A no-op in
+ * hardware for addresses that are not cached (e.g. DTCM).
+ *
+ * @param addr Buffer start. @param size Buffer length in bytes.
+ * @return ::HAL_OK.
+ */
+hal_status_t hal_dcache_clean(const void *addr, size_t size);
+
+/**
+ * @brief Invalidate a buffer's D-cache lines so the CPU re-reads main memory.
+ *
+ * Call after a peripheral→memory DMA, before the CPU reads the result. Discards
+ * cached copies of whole lines spanning the range — if the buffer is not
+ * cache-line aligned/padded this destroys neighbouring data, hence the
+ * ::NAVHAL_DMA_ALIGN contract. A no-op in hardware for uncached addresses.
+ *
+ * @param addr Buffer start. @param size Buffer length in bytes.
+ * @return ::HAL_OK.
+ */
+hal_status_t hal_dcache_invalidate(void *addr, size_t size);
+
+/**
+ * @brief Clean then invalidate a buffer's D-cache lines.
+ *
+ * For bidirectional buffers (e.g. a descriptor the CPU writes and the DMA
+ * updates). Same alignment contract as ::hal_dcache_invalidate.
+ *
+ * @param addr Buffer start. @param size Buffer length in bytes.
+ * @return ::HAL_OK.
+ */
+hal_status_t hal_dcache_clean_invalidate(void *addr, size_t size);
+
+#else /* !NAVHAL_CONFIG_DRV_CACHE — no data cache: maintenance is a no-op */
+
+NAVHAL_INLINE hal_status_t hal_dcache_clean(const void *addr, size_t size) {
+  (void)addr;
+  (void)size;
+  return HAL_OK;
+}
+NAVHAL_INLINE hal_status_t hal_dcache_invalidate(void *addr, size_t size) {
+  (void)addr;
+  (void)size;
+  return HAL_OK;
+}
+NAVHAL_INLINE hal_status_t hal_dcache_clean_invalidate(void *addr, size_t size) {
+  (void)addr;
+  (void)size;
+  return HAL_OK;
+}
+
+#endif /* NAVHAL_CONFIG_DRV_CACHE */
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -97,7 +97,7 @@ jobs:
       - name: Install ${{ matrix.board }} deps
         run: tools/pil/run.sh ${{ matrix.board }} --install-deps
       - name: Build + run PIL for ${{ matrix.board }}
-        run: tools/pil/run.sh ${{ matrix.board }}
+        run: tools/ntest pil ${{ matrix.board }}
 
   # M8 §8.1 — single required-status-check name for stable branch
   # protection. Succeeds if every PIL job that ran passed (or all were

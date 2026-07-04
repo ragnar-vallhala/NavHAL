@@ -44,7 +44,7 @@
  * @{
  */
 
-#include "common/hal_config.h" /* sources the NAVHAL_CONFIG_DRV_SDIO capability flag */
+#include "common/hal_config.h" /* NAVHAL_CONFIG_DRV_SDIO: force-included, or pulled here when reachable */
 #include <stdint.h>
 
 

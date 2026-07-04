@@ -26,3 +26,4 @@ docs/*.synctex.gz
 docs/*.toc
 docs/*.pdf
 docs/sections/*.aux
+__pycache__/

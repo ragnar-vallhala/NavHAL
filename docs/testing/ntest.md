@@ -17,6 +17,15 @@ ntest list                 # the catalog (boards, host suites, arches)
 ntest                      # interactive TUI (a TTY) / `all` (piped)
 ```
 
+## The TUI
+
+On a terminal, a bare `ntest` opens a lazygit-style layout that stays put — a
+`tests` list and a `result` box on the left, a live `logs` pane on the right.
+Running a tier streams its output into the log pane in place (it re-invokes
+`ntest <tier>` as a child and pumps the pipe); it never drops you to a scrollback
+and back. `↑↓` move, `⏎`/`r` run the selection, `a` runs everything, `x` stops
+the current run, `⇧J`/`⇧K` (or PgUp/PgDn) and `g`/`G` scroll the log, `q` quits.
+
 Exit code is `0` if everything passed, `1` otherwise — so it drops straight
 into CI. A summary table prints at the end:
 
@@ -40,8 +49,11 @@ into CI. A summary table prints at the end:
 | **coverage** | `ntest coverage` | host build with `--coverage`, `gcovr` summary over `src/` |
 
 `hil` with no attached board **skips cleanly** (green) so CI/laptops stay
-honest. Boards are matched to hardware by ST-Link chip-id, never a hard-coded
-serial, so a checkout works on any bench.
+honest. Boards are matched to their hardware, never a hard-coded `/dev` path,
+so a checkout works on any bench: STM32 boards by ST-Link chip-id (`st-flash`),
+AVR boards by the USB vendor id of their serial bridge (`avrdude` over the
+bootloader — an Uno/clone auto-resets on DTR so the flashed program re-runs
+into the capture).
 
 ## Board registry
 

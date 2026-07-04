@@ -20,7 +20,6 @@
  * @brief Benchmark: 1000 Iteration BMX160 DMA fast-read.
  */
 
-#define CORTEX_M4
 #include "navhal_port_clock.h"
 #include "navhal.h"
 
@@ -102,7 +101,9 @@ int main(void) {
 
   hal_uart_print(HAL_UART_2, "Sensors ready. Executing 1000 iteration DMA read...\n\r");
 
-  uint8_t rx_buf[30];
+  /* 32-byte aligned and size-padded (30->32) so a D-cache invalidate on the
+   * DMA'd buffer never touches a neighbouring cache line. */
+  uint8_t rx_buf[32] NAVHAL_DMA_ALIGN;
 
   // Configure DMA for HAL_I2C_1 RX (DMA1, Stream 0, Channel 1)
   hal_dma_config_t i2c_dma_cfg = {
@@ -110,7 +111,7 @@ int main(void) {
       .stream = 0,
       .channel = 1,
       .direction = HAL_DMA_DIR_P2M,
-      .src_addr = (uint32_t)(0x40005400 + 0x10), // I2C1_BASE + DR Offset
+      .src_addr = 0, // set by hal_i2c_read_regs_dma to the I2C RX data register
       .dst_addr = (uint32_t)rx_buf,
       .data_count = 30,
       .src_inc = 0,

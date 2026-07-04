@@ -50,6 +50,7 @@ extern "C" {
 #define NAVHAL_PACKED        __attribute__((packed))                    /**< Remove struct padding. */
 #define NAVHAL_NORETURN      __attribute__((noreturn))                  /**< Function never returns. */
 #define NAVHAL_DEPRECATED(msg) __attribute__((deprecated(msg)))         /**< Mark symbol deprecated. */
+#define NAVHAL_ALIGNED(n)    __attribute__((aligned(n)))                /**< Align a symbol to @p n bytes. */
 
 #else /* non-GCC: degrade to no-ops */
 
@@ -61,8 +62,36 @@ extern "C" {
 #define NAVHAL_PACKED
 #define NAVHAL_NORETURN
 #define NAVHAL_DEPRECATED(msg)
+#define NAVHAL_ALIGNED(n)
 
 #endif
+
+/**
+ * @brief L1 cache line size (bytes) on the widest-cache target we build for.
+ *
+ * The Cortex-M7 D-cache line is 32 bytes; DMA buffers must be aligned to and
+ * sized in multiples of this so a clean/invalidate on one buffer never touches
+ * a cache line shared with unrelated data. Targets without a data cache still
+ * use this as the DMA-buffer alignment granularity (harmless over-alignment).
+ * Boards may override it (e.g. a future 64-byte-line core) before this header.
+ */
+#ifndef NAVHAL_CACHE_LINE
+#define NAVHAL_CACHE_LINE 32U
+#endif
+
+/**
+ * @brief Align a DMA buffer to a cache line.
+ *
+ * Apply to any buffer handed to a DMA engine so it is safe to clean/invalidate
+ * once the L1 D-cache is enabled. Works on statics *and* stack locals (unlike a
+ * section attribute). The caller must still pad the buffer's *size* to a
+ * multiple of ::NAVHAL_CACHE_LINE — alignment fixes the start, padding the end.
+ *
+ * @code
+ * uint8_t rx[NAVHAL_CACHE_LINE] NAVHAL_DMA_ALIGN;   // 32-aligned, 32 bytes
+ * @endcode
+ */
+#define NAVHAL_DMA_ALIGN NAVHAL_ALIGNED(NAVHAL_CACHE_LINE)
 
 
 #ifdef __cplusplus

@@ -101,7 +101,7 @@ static inline uint32_t sdio_get_sector_count(void) {
   return hal_sdio_get_sector_count();
 }
 
-#ifdef _SDIO_BACKEND_DMA
+#if NAVHAL_CONFIG_DRV_SDIO_DMA
 /** @deprecated Use hal_sdio_read_block_async(). */
 NAVHAL_DEPRECATED("use hal_sdio_read_block_async")
 static inline hal_sdio_error_t sdio_read_block_async(uint32_t addr,
@@ -129,7 +129,7 @@ static inline hal_sdio_error_t
 sdio_write_blocks_async(uint32_t addr, const uint8_t *buffer, uint32_t count) {
   return hal_sdio_write_blocks_async(addr, buffer, count);
 }
-#endif /* _SDIO_BACKEND_DMA */
+#endif /* NAVHAL_CONFIG_DRV_SDIO_DMA */
 
 
 #ifdef __cplusplus

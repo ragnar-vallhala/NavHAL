@@ -50,7 +50,7 @@ int main(void) {
 
   hal_crc_config_t crc_cfg = {.polynomial = HAL_CRC_POLY_CRC32,
                               .init_value = 0xFFFFFFFF};
-#ifdef _CRC_HW_ENABLED
+#if NAVHAL_CONFIG_DRV_CRC
   hal_uart_print(BOARD_CONSOLE_UART, "Mode: Hardware Accelerated\r\n\r\n");
 #else
   hal_uart_print(BOARD_CONSOLE_UART, "Mode: Software Fallback\r\n\r\n");

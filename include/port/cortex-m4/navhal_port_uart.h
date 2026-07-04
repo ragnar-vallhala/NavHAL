@@ -37,14 +37,13 @@
 extern "C" {
 #endif
 
-/* The _UART_BACKEND_DMA selector is derived in navhal_port_config.h from
-   NAVHAL_HAS_UART_DMA so that the UART driver's DMA paths can be disabled
-   independently of other DMA users. */
+/* NAVHAL_CONFIG_DRV_UART_DMA is force-included (from navhal_target.h) and lets
+   the UART driver's DMA paths be disabled independently of other DMA users. */
 
 /* -------------------------------------------------------------------------- *
  * DMA-backed UART API — available only when the DMA backend is enabled.
  * -------------------------------------------------------------------------- */
-#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+#if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
 
 /** @brief Transmit a byte buffer using DMA (buffer must stay valid). */
 hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
@@ -55,7 +54,7 @@ hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
 /** @brief Transmit a null-terminated string using DMA. */
 hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 
-#endif /* _DMA_ENABLED && _UART_BACKEND_DMA */
+#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
 
 #ifdef __cplusplus
 } /* extern "C" */

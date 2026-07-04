@@ -46,8 +46,10 @@ fi
 TOOLCHAIN="cmake/toolchains/avr-toolchain.cmake"
 
 # Portable samples: directory names are "NN_<slug>"; -DSAMPLE takes the slug.
-SAMPLES=$(ls samples/portable/ | sed 's/^[0-9]\+_//' | sort -u)
-[ -n "$SAMPLES" ] || { echo "no portable samples found" >&2; exit 2; }
+# Every sample whose Kconfig arch gate admits the AVR (the portable tier — the
+# cortex-m samples are all gated to a Cortex arch).
+SAMPLES=$("$REPO_ROOT/tools/samples_for_arch.sh" ARCH_AVR8)
+[ -n "$SAMPLES" ] || { echo "no ARCH_AVR8 samples found" >&2; exit 2; }
 
 PASS=0
 FAIL=0

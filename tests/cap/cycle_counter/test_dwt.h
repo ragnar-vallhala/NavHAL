@@ -25,7 +25,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#if NAVHAL_HAS_CYCLE_COUNTER
+#if NAVHAL_CONFIG_DRV_DWT
 
 void test_dwt_init_enables_counters(void);
 void test_dwt_get_cycles_increments(void);
@@ -36,7 +36,7 @@ void test_hal_cycle_counter_reset_returns_ok(void);
 
 extern const navtest_suite_t test_dwt_suite;
 
-#endif /* NAVHAL_HAS_CYCLE_COUNTER */
+#endif /* NAVHAL_CONFIG_DRV_DWT */
 
 #ifdef __cplusplus
 } /* extern "C" */

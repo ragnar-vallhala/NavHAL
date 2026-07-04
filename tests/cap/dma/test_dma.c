@@ -20,11 +20,10 @@
  * @brief DMA unit tests for NavTest.
  */
 
-#define CORTEX_M4
 #include "common/hal_config.h"
 
 #include "common/hal_features.h"
-#if NAVHAL_HAS_DMA
+#if NAVHAL_CONFIG_DRV_DMA
 
 #include "navhal_port_dma.h"
 #include "family/rcc_reg.h"
@@ -237,4 +236,4 @@ const navtest_suite_t test_dma_suite = {
     .between = NULL,
 };
 
-#endif /* NAVHAL_HAS_DMA */
+#endif /* NAVHAL_CONFIG_DRV_DMA */

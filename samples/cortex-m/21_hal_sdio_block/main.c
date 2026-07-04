@@ -25,7 +25,6 @@
  * - Reads it back and verifies the data integrity.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 int main(void) {
@@ -69,8 +68,10 @@ int main(void) {
   hal_uart_write_string(HAL_UART_2, "Disk Initialized.\n\r");
 
   /* 4. Prepare Test Data */
-  uint8_t write_buf[512] __attribute__((aligned(4)));
-  uint8_t read_buf[512] __attribute__((aligned(4)));
+  /* Cache-line aligned for safe clean/invalidate under the D-cache; 512 is
+   * already a cache-line multiple. */
+  uint8_t write_buf[512] NAVHAL_DMA_ALIGN;
+  uint8_t read_buf[512] NAVHAL_DMA_ALIGN;
   for (int i = 0; i < 512; i++)
     write_buf[i] = (uint8_t)i;
   for (int i = 0; i < 512; i++)

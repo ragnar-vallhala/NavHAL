@@ -63,6 +63,14 @@ typedef struct {
 /** DWT Control Register bits */
 #define DWT_CTRL_CYCCNTENA_BIT (1 << 0) /**< Enable cycle counter */
 
+/** DWT CoreSight Lock Access Register (offset 0xFB0). Writing the key
+ *  disengages the DWT software lock. On Cortex-M7 the lock ships engaged
+ *  out of reset, so DWT register writes (e.g. CYCCNTENA) are ignored until
+ *  this is written; on Cortex-M4 the lock is not implemented and the write
+ *  is a harmless no-op. */
+#define DWT_LAR (*(__IO uint32_t *)0xE0001FB0UL)
+#define DWT_LAR_UNLOCK_KEY 0xC5ACCE55UL
+
 /**
  * @brief CoreDebug register map (partial, for DWT support).
  */

@@ -27,7 +27,6 @@
  */
 
 #include "navhal_port_uart.h"
-#define CORTEX_M4
 #include "navhal.h"
 
 #define MATRIX_DIM 20
@@ -287,14 +286,14 @@ float result[20][20];
 
 int main(void) {
   /* Initialize Hardware */
-#ifdef _FPU_ENABLED
+#if NAVHAL_CONFIG_USE_FPU
   hal_fpu_enable();
 #endif
   hal_timebase_init(1000); /**< Initialize SysTick with 1 ms tick */
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});   /**< Initialize HAL_UART_2 at 9600 baud */
 
   hal_uart_write_string(HAL_UART_2, "\n\r--- FPU Matrix Multiplication Test ---\n\r");
-#ifdef _FPU_ENABLED
+#if NAVHAL_CONFIG_USE_FPU
   hal_uart_write_string(HAL_UART_2, "FPU: Hardware enabled\n\r");
 #else
   hal_uart_write_string(HAL_UART_2, "FPU: Software emulation\n\r");

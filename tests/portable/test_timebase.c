@@ -20,7 +20,6 @@
  * @brief Standardized hal_timebase_* API tests.
  */
 
-#define CORTEX_M4
 #include "navhal_port_timer.h"
 #include "navtest/navtest.h"
 #include "test_timebase.h"

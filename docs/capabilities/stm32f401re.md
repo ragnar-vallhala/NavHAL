@@ -32,6 +32,7 @@ The reference target for NavHAL v1. Everything in the public API has a working i
 | FLASH             | ✓ | `src/vendor/stm32/flash/flash.c`   | Sector-aligned erase, word-aligned program; word & half-word reads. |
 | CRC_HW            | ✓ | `src/vendor/stm32/crc/crc.c`       | CRC-32 / MPEG-2 with the F4 hardware unit. |
 | CYCLE_COUNTER     | ✓ | `src/arch/armv7e-m/dwt/dwt.c`      | DWT-backed. Adds µs-resolution helpers (`_get_us`, `_delay_us`). |
+| MPU               | ✓ | `src/arch/armv7e-m/mpu/mpu.c`      | PMSAv7 MPU, **8 regions** (read at runtime from `MPU_TYPE.DREGION`); shared ARMv7-M driver. Opt-in via `CONFIG_DRV_MPU`; `test_mpu` (4) passes on hardware. |
 | FPU               | ✓ | `src/arch/armv7e-m/fpu/fpu.c`      | Hardware FPU enabled via `CONFIG_USE_FPU=y` (also flips `-mfpu=fpv4-sp-d16`). |
 | DMA               | ✓ | `src/vendor/stm32/dma/dma.c`       | DMA1 + DMA2, all streams. |
 | SDIO              | ✓ | `src/vendor/stm32/sdio/sdio.c`     | 1-bit + 4-bit; polling + async (DMA) block transfers. No SD card present on the Nucleo board itself — bring your own breakout. |

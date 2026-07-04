@@ -25,7 +25,6 @@
  * - Sends CMD0 (GO_IDLE_STATE) to reset the card.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 /**

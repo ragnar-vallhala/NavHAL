@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-# Builds every sample declared in Kconfig. Catches missing `select` clauses
-# on SAMPLE_* entries (a sample that uses DRV_SDIO but doesn't select it
-# will fail to link). Used by CI and the .githooks/pre-push hook.
+# Builds every Cortex-M4-buildable sample (the default toolchain). Catches
+# missing `select` clauses on SAMPLE_* entries (a sample that uses DRV_SDIO but
+# doesn't select it will fail to link). Used by CI and the .githooks/pre-push
+# hook.
+#
+# Samples gated to another arch (e.g. Ethernet, `depends on ARCH_CORTEX_M7`) are
+# skipped here and covered by build_all_f767_samples.sh — see
+# tools/samples_for_arch.sh for the gate-aware selection.
 #
 # Each sample is a fresh configure + build; about a second each.
 #
@@ -12,21 +17,11 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
-# Sample names extracted from the SAMPLE Kconfig string defaults
-# (config SAMPLE / default "<name>" if SAMPLE_<N>_*).
-SAMPLES=$(awk '
-  /^config SAMPLE$/        { in_sample = 1; next }
-  in_sample && /^config /  { in_sample = 0 }
-  in_sample && /default "/ {
-    match($0, /"[^"]+"/);
-    if (RSTART) {
-      name = substr($0, RSTART + 1, RLENGTH - 2);
-      if (name != "") print name;
-    }
-  }
-' Kconfig samples/Kconfig 2>/dev/null | sort -u)
+# The default toolchain targets the Cortex-M4; build only the samples whose
+# Kconfig arch gate admits it.
+SAMPLES=$("$REPO_ROOT/tools/samples_for_arch.sh" ARCH_CORTEX_M4)
 
-[ -n "$SAMPLES" ] || { echo "error: no SAMPLE names parsed from Kconfig" >&2; exit 2; }
+[ -n "$SAMPLES" ] || { echo "error: no ARCH_CORTEX_M4 samples parsed from Kconfig" >&2; exit 2; }
 
 PASS=0
 FAIL=0

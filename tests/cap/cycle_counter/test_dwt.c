@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-#define CORTEX_M4
 #include "test_dwt.h"
 #include "common/hal_features.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"
 #include <stdint.h>
 
-#if NAVHAL_HAS_CYCLE_COUNTER
+#if NAVHAL_CONFIG_DRV_DWT
 #include "navhal_port_dwt.h"
 #include "family/dwt_reg.h"
 
@@ -113,4 +112,4 @@ const navtest_suite_t test_dwt_suite = {
     .between = NULL,
 };
 
-#endif /* NAVHAL_HAS_CYCLE_COUNTER */
+#endif /* NAVHAL_CONFIG_DRV_DWT */

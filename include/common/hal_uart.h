@@ -151,7 +151,7 @@ uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,
 } /* extern "C" */
 #endif
 
-/* Port-specific bits: DMA-backed API behind @c _DMA_ENABLED, compat shim. */
+/* Port-specific bits: DMA-backed API behind @c NAVHAL_CONFIG_DRV_DMA, compat shim. */
 #include "navhal_port_uart.h"
 
 

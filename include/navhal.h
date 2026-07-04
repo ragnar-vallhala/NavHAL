@@ -80,18 +80,24 @@ extern "C" {
 
 #include "common/hal_spi.h"
 
+#include "common/hal_adc.h"
+
 #include "common/hal_interrupt.h"
 
 #include "common/hal_fpu.h"
 
 #include "common/hal_config.h"
 
+#include "common/hal_cache.h"
 #include "common/hal_crc.h"
 #include "common/hal_diskio.h"
 #include "common/hal_dma.h"
 #include "common/hal_dwt.h"
+#include "common/hal_eth.h"
 #include "common/hal_flash.h"
+#include "common/hal_mpu.h"
 #include "common/hal_sdio.h"
+#include "common/hal_tcm.h"
 
 
 #ifdef __cplusplus

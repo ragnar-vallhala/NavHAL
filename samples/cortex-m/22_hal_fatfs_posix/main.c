@@ -22,7 +22,6 @@
 
 #include "navhal_port_timer.h"
 #include <stdint.h>
-#define CORTEX_M4
 #include "navhal.h"
 #include "utils/util.h"
 #include "utils/v_fs.h"
@@ -114,7 +113,7 @@ int main(void) {
       ;
   }
 
-  uint8_t read_buf[1024 * 6] __attribute__((aligned(4)));
+  uint8_t read_buf[1024 * 6] NAVHAL_DMA_ALIGN; /* cache-line aligned for SDIO DMA */
   hal_memset(read_buf, 0, sizeof(read_buf));
   int read_bytes = v_read(fd, read_buf, 1024 * 6);
   if (read_bytes > 0) {

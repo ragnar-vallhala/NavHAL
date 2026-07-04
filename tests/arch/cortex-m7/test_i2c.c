@@ -100,6 +100,29 @@ void test_hal_i2c_typed_id_compiles(void) {
   TEST_ASSERT_TRUE(1);
 }
 
+/* HIL: with nothing answering, a master transfer still runs the full transfer
+ * FSM on silicon — START, 7-bit addressing, ACK sampling — and must report the
+ * missing ACK as a NACK (HAL_ERR_IO), not stall into a timeout (which would mean
+ * TIMINGR/PE/clocks aren't actually live). Addressing a reserved I²C address
+ * (0x7C is never a 7-bit device) makes the result independent of whatever is or
+ * isn't wired to the bench, so the suite runs on a bare board. hal_i2c_write
+ * uses AUTOEND, so the peripheral issues STOP itself on the NACK; just clear the
+ * status flags. PIL: Renode's model doesn't drive the NACK path, so skip. */
+void test_i2c_transfer_fsm_nacks_absent_device(void) {
+  NAVTEST_SKIP_ON_PIL();
+  hal_i2c_config_t cfg = {.clock_speed = HAL_I2C_SPEED_STANDARD,
+                          .own_address = I2C_MASTER,
+                          .acknowledge = true};
+  hal_i2c_init(HAL_I2C_1, &cfg);
+
+  uint8_t val = 0x00;
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_IO,
+                           (uint32_t)hal_i2c_write(HAL_I2C_1, 0x7C, &val, 1));
+
+  volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(HAL_I2C_1);
+  I2C->ICR = I2C_ICR_STOPCF | I2C_ICR_NACKCF;
+}
+
 /* PIL-only: exercise a real master transfer against the Renode-modelled BMP180
  * on I2C1 @ 0x77 (see tools/renode/stm32f767zi.repl). Reads the chip-ID
  * register (0xD0 -> 0x55) via write_read, proving the i2c_f7 transfer FSM
@@ -120,6 +143,7 @@ void test_i2c_pil_device_read_chip_id(void) {
 }
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
 NAVTEST_CASE_DECL(test_i2c_init_config);
+NAVTEST_CASE_DECL(test_i2c_transfer_fsm_nacks_absent_device);
 NAVTEST_CASE_DECL(test_i2c_pil_device_read_chip_id);
 NAVTEST_CASE_DECL(test_i2c_fast_mode_config);
 NAVTEST_CASE_DECL(test_hal_i2c_init_returns_ok);
@@ -139,6 +163,7 @@ static const navtest_case_t i2c_cases[] = {
     NAVTEST_CASE(test_hal_i2c_read_rejects_null_data),
     NAVTEST_CASE(test_hal_i2c_write_read_rejects_null_data),
     NAVTEST_CASE(test_hal_i2c_typed_id_compiles),
+    NAVTEST_CASE(test_i2c_transfer_fsm_nacks_absent_device),
     NAVTEST_CASE(test_i2c_pil_device_read_chip_id),
 };
 

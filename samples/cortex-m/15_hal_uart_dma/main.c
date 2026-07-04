@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 int main() {
@@ -23,7 +22,7 @@ int main() {
   hal_uart_init(HAL_UART_6, &(hal_uart_config_t){.baudrate=9600});
 
   /* --- DMA benchmark --- */
-#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+#if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
   int n = hal_timebase_get_tick();
   int iter = 100;
   while (iter--)

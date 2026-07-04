@@ -60,6 +60,11 @@ if(CONFIG_DRV_I2C)
         list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c)
     endif()
 endif()
+if(CONFIG_DRV_ADC)
+    # The classic STM32 SAR ADC IP is register-compatible across F4 and F7, so a
+    # single adc.c serves both (the family adc_reg.h supplies the unit count).
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/adc/adc.c)
+endif()
 if(CONFIG_DRV_SPI)
     # F7 SPI puts the frame size in CR2.DS (+ FRXTH for byte FIFO access), not
     # the F4's CR1.DFF — a separate driver. Selected by family; F4 spi.c stays.
@@ -87,6 +92,18 @@ if(CONFIG_DRV_SDIO)
 endif()
 if(CONFIG_DRV_DWT)
     list(APPEND HAL_SOURCES ${SRC_ARCH}/dwt/dwt.c)
+endif()
+if(CONFIG_DRV_MPU)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/mpu/mpu.c)
+endif()
+if(CONFIG_DRV_CACHE)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/cache/cache.c)
+endif()
+if(CONFIG_DRV_ETH)
+    # F7-only: the ETH MAC + its dedicated DMA against an RMII PHY.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/eth/eth_f7.c)
+    endif()
 endif()
 
 add_library(hal STATIC

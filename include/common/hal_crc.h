@@ -22,7 +22,7 @@
  * @details
  * Standardized CRC API (see @c docs/api_standardization.md). On the Cortex-M4
  * port this is backed either by the STM32F4 hardware CRC unit (when
- * @c _CRC_HW_ENABLED is defined) or by a software fallback — the API is
+ * @c NAVHAL_CONFIG_DRV_CRC is defined) or by a software fallback — the API is
  * identical in both cases.
  *
  * ### Typical usage

@@ -12,8 +12,14 @@
 # src/vendor/stm32/uart/uart_f7.c, selected by the vendor CMakeLists when
 # CONFIG_FAMILY_STM32F7 is set (the F7 USART IP uses ISR/RDR/TDR, not the F4
 # SR/DR model). See docs/stm32f767zi_port_plan.md, milestone F7-2.
+#
+# DRV_CACHE is on by default: the L1 I/D cache driver plus the clean/invalidate
+# maintenance the DMA drivers use to stay coherent. Validated on hardware
+# (F767 HIL 172/0 with the D-cache enabled). An app still calls
+# hal_icache_enable / hal_dcache_enable to switch the caches on at boot.
 
 CONFIG_ARCH_CORTEX_M7=y
 CONFIG_VENDOR_STM32=y
 CONFIG_FAMILY_STM32F7=y
 CONFIG_BOARD_NUCLEO_F767ZI=y
+CONFIG_DRV_CACHE=y

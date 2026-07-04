@@ -22,22 +22,22 @@
 #include "common/hal_gpio.h"
 #include "common/hal_clock.h"
 
-#if NAVHAL_HAS_UART
+#if NAVHAL_CONFIG_DRV_UART
 #include "common/hal_uart.h"
 #endif
-#if NAVHAL_HAS_DMA
+#if NAVHAL_CONFIG_DRV_DMA
 #include "common/hal_dma.h"
 #endif
-#if NAVHAL_HAS_I2C
+#if NAVHAL_CONFIG_DRV_I2C
 #include "common/hal_i2c.h"
 #endif
-#if NAVHAL_HAS_SPI
+#if NAVHAL_CONFIG_DRV_SPI
 #include "common/hal_spi.h"
 #endif
-#if NAVHAL_HAS_PWM
+#if NAVHAL_CONFIG_DRV_PWM
 #include "common/hal_pwm.h"
 #endif
-#if NAVHAL_HAS_SDIO
+#if NAVHAL_CONFIG_DRV_SDIO
 #include "common/hal_sdio.h"
 #endif
 
@@ -131,7 +131,7 @@ void test_conformance_gpio_init_rejects_null(void) {
 }
 
 void test_conformance_clock_init_rejects_null(void) {
-#if NAVHAL_HAS_CLOCK
+#if NAVHAL_CONFIG_DRV_CLOCK
   /* hal_clock_init takes (cfg, pll_cfg). NULL cfg must return non-OK. */
   hal_status_t st = hal_clock_init(NULL, NULL);
   TEST_ASSERT_TRUE(st != HAL_OK);
@@ -139,39 +139,39 @@ void test_conformance_clock_init_rejects_null(void) {
 }
 
 void test_conformance_uart_init_rejects_null(void) {
-#if NAVHAL_HAS_UART
+#if NAVHAL_CONFIG_DRV_UART
   hal_uart_t inst = (hal_uart_t)0;
   TEST_ASSERT_TRUE(hal_uart_init(inst, NULL) != HAL_OK);
 #endif
 }
 
 void test_conformance_dma_init_rejects_null(void) {
-#if NAVHAL_HAS_DMA
+#if NAVHAL_CONFIG_DRV_DMA
   TEST_ASSERT_TRUE(hal_dma_init(NULL) != HAL_OK);
 #endif
 }
 
 void test_conformance_i2c_init_rejects_null(void) {
-#if NAVHAL_HAS_I2C
+#if NAVHAL_CONFIG_DRV_I2C
   TEST_ASSERT_TRUE(hal_i2c_init((hal_i2c_bus_t)0, NULL) != HAL_OK);
 #endif
 }
 
 void test_conformance_spi_init_rejects_null(void) {
-#if NAVHAL_HAS_SPI
+#if NAVHAL_CONFIG_DRV_SPI
   /* Most SPI inits take an instance + config; null config must reject. */
   /* Skip if the port's API shape doesn't match — placeholder for now. */
 #endif
 }
 
 void test_conformance_pwm_init_rejects_null(void) {
-#if NAVHAL_HAS_PWM
+#if NAVHAL_CONFIG_DRV_PWM
   /* PWM init shape varies; placeholder. Expand once we audit. */
 #endif
 }
 
 void test_conformance_sdio_init_rejects_null(void) {
-#if NAVHAL_HAS_SDIO
+#if NAVHAL_CONFIG_DRV_SDIO
   TEST_ASSERT_TRUE(hal_sdio_init(NULL) != HAL_SDIO_OK);
 #endif
 }
@@ -184,19 +184,19 @@ void test_conformance_null_init_is_idempotent(void) {
   hal_status_t b = hal_gpio_init((hal_gpio_pin_t)0, NULL);
   TEST_ASSERT_EQUAL_UINT32((uint32_t)a, (uint32_t)b);
 
-#if NAVHAL_HAS_DMA
+#if NAVHAL_CONFIG_DRV_DMA
   hal_status_t da = hal_dma_init(NULL);
   hal_status_t db = hal_dma_init(NULL);
   TEST_ASSERT_EQUAL_UINT32((uint32_t)da, (uint32_t)db);
 #endif
 
-#if NAVHAL_HAS_I2C
+#if NAVHAL_CONFIG_DRV_I2C
   hal_status_t ia = hal_i2c_init((hal_i2c_bus_t)0, NULL);
   hal_status_t ib = hal_i2c_init((hal_i2c_bus_t)0, NULL);
   TEST_ASSERT_EQUAL_UINT32((uint32_t)ia, (uint32_t)ib);
 #endif
 
-#if NAVHAL_HAS_UART
+#if NAVHAL_CONFIG_DRV_UART
   hal_uart_t inst = (hal_uart_t)0;
   hal_status_t ua = hal_uart_init(inst, NULL);
   hal_status_t ub = hal_uart_init(inst, NULL);
@@ -205,35 +205,50 @@ void test_conformance_null_init_is_idempotent(void) {
 }
 
 /* -------------------------------------------------------------------------- *
- * Capability-flag contract — every NAVHAL_HAS_* macro must be defined
- * as a numeric 0 or 1. Source code that does `#if NAVHAL_HAS_X` relies
- * on this; `#ifdef NAVHAL_HAS_X` would silently be true everywhere.
+ * Capability-flag contract — every NAVHAL_CONFIG_DRV_* macro must be defined
+ * as a numeric 0 or 1. Source code that does `#if NAVHAL_CONFIG_DRV_X` relies
+ * on this; `#ifdef` would silently be true everywhere. The deprecated
+ * NAVHAL_CONFIG_DRV_* aliases must stay defined and equal their CONFIG source so
+ * out-of-tree consumers keep building.
  * -------------------------------------------------------------------------- */
 
 void test_conformance_cap_macros_are_defined(void) {
   /* These compile-time checks are the real contract; the runtime
    * assertions are just to make the test register in the suite output. */
-#if !defined(NAVHAL_HAS_DMA)
-#  error "NAVHAL_HAS_DMA is not defined — contract violation"
+#if !defined(NAVHAL_CONFIG_DRV_DMA)
+#  error "NAVHAL_CONFIG_DRV_DMA is not defined — contract violation"
 #endif
-#if !defined(NAVHAL_HAS_FPU)
-#  error "NAVHAL_HAS_FPU is not defined"
+#if !defined(NAVHAL_CONFIG_USE_FPU)
+#  error "NAVHAL_CONFIG_USE_FPU is not defined"
 #endif
-#if !defined(NAVHAL_HAS_CRC_HW)
-#  error "NAVHAL_HAS_CRC_HW is not defined"
+#if !defined(NAVHAL_CONFIG_DRV_CRC)
+#  error "NAVHAL_CONFIG_DRV_CRC is not defined"
 #endif
-#if !defined(NAVHAL_HAS_CYCLE_COUNTER)
-#  error "NAVHAL_HAS_CYCLE_COUNTER is not defined"
+#if !defined(NAVHAL_CONFIG_DRV_DWT)
+#  error "NAVHAL_CONFIG_DRV_DWT is not defined"
 #endif
-#if !defined(NAVHAL_HAS_SDIO)
-#  error "NAVHAL_HAS_SDIO is not defined"
+#if !defined(NAVHAL_CONFIG_DRV_SDIO)
+#  error "NAVHAL_CONFIG_DRV_SDIO is not defined"
 #endif
   /* Numeric domain: must be exactly 0 or 1. */
-  TEST_ASSERT_TRUE(NAVHAL_HAS_DMA            == 0 || NAVHAL_HAS_DMA            == 1);
-  TEST_ASSERT_TRUE(NAVHAL_HAS_FPU            == 0 || NAVHAL_HAS_FPU            == 1);
-  TEST_ASSERT_TRUE(NAVHAL_HAS_CRC_HW         == 0 || NAVHAL_HAS_CRC_HW         == 1);
-  TEST_ASSERT_TRUE(NAVHAL_HAS_CYCLE_COUNTER  == 0 || NAVHAL_HAS_CYCLE_COUNTER  == 1);
-  TEST_ASSERT_TRUE(NAVHAL_HAS_SDIO           == 0 || NAVHAL_HAS_SDIO           == 1);
+  TEST_ASSERT_TRUE(NAVHAL_CONFIG_DRV_DMA  == 0 || NAVHAL_CONFIG_DRV_DMA  == 1);
+  TEST_ASSERT_TRUE(NAVHAL_CONFIG_USE_FPU  == 0 || NAVHAL_CONFIG_USE_FPU  == 1);
+  TEST_ASSERT_TRUE(NAVHAL_CONFIG_DRV_CRC  == 0 || NAVHAL_CONFIG_DRV_CRC  == 1);
+  TEST_ASSERT_TRUE(NAVHAL_CONFIG_DRV_DWT  == 0 || NAVHAL_CONFIG_DRV_DWT  == 1);
+  TEST_ASSERT_TRUE(NAVHAL_CONFIG_DRV_SDIO == 0 || NAVHAL_CONFIG_DRV_SDIO == 1);
+
+  /* Deprecated NAVHAL_HAS_* aliases must remain defined and track their
+   * NAVHAL_CONFIG_* source, so out-of-tree consumers keep building. */
+#if !defined(NAVHAL_HAS_DMA) || !defined(NAVHAL_HAS_FPU) ||                     \
+    !defined(NAVHAL_HAS_CRC_HW) || !defined(NAVHAL_HAS_CYCLE_COUNTER) ||        \
+    !defined(NAVHAL_HAS_SDIO)
+#  error "a deprecated NAVHAL_HAS_* alias is missing — out-of-tree contract broken"
+#endif
+  TEST_ASSERT_EQUAL_UINT32(NAVHAL_CONFIG_DRV_DMA,  NAVHAL_HAS_DMA);
+  TEST_ASSERT_EQUAL_UINT32(NAVHAL_CONFIG_USE_FPU,  NAVHAL_HAS_FPU);
+  TEST_ASSERT_EQUAL_UINT32(NAVHAL_CONFIG_DRV_CRC,  NAVHAL_HAS_CRC_HW);
+  TEST_ASSERT_EQUAL_UINT32(NAVHAL_CONFIG_DRV_DWT,  NAVHAL_HAS_CYCLE_COUNTER);
+  TEST_ASSERT_EQUAL_UINT32(NAVHAL_CONFIG_DRV_SDIO, NAVHAL_HAS_SDIO);
 }
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
 NAVTEST_CASE_DECL(test_conformance_status_ok_is_zero);

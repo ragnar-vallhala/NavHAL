@@ -49,6 +49,12 @@
 .global HardFault_Handler
 .global PendSV_Handler
 .global SVCall_Handler
+/* System (internal) exceptions — named weak handlers, see interrupt.c. */
+.global NMI_Handler
+.global MemManage_Handler
+.global BusFault_Handler
+.global UsageFault_Handler
+.global DebugMon_Handler
 /* DMA stream handlers (macro-driven in the DMA driver). */
 .global DMA1_Stream0_IRQHandler
 .global DMA1_Stream1_IRQHandler
@@ -81,17 +87,17 @@
 .section .isr_vector, "a", %progbits
     .word  _estack                  /* Top of Stack */
     .word  Reset_Handler            /* Reset */
-    .word  Default_Handler          /* NMI */
+    .word  NMI_Handler              /* NMI */
     .word  HardFault_Handler        /* HardFault */
-    .word  Default_Handler          /* MemManage */
-    .word  Default_Handler          /* BusFault */
-    .word  Default_Handler          /* UsageFault */
+    .word  MemManage_Handler        /* MemManage */
+    .word  BusFault_Handler         /* BusFault */
+    .word  UsageFault_Handler       /* UsageFault */
     .word  0                        /* Reserved */
     .word  0                        /* Reserved */
     .word  0                        /* Reserved */
     .word  0                        /* Reserved */
     .word  SVCall_Handler           /* SVCall */
-    .word  Default_Handler          /* DebugMon */
+    .word  DebugMon_Handler         /* DebugMon */
     .word  0                        /* Reserved */
     .word  PendSV_Handler           /* PendSV */
     .word  SysTick_Handler          /* SysTick */
@@ -197,12 +203,42 @@
     .word  Default_Handler          /* 97 SPDIF_RX */
 
 /*
- * @brief Reset Handler — copy .data, zero .bss, call main(). Identical to the
- * arch startup; duplicated so this file is a self-contained chip startup.
+ * @brief Reset Handler — copy the TCM sections (.itcm, .dtcm) and .data from
+ * flash, zero .dtcm_bss and .bss, then call main(). The TCM copies are F767-
+ * specific (the Cortex-M7 tightly-coupled memories); the section symbols are
+ * defined by both the board and the test linker, so these loops copy nothing
+ * when TCM placement is unused.
  */
 .text
 .type Reset_Handler, %function
 Reset_Handler:
+    /* .itcm : flash -> ITCM (0-wait code) */
+    ldr r0, =_siitcm
+    ldr r1, =_sitcm
+    ldr r2, =_eitcm
+1:  cmp r1, r2
+    bcs 2f
+    ldr r3, [r0], #4
+    str r3, [r1], #4
+    b 1b
+2:  /* .dtcm : flash -> DTCM (0-wait initialized data) */
+    ldr r0, =_sidtcm
+    ldr r1, =_sdtcm
+    ldr r2, =_edtcm
+1:  cmp r1, r2
+    bcs 2f
+    ldr r3, [r0], #4
+    str r3, [r1], #4
+    b 1b
+2:  /* .dtcm_bss : zero */
+    ldr r0, =_sdtcm_bss
+    ldr r1, =_edtcm_bss
+1:  cmp r0, r1
+    bcs 2f
+    movs r2, #0
+    str r2, [r0], #4
+    b 1b
+2:  /* .data : flash -> RAM */
     ldr r0, =_sidata
     ldr r1, =_sdata
     ldr r2, =_edata

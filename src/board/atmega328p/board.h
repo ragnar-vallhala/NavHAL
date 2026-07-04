@@ -41,6 +41,7 @@ extern "C" {
 #include "utils/spi_types.h"
 #include "utils/timer_types.h"
 #include "utils/uart_types.h"
+#include "utils/adc_types.h"
 
 /* On-board indicator / input */
 #define LED_BUILTIN  GPIO_PB05  /**< On-board LED, shared with D13 (SCK). */
@@ -69,6 +70,11 @@ extern "C" {
 #define A3   GPIO_PC03
 #define A4   GPIO_PC04  /**< TWI SDA. */
 #define A5   GPIO_PC05  /**< TWI SCL. */
+
+/* ADC — the demo analog input: A0 (PC0) is ADC channel 0. */
+#define BOARD_ADC          HAL_ADC_0
+#define BOARD_ADC_PIN      A0
+#define BOARD_ADC_CHANNEL  0
 
 /* Board console UART — the ATmega328P has a single USART. */
 #define BOARD_CONSOLE_UART      HAL_UART_0

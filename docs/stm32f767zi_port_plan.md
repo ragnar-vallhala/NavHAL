@@ -52,9 +52,12 @@ existing `src/arch/armv7e-m/` and `include/port/cortex-m7/` (copied from
 - **FPU width** — M4 is single-precision (`fpv4-sp-d16`), M7 is
   double-precision (`fpv5-d16`). Handled in `cmake/arch/armv7e-m.cmake` by
   branching the `-mfpu=` flag on `CMAKE_SYSTEM_PROCESSOR`.
-- **L1 cache** — M7 adds optional I-cache/D-cache (not present on M4). Left
-  disabled for v1 bring-up; enabling it later requires cache-maintenance around
-  DMA buffers (see follow-ups).
+- **L1 cache** — M7 adds I-cache/D-cache (not present on M4). Both are now
+  driven (`hal_icache_enable` / `hal_dcache_enable`): the D-cache is kept
+  coherent by a clean/invalidate maintenance API applied around every DMA
+  hand-off (ETH internally; UART/I2C/SDIO via the `navhal_dma_*` helpers, which
+  skip uncached DTCM and reject unreachable ITCM). PIL-green with the cache on;
+  HIL coherency sign-off pending before it goes in the shipped defconfig.
 
 Everything else that differs between the targets is **family** (STM32F7 vs
 STM32F4 register maps) or **board** (pinout), which the layered tree already

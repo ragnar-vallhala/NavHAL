@@ -20,7 +20,6 @@
  * @brief DMA test function declarations for NavTest.
  */
 
-#define CORTEX_M4
 #ifndef TEST_DMA_H
 #define TEST_DMA_H
 #include "common/hal_config.h"
@@ -30,7 +29,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#if NAVHAL_HAS_DMA
+#if NAVHAL_CONFIG_DRV_DMA
 
 void test_dma_clock_enable_dma1(void);
 void test_dma_clock_enable_dma2(void);
@@ -53,7 +52,7 @@ void test_hal_dma_stop_rejects_null_config(void);
 
 extern const navtest_suite_t test_dma_suite;
 
-#endif /* NAVHAL_HAS_DMA */
+#endif /* NAVHAL_CONFIG_DRV_DMA */
 
 
 #ifdef __cplusplus

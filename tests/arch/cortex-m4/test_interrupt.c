@@ -20,7 +20,6 @@
  * @brief Standardized hal_interrupt_* (NVIC) tests.
  */
 
-#define CORTEX_M4
 #include "navhal_port_interrupt.h"
 #include "family/interrupt_reg.h"
 #include "navtest/navtest.h"

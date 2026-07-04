@@ -62,10 +62,12 @@ menu "System & Features Configuration"
 osource "src/arch/*/Kconfig.features"
 
 config DRV_CRC
-    bool "Enable Hardware CRC Unit"
+    bool "Enable CRC support"
     default n
     help
-      Enables hardware cyclic redundancy check unit support.
+      Provides the hal_crc_* API. Backed by the hardware CRC unit on STM32
+      (Cortex-M4/M7); on the ATmega328P, which has no CRC peripheral, it is a
+      bitwise software CRC-32 fallback.
 
 endmenu
 
@@ -99,14 +101,14 @@ config DRV_UART
 
 config DRV_UART_DMA
     bool "Enable DMA-backed UART API"
-    default y if DRV_UART && ARCH_CORTEX_M4
-    depends on DRV_UART
-    select DRV_DMA if ARCH_CORTEX_M4
+    default y if DRV_UART && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    depends on DRV_UART && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    select DRV_DMA
     help
       Compile the hal_uart_write_dma / init_dma_rx variants. Disable to
       drop the DMA backend from a DMA-enabled build (e.g. to save flash
       when DMA is only used by other drivers). Enabling this is what pulls
-      DRV_DMA in for the UART driver on Cortex-M4 — DRV_UART itself does
+      DRV_DMA in for the UART driver on Cortex-M4/M7 — DRV_UART itself does
       not require DMA.
 
 config DRV_I2C
@@ -117,18 +119,25 @@ config DRV_I2C
 
 config DRV_I2C_DMA
     bool "Enable DMA-backed I2C API"
-    default y if DRV_I2C && ARCH_CORTEX_M4
-    depends on DRV_I2C
-    select DRV_DMA if ARCH_CORTEX_M4
+    default y if DRV_I2C && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    depends on DRV_I2C && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    select DRV_DMA
     help
       Compile hal_i2c_read_regs_dma. Disable to drop the DMA backend
-      from a DMA-enabled I2C build.
+      from a DMA-enabled I2C build. On the F7 the read phase uses the
+      CR1.RXDMAEN request with AUTOEND framing.
 
 config DRV_SPI
     bool "Enable SPI Driver"
     default n
     select DRV_GPIO
     select DRV_TIMER
+
+config DRV_ADC
+    bool "Enable ADC Driver"
+    default n
+    select DRV_CLOCK
+    select DRV_GPIO
 
 config DRV_PWM
     bool "Enable PWM Driver"
@@ -147,21 +156,35 @@ config DRV_SDIO
 
 config DRV_SDIO_DMA
     bool "Enable DMA-backed SDIO async API"
-    default y if DRV_SDIO && ARCH_CORTEX_M4
-    depends on DRV_SDIO && ARCH_CORTEX_M4
+    default y if DRV_SDIO && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    depends on DRV_SDIO && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
     select DRV_DMA
     help
       Compile the hal_sdio_*_async block-transfer variants. Disable to
       restrict SDIO to the polled (synchronous) API.
 
-      Cortex-M7 (STM32F7) runs the SDIO peripheral in polled mode only:
-      the F7 SDMMC IP is register-identical to the F4 SDIO, but the
-      DMA-backed async path is not yet validated under the F7's L1 cache,
-      so this option is gated to Cortex-M4 for now.
+      The F7 SDMMC IP is register-identical to the F4 SDIO and shares the
+      same driver, so the async path is available on both cores. DMA buffers
+      are coherent while the L1 D-cache is disabled (the current default);
+      when it is enabled they must be cleaned/invalidated or placed in DTCM
+      (NAVHAL_DTCM_NOINIT).
 
 config DRV_FLASH
     bool "Enable Flash Driver"
     default n
+
+config DRV_ETH
+    bool "Enable Ethernet MAC Driver"
+    depends on ARCH_CORTEX_M7
+    default n
+    select DRV_CLOCK
+    select DRV_GPIO
+    select DRV_INTERRUPT
+    help
+      Compile the frame-level Ethernet MAC API (hal_eth_*). The MAC uses its
+      own dedicated DMA with descriptor rings, independent of DRV_DMA. RMII/MII
+      GPIOs and the PHY (MDIO) are brought up by the driver. Cortex-M7 only
+      (the STM32F767 ETH IP).
 
 endmenu
 

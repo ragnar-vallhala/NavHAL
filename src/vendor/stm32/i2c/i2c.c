@@ -47,7 +47,7 @@ static int _wait_flag(volatile uint32_t *reg, uint32_t mask);
 
 uint8_t hal_i2c_get_init_status(void) { return __i2c_init_status; }
 
-#ifdef _I2C_BACKEND_DMA
+#if NAVHAL_CONFIG_DRV_I2C_DMA
 #include "navhal_port_interrupt.h"
 
 static void (*_i2c_dma_rx_callback)(void) = NULL;

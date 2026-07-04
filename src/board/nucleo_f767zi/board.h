@@ -45,6 +45,7 @@ extern "C" {
 #include "utils/spi_types.h"
 #include "utils/timer_types.h"
 #include "utils/uart_types.h"
+#include "utils/adc_types.h"
 
 /* On-board indicators / inputs */
 #define LED_BUILTIN  GPIO_PB00  /**< LD1 (green user LED). */
@@ -104,6 +105,11 @@ extern "C" {
 #define A3   GPIO_PF03
 #define A4   GPIO_PF05
 #define A5   GPIO_PF10
+
+/* ADC — the demo analog input: A0 (PA3) is ADC1 channel 3. */
+#define BOARD_ADC          HAL_ADC_1
+#define BOARD_ADC_PIN      A0
+#define BOARD_ADC_CHANNEL  3
 
 /* On-board oscillator frequencies (Hz) */
 #define BOARD_HSI_FREQ_HZ  16000000U  /**< Internal RC, fixed in silicon. */

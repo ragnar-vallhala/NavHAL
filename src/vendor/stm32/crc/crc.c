@@ -20,7 +20,7 @@
  * @brief CRC peripheral driver for STM32F4.
  *
  * Provides CRC-32/MPEG-2 calculation. Uses the STM32F4 hardware CRC unit
- * when _CRC_HW_ENABLED is defined, otherwise uses a software lookup table.
+ * when NAVHAL_CONFIG_DRV_CRC is defined, otherwise uses a software lookup table.
  */
 
 #include "navhal_port_crc.h"
@@ -29,7 +29,7 @@
 /* Keep track of configured init value */
 static uint32_t s_crc_init_value = 0xFFFFFFFF;
 
-#ifdef _CRC_HW_ENABLED
+#if NAVHAL_CONFIG_DRV_CRC
 
 #include "family/crc_reg.h"
 #include "family/rcc_reg.h"
@@ -194,4 +194,4 @@ uint32_t hal_crc_compute(const uint8_t *data, uint32_t len) {
   return hal_crc_accumulate(data, len);
 }
 
-#endif /* _CRC_HW_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_CRC */

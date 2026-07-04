@@ -26,6 +26,12 @@ set(NAVHAL_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 add_compile_options(-Wall -Wextra -Wno-unused-parameter -O0 -g)
 add_compile_definitions(NAVTEST_HOST)
 
+# Force-include the host capability stub into every TU, mirroring the root
+# build's force-include of the Kconfig-generated navhal_target.h. This makes
+# NAVHAL_CONFIG_DRV_* (and the deprecated NAVHAL_HAS_* aliases) ambient without
+# relying on any per-target include path.
+add_compile_options(-include ${CMAKE_CURRENT_SOURCE_DIR}/navhal_target.h)
+
 enable_testing()
 
 # -------------------------------------------------------------------------
@@ -68,6 +74,7 @@ add_executable(tests_host_drivers
   test_spi_driver.c
   test_clock_driver.c
   test_flash_driver.c
+  test_mpu.c
 
   ${NAVHAL_ROOT}/tests/navtest_state.c
 
@@ -78,6 +85,7 @@ add_executable(tests_host_drivers
   ${NAVHAL_ROOT}/src/vendor/stm32/i2c/i2c_f7.c
   ${NAVHAL_ROOT}/src/vendor/stm32/spi/spi_f7.c
   ${NAVHAL_ROOT}/src/vendor/stm32/flash/flash.c
+  ${NAVHAL_ROOT}/src/arch/armv7e-m/mpu/mpu.c
   ${NAVHAL_ROOT}/src/utils/util.c
 )
 target_include_directories(tests_host_drivers PRIVATE

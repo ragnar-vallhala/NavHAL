@@ -234,6 +234,14 @@ void hal_interrupt_clear_all_pending(void) {
 __attribute__((weak)) void PendSV_Handler(void) {}
 __attribute__((weak)) void HardFault_Handler(void) {}
 __attribute__((weak)) void SVCall_Handler(void) {}
+/* System (internal) exceptions get their own named weak vectors, like
+ * HardFault above — override any with a strong definition. No Default_Handler
+ * routing for these. */
+__attribute__((weak)) void NMI_Handler(void) {}
+__attribute__((weak)) void MemManage_Handler(void) {}
+__attribute__((weak)) void BusFault_Handler(void) {}
+__attribute__((weak)) void UsageFault_Handler(void) {}
+__attribute__((weak)) void DebugMon_Handler(void) {}
 __attribute__((weak)) void Default_Handler(void) {}
 __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 

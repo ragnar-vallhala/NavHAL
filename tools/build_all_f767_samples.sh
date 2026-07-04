@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Builds every portable sample under the STM32F767ZI (Cortex-M7) configuration.
-# Catches F7-port regressions and verifies the portable-tier contract: every
-# sample in samples/portable/ must compile on Cortex-M4, AVR *and* Cortex-M7.
-# Samples under samples/cortex-m/ are skipped here — some select M4-only
-# features (e.g. DRV_SDIO depends on ARCH_CORTEX_M4), so a whole-tree build
-# would fail to configure; covering the cortex-m tier on F767 is a follow-up.
+# Builds every Cortex-M7-buildable sample under the STM32F767ZI configuration —
+# the portable tier plus the cortex-m samples whose Kconfig arch gate admits the
+# M7 (Ethernet, SDIO, DMA-backed I2C/UART, etc.). Samples gated to another arch
+# (the M4-only no_hal / systick / clock demos) are skipped; see
+# tools/samples_for_arch.sh. Catches F7-port regressions across the whole
+# M7-capable sample set.
 #
 # Uses cmake/toolchains/arm-none-eabi-f767-toolchain.cmake — that file points at
 # the F767 defconfig (cmake/defconfigs/cortex-m7_stm32f7_nucleo_f767zi.defconfig)
@@ -46,9 +46,9 @@ fi
 
 TOOLCHAIN="cmake/toolchains/arm-none-eabi-f767-toolchain.cmake"
 
-# Portable samples: directory names are "NN_<slug>"; -DSAMPLE takes the slug.
-SAMPLES=$(ls samples/portable/ | sed 's/^[0-9]\+_//' | sort -u)
-[ -n "$SAMPLES" ] || { echo "no portable samples found" >&2; exit 2; }
+# Every sample whose Kconfig arch gate admits the Cortex-M7.
+SAMPLES=$("$REPO_ROOT/tools/samples_for_arch.sh" ARCH_CORTEX_M7)
+[ -n "$SAMPLES" ] || { echo "no ARCH_CORTEX_M7 samples found" >&2; exit 2; }
 
 PASS=0
 FAIL=0

@@ -330,6 +330,12 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
   if (!p.controller)
     return HAL_ERR_INVALID_ARG;
 
+  /* Flush the caller's buffer so the DMA transmits the CPU's latest writes
+   * (no-op for DTCM/uncached buffers and cache-off builds; rejects ITCM). */
+  hal_status_t cs = navhal_dma_tx_prepare(data, length);
+  if (cs != HAL_OK)
+    return cs;
+
   volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
   usart->CR3 |= USART_CR3_DMAT;
 
@@ -367,10 +373,21 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
   return HAL_OK;
 }
 
+/*
+ * NOTE (D-cache): this is a *circular* RX DMA the CPU reads live, so the driver
+ * cannot invalidate on the caller's behalf. On a cache-on build place @p buffer
+ * in DTCM (::NAVHAL_DTCM) — DMA1/DMA2 reach it and it is never cached, so it
+ * stays coherent for free — or invalidate the region yourself before each read.
+ * The guard below only rejects a DMA-unreachable (ITCM) buffer.
+ */
 hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
                                   uint16_t length) {
   if (!buffer || length == 0)
     return HAL_ERR_INVALID_ARG;
+
+  hal_status_t gs = navhal_dma_rx_guard(buffer);
+  if (gs != HAL_OK)
+    return gs;
 
   _uart_dma_params_t p = _get_uart_dma_params(uart, 0);
   if (!p.controller)

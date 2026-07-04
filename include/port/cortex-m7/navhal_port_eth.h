@@ -35,11 +35,12 @@
  * IEEE-1588 timestamping) is a later addition.
  *
  * @note The descriptor rings and frame buffers are accessed by the MAC DMA,
- *       which reaches SRAM but not the CPU-tightly-coupled DTCM. Tag them with
- *       ::NAVHAL_ETH_RAM so the linker places them in the dedicated ETHRAM
- *       region (SRAM). The buffer size and alignment below put buffers on
- *       32-byte cache-line boundaries so they can be cleaned/invalidated once
- *       the L1 D-cache is enabled (it is off at bring-up, so they are coherent).
+ *       which — unlike the general-purpose DMA1/DMA2 — reaches SRAM but not the
+ *       CPU-tightly-coupled DTCM. Tag them with ::NAVHAL_ETH_RAM so the linker
+ *       places them in the dedicated ETHRAM region (SRAM). The buffer size and
+ *       alignment below put descriptors and buffers on 32-byte cache-line
+ *       boundaries; the driver cleans/invalidates them around each DMA handoff,
+ *       so they stay coherent whether or not the L1 D-cache is enabled.
  */
 
 #ifndef NAVHAL_PORT_ETH_H
@@ -89,12 +90,21 @@ extern "C" {
  * Field meaning depends on direction (see the TDESn / RDESn bit macros): des0
  * is status + OWN, des1 is control + buffer size, des2 is the buffer address,
  * and des3 is the second-buffer or (when chained) next-descriptor address.
+ *
+ * The normal (4-word) format the DMA reads is only 16 bytes, but the struct is
+ * padded to a full 32-byte cache line so each descriptor owns its own line. That
+ * lets the driver clean/invalidate one descriptor without disturbing a neighbour
+ * the DMA may be mid-writing, once the L1 D-cache is enabled. The DMA never reads
+ * the padding words (chained mode follows des3, not a stride). Buffer sizing is
+ * likewise a multiple of a cache line, so each buffer is independently
+ * maintainable.
  */
 typedef struct {
   __IO uint32_t des0; /**< Status word; bit 31 is OWN. */
   __IO uint32_t des1; /**< Control + buffer-1 byte count. */
   __IO uint32_t des2; /**< Buffer-1 address. */
   __IO uint32_t des3; /**< Buffer-2 / next-descriptor address (chained). */
+  uint32_t _pad[4];   /**< Pad to a 32-byte cache line (not read by the DMA). */
 } navhal_eth_dma_desc_t;
 
 /** @brief OWN bit (des0): set = the DMA owns the descriptor, clear = the CPU. */

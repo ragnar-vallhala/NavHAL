@@ -29,14 +29,18 @@
  * per descriptor sized to hold a full frame, so every frame occupies a single
  * descriptor — no scatter/gather reassembly. The rings and buffers are tagged
  * ::NAVHAL_ETH_RAM so they land in DMA-reachable SRAM (the MAC DMA cannot reach
- * the CPU-local DTCM). They are coherent while the L1 D-cache is off (the
- * bring-up default); enabling it will require clean/invalidate around them.
+ * the CPU-local DTCM). Each descriptor and buffer occupies whole cache lines,
+ * and the driver cleans a descriptor/buffer before handing it to the DMA and
+ * invalidates it before reading what the DMA wrote — so the rings stay coherent
+ * with or without the L1 D-cache (the maintenance calls are no-ops when it is
+ * off).
  */
 
 #include "common/hal_eth.h"
 
 #if NAVHAL_CONFIG_DRV_ETH
 
+#include "common/hal_cache.h"
 #include "common/hal_clock.h"
 #include "family/eth_reg.h"
 #include "family/interrupt_reg.h"
@@ -55,6 +59,13 @@ static NAVHAL_ETH_RAM navhal_eth_dma_desc_t _rx_desc[NAVHAL_ETH_RX_DESC_COUNT];
 static NAVHAL_ETH_RAM navhal_eth_dma_desc_t _tx_desc[NAVHAL_ETH_TX_DESC_COUNT];
 static NAVHAL_ETH_RAM uint8_t _rx_buf[NAVHAL_ETH_RX_DESC_COUNT][NAVHAL_ETH_BUF_SIZE];
 static NAVHAL_ETH_RAM uint8_t _tx_buf[NAVHAL_ETH_TX_DESC_COUNT][NAVHAL_ETH_BUF_SIZE];
+
+/* Each descriptor must be exactly one cache line so a clean/invalidate on one
+ * never touches a neighbour the DMA may own; the buffers a whole multiple. */
+_Static_assert(sizeof(navhal_eth_dma_desc_t) == NAVHAL_CACHE_LINE,
+               "ETH descriptor must be one cache line wide");
+_Static_assert(NAVHAL_ETH_BUF_SIZE % NAVHAL_CACHE_LINE == 0,
+               "ETH buffer size must be a cache-line multiple");
 
 static uint32_t _rx_idx;      /* next RX descriptor the CPU will inspect */
 static uint32_t _tx_idx;      /* next TX descriptor the CPU will fill */
@@ -220,6 +231,9 @@ static void _init_rings(void) {
   }
   _rx_idx = 0;
   _tx_idx = 0;
+  /* Flush the freshly-written rings to SRAM before the DMA reads them. */
+  hal_dcache_clean(_rx_desc, sizeof _rx_desc);
+  hal_dcache_clean(_tx_desc, sizeof _tx_desc);
   ETH_DMA->DMARDLAR = (uint32_t)(uintptr_t)&_rx_desc[0];
   ETH_DMA->DMATDLAR = (uint32_t)(uintptr_t)&_tx_desc[0];
 }
@@ -379,13 +393,16 @@ hal_status_t hal_eth_send(const uint8_t *frame, uint16_t len) {
     return HAL_ERR_NOT_INITIALIZED;
 
   navhal_eth_dma_desc_t *d = &_tx_desc[_tx_idx];
+  hal_dcache_invalidate(d, sizeof *d); /* see the DMA's completion write of des0 */
   if (d->des0 & ETH_DMA_DESC_OWN)
     return HAL_ERR_BUSY; /* the DMA still owns this descriptor. */
 
   _copy(&_tx_buf[_tx_idx][0], frame, len);
+  hal_dcache_clean(&_tx_buf[_tx_idx][0], len); /* flush the frame for the DMA */
   d->des1 = (uint32_t)len & ETH_DMA_TDES1_TBS1_MASK;
   d->des0 = ETH_DMA_TDES0_TCH | ETH_DMA_TDES0_FS | ETH_DMA_TDES0_LS |
             ETH_DMA_TDES0_IC | ETH_DMA_DESC_OWN;
+  hal_dcache_clean(d, sizeof *d); /* publish the armed descriptor to the DMA */
   _tx_idx = (_tx_idx + 1U) % NAVHAL_ETH_TX_DESC_COUNT;
 
   /* Clear a pending "transmit buffer unavailable" and poke the DMA to fetch the
@@ -403,6 +420,7 @@ hal_status_t hal_eth_receive(uint8_t *buf, uint16_t max_len, uint16_t *out_len) 
   *out_len = 0;
 
   navhal_eth_dma_desc_t *d = &_rx_desc[_rx_idx];
+  hal_dcache_invalidate(d, sizeof *d); /* see the DMA's status write of des0 */
   if (d->des0 & ETH_DMA_DESC_OWN)
     return HAL_OK; /* no completed frame. */
 
@@ -416,12 +434,15 @@ hal_status_t hal_eth_receive(uint8_t *buf, uint16_t max_len, uint16_t *out_len) 
     if (len > max_len) {
       rc = HAL_ERR_NO_MEM;
     } else {
+      /* Drop the CPU's stale cached copy of the buffer the DMA just filled. */
+      hal_dcache_invalidate(&_rx_buf[_rx_idx][0], fl);
       _copy(buf, &_rx_buf[_rx_idx][0], len);
       *out_len = len;
     }
   }
 
-  d->des0 = ETH_DMA_DESC_OWN; /* return the descriptor to the DMA. */
+  d->des0 = ETH_DMA_DESC_OWN;          /* return the descriptor to the DMA. */
+  hal_dcache_clean(d, sizeof *d);      /* publish the OWN handoff to the DMA */
   _rx_idx = (_rx_idx + 1U) % NAVHAL_ETH_RX_DESC_COUNT;
 
   /* Clear a pending "receive buffer unavailable" and resume reception. */

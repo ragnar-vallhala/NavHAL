@@ -224,6 +224,12 @@ hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
   if (!I2C)
     return HAL_ERR_NOT_INITIALIZED;
 
+  /* The DMA writes into the caller's buffer; reject one no DMA can reach. The
+   * matching invalidate happens on completion in _i2c_dma_irq_handler. */
+  hal_status_t gs = navhal_dma_rx_guard((const void *)(uintptr_t)dma_cfg->dst_addr);
+  if (gs != HAL_OK)
+    return gs;
+
   /* Write phase: send the register pointer (SOFTEND so a repeated START can
    * follow) — identical framing to hal_i2c_write_read's write phase. */
   I2C->CR2 = I2C_CR2_SADD7(dev_addr) | I2C_CR2_NBYTES(1) | I2C_CR2_START;
@@ -272,6 +278,10 @@ static void _i2c_dma_irq_handler(void) {
   volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(_active_i2c_dma_bus);
   if (I2C)
     I2C->CR1 &= ~I2C_CR1_RXDMAEN;
+  /* Drop the CPU's stale cached copy of the buffer the DMA just filled, before
+   * the callback (and the caller) read it. 8-bit transfers: items == bytes. */
+  navhal_dma_rx_finish((void *)(uintptr_t)_active_i2c_dma_config.dst_addr,
+                       _active_i2c_dma_config.data_count);
   if (_i2c_dma_rx_callback)
     _i2c_dma_rx_callback();
 }

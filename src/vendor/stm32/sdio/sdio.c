@@ -487,6 +487,11 @@ hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buf) {
   if (sd_busy)
     return HAL_SDIO_BUSY;
 
+  /* DMA writes into buf; reject one no DMA can reach. Invalidate on completion
+   * happens in _sdio_dma_rx_irq_handler. (No-ops without the D-cache.) */
+  if (navhal_dma_rx_guard(buf) != HAL_OK)
+    return HAL_SDIO_ERROR;
+
   if (!card_is_sdhc)
     addr *= 512;
 
@@ -549,6 +554,10 @@ hal_sdio_error_t hal_sdio_write_block_async(uint32_t addr, const uint8_t *buf) {
   if (sd_busy)
     return HAL_SDIO_BUSY;
 
+  /* Flush buf so the DMA transmits the CPU's latest writes; reject ITCM. */
+  if (navhal_dma_tx_prepare(buf, 512) != HAL_OK)
+    return HAL_SDIO_ERROR;
+
   if (!card_is_sdhc)
     addr *= 512;
 
@@ -609,6 +618,9 @@ hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
                                         uint32_t count) {
   if (sd_busy)
     return HAL_SDIO_BUSY;
+
+  if (navhal_dma_rx_guard(buf) != HAL_OK)
+    return HAL_SDIO_ERROR;
 
   if (!card_is_sdhc)
     addr *= 512;
@@ -676,6 +688,9 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
                                          uint32_t count) {
   if (sd_busy)
     return HAL_SDIO_BUSY;
+
+  if (navhal_dma_tx_prepare(buf, (size_t)512 * count) != HAL_OK)
+    return HAL_SDIO_ERROR;
 
   if (!card_is_sdhc)
     addr *= 512;
@@ -772,6 +787,10 @@ void SDIO_IRQHandler(void) {
 
 static void _sdio_dma_rx_irq_handler(void) {
   hal_dma_clear_flags((const hal_dma_config_t *)&dma2_stream3_cfg);
+  /* The DMA has finished writing the block(s) to memory; drop the CPU's stale
+   * cached copy before the caller reads it. 32-bit items -> ×4 for bytes. */
+  navhal_dma_rx_finish((void *)(uintptr_t)dma2_stream3_cfg.dst_addr,
+                       (size_t)dma2_stream3_cfg.data_count * 4U);
   dma_done = 1;
   if (sdio_done || sd_last_error != HAL_SDIO_OK) {
     sd_busy = 0;

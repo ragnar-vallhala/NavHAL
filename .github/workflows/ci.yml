@@ -102,12 +102,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Configure host build
-        run: cmake -B build-host -S tests/host
-      - name: Build host tests
-        run: cmake --build build-host -j
-      - name: Run host tests
-        run: ./build-host/tests_host
+      - name: Host tests (SIL)
+        run: tools/ntest host
 
   # Cross-compile the on-target navtest ELF. Uploads the binary as a
   # workflow artifact so the (separate) renode.yml workflow can consume
@@ -194,7 +190,7 @@ jobs:
       - name: Install kconfiglib
         run: pip install kconfiglib
       - name: Run cap contract tests
-        run: tools/test_cap_contract.sh
+        run: tools/ntest cap-contract
 
   # Catches missing `select` clauses on SAMPLE_* Kconfig entries: a sample
   # that needs DRV_SDIO but doesn't select it will silently fall back to
@@ -215,7 +211,7 @@ jobs:
       - name: Install kconfiglib
         run: pip install kconfiglib
       - name: Build every sample
-        run: tools/build_all_samples.sh
+        run: tools/ntest samples m4
 
   # Same idea but on the AVR (ATmega328P) port. Builds only samples in
   # samples/portable/ — those are the contract for "runs on both arches".
@@ -235,7 +231,7 @@ jobs:
       - name: Install kconfiglib
         run: pip install kconfiglib
       - name: Build every portable sample under AVR config
-        run: tools/build_all_avr_samples.sh
+        run: tools/ntest samples avr
 
   # Same idea on the STM32F767ZI (Cortex-M7) port. Builds the portable-sample
   # tier under the F767 toolchain/defconfig so the F7 port can't bit-rot.
@@ -256,7 +252,7 @@ jobs:
       - name: Install kconfiglib
         run: pip install kconfiglib
       - name: Build every portable sample under F767 config
-        run: tools/build_all_f767_samples.sh
+        run: tools/ntest samples m7
 
   # M8 §8.1 — Single required-status-check name to put on branch
   # protection. Succeeds if every per-PR job either passed or was

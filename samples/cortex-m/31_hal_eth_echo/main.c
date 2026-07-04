@@ -40,6 +40,10 @@ static uint8_t s_rx[HAL_ETH_MAX_FRAME_LEN];
 static uint8_t s_tx[HAL_ETH_MAX_FRAME_LEN];
 
 int main(void) {
+#if NAVHAL_CONFIG_DRV_CACHE
+  hal_icache_enable();
+  hal_dcache_enable(); /* exercises the ETH DMA path under the L1 D-cache */
+#endif
   hal_pll_config_t pll = {.input_src = HAL_CLOCK_SOURCE_HSI,
                           .pll_m = 8,
                           .pll_n = 100,

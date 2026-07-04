@@ -100,7 +100,7 @@ int main(void) {
 
   /* 4. Prepare Test Data */
   // Use a 64KB buffer (128 sectors) to test multi-block performance
-  static uint8_t buf[CHUNK_SIZE * 512] __attribute__((aligned(4)));
+  static uint8_t buf[CHUNK_SIZE * 512] NAVHAL_DMA_ALIGN; /* cache-line aligned for D-cache */
   for (int i = 0; i < (CHUNK_SIZE * 512); i++) {
     buf[i] = (uint8_t)(i & 0xFF);
   }

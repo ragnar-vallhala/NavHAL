@@ -78,7 +78,7 @@ config SAMPLE_14_HAL_UART_INT
 
 config SAMPLE_15_HAL_UART_DMA
     bool "15_hal_uart_dma"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
 
 config SAMPLE_16_HAL_DMA_POLLING_UART
     bool "16_hal_dma_polling_uart"
@@ -94,32 +94,32 @@ config SAMPLE_18_HAL_CRC
 
 config SAMPLE_19_HAL_DMA_I2C
     bool "19_hal_dma_i2c"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     select DRV_I2C
 
 config SAMPLE_20_HAL_SDIO
     bool "20_hal_sdio"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     select DRV_SDIO
 
 config SAMPLE_21_HAL_SDIO_BLOCK
     bool "21_hal_sdio_block"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     select DRV_SDIO
 
 config SAMPLE_22_HAL_FATFS_POSIX
     bool "22_hal_fatfs_posix"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     select DRV_SDIO
 
 config SAMPLE_23_HAL_SDIO_PERF
     bool "23_hal_sdio_perf"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     select DRV_SDIO
 
 config SAMPLE_24_HAL_UART_DMA_BRIDGE
     bool "24_hal_uart_dma_bridge"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
 
 config SAMPLE_25_HAL_SPI_ESP_BRIDGE
     bool "25_hal_spi_esp_bridge"

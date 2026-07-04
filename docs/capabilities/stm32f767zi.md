@@ -41,7 +41,7 @@ by adding a board layer.
 | CRC_HW            | ✓ | `src/vendor/stm32/crc/crc.c`            | Hardware CRC-32; default polynomial is register-compatible with F4. Opt-in via `CONFIG_DRV_CRC`; the CRC suite (7) passes via the hardware unit on F767. |
 | CYCLE_COUNTER     | ✓ | `src/arch/armv7e-m/dwt/dwt.c`            | DWT-backed; shared ARMv7E-M arch code. Opt-in via `CONFIG_DRV_DWT`; `test_dwt` (6) passes on hardware. |
 | MPU               | ✓ | `src/arch/armv7e-m/mpu/mpu.c`            | PMSAv7 MPU, **16 regions** (read at runtime from `MPU_TYPE.DREGION`); shared ARMv7-M driver. Opt-in via `CONFIG_DRV_MPU`; `test_mpu` (4) passes on hardware — presence/region-count, bit-exact `RBAR`/`RASR` encoding, configure/disable, bulk apply. Fault-on-violation *enforcement* is demonstrated on hardware by the `32_hal_mpu_fault` sample: a read of a no-access region traps into `MemManage_Handler` (faulting address in `MMFAR`), which recovers by disabling the MPU. |
-| CACHE             | ◐ | `src/arch/armv7e-m/cache/cache.c`        | L1 **instruction cache** enable (`hal_icache_enable`); M7-only, opt-in via `CONFIG_DRV_CACHE`. `test_cache` (2) passes on hardware (`SCB_CCR.IC` verified set). The **data cache** is a later phase — it needs clean/invalidate maintenance around DMA buffers to stay coherent — so it is left off (`◐`). |
+| CACHE             | ✓ | `src/arch/armv7e-m/cache/cache.c`        | L1 **instruction + data cache**; M7-only, opt-in via `CONFIG_DRV_CACHE`. I-cache via `hal_icache_enable`; D-cache via `hal_dcache_enable` (full set/way invalidate then `CCR.DC`) plus by-MVA `hal_dcache_clean/invalidate/clean_invalidate`. Coherency is kept by clean/invalidate around every DMA hand-off: ETH descriptors/buffers, and the general-DMA drivers (UART/I2C/SDIO) via the `navhal_dma_*` helpers, which skip uncached DTCM and reject unreachable ITCM (see `navhal_port_dma.h`). `test_cache` (5) passes; the full suite runs **157/0 in PIL with the D-cache enabled in boot**. HIL hardware coherency sign-off pending. |
 | FPU               | ✓ | `src/arch/armv7e-m/fpu/fpu.c`            | Hardware **double-precision** FPU (`-mfpu=fpv5-d16`, hard float) via `CONFIG_USE_FPU` + `CONFIG_DRV_FPU`. `test_fpu_accel` (3) passes on hardware. |
 | DMA               | ✓ | `src/vendor/stm32/dma/dma.c`            | DMA1/DMA2 stream controller (register-compatible with F4). Opt-in via `CONFIG_DRV_DMA`; `test_dma` (17) passes on hardware. Coherent while the L1 D-cache stays off (see caveats); a DMA UART backend is still pending. |
 | SDIO              | ◐ | `src/vendor/stm32/sdio/sdio.c`          | **Polled** SD-card block I/O. The F7 SDMMC1 IP is register-identical to the F4 SDIO (same base `0x40012C00`, same APB2ENR bit, same AF12 pinmux, same vector slot 49), so the shared driver runs unchanged. Opt-in via `CONFIG_DRV_SDIO`; `test_sdio` (6) passes, and a card-init + 512-byte block write/read round-trip is validated in PIL against a Renode `SD.STM32FSDMMC` + attached card (`NAVTEST_PIL_ONLY`). The DMA-backed async API (`DRV_SDIO_DMA`) is now compiled on the F7 too — same shared driver, and coherent with the L1 D-cache off — but is **not yet hardware-validated**: the Nucleo has no card slot, and Renode's SD model does not service the SDMMC→DMA request path (the async round-trip times out there while the polled path works). |
@@ -64,7 +64,7 @@ them unwrapped for now.
 | M7-only feature | NavHAL status | Where | Notes |
 |---|---|---|---|
 | Double-precision FPU (`fpv5-d16`) | ✓ (in the FPU module) | `cmake/arch/armv7e-m.cmake` | M4 has only the single-precision `fpv4-sp-d16`. Same `hal_fpu` API; the `-mfpu` is picked from `CMAKE_SYSTEM_PROCESSOR` so M7 gets hardware `double`. |
-| L1 caches — 16 KB I-cache + 16 KB D-cache | ◐ (I-cache driven; D-cache **off**) | `src/arch/armv7e-m/cache/cache.c` | I-cache enabled via `hal_icache_enable` (the `CACHE` capability above). The D-cache is deliberately left disabled so DMA/peripheral buffers stay coherent without clean/invalidate; enabling it is a future phase needing a maintenance API. M4 has no cache at all. |
+| L1 caches — 16 KB I-cache + 16 KB D-cache | ✓ (both driven) | `src/arch/armv7e-m/cache/cache.c` | I-cache via `hal_icache_enable`; D-cache via `hal_dcache_enable` + the clean/invalidate maintenance API. DMA buffers stay coherent via clean-before-TX / invalidate-after-RX at each driver hand-off (ETH internally; UART/I2C/SDIO via the `navhal_dma_*` helpers). PIL-green with the D-cache on; HIL sign-off pending. M4 has no cache at all. |
 | DTCM / ITCM tightly-coupled memory (128 KB / 16 KB) | ✓ (static placement) | `common/hal_tcm.h` + `linker.ld` + `startup.s` | Pin code/data into the 0-wait TCMs with `NAVHAL_ITCM` / `NAVHAL_DTCM` / `NAVHAL_DTCM_NOINIT` (opt-in `CONFIG_USE_TCM`); the board startup copies `.itcm`/`.dtcm` from flash at reset and zeroes `.dtcm_bss`. `test_tcm` (3) passes on hardware (ITCM code executes from `0x0`, DTCM init copied, NOINIT zeroed). No TCM allocator / heap-in-TCM yet. Since DTCM is not cached, it doubles as a coherency-free home for DMA buffers. |
 
 `◐` here flags an M7 feature NavHAL is *aware* of but does not yet expose as a
@@ -128,13 +128,17 @@ implemented and pass their on-target test suites — see the bring-up record.
   up (up to 216 MHz — `clock_f7.c` does VOS/over-drive/wait-states for you).
 * UART DMA TX is hardware-validated; the DMA **RX** path (`hal_uart_init_dma_rx`)
   is implemented but not yet exercised on the bench (no serial input source
-  wired). DMA buffers are coherent while the L1 D-cache stays off; enabling the
-  D-cache later means clean/invalidate around them, or placing them in DTCM
-  (`NAVHAL_DTCM_NOINIT`).
-* The **L1 D-cache is kept disabled**, which is what makes DMA buffers coherent
-  today. The DMA driver is verified in this configuration. Enabling the D-cache
-  later for performance will require cache clean/invalidate around any
-  DMA/peripheral-shared buffer (`SCB_CleanDCache_by_Addr` / `InvalidateDCache`).
+  wired). It is a *circular* RX buffer read live, so with the D-cache on it must
+  sit in DTCM (uncached, DMA1/2-reachable) or be invalidated before each read —
+  the driver only guards reachability.
+* The **L1 D-cache is enabled via `hal_dcache_enable`** and kept coherent by
+  clean/invalidate around every DMA hand-off — ETH descriptors/buffers directly,
+  and the general-DMA drivers (UART/I2C/SDIO) through the `navhal_dma_*` helpers,
+  which clean before a TX DMA, invalidate after an RX DMA, skip uncached DTCM,
+  and reject DMA-unreachable ITCM. Caller DMA buffers must be `NAVHAL_DMA_ALIGN`
+  (32-byte, size-padded). Full suite is **157/0 in PIL with the D-cache on**;
+  on-hardware coherency sign-off (HIL) is the remaining step before enabling it
+  in the shipped defconfig.
 * Wired into CI: `sample-matrix-f767` (portable samples build under the F767
   toolchain) and `build-on-target-f767` (test-ELF compile) in `ci.yml`, plus a
   `nucleo_f767zi` job in the per-arch PIL matrix (`renode.yml`) that runs the

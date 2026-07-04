@@ -43,14 +43,49 @@ void test_icache_enabled_after_enable(void) {
   TEST_ASSERT_TRUE(hal_icache_is_enabled());
 }
 
+void test_dcache_enable_returns_ok(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_dcache_enable());
+}
+
+void test_dcache_enabled_after_enable(void) {
+  NAVTEST_SKIP_ON_PIL(); /* SCB_CCR.DC may not be modelled by the emulator */
+  hal_dcache_enable();
+  TEST_ASSERT_TRUE(hal_dcache_is_enabled());
+}
+
+/* Drive the by-MVA clean/invalidate loops over a real cache-line-aligned buffer.
+ * A bad SCB maintenance-register address or a broken line-walk would fault here;
+ * the data check confirms a clean+invalidate round-trip preserves the bytes. */
+void test_dcache_maintenance_smoke(void) {
+  static uint8_t buf[NAVHAL_CACHE_LINE * 2] NAVHAL_DMA_ALIGN;
+  for (unsigned i = 0; i < sizeof buf; i++)
+    buf[i] = (uint8_t)(i + 1U);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_dcache_clean(buf, sizeof buf));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_dcache_clean_invalidate(buf, sizeof buf));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_dcache_invalidate(buf, sizeof buf));
+  bool intact = true;
+  for (unsigned i = 0; i < sizeof buf; i++)
+    intact = intact && (buf[i] == (uint8_t)(i + 1U));
+  TEST_ASSERT_TRUE(intact);
+}
+
 /* PROGMEM slot for each case name on AVR; no-op elsewhere (never links on AVR —
  * the cache cap is Cortex-M7 only — but keep the portable idiom). */
 NAVTEST_CASE_DECL(test_icache_enable_returns_ok);
 NAVTEST_CASE_DECL(test_icache_enabled_after_enable);
+NAVTEST_CASE_DECL(test_dcache_enable_returns_ok);
+NAVTEST_CASE_DECL(test_dcache_enabled_after_enable);
+NAVTEST_CASE_DECL(test_dcache_maintenance_smoke);
 
 static const navtest_case_t cache_cases[] = {
     NAVTEST_CASE(test_icache_enable_returns_ok),
     NAVTEST_CASE(test_icache_enabled_after_enable),
+    NAVTEST_CASE(test_dcache_enable_returns_ok),
+    NAVTEST_CASE(test_dcache_enabled_after_enable),
+    NAVTEST_CASE(test_dcache_maintenance_smoke),
 };
 
 const navtest_suite_t test_cache_suite = {

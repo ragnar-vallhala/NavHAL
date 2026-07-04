@@ -159,6 +159,7 @@ static void print_startup_message(void) {
 int main(void) {
 #if NAVHAL_CONFIG_DRV_CACHE
   hal_icache_enable(); /* hazard-free perf win; do it before anything else */
+  hal_dcache_enable(); /* invalidates then enables; DMA paths self-maintain */
 #endif
   hal_uart_init(NAVTEST_UART, &(hal_uart_config_t){.baudrate=9600});
 #if NAVHAL_CONFIG_USE_FPU

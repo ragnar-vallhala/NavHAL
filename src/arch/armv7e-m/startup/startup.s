@@ -195,45 +195,10 @@
 
 /*
  * @brief Reset Handler
- * This is the entry point after a reset. It copies initialized data from
- * flash to RAM, zeroes the .bss section, and then calls main().
+ * The reset routine (memory bring-up + hooks + main) is shared C, in
+ * src/arch/armv7e-m/startup/boot.c. The vector table above points at the
+ * Reset_Handler symbol it defines; only the MCU-specific table stays here.
  */
-.text
-.type Reset_Handler, %function
-Reset_Handler:
-
-    // Copy .data section from Flash to RAM
-    ldr r0, =_sidata      // r0 = source (start of initialized data in Flash)
-    ldr r1, =_sdata       // r1 = destination (start of .data in RAM)
-    ldr r2, =_edata       // r2 = end of .data in RAM
-
-copy_data:
-    cmp r1, r2         // compare dest < end
-    bcs init_bss       // if dest >= end, done
-    ldr r3, [r0], #4   // load from Flash
-    str r3, [r1], #4   // store to RAM
-    b copy_data
-
-    // Zero initialize the .bss section (uninitialized data)
-init_bss:
-    ldr r0, =_sbss        // r0 = start of .bss
-    ldr r1, =_ebss        // r1 = end of .bss
-
-zero_bss:
-    cmp r0, r1
-    bcs call_main    // done, go to main
-    movs r2, #0
-    str r2, [r0], #4
-    b zero_bss
-
-    // Call main function
-call_main:
-    cpsie i  // enable interrupts
-    bl main
-
-    // If main returns, loop forever
-loop_forever:
-    b loop_forever
 
 .weak Default_Handler
 .weak DMA1_Stream0_IRQHandler

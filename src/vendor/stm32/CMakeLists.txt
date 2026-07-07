@@ -44,6 +44,10 @@ if(EXISTS ${SRC_BOARD}/startup.s)
 else()
     list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)
 endif()
+# Shared C reset path (Reset_Handler + memory bring-up + boot hooks); the .s
+# above now carries only the MCU-specific vector table. (The TEST build globs
+# ${SRC_ARCH}/*.c and picks this up automatically.)
+list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/boot.c)
 
 if(CONFIG_DRV_INTERRUPT)
     list(APPEND HAL_SOURCES ${SRC_ARCH}/interrupt/interrupt.c)

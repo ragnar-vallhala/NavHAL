@@ -34,6 +34,21 @@ SECTIONS {
 
     . = ALIGN(4);
     *(.eh_frame*)
+
+    /* Reset copy/zero tables (const) walked by Reset_Handler (boot.c). Kept in
+       the read-only .text load segment so no spurious RW segment appears. Copy
+       triples {flash-src, ram-dst, byte-len}; zero pairs {ram-dst, byte-len}.
+       F7 TCM regions are extra rows. Symbols are resolved after layout. */
+    . = ALIGN(4);
+    __copy_table_start__ = .;
+    LONG(_siitcm); LONG(_sitcm); LONG(_eitcm - _sitcm);
+    LONG(_sidtcm); LONG(_sdtcm); LONG(_edtcm - _sdtcm);
+    LONG(_sidata); LONG(_sdata); LONG(_edata - _sdata);
+    __copy_table_end__ = .;
+    __zero_table_start__ = .;
+    LONG(_sdtcm_bss); LONG(_edtcm_bss - _sdtcm_bss);
+    LONG(_sbss); LONG(_ebss - _sbss);
+    __zero_table_end__ = .;
   } > FLASH
 
   /* Instruction TCM — hot code (NAVHAL_ITCM), copied flash -> ITCM at reset. */

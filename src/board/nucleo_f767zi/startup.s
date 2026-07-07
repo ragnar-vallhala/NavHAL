@@ -203,65 +203,12 @@
     .word  Default_Handler          /* 97 SPDIF_RX */
 
 /*
- * @brief Reset Handler — copy the TCM sections (.itcm, .dtcm) and .data from
- * flash, zero .dtcm_bss and .bss, then call main(). The TCM copies are F767-
- * specific (the Cortex-M7 tightly-coupled memories); the section symbols are
- * defined by both the board and the test linker, so these loops copy nothing
- * when TCM placement is unused.
+ * @brief Reset Handler — shared C, in src/arch/armv7e-m/startup/boot.c. The F7
+ * TCM (.itcm/.dtcm) and .data copies plus the .dtcm_bss/.bss zeroing are now
+ * driven by the linker's copy/zero tables, so they are extra table rows rather
+ * than hand-written loops here. The vector table above points at the
+ * Reset_Handler symbol boot.c defines; only this MCU-specific table stays here.
  */
-.text
-.type Reset_Handler, %function
-Reset_Handler:
-    /* .itcm : flash -> ITCM (0-wait code) */
-    ldr r0, =_siitcm
-    ldr r1, =_sitcm
-    ldr r2, =_eitcm
-1:  cmp r1, r2
-    bcs 2f
-    ldr r3, [r0], #4
-    str r3, [r1], #4
-    b 1b
-2:  /* .dtcm : flash -> DTCM (0-wait initialized data) */
-    ldr r0, =_sidtcm
-    ldr r1, =_sdtcm
-    ldr r2, =_edtcm
-1:  cmp r1, r2
-    bcs 2f
-    ldr r3, [r0], #4
-    str r3, [r1], #4
-    b 1b
-2:  /* .dtcm_bss : zero */
-    ldr r0, =_sdtcm_bss
-    ldr r1, =_edtcm_bss
-1:  cmp r0, r1
-    bcs 2f
-    movs r2, #0
-    str r2, [r0], #4
-    b 1b
-2:  /* .data : flash -> RAM */
-    ldr r0, =_sidata
-    ldr r1, =_sdata
-    ldr r2, =_edata
-copy_data:
-    cmp r1, r2
-    bcs init_bss
-    ldr r3, [r0], #4
-    str r3, [r1], #4
-    b copy_data
-init_bss:
-    ldr r0, =_sbss
-    ldr r1, =_ebss
-zero_bss:
-    cmp r0, r1
-    bcs call_main
-    movs r2, #0
-    str r2, [r0], #4
-    b zero_bss
-call_main:
-    cpsie i
-    bl main
-loop_forever:
-    b loop_forever
 
 .weak Default_Handler
 .weak DMA1_Stream0_IRQHandler

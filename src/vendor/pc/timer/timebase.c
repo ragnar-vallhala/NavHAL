@@ -8,26 +8,42 @@
 
 /**
  * @file timebase.c
- * @brief HAL timebase for the PC — TSC-backed, polled (no interrupts).
+ * @brief HAL timebase for the PC — TSC for time queries, PIT IRQ for the tick.
  *
  * @details
  * hal_timebase_get_micros/millis and hal_delay_* read the TSC directly and
- * scale by the calibrated frequency (clock.c). This needs no IRQs. The
- * *periodic* tick and its callback are IRQ-driven (PIT IRQ0) and land with the
- * interrupt slice; they are kept API-complete here (the callback store works,
- * and hal_timebase_tick() dispatches it if called).
- *
- * @note hal_timebase_init() must be called (after the clock is calibrated)
- *       before the get_micros/millis and delay helpers return meaningful values.
+ * scale by the calibrated frequency (clock.c) — accurate and available without
+ * interrupts. When the interrupt driver is present, hal_timebase_init also
+ * programs 8254 PIT channel 0 for a periodic IRQ0 that drives
+ * hal_timebase_tick(), so hal_timebase_get_tick() and the registered tick
+ * callback advance from a real hardware interrupt (as SysTick does on Cortex-M).
  */
 
 #include "common/hal_timer.h"
 #include "pc_io.h"
 
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+#include "common/hal_interrupt.h"
+
+#define PIT_CH0 0x40
+#define PIT_CMD 0x43
+#define PIT_INPUT_HZ 1193182u
+
+static void pit_start_periodic(uint32_t freq_hz) {
+  uint32_t div = PIT_INPUT_HZ / (freq_hz ? freq_hz : 1000u);
+  if (div == 0) div = 1;
+  if (div > 0xFFFF) div = 0xFFFF;
+  pc_outb(PIT_CMD, 0x34); /* ch0, lo/hi access, mode 2 (rate generator), binary */
+  pc_outb(PIT_CH0, (uint8_t)(div & 0xFF));
+  pc_outb(PIT_CH0, (uint8_t)(div >> 8));
+}
+#endif
+
 static uint64_t g_tsc0;      /* TSC snapshot at hal_timebase_init */
 static uint32_t g_tick_us;
 static uint64_t g_cyc_per_us = 1;
 static uint64_t g_cyc_per_ms = 1;
+static volatile uint32_t g_ticks;
 static hal_timebase_callback_t g_cb;
 
 hal_status_t hal_timebase_init(uint32_t tick_us) {
@@ -38,7 +54,13 @@ hal_status_t hal_timebase_init(uint32_t tick_us) {
   if (!g_cyc_per_us) g_cyc_per_us = 1;
   if (!g_cyc_per_ms) g_cyc_per_ms = 1;
   g_tick_us = tick_us;
+  g_ticks = 0;
   g_tsc0 = pc_rdtsc();
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+  pit_start_periodic(1000000u / tick_us);
+  hal_interrupt_attach_callback(HAL_IRQ_TIMER, hal_timebase_tick);
+  hal_interrupt_enable(HAL_IRQ_TIMER);
+#endif
   return HAL_OK;
 }
 
@@ -51,8 +73,12 @@ uint32_t hal_timebase_get_millis(void) {
 }
 
 uint32_t hal_timebase_get_tick(void) {
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+  return g_ticks; /* incremented by the PIT IRQ */
+#else
   if (!g_tick_us) return 0;
   return hal_timebase_get_micros() / g_tick_us;
+#endif
 }
 
 uint32_t hal_timebase_get_tick_duration_us(void) { return g_tick_us; }
@@ -72,7 +98,9 @@ void hal_delay_ms(uint32_t ms) {
   while ((pc_rdtsc() - start) < target) __asm__ volatile("pause");
 }
 
+/* Tick handler: invoked from the PIT IRQ (or manually in a polled build). */
 void hal_timebase_tick(void) {
+  g_ticks++;
   if (g_cb) g_cb();
 }
 

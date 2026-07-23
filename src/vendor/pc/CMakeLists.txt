@@ -17,6 +17,15 @@ if(CONFIG_DRV_TIMER)
     # (PIT channels) needs IRQs and lands with the interrupt slice.
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/timer/timebase.c)
 endif()
+if(CONFIG_DRV_INTERRUPT)
+    # PIC driver (hal_interrupt_*) is vendor; the IDT + ISR entry stubs are the
+    # x86_64 CPU arch layer (mirrors NVIC-in-arch on Cortex-M).
+    list(APPEND HAL_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/interrupt/interrupt.c
+        ${SRC_ARCH}/interrupt/idt.c
+        ${SRC_ARCH}/interrupt/isr.s
+    )
+endif()
 
 # Arch startup (asm): multiboot2 header, 32-bit stub -> long mode -> main().
 list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)

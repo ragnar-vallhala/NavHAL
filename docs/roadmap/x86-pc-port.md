@@ -151,11 +151,11 @@ Kconfig target: `CONFIG_ARCH_X86_64` / `VENDOR_PC` / `FAMILY_PC` / `BOARD_QEMU`
 
 ## Testing
 
-- **Smoke, per slice:** boot in QEMU under a timeout, assert expected serial
-  output on COM1 (`-serial stdio`). Slice 1 asserts the "Hello…" line.
-- **Host/PIL later:** an x86 entry for the PIL harness (boot the ISO headless,
-  scrape serial) mirrors the Renode/simavr dispatchers under `tools/`. Wire
-  once Slice 2+ gives it something worth asserting beyond boot.
+- **CI smoke (`tools/qemu/smoke.sh`):** builds a sample, boots the GRUB ISO
+  headless in QEMU, and asserts a substring on COM1, exiting as soon as it
+  appears. The `x86-smoke` CI job runs it for hello / timing / interrupt, so a
+  boot / clock / interrupt regression fails the PR. Gated by a `run-x86`
+  dispatch flag (x86-only diffs skip the Cortex/AVR matrices and vice-versa).
 - On-target `tests/` (the Unity suite) is not wired for x86 yet; the arch
   fragment leaves the `NAVHAL_TEST_*` slots empty so a non-TEST configure is
   unaffected.

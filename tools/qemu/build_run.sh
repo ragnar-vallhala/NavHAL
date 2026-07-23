@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # One-shot: configure + build the x86-64 sample, then boot it in QEMU.
 #
-#   tools/qemu/build_run.sh [sample]      # default sample: hal_x86_hello
+#   tools/qemu/build_run.sh [sample] [--window] [--iso-only]
+#     default sample: hal_x86_hello
+#     --window / --iso-only are forwarded to tools/qemu/run.sh (see its help).
 #
 # Env overrides: BUILD_DIR (default build-x86).
 #
@@ -12,7 +14,14 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-SAMPLE="${1:-hal_x86_hello}"
+SAMPLE="hal_x86_hello"
+RUN_FLAGS=()
+for arg in "$@"; do
+  case "$arg" in
+    -*) RUN_FLAGS+=("$arg") ;;   # forward flags to run.sh
+    *)  SAMPLE="$arg" ;;
+  esac
+done
 BUILD="${BUILD_DIR:-$ROOT/build-x86}"
 
 cd "$ROOT"
@@ -25,4 +34,4 @@ cmake --build "$BUILD"
 ELF="$(find "$BUILD/samples" -name "$SAMPLE.elf" -print -quit)"
 [ -n "$ELF" ] || { echo "error: $SAMPLE.elf not found under $BUILD/samples" >&2; exit 1; }
 
-exec "$ROOT/tools/qemu/run.sh" "$ELF"
+exec "$ROOT/tools/qemu/run.sh" "$ELF" "${RUN_FLAGS[@]}"

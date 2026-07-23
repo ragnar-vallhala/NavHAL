@@ -55,7 +55,7 @@ verified end-to-end in QEMU before the next starts.
 | 2 | Clock + timebase (polled) | `hal_clock_init`, `hal_timebase_get_micros/millis`, `hal_delay_ms/us` | no | **done** |
 | 3 | Interrupts + periodic tick | `hal_interrupt_*` (IDT + 8259 PIC); PIT IRQ0 -> `hal_timebase_tick` | — | **done** |
 | 4 | General-purpose timer | `hal_timer_*` (PIT channels)                 | yes | optional |
-| 5 | UART RX               | `hal_uart_read_char/available/read_until`    | opt | next |
+| 5 | UART RX               | `hal_uart_read_char/available/read_until`    | opt | **done** |
 
 Slice 3 folded in the periodic-timebase half of the original Slice 4: the tick
 callback and `hal_timebase_get_tick()` are now driven by the PIT IRQ. The
@@ -114,10 +114,16 @@ Expose the remaining PIT channels through `hal_timer_*`
 maps poorly onto the PIT, and the periodic tick that most code needs already
 landed in Slice 3.
 
-### Slice 5 — UART RX
+### Slice 5 — UART RX  (done)
 
-`hal_uart_available` / `read_char` / `read_until` on the 16550 RX path — polled
-first; RX-interrupt-driven once Slice 3 is in.
+`hal_uart_available` / `read_char` / `read_until` on the 16550 RX path (LSR Data
+Ready + RBR), polled. `read_until` consumes the delimiter without storing it.
+Sample `x86/03_hal_x86_echo` echoes a line. RX-interrupt-driven input
+(`HAL_IRQ_COM1`, IRQ4) is a future extra; polled satisfies the contract.
+
+Note: `hal_uart_init` flushes the RX FIFO (a clean receiver on init), so bytes
+arriving before init are dropped — visible only when input is piped before the
+guest is ready, not in interactive use.
 
 ## Build & run
 

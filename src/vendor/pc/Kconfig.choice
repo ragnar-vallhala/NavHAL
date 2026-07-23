@@ -1,0 +1,11 @@
+# vim: ft=kconfig
+# Vendor choice entry for the standard PC platform.
+# Sourced inside the root "Vendor" choice. Visible only on x86-64, so it
+# auto-selects when that arch is active.
+
+config VENDOR_PC
+    bool "PC (standard x86 platform)"
+    depends on ARCH_X86_64
+    help
+      Standard PC peripherals (16550 UART; 8254 PIT / 8259 PIC to follow).
+      Sources live under src/vendor/pc/.

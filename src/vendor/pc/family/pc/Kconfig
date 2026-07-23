@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Family identity string for the PC platform. Sourced at top level.
+
+config FAMILY
+    string
+    default "pc" if FAMILY_PC

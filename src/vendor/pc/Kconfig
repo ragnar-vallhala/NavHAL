@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Vendor identity string for the PC platform. Sourced at top level.
+
+config VENDOR
+    string
+    default "pc" if VENDOR_PC

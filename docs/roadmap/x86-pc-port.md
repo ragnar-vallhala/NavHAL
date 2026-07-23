@@ -52,8 +52,8 @@ verified end-to-end in QEMU before the next starts.
 | # | Slice | HAL contract | Needs IRQs? | Status |
 |---|---|---|---|---|
 | 1 | Boot + UART           | `hal_uart_*` (TX, polled)                    | no  | **done** |
-| 2 | Clock + timebase (polled) | `hal_clock_init`, `hal_timebase_get_micros/millis`, `hal_delay_ms/us` | no | next |
-| 3 | Interrupts            | `hal_interrupt_*` (IDT + 8259 PIC)           | —   | planned |
+| 2 | Clock + timebase (polled) | `hal_clock_init`, `hal_timebase_get_micros/millis`, `hal_delay_ms/us` | no | **done** |
+| 3 | Interrupts            | `hal_interrupt_*` (IDT + 8259 PIC)           | —   | next |
 | 4 | Periodic timebase + timer | `hal_timebase_tick`/callbacks, `hal_timer_*` | yes | planned |
 | 5 | UART RX               | `hal_uart_read_char/available/read_until`    | opt | planned |
 
@@ -64,7 +64,7 @@ identity-maps the first 1 GiB with 2 MiB pages, enters long mode, enables SSE
 (the SysV float ABI uses xmm), and calls `main()`. `vendor/pc/uart/uart.c`
 drives the 16550 (COM1..COM4) polled TX. Verified: prints "Hello…" over COM1.
 
-### Slice 2 — Clock + timebase, polled  (next)
+### Slice 2 — Clock + timebase, polled  (done)
 
 The timing core the nav stack actually needs, with **no interrupt dependency**:
 

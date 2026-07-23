@@ -178,7 +178,9 @@ uint32_t hal_sdio_get_sector_count(void);
 #endif
 
 /* Port-specific bits: register-bit defines, async/DMA prototypes, compat. */
+#if NAVHAL_CONFIG_DRV_SDIO
 #include "navhal_port_sdio.h"
+#endif
 
 
 /** @} */ /* end of group HAL_SDIO */

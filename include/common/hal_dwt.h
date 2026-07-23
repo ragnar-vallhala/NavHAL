@@ -100,7 +100,9 @@ void hal_cycle_counter_delay_us(uint32_t us);
 #endif
 
 /* Port-specific bits (compat shim, deprecated names). */
+#if NAVHAL_CONFIG_DRV_DWT
 #include "navhal_port_dwt.h"
+#endif
 
 
 /** @} */ /* end of group HAL_CYCLE_COUNTER */

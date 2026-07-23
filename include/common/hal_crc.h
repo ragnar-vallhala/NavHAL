@@ -106,7 +106,9 @@ hal_status_t hal_crc_reset(void);
 
 /* Port-specific bits (currently none for CRC; header retained for the
  * existing @c #include "navhal_port_crc.h" path). */
+#if NAVHAL_CONFIG_DRV_CRC
 #include "navhal_port_crc.h"
+#endif
 
 
 /** @} */ /* end of group HAL_CRC */

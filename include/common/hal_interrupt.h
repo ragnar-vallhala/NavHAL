@@ -42,7 +42,9 @@ extern "C" {
  * @author Ashutosh Vishwakarma
  * @date 2025-07-20
  */
+#if NAVHAL_CONFIG_DRV_INTERRUPT
 #include "navhal_port_interrupt.h" // Include architecture-specific interrupt definitions
+#endif
 #include "family/interrupt_reg.h" // Include architecture-specific interrupt register definitions
 
 #ifdef __cplusplus

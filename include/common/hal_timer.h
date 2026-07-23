@@ -161,7 +161,9 @@ uint32_t hal_timer_get_auto_reload(hal_timer_t timer);
 #endif
 
 /* Port-specific bits: SysTick / RCC register defines, vector-table entries. */
+#if NAVHAL_CONFIG_DRV_TIMER
 #include "navhal_port_timer.h"
+#endif
 
 
 /** @} */ /* end of group HAL_TIMER */

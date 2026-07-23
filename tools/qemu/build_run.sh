@@ -24,6 +24,11 @@ for arg in "$@"; do
 done
 BUILD="${BUILD_DIR:-$ROOT/build-x86}"
 
+# Accept the sample directory name too: strip any path and a leading NN_ index
+# so "02_hal_x86_interrupt" or "x86/02_hal_x86_interrupt" resolve to the
+# registered slug "hal_x86_interrupt".
+SAMPLE="$(printf '%s' "$SAMPLE" | sed -E 's#.*/##; s/^[0-9]+_//')"
+
 cd "$ROOT"
 rm -f .config
 cmake -S "$ROOT" -B "$BUILD" \

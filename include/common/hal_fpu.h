@@ -52,7 +52,9 @@ hal_status_t hal_fpu_enable(void);
 } /* extern "C" */
 #endif
 
+#if NAVHAL_CONFIG_DRV_FPU
 #include "navhal_port_fpu.h"
+#endif
 
 
 /** @} */ /* end of group HAL_FPU */

@@ -155,7 +155,9 @@ typedef hal_status_t hal_i2c_status_t NAVHAL_DEPRECATED("use hal_status_t");
 #endif
 
 /* Port-specific bits: DMA-backed I²C API behind @c NAVHAL_CONFIG_DRV_DMA. */
+#if NAVHAL_CONFIG_DRV_I2C
 #include "navhal_port_i2c.h"
+#endif
 
 
 /** @} */ /* end of group HAL_I2C */

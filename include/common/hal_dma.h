@@ -211,7 +211,9 @@ typedef hal_dma_config_t dma_config_t NAVHAL_DEPRECATED("use hal_dma_config_t");
 #endif
 
 /* Port-specific bits: register map, deprecated-function compat shim. */
+#if NAVHAL_CONFIG_DRV_DMA
 #include "navhal_port_dma.h"
+#endif
 
 
 /** @} */ /* end of group HAL_DMA */

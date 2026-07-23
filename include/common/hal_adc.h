@@ -103,6 +103,8 @@ hal_status_t hal_adc_read(hal_adc_t adc, uint8_t channel, uint16_t *out);
 
 /** @} */ /* end of group HAL_ADC */
 
+#if NAVHAL_CONFIG_DRV_ADC
 #include "navhal_port_adc.h" /* port-specific extras (none on the current ports) */
+#endif
 
 #endif /* HAL_ADC_H */

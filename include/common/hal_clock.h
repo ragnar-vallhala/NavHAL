@@ -89,7 +89,9 @@ uint32_t hal_clock_get_apb2clk(void);
 } /* extern "C" */
 #endif
 
+#if NAVHAL_CONFIG_DRV_CLOCK
 #include "navhal_port_clock.h"
+#endif
 
 
 /** @} */ /* end of group HAL_CLOCK */

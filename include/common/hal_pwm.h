@@ -101,7 +101,9 @@ typedef hal_pwm_handle_t PWM_Handle NAVHAL_DEPRECATED("use hal_pwm_handle_t");
 } /* extern "C" */
 #endif
 
+#if NAVHAL_CONFIG_DRV_PWM
 #include "navhal_port_pwm.h"
+#endif
 
 
 /** @} */ /* end of group HAL_PWM */

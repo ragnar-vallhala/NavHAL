@@ -126,7 +126,9 @@ hal_status_t hal_gpio_set_output_speed(hal_gpio_pin_t pin,
 #endif
 
 /* Port-specific hot-path inlines + register-backed defines. */
+#if NAVHAL_CONFIG_DRV_GPIO
 #include "navhal_port_gpio.h"
+#endif
 
 
 /** @} */ /* end of group HAL_GPIO */

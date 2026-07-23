@@ -180,7 +180,9 @@ typedef hal_status_t hal_spi_status_t NAVHAL_DEPRECATED("use hal_status_t");
 
 /* Port-specific bits (currently none for SPI; header retained for the
  * existing @c #include "navhal_port_spi.h" path). */
+#if NAVHAL_CONFIG_DRV_SPI
 #include "navhal_port_spi.h"
+#endif
 
 
 /** @} */ /* end of group HAL_SPI */

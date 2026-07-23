@@ -53,9 +53,17 @@ verified end-to-end in QEMU before the next starts.
 |---|---|---|---|---|
 | 1 | Boot + UART           | `hal_uart_*` (TX, polled)                    | no  | **done** |
 | 2 | Clock + timebase (polled) | `hal_clock_init`, `hal_timebase_get_micros/millis`, `hal_delay_ms/us` | no | **done** |
-| 3 | Interrupts            | `hal_interrupt_*` (IDT + 8259 PIC)           | —   | next |
-| 4 | Periodic timebase + timer | `hal_timebase_tick`/callbacks, `hal_timer_*` | yes | planned |
-| 5 | UART RX               | `hal_uart_read_char/available/read_until`    | opt | planned |
+| 3 | Interrupts + periodic tick | `hal_interrupt_*` (IDT + 8259 PIC); PIT IRQ0 -> `hal_timebase_tick` | — | **done** |
+| 4 | General-purpose timer | `hal_timer_*` (PIT channels)                 | yes | optional |
+| 5 | UART RX               | `hal_uart_read_char/available/read_until`    | opt | next |
+
+Slice 3 folded in the periodic-timebase half of the original Slice 4: the tick
+callback and `hal_timebase_get_tick()` are now driven by the PIT IRQ. The
+remainder of Slice 4 is the general-purpose `hal_timer_*` API, which maps
+awkwardly onto the 3-channel PIT (only channel 0 has an IRQ line, and the
+STM32-style prescaler/auto-reload model doesn't fit) — deprioritized as
+**optional** until a sample needs it. Slice 5 (UART RX) is the more useful next
+step.
 
 ### Slice 1 — Boot + UART  (done)
 
@@ -84,22 +92,27 @@ until then. The query + delay paths are fully live after Slice 2.
 Verify: a sample that prints, `hal_delay_ms(500)`, prints again — measure the
 wall-clock gap under QEMU.
 
-### Slice 3 — Interrupts (IDT + 8259 PIC)
+### Slice 3 — Interrupts (IDT + 8259 PIC)  (done)
 
-- Build and load a 256-entry IDT; ISR stubs save/restore state and dispatch.
-- Remap the 8259 PIC (IRQ0–15 → vectors 32–47) so hardware IRQs don't collide
-  with CPU exceptions.
-- Wire the `hal_interrupt_*` contract (enable/disable/attach-callback), matching
-  how the other ports expose external IRQs.
+- 256-entry IDT, every vector defaulting to a halt-on-fault stub (so a stray
+  CPU exception freezes instead of triple-faulting into a reboot loop),
+  overridden for the 16 PIC lines. ISR stubs save volatiles, 16-align the stack,
+  and call the C dispatcher.
+- Remap the master/slave 8259 PIC (IRQ0–15 → vectors 32–47) so hardware IRQs
+  don't collide with CPU exceptions; all lines masked, `hal_interrupt_enable`
+  unmasks per line; IDT load + remap + `sti` happen lazily on first enable.
+- `hal_interrupt_*` (enable/disable/attach/detach-callback). The PIC has fixed
+  hardware priority, so there is no settable-priority entry point.
+- `hal_timebase_init` programs PIT channel 0 for a periodic IRQ0 wired to
+  `hal_timebase_tick()`, so the tick counter and callback advance from a real
+  interrupt.
 
-This is the prerequisite for anything periodic or event-driven.
+### Slice 4 — General-purpose timer  (optional)
 
-### Slice 4 — Periodic timebase + timer
-
-On top of Slice 3: program PIT channel 0 for a periodic IRQ0 that calls
-`hal_timebase_tick()`, making `hal_timebase_get_millis` (tick-counted) and
-timebase callbacks live. Expose PIT channels through `hal_timer_*`
-(init/start/stop/attach_callback).
+Expose the remaining PIT channels through `hal_timer_*`
+(init/start/stop/attach_callback). Deprioritized: the STM32 prescaler/ARR shape
+maps poorly onto the PIT, and the periodic tick that most code needs already
+landed in Slice 3.
 
 ### Slice 5 — UART RX
 

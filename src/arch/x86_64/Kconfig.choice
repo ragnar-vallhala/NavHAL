@@ -1,0 +1,9 @@
+# vim: ft=kconfig
+# Processor Architecture choice entry for x86-64.
+# Sourced inside the root "Processor Architecture" choice.
+
+config ARCH_X86_64
+    bool "x86-64 (64-bit PC)"
+    help
+      64-bit x86 (long mode). Bare-metal PC target: boots via multiboot2
+      (GRUB) and runs under QEMU. Arch sources live under src/arch/x86_64/.

@@ -72,7 +72,7 @@ config DRV_CRC
 endmenu
 
 menu "HAL Drivers Configuration"
-    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8 || ARCH_X86_64
 
 config DRV_CLOCK
     bool "Enable Clock Driver"
@@ -95,9 +95,12 @@ config DRV_TIMER
 config DRV_UART
     bool "Enable UART Driver"
     default y
-    select DRV_GPIO
-    select DRV_CLOCK
-    select DRV_INTERRUPT
+    # MCU UARTs need pin-mux (GPIO), a clock gate, and the NVIC. The PC 16550
+    # is a fixed I/O-port device needing none of these, so the selects are
+    # gated to the MCU arches.
+    select DRV_GPIO if ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
+    select DRV_CLOCK if ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
+    select DRV_INTERRUPT if ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
 
 config DRV_UART_DMA
     bool "Enable DMA-backed UART API"

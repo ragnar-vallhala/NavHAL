@@ -173,11 +173,16 @@ config SAMPLE_33_HAL_ADC
     select DRV_ADC
     select DRV_UART
 
+config SAMPLE_00_HAL_X86_HELLO
+    bool "00_hal_x86_hello"
+    depends on ARCH_X86_64
+
 endchoice
 
 config SAMPLE
     string
     default "" if SAMPLE_NONE
+    default "hal_x86_hello" if SAMPLE_00_HAL_X86_HELLO
     default "hal_blink" if SAMPLE_01_HAL_BLINK
     default "no_hal_blink" if SAMPLE_01_NO_HAL_BLINK
     default "hal_pupd" if SAMPLE_02_HAL_PUPD

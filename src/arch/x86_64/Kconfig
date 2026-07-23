@@ -1,0 +1,15 @@
+# vim: ft=kconfig
+# Per-arch identity for x86-64. Sourced unconditionally at top level; every
+# default is gated on ARCH_X86_64 so only the selected arch contributes a value.
+
+config CMAKE_SYSTEM_PROCESSOR
+    string
+    default "x86_64" if ARCH_X86_64
+
+config ARCH_ISA
+    string
+    default "x86_64" if ARCH_X86_64
+
+# Native host toolchain — no cross prefix.
+config TOOLCHAIN_PREFIX
+    default "" if ARCH_X86_64

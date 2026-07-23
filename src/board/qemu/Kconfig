@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Board identity string for the QEMU PC. Sourced at top level.
+
+config BOARD
+    string
+    default "qemu" if BOARD_QEMU

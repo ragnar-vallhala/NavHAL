@@ -1,0 +1,16 @@
+# NavHAL defconfig — bare-metal x86-64 / PC / QEMU.
+#
+# Selects the arch / vendor / family / board. A PC has none of the MCU
+# peripherals (GPIO/SPI/I2C/ADC/PWM/timer-as-driver), so only UART is on;
+# the rest cascade off. Seeded by cmake/toolchains/x86_64-qemu-toolchain.cmake.
+
+CONFIG_ARCH_X86_64=y
+CONFIG_VENDOR_PC=y
+CONFIG_FAMILY_PC=y
+CONFIG_BOARD_QEMU=y
+
+CONFIG_DRV_UART=y
+# CONFIG_DRV_GPIO is not set
+# CONFIG_DRV_CLOCK is not set
+# CONFIG_DRV_TIMER is not set
+# CONFIG_DRV_INTERRUPT is not set

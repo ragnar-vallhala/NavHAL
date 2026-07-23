@@ -9,6 +9,14 @@ set(HAL_SOURCES)
 if(CONFIG_DRV_UART)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
 endif()
+if(CONFIG_DRV_CLOCK)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
+endif()
+if(CONFIG_DRV_TIMER)
+    # TSC-backed timebase (delay/millis), polled. The general-purpose hal_timer_*
+    # (PIT channels) needs IRQs and lands with the interrupt slice.
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/timer/timebase.c)
+endif()
 
 # Arch startup (asm): multiboot2 header, 32-bit stub -> long mode -> main().
 list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)
@@ -21,6 +29,7 @@ add_library(hal STATIC
 target_link_libraries(hal gcc)
 target_include_directories(hal PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
+    ${CMAKE_CURRENT_SOURCE_DIR}   # shared pc_io.h (port I/O + TSC)
     ${INCLUDE_PORT}
     ${INCLUDE_FAMILY}
     ${SRC_BOARD}

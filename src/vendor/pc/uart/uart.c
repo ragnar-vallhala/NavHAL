@@ -82,3 +82,34 @@ hal_status_t hal_uart_write_string(hal_uart_t uart, const char *s) {
   while (*s) (void)hal_uart_write_char(uart, *s++);
   return HAL_OK;
 }
+
+static void uart_write_dec(hal_uart_t uart, uint32_t v) {
+  char buf[10];
+  int i = 0;
+  if (v == 0) {
+    (void)hal_uart_write_char(uart, '0');
+    return;
+  }
+  while (v) {
+    buf[i++] = (char)('0' + (v % 10));
+    v /= 10;
+  }
+  while (i--) (void)hal_uart_write_char(uart, buf[i]);
+}
+
+hal_status_t hal_uart_write_uint(hal_uart_t uart, uint32_t num) {
+  if (!uart_base(uart)) return HAL_ERR_INVALID_ARG;
+  uart_write_dec(uart, num);
+  return HAL_OK;
+}
+
+hal_status_t hal_uart_write_int(hal_uart_t uart, int32_t num) {
+  if (!uart_base(uart)) return HAL_ERR_INVALID_ARG;
+  if (num < 0) {
+    (void)hal_uart_write_char(uart, '-');
+    uart_write_dec(uart, (uint32_t)(-(int64_t)num));
+  } else {
+    uart_write_dec(uart, (uint32_t)num);
+  }
+  return HAL_OK;
+}

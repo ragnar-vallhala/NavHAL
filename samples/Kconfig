@@ -185,6 +185,10 @@ config SAMPLE_02_HAL_X86_INTERRUPT
     bool "02_hal_x86_interrupt"
     depends on ARCH_X86_64
 
+config SAMPLE_03_HAL_X86_ECHO
+    bool "03_hal_x86_echo"
+    depends on ARCH_X86_64
+
 endchoice
 
 config SAMPLE
@@ -193,6 +197,7 @@ config SAMPLE
     default "hal_x86_hello" if SAMPLE_00_HAL_X86_HELLO
     default "hal_x86_timing" if SAMPLE_01_HAL_X86_TIMING
     default "hal_x86_interrupt" if SAMPLE_02_HAL_X86_INTERRUPT
+    default "hal_x86_echo" if SAMPLE_03_HAL_X86_ECHO
     default "hal_blink" if SAMPLE_01_HAL_BLINK
     default "no_hal_blink" if SAMPLE_01_NO_HAL_BLINK
     default "hal_pupd" if SAMPLE_02_HAL_PUPD

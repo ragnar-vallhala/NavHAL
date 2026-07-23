@@ -113,3 +113,31 @@ hal_status_t hal_uart_write_int(hal_uart_t uart, int32_t num) {
   }
   return HAL_OK;
 }
+
+/* ===== Receive (polled) ===== */
+
+bool hal_uart_available(hal_uart_t uart) {
+  uint16_t base = uart_base(uart);
+  if (!base) return false;
+  return (inb(base + 5) & 0x01) != 0; /* LSR bit0: Data Ready */
+}
+
+char hal_uart_read_char(hal_uart_t uart) {
+  uint16_t base = uart_base(uart);
+  if (!base) return 0;
+  while ((inb(base + 5) & 0x01) == 0) { /* wait: Data Ready */ }
+  return (char)inb(base); /* RBR */
+}
+
+uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,
+                             char delimiter) {
+  if (!buffer || maxlen == 0 || !uart_base(uart)) return 0;
+  uint32_t i = 0;
+  while (i < maxlen - 1) {
+    char c = hal_uart_read_char(uart);
+    if (c == delimiter) break;
+    buffer[i++] = c;
+  }
+  buffer[i] = '\0';
+  return i;
+}

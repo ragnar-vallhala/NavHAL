@@ -7,7 +7,11 @@
 set(HAL_SOURCES)
 
 if(CONFIG_DRV_UART)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
+    # uart.c mirrors console output to the VGA text terminal (vga.c) so the PC
+    # screen shows what goes out on serial.
+    list(APPEND HAL_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/vga/vga.c)
 endif()
 if(CONFIG_DRV_CLOCK)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)

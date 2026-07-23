@@ -18,6 +18,7 @@
  */
 
 #include "common/hal_uart.h"
+#include "vga/vga.h" /* mirror console output to the on-screen terminal */
 
 /* Standard PC serial base I/O ports. */
 static uint16_t uart_base(hal_uart_t uart) {
@@ -56,6 +57,7 @@ hal_status_t hal_uart_init(hal_uart_t uart, const hal_uart_config_t *cfg) {
   outb(base + 3, 0x03);              /* 8N1, DLAB off */
   outb(base + 2, 0xC7);              /* FIFO on, cleared, 14-byte threshold */
   outb(base + 4, 0x0B);             /* DTR/RTS on, OUT2 (needed for IRQs later) */
+  vga_init();                        /* clear the on-screen terminal */
   return HAL_OK;
 }
 
@@ -64,6 +66,7 @@ hal_status_t hal_uart_write_char(hal_uart_t uart, char c) {
   if (!base) return HAL_ERR_INVALID_ARG;
   while ((inb(base + 5) & 0x20) == 0) { /* wait: THR empty */ }
   outb(base, (uint8_t)c);
+  vga_putc(c); /* mirror to the on-screen terminal */
   return HAL_OK;
 }
 

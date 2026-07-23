@@ -39,15 +39,23 @@ is intended to boot on physical hardware.
 - **DMA, MPU, FPU-as-driver, cache, DWT, SDIO, ETH, flash** — no PC equivalent
   or no near-term need. Disabled.
 
-## Screen console (VGA)
+## Screen terminal (VGA + PS/2 keyboard)
 
-Added by request so the QEMU/PC *screen* shows console output. It is
-deliberately **not** a portable `hal_*` driver (VGA has no MCU equivalent):
-`src/vendor/pc/vga/vga.c` is an x86-only text-mode console (0xB8000, 80x25), and
-the UART driver mirrors every transmitted character to it. So the on-screen
-terminal and the serial line always show the same output, with no changes to any
-sample. RX is not echoed to VGA by the driver (the echo sample writes it back
-through the UART, which mirrors).
+Added by request so the QEMU/PC *screen* is a usable terminal. Neither piece is
+a portable `hal_*` driver (no MCU equivalent); they are the x86-only console
+plumbing, wired into the UART driver so existing samples work unchanged:
+
+- **Output** — `src/vendor/pc/vga/vga.c`: text-mode console (0xB8000, 80x25,
+  scroll + cursor, `\b` erase). The UART driver mirrors every transmitted
+  character to it, so screen and serial always show the same output.
+- **Input** — `src/vendor/pc/ps2/keyboard.c`: PS/2 keyboard (IRQ1, scancode
+  set 1, shift + caps-lock, extended keys ignored). The UART RX path drains it,
+  so `hal_uart_read_char` / `hal_uart_available` return keyboard **or** serial
+  input, whichever arrives.
+
+So the on-screen terminal is bidirectional and the serial line still works in
+parallel. Keyboard input needs `DRV_INTERRUPT` (all wiring is `#if
+NAVHAL_CONFIG_DRV_INTERRUPT`).
 
 ## Slices
 

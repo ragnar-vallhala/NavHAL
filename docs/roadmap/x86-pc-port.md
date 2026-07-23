@@ -36,13 +36,18 @@ is intended to boot on physical hardware.
 
 - **GPIO, SPI, I2C, ADC, PWM** — a commodity PC has none of these. They stay
   Kconfig-disabled; no port drivers, no port headers.
-- **VGA / framebuffer text console** — tempting (it would put text in the QEMU
-  window) but **off-mission**: it fits no portable `hal_*` contract (no MCU has
-  VGA), and it duplicates output the UART console already provides on serial.
-  If an in-window console is ever wanted it lives as an x86-only extra, not in
-  the HAL API, and only after the timing/interrupt core is done.
 - **DMA, MPU, FPU-as-driver, cache, DWT, SDIO, ETH, flash** — no PC equivalent
   or no near-term need. Disabled.
+
+## Screen console (VGA)
+
+Added by request so the QEMU/PC *screen* shows console output. It is
+deliberately **not** a portable `hal_*` driver (VGA has no MCU equivalent):
+`src/vendor/pc/vga/vga.c` is an x86-only text-mode console (0xB8000, 80x25), and
+the UART driver mirrors every transmitted character to it. So the on-screen
+terminal and the serial line always show the same output, with no changes to any
+sample. RX is not echoed to VGA by the driver (the echo sample writes it back
+through the UART, which mirrors).
 
 ## Slices
 

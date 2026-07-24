@@ -39,15 +39,23 @@ is intended to boot on physical hardware.
 - **DMA, MPU, FPU-as-driver, cache, DWT, SDIO, ETH, flash** — no PC equivalent
   or no near-term need. Disabled.
 
-## Screen console (VGA)
+## Screen terminal (VGA + PS/2 keyboard)
 
-Added by request so the QEMU/PC *screen* shows console output. It is
-deliberately **not** a portable `hal_*` driver (VGA has no MCU equivalent):
-`src/vendor/pc/vga/vga.c` is an x86-only text-mode console (0xB8000, 80x25), and
-the UART driver mirrors every transmitted character to it. So the on-screen
-terminal and the serial line always show the same output, with no changes to any
-sample. RX is not echoed to VGA by the driver (the echo sample writes it back
-through the UART, which mirrors).
+Added by request so the QEMU/PC *screen* is a usable terminal. Neither piece is
+a portable `hal_*` driver (no MCU equivalent); they are the x86-only console
+plumbing, wired into the UART driver so existing samples work unchanged:
+
+- **Output** — `src/vendor/pc/vga/vga.c`: text-mode console (0xB8000, 80x25,
+  scroll + cursor, `\b` erase). The UART driver mirrors every transmitted
+  character to it, so screen and serial always show the same output.
+- **Input** — `src/vendor/pc/ps2/keyboard.c`: PS/2 keyboard (IRQ1, scancode
+  set 1, shift + caps-lock, extended keys ignored). The UART RX path drains it,
+  so `hal_uart_read_char` / `hal_uart_available` return keyboard **or** serial
+  input, whichever arrives.
+
+So the on-screen terminal is bidirectional and the serial line still works in
+parallel. Keyboard input needs `DRV_INTERRUPT` (all wiring is `#if
+NAVHAL_CONFIG_DRV_INTERRUPT`).
 
 ## Slices
 
@@ -143,11 +151,11 @@ Kconfig target: `CONFIG_ARCH_X86_64` / `VENDOR_PC` / `FAMILY_PC` / `BOARD_QEMU`
 
 ## Testing
 
-- **Smoke, per slice:** boot in QEMU under a timeout, assert expected serial
-  output on COM1 (`-serial stdio`). Slice 1 asserts the "Hello…" line.
-- **Host/PIL later:** an x86 entry for the PIL harness (boot the ISO headless,
-  scrape serial) mirrors the Renode/simavr dispatchers under `tools/`. Wire
-  once Slice 2+ gives it something worth asserting beyond boot.
+- **CI smoke (`tools/qemu/smoke.sh`):** builds a sample, boots the GRUB ISO
+  headless in QEMU, and asserts a substring on COM1, exiting as soon as it
+  appears. The `x86-smoke` CI job runs it for hello / timing / interrupt, so a
+  boot / clock / interrupt regression fails the PR. Gated by a `run-x86`
+  dispatch flag (x86-only diffs skip the Cortex/AVR matrices and vice-versa).
 - On-target `tests/` (the Unity suite) is not wired for x86 yet; the arch
   fragment leaves the `NAVHAL_TEST_*` slots empty so a non-TEST configure is
   unaffected.

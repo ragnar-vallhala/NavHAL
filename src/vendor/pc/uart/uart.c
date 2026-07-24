@@ -19,6 +19,9 @@
 
 #include "common/hal_uart.h"
 #include "vga/vga.h" /* mirror console output to the on-screen terminal */
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+#include "ps2/keyboard.h" /* screen-terminal input: PC keyboard -> console RX */
+#endif
 
 /* Standard PC serial base I/O ports. */
 static uint16_t uart_base(hal_uart_t uart) {
@@ -58,6 +61,9 @@ hal_status_t hal_uart_init(hal_uart_t uart, const hal_uart_config_t *cfg) {
   outb(base + 2, 0xC7);              /* FIFO on, cleared, 14-byte threshold */
   outb(base + 4, 0x0B);             /* DTR/RTS on, OUT2 (needed for IRQs later) */
   vga_init();                        /* clear the on-screen terminal */
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+  kbd_init();                        /* accept keystrokes from the PC keyboard */
+#endif
   return HAL_OK;
 }
 
@@ -122,14 +128,22 @@ hal_status_t hal_uart_write_int(hal_uart_t uart, int32_t num) {
 bool hal_uart_available(hal_uart_t uart) {
   uint16_t base = uart_base(uart);
   if (!base) return false;
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+  if (kbd_available()) return true; /* PC keyboard input */
+#endif
   return (inb(base + 5) & 0x01) != 0; /* LSR bit0: Data Ready */
 }
 
 char hal_uart_read_char(hal_uart_t uart) {
   uint16_t base = uart_base(uart);
   if (!base) return 0;
-  while ((inb(base + 5) & 0x01) == 0) { /* wait: Data Ready */ }
-  return (char)inb(base); /* RBR */
+  for (;;) {
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+    int k = kbd_getchar(); /* keyboard (screen terminal) */
+    if (k >= 0) return (char)k;
+#endif
+    if (inb(base + 5) & 0x01) return (char)inb(base); /* serial RBR */
+  }
 }
 
 uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,

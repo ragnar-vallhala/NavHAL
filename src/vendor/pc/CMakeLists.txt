@@ -29,6 +29,10 @@ if(CONFIG_DRV_INTERRUPT)
         ${SRC_ARCH}/interrupt/idt.c
         ${SRC_ARCH}/interrupt/isr.s
     )
+    # PS/2 keyboard feeds the screen-terminal input path in uart.c.
+    if(CONFIG_DRV_UART)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/ps2/keyboard.c)
+    endif()
 endif()
 
 # Arch startup (asm): multiboot2 header, 32-bit stub -> long mode -> main().

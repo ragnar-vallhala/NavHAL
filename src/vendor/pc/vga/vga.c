@@ -69,6 +69,9 @@ void vga_putc(char ch) {
   case '\r':
     s_col = 0;
     break;
+  case '\b':
+    if (s_col > 0) s_col--; /* move left; the "\b \b" echo overwrites with space */
+    break;
   case '\t':
     s_col = (s_col + 8) & ~7;
     break;

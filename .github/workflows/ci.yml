@@ -26,6 +26,7 @@ jobs:
     outputs:
       run-cortex-m: ${{ steps.compute.outputs.run-cortex-m }}
       run-avr:      ${{ steps.compute.outputs.run-avr }}
+      run-x86:      ${{ steps.compute.outputs.run-x86 }}
     steps:
       - uses: actions/checkout@v4
       - name: Classify the diff
@@ -59,27 +60,42 @@ jobs:
               - 'cmake/defconfigs/avr_*'
               - 'tools/simavr/**'
               - 'tools/pil/boards/atmega328p.conf'
+            x86-only:
+              - 'src/arch/x86_64/**'
+              - 'src/vendor/pc/**'
+              - 'src/board/qemu/**'
+              - 'include/port/x86_64/**'
+              - 'cmake/toolchains/x86_64-qemu-toolchain.cmake'
+              - 'cmake/defconfigs/x86_64_*'
+              - 'tools/qemu/**'
+              - 'samples/x86/**'
       - name: Compute run flags
         id: compute
         run: |
           # Defaults: run everything (push / dispatch / cron / safety).
           run_cm=true
           run_avr=true
+          run_x86=true
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             cm_only="${{ steps.filter.outputs.cortex-m-only }}"
             avr_only="${{ steps.filter.outputs.avr-only }}"
-            # If only cortex-m-only matched (no other path), AVR jobs can sit out.
-            if [ "$cm_only" = "true" ] && [ "$avr_only" = "false" ]; then
-              run_avr=false
-            elif [ "$avr_only" = "true" ] && [ "$cm_only" = "false" ]; then
-              run_cm=false
+            x86_only="${{ steps.filter.outputs.x86-only }}"
+            n=0
+            [ "$cm_only" = "true" ]  && n=$((n + 1))
+            [ "$avr_only" = "true" ] && n=$((n + 1))
+            [ "$x86_only" = "true" ] && n=$((n + 1))
+            # Exactly one arch's files changed → only that arch runs; the others
+            # sit out. Zero matches (common code) or >1 (mixed PR) → run all.
+            if [ "$n" -eq 1 ]; then
+              run_cm=$cm_only
+              run_avr=$avr_only
+              run_x86=$x86_only
             fi
-            # Both false → diff was common (headers/tools/etc.) → run both.
-            # Both true → mixed PR → run both.
           fi
           echo "run-cortex-m=$run_cm" >> "$GITHUB_OUTPUT"
           echo "run-avr=$run_avr"     >> "$GITHUB_OUTPUT"
-          echo "dispatch: run-cortex-m=$run_cm run-avr=$run_avr"
+          echo "run-x86=$run_x86"     >> "$GITHUB_OUTPUT"
+          echo "dispatch: run-cortex-m=$run_cm run-avr=$run_avr run-x86=$run_x86"
 
   # Enforce Conventional Commits on every commit added in a PR. Catches
   # --no-verify bypasses of the local .githooks/commit-msg hook. Only runs
@@ -254,6 +270,29 @@ jobs:
       - name: Build every portable sample under F767 config
         run: tools/ntest samples m7
 
+  # Bare-metal x86-64 port: build the samples, boot each in QEMU (headless via a
+  # GRUB multiboot2 ISO), and assert the expected line on COM1. Catches boot /
+  # clock / interrupt regressions that a build-only check can't see.
+  x86-smoke:
+    name: x86-64 QEMU smoke
+    runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-x86 == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install QEMU + GRUB + build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            qemu-system-x86 grub-pc-bin grub-common xorriso mtools ninja-build
+      - name: Install kconfiglib
+        run: pip install kconfiglib
+      - name: Boot samples in QEMU and assert serial output
+        run: |
+          tools/qemu/smoke.sh hal_x86_hello     "Hello from NavHAL on x86-64 (QEMU)!"
+          tools/qemu/smoke.sh hal_x86_timing    "elapsed ms over delay(500):"
+          tools/qemu/smoke.sh hal_x86_interrupt "hal_timebase_get_tick:"
+
   # M8 §8.1 — Single required-status-check name to put on branch
   # protection. Succeeds if every per-PR job either passed or was
   # legitimately skipped by the dispatcher. GitHub doesn't treat
@@ -274,6 +313,7 @@ jobs:
       - sample-matrix
       - sample-matrix-avr
       - sample-matrix-f767
+      - x86-smoke
     steps:
       - name: Aggregate per-job results (success or skipped == ok)
         run: |
@@ -294,6 +334,7 @@ jobs:
           check sample-matrix      "${{ needs.sample-matrix.result }}"
           check sample-matrix-avr  "${{ needs.sample-matrix-avr.result }}"
           check sample-matrix-f767 "${{ needs.sample-matrix-f767.result }}"
+          check x86-smoke          "${{ needs.x86-smoke.result }}"
           if [ "$fail" -eq 0 ]; then
             echo "CI green."
           fi

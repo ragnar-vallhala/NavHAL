@@ -73,6 +73,36 @@ extern "C" {
 /** @brief Bulk endpoint packet size (USB full speed). */
 #define HAL_USB_CDC_PACKET_SIZE 64
 
+/** @name Control lines the host drives (SET_CONTROL_LINE_STATE)
+ *  @{ */
+#define HAL_USB_CDC_LINE_DTR (1U << 0) /**< Host opened the port. */
+#define HAL_USB_CDC_LINE_RTS (1U << 1) /**< Host is ready to receive. */
+/** @} */
+
+/** @name Serial-state bits reported to the host (CDC PSTN 1.2 §6.5.4)
+ *  @{ */
+#define HAL_USB_CDC_STATE_DCD (1U << 0)     /**< Carrier detect. */
+#define HAL_USB_CDC_STATE_DSR (1U << 1)     /**< Data set ready. */
+#define HAL_USB_CDC_STATE_BREAK (1U << 2)   /**< Break received. */
+#define HAL_USB_CDC_STATE_RING (1U << 3)    /**< Ring signal. */
+#define HAL_USB_CDC_STATE_FRAMING (1U << 4) /**< Framing error. */
+#define HAL_USB_CDC_STATE_PARITY (1U << 5)  /**< Parity error. */
+#define HAL_USB_CDC_STATE_OVERRUN (1U << 6) /**< Receive overrun. */
+/** @} */
+
+/**
+ * @brief Line settings the host asked for.
+ *
+ * Cosmetic for a pure virtual port, but a bridge to a real UART should apply
+ * them so the far end matches what the host thinks it opened.
+ */
+typedef struct {
+  uint32_t baudrate;  /**< Bits per second. */
+  uint8_t stop_bits;  /**< 0 = 1 stop bit, 1 = 1.5, 2 = 2. */
+  uint8_t parity;     /**< 0 none, 1 odd, 2 even, 3 mark, 4 space. */
+  uint8_t data_bits;  /**< 5, 6, 7, 8 or 16. */
+} hal_usb_cdc_line_coding_t;
+
 /**
  * @brief Called from interrupt context when bytes arrive.
  *
@@ -150,6 +180,41 @@ hal_status_t hal_usb_cdc_set_rx_callback(hal_usb_cdc_rx_callback_t cb);
  * @return Baud rate in bits per second; 115200 until the host sets one.
  */
 uint32_t hal_usb_cdc_get_baudrate(void);
+
+/**
+ * @brief Full line settings the host last asked for.
+ * @param out Destination; must not be NULL.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL pointer.
+ */
+hal_status_t hal_usb_cdc_get_line_coding(hal_usb_cdc_line_coding_t *out);
+
+/**
+ * @brief Control lines the host is asserting.
+ * @return Bitwise OR of ::HAL_USB_CDC_LINE_DTR and ::HAL_USB_CDC_LINE_RTS.
+ */
+uint8_t hal_usb_cdc_get_line_state(void);
+
+/**
+ * @brief Break the host has asked the port to send.
+ *
+ * A bridge to a real UART should drive its TX line low for this long. The value
+ * stands until the host changes it.
+ *
+ * @return Duration in milliseconds; 0 = no break, 0xFFFF = until revoked.
+ */
+uint16_t hal_usb_cdc_get_break_ms(void);
+
+/**
+ * @brief Report serial-line state to the host over the notification endpoint.
+ *
+ * This is how a device tells the host about carrier, break, and receive errors
+ * — a virtual port has no wires to carry them.
+ *
+ * @param state Bitwise OR of the @c HAL_USB_CDC_STATE_* bits.
+ * @return ::HAL_OK, ::HAL_ERR_NOT_INITIALIZED if the host has not configured
+ *         the device, or ::HAL_ERR_TIMEOUT if it stopped polling the endpoint.
+ */
+hal_status_t hal_usb_cdc_notify_serial_state(uint16_t state);
 
 #endif /* NAVHAL_CONFIG_DRV_USB_CDC */
 

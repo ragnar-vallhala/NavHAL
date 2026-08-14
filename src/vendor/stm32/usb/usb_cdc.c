@@ -21,14 +21,16 @@
  *
  * @details
  * A single-configuration full-speed device: control endpoint 0, bulk IN/OUT
- * endpoint 1 carrying the serial data, and interrupt IN endpoint 2 for the
- * (unused) CDC notification channel. The core has no DMA, so packets are
- * copied word-wise through the FIFO push/pop windows.
+ * endpoint 1 carrying the serial data, and interrupt IN endpoint 2 carrying
+ * CDC serial-state notifications. The core has no DMA, so packets are copied
+ * word-wise through the FIFO push/pop windows.
  *
  * Everything after ::hal_usb_cdc_init runs from the OTG_FS interrupt:
  * enumeration, control transfers, and moving received bytes into the RX ring
- * buffer. Only ::hal_usb_cdc_write touches the hardware from thread context,
- * and only after the interrupt has reported the previous IN transfer done.
+ * buffer. Only ::hal_usb_cdc_write and ::hal_usb_cdc_notify_serial_state touch
+ * the hardware from thread context, and only after the interrupt has reported
+ * the previous transfer on that endpoint done — so neither may be called from
+ * an interrupt handler, including the RX callback.
  *
  * Reference: RM0368 §22 (device programming model), USB 2.0 §9, and
  * USB CDC 1.2 / PSTN 1.2 for the ACM subclass.
@@ -56,10 +58,12 @@
  * DIEPCTL.TXFNUM is programmed with. */
 #define EP_CTRL 0U
 #define EP_DATA 1U /* 0x81 bulk IN + 0x01 bulk OUT — the serial stream */
-#define EP_NOTIF 2U /* 0x82 interrupt IN — CDC notifications (never sent) */
+#define EP_NOTIF 2U /* 0x82 interrupt IN — CDC serial-state notifications */
 
 #define EP0_MAX_PACKET 64U
-#define NOTIF_MAX_PACKET 8U
+/* 16, not the more common 8: a SERIAL_STATE notification is 10 bytes, and a
+ * packet size that splits it in two buys nothing but a second transaction. */
+#define NOTIF_MAX_PACKET 16U
 
 /* FIFO RAM budget: the OTG_FS core has 1.25 KB = 320 words, split here as
  * 128 (shared RX) + 64 (EP0 TX) + 96 (bulk TX) + 32 (notification TX). */
@@ -128,11 +132,14 @@ static const uint8_t config_desc[67] = {
     5, 0x24, 0x00, 0x10, 0x01,
     /* Call management: device does not handle call management */
     5, 0x24, 0x01, 0x00, 0x01,
-    /* ACM functional: supports Set/Get_Line_Coding + Set_Control_Line_State */
-    4, 0x24, 0x02, 0x02,
+    /* ACM functional. bmCapabilities bit1: Set/Get_Line_Coding,
+     * Set_Control_Line_State and the SerialState notification; bit2: Send_Break.
+     * A host will not issue a request this byte does not claim — Linux quietly
+     * fails tcsendbreak() without bit2 set. */
+    4, 0x24, 0x02, 0x06,
     /* Union functional: control interface 0, subordinate data interface 1 */
     5, 0x24, 0x06, 0x00, 0x01,
-    /* Notification endpoint 0x82, interrupt, 8 bytes, 16 ms */
+    /* Notification endpoint 0x82, interrupt, 16 ms polling */
     7, 0x05, 0x82, 0x03, NOTIF_MAX_PACKET, 0x00, 0x10,
 
     /* Interface 1 — CDC data */
@@ -158,8 +165,11 @@ static const char *const string_table[] = {
  * -------------------------------------------------------------------------- */
 
 static volatile uint8_t usb_configured;
-static volatile uint8_t usb_dtr;    /* host opened the port (SET_CONTROL_LINE_STATE) */
-static volatile uint8_t ep_in_busy; /* a bulk IN transfer is in flight */
+static volatile uint8_t usb_line_state; /* DTR/RTS from SET_CONTROL_LINE_STATE */
+static volatile uint8_t usb_suspended;  /* bus idle; the host is not polling */
+static volatile uint16_t usb_break_ms;  /* break the host asked us to send */
+static volatile uint8_t ep_in_busy;     /* a bulk IN transfer is in flight */
+static volatile uint8_t ep_notif_busy;  /* a notification is in flight */
 static volatile uint8_t out_ep_armed;
 
 static uint8_t rx_ring[RX_RING_SIZE];
@@ -292,6 +302,67 @@ static void ep_close(void) {
   out_ep_armed = 0;
 }
 
+/* Halt / un-halt an endpoint by USB address (0x81, 0x01, 0x82).
+ *
+ * USB 2.0 §9.4.5: clearing a halt also resets the endpoint's data toggle to
+ * DATA0. Skipping that leaves the host and device toggles one apart, and every
+ * later packet is silently discarded as a retransmission — a stall that looks
+ * like a dead link rather than an error. */
+static void ep_set_halt(uint8_t addr, uint8_t halt) {
+  uint8_t num = addr & 0x0FU;
+  if (num == 0U || num > EP_NOTIF)
+    return;
+
+  volatile uint32_t *ctl =
+      (addr & 0x80U) ? &USB_INEP(num)->CTL : &USB_OUTEP(num)->CTL;
+
+  if (halt) {
+    /* An IN endpoint with a transfer in flight has to be torn down first, or
+     * the queued packet would still go out. An OUT endpoint must NOT be
+     * disabled this way — the core requires the global OUT-NAK handshake for
+     * that, and a bare EPDIS leaves EPDIS and EPENA both stuck set, wedging the
+     * endpoint for good. Stalling alone is all the standard asks for. */
+    if ((addr & 0x80U) && (*ctl & USB_EPCTL_EPENA))
+      *ctl |= USB_EPCTL_EPDIS;
+    *ctl |= USB_EPCTL_STALL;
+  } else {
+    *ctl &= ~USB_EPCTL_STALL;
+    *ctl |= USB_EPCTL_SD0PID;
+  }
+
+  if (addr & 0x80U) {
+    if (num == EP_DATA)
+      ep_in_busy = 0; /* whatever was queued will never complete now */
+    else
+      ep_notif_busy = 0;
+  } else if (!halt) {
+    out_arm();
+  } else {
+    out_ep_armed = 0;
+  }
+}
+
+static uint8_t ep_is_halted(uint8_t addr) {
+  uint8_t num = addr & 0x0FU;
+  if (num == 0U || num > EP_NOTIF)
+    return 0;
+  uint32_t ctl =
+      (addr & 0x80U) ? USB_INEP(num)->CTL : USB_OUTEP(num)->CTL;
+  return (ctl & USB_EPCTL_STALL) ? 1U : 0U;
+}
+
+/* SET_INTERFACE re-selects an alternate setting, and the host resets its own
+ * data toggles when it does. This device has one setting per interface, so the
+ * only thing to honour is the toggle reset. */
+static void ep_reset_toggles(void) {
+  USB_INEP(EP_DATA)->CTL |= USB_EPCTL_SD0PID;
+  USB_INEP(EP_NOTIF)->CTL |= USB_EPCTL_SD0PID;
+  USB_OUTEP(EP_DATA)->CTL |= USB_EPCTL_SD0PID;
+  ep_in_busy = 0;
+  ep_notif_busy = 0;
+  out_arm();
+}
+
 /* -------------------------------------------------------------------------- *
  * Control transfers
  * -------------------------------------------------------------------------- */
@@ -338,8 +409,10 @@ static void handle_get_descriptor(uint16_t wValue, uint16_t wLength) {
 static void handle_setup(void) {
   const uint8_t *s = (const uint8_t *)setup_pkt;
   uint8_t type = (uint8_t)((s[0] >> 5) & 0x03);
+  uint8_t recipient = (uint8_t)(s[0] & 0x1F);
   uint8_t request = s[1];
   uint16_t wValue = (uint16_t)(s[2] | ((uint16_t)s[3] << 8));
+  uint16_t wIndex = (uint16_t)(s[4] | ((uint16_t)s[5] << 8));
   uint16_t wLength = (uint16_t)(s[6] | ((uint16_t)s[7] << 8));
 
   if (type == 0x01) { /* class request — CDC */
@@ -352,10 +425,14 @@ static void handle_setup(void) {
       ep0_send(line_coding, sizeof(line_coding), wLength);
       break;
     case CDC_SET_CONTROL_LINE_STATE:
-      usb_dtr = (uint8_t)(wValue & 0x01);
+      usb_line_state = (uint8_t)(wValue & 0x03); /* bit0 DTR, bit1 RTS */
       ep0_send(0, 0, 0);
       break;
     case CDC_SEND_BREAK:
+      /* wValue is the duration in ms; 0 revokes it, 0xFFFF means "until I say
+       * otherwise". Nothing to drive on a virtual port — a UART bridge reads it
+       * back with hal_usb_cdc_get_break_ms(). */
+      usb_break_ms = wValue;
       ep0_send(0, 0, 0);
       break;
     default:
@@ -396,7 +473,9 @@ static void handle_setup(void) {
     ep0_send(ep0_buf, 1, wLength);
     break;
   case REQ_GET_STATUS:
-    ep0_buf[0] = 0;
+    /* Device: bus powered, no remote wakeup. Endpoint: the halt bit, which is
+     * how a host confirms a stall it cleared is really gone. */
+    ep0_buf[0] = (recipient == 0x02) ? ep_is_halted((uint8_t)wIndex) : 0;
     ep0_buf[1] = 0;
     ep0_send(ep0_buf, 2, wLength);
     break;
@@ -406,8 +485,16 @@ static void handle_setup(void) {
     break;
   case REQ_CLEAR_FEATURE:
   case REQ_SET_FEATURE:
+    /* ENDPOINT_HALT (feature selector 0) on an endpoint is the only feature
+     * this device implements; the host uses it to recover a wedged endpoint.
+     * Everything else is accepted and ignored. */
+    if (recipient == 0x02 && wValue == 0x00)
+      ep_set_halt((uint8_t)wIndex, request == REQ_SET_FEATURE);
+    ep0_send(0, 0, 0);
+    break;
   case REQ_SET_INTERFACE:
-    ep0_send(0, 0, 0); /* accepted, nothing to do: one config, one alt setting */
+    ep_reset_toggles();
+    ep0_send(0, 0, 0);
     break;
   default:
     ep0_stall();
@@ -438,8 +525,11 @@ static void on_reset(void) {
   USB_DEVICE->DCFG &= ~USB_DCFG_DAD_MASK; /* back to the default address */
 
   usb_configured = 0;
-  usb_dtr = 0;
+  usb_line_state = 0;
+  usb_suspended = 0;
+  usb_break_ms = 0;
   ep_in_busy = 0;
+  ep_notif_busy = 0;
   out_ep_armed = 0;
   ctrl_out_request = 0;
   rx_head = rx_tail = 0;
@@ -540,6 +630,8 @@ static void on_in_ep_int(void) {
       USB_INEP(ep)->INT = USB_EPINT_XFRC;
       if (ep == EP_DATA)
         ep_in_busy = 0;
+      else if (ep == EP_NOTIF)
+        ep_notif_busy = 0;
     }
     USB_INEP(ep)->INT = flags & ~USB_DIEPINT_TXFE;
   }
@@ -564,8 +656,13 @@ static void usb_irq_handler(void) {
     on_in_ep_int();
   if (sts & USB_GINT_USBSUSP) {
     USB_GLOBAL->GINTSTS = USB_GINT_USBSUSP;
-    usb_dtr = 0; /* the port cannot be in use while the bus is suspended */
+    /* Suspend does not close the port: the host never re-sends DTR on resume,
+     * so clearing the line state here would leave the device mute forever.
+     * Track it separately and let it lift on the resume interrupt. */
+    usb_suspended = 1;
   }
+  if (sts & USB_GINT_WKUPINT)
+    usb_suspended = 0;
   if (sts & (USB_GINT_WKUPINT | USB_GINT_ESUSP | USB_GINT_SOF | USB_GINT_MMIS |
              USB_GINT_OTGINT))
     USB_GLOBAL->GINTSTS = USB_GINT_WKUPINT | USB_GINT_ESUSP | USB_GINT_SOF |
@@ -700,7 +797,7 @@ hal_status_t hal_usb_cdc_deinit(void) {
   USB_GLOBAL->GCCFG = 0;
   RCC->AHB2ENR &= ~RCC_AHB2ENR_OTGFSEN;
   usb_configured = 0;
-  usb_dtr = 0;
+  usb_line_state = 0;
   return HAL_OK;
 }
 
@@ -708,7 +805,10 @@ hal_status_t hal_usb_cdc_deinit(void) {
  * Public data path
  * -------------------------------------------------------------------------- */
 
-bool hal_usb_cdc_connected(void) { return usb_configured && usb_dtr; }
+bool hal_usb_cdc_connected(void) {
+  return usb_configured && !usb_suspended &&
+         (usb_line_state & HAL_USB_CDC_LINE_DTR);
+}
 
 static hal_status_t ep_in_transfer(const uint8_t *data, uint16_t len) {
   uint32_t spins = TX_TIMEOUT_SPINS;
@@ -792,6 +892,51 @@ uint16_t hal_usb_cdc_available(void) { return ring_used(); }
 
 hal_status_t hal_usb_cdc_set_rx_callback(hal_usb_cdc_rx_callback_t cb) {
   rx_cb = cb;
+  return HAL_OK;
+}
+
+hal_status_t hal_usb_cdc_get_line_coding(hal_usb_cdc_line_coding_t *out) {
+  if (!out)
+    return HAL_ERR_INVALID_ARG;
+  out->baudrate = hal_usb_cdc_get_baudrate();
+  out->stop_bits = line_coding[4];
+  out->parity = line_coding[5];
+  out->data_bits = line_coding[6];
+  return HAL_OK;
+}
+
+uint8_t hal_usb_cdc_get_line_state(void) { return usb_line_state; }
+
+uint16_t hal_usb_cdc_get_break_ms(void) { return usb_break_ms; }
+
+hal_status_t hal_usb_cdc_notify_serial_state(uint16_t state) {
+  if (!usb_configured)
+    return HAL_ERR_NOT_INITIALIZED;
+
+  /* Class notification header (CDC 1.2 §6.3): interface request, SERIAL_STATE,
+   * addressed to the communication interface, carrying a 2-byte bitmap. */
+  const uint8_t packet[10] = {
+      0xA1, 0x20, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00,
+      (uint8_t)(state & 0xFF), (uint8_t)(state >> 8),
+  };
+
+  uint32_t spins = TX_TIMEOUT_SPINS;
+  while (ep_notif_busy) {
+    if (!usb_configured)
+      return HAL_ERR_NOT_INITIALIZED;
+    if (--spins == 0)
+      return HAL_ERR_TIMEOUT;
+  }
+
+  uint32_t irq = hal_interrupt_disable_global();
+  ep_notif_busy = 1;
+  USB_INEP(EP_NOTIF)->TSIZ =
+      USB_EPTSIZ_PKTCNT((sizeof(packet) + NOTIF_MAX_PACKET - 1U) /
+                        NOTIF_MAX_PACKET) |
+      USB_EPTSIZ_XFRSIZ(sizeof(packet));
+  USB_INEP(EP_NOTIF)->CTL |= USB_EPCTL_EPENA | USB_EPCTL_CNAK;
+  fifo_write(EP_NOTIF, packet, sizeof(packet));
+  hal_interrupt_enable_global(irq);
   return HAL_OK;
 }
 

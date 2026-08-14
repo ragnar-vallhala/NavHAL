@@ -153,6 +153,115 @@ void test_rtc_backup_rejects_bad_index(void) {
   TEST_ASSERT_EQUAL_UINT32(HAL_ERR_INVALID_ARG, hal_rtc_backup_read(0, NULL));
 }
 
+/* Spin until `flag` or the bound runs out; the bound only has to outlast a
+ * couple of RTC seconds at whatever clock the test build runs at. */
+#define POLL_UNTIL(flag)                                                       \
+  ({                                                                           \
+    uint32_t _spins = SECOND_TICK_SPINS * 3u;                                  \
+    while (!(flag) && --_spins) {                                              \
+    }                                                                          \
+    _spins != 0u;                                                              \
+  })
+
+static volatile uint32_t alarm_hits;
+static void on_alarm(void) { alarm_hits++; }
+
+void test_rtc_wakeup_fires_and_repeats(void) {
+  NAVTEST_SKIP_ON_PIL();
+  hal_rtc_init(NULL);
+
+  /* No callback: the flag still sets, which is the polling path. */
+  TEST_ASSERT_EQUAL_UINT32(HAL_OK, hal_rtc_set_wakeup(1000u, NULL));
+  TEST_ASSERT_TRUE(POLL_UNTIL(hal_rtc_wakeup_fired()));
+  /* It reloads itself, so a second period follows without re-arming. */
+  TEST_ASSERT_TRUE(POLL_UNTIL(hal_rtc_wakeup_fired()));
+  hal_rtc_cancel_wakeup();
+}
+
+void test_rtc_cancel_wakeup_stops_it(void) {
+  NAVTEST_SKIP_ON_PIL();
+  hal_rtc_init(NULL);
+  hal_rtc_set_wakeup(1000u, NULL);
+  TEST_ASSERT_EQUAL_UINT32(HAL_OK, hal_rtc_cancel_wakeup());
+  (void)hal_rtc_wakeup_fired(); /* drop anything already pending */
+
+  uint32_t spins = SECOND_TICK_SPINS * 3u;
+  while (--spins) {
+  }
+  TEST_ASSERT_FALSE(hal_rtc_wakeup_fired());
+}
+
+void test_rtc_alarm_fires_on_match(void) {
+  NAVTEST_SKIP_ON_PIL();
+  hal_rtc_init(NULL);
+  hal_rtc_set_datetime(&reference);
+
+  hal_rtc_datetime_t now;
+  hal_rtc_get_datetime(&now);
+
+  /* Two seconds out, matching the second alone — far enough ahead that the
+   * calendar cannot have passed it before the alarm is armed. */
+  hal_rtc_alarm_config_t cfg = {
+      .second = (uint8_t)((now.second + 2u) % 60u),
+      .match = HAL_RTC_MATCH_SECOND,
+  };
+  TEST_ASSERT_EQUAL_UINT32(HAL_OK,
+                           hal_rtc_set_alarm(HAL_RTC_ALARM_A, &cfg, NULL));
+  TEST_ASSERT_TRUE(POLL_UNTIL(hal_rtc_alarm_fired(HAL_RTC_ALARM_A)));
+  hal_rtc_cancel_alarm(HAL_RTC_ALARM_A);
+}
+
+void test_rtc_alarm_callback_runs(void) {
+  NAVTEST_SKIP_ON_PIL();
+  hal_rtc_init(NULL);
+  hal_rtc_set_datetime(&reference);
+
+  hal_rtc_datetime_t now;
+  hal_rtc_get_datetime(&now);
+  alarm_hits = 0;
+
+  /* With a callback the whole path is under test: RTC flag, EXTI line, NVIC. */
+  hal_rtc_alarm_config_t cfg = {
+      .second = (uint8_t)((now.second + 2u) % 60u),
+      .match = HAL_RTC_MATCH_SECOND,
+  };
+  TEST_ASSERT_EQUAL_UINT32(HAL_OK,
+                           hal_rtc_set_alarm(HAL_RTC_ALARM_B, &cfg, on_alarm));
+  TEST_ASSERT_TRUE(POLL_UNTIL(alarm_hits > 0u));
+  hal_rtc_cancel_alarm(HAL_RTC_ALARM_B);
+}
+
+void test_rtc_alarm_rejects_bad_args(void) {
+  NAVTEST_SKIP_ON_PIL();
+  hal_rtc_init(NULL);
+
+  hal_rtc_alarm_config_t cfg = {.second = 0, .match = HAL_RTC_MATCH_SECOND};
+  TEST_ASSERT_EQUAL_UINT32(HAL_ERR_INVALID_ARG,
+                           hal_rtc_set_alarm(HAL_RTC_ALARM_A, NULL, NULL));
+  TEST_ASSERT_EQUAL_UINT32(HAL_ERR_INVALID_ARG,
+                           hal_rtc_set_alarm((hal_rtc_alarm_t)7, &cfg, NULL));
+
+  cfg.hour = 24;
+  cfg.match = HAL_RTC_MATCH_HOUR;
+  TEST_ASSERT_EQUAL_UINT32(HAL_ERR_INVALID_ARG,
+                           hal_rtc_set_alarm(HAL_RTC_ALARM_A, &cfg, NULL));
+
+  /* A day of 0 is fine as long as the alarm does not compare the day. */
+  hal_rtc_alarm_config_t unmatched = {.second = 5,
+                                      .match = HAL_RTC_MATCH_SECOND};
+  TEST_ASSERT_EQUAL_UINT32(HAL_OK,
+                           hal_rtc_set_alarm(HAL_RTC_ALARM_A, &unmatched, NULL));
+  hal_rtc_cancel_alarm(HAL_RTC_ALARM_A);
+}
+
+void test_rtc_wakeup_rejects_bad_period(void) {
+  NAVTEST_SKIP_ON_PIL();
+  hal_rtc_init(NULL);
+  TEST_ASSERT_EQUAL_UINT32(HAL_ERR_INVALID_ARG, hal_rtc_set_wakeup(0u, NULL));
+  TEST_ASSERT_EQUAL_UINT32(HAL_ERR_INVALID_ARG,
+                           hal_rtc_set_wakeup(65536001u, NULL));
+}
+
 NAVTEST_CASE_DECL(test_rtc_init_returns_ok);
 NAVTEST_CASE_DECL(test_rtc_clock_is_running);
 NAVTEST_CASE_DECL(test_rtc_set_then_get_round_trips);
@@ -161,6 +270,12 @@ NAVTEST_CASE_DECL(test_rtc_is_set_after_setting);
 NAVTEST_CASE_DECL(test_rtc_set_rejects_out_of_range);
 NAVTEST_CASE_DECL(test_rtc_backup_round_trips);
 NAVTEST_CASE_DECL(test_rtc_backup_rejects_bad_index);
+NAVTEST_CASE_DECL(test_rtc_wakeup_fires_and_repeats);
+NAVTEST_CASE_DECL(test_rtc_cancel_wakeup_stops_it);
+NAVTEST_CASE_DECL(test_rtc_alarm_fires_on_match);
+NAVTEST_CASE_DECL(test_rtc_alarm_callback_runs);
+NAVTEST_CASE_DECL(test_rtc_alarm_rejects_bad_args);
+NAVTEST_CASE_DECL(test_rtc_wakeup_rejects_bad_period);
 
 static const navtest_case_t rtc_cases[] = {
     NAVTEST_CASE(test_rtc_init_returns_ok),
@@ -171,6 +286,12 @@ static const navtest_case_t rtc_cases[] = {
     NAVTEST_CASE(test_rtc_set_rejects_out_of_range),
     NAVTEST_CASE(test_rtc_backup_round_trips),
     NAVTEST_CASE(test_rtc_backup_rejects_bad_index),
+    NAVTEST_CASE(test_rtc_wakeup_fires_and_repeats),
+    NAVTEST_CASE(test_rtc_cancel_wakeup_stops_it),
+    NAVTEST_CASE(test_rtc_alarm_fires_on_match),
+    NAVTEST_CASE(test_rtc_alarm_callback_runs),
+    NAVTEST_CASE(test_rtc_alarm_rejects_bad_args),
+    NAVTEST_CASE(test_rtc_wakeup_rejects_bad_period),
 };
 
 const navtest_suite_t test_rtc_suite = {

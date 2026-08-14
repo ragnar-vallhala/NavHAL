@@ -31,8 +31,10 @@
 
 #if NAVHAL_CONFIG_DRV_RTC
 
+#include "family/exti_reg.h"
 #include "family/rcc_reg.h"
 #include "family/rtc_reg.h"
+#include "navhal_port_interrupt.h"
 #include <stdint.h>
 
 /* A crystal can take a second or two to start, and this is the only place that
@@ -87,6 +89,13 @@ static hal_status_t init_enter(void) {
 }
 
 static void init_exit(void) { RTC->ISR &= ~RTC_ISR_INIT; }
+
+/* Clear one status flag. The flags clear on a written 0 and ignore a written 1,
+ * so the obvious ~FLAG looks right — but INIT lives in the same register and
+ * does not ignore a 1: it stops the calendar and puts it into initialization
+ * mode. Mask INIT out of every flag write; the wakeup timer keeps counting
+ * either way, so a calendar frozen this way is easy to miss. */
+static void clear_flag(uint32_t flag) { RTC->ISR = ~(flag | RTC_ISR_INIT); }
 
 /* The shadow copies the CPU reads are refreshed once per RTC cycle. After
  * leaving init mode the old contents are stale, so wait for the refresh rather
@@ -260,6 +269,223 @@ hal_rtc_clock_t hal_rtc_get_clock(void) {
   default:
     return HAL_RTC_CLOCK_NONE;
   }
+}
+
+/* -------------------------------------------------------------------------- *
+ * Alarms and the wakeup timer
+ *
+ * Both reach the NVIC through the EXTI, and both are wired to it as internal
+ * lines that only ever pulse: a line left masked there keeps its RTC flag set
+ * and never interrupts anything, which is the classic "the alarm fires but
+ * nothing happens" bug.
+ * -------------------------------------------------------------------------- */
+
+static hal_rtc_callback_t alarm_cb[2];
+static hal_rtc_callback_t wakeup_cb;
+
+static void rtc_alarm_isr(void) {
+  uint32_t isr = RTC->ISR;
+
+  if (isr & RTC_ISR_ALRAF) {
+    clear_flag(RTC_ISR_ALRAF);
+    if (alarm_cb[HAL_RTC_ALARM_A])
+      alarm_cb[HAL_RTC_ALARM_A]();
+  }
+  if (isr & RTC_ISR_ALRBF) {
+    clear_flag(RTC_ISR_ALRBF);
+    if (alarm_cb[HAL_RTC_ALARM_B])
+      alarm_cb[HAL_RTC_ALARM_B]();
+  }
+  EXTI->PR = EXTI_LINE_RTC_ALARM;
+}
+
+static void rtc_wakeup_isr(void) {
+  clear_flag(RTC_ISR_WUTF);
+  EXTI->PR = EXTI_LINE_RTC_WAKEUP;
+  if (wakeup_cb)
+    wakeup_cb();
+}
+
+static void exti_line_enable(uint32_t line, uint8_t on) {
+  if (on) {
+    EXTI->RTSR |= line; /* the RTC drives these lines with a rising pulse */
+    EXTI->IMR |= line;
+  } else {
+    EXTI->IMR &= ~line;
+  }
+  EXTI->PR = line;
+}
+
+hal_status_t hal_rtc_set_alarm(hal_rtc_alarm_t alarm,
+                               const hal_rtc_alarm_config_t *cfg,
+                               hal_rtc_callback_t cb) {
+  if (!rtc_ready)
+    return HAL_ERR_NOT_INITIALIZED;
+  if (!cfg || (alarm != HAL_RTC_ALARM_A && alarm != HAL_RTC_ALARM_B))
+    return HAL_ERR_INVALID_ARG;
+  if (cfg->second > 59U || cfg->minute > 59U || cfg->hour > 23U)
+    return HAL_ERR_INVALID_ARG;
+  /* A field the alarm does not compare is never read, so it does not have to
+   * hold a sensible value — "every minute at second 30" leaves day at 0. */
+  if ((cfg->match & HAL_RTC_MATCH_DAY) &&
+      (cfg->day < 1U || cfg->day > (cfg->day_is_weekday ? 7U : 31U)))
+    return HAL_ERR_INVALID_ARG;
+
+  /* The register masks say which fields to *ignore*, so invert the request. */
+  uint32_t reg = ((uint32_t)to_bcd(cfg->second) << RTC_ALRM_SECOND_SHIFT) |
+                 ((uint32_t)to_bcd(cfg->minute) << RTC_ALRM_MINUTE_SHIFT) |
+                 ((uint32_t)to_bcd(cfg->hour) << RTC_ALRM_HOUR_SHIFT) |
+                 ((uint32_t)to_bcd(cfg->day) << RTC_ALRM_DAY_SHIFT);
+  if (!(cfg->match & HAL_RTC_MATCH_SECOND))
+    reg |= RTC_ALRM_MSK_SECOND;
+  if (!(cfg->match & HAL_RTC_MATCH_MINUTE))
+    reg |= RTC_ALRM_MSK_MINUTE;
+  if (!(cfg->match & HAL_RTC_MATCH_HOUR))
+    reg |= RTC_ALRM_MSK_HOUR;
+  if (!(cfg->match & HAL_RTC_MATCH_DAY))
+    reg |= RTC_ALRM_MSK_DAY;
+  if (cfg->day_is_weekday)
+    reg |= RTC_ALRM_WDSEL;
+
+  uint32_t enable = (alarm == HAL_RTC_ALARM_A) ? RTC_CR_ALRAE : RTC_CR_ALRBE;
+  uint32_t irq_en = (alarm == HAL_RTC_ALARM_A) ? RTC_CR_ALRAIE : RTC_CR_ALRBIE;
+  uint32_t writable = (alarm == HAL_RTC_ALARM_A) ? RTC_ISR_ALRAWF : RTC_ISR_ALRBWF;
+  uint32_t fired = (alarm == HAL_RTC_ALARM_A) ? RTC_ISR_ALRAF : RTC_ISR_ALRBF;
+
+  alarm_cb[alarm] = cb;
+
+  write_unlock();
+  /* An armed alarm's registers are read-only; disabling it is what makes them
+   * writable, and the hardware takes up to two RTC cycles to say so. */
+  RTC->CR &= ~(enable | irq_en);
+  uint32_t to = RTC_TIMEOUT_SPINS;
+  while (!(RTC->ISR & writable)) {
+    if (--to == 0u) {
+      write_lock();
+      return HAL_ERR_TIMEOUT;
+    }
+  }
+
+  if (alarm == HAL_RTC_ALARM_A)
+    RTC->ALRMAR = reg;
+  else
+    RTC->ALRMBR = reg;
+
+  clear_flag(fired);
+  RTC->CR |= enable | (cb ? irq_en : 0u);
+  write_lock();
+
+  exti_line_enable(EXTI_LINE_RTC_ALARM, cb != 0);
+  if (cb) {
+    hal_interrupt_attach_callback(RTC_Alarm_IRQn, rtc_alarm_isr);
+    hal_interrupt_enable(RTC_Alarm_IRQn);
+  }
+  return HAL_OK;
+}
+
+hal_status_t hal_rtc_cancel_alarm(hal_rtc_alarm_t alarm) {
+  if (!rtc_ready)
+    return HAL_ERR_NOT_INITIALIZED;
+  if (alarm != HAL_RTC_ALARM_A && alarm != HAL_RTC_ALARM_B)
+    return HAL_ERR_INVALID_ARG;
+
+  uint32_t enable = (alarm == HAL_RTC_ALARM_A) ? RTC_CR_ALRAE : RTC_CR_ALRBE;
+  uint32_t irq_en = (alarm == HAL_RTC_ALARM_A) ? RTC_CR_ALRAIE : RTC_CR_ALRBIE;
+  uint32_t fired = (alarm == HAL_RTC_ALARM_A) ? RTC_ISR_ALRAF : RTC_ISR_ALRBF;
+
+  write_unlock();
+  RTC->CR &= ~(enable | irq_en);
+  clear_flag(fired);
+  write_lock();
+
+  alarm_cb[alarm] = 0;
+  /* The line is shared by both alarms — only mask it once neither wants it. */
+  if (!alarm_cb[HAL_RTC_ALARM_A] && !alarm_cb[HAL_RTC_ALARM_B])
+    exti_line_enable(EXTI_LINE_RTC_ALARM, 0);
+  return HAL_OK;
+}
+
+bool hal_rtc_alarm_fired(hal_rtc_alarm_t alarm) {
+  if (!rtc_ready || (alarm != HAL_RTC_ALARM_A && alarm != HAL_RTC_ALARM_B))
+    return false;
+  uint32_t fired = (alarm == HAL_RTC_ALARM_A) ? RTC_ISR_ALRAF : RTC_ISR_ALRBF;
+  if (!(RTC->ISR & fired))
+    return false;
+  clear_flag(fired);
+  return true;
+}
+
+hal_status_t hal_rtc_set_wakeup(uint32_t period_ms, hal_rtc_callback_t cb) {
+  if (!rtc_ready)
+    return HAL_ERR_NOT_INITIALIZED;
+  if (period_ms == 0u || period_ms > 65536000u)
+    return HAL_ERR_INVALID_ARG;
+
+  /* Two ranges, and the counter is 16 bits in both. Short periods count the
+   * oscillator over 16 (2048 Hz on a 32.768 kHz crystal), which reaches 32 s;
+   * longer ones count the calendar's own 1 Hz tick, out to about 18 hours. */
+  uint32_t tick_hz =
+      (hal_rtc_get_clock() == HAL_RTC_CLOCK_LSE) ? 32768u / 16u : 32000u / 16u;
+  uint32_t select, reload;
+
+  if (period_ms <= (65536u * 1000u) / tick_hz) {
+    select = RTC_CR_WUCKSEL_DIV16;
+    reload = (period_ms * tick_hz) / 1000u;
+    if (reload == 0u)
+      reload = 1u;
+  } else {
+    select = RTC_CR_WUCKSEL_SPRE;
+    reload = period_ms / 1000u;
+  }
+  if (reload > 65536u)
+    return HAL_ERR_INVALID_ARG;
+
+  wakeup_cb = cb;
+
+  write_unlock();
+  /* Same rule as the alarms: stop it before its registers will take a write. */
+  RTC->CR &= ~(RTC_CR_WUTE | RTC_CR_WUTIE);
+  uint32_t to = RTC_TIMEOUT_SPINS;
+  while (!(RTC->ISR & RTC_ISR_WUTWF)) {
+    if (--to == 0u) {
+      write_lock();
+      return HAL_ERR_TIMEOUT;
+    }
+  }
+
+  RTC->WUTR = reload - 1u; /* counts reload-1 down to 0, so one full period */
+  RTC->CR = (RTC->CR & ~RTC_CR_WUCKSEL_MASK) | select;
+  clear_flag(RTC_ISR_WUTF);
+  RTC->CR |= RTC_CR_WUTE | (cb ? RTC_CR_WUTIE : 0u);
+  write_lock();
+
+  exti_line_enable(EXTI_LINE_RTC_WAKEUP, cb != 0);
+  if (cb) {
+    hal_interrupt_attach_callback(RTC_WKUP_IRQn, rtc_wakeup_isr);
+    hal_interrupt_enable(RTC_WKUP_IRQn);
+  }
+  return HAL_OK;
+}
+
+hal_status_t hal_rtc_cancel_wakeup(void) {
+  if (!rtc_ready)
+    return HAL_ERR_NOT_INITIALIZED;
+
+  write_unlock();
+  RTC->CR &= ~(RTC_CR_WUTE | RTC_CR_WUTIE);
+  clear_flag(RTC_ISR_WUTF);
+  write_lock();
+
+  wakeup_cb = 0;
+  exti_line_enable(EXTI_LINE_RTC_WAKEUP, 0);
+  return HAL_OK;
+}
+
+bool hal_rtc_wakeup_fired(void) {
+  if (!rtc_ready || !(RTC->ISR & RTC_ISR_WUTF))
+    return false;
+  clear_flag(RTC_ISR_WUTF);
+  return true;
 }
 
 hal_status_t hal_rtc_backup_write(uint8_t index, uint32_t value) {

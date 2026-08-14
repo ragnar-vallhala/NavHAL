@@ -34,6 +34,12 @@ void test_rtc_is_set_after_setting(void);
 void test_rtc_set_rejects_out_of_range(void);
 void test_rtc_backup_round_trips(void);
 void test_rtc_backup_rejects_bad_index(void);
+void test_rtc_wakeup_fires_and_repeats(void);
+void test_rtc_cancel_wakeup_stops_it(void);
+void test_rtc_alarm_fires_on_match(void);
+void test_rtc_alarm_callback_runs(void);
+void test_rtc_alarm_rejects_bad_args(void);
+void test_rtc_wakeup_rejects_bad_period(void);
 
 extern const navtest_suite_t test_rtc_suite;
 

@@ -115,6 +115,41 @@ typedef struct {
   uint8_t second;  /**< 0..59. */
 } hal_rtc_datetime_t;
 
+/** @brief The two independent alarms the calendar provides. */
+typedef enum {
+  HAL_RTC_ALARM_A = 0,
+  HAL_RTC_ALARM_B = 1,
+} hal_rtc_alarm_t;
+
+/** @name Calendar fields an alarm compares before firing
+ *
+ * Only the fields named here have to match, so the same alarm expresses
+ * "every minute at second 30" (::HAL_RTC_MATCH_SECOND alone) or "09:30:00 on
+ * the 1st" (all four). Naming no field at all fires once a second.
+ *  @{ */
+#define HAL_RTC_MATCH_SECOND (1U << 0)
+#define HAL_RTC_MATCH_MINUTE (1U << 1)
+#define HAL_RTC_MATCH_HOUR (1U << 2)
+#define HAL_RTC_MATCH_DAY (1U << 3)
+/** @} */
+
+/** @brief When an alarm should fire. */
+typedef struct {
+  uint8_t day;    /**< Day of month 1..31, or weekday 1..7 — see @c day_is_weekday. */
+  uint8_t hour;   /**< 0..23. */
+  uint8_t minute; /**< 0..59. */
+  uint8_t second; /**< 0..59. */
+  uint8_t match;  /**< Fields that must match: @c HAL_RTC_MATCH_* , OR'd. */
+  bool day_is_weekday; /**< Read @c day as a weekday rather than a date. */
+} hal_rtc_alarm_config_t;
+
+/**
+ * @brief Called when an alarm or the wakeup timer fires.
+ *
+ * Runs in interrupt context, with the hardware flag already cleared.
+ */
+typedef void (*hal_rtc_callback_t)(void);
+
 /**
  * @brief Start the calendar, or adopt one that is already running.
  *
@@ -165,6 +200,79 @@ bool hal_rtc_is_set(void);
  *         when the RTC is not running.
  */
 hal_rtc_clock_t hal_rtc_get_clock(void);
+
+/**
+ * @brief Arm an alarm on a calendar match.
+ *
+ * Re-arms itself: an alarm that names fewer fields than the full date repeats
+ * on the next match, so "every minute at second 30" keeps firing without being
+ * set again.
+ *
+ * @param alarm Which alarm to program.
+ * @param cfg   When it should fire; must not be NULL.
+ * @param cb    Called from interrupt context on each match, or NULL to leave
+ *              the interrupt off and poll ::hal_rtc_alarm_fired instead.
+ * @return ::HAL_OK, ::HAL_ERR_INVALID_ARG for a NULL or out-of-range value,
+ *         ::HAL_ERR_NOT_INITIALIZED before ::hal_rtc_init, or
+ *         ::HAL_ERR_TIMEOUT if the alarm registers never became writable.
+ */
+hal_status_t hal_rtc_set_alarm(hal_rtc_alarm_t alarm,
+                               const hal_rtc_alarm_config_t *cfg,
+                               hal_rtc_callback_t cb);
+
+/**
+ * @brief Disarm an alarm and detach its callback.
+ * @param alarm Which alarm to stop.
+ * @return ::HAL_OK, ::HAL_ERR_INVALID_ARG for an unknown alarm, or
+ *         ::HAL_ERR_NOT_INITIALIZED before ::hal_rtc_init.
+ */
+hal_status_t hal_rtc_cancel_alarm(hal_rtc_alarm_t alarm);
+
+/**
+ * @brief Whether an alarm has fired since this was last called.
+ *
+ * For polling without an interrupt; reading clears the flag. An alarm with a
+ * callback clears its own flag, so this always reports false for one.
+ *
+ * @param alarm Which alarm to test.
+ * @return true if it had fired.
+ */
+bool hal_rtc_alarm_fired(hal_rtc_alarm_t alarm);
+
+/**
+ * @brief Start the periodic wakeup timer.
+ *
+ * A countdown independent of the calendar, reloading itself every period. It
+ * keeps running in the low-power modes that stop the CPU clock, which is what
+ * makes it the usual way to wake a sleeping board on a schedule.
+ *
+ * Resolution follows the period: below ~30 seconds the timer counts the
+ * oscillator directly, above that it counts whole seconds. The achievable
+ * period is quantised to those ticks, so a request is rounded, and on a board
+ * without a crystal the internal RC's tolerance applies on top.
+ *
+ * @param period_ms Period in milliseconds, 1..65536000 (about 18 hours).
+ * @param cb        Called from interrupt context each period, or NULL to leave
+ *                  the interrupt off.
+ * @return ::HAL_OK, ::HAL_ERR_INVALID_ARG for a period out of range,
+ *         ::HAL_ERR_NOT_INITIALIZED before ::hal_rtc_init, or
+ *         ::HAL_ERR_TIMEOUT if the timer registers never became writable.
+ */
+hal_status_t hal_rtc_set_wakeup(uint32_t period_ms, hal_rtc_callback_t cb);
+
+/**
+ * @brief Stop the wakeup timer and detach its callback.
+ * @return ::HAL_OK, or ::HAL_ERR_NOT_INITIALIZED before ::hal_rtc_init.
+ */
+hal_status_t hal_rtc_cancel_wakeup(void);
+
+/**
+ * @brief Whether the wakeup timer has fired since this was last called.
+ *
+ * For polling without an interrupt; reading clears the flag.
+ * @return true if it had fired.
+ */
+bool hal_rtc_wakeup_fired(void);
 
 /**
  * @brief Store a word in the backup domain, where it survives a reset.

@@ -23,6 +23,10 @@
  * Prints the date and time once a second, along with the oscillator driving
  * the calendar and a boot counter kept in a backup register.
  *
+ * A wakeup timer runs every 5 seconds and an alarm fires on second 30 of every
+ * minute, both through their interrupts; the line marks each one that has
+ * arrived since the last print.
+ *
  * The point of the sample is what happens across a reset: the calendar keeps
  * counting and the boot counter keeps incrementing, because both live in the
  * backup domain, which the reset line does not reach. Press reset (or reflash)
@@ -46,6 +50,12 @@ static hal_pll_config_t pll_cfg = {
 static hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
 #define BACKUP_REG_BOOTS 0
+
+static volatile uint32_t wakeups;
+static volatile uint32_t alarms;
+
+static void on_wakeup(void) { wakeups++; }
+static void on_alarm(void) { alarms++; }
 
 static char line[96];
 static uint16_t put_str(char *p, const char *s) {
@@ -90,6 +100,14 @@ int main(void) {
   hal_rtc_backup_read(BACKUP_REG_BOOTS, &boots);
   hal_rtc_backup_write(BACKUP_REG_BOOTS, boots + 1);
 
+  /* Every 5 s, and on second 30 of every minute — the alarm names only the
+   * second, so the hardware repeats it without being re-armed. */
+  hal_rtc_set_wakeup(5000, on_wakeup);
+  hal_rtc_set_alarm(HAL_RTC_ALARM_A,
+                    &(hal_rtc_alarm_config_t){.second = 30,
+                                              .match = HAL_RTC_MATCH_SECOND},
+                    on_alarm);
+
   hal_usb_cdc_init();
 
   uint32_t last = 0;
@@ -123,6 +141,10 @@ int main(void) {
                                                         : "none");
       n += put_str(line + n, "  boots=");
       n += put_uint(line + n, boots + 1, 1);
+      n += put_str(line + n, "  wakeups=");
+      n += put_uint(line + n, wakeups, 1);
+      n += put_str(line + n, "  alarms=");
+      n += put_uint(line + n, alarms, 1);
       n += put_str(line + n, "\r\n");
       hal_usb_cdc_write((const uint8_t *)line, n);
     }

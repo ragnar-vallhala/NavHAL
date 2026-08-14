@@ -75,14 +75,40 @@ typedef struct {
 #define RTC_DR_YEAR_SHIFT 16
 
 /* RTC_CR */
+#define RTC_CR_WUCKSEL_MASK (0x7U << 0)
+#define RTC_CR_WUCKSEL_DIV16 (0x0U << 0) /**< Wakeup counts RTCCLK/16 */
+#define RTC_CR_WUCKSEL_SPRE (0x4U << 0)  /**< Wakeup counts the 1 Hz tick */
 #define RTC_CR_BYPSHAD (1U << 5) /**< Read the counters, not the shadow regs */
 #define RTC_CR_FMT (1U << 6)     /**< 0 = 24-hour clock, 1 = AM/PM */
+#define RTC_CR_ALRAE (1U << 8)   /**< Alarm A enable */
+#define RTC_CR_ALRBE (1U << 9)   /**< Alarm B enable */
+#define RTC_CR_WUTE (1U << 10)   /**< Wakeup timer enable */
+#define RTC_CR_ALRAIE (1U << 12) /**< Alarm A interrupt enable */
+#define RTC_CR_ALRBIE (1U << 13) /**< Alarm B interrupt enable */
+#define RTC_CR_WUTIE (1U << 14)  /**< Wakeup timer interrupt enable */
 
 /* RTC_ISR */
+#define RTC_ISR_ALRAWF (1U << 0) /**< Alarm A registers may be written */
+#define RTC_ISR_ALRBWF (1U << 1) /**< Alarm B registers may be written */
+#define RTC_ISR_WUTWF (1U << 2)  /**< Wakeup timer registers may be written */
 #define RTC_ISR_INITS (1U << 4) /**< Calendar has been initialized */
 #define RTC_ISR_RSF (1U << 5)   /**< Shadow registers synchronized */
 #define RTC_ISR_INITF (1U << 6) /**< Initialization mode entered */
 #define RTC_ISR_INIT (1U << 7)  /**< Request initialization mode */
+#define RTC_ISR_ALRAF (1U << 8) /**< Alarm A fired */
+#define RTC_ISR_ALRBF (1U << 9) /**< Alarm B fired */
+#define RTC_ISR_WUTF (1U << 10) /**< Wakeup timer fired */
+
+/* RTC_ALRMxR — the MSKn bits mean "ignore this field when matching". */
+#define RTC_ALRM_SECOND_SHIFT 0
+#define RTC_ALRM_MINUTE_SHIFT 8
+#define RTC_ALRM_HOUR_SHIFT 16
+#define RTC_ALRM_DAY_SHIFT 24
+#define RTC_ALRM_MSK_SECOND (1U << 7)
+#define RTC_ALRM_MSK_MINUTE (1U << 15)
+#define RTC_ALRM_MSK_HOUR (1U << 23)
+#define RTC_ALRM_MSK_DAY (1U << 31)
+#define RTC_ALRM_WDSEL (1U << 30) /**< Match a weekday, not a date */
 
 /* RTC_PRER */
 #define RTC_PRER_SYNC(x) ((x) & 0x7FFFU)

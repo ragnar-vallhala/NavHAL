@@ -173,6 +173,12 @@ config SAMPLE_33_HAL_ADC
     select DRV_ADC
     select DRV_UART
 
+config SAMPLE_35_HAL_RTC
+    bool "35_hal_rtc"
+    depends on FAMILY_STM32F4
+    select DRV_RTC
+    select DRV_USB_CDC
+
 config SAMPLE_34_HAL_USB_CDC
     bool "34_hal_usb_cdc"
     depends on FAMILY_STM32F4
@@ -238,3 +244,4 @@ config SAMPLE
     default "hal_mpu_fault" if SAMPLE_32_HAL_MPU_FAULT
     default "hal_adc" if SAMPLE_33_HAL_ADC
     default "hal_usb_cdc" if SAMPLE_34_HAL_USB_CDC
+    default "hal_rtc" if SAMPLE_35_HAL_RTC

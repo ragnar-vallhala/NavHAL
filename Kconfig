@@ -175,6 +175,15 @@ config DRV_SDIO_DMA
       when it is enabled they must be cleaned/invalidated or placed in DTCM
       (NAVHAL_DTCM_NOINIT).
 
+config DRV_RTC
+    bool "Enable RTC Driver"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    default n
+    help
+      Compile the hal_rtc_* API: a calendar in the always-on backup domain that
+      keeps time across a reset, plus its 20 backup registers. Runs from the
+      board's 32.768 kHz crystal when there is one, otherwise the internal RC.
+
 config DRV_USB_CDC
     bool "Enable USB CDC-ACM Device Driver"
     depends on FAMILY_STM32F4

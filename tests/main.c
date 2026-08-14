@@ -37,6 +37,7 @@
 #include "cap/eth/test_eth.h"
 #include "cap/i2c_dma/test_i2c_dma.h"
 #include "cap/cycle_counter/test_dwt.h"
+#include "cap/rtc/test_rtc.h"
 #include "cap/fpu/test_fpu_accel.h"
 #include "cap/mpu/test_mpu.h"
 #include "cap/sdio/test_sdio.h"
@@ -120,6 +121,9 @@ static const navtest_suite_t *const all_suites[] = {
     &test_crc_suite,
 #if NAVHAL_CONFIG_DRV_DWT
     &test_dwt_suite,
+#endif
+#if NAVHAL_CONFIG_DRV_RTC
+    &test_rtc_suite,
 #endif
 #if NAVHAL_CONFIG_USE_FPU
     &test_fpu_suite,

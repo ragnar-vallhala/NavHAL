@@ -78,6 +78,10 @@ if(CONFIG_DRV_SPI)
         list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spi/spi.c)
     endif()
 endif()
+if(CONFIG_DRV_RTC)
+    # The RTC IP is register-compatible across F4 and F7, so one driver serves both.
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/rtc/rtc.c)
+endif()
 if(CONFIG_DRV_USB_CDC)
     # F4-only: the OTG_FS device core driving a CDC-ACM virtual serial port.
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/usb/usb_cdc.c)

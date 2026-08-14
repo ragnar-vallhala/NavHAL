@@ -175,6 +175,19 @@ config DRV_SDIO_DMA
       when it is enabled they must be cleaned/invalidated or placed in DTCM
       (NAVHAL_DTCM_NOINIT).
 
+config DRV_USB_CDC
+    bool "Enable USB CDC-ACM Device Driver"
+    depends on FAMILY_STM32F4
+    default n
+    select DRV_CLOCK
+    select DRV_GPIO
+    select DRV_INTERRUPT
+    help
+      Compile the hal_usb_cdc_* API: the target enumerates as a USB full-speed
+      virtual serial port (/dev/ttyACM0) on the OTG_FS peripheral. Requires the
+      RCC PLL Q output to be exactly 48 MHz; hal_usb_cdc_init() refuses to run
+      otherwise.
+
 config DRV_FLASH
     bool "Enable Flash Driver"
     default n

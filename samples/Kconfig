@@ -173,6 +173,11 @@ config SAMPLE_33_HAL_ADC
     select DRV_ADC
     select DRV_UART
 
+config SAMPLE_34_HAL_USB_CDC
+    bool "34_hal_usb_cdc"
+    depends on FAMILY_STM32F4
+    select DRV_USB_CDC
+
 config SAMPLE_00_HAL_X86_HELLO
     bool "00_hal_x86_hello"
     depends on ARCH_X86_64
@@ -232,3 +237,4 @@ config SAMPLE
     default "hal_eth_echo" if SAMPLE_31_HAL_ETH_ECHO
     default "hal_mpu_fault" if SAMPLE_32_HAL_MPU_FAULT
     default "hal_adc" if SAMPLE_33_HAL_ADC
+    default "hal_usb_cdc" if SAMPLE_34_HAL_USB_CDC

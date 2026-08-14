@@ -105,6 +105,9 @@ typedef struct {
 #define RCC_CR_PLLON (1 << RCC_CR_PLL_ON_BIT)   /**< Enable PLL */
 #define RCC_CR_PLLRDY (1 << RCC_CR_PLL_READY_BIT) /**< PLL ready flag */
 
+/* RCC_AHB2ENR masks */
+#define RCC_AHB2ENR_OTGFSEN (1 << 7) /**< USB OTG full-speed clock enable */
+
 /* RCC_PLLCFGR bit positions */
 #define RCC_PLLCFGR_SRC_BIT 22  /**< PLL source selection bit */
 #define RCC_PLLCFGR_PLLM_BIT 0  /**< PLLM bits */

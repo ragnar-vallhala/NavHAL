@@ -98,6 +98,7 @@ extern "C" {
 #include "common/hal_mpu.h"
 #include "common/hal_sdio.h"
 #include "common/hal_tcm.h"
+#include "common/hal_usb_cdc.h"
 
 
 #ifdef __cplusplus

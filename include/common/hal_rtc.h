@@ -97,9 +97,23 @@ typedef enum {
   HAL_RTC_CLOCK_NONE = 3, /**< Not running (::hal_rtc_get_clock only). */
 } hal_rtc_clock_t;
 
-/** @brief RTC initialization configuration. Zero-initializes to AUTO. */
+/** @brief RTC initialization configuration. Zero-initializes to sane defaults. */
 typedef struct {
   hal_rtc_clock_t clock; /**< Oscillator to drive the calendar. */
+  /**
+   * @brief How long to wait for the crystal, in milliseconds; 0 uses 5000.
+   *
+   * A 32.768 kHz crystal is slow to start — usually well under two seconds,
+   * but a marginal one (load capacitors above what it wants, or high ESR) can
+   * take ten. The wait blocks, and it is paid on the boot that configures the
+   * RTC: once it is running, the oscillator stays powered in the backup domain
+   * across resets, and later boots do not wait at all.
+   *
+   * ::HAL_RTC_CLOCK_AUTO falls back to the internal RC when this expires,
+   * which is why a too-short value shows up as an accurate-looking clock that
+   * quietly drifts. ::HAL_RTC_CLOCK_LSE fails instead of falling back.
+   */
+  uint16_t lse_timeout_ms;
 } hal_rtc_config_t;
 
 /**
@@ -158,10 +172,13 @@ typedef void (*hal_rtc_callback_t)(void);
  * configured from scratch, so calling this at every boot is safe and is what
  * an application should do.
  *
- * Starting a crystal takes up to a second or two, and this call waits for it.
- * That happens once, on the boot that first configures the RTC.
+ * Naming an oscillator that is not the one already running is the exception,
+ * and it is destructive: the selection can only be changed by resetting the
+ * backup domain, which clears the calendar and every backup register. Pass
+ * ::HAL_RTC_CLOCK_AUTO to keep whatever is running.
  *
- * @param cfg Configuration; NULL selects ::HAL_RTC_CLOCK_AUTO.
+ * @param cfg Configuration; NULL selects ::HAL_RTC_CLOCK_AUTO with the default
+ *            crystal timeout.
  * @return ::HAL_OK, or ::HAL_ERR_TIMEOUT if the requested oscillator never
  *         started or the calendar would not enter initialization mode.
  */

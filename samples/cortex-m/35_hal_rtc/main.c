@@ -86,7 +86,13 @@ int main(void) {
   hal_timebase_init(1000);
   hal_gpio_set_mode(LED_BUILTIN, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_NONE);
 
-  hal_rtc_init(&(hal_rtc_config_t){.clock = HAL_RTC_CLOCK_AUTO});
+  /* This board fits a 32.768 kHz crystal that is slow to start — measured at
+   * 7-10 s from cold, against the sub-second a healthy one takes. Ask for it by
+   * name so a timeout is an error rather than a silent fall back to the RC, and
+   * allow enough time for it. The wait is paid only on the boot that configures
+   * the RTC; after that the oscillator stays powered in the backup domain. */
+  hal_rtc_init(&(hal_rtc_config_t){.clock = HAL_RTC_CLOCK_LSE,
+                                   .lse_timeout_ms = 15000});
 
   /* Only seed the calendar on a cold start — a reset must not rewind it. */
   if (!hal_rtc_is_set()) {

@@ -34,12 +34,17 @@
 #include "family/exti_reg.h"
 #include "family/rcc_reg.h"
 #include "family/rtc_reg.h"
+#include "navhal_port_clock.h"
 #include "navhal_port_interrupt.h"
 #include <stdint.h>
 
-/* A crystal can take a second or two to start, and this is the only place that
- * waits for one. The internal RC starts in tens of microseconds. */
-#define LSE_TIMEOUT_SPINS 20000000UL
+/* Waiting for the crystal is the one place a real-time bound matters, so it is
+ * derived from the system clock rather than being a magic spin count. The
+ * estimate assumes roughly ten core cycles per poll of an APB register; it is
+ * approximate by nature, and generous enough that a healthy crystal is never
+ * cut short. */
+#define LSE_DEFAULT_TIMEOUT_MS 5000U
+#define CYCLES_PER_POLL 10U
 #define LSI_TIMEOUT_SPINS 100000UL
 /* Entering initialization mode costs up to two RTC clock cycles — an eternity
  * in CPU terms at 32 kHz, hence the generous bound. */
@@ -106,9 +111,15 @@ static hal_status_t wait_sync(void) {
   return HAL_OK;
 }
 
-static hal_status_t start_lse(void) {
+static hal_status_t start_lse(uint16_t timeout_ms) {
+  uint32_t ms = timeout_ms ? timeout_ms : LSE_DEFAULT_TIMEOUT_MS;
+  uint32_t sysclk = hal_clock_get_sysclk();
+  if (sysclk == 0u)
+    sysclk = 16000000u; /* clock driver could not tell; assume the reset HSI */
+  uint32_t spins = (sysclk / 1000u) * ms / CYCLES_PER_POLL;
+
   RCC->BDCR |= RCC_BDCR_LSEON;
-  WAIT_OR_TIMEOUT(!(RCC->BDCR & RCC_BDCR_LSERDY), LSE_TIMEOUT_SPINS);
+  WAIT_OR_TIMEOUT(!(RCC->BDCR & RCC_BDCR_LSERDY), spins);
   return HAL_OK;
 }
 
@@ -136,11 +147,19 @@ hal_status_t hal_rtc_init(const hal_rtc_config_t *cfg) {
    * RCC_CSR, which the system reset clears — so an RC-driven calendar comes back
    * configured, adopted, and quietly stopped, reading its power-on default. Get
    * the clock going again before calling it good. */
-  if ((RCC->BDCR & RCC_BDCR_RTCEN) && (RTC->ISR & RTC_ISR_INITS)) {
-    if ((RCC->BDCR & RCC_BDCR_RTCSEL_MASK) == RCC_BDCR_RTCSEL_LSI)
+  uint32_t running = RCC->BDCR & RCC_BDCR_RTCSEL_MASK;
+  /* Naming an oscillator that is not the one running is a request to
+   * reconfigure, and that costs the calendar and the backup registers. AUTO
+   * never asks for it — otherwise a crystal that is merely slow this boot would
+   * wipe the clock it was supposed to keep. */
+  uint8_t mismatch = (want == HAL_RTC_CLOCK_LSE && running != RCC_BDCR_RTCSEL_LSE) ||
+                     (want == HAL_RTC_CLOCK_LSI && running != RCC_BDCR_RTCSEL_LSI);
+
+  if ((RCC->BDCR & RCC_BDCR_RTCEN) && (RTC->ISR & RTC_ISR_INITS) && !mismatch) {
+    if (running == RCC_BDCR_RTCSEL_LSI)
       HAL_OK_OR_RETURN(start_lsi());
     else if (!(RCC->BDCR & RCC_BDCR_LSERDY))
-      HAL_OK_OR_RETURN(start_lse());
+      HAL_OK_OR_RETURN(start_lse(cfg ? cfg->lse_timeout_ms : 0));
     rtc_ready = 1;
     /* The shadow copies were cleared by the reset; do not hand back a
      * power-on default as a timestamp. */
@@ -152,7 +171,7 @@ hal_status_t hal_rtc_init(const hal_rtc_config_t *cfg) {
   uint32_t sync = PRESCALER_SYNC_LSI;
 
   if (want == HAL_RTC_CLOCK_LSE || want == HAL_RTC_CLOCK_AUTO) {
-    st = start_lse();
+    st = start_lse(cfg ? cfg->lse_timeout_ms : 0);
     if (st == HAL_OK) {
       source = RCC_BDCR_RTCSEL_LSE;
       sync = PRESCALER_SYNC_LSE;
@@ -174,7 +193,7 @@ hal_status_t hal_rtc_init(const hal_rtc_config_t *cfg) {
 
   /* The domain reset cleared LSEON, so re-start whichever oscillator won. */
   if (source == RCC_BDCR_RTCSEL_LSE)
-    HAL_OK_OR_RETURN(start_lse());
+    HAL_OK_OR_RETURN(start_lse(cfg ? cfg->lse_timeout_ms : 0));
 
   RCC->BDCR = (RCC->BDCR & ~RCC_BDCR_RTCSEL_MASK) | source;
   RCC->BDCR |= RCC_BDCR_RTCEN;

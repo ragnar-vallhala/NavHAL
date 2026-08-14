@@ -179,6 +179,7 @@ config DRV_RTC
     bool "Enable RTC Driver"
     depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
+    select DRV_CLOCK
     select DRV_INTERRUPT
     help
       Compile the hal_rtc_* API: a calendar in the always-on backup domain that

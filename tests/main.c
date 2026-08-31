@@ -37,11 +37,13 @@
 #include "cap/eth/test_eth.h"
 #include "cap/i2c_dma/test_i2c_dma.h"
 #include "cap/cycle_counter/test_dwt.h"
+#include "cap/rtc/test_rtc.h"
 #include "cap/fpu/test_fpu_accel.h"
 #include "cap/mpu/test_mpu.h"
 #include "cap/sdio/test_sdio.h"
 #include "cap/tcm/test_tcm.h"
 #include "cap/uart_dma/test_uart_dma.h"
+#include "cap/usb_cdc/test_usb_cdc.h"
 
 /* White-box, register-poke suites are per-processor. Only the Cortex-M4 set
  * exists today; a cortex-m7 build skips this tier (its registers differ — e.g.
@@ -120,6 +122,12 @@ static const navtest_suite_t *const all_suites[] = {
     &test_crc_suite,
 #if NAVHAL_CONFIG_DRV_DWT
     &test_dwt_suite,
+#endif
+#if NAVHAL_CONFIG_DRV_RTC
+    &test_rtc_suite,
+#endif
+#if NAVHAL_CONFIG_DRV_USB_CDC
+    &test_usb_cdc_suite,
 #endif
 #if NAVHAL_CONFIG_USE_FPU
     &test_fpu_suite,

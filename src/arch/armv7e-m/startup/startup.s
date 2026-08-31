@@ -254,6 +254,12 @@
 .set TIM5_IRQHandler, Default_Handler
 
 .section .text.Default_Handler, "ax", %progbits
+/* .thumb_func is what puts the Thumb bit in every `.word Default_Handler`
+   vector above. Without it the table holds an even address and the first IRQ
+   that lands here escalates to a HardFault with CFSR.INVSTATE — the handler
+   is never reached, so the failure looks like a dead peripheral. */
+.type Default_Handler, %function
+.thumb_func
 Default_Handler:
     /* Generic fallback for any vector with no dedicated handler. Tail-branch to
        the C dispatcher, which reads IPSR and invokes the registered callback

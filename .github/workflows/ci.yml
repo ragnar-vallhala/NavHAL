@@ -38,6 +38,8 @@ jobs:
             cortex-m-only:
               - 'src/arch/armv7e-m/**'
               - 'src/vendor/stm32/**'
+              - 'src/board/nucleo_f401re/**'
+              - 'src/board/navixsmf401re/**'
               - 'src/board/nucleo_f767zi/**'
               - 'include/port/cortex-m4/**'
               - 'include/port/cortex-m7/**'
@@ -53,6 +55,7 @@ jobs:
               - 'tools/pil/boards/nucleo_f401re.conf'
             avr-only:
               - 'src/arch/avr/**'
+              - 'src/board/atmega328p/**'
               - 'src/vendor/microchip/**'
               - 'include/port/avr/**'
               - 'tests/arch/avr/**'
@@ -150,6 +153,19 @@ jobs:
           name: tests-elf
           path: build-test/tests
           retention-days: 7
+      # The sample matrix and the build above both target the family's default
+      # board, so nothing else in CI compiles a second board's board.h. Build
+      # the NAVIXSM defconfig too, with the drivers only it has the hardware
+      # for, so its pin map and their register trees stay honest. Last in the
+      # job because it seeds .config, which the steps above expect to be absent.
+      - name: Build on-target ELF (NAVIXSM-F401RE)
+        run: |
+          cp cmake/defconfigs/cortex-m4_stm32f4_navixsmf401re.defconfig .config
+          printf 'CONFIG_DRV_RTC=y\nCONFIG_DRV_USB_CDC=y\n' >> .config
+          cmake -B build-test-navixsm -DTEST=ON
+          cmake --build build-test-navixsm --target tests -j
+          arm-none-eabi-size build-test-navixsm/tests
+          rm -f .config
 
   # Same as build-on-target but for the STM32F767ZI (Cortex-M7) port: builds
   # the on-target navtest ELF under the F767 toolchain so a break in the F7

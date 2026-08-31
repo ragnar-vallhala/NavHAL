@@ -36,6 +36,9 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | System | DMA controller            | `DMA`           | ✓ | — | ✓ |
 | System | Hardware CRC              | `CRC_HW`        | ✓ | s/w | ✓ |
 | System | RTC (calendar + backup)   | `RTC`           | ✓ | — | ✗ ‡ |
+| System | Reset + reset cause       | `RESET`         | ✓ | ✓ | ✓ |
+| System | Independent watchdog      | `WATCHDOG`      | ✓ (IWDG) | ✓ (WDT) | ✓ (IWDG) |
+| System | Window watchdog           | `WWDG`          | ✓ | — | ✓ |
 | I/O    | GPIO                      | `GPIO`          | ✓ | ✓ | ✓ |
 | I/O    | Timer                     | `TIMER`         | ✓ | ✓ | ✓ |
 | I/O    | PWM                       | `PWM`           | ✓ | ✓ | ✓ |

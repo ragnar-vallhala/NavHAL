@@ -211,6 +211,37 @@ config DRV_USB_CDC
       RCC PLL Q output to be exactly 48 MHz; hal_usb_cdc_init() refuses to run
       otherwise.
 
+config DRV_RESET
+    bool "Enable Reset Driver"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
+    default n
+    help
+      Compile the hal_reset_* API: reset the MCU, and read why it last reset
+      (power-on, pin, brown-out, software, watchdog). The cause flags are
+      sticky in hardware, so hal_reset_init() latches and clears them — call it
+      early. Pairs with DRV_WATCHDOG: the watchdog recovers the board, the
+      cause is how the next boot knows it had to.
+
+config DRV_WATCHDOG
+    bool "Enable Watchdog Driver"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
+    default n
+    help
+      Compile the hal_watchdog_* API: the independent watchdog (IWDG on STM32,
+      WDT on AVR), which runs from its own oscillator and so still fires when
+      the system clock has died. It cannot be stopped once started — that is
+      the point, and it is why nothing in the API offers a stop.
+
+config DRV_WWDG
+    bool "Enable Window Watchdog API"
+    depends on DRV_WATCHDOG && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    default n
+    help
+      Compile the hal_wwdg_* variants on top of the watchdog driver. The window
+      watchdog treats an early kick as a fault too, so it catches a loop running
+      free that the independent watchdog is blind to. STM32 only: the ATmega328P
+      has one watchdog and no window on it.
+
 config DRV_FLASH
     bool "Enable Flash Driver"
     default n

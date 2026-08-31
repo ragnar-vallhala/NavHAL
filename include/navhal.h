@@ -96,10 +96,12 @@ extern "C" {
 #include "common/hal_eth.h"
 #include "common/hal_flash.h"
 #include "common/hal_mpu.h"
+#include "common/hal_reset.h"
 #include "common/hal_rtc.h"
 #include "common/hal_sdio.h"
 #include "common/hal_tcm.h"
 #include "common/hal_usb_cdc.h"
+#include "common/hal_watchdog.h"
 
 
 #ifdef __cplusplus

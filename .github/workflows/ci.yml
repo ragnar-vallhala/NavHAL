@@ -38,6 +38,8 @@ jobs:
             cortex-m-only:
               - 'src/arch/armv7e-m/**'
               - 'src/vendor/stm32/**'
+              - 'src/board/nucleo_f401re/**'
+              - 'src/board/navixsmf401re/**'
               - 'src/board/nucleo_f767zi/**'
               - 'include/port/cortex-m4/**'
               - 'include/port/cortex-m7/**'
@@ -53,6 +55,7 @@ jobs:
               - 'tools/pil/boards/nucleo_f401re.conf'
             avr-only:
               - 'src/arch/avr/**'
+              - 'src/board/atmega328p/**'
               - 'src/vendor/microchip/**'
               - 'include/port/avr/**'
               - 'tests/arch/avr/**'

@@ -38,6 +38,13 @@
  *
  * Target-agnostic: the console is ::BOARD_CONSOLE_UART, so the same source
  * builds for the Nucleo boards and the ATmega328P.
+ *
+ * @note On an Arduino Uno the cause prints as `unknown` even though the reset
+ * really was the watchdog. The bootloader reads MCUSR and clears it before the
+ * application starts — it has to, or a watchdog reset would loop forever — and
+ * this one keeps no copy anywhere the application can reach. The watchdog half
+ * still works and the board still cycles; it is only the reporting that the
+ * bootloader has taken away. A bare chip programmed over ISP reports properly.
  */
 
 #include "board.h"

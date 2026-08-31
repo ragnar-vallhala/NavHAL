@@ -38,6 +38,9 @@ The M6 target. An 8-bit AVR — none of the optional Cortex-M caps (DMA, FPU, DW
 | UART_DMA          | —   | n/a                                    | Requires DMA. |
 | I2C_DMA           | —   | n/a                                    | Requires DMA. |
 | SDIO_DMA          | —   | n/a                                    | Requires SDIO + DMA. |
+| RESET             | ✓   | `src/vendor/microchip/reset/reset.c`   | Cause from MCUSR (`PORF`/`EXTRF`/`BORF`/`WDRF`). There is no reset-request register, so `hal_system_reset()` arms the shortest watchdog and stops feeding it — the next boot therefore reports `WATCHDOG`, not `SOFTWARE`. Opt-in via `CONFIG_DRV_RESET`. |
+| WATCHDOG          | ✓   | `src/vendor/microchip/watchdog/watchdog.c` | The WDT on its own ~128 kHz RC: ten fixed steps from 16 ms to 8 s, so a request rounds up to the first step that covers it. Opt-in via `CONFIG_DRV_WATCHDOG`. |
+| WWDG              | —   | n/a                                    | The ATmega328P has one watchdog and no window on it. `CONFIG_DRV_WWDG` is not offered for AVR. |
 
 ## Default Kconfig state
 
@@ -69,6 +72,7 @@ The `—` rows are hard-wired at 0 — even if a user sets `CONFIG_DRV_DMA=y` in
 
 * `hal_clock` doesn't reconfigure the prescaler; it reports `F_CPU`. If your application needs to slow the CPU at runtime, write CLKPR yourself and re-build with the new `F_CPU`.
 * `hal_flash` write requires the application to run from the bootloader section so SPM works. Out-of-the-box samples that touch flash assume this.
+* **On a bootloader board (Arduino Uno and clones) `hal_reset_get_cause()` reports `UNKNOWN`.** The bootloader reads MCUSR and clears it before the application starts — it has to, since a watchdog reset otherwise loops forever — and the bootloader on the board tested here keeps no copy the application can reach. Measured directly: MCUSR is 0 at `main()`, and `r2` holds 0xFE rather than a valid MCUSR value, so this is not the optiboot convention of passing the flags in `r2`. The watchdog itself works normally; it is only the reporting that the bootloader takes away. A bare chip programmed over ISP reports the cause properly.
 * The AVR port is recent (M6) — peripheral edge cases will surface as samples in `samples/portable/` exercise them. See [`docs/m5_avr_readiness_review.md`](../m5_avr_readiness_review.md) for the readiness audit and [`docs/m5_conformance_audit.md`](../m5_conformance_audit.md) for the per-driver conformance check.
 
 ## Sample matrix coverage

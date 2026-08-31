@@ -39,6 +39,8 @@ The reference target for NavHAL v1. Everything in the public API has a working i
 | UART_DMA          | ✓ | (uart.c)                            | `hal_uart_write_dma` etc. Defaults on when UART + DMA are on. |
 | I2C_DMA           | ✓ | (i2c.c)                             | `hal_i2c_read_regs_dma`. Defaults on when I²C + DMA are on. |
 | SDIO_DMA          | ✓ | (sdio.c)                            | `hal_sdio_*_async` block transfers. Defaults on when SDIO + DMA are on. |
+| RTC               | ✓ | `src/vendor/stm32/rtc/rtc.c`       | Calendar, alarm A, periodic wakeup, 20 backup registers. Runs from the board's 32.768 kHz crystal when one is fitted, otherwise the ~32 kHz internal RC. The Nucleo has no crystal, so it falls back to LSI; `hal_rtc_get_clock()` reports which. Opt-in via `CONFIG_DRV_RTC`. |
+| USB_CDC           | ✓ | `src/vendor/stm32/usb/usb_cdc.c`   | OTG_FS device mode; the target enumerates as a USB full-speed virtual COM port. Needs the PLL Q output at exactly 48 MHz — `hal_usb_cdc_init()` returns `HAL_ERR_NOT_INITIALIZED` otherwise. The Nucleo does not route USB to a connector, so this is buildable but not usable there. Opt-in via `CONFIG_DRV_USB_CDC`. |
 
 ## Default Kconfig state
 
@@ -62,6 +64,8 @@ NAVHAL_HAS_FLASH          0   (selectable via CONFIG_DRV_FLASH)
 NAVHAL_HAS_UART_DMA       1
 NAVHAL_HAS_I2C_DMA        0
 NAVHAL_HAS_SDIO_DMA       0
+NAVHAL_HAS_RTC            0   (selectable via CONFIG_DRV_RTC)
+NAVHAL_HAS_USB_CDC        0   (selectable via CONFIG_DRV_USB_CDC)
 ```
 
 A `0` in the *default* config doesn't mean "unsupported" — it means the driver is opt-in. The matrix `✓` reflects what's possible, not what's default.
@@ -72,6 +76,8 @@ A `0` in the *default* config doesn't mean "unsupported" — it means the driver
 * `hal_clock_init` busy-waits on PLL/HSE ready flags. Renode's RCC model used to assert these much slower than real silicon, which is why early PIL runs were very slow.
 * No DMA buffer-alignment assertion in `hal_uart_write_dma` — caller must ensure the buffer outlives the transfer.
 * SDIO timing is calibrated for ~21 MHz post-handshake (CLKCR DIV=2 from 84 MHz SDIOCLK).
+* The RTC calendar survives a reset only while the backup domain stays powered; with no coin cell on VBAT that means as long as 3V3 holds. On a board without a 32.768 kHz crystal the LSI fallback drifts by a percent or so — fine for timestamps, not for timekeeping.
+* `hal_usb_cdc` is device-mode only (no host, no OTG role switching), one CDC-ACM function, full speed.
 
 ## Sample matrix coverage
 

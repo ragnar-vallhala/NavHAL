@@ -185,7 +185,11 @@ config DRV_SDIO_DMA
 
 config DRV_RTC
     bool "Enable RTC Driver"
-    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    # F4 only: rtc.c includes family/rtc_reg.h and family/exti_reg.h, which
+    # exist under stm32f4 alone. The F7 RTC is near enough the same IP that the
+    # driver should port, but until those headers land, offering the symbol on
+    # M7 only buys a build that fails at the first include.
+    depends on FAMILY_STM32F4
     default n
     select DRV_CLOCK
     select DRV_INTERRUPT

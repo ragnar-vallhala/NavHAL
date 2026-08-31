@@ -4,7 +4,7 @@
 
 What the HAL capability contract reports for each supported MCU. The canonical gate is `NAVHAL_CONFIG_DRV_*` (a 1:1 mirror of Kconfig, force-included into every TU); the `NAVHAL_HAS_*` names below are the **deprecated** aliases kept for out-of-tree consumers. Macro definitions and the contract semantics live in [`../api_standardization.md`](../api_standardization.md); this directory only tracks per-target availability and implementation status.
 
-**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_atmega328p &nbsp;·&nbsp; @subpage cap_stm32f767zi
+**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_navixsmf401re &nbsp;·&nbsp; @subpage cap_atmega328p &nbsp;·&nbsp; @subpage cap_stm32f767zi
 
 ## Symbol legend
 
@@ -35,7 +35,7 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | System | Flash (KV store)          | `FLASH`         | ✓ | ◐ | ✓ |
 | System | DMA controller            | `DMA`           | ✓ | — | ✓ |
 | System | Hardware CRC              | `CRC_HW`        | ✓ | s/w | ✓ |
-| System | RTC                       | *(none)*        | ✗ | — | ✗ |
+| System | RTC (calendar + backup)   | `RTC`           | ✓ | — | ✗ ‡ |
 | I/O    | GPIO                      | `GPIO`          | ✓ | ✓ | ✓ |
 | I/O    | Timer                     | `TIMER`         | ✓ | ✓ | ✓ |
 | I/O    | PWM                       | `PWM`           | ✓ | ✓ | ✓ |
@@ -47,7 +47,7 @@ that has no driver yet shows `✗` and carries no macro (`—` in that column).
 | Bus    | SDIO / SDMMC              | `SDIO`          | ✓ (1×) | — | ◐ (2×) |
 | Bus    | SDIO async (DMA)          | `SDIO_DMA`      | ✓ | — | ◐ ¶ |
 | Bus    | Ethernet MAC (frame-level)| `ETH`           | — | — | ✓ |
-| Bus    | USB OTG FS                | *(none)*        | ✗ | — | ✗ |
+| Bus    | USB OTG FS (CDC-ACM dev)  | `USB_CDC`       | ✓ | — | ✗ |
 | Bus    | USB OTG HS                | *(none)*        | — | — | ✗ |
 | Bus    | CAN (bxCAN)               | *(none)*        | — | — | ✗ (3×) |
 | Bus    | QUAD-SPI                  | *(none)*        | — | — | ✗ |
@@ -67,6 +67,10 @@ Most `✗` rows are silicon NavHAL simply hasn't scoped a driver for yet (roadma
 
 `†` The FPU **module** is shared across the M4 and M7 ports; the FPU
 *precision/variant* differs by core — see each MCU's page.
+
+`‡` The F767 carries the same RTC block, but `hal_rtc` reaches for register
+headers that exist only under `family/stm32f4/`. `CONFIG_DRV_RTC` is gated to
+`FAMILY_STM32F4` for that reason — the port is a header away, not a driver away.
 
 `§` MPU support is a shared ARMv7-M core driver (`hal_mpu`), gated on
 `NAVHAL_CONFIG_DRV_MPU` (deprecated alias `NAVHAL_HAS_MPU`). Per-core region

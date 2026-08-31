@@ -48,6 +48,8 @@ extern "C" {
 
 /* On-board indicators / inputs */
 #define LED_BUILTIN  GPIO_PA05  /**< LD2 (green user LED), shared with D13. */
+#define LED_ON       HAL_GPIO_HIGH /**< Level that lights ::LED_BUILTIN. */
+#define LED_OFF      HAL_GPIO_LOW  /**< Level that extinguishes it. */
 #define USER_BUTTON  GPIO_PC13  /**< B1 user button, active-low. */
 
 /* Board console UART — USART2 is wired to the ST-LINK virtual COM port. */

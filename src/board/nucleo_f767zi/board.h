@@ -49,6 +49,8 @@ extern "C" {
 
 /* On-board indicators / inputs */
 #define LED_BUILTIN  GPIO_PB00  /**< LD1 (green user LED). */
+#define LED_ON       HAL_GPIO_HIGH /**< Level that lights ::LED_BUILTIN. */
+#define LED_OFF      HAL_GPIO_LOW  /**< Level that extinguishes it. */
 #define LD1_GREEN    GPIO_PB00  /**< LD1 green. */
 #define LD2_BLUE     GPIO_PB07  /**< LD2 blue. */
 #define LD3_RED      GPIO_PB14  /**< LD3 red. */

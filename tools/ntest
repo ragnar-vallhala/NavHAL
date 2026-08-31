@@ -483,7 +483,10 @@ def run_hil(args):
 
 # --- samples ---------------------------------------------------------------
 ARCH_TOOLCHAIN = {
-    "ARCH_CORTEX_M4": None,  # default toolchain
+    # Pinned, not None: with no toolchain file there is no NAVHAL_DEFCONFIG,
+    # so the board falls out of the Kconfig choice default — and that moves
+    # whenever a board is added to the family. The matrix has to name its board.
+    "ARCH_CORTEX_M4": "cmake/toolchains/arm-none-eabi-toolchain.cmake",
     "ARCH_CORTEX_M7": "cmake/toolchains/arm-none-eabi-f767-toolchain.cmake",
     "ARCH_AVR8": "cmake/toolchains/avr-toolchain.cmake",
 }

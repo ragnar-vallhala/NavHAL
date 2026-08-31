@@ -45,6 +45,8 @@ extern "C" {
 
 /* On-board indicator / input */
 #define LED_BUILTIN  GPIO_PB05  /**< On-board LED, shared with D13 (SCK). */
+#define LED_ON       HAL_GPIO_HIGH /**< Level that lights ::LED_BUILTIN. */
+#define LED_OFF      HAL_GPIO_LOW  /**< Level that extinguishes it. */
 #define USER_BUTTON  GPIO_PD02  /**< D2 — wire a button to GND; uses a pull-up. */
 
 /* Arduino-Uno digital header D0..D13 */

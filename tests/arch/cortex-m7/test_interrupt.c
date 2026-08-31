@@ -213,8 +213,33 @@ void test_driver_enabled_irqs_have_dedicated_handlers(void) {
                    (((uint32_t)(uintptr_t)Default_Handler) & ~1u));
 }
 
+
+/* Word count of the .isr_vector table in src/board/nucleo_f767zi/startup.s
+ * (initial SP + 15 system exceptions + IRQ 0..97, the last being SPDIF_RX).
+ * Past the end is code, whose words are not vectors and are not odd. */
+#define VECTOR_TABLE_ENTRIES 114u
+
+/* The Thumb-bit regression. ASSERT_VECTOR_IS above masks the LSB off both
+ * sides, so it passes whether or not the vector carries it — but the core
+ * BXes to the vector word, and a word with the LSB clear asks for ARM state,
+ * which ARMv7-M does not implement. The IRQ escalates to a HardFault with
+ * CFSR.INVSTATE and the handler never runs, so the symptom is a peripheral
+ * that looks dead. Default_Handler lost the bit by being declared without
+ * .thumb_func; scan the whole live table so any handler can only lose it once.
+ */
+void test_vector_table_entries_are_thumb(void) {
+  TEST_ASSERT_TRUE((((uint32_t)(uintptr_t)Default_Handler) & 1u) == 1u);
+  for (uint32_t exc = 1u; exc < VECTOR_TABLE_ENTRIES; exc++) {
+    uint32_t word = vector_word(exc);
+    if (word == 0u)
+      continue; /* reserved slot */
+    TEST_ASSERT_TRUE((word & 1u) == 1u);
+  }
+}
+
 /* -------------------- Suite -------------------- */
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+NAVTEST_CASE_DECL(test_vector_table_entries_are_thumb);
 NAVTEST_CASE_DECL(test_hal_interrupt_enable_sets_iser_bit);
 NAVTEST_CASE_DECL(test_hal_interrupt_disable_sets_icer_bit);
 NAVTEST_CASE_DECL(test_hal_interrupt_clear_pending_clears_ispr_bit);
@@ -232,6 +257,7 @@ NAVTEST_CASE_DECL(test_hal_interrupt_detach_rejects_out_of_range);
 
 
 static const navtest_case_t interrupt_cases[] = {
+    NAVTEST_CASE(test_vector_table_entries_are_thumb),
     NAVTEST_CASE(test_hal_interrupt_enable_sets_iser_bit),
     NAVTEST_CASE(test_hal_interrupt_disable_sets_icer_bit),
     NAVTEST_CASE(test_hal_interrupt_clear_pending_clears_ispr_bit),

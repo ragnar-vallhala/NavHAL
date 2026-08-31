@@ -790,6 +790,12 @@ hal_status_t hal_usb_cdc_init(void) {
 }
 
 hal_status_t hal_usb_cdc_deinit(void) {
+  /* Every register below lives behind the OTG_FS clock gate, and reading one
+   * while the gate is shut faults. Deinit before a successful init is a no-op,
+   * not a bus error. */
+  if (!(RCC->AHB2ENR & RCC_AHB2ENR_OTGFSEN))
+    return HAL_OK;
+
   USB_DEVICE->DCTL |= USB_DCTL_SDIS;
   USB_GLOBAL->GAHBCFG &= ~USB_GAHBCFG_GINT;
   hal_interrupt_disable(OTG_FS_IRQn);

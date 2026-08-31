@@ -27,6 +27,7 @@ STUB=build-cap-stub
 DEFAULT=build-cap-default
 NOCAP=build-cap-nocap
 MIX=build-cap-mix
+OPTIN=build-cap-optin
 
 cleanup() {
   if [ -n "$SAVED_CONFIG" ] && [ -f "$SAVED_CONFIG" ]; then
@@ -34,7 +35,7 @@ cleanup() {
   else
     rm -f .config
   fi
-  rm -rf "$STUB" "$DEFAULT" "$NOCAP" "$MIX"
+  rm -rf "$STUB" "$DEFAULT" "$NOCAP" "$MIX" "$OPTIN"
 }
 trap cleanup EXIT
 
@@ -78,6 +79,9 @@ materialize_default_config
 build_test "$DEFAULT"
 expect_present "$DEFAULT/tests" hal_dma_init
 expect_present "$DEFAULT/tests" hal_uart_write_dma
+# Opt-in drivers (default n) must stay out of a build that never asked for them.
+expect_absent "$DEFAULT/tests" hal_rtc_init
+expect_absent "$DEFAULT/tests" hal_usb_cdc_init
 
 echo "==== Scenario 2: no-cap strip (everything off) ===="
 materialize_default_config
@@ -108,6 +112,20 @@ cmake -B "$STUB" -DTEST=ON >/dev/null && rm -rf "$STUB"
 build_test "$MIX"
 expect_absent  "$MIX/tests" hal_uart_write_dma
 expect_present "$MIX/tests" hal_sdio_read_block_async
+
+echo "==== Scenario 4: opt-in drivers actually compile in ===="
+# The mirror of scenario 1: a driver that is absent by default has to appear
+# once its symbol is set, or the Kconfig-to-CMake wiring is dead and nobody
+# would notice — the default build looks identical either way.
+materialize_default_config
+sed -i \
+  -e 's/^# CONFIG_DRV_RTC is not set/CONFIG_DRV_RTC=y/' \
+  -e 's/^# CONFIG_DRV_USB_CDC is not set/CONFIG_DRV_USB_CDC=y/' \
+  .config
+cmake -B "$STUB" -DTEST=ON >/dev/null && rm -rf "$STUB"
+build_test "$OPTIN"
+expect_present "$OPTIN/tests" hal_rtc_init
+expect_present "$OPTIN/tests" hal_usb_cdc_init
 expect_present "$MIX/tests" hal_dma_init
 
 echo

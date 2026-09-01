@@ -41,6 +41,9 @@ The reference target for NavHAL v1. Everything in the public API has a working i
 | SDIO_DMA          | ✓ | (sdio.c)                            | `hal_sdio_*_async` block transfers. Defaults on when SDIO + DMA are on. |
 | RTC               | ✓ | `src/vendor/stm32/rtc/rtc.c`       | Calendar, alarm A, periodic wakeup, 20 backup registers. Runs from the board's 32.768 kHz crystal when one is fitted, otherwise the ~32 kHz internal RC. The Nucleo has no crystal, so it falls back to LSI; `hal_rtc_get_clock()` reports which. Opt-in via `CONFIG_DRV_RTC`. |
 | USB_CDC           | ✓ | `src/vendor/stm32/usb/usb_cdc.c`   | OTG_FS device mode; the target enumerates as a USB full-speed virtual COM port. Needs the PLL Q output at exactly 48 MHz — `hal_usb_cdc_init()` returns `HAL_ERR_NOT_INITIALIZED` otherwise. The Nucleo does not route USB to a connector, so this is buildable but not usable there. Opt-in via `CONFIG_DRV_USB_CDC`. |
+| RESET             | ✓ | `src/vendor/stm32/reset/reset.c`   | `hal_system_reset()` via SCB AIRCR; cause from the sticky RCC_CSR flags, latched and cleared by `hal_reset_init()`. Opt-in via `CONFIG_DRV_RESET`. |
+| WATCHDOG          | ✓ | `src/vendor/stm32/watchdog/watchdog.c` | IWDG on the LSI: ~0.125 ms to 32.7 s, unstoppable once started. Opt-in via `CONFIG_DRV_WATCHDOG`. |
+| WWDG              | ✓ | (watchdog.c)                       | Window watchdog on PCLK1/4096. Range is tens of milliseconds — seconds are the IWDG's job. Opt-in via `CONFIG_DRV_WWDG`. |
 
 ## Default Kconfig state
 
@@ -66,6 +69,9 @@ NAVHAL_HAS_I2C_DMA        0
 NAVHAL_HAS_SDIO_DMA       0
 NAVHAL_HAS_RTC            0   (selectable via CONFIG_DRV_RTC)
 NAVHAL_HAS_USB_CDC        0   (selectable via CONFIG_DRV_USB_CDC)
+NAVHAL_HAS_RESET          0   (selectable via CONFIG_DRV_RESET)
+NAVHAL_HAS_WATCHDOG       0   (selectable via CONFIG_DRV_WATCHDOG)
+NAVHAL_HAS_WWDG           0   (selectable via CONFIG_DRV_WWDG)
 ```
 
 A `0` in the *default* config doesn't mean "unsupported" — it means the driver is opt-in. The matrix `✓` reflects what's possible, not what's default.
@@ -78,6 +84,9 @@ A `0` in the *default* config doesn't mean "unsupported" — it means the driver
 * SDIO timing is calibrated for ~21 MHz post-handshake (CLKCR DIV=2 from 84 MHz SDIOCLK).
 * The RTC calendar survives a reset only while the backup domain stays powered; with no coin cell on VBAT that means as long as 3V3 holds. On a board without a 32.768 kHz crystal the LSI fallback drifts by a percent or so — fine for timestamps, not for timekeeping.
 * `hal_usb_cdc` is device-mode only (no host, no OTG role switching), one CDC-ACM function, full speed.
+* Neither watchdog can be stopped once started, so there is no API to do so. A build that arms one has committed every code path after that point to kicking it.
+* The IWDG runs from the LSI, an RC oscillator good to a few percent over temperature — `hal_watchdog_get_timeout_ms()` returns the nominal figure, not a guarantee. Kick at a fraction of it.
+* A watchdog reset also asserts the internal reset line, so `hal_reset_get_cause()` reports `PIN` alongside `WATCHDOG`. That is why the cause is a bitmask and not a single value.
 
 ## Sample matrix coverage
 

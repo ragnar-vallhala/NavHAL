@@ -82,6 +82,8 @@ expect_present "$DEFAULT/tests" hal_uart_write_dma
 # Opt-in drivers (default n) must stay out of a build that never asked for them.
 expect_absent "$DEFAULT/tests" hal_rtc_init
 expect_absent "$DEFAULT/tests" hal_usb_cdc_init
+expect_absent "$DEFAULT/tests" hal_reset_init
+expect_absent "$DEFAULT/tests" hal_watchdog_start
 
 echo "==== Scenario 2: no-cap strip (everything off) ===="
 materialize_default_config
@@ -121,11 +123,15 @@ materialize_default_config
 sed -i \
   -e 's/^# CONFIG_DRV_RTC is not set/CONFIG_DRV_RTC=y/' \
   -e 's/^# CONFIG_DRV_USB_CDC is not set/CONFIG_DRV_USB_CDC=y/' \
+  -e 's/^# CONFIG_DRV_RESET is not set/CONFIG_DRV_RESET=y/' \
+  -e 's/^# CONFIG_DRV_WATCHDOG is not set/CONFIG_DRV_WATCHDOG=y/' \
   .config
 cmake -B "$STUB" -DTEST=ON >/dev/null && rm -rf "$STUB"
 build_test "$OPTIN"
 expect_present "$OPTIN/tests" hal_rtc_init
 expect_present "$OPTIN/tests" hal_usb_cdc_init
+expect_present "$OPTIN/tests" hal_reset_init
+expect_present "$OPTIN/tests" hal_watchdog_start
 expect_present "$MIX/tests" hal_dma_init
 
 echo

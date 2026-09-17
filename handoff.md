@@ -169,7 +169,7 @@ capability matrix (`docs/capabilities/README.md`), not a false `✓`.
      **RX not yet physically confirmed** (needs the host to transmit to it).
 5. **Version + release** — `VERSION` in `include/navhal.h` is the source of
    truth (`0.3.x-dev`). Path to ship: push → merge to `main` → cut to `stable`
-   with a version bump. Per-minor changelog under `docs/changelog/`.
+   with a version bump.
 
 ---
 

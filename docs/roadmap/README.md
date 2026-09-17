@@ -21,13 +21,14 @@ The answer to (2) is the [Module ABI](../MODULE_ABI.md) spec, which
 already covers `module` and `app` kinds; a third `port` kind closes
 the loop.
 
-This roadmap is the work to get there, factored into five milestones.
+This roadmap is the remaining work to get there. Shipped milestones are
+summarised below rather than kept as pages; git history has the detail.
 
-## Where we are today (post-M6)
+## Where we are today (post-M8)
 
 | | |
 |---|---|
-| Supported MCUs                       | 2 — STM32F401RE (Cortex-M4) · ATmega328P (AVR) |
+| Supported MCUs                       | 3 — STM32F401RE (Cortex-M4) · STM32F767ZI (Cortex-M7) · ATmega328P (AVR), plus a bare-metal x86-64 PC target |
 | Built-in CI gates                    | Host tests, cap-contract, sample matrices (both archs), PIL (Renode for Cortex, simavr for AVR), Conventional Commits, release gate on `main → stable` |
 | Per-MCU PIL dispatcher               | `tools/pil/run.sh <board>` + `tools/pil/boards/<board>.conf` |
 | Distribution model                   | bundled monorepo |
@@ -38,17 +39,18 @@ This roadmap is the work to get there, factored into five milestones.
 
 | Milestone        | Status      | Scope                                       | Unlocks                                              |
 |---|---|---|---|
-| @subpage roadmap_m7  | **done**    | Modular build system | 5–15 MCUs without CMakeLists/Kconfig becoming a swamp |
-| @subpage roadmap_m8  | **done**    | CI tiering + portable test framework        | Per-arch CI scaling; HAL-only tests run on every arch |
 | @subpage roadmap_m9  | planned     | Driver vtable / vendor-backend abstraction  | ~80 % less per-vendor boilerplate; conformance enforced by interface |
 | @subpage roadmap_m10 | planned     | Port as a registry package                  | Strategic shift away from monorepo. Vendors publish ports independently. |
 | @subpage roadmap_m11 | planned     | `HAL_API_VERSION 2`                         | Subsystem namespaces v1 couldn't anticipate — USB, Ethernet, BLE, AI accelerators |
-| @subpage roadmap_f767 | **done**    | Cortex-M7 / STM32F767ZI port                 | A third implemented port; the Cortex-M7 arch tier |
 | @subpage roadmap_x86 | in-progress | Bare-metal x86-64 PC port (QEMU first)      | Running NavHAL on commodity x86; a third ISA exercising the port contract |
 
-The first three (M7–M9) are pure engineering on the current monorepo.
-The last two (M10–M11) are the strategic shifts that take NavHAL
-from "thoughtful HAL for a handful of MCUs" to "Arduino-scale".
+M9 is pure engineering on the current monorepo. M10 and M11 are the
+strategic shifts that take NavHAL from "thoughtful HAL for a handful of
+MCUs" to "Arduino-scale".
+
+Already shipped, pages removed: **M7** (modular build), **M8** (CI tiering
+and the portable test framework, including the §8.4 conformance contract the
+pages below still cite), and the **STM32F767ZI** Cortex-M7 port.
 
 Reference reading: @subpage roadmap_abstraction — how NavHAL abstracts
 per-vendor hardware today, and why the M9 indirection is free under `-flto`.
@@ -56,23 +58,14 @@ per-vendor hardware today, and why the M9 indirection is free under `-flto`.
 ## Dependency graph
 
 ```
-   M6 (done)
+   M8 (done)
     │
     ▼
-   M7 ── M8
-    │     │
-    ▼     ▼
-   M9 ──┐
-        │
-        ▼
-       M10 ── M11
+   M9 ── M10 ── M11
 ```
 
-* **M7 first** — fragmenting the build is a no-regret refactor that
-  every subsequent milestone benefits from.
-* **M8 in parallel** with M7 — independent concerns; can interleave.
 * **M9 needs M7** — the vtable refactor will touch a lot of
-  per-vendor code; cleaner if the build is already modular.
+  per-vendor code; cleaner now that the build is modular.
 * **M10 needs M9** — a "port package" is well-defined only when the
   port-vendor interface is clean. Otherwise every port package has to
   ship its own snowflake build glue.
@@ -101,8 +94,8 @@ M10 is where the answer gets committed. Before M10, NavHAL stays
 monorepo. After M10, the AVR (or RP2040, ESP32, …) ports could move
 to standalone repos under the `nav` registry — and the core repo
 becomes the reference Cortex-M4 port + the HAL contract + the test
-framework. **The architecture allows either; M7–M9 don't foreclose
-M10.** That's the property to preserve.
+framework. **The architecture allows either; nothing shipped so far
+forecloses M10.** That's the property to preserve.
 
 ## Open strategic questions
 

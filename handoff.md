@@ -155,8 +155,7 @@ capability matrix (`docs/capabilities/README.md`), not a false `✓`.
    separate, carefully-validated change. `hal_cache.h` already documents it as
    the next phase.
 3. **UART DMA RX** — implemented, validate with a TX↔RX loopback jumper.
-4. **Additional F7 drivers** — continue per the port plan
-   (`docs/roadmap/stm32f767zi-port.md`) / capability matrix `✗` rows.
+4. **Additional F7 drivers** — continue per the capability matrix `✗` rows.
    - **Ethernet — ✓ DONE & hardware-validated.** Frame-level MAC + dedicated DMA
      over RMII/LAN8742 (`hal_eth_*`, `src/vendor/stm32/eth/eth_f7.c`, `DRV_ETH`).
      Device-free `test_eth` reads PHY ID `0x0007C131`; bring-up sample

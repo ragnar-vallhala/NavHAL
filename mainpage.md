@@ -44,6 +44,7 @@ The Related Pages tab is structured top-down — start here:
 
 - **Testing & verification**
   - @subpage testing
+  - @subpage conformance
 
 - **Roadmap**
   - @subpage roadmap

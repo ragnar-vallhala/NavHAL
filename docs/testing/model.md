@@ -117,6 +117,12 @@ or QEMU for a future Cortex-A port) it stays on the GitHub-hosted
 tier as long as the wall-clock fits. If it grows past ~10 min, move
 that single job to self-hosted and keep the per-PR jobs hosted.
 
+## Conformance — orthogonal to the triangle
+
+`tests/portable/conformance/` asserts that the HAL *contract* holds, not
+that a given driver works, so it cuts across SIL, PIL and HIL rather than
+sitting inside one of them. It has its own page: @ref conformance.
+
 ## What sits *above* this triangle
 
 A few classes of test are still on the wishlist and don't fit any of

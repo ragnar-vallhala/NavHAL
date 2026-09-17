@@ -11,7 +11,7 @@
 # UART (USART3 console) is served by the F7-specific driver
 # src/vendor/stm32/uart/uart_f7.c, selected by the vendor CMakeLists when
 # CONFIG_FAMILY_STM32F7 is set (the F7 USART IP uses ISR/RDR/TDR, not the F4
-# SR/DR model). See docs/stm32f767zi_port_plan.md, milestone F7-2.
+# SR/DR model).
 #
 # DRV_CACHE is on by default: the L1 I/D cache driver plus the clean/invalidate
 # maintenance the DMA drivers use to stay coherent. Validated on hardware

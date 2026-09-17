@@ -383,7 +383,7 @@ With the API surface frozen by Phase 2, grow `tests/` to cover the whole
 standardized `hal_*` API — every function, success and `hal_status_t` error
 paths — plus a host-runnable subset and CI. Built before Phases 3–4 so those
 mechanical refactors are provably behavior-preserving, and it doubles as the
-conformance harness for the M6 AVR port. See M2+ in `docs/execution_plan.md`.
+conformance harness for the M6 AVR port.
 
 **Phase 3 — Directory restructure.**
 Split `core/cortex-m4/` into `arch/armv7e-m/`, `vendor/stm32/`,

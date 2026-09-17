@@ -1,8 +1,13 @@
-# STM32F767ZI Port Plan
+@page roadmap_f767 STM32F767ZI port
 
-> Status: **in progress** — build wiring + GPIO/CLOCK/TIMER/INTERRUPT bring-up
-> landed; UART / FLASH / hardware-FPU / DMA / high-frequency clock are scoped
-> follow-ups. See [Milestones](#milestones).
+# STM32F767ZI port
+
+> Status: **done** — every milestone below landed and is validated on hardware
+> at 216 MHz.
+> Scope: a third implemented NavHAL port — ARM Cortex-M7 / STM32F7 / Nucleo-F767ZI.
+> Predecessor: M7 (modular build) — a new port is purely additive there.
+> Remaining as optional follow-ups, none blocking: D-cache enablement, a DMA
+> UART backend, and the SDIO async DMA backend (all still M4-only).
 
 ## Goal
 
@@ -102,7 +107,7 @@ the reset-default HSI (16 MHz, 0 flash wait-states), using:
 ### Files added / touched
 
 ```
-docs/stm32f767zi_port_plan.md                         (this file)
+docs/roadmap/stm32f767zi-port.md                      (this file)
 docs/capabilities/stm32f767zi.md                      (capability matrix)
 
 src/arch/armv7e-m/Kconfig            (+ARCH_CORTEX_M7 identity defaults)

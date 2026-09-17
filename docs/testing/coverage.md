@@ -104,7 +104,7 @@ documented in `include/core/cortex-m4/<driver>.h`.)
 
 ## Acceptance bar
 
-From `docs/m2_plus_plan.md` §Acceptance gate:
+The acceptance gate:
 
 - Every standardized `hal_*` function has ≥1 success-path test. ✅
 - Every `hal_status_t`-returning function has ≥1 error-path test. ✅

@@ -38,16 +38,20 @@ This roadmap is the work to get there, factored into five milestones.
 
 | Milestone        | Status      | Scope                                       | Unlocks                                              |
 |---|---|---|---|
-| @ref roadmap_m7  | **done**    | Modular build system | 5–15 MCUs without CMakeLists/Kconfig becoming a swamp |
-| @ref roadmap_m8  | **done**    | CI tiering + portable test framework        | Per-arch CI scaling; HAL-only tests run on every arch |
-| @ref roadmap_m9  | planned     | Driver vtable / vendor-backend abstraction  | ~80 % less per-vendor boilerplate; conformance enforced by interface |
-| @ref roadmap_m10 | planned     | Port as a registry package                  | Strategic shift away from monorepo. Vendors publish ports independently. |
-| @ref roadmap_m11 | planned     | `HAL_API_VERSION 2`                         | Subsystem namespaces v1 couldn't anticipate — USB, Ethernet, BLE, AI accelerators |
-| @ref roadmap_x86 | in-progress | Bare-metal x86-64 PC port (QEMU first)      | Running NavHAL on commodity x86; a third ISA exercising the port contract |
+| @subpage roadmap_m7  | **done**    | Modular build system | 5–15 MCUs without CMakeLists/Kconfig becoming a swamp |
+| @subpage roadmap_m8  | **done**    | CI tiering + portable test framework        | Per-arch CI scaling; HAL-only tests run on every arch |
+| @subpage roadmap_m9  | planned     | Driver vtable / vendor-backend abstraction  | ~80 % less per-vendor boilerplate; conformance enforced by interface |
+| @subpage roadmap_m10 | planned     | Port as a registry package                  | Strategic shift away from monorepo. Vendors publish ports independently. |
+| @subpage roadmap_m11 | planned     | `HAL_API_VERSION 2`                         | Subsystem namespaces v1 couldn't anticipate — USB, Ethernet, BLE, AI accelerators |
+| @subpage roadmap_f767 | **done**    | Cortex-M7 / STM32F767ZI port                 | A third implemented port; the Cortex-M7 arch tier |
+| @subpage roadmap_x86 | in-progress | Bare-metal x86-64 PC port (QEMU first)      | Running NavHAL on commodity x86; a third ISA exercising the port contract |
 
 The first three (M7–M9) are pure engineering on the current monorepo.
 The last two (M10–M11) are the strategic shifts that take NavHAL
 from "thoughtful HAL for a handful of MCUs" to "Arduino-scale".
+
+Reference reading: @subpage roadmap_abstraction — how NavHAL abstracts
+per-vendor hardware today, and why the M9 indirection is free under `-flto`.
 
 ## Dependency graph
 

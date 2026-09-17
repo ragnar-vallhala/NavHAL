@@ -57,9 +57,8 @@ extern "C" {
 #define USER_BUTTON  GPIO_PC13  /**< B1 user button (active-high on this board). */
 
 /* Board console UART — USART3 is wired to the ST-LINK virtual COM port
- * (TX = PD8, RX = PD9, AF7). NOTE: the F7 USART IP differs from the F4 model
- * the shared uart.c targets; UART is disabled in this board's defconfig until
- * the F7 driver path lands (see docs/stm32f767zi_port_plan.md, F7-2). */
+ * (TX = PD8, RX = PD9, AF7). The F7 USART IP uses ISR/RDR/TDR rather than the
+ * F4 SR/DR model, so this family builds uart_f7.c in place of uart.c. */
 #define BOARD_CONSOLE_UART      HAL_UART_3
 #define BOARD_CONSOLE_UART_IRQ  USART3_IRQn
 #define BOARD_CONSOLE_UART_TX   GPIO_PD08

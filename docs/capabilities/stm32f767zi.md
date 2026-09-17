@@ -4,8 +4,9 @@
 
 The third NavHAL port, in **initial bring-up**. The build system, GPIO, clock,
 timer and interrupt layers are implemented and verified on real hardware (a
-flashed `hal_blink` toggles the LED). The remaining peripherals are scoped
-follow-ups — see [`../stm32f767zi_port_plan.md`](../stm32f767zi_port_plan.md).
+flashed `hal_blink` toggles the LED). The port is complete; see
+@ref roadmap_f767 for the bring-up record and the optional backends that
+remain.
 The reference board used for bring-up is the ST Nucleo-F767ZI, but the port
 targets the STM32F767ZI MCU; other boards built on the same MCU are supported
 by adding a board layer.

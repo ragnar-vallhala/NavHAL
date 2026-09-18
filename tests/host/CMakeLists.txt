@@ -82,6 +82,15 @@ add_executable(tests_host_drivers
 
   ${NAVHAL_ROOT}/tests/navtest_state.c
 
+  # Shared public layer for the drivers that have been migrated to the vtable:
+  # the vendor file now holds only static backend functions plus its ops table,
+  # so the public hal_gpio_*/hal_flash_* symbols come from here. The F7 drivers
+  # below call hal_gpio_* directly, so this is what resolves them. Drivers not
+  # yet migrated (uart_f7, i2c_f7, spi_f7, clock_f7) still export their own
+  # public symbols, so their common/ counterparts must stay out of this target.
+  ${NAVHAL_ROOT}/src/common/hal_gpio.c
+  ${NAVHAL_ROOT}/src/common/hal_flash.c
+
   # real driver sources under test
   ${NAVHAL_ROOT}/src/vendor/stm32/gpio/gpio.c
   ${NAVHAL_ROOT}/src/vendor/stm32/clock/clock_f7.c

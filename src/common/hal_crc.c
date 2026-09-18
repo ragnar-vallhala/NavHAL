@@ -26,7 +26,7 @@
  *     active backend's ::_hal_crc_ops).
  *  2. A complete **software** CRC-32/MPEG-2 implementation, exported as
  *     @c hal_crc_sw_* . Every port without a hardware CRC unit (the ATmega328P,
- *     and the STM32F4 when @c _CRC_HW_ENABLED is off) points its ops table at
+ *     and the STM32F4 when @c NAVHAL_CONFIG_DRV_CRC is off) points its ops table at
  *     these functions instead of carrying its own copy of the algorithm — the
  *     AVR and STM32-software CRC drivers were byte-for-byte the same math.
  *

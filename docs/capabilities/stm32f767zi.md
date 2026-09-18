@@ -4,8 +4,9 @@
 
 The third NavHAL port, in **initial bring-up**. The build system, GPIO, clock,
 timer and interrupt layers are implemented and verified on real hardware (a
-flashed `hal_blink` toggles the LED). The remaining peripherals are scoped
-follow-ups — see [`../stm32f767zi_port_plan.md`](../stm32f767zi_port_plan.md).
+flashed `hal_blink` toggles the LED). The port is complete; the optional
+backends that remain are D-cache enablement, a DMA UART backend and the SDIO
+async DMA backend, all still M4-only.
 The reference board used for bring-up is the ST Nucleo-F767ZI, but the port
 targets the STM32F767ZI MCU; other boards built on the same MCU are supported
 by adding a board layer.
@@ -72,6 +73,30 @@ standalone driver; `✓` means it's already covered inside the listed module.
 
 (The flash ART accelerator + prefetch, enabled in `clock_f7.c`, is *not* listed
 here — it is an STM32F4 feature too, so it isn't part of the M7 delta.)
+
+### F4 → F7 driver divergence
+
+The shared vendor drivers under `src/vendor/stm32/*.c` reference family
+register structs and macros by name; the family register headers
+(`src/vendor/stm32/family/<family>/include/family/*_reg.h`, selected via the
+`INCLUDE_FAMILY` path) are the abstraction boundary. Where the register layout
+and semantics match, the driver is reused verbatim against an F7 header; where
+they diverge, the family gets its own driver file. This table is why some
+peripherals have an `_f7.c` and most do not.
+
+| Peripheral | F4 vs F7 | Serves F7 |
+|---|---|---|
+| **GPIO** | Identical IP, same base `0x40020000`. F7 exposes contiguous ports A–G (+H); F401 jumps PE→PH. | `gpio.c` + F7 `gpio_reg.h` (contiguous `n>>4` port indexing) |
+| **CLOCK / RCC** | Same `CR`/`PLLCFGR`/`CFGR` layout and base. F7 adds over-drive (`PWR_CR1` ODEN/ODSWEN) and VOS scaling above 180 MHz, frequency-scaled flash wait states, and bus limits (APB1 ≤54, APB2 ≤108 MHz). | `clock_f7.c` |
+| **FLASH** | Same `ACR`/`KEYR`/`CR`/`SR`, 5-bit `SNB`. **Sector map differs**: F767 is 32 KB×4, 128 KB×1, 256 KB×7 — 2 MB single bank, 12 sectors. | `flash.c` + F7 `flash_reg.h`. The M7 write buffer needs a `DSB` before polling `BSY`. |
+| **USART** | **Major divergence.** F4 uses `SR`/`DR`; F7 uses `ISR` (RO) / `ICR` / `RDR` / `TDR`, with different `BRR` oversampling. | `uart_f7.c`, selected when `CONFIG_FAMILY_STM32F7` |
+| **SPI** | F7 moved frame size to `CR2.DS` (plus `FRXTH` and a byte-wide `DR` FIFO); F4's `CR1.DFF` is gone. | `spi_f7.c` |
+| **I2C** | **Different IP generation** — F7 `TIMINGR` / `ISR`-`ICR` / CR2-framed / `RXDR`-`TXDR` against the F4 legacy model. | `i2c_f7.c` + F7 `i2c_reg.h` |
+| **TIMER / PWM** | General-purpose timers (TIM2–5, TIM1/9/10/11) identical in layout and base. | `timer.c`, `pwm.c` |
+| **INTERRUPT / NVIC** | NVIC model identical, but the **peripheral vector table is MCU-specific**: F767 USART3 is IRQ 39, a literal `0` ("Reserved") in the F401-based arch `startup.s`, so an F401-absent interrupt would vector to address 0. | arch `interrupt.c` + the board's own `src/board/nucleo_f767zi/startup.s` carrying the full STM32F767xx table. The build prefers a board `startup.s` when present. |
+| **DMA** | Stream/channel-compatible with F4. Cache coherency only matters when the D-cache is on. | `dma.c` + F7 `dma_reg.h` |
+| **CRC** | Hardware CRC-32, default polynomial register-compatible. | `crc.c` |
+| **SDIO** | F767 SDMMC1 is register-identical to the F4 SDIO — same base `0x40012C00`, APB2ENR bit 11, AF12 pinmux, vector slot 49. The "SDMMC rename" is cosmetic for the registers the driver touches. | `sdio.c`, unchanged |
 
 ## Default Kconfig state
 

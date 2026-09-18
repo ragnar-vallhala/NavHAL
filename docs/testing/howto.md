@@ -2,8 +2,7 @@
 
 # NavHAL — Testing Guide
 
-**Companion to:** `docs/api_standardization.md`, `docs/execution_plan.md`,
-`docs/m2_plus_plan.md`.
+**Companion to:** `docs/api_standardization.md`.
 
 NavHAL has three test entry points, each used for a different purpose:
 
@@ -204,7 +203,7 @@ static const navtest_suite_t *const all_suites[] = {
 
 ### Coverage bar
 
-Per `docs/m2_plus_plan.md`:
+The tiering rule:
 
 - Every public function in `include/core/cortex-m4/<driver>.h` has at
   least one success-path test.

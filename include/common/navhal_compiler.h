@@ -30,7 +30,7 @@
  * compilers (attributes simply become no-ops).
  *
  * Part of the M1 standardization foundations — see
- * `docs/api_standardization.md` and `docs/execution_plan.md`.
+ * `docs/api_standardization.md`.
  */
 
 #ifndef NAVHAL_COMPILER_H

@@ -44,6 +44,7 @@ This roadmap is the work to get there, factored into five milestones.
 | @ref roadmap_m10 | planned     | Port as a registry package                  | Strategic shift away from monorepo. Vendors publish ports independently. |
 | @ref roadmap_m11 | planned     | `HAL_API_VERSION 2`                         | Subsystem namespaces v1 couldn't anticipate — USB, Ethernet, BLE, AI accelerators |
 | @ref roadmap_x86 | in-progress | Bare-metal x86-64 PC port (QEMU first)      | Running NavHAL on commodity x86; a third ISA exercising the port contract |
+| @ref roadmap_bootloader | planned | Two-stage signed bootloader, RDP2 production lock | Authenticated field updates over UART/CDC; crashloop recovery without physical access |
 
 The first three (M7–M9) are pure engineering on the current monorepo.
 The last two (M10–M11) are the strategic shifts that take NavHAL

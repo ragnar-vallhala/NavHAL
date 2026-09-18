@@ -2,7 +2,11 @@
 
 # x86-64 PC port
 
-> Status: **in-progress** — Slice 1 (boot + UART) landed on `feat/x86-qemu-port`.
+> Status: **done (core port)** — merged to `main` via PR #51 and #52.
+> Slices 1–3 and 5 landed: multiboot2 boot, 16550 UART TX/RX, TSC/PIT clock
+> and timebase, IDT + 8259 interrupts, plus a VGA + PS/2 screen terminal and a
+> QEMU smoke job in CI. Slice 4 (general-purpose timer on the PIT) and an RX
+> interrupt path remain, both optional.
 > Scope: a bare-metal x86-64 port of NavHAL that boots on a PC, QEMU first,
 > real hardware later.
 > Predecessor: M7 (modular build) — a new port is purely additive there.

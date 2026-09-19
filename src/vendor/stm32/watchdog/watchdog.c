@@ -26,6 +26,7 @@
 #if NAVHAL_CONFIG_DRV_WATCHDOG
 
 #include "common/hal_watchdog.h"
+#include "internal/hal_watchdog_ops.h"
 #include "common/hal_clock.h"
 #include "family/rcc_reg.h"
 #include "family/wdg_reg.h"
@@ -40,14 +41,14 @@
 static uint32_t iwdg_timeout_ms;
 static uint8_t iwdg_running;
 
-uint32_t hal_watchdog_max_timeout_ms(void) {
+static uint32_t stm32_watchdog_max_timeout_ms(void) {
   /* Slowest divider against a full 12-bit reload. */
   return (uint32_t)(((IWDG_RLR_MASK + 1UL) * (4UL << IWDG_PR_MAX) * 1000UL) /
                     IWDG_LSI_HZ);
 }
 
-hal_status_t hal_watchdog_start(uint32_t timeout_ms) {
-  if (timeout_ms == 0U || timeout_ms > hal_watchdog_max_timeout_ms())
+static hal_status_t stm32_watchdog_start(uint32_t timeout_ms) {
+  if (timeout_ms == 0U || timeout_ms > stm32_watchdog_max_timeout_ms())
     return HAL_ERR_INVALID_ARG;
 
   /* LSI cycles the request is worth, rounded up: a caller that asks for 1 s
@@ -90,16 +91,16 @@ hal_status_t hal_watchdog_start(uint32_t timeout_ms) {
   return HAL_OK;
 }
 
-hal_status_t hal_watchdog_kick(void) {
+static hal_status_t stm32_watchdog_kick(void) {
   if (!iwdg_running)
     return HAL_ERR_NOT_INITIALIZED;
   IWDG->KR = IWDG_KEY_RELOAD;
   return HAL_OK;
 }
 
-uint32_t hal_watchdog_get_timeout_ms(void) { return iwdg_timeout_ms; }
+static uint32_t stm32_watchdog_get_timeout_ms(void) { return iwdg_timeout_ms; }
 
-bool hal_watchdog_is_running(void) { return iwdg_running != 0U; }
+static bool stm32_watchdog_is_running(void) { return iwdg_running != 0U; }
 
 #if NAVHAL_CONFIG_DRV_WWDG
 
@@ -169,5 +170,15 @@ bool hal_wwdg_window_open(void) {
 bool hal_wwdg_is_running(void) { return wwdg_running != 0U; }
 
 #endif /* NAVHAL_CONFIG_DRV_WWDG */
+
+
+/** @brief The STM32 watchdog backend. */
+const hal_watchdog_ops_t _hal_watchdog_ops = {
+    .start = stm32_watchdog_start,
+    .kick = stm32_watchdog_kick,
+    .get_timeout_ms = stm32_watchdog_get_timeout_ms,
+    .is_running = stm32_watchdog_is_running,
+    .max_timeout_ms = stm32_watchdog_max_timeout_ms,
+};
 
 #endif /* NAVHAL_CONFIG_DRV_WATCHDOG */

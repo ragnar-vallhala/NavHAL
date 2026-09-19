@@ -29,6 +29,7 @@
  */
 
 #include "common/hal_adc.h"
+#include "internal/hal_adc_ops.h"
 
 #include <avr/io.h>
 #include <stddef.h>
@@ -37,7 +38,7 @@
 /** @brief Bounded spin for the conversion wait (far exceeds one 13-cycle conv). */
 #define ADC_SPIN 60000U
 
-hal_status_t hal_adc_init(hal_adc_t adc, const hal_adc_config_t *config) {
+static hal_status_t avr_adc_init(hal_adc_t adc, const hal_adc_config_t *config) {
   (void)config; /* fixed 10-bit */
   if (adc != HAL_ADC_0)
     return HAL_ERR_INVALID_ARG;
@@ -47,7 +48,7 @@ hal_status_t hal_adc_init(hal_adc_t adc, const hal_adc_config_t *config) {
   return HAL_OK;
 }
 
-hal_status_t hal_adc_read(hal_adc_t adc, uint8_t channel, uint16_t *out) {
+static hal_status_t avr_adc_read(hal_adc_t adc, uint8_t channel, uint16_t *out) {
   if (out == NULL || adc != HAL_ADC_0)
     return HAL_ERR_INVALID_ARG;
 
@@ -63,3 +64,9 @@ hal_status_t hal_adc_read(hal_adc_t adc, uint8_t channel, uint16_t *out) {
   *out = ADC; /* avr-libc reads ADCL then ADCH in the required order */
   return HAL_OK;
 }
+
+/** @brief The AVR adc backend. */
+const hal_adc_ops_t _hal_adc_ops = {
+    .init = avr_adc_init,
+    .read = avr_adc_read,
+};

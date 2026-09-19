@@ -31,6 +31,7 @@
 #if NAVHAL_CONFIG_DRV_RESET
 
 #include "common/hal_reset.h"
+#include "internal/hal_reset_ops.h"
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -39,7 +40,7 @@
 static uint32_t latched_cause;
 static uint8_t cause_valid;
 
-hal_status_t hal_reset_init(void) {
+static hal_status_t avr_reset_init(void) {
   if (cause_valid)
     return HAL_OK;
 
@@ -68,9 +69,9 @@ hal_status_t hal_reset_init(void) {
   return HAL_OK;
 }
 
-uint32_t hal_reset_get_cause(void) { return latched_cause; }
+static uint32_t avr_reset_get_cause(void) { return latched_cause; }
 
-hal_status_t hal_system_reset(void) {
+static hal_status_t avr_reset_system_reset(void) {
   /* No SYSRESETREQ equivalent: arm the shortest watchdog and stop feeding it.
    * The next boot therefore reports HAL_RESET_CAUSE_WATCHDOG rather than
    * _SOFTWARE — the hardware keeps no separate flag for "firmware asked", and
@@ -79,6 +80,16 @@ hal_status_t hal_system_reset(void) {
   wdt_enable(WDTO_15MS);
   for (;;) {
   }
+
+  return HAL_OK; /* unreachable; the op returns hal_status_t. */
 }
+
+
+/** @brief The AVR reset backend. */
+const hal_reset_ops_t _hal_reset_ops = {
+    .init = avr_reset_init,
+    .get_cause = avr_reset_get_cause,
+    .system_reset = avr_reset_system_reset,
+};
 
 #endif /* NAVHAL_CONFIG_DRV_RESET */

@@ -16,9 +16,11 @@ endif()
 if(CONFIG_DRV_CLOCK)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
 endif()
-if(CONFIG_DRV_TIMER)
-    # TSC-backed timebase (delay/millis), polled. The general-purpose hal_timer_*
-    # (PIT channels) needs IRQs and lands with the interrupt slice.
+if(CONFIG_DRV_CLOCK)
+    # TSC-backed timebase (delay/millis), polled. Gated with the clock, not
+    # DRV_TIMER: this port has no general-purpose hal_timer_* (PIT channels
+    # need IRQs and land with a later slice), and DRV_TIMER is what pulls in
+    # the shared hal_timer layer that expects a _hal_timer_ops table.
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/timer/timebase.c)
 endif()
 if(CONFIG_DRV_INTERRUPT)

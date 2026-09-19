@@ -70,14 +70,23 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg);
 /** @brief Get the system clock frequency (SYSCLK) in Hz. */
 uint32_t hal_clock_get_sysclk(void);
 
-/** @brief Get the AHB bus clock frequency in Hz. */
-uint32_t hal_clock_get_ahbclk(void);
+/**
+ * @brief Number of separately-clocked buses this port reports.
+ *
+ * Zero on a port with no bus hierarchy (AVR, x86), where every peripheral
+ * runs from SYSCLK and ::hal_clock_get_sysclk is the only clock query needed.
+ */
+uint8_t hal_clock_get_bus_count(void);
 
-/** @brief Get the APB1 bus clock frequency in Hz. */
-uint32_t hal_clock_get_apb1clk(void);
-
-/** @brief Get the APB2 bus clock frequency in Hz. */
-uint32_t hal_clock_get_apb2clk(void);
+/**
+ * @brief Get a bus clock frequency in Hz.
+ *
+ * @param bus Index below ::hal_clock_get_bus_count. Ports name their buses in
+ *            their own @c hal_clock_bus_t; there is no portable bus vocabulary
+ *            because bus topology is not a portable concept.
+ * @return Frequency in Hz, or 0 if @p bus is not a bus this port has.
+ */
+uint32_t hal_clock_get_bus_clock(uint8_t bus);
 
 #ifdef __cplusplus
 } /* extern "C" */

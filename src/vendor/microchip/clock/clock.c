@@ -52,16 +52,21 @@ static uint32_t avr_clock_get_sysclk(void) {
   return (uint32_t)F_CPU >> s_prescaler_log2;
 }
 
-static uint32_t avr_clock_get_ahbclk(void) { return avr_clock_get_sysclk(); }
 
-static uint32_t avr_clock_get_apb1clk(void) { return avr_clock_get_sysclk(); }
 
-static uint32_t avr_clock_get_apb2clk(void) { return avr_clock_get_sysclk(); }
+
+/* No bus hierarchy: every peripheral runs from the core clock, so there is
+ * nothing for hal_clock_get_bus_clock to report. Callers use get_sysclk. */
+static uint8_t avr_clock_get_bus_count(void) { return 0u; }
+
+static uint32_t avr_clock_get_bus_clock(uint8_t bus) {
+  (void)bus;
+  return 0u;
+}
 
 const hal_clock_ops_t _hal_clock_ops = {
     .init = avr_clock_init,
     .get_sysclk = avr_clock_get_sysclk,
-    .get_ahbclk = avr_clock_get_ahbclk,
-    .get_apb1clk = avr_clock_get_apb1clk,
-    .get_apb2clk = avr_clock_get_apb2clk,
+    .get_bus_count = avr_clock_get_bus_count,
+    .get_bus_clock = avr_clock_get_bus_clock,
 };

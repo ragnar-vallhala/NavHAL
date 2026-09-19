@@ -42,6 +42,20 @@ extern "C" {
 #define NAVHAL_HAS_CLOCK_PLL 1
 
 /**
+ * @brief Buses this port clocks separately from SYSCLK.
+ *
+ * The portable layer only knows a bus count and an index; the names are the
+ * port's own, because AHB/APB are an STM32 notion and mean nothing on a part
+ * without that hierarchy.
+ */
+typedef enum {
+  HAL_CLOCK_BUS_AHB = 0, ///< AHB / HCLK
+  HAL_CLOCK_BUS_APB1,    ///< APB1 / PCLK1
+  HAL_CLOCK_BUS_APB2,    ///< APB2 / PCLK2
+  HAL_CLOCK_BUS_COUNT    ///< Number of buses this port reports
+} hal_clock_bus_t;
+
+/**
  * @brief Enumeration of possible system clock sources.
  */
 typedef enum {

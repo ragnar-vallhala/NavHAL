@@ -18,6 +18,7 @@
  */
 
 #include "common/hal_uart.h"
+#include "internal/hal_uart_ops.h"
 #include "vga/vga.h" /* mirror console output to the on-screen terminal */
 #if NAVHAL_CONFIG_DRV_INTERRUPT
 #include "ps2/keyboard.h" /* screen-terminal input: PC keyboard -> console RX */
@@ -43,7 +44,8 @@ static inline uint8_t inb(uint16_t port) {
   return r;
 }
 
-hal_status_t hal_uart_init(hal_uart_t uart, const hal_uart_config_t *cfg) {
+static hal_status_t pc_uart_init(hal_uart_t uart,
+                                 const hal_uart_config_t *cfg) {
   if (!cfg) return HAL_ERR_INVALID_ARG;
   uint16_t base = uart_base(uart);
   if (!base) return HAL_ERR_INVALID_ARG;
@@ -67,7 +69,7 @@ hal_status_t hal_uart_init(hal_uart_t uart, const hal_uart_config_t *cfg) {
   return HAL_OK;
 }
 
-hal_status_t hal_uart_write_char(hal_uart_t uart, char c) {
+static hal_status_t pc_uart_write_char(hal_uart_t uart, char c) {
   uint16_t base = uart_base(uart);
   if (!base) return HAL_ERR_INVALID_ARG;
   while ((inb(base + 5) & 0x20) == 0) { /* wait: THR empty */ }
@@ -76,21 +78,7 @@ hal_status_t hal_uart_write_char(hal_uart_t uart, char c) {
   return HAL_OK;
 }
 
-hal_status_t hal_uart_write(hal_uart_t uart, const uint8_t *data,
-                            uint16_t length) {
-  if (!data) return HAL_ERR_INVALID_ARG;
-  if (!uart_base(uart)) return HAL_ERR_INVALID_ARG;
-  for (uint16_t i = 0; i < length; i++)
-    (void)hal_uart_write_char(uart, (char)data[i]);
-  return HAL_OK;
-}
 
-hal_status_t hal_uart_write_string(hal_uart_t uart, const char *s) {
-  if (!s) return HAL_ERR_INVALID_ARG;
-  if (!uart_base(uart)) return HAL_ERR_INVALID_ARG;
-  while (*s) (void)hal_uart_write_char(uart, *s++);
-  return HAL_OK;
-}
 
 static void uart_write_dec(hal_uart_t uart, uint32_t v) {
   char buf[10];
@@ -106,26 +94,11 @@ static void uart_write_dec(hal_uart_t uart, uint32_t v) {
   while (i--) (void)hal_uart_write_char(uart, buf[i]);
 }
 
-hal_status_t hal_uart_write_uint(hal_uart_t uart, uint32_t num) {
-  if (!uart_base(uart)) return HAL_ERR_INVALID_ARG;
-  uart_write_dec(uart, num);
-  return HAL_OK;
-}
 
-hal_status_t hal_uart_write_int(hal_uart_t uart, int32_t num) {
-  if (!uart_base(uart)) return HAL_ERR_INVALID_ARG;
-  if (num < 0) {
-    (void)hal_uart_write_char(uart, '-');
-    uart_write_dec(uart, (uint32_t)(-(int64_t)num));
-  } else {
-    uart_write_dec(uart, (uint32_t)num);
-  }
-  return HAL_OK;
-}
 
 /* ===== Receive (polled) ===== */
 
-bool hal_uart_available(hal_uart_t uart) {
+static bool pc_uart_available(hal_uart_t uart) {
   uint16_t base = uart_base(uart);
   if (!base) return false;
 #if NAVHAL_CONFIG_DRV_INTERRUPT
@@ -134,7 +107,7 @@ bool hal_uart_available(hal_uart_t uart) {
   return (inb(base + 5) & 0x01) != 0; /* LSR bit0: Data Ready */
 }
 
-char hal_uart_read_char(hal_uart_t uart) {
+static char pc_uart_read_char(hal_uart_t uart) {
   uint16_t base = uart_base(uart);
   if (!base) return 0;
   for (;;) {
@@ -146,15 +119,21 @@ char hal_uart_read_char(hal_uart_t uart) {
   }
 }
 
-uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,
-                             char delimiter) {
-  if (!buffer || maxlen == 0 || !uart_base(uart)) return 0;
-  uint32_t i = 0;
-  while (i < maxlen - 1) {
-    char c = hal_uart_read_char(uart);
-    if (c == delimiter) break;
-    buffer[i++] = c;
-  }
-  buffer[i] = '\0';
-  return i;
+/* The 16550 RX interrupt path is not wired up (the port polls), so this
+ * reports the capability honestly rather than silently doing nothing. */
+static hal_status_t pc_uart_enable_interrupt(hal_uart_t uart, uint8_t rx_en,
+                                             uint8_t tx_en) {
+  (void)uart;
+  (void)rx_en;
+  (void)tx_en;
+  return HAL_ERR_NOT_SUPPORTED;
 }
+
+/** @brief The PC UART primitives; derived writes come from the shared layer. */
+const hal_uart_ops_t _hal_uart_ops = {
+    .init = pc_uart_init,
+    .enable_interrupt = pc_uart_enable_interrupt,
+    .write_char = pc_uart_write_char,
+    .read_char = pc_uart_read_char,
+    .available = pc_uart_available,
+};

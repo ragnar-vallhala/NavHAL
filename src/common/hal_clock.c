@@ -40,8 +40,11 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg) {
 
 uint32_t hal_clock_get_sysclk(void) { return _hal_clock_ops.get_sysclk(); }
 
-uint32_t hal_clock_get_ahbclk(void) { return _hal_clock_ops.get_ahbclk(); }
+uint8_t hal_clock_get_bus_count(void) { return _hal_clock_ops.get_bus_count(); }
 
-uint32_t hal_clock_get_apb1clk(void) { return _hal_clock_ops.get_apb1clk(); }
-
-uint32_t hal_clock_get_apb2clk(void) { return _hal_clock_ops.get_apb2clk(); }
+/* Bounds-checked here so no backend has to repeat it. */
+uint32_t hal_clock_get_bus_clock(uint8_t bus) {
+  if (bus >= _hal_clock_ops.get_bus_count())
+    return 0u;
+  return _hal_clock_ops.get_bus_clock(bus);
+}

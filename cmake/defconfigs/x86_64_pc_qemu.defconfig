@@ -11,6 +11,10 @@ CONFIG_BOARD_QEMU=y
 
 CONFIG_DRV_UART=y
 CONFIG_DRV_CLOCK=y
-CONFIG_DRV_TIMER=y
 CONFIG_DRV_INTERRUPT=y
+# DRV_TIMER defaults y, but this port implements only the polled TSC timebase
+# (hal_timebase_*), not the general-purpose hal_timer_* peripheral API, so it
+# has no _hal_timer_ops table to offer. Claiming the driver would advertise a
+# capability that is not there. Re-enable when the PIT-IRQ timer slice lands.
+CONFIG_DRV_TIMER=n
 # CONFIG_DRV_GPIO is not set

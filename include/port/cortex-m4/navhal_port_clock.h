@@ -29,6 +29,18 @@
 
 #include "common/hal_clock.h"
 
+/* AHB/APB are this port's bus names, so the convenience accessors live here
+ * rather than in the portable header. They are the same indexed query. */
+static inline uint32_t hal_clock_get_ahbclk(void) {
+  return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_AHB);
+}
+static inline uint32_t hal_clock_get_apb1clk(void) {
+  return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_APB1);
+}
+static inline uint32_t hal_clock_get_apb2clk(void) {
+  return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_APB2);
+}
+
 /* Deprecated two-argument init — retained as a backward-compat shim. */
 #include "compat/clock_compat.h"
 

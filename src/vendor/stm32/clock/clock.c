@@ -319,10 +319,26 @@ static uint32_t stm32_clock_get_apb2clk(void) {
   return stm32_clock_get_sysclk() / _decode_apb_prescaler(prescaler);
 }
 
+static uint8_t stm32_clock_get_bus_count(void) {
+  return (uint8_t)HAL_CLOCK_BUS_COUNT;
+}
+
+static uint32_t stm32_clock_get_bus_clock(uint8_t bus) {
+  switch ((hal_clock_bus_t)bus) {
+  case HAL_CLOCK_BUS_AHB:
+    return stm32_clock_get_ahbclk();
+  case HAL_CLOCK_BUS_APB1:
+    return stm32_clock_get_apb1clk();
+  case HAL_CLOCK_BUS_APB2:
+    return stm32_clock_get_apb2clk();
+  default:
+    return 0u;
+  }
+}
+
 const hal_clock_ops_t _hal_clock_ops = {
     .init = stm32_clock_init,
     .get_sysclk = stm32_clock_get_sysclk,
-    .get_ahbclk = stm32_clock_get_ahbclk,
-    .get_apb1clk = stm32_clock_get_apb1clk,
-    .get_apb2clk = stm32_clock_get_apb2clk,
+    .get_bus_count = stm32_clock_get_bus_count,
+    .get_bus_clock = stm32_clock_get_bus_clock,
 };

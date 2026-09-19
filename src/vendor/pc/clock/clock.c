@@ -65,16 +65,21 @@ static hal_status_t pc_clock_init(const hal_clock_config_t *cfg) {
 static uint32_t pc_clock_get_sysclk(void) { return (uint32_t)pc_tsc_hz(); }
 
 /* A PC has no AHB/APB bus hierarchy; report the core (TSC) rate uniformly. */
-static uint32_t pc_clock_get_ahbclk(void) { return pc_clock_get_sysclk(); }
-static uint32_t pc_clock_get_apb1clk(void) { return pc_clock_get_sysclk(); }
-static uint32_t pc_clock_get_apb2clk(void) { return pc_clock_get_sysclk(); }
 
 /** @brief The PC clock backend. A PC has no bus hierarchy, so the bus
  *  accessors all report the core clock. */
+/* No bus hierarchy: every peripheral runs from the core clock, so there is
+ * nothing for hal_clock_get_bus_clock to report. Callers use get_sysclk. */
+static uint8_t pc_clock_get_bus_count(void) { return 0u; }
+
+static uint32_t pc_clock_get_bus_clock(uint8_t bus) {
+  (void)bus;
+  return 0u;
+}
+
 const hal_clock_ops_t _hal_clock_ops = {
     .init = pc_clock_init,
     .get_sysclk = pc_clock_get_sysclk,
-    .get_ahbclk = pc_clock_get_ahbclk,
-    .get_apb1clk = pc_clock_get_apb1clk,
-    .get_apb2clk = pc_clock_get_apb2clk,
+    .get_bus_count = pc_clock_get_bus_count,
+    .get_bus_clock = pc_clock_get_bus_clock,
 };

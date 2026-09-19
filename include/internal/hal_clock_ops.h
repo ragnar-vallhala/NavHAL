@@ -44,12 +44,10 @@ typedef struct {
   hal_status_t (*init)(const hal_clock_config_t *cfg);
   /** Backend for ::hal_clock_get_sysclk. */
   uint32_t (*get_sysclk)(void);
-  /** Backend for ::hal_clock_get_ahbclk. */
-  uint32_t (*get_ahbclk)(void);
-  /** Backend for ::hal_clock_get_apb1clk. */
-  uint32_t (*get_apb1clk)(void);
-  /** Backend for ::hal_clock_get_apb2clk. */
-  uint32_t (*get_apb2clk)(void);
+  /** Number of separately-clocked buses; 0 if the port has no hierarchy. */
+  uint8_t (*get_bus_count)(void);
+  /** Frequency of one bus in Hz; 0 for an index the port does not have. */
+  uint32_t (*get_bus_clock)(uint8_t bus);
 } hal_clock_ops_t;
 
 /** @brief The active port's clock operations table (defined by one backend). */

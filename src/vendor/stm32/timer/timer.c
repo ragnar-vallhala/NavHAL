@@ -38,9 +38,9 @@
 #include "utils/timer_types.h"
 #include <stdint.h>
 
-/* Forward declaration: set_compare calls enable_channel, defined further down. */
-static hal_status_t stm32_timer_enable_channel(hal_timer_t timer,
-                                               uint32_t channel);
+/* Forward declaration: set_compare enables the channel, defined further down. */
+static hal_status_t stm32_timer_set_channel_enabled(hal_timer_t timer,
+                                                    uint32_t channel, bool on);
 
 /**
  * @internal
@@ -118,34 +118,30 @@ static hal_status_t stm32_timer_init(hal_timer_t timer,
  * @note Computes the optimal PSC and ARR to achieve the target frequency,
  *       handling both 16-bit and 32-bit timers.
  */
-static hal_status_t stm32_timer_init_freq(hal_timer_t timer, uint32_t freq) {
-  if (freq == 0)
-    return HAL_ERR_INVALID_ARG;
-
-  // 1. Get clock
-  uint32_t timer_clk;
+/* APB timer clock: the bus clock, doubled when its prescaler is not /1. */
+static uint32_t stm32_timer_get_input_clock(hal_timer_t timer) {
   uint32_t ppre1 = (RCC->CFGR >> RCC_CFGR_PPRE1_BIT) & 0x7;
   uint32_t ppre2 = (RCC->CFGR >> RCC_CFGR_PPRE2_BIT) & 0x7;
 
   if (timer == TIM1 || timer == TIM9 || timer == TIM10 || timer == TIM11) {
     uint32_t apb2 = hal_clock_get_apb2clk();
-    timer_clk = (ppre2 == 0) ? apb2 : (apb2 * 2);
-  } else {
-    uint32_t apb1 = hal_clock_get_apb1clk();
-    timer_clk = (ppre1 == 0) ? apb1 : (apb1 * 2);
+    return (ppre2 == 0) ? apb2 : (apb2 * 2);
   }
+  uint32_t apb1 = hal_clock_get_apb1clk();
+  return (ppre1 == 0) ? apb1 : (apb1 * 2);
+}
 
-  // 2. Calculate ticks = timer_clk / freq
-  uint64_t total_ticks = (uint64_t)timer_clk / freq;
-
-  if (total_ticks == 0) {
-    total_ticks = 1;
-  }
+/* Split `ticks` into the PSC/ARR pair that expresses it. TIM2/TIM5 are 32-bit
+ * counters; the rest are 16-bit, which is why a prescaler search is needed at
+ * all. The shared layer has already turned a frequency into ticks. */
+static hal_status_t stm32_timer_set_timebase(hal_timer_t timer,
+                                             uint64_t total_ticks) {
+  if (total_ticks == 0u)
+    total_ticks = 1u;
 
   uint32_t psc = 0;
   uint32_t arr = 0;
 
-  // For 32-bit timers (TIM2, TIM5), ARR can be up to 0xFFFFFFFF
   if (timer == TIM2 || timer == TIM5) {
     if (total_ticks > 0xFFFFFFFFULL) {
       psc = (uint32_t)(total_ticks / 0xFFFFFFFFULL);
@@ -155,23 +151,20 @@ static hal_status_t stm32_timer_init_freq(hal_timer_t timer, uint32_t freq) {
       arr = (uint32_t)total_ticks - 1;
     }
   } else {
-    // 16-bit timers (TIM1, TIM3, TIM4, TIM9, TIM10, TIM11)
     if (total_ticks > 0x10000ULL) {
-      // Find PSC and ARR such that (PSC+1)*(ARR+1) is closest to total_ticks
-      // We can iterate over PSC values or use a clever heuristic.
-      // Smallest possible PSC is total_ticks / 65536
+      /* Smallest PSC whose ARR still fits 16 bits, then a short search for a
+       * pair that divides `total_ticks` more exactly. */
       uint32_t min_psc = (uint32_t)(total_ticks / 0x10000ULL);
       uint32_t best_psc = min_psc;
       uint32_t best_arr = (uint32_t)(total_ticks / (min_psc + 1)) - 1;
       uint64_t min_error = total_ticks % (min_psc + 1);
 
-      // Simple search for better PSC if remainder is large
-      for (uint32_t p = min_psc; p < min_psc + 10 && p <= 0xFFFF; p++) {
-        uint64_t error = total_ticks % (p + 1);
+      for (uint32_t pp = min_psc; pp < min_psc + 10 && pp <= 0xFFFF; pp++) {
+        uint64_t error = total_ticks % (pp + 1);
         if (error < min_error) {
           min_error = error;
-          best_psc = p;
-          best_arr = (uint32_t)(total_ticks / (p + 1)) - 1;
+          best_psc = pp;
+          best_arr = (uint32_t)(total_ticks / (pp + 1)) - 1;
         }
         if (error == 0)
           break;
@@ -193,11 +186,14 @@ static hal_status_t stm32_timer_init_freq(hal_timer_t timer, uint32_t freq) {
  * @param timer Timer identifier.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-static hal_status_t stm32_timer_start(hal_timer_t timer) {
+static hal_status_t stm32_timer_set_running(hal_timer_t timer, bool on) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return HAL_ERR_INVALID_ARG;
-  tim->CR1 |= TIMx_CR1_CEN;
+  if (on)
+    tim->CR1 |= TIMx_CR1_CEN;
+  else
+    tim->CR1 &= (~TIMx_CR1_CEN);
   return HAL_OK;
 }
 
@@ -206,13 +202,6 @@ static hal_status_t stm32_timer_start(hal_timer_t timer) {
  * @param timer Timer identifier.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
-static hal_status_t stm32_timer_stop(hal_timer_t timer) {
-  TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
-  if (tim == NULL)
-    return HAL_ERR_INVALID_ARG;
-  tim->CR1 &= (~TIMx_CR1_CEN);
-  return HAL_OK;
-}
 
 /**
  * @brief Reset the timer counter to zero.
@@ -244,35 +233,12 @@ static uint32_t stm32_timer_get_count(hal_timer_t timer) {
  * @param timer Timer identifier.
  * @return Timer frequency in Hz, or 0 for an invalid timer.
  */
-static uint32_t stm32_timer_get_frequency(hal_timer_t timer) {
+/* Effective divider, not the register value: PSC divides by PSC+1. */
+static uint32_t stm32_timer_get_divider(hal_timer_t timer) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
     return 0;
-
-  // 1. Get clock
-  uint32_t timer_clk;
-
-  uint32_t ppre1 = (RCC->CFGR >> RCC_CFGR_PPRE1_BIT) & 0x7;
-  uint32_t ppre2 = (RCC->CFGR >> RCC_CFGR_PPRE2_BIT) & 0x7;
-
-  if (timer == TIM1 || timer == TIM9 || timer == TIM10 || timer == TIM11) {
-    uint32_t apb2 = hal_clock_get_apb2clk();
-    timer_clk = (ppre2 == 0) ? apb2 : (apb2 * 2);
-  } else {
-    uint32_t apb1 = hal_clock_get_apb1clk();
-    timer_clk = (ppre1 == 0) ? apb1 : (apb1 * 2);
-  }
-
-  // 2. Get prescaler and ARR
-  uint32_t prescaler = tim->PSC;
-  uint32_t arr = tim->ARR;
-
-  if (arr == 0x0)
-    arr = 0xFFFF; // Prevent division by zero
-
-  // 3. Calculate frequency
-  uint32_t freq = timer_clk / (prescaler + 1) / (arr + 1);
-  return freq;
+  return tim->PSC + 1u;
 }
 
 /**
@@ -301,11 +267,11 @@ static hal_status_t stm32_timer_set_auto_reload(hal_timer_t timer,
   if (tim == NULL)
     return HAL_ERR_INVALID_ARG;
 
-  stm32_timer_stop(timer);
+  stm32_timer_set_running(timer, false);
   if (!(timer == TIM2 || timer == TIM5))
     auto_reload = (uint16_t)auto_reload;
   tim->ARR = auto_reload;
-  stm32_timer_start(timer);
+  stm32_timer_set_running(timer, true);
   return HAL_OK;
 }
 
@@ -385,64 +351,69 @@ static void _set_interrupt_enable_bit(hal_timer_t timer) {
  * @return ::HAL_OK.
  * @note TIM1's more complex interrupt options are not yet implemented.
  */
-static hal_status_t stm32_timer_enable_interrupt(hal_timer_t timer) {
+/* Every interrupt entry point below needs the same timer -> IRQ line map, so
+ * it lives here once. TIM1 splits update/break/trigger across separate IRQs
+ * and is not wired up. */
+static bool _timer_irq(hal_timer_t timer, hal_irq_t *out) {
   switch (timer) {
-  case TIM1:
-    break; // [TODO] Implement the complex interrupt options
   case TIM2:
-    hal_interrupt_enable(TIM2_IRQn);
-    break;
+    *out = TIM2_IRQn;
+    return true;
   case TIM3:
-    hal_interrupt_enable(TIM3_IRQn);
-    break;
+    *out = TIM3_IRQn;
+    return true;
   case TIM4:
-    hal_interrupt_enable(TIM4_IRQn);
-    break;
+    *out = TIM4_IRQn;
+    return true;
   case TIM5:
-    hal_interrupt_enable(TIM5_IRQn);
-    break;
+    *out = TIM5_IRQn;
+    return true;
   case TIM9:
-    hal_interrupt_enable(TIM1_BRK_TIM9_IRQn);
-    break;
+    *out = TIM1_BRK_TIM9_IRQn;
+    return true;
   default:
-    break;
+    return false;
   }
-  _set_interrupt_enable_bit(timer);
+}
+
+static hal_status_t stm32_timer_set_interrupt(hal_timer_t timer, bool on) {
+  hal_irq_t irq;
+  if (_timer_irq(timer, &irq)) {
+    if (on)
+      hal_interrupt_enable(irq);
+    else
+      hal_interrupt_disable(irq);
+  }
+
+  if (on) {
+    _set_interrupt_enable_bit(timer);
+  } else {
+    TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
+    if (tim != NULL)
+      tim->DIER &= ~TIMx_DIER_UIE;
+  }
   return HAL_OK;
 }
+
+static hal_status_t stm32_timer_set_callback(hal_timer_t timer,
+                                             hal_timer_callback_t callback) {
+  hal_irq_t irq;
+  if (!_timer_irq(timer, &irq))
+    return HAL_OK;
+
+  if (callback != NULL)
+    hal_interrupt_attach_callback(irq, callback);
+  else
+    hal_interrupt_detach_callback(irq);
+  return HAL_OK;
+}
+
 
 /**
  * @brief Disable a timer's update interrupt (NVIC + DIER UIE).
  * @param timer Timer identifier.
  * @return ::HAL_OK.
  */
-static hal_status_t stm32_timer_disable_interrupt(hal_timer_t timer) {
-  switch (timer) {
-  case TIM1:
-    break; // [TODO] Implement the complex interrupt options
-  case TIM2:
-    hal_interrupt_disable(TIM2_IRQn);
-    break;
-  case TIM3:
-    hal_interrupt_disable(TIM3_IRQn);
-    break;
-  case TIM4:
-    hal_interrupt_disable(TIM4_IRQn);
-    break;
-  case TIM5:
-    hal_interrupt_disable(TIM5_IRQn);
-    break;
-  case TIM9:
-    hal_interrupt_disable(TIM1_BRK_TIM9_IRQn);
-    break;
-  default:
-    break;
-  }
-  TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
-  if (tim != NULL)
-    tim->DIER &= ~TIMx_DIER_UIE;
-  return HAL_OK;
-}
 
 /**
  * @brief Register a callback for a timer's update interrupt.
@@ -450,61 +421,12 @@ static hal_status_t stm32_timer_disable_interrupt(hal_timer_t timer) {
  * @param callback Callback to invoke, or NULL to clear.
  * @return ::HAL_OK.
  */
-static hal_status_t stm32_timer_attach_callback(hal_timer_t timer,
-                                       hal_timer_callback_t callback) {
-  switch (timer) {
-  case TIM1:
-    break; // [TODO] Implement the complex interrupt options
-  case TIM2:
-    hal_interrupt_attach_callback(TIM2_IRQn, callback);
-    break;
-  case TIM3:
-    hal_interrupt_attach_callback(TIM3_IRQn, callback);
-    break;
-  case TIM4:
-    hal_interrupt_attach_callback(TIM4_IRQn, callback);
-    break;
-  case TIM5:
-    hal_interrupt_attach_callback(TIM5_IRQn, callback);
-    break;
-  case TIM9:
-    hal_interrupt_attach_callback(TIM1_BRK_TIM9_IRQn, callback);
-    break;
-  default:
-    break;
-  }
-  return HAL_OK;
-}
 
 /**
  * @brief Remove the callback registered for a timer's update interrupt.
  * @param timer Timer identifier.
  * @return ::HAL_OK.
  */
-static hal_status_t stm32_timer_detach_callback(hal_timer_t timer) {
-  switch (timer) {
-  case TIM1:
-    break; // [TODO] Implement the complex interrupt options
-  case TIM2:
-    hal_interrupt_detach_callback(TIM2_IRQn);
-    break;
-  case TIM3:
-    hal_interrupt_detach_callback(TIM3_IRQn);
-    break;
-  case TIM4:
-    hal_interrupt_detach_callback(TIM4_IRQn);
-    break;
-  case TIM5:
-    hal_interrupt_detach_callback(TIM5_IRQn);
-    break;
-  case TIM9:
-    hal_interrupt_detach_callback(TIM1_BRK_TIM9_IRQn);
-    break;
-  default:
-    break;
-  }
-  return HAL_OK;
-}
 
 /**
  * @brief Set a channel's compare register and configure it for PWM mode 1.
@@ -551,7 +473,7 @@ static hal_status_t stm32_timer_set_compare(hal_timer_t timer, uint8_t channel,
     tim->CCMR2 |= TIMx_CCMRy_OCzM_PWM_MODE1_MASK(channel);
     tim->CCMR2 |= TIMx_CCMRy_OCxPE(channel);
   }
-  stm32_timer_enable_channel(timer, channel);
+  stm32_timer_set_channel_enabled(timer, channel, true);
   return HAL_OK;
 }
 
@@ -585,13 +507,19 @@ static uint32_t stm32_timer_get_compare(hal_timer_t timer, uint32_t channel) {
  * @param channel Channel number (1-4).
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer/channel.
  */
-static hal_status_t stm32_timer_enable_channel(hal_timer_t timer, uint32_t channel) {
+static hal_status_t stm32_timer_set_channel_enabled(hal_timer_t timer,
+                                                    uint32_t channel, bool on) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL || channel < 1 || channel > 4)
     return HAL_ERR_INVALID_ARG;
-  tim->CCER |= TIMx_CCER_CCxE_MASK(channel);
-  if (timer == TIM1) {
-    tim->BDTR |= TIMx_BDTR_MOE;
+  if (on) {
+    tim->CCER |= TIMx_CCER_CCxE_MASK(channel);
+    /* MOE gates all outputs on the advanced timer; left set on disable, as
+     * before, so disabling one channel does not kill the others. */
+    if (timer == TIM1)
+      tim->BDTR |= TIMx_BDTR_MOE;
+  } else {
+    tim->CCER &= (~TIMx_CCER_CCxE_MASK(channel));
   }
   return HAL_OK;
 }
@@ -602,32 +530,22 @@ static hal_status_t stm32_timer_enable_channel(hal_timer_t timer, uint32_t chann
  * @param channel Channel number (1-4).
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer/channel.
  */
-static hal_status_t stm32_timer_disable_channel(hal_timer_t timer, uint32_t channel) {
-  TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
-  if (tim == NULL || channel < 1 || channel > 4)
-    return HAL_ERR_INVALID_ARG;
-  tim->CCER &= (~TIMx_CCER_CCxE_MASK(channel));
-  return HAL_OK;
-}
 
 const hal_timer_ops_t _hal_timer_ops = {
     .init = stm32_timer_init,
-    .init_freq = stm32_timer_init_freq,
-    .start = stm32_timer_start,
-    .stop = stm32_timer_stop,
+    .set_timebase = stm32_timer_set_timebase,
+    .get_input_clock = stm32_timer_get_input_clock,
+    .set_running = stm32_timer_set_running,
     .reset = stm32_timer_reset,
     .get_count = stm32_timer_get_count,
-    .enable_interrupt = stm32_timer_enable_interrupt,
-    .disable_interrupt = stm32_timer_disable_interrupt,
-    .clear_interrupt_flag = stm32_timer_clear_interrupt_flag,
-    .attach_callback = stm32_timer_attach_callback,
-    .detach_callback = stm32_timer_detach_callback,
-    .set_compare = stm32_timer_set_compare,
-    .get_compare = stm32_timer_get_compare,
-    .enable_channel = stm32_timer_enable_channel,
-    .disable_channel = stm32_timer_disable_channel,
-    .get_frequency = stm32_timer_get_frequency,
     .set_prescaler = stm32_timer_set_prescaler,
+    .get_divider = stm32_timer_get_divider,
     .set_auto_reload = stm32_timer_set_auto_reload,
     .get_auto_reload = stm32_timer_get_auto_reload,
+    .set_interrupt = stm32_timer_set_interrupt,
+    .clear_interrupt_flag = stm32_timer_clear_interrupt_flag,
+    .set_callback = stm32_timer_set_callback,
+    .set_channel_enabled = stm32_timer_set_channel_enabled,
+    .set_compare = stm32_timer_set_compare,
+    .get_compare = stm32_timer_get_compare,
 };

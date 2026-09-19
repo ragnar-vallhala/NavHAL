@@ -33,6 +33,7 @@
 #include "common/hal_timer.h"
 #include "common/hal_status.h"
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -41,27 +42,64 @@ extern "C" {
 
 /** @brief Per-vendor timer operations table. */
 typedef struct {
+  /* ---- configuration ------------------------------------------------- */
+  /** Backend for ::hal_timer_init. Validation (NULL @p cfg) has already run. */
   hal_status_t (*init)(hal_timer_t timer, const hal_timer_config_t *cfg);
-  hal_status_t (*init_freq)(hal_timer_t timer, uint32_t freq);
-  hal_status_t (*start)(hal_timer_t timer);
-  hal_status_t (*stop)(hal_timer_t timer);
+  /**
+   * Program a time base of @p ticks input-clock periods.
+   *
+   * This is the one part of frequency setup that cannot be shared: the
+   * achievable (divider, reload) pairs are a hardware property. STM32 solves
+   * an arbitrary PSC/ARR; the AVR searches a fixed divider table
+   * (1/8/64/256/1024). The shared layer does the portable half -- reject
+   * freq == 0, read the input clock, divide -- and hands the result here.
+   */
+  hal_status_t (*set_timebase)(hal_timer_t timer, uint64_t ticks);
+  /** Frequency in Hz feeding this timer's prescaler. */
+  uint32_t (*get_input_clock)(hal_timer_t timer);
+
+  /* ---- run state ------------------------------------------------------ */
+  /** Start (@p on true) or stop the counter. */
+  hal_status_t (*set_running)(hal_timer_t timer, bool on);
+  /** Backend for ::hal_timer_reset -- zero the counter. */
   hal_status_t (*reset)(hal_timer_t timer);
+  /** Backend for ::hal_timer_get_count. */
   uint32_t (*get_count)(hal_timer_t timer);
-  hal_status_t (*enable_interrupt)(hal_timer_t timer);
-  hal_status_t (*disable_interrupt)(hal_timer_t timer);
+
+  /* ---- time base registers -------------------------------------------- */
+  /**
+   * Backend for ::hal_timer_set_prescaler. NOTE: v1 documents this argument
+   * as the STM32 PSC register value, and the AVR backend instead snaps it to
+   * the nearest achievable divider. That divergence is pre-existing and is
+   * deliberately preserved here; ::get_divider exists so the shared layer
+   * never has to guess which meaning applies.
+   */
+  hal_status_t (*set_prescaler)(hal_timer_t timer, uint32_t prescaler);
+  /** Effective divider currently applied (not a register value). */
+  uint32_t (*get_divider)(hal_timer_t timer);
+  /** Backend for ::hal_timer_set_auto_reload. */
+  hal_status_t (*set_auto_reload)(hal_timer_t timer, uint32_t auto_reload);
+  /** Backend for ::hal_timer_get_auto_reload. */
+  uint32_t (*get_auto_reload)(hal_timer_t timer);
+
+  /* ---- interrupts ------------------------------------------------------ */
+  /** Enable (@p on true) or disable the update interrupt. */
+  hal_status_t (*set_interrupt)(hal_timer_t timer, bool on);
+  /** Backend for ::hal_timer_clear_interrupt_flag. */
   hal_status_t (*clear_interrupt_flag)(hal_timer_t timer);
-  hal_status_t (*attach_callback)(hal_timer_t timer,
-                                  hal_timer_callback_t callback);
-  hal_status_t (*detach_callback)(hal_timer_t timer);
+  /** Install @p callback, or detach when it is NULL. */
+  hal_status_t (*set_callback)(hal_timer_t timer,
+                               hal_timer_callback_t callback);
+
+  /* ---- capture / compare ------------------------------------------------ */
+  /** Enable (@p on true) or disable an output channel. */
+  hal_status_t (*set_channel_enabled)(hal_timer_t timer, uint32_t channel,
+                                      bool on);
+  /** Backend for ::hal_timer_set_compare. */
   hal_status_t (*set_compare)(hal_timer_t timer, uint8_t channel,
                               uint32_t compare_value);
+  /** Backend for ::hal_timer_get_compare. */
   uint32_t (*get_compare)(hal_timer_t timer, uint32_t channel);
-  hal_status_t (*enable_channel)(hal_timer_t timer, uint32_t channel);
-  hal_status_t (*disable_channel)(hal_timer_t timer, uint32_t channel);
-  uint32_t (*get_frequency)(hal_timer_t timer);
-  hal_status_t (*set_prescaler)(hal_timer_t timer, uint32_t prescaler);
-  hal_status_t (*set_auto_reload)(hal_timer_t timer, uint32_t auto_reload);
-  uint32_t (*get_auto_reload)(hal_timer_t timer);
 } hal_timer_ops_t;
 
 /** @brief The active port's timer operations table (defined by one backend). */

@@ -29,6 +29,7 @@
 #include "common/hal_timer.h"
 #include "internal/hal_timer_ops.h"
 
+#include <stdbool.h>
 #include <stddef.h>
 
 hal_status_t hal_timer_init(hal_timer_t timer, const hal_timer_config_t *cfg) {
@@ -37,16 +38,30 @@ hal_status_t hal_timer_init(hal_timer_t timer, const hal_timer_config_t *cfg) {
   return _hal_timer_ops.init(timer, cfg);
 }
 
+/* Portable half of frequency setup: the tick count is just clock/freq on every
+ * port. Only the (divider, reload) split that expresses those ticks is
+ * hardware-shaped, and that is what set_timebase owns. */
 hal_status_t hal_timer_init_freq(hal_timer_t timer, uint32_t freq) {
-  return _hal_timer_ops.init_freq(timer, freq);
+  if (freq == 0u)
+    return HAL_ERR_INVALID_ARG;
+
+  uint32_t clk = _hal_timer_ops.get_input_clock(timer);
+  if (clk == 0u)
+    return HAL_ERR;
+
+  uint64_t ticks = (uint64_t)clk / freq;
+  if (ticks == 0u)
+    ticks = 1u;
+
+  return _hal_timer_ops.set_timebase(timer, ticks);
 }
 
 hal_status_t hal_timer_start(hal_timer_t timer) {
-  return _hal_timer_ops.start(timer);
+  return _hal_timer_ops.set_running(timer, true);
 }
 
 hal_status_t hal_timer_stop(hal_timer_t timer) {
-  return _hal_timer_ops.stop(timer);
+  return _hal_timer_ops.set_running(timer, false);
 }
 
 hal_status_t hal_timer_reset(hal_timer_t timer) {
@@ -58,11 +73,11 @@ uint32_t hal_timer_get_count(hal_timer_t timer) {
 }
 
 hal_status_t hal_timer_enable_interrupt(hal_timer_t timer) {
-  return _hal_timer_ops.enable_interrupt(timer);
+  return _hal_timer_ops.set_interrupt(timer, true);
 }
 
 hal_status_t hal_timer_disable_interrupt(hal_timer_t timer) {
-  return _hal_timer_ops.disable_interrupt(timer);
+  return _hal_timer_ops.set_interrupt(timer, false);
 }
 
 hal_status_t hal_timer_clear_interrupt_flag(hal_timer_t timer) {
@@ -71,11 +86,11 @@ hal_status_t hal_timer_clear_interrupt_flag(hal_timer_t timer) {
 
 hal_status_t hal_timer_attach_callback(hal_timer_t timer,
                                        hal_timer_callback_t callback) {
-  return _hal_timer_ops.attach_callback(timer, callback);
+  return _hal_timer_ops.set_callback(timer, callback);
 }
 
 hal_status_t hal_timer_detach_callback(hal_timer_t timer) {
-  return _hal_timer_ops.detach_callback(timer);
+  return _hal_timer_ops.set_callback(timer, NULL);
 }
 
 hal_status_t hal_timer_set_compare(hal_timer_t timer, uint8_t channel,
@@ -88,15 +103,25 @@ uint32_t hal_timer_get_compare(hal_timer_t timer, uint32_t channel) {
 }
 
 hal_status_t hal_timer_enable_channel(hal_timer_t timer, uint32_t channel) {
-  return _hal_timer_ops.enable_channel(timer, channel);
+  return _hal_timer_ops.set_channel_enabled(timer, channel, true);
 }
 
 hal_status_t hal_timer_disable_channel(hal_timer_t timer, uint32_t channel) {
-  return _hal_timer_ops.disable_channel(timer, channel);
+  return _hal_timer_ops.set_channel_enabled(timer, channel, false);
 }
 
+/* freq = clock / divider / (reload + 1) holds on every port once the backend
+ * reports its effective divider, so the arithmetic lives here rather than
+ * being re-derived (and re-diverging) per vendor. */
 uint32_t hal_timer_get_frequency(hal_timer_t timer) {
-  return _hal_timer_ops.get_frequency(timer);
+  uint32_t clk = _hal_timer_ops.get_input_clock(timer);
+  uint32_t divider = _hal_timer_ops.get_divider(timer);
+  uint32_t reload = _hal_timer_ops.get_auto_reload(timer);
+
+  if (clk == 0u || divider == 0u)
+    return 0u;
+
+  return clk / divider / (reload + 1u);
 }
 
 hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {

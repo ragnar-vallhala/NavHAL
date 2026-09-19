@@ -41,14 +41,15 @@ hal_pll_config_t pll_cfg = {
 /** @brief System clock source configuration */
 hal_clock_config_t clock_cfg = {
     .source = HAL_CLOCK_SOURCE_PLL, /**< Use PLL as system clock */
-    .hpre_div = RCC_CFGR_HPRE_DIV1,
-    .ppre1_div = RCC_CFGR_PPRE_DIV2,
-    .ppre2_div = RCC_CFGR_PPRE_DIV1};
+    .hpre_div = 1,
+    .ppre1_div = 2,
+    .ppre2_div = 1};
 
 int main(void) {
   // Initialize system
   hal_fpu_enable();
-  hal_clock_init(&clock_cfg, &pll_cfg);
+  clock_cfg.pll = pll_cfg;
+  hal_clock_init(&clock_cfg);
   hal_timebase_init(1000);
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
 

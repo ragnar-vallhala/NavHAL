@@ -32,11 +32,10 @@
 
 #include <stddef.h>
 
-hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
-                            const hal_pll_config_t *pll_cfg) {
+hal_status_t hal_clock_init(const hal_clock_config_t *cfg) {
   if (cfg == NULL)
     return HAL_ERR_INVALID_ARG;
-  return _hal_clock_ops.init(cfg, pll_cfg);
+  return _hal_clock_ops.init(cfg);
 }
 
 uint32_t hal_clock_get_sysclk(void) { return _hal_clock_ops.get_sysclk(); }

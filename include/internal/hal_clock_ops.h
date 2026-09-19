@@ -41,8 +41,7 @@ extern "C" {
 /** @brief Per-backend clock operations table. */
 typedef struct {
   /** Backend for ::hal_clock_init. NULL @p cfg already rejected upstream. */
-  hal_status_t (*init)(const hal_clock_config_t *cfg,
-                       const hal_pll_config_t *pll_cfg);
+  hal_status_t (*init)(const hal_clock_config_t *cfg);
   /** Backend for ::hal_clock_get_sysclk. */
   uint32_t (*get_sysclk)(void);
   /** Backend for ::hal_clock_get_ahbclk. */

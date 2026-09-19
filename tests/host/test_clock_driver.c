@@ -86,10 +86,10 @@ void test_host_clock_apb2_prescaler(void) {
 
 void test_host_clock_init_rejects_null(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
-                           (uint32_t)hal_clock_init(NULL, NULL));
+                           (uint32_t)hal_clock_init(NULL));
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_PLL};
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
-                           (uint32_t)hal_clock_init(&cfg, NULL));
+                           (uint32_t)hal_clock_init(&cfg));
 }
 
 NAVTEST_CASE_DECL(test_host_clock_sysclk_hsi);

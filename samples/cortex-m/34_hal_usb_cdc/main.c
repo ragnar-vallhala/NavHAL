@@ -52,7 +52,8 @@ static hal_pll_config_t pll_cfg = {
 static hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
 int main(void) {
-  hal_clock_init(&clk_cfg, &pll_cfg);
+  clk_cfg.pll = pll_cfg;
+  hal_clock_init(&clk_cfg);
   hal_timebase_init(1000);
 
   hal_gpio_set_mode(LED_BUILTIN, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_NONE);

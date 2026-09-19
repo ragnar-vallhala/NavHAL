@@ -45,19 +45,6 @@
 extern "C" {
 #endif
 
-/**
- * @brief PLL (Phase Locked Loop) configuration structure.
- *
- * Defines the parameters used to derive the system clock from the selected
- * input source.
- */
-typedef struct {
-  hal_clock_source_t input_src; /**< Clock input source for PLL. */
-  uint8_t pll_m;                /**< Division factor for PLL input. */
-  uint16_t pll_n;               /**< Multiplication factor for PLL VCO. */
-  uint8_t pll_p;                /**< Division factor for main system clock. */
-  uint8_t pll_q;                /**< Division factor for peripheral clocks. */
-} hal_pll_config_t;
 
 /**
  * @brief Initialize the system clock.
@@ -70,8 +57,15 @@ typedef struct {
  *
  * @note Must be called before using other peripheral clocks.
  */
-hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
-                            const hal_pll_config_t *pll_cfg);
+/**
+ * @brief Configure the system clock.
+ *
+ * @param cfg Port-defined clock configuration. On ports whose clock is driven
+ *            by a PLL the PLL parameters live in @c cfg (see the port's
+ *            @c clock_types.h); there is no separate PLL argument.
+ * @return ::HAL_OK on success.
+ */
+hal_status_t hal_clock_init(const hal_clock_config_t *cfg);
 
 /** @brief Get the system clock frequency (SYSCLK) in Hz. */
 uint32_t hal_clock_get_sysclk(void);

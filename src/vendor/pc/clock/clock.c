@@ -19,6 +19,7 @@
  */
 
 #include "common/hal_clock.h"
+#include "internal/hal_clock_ops.h"
 #include "pc_io.h"
 
 #define PIT_INPUT_HZ 1193182u /* 8254 input clock */
@@ -55,17 +56,25 @@ uint64_t pc_tsc_hz(void) {
   return g_tsc_hz;
 }
 
-hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
-                            const hal_pll_config_t *pll_cfg) {
-  (void)pll_cfg; /* no PLL on a PC */
+static hal_status_t pc_clock_init(const hal_clock_config_t *cfg) {
   if (!cfg) return HAL_ERR_INVALID_ARG;
   g_tsc_hz = calibrate_tsc_hz();
   return HAL_OK;
 }
 
-uint32_t hal_clock_get_sysclk(void) { return (uint32_t)pc_tsc_hz(); }
+static uint32_t pc_clock_get_sysclk(void) { return (uint32_t)pc_tsc_hz(); }
 
 /* A PC has no AHB/APB bus hierarchy; report the core (TSC) rate uniformly. */
-uint32_t hal_clock_get_ahbclk(void) { return hal_clock_get_sysclk(); }
-uint32_t hal_clock_get_apb1clk(void) { return hal_clock_get_sysclk(); }
-uint32_t hal_clock_get_apb2clk(void) { return hal_clock_get_sysclk(); }
+static uint32_t pc_clock_get_ahbclk(void) { return pc_clock_get_sysclk(); }
+static uint32_t pc_clock_get_apb1clk(void) { return pc_clock_get_sysclk(); }
+static uint32_t pc_clock_get_apb2clk(void) { return pc_clock_get_sysclk(); }
+
+/** @brief The PC clock backend. A PC has no bus hierarchy, so the bus
+ *  accessors all report the core clock. */
+const hal_clock_ops_t _hal_clock_ops = {
+    .init = pc_clock_init,
+    .get_sysclk = pc_clock_get_sysclk,
+    .get_ahbclk = pc_clock_get_ahbclk,
+    .get_apb1clk = pc_clock_get_apb1clk,
+    .get_apb2clk = pc_clock_get_apb2clk,
+};

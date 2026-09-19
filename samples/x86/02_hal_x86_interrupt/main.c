@@ -30,7 +30,7 @@ int main(void) {
   hal_uart_init(CONSOLE_UART, &ucfg);
 
   hal_clock_config_t ccfg = {.source = HAL_CLOCK_SOURCE_TSC};
-  hal_clock_init(&ccfg, 0);
+  hal_clock_init(&ccfg);
 
   hal_timebase_set_callback(on_tick);
   hal_timebase_init(1000); /* 1 kHz PIT IRQ */

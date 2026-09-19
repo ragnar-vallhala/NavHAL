@@ -37,10 +37,8 @@
 /** @brief Active CLKPS divider exponent (0 = /1 ... 8 = /256). */
 static uint8_t s_prescaler_log2 = 0;
 
-static hal_status_t avr_clock_init(const hal_clock_config_t *cfg,
-                                   const hal_pll_config_t *pll_cfg) {
+static hal_status_t avr_clock_init(const hal_clock_config_t *cfg) {
   /* cfg is non-NULL: the public layer validated it before dispatching. */
-  (void)pll_cfg; /* No PLL on the ATmega328P. */
   if (cfg->prescaler_log2 > 8) /* CLKPS encodes /1 .. /256. */
     return HAL_ERR_INVALID_ARG;
 

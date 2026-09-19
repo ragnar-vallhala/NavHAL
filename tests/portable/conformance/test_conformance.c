@@ -133,7 +133,7 @@ void test_conformance_gpio_init_rejects_null(void) {
 void test_conformance_clock_init_rejects_null(void) {
 #if NAVHAL_CONFIG_DRV_CLOCK
   /* hal_clock_init takes (cfg, pll_cfg). NULL cfg must return non-OK. */
-  hal_status_t st = hal_clock_init(NULL, NULL);
+  hal_status_t st = hal_clock_init(NULL);
   TEST_ASSERT_TRUE(st != HAL_OK);
 #endif
 }

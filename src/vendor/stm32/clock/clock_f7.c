@@ -106,13 +106,18 @@ static uint32_t _flash_ws_for(uint32_t hclk) {
   return (ws > 7) ? 7 : ws;
 }
 
-static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg,
-                            const hal_pll_config_t *pll_cfg) {
-  if (cfg == NULL)
-    return HAL_ERR_INVALID_ARG;
-  if (cfg->source == HAL_CLOCK_SOURCE_PLL && pll_cfg == NULL)
+static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
+  /* A PLL source with no usable PLL parameters is rejected rather than being
+   * programmed: m/n/p are divisors, and a zeroed config would either divide by
+   * zero or wait forever for a lock that cannot happen. This replaces the old
+   * pll_cfg == NULL check, and also catches a present-but-empty config, which
+   * that check let through. */
+  if (cfg->source == HAL_CLOCK_SOURCE_PLL &&
+      (cfg->pll.pll_m == 0u || cfg->pll.pll_n == 0u || cfg->pll.pll_p == 0u))
     return HAL_ERR_INVALID_ARG;
 
+  if (cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
   /* Power up the PWR controller and select voltage Scale 1 (needed before
    * over-drive / high frequency). */
   RCC->APB1ENR |= RCC_APB1ENR_PWREN;
@@ -125,25 +130,25 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg,
   } else if (cfg->source == HAL_CLOCK_SOURCE_HSI) {
     _toggle_hsi_clock(RCC_ON);
   } else if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
-    if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSE)
+    if (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSE)
       _toggle_hse_clock(RCC_ON);
     else
       _toggle_hsi_clock(RCC_ON);
 
     _toggle_pll_clock(RCC_OFF);
     RCC->PLLCFGR = 0;
-    if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSI)
+    if (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSI)
       RCC->PLLCFGR &= ~RCC_PLLCFGR_SRC;
     else
       RCC->PLLCFGR |= RCC_PLLCFGR_SRC;
     RCC->PLLCFGR |=
-        RCC_PLLCFGR_PLLM(pll_cfg->pll_m) | RCC_PLLCFGR_PLLN(pll_cfg->pll_n) |
-        RCC_PLLCFGR_PLLP(pll_cfg->pll_p) | RCC_PLLCFGR_PLLQ(pll_cfg->pll_q);
+        RCC_PLLCFGR_PLLM(cfg->pll.pll_m) | RCC_PLLCFGR_PLLN(cfg->pll.pll_n) |
+        RCC_PLLCFGR_PLLP(cfg->pll.pll_p) | RCC_PLLCFGR_PLLQ(cfg->pll.pll_q);
     _toggle_pll_clock(RCC_ON);
   }
 
   /* Target HCLK (AHB prescaler is /1 below). */
-  uint32_t hclk = (cfg->source == HAL_CLOCK_SOURCE_PLL) ? _pll_output_hz(pll_cfg)
+  uint32_t hclk = (cfg->source == HAL_CLOCK_SOURCE_PLL) ? _pll_output_hz(&cfg->pll)
                   : (cfg->source == HAL_CLOCK_SOURCE_HSE) ? HSE_FREQ_HZ
                                                           : HSI_FREQ_HZ;
 

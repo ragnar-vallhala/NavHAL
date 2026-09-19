@@ -33,12 +33,12 @@ static void wait_uart_empty(void) {
 // -------------------- Clock Initialization --------------------
 void test_hal_clock_init_hsi(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI,
-                            .hpre_div = RCC_CFGR_HPRE_DIV1,
-                            .ppre1_div = RCC_CFGR_PPRE_DIV1,
-                            .ppre2_div = RCC_CFGR_PPRE_DIV1};
+                            .hpre_div = 1,
+                            .ppre1_div = 1,
+                            .ppre2_div = 1};
 
   wait_uart_empty();
-  hal_clock_init(&cfg, NULL);
+  hal_clock_init(&cfg);
 
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
 
@@ -47,11 +47,11 @@ void test_hal_clock_init_hsi(void) {
 
 void test_hal_clock_init_hse(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSE,
-                            .hpre_div = RCC_CFGR_HPRE_DIV1,
-                            .ppre1_div = RCC_CFGR_PPRE_DIV1,
-                            .ppre2_div = RCC_CFGR_PPRE_DIV1};
+                            .hpre_div = 1,
+                            .ppre1_div = 1,
+                            .ppre2_div = 1};
   wait_uart_empty();
-  hal_clock_init(&cfg, NULL);
+  hal_clock_init(&cfg);
 
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   TEST_ASSERT_EQUAL_UINT32(1, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
@@ -59,16 +59,17 @@ void test_hal_clock_init_hse(void) {
 
 void test_hal_clock_init_pll(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_PLL,
-                            .hpre_div = RCC_CFGR_HPRE_DIV1,
-                            .ppre1_div = RCC_CFGR_PPRE_DIV4,
-                            .ppre2_div = RCC_CFGR_PPRE_DIV2};
+                            .hpre_div = 1,
+                            .ppre1_div = 4,
+                            .ppre2_div = 2};
   hal_pll_config_t pll_cfg = {.input_src = HAL_CLOCK_SOURCE_HSE,
                               .pll_m = 8,
                               .pll_n = 168,
                               .pll_p = 2,
                               .pll_q = 7};
   wait_uart_empty();
-  hal_clock_init(&cfg, &pll_cfg);
+  cfg.pll = pll_cfg;
+  hal_clock_init(&cfg);
 
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   TEST_ASSERT_EQUAL_UINT32(2, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
@@ -77,11 +78,11 @@ void test_hal_clock_init_pll(void) {
 // -------------------- SYSCLK --------------------
 void test_hal_clock_get_sysclk_returns_correct_value_hsi(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI,
-                            .hpre_div = RCC_CFGR_HPRE_DIV1,
-                            .ppre1_div = RCC_CFGR_PPRE_DIV1,
-                            .ppre2_div = RCC_CFGR_PPRE_DIV1};
+                            .hpre_div = 1,
+                            .ppre1_div = 1,
+                            .ppre2_div = 1};
   wait_uart_empty();
-  hal_clock_init(&cfg, NULL);
+  hal_clock_init(&cfg);
 
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   uint32_t sysclk = hal_clock_get_sysclk();
@@ -90,11 +91,11 @@ void test_hal_clock_get_sysclk_returns_correct_value_hsi(void) {
 
 void test_hal_clock_get_sysclk_returns_correct_value_hse(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSE,
-                            .hpre_div = RCC_CFGR_HPRE_DIV1,
-                            .ppre1_div = RCC_CFGR_PPRE_DIV1,
-                            .ppre2_div = RCC_CFGR_PPRE_DIV1};
+                            .hpre_div = 1,
+                            .ppre1_div = 1,
+                            .ppre2_div = 1};
   wait_uart_empty();
-  hal_clock_init(&cfg, NULL);
+  hal_clock_init(&cfg);
 
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   uint32_t sysclk = hal_clock_get_sysclk();
@@ -103,16 +104,17 @@ void test_hal_clock_get_sysclk_returns_correct_value_hse(void) {
 
 void test_hal_clock_get_sysclk_returns_correct_value_pll(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_PLL,
-                            .hpre_div = RCC_CFGR_HPRE_DIV1,
-                            .ppre1_div = RCC_CFGR_PPRE_DIV4,
-                            .ppre2_div = RCC_CFGR_PPRE_DIV2};
+                            .hpre_div = 1,
+                            .ppre1_div = 4,
+                            .ppre2_div = 2};
   hal_pll_config_t pll_cfg = {.input_src = HAL_CLOCK_SOURCE_HSE,
                               .pll_m = 8,
                               .pll_n = 168,
                               .pll_p = 2,
                               .pll_q = 7};
   wait_uart_empty();
-  hal_clock_init(&cfg, &pll_cfg);
+  cfg.pll = pll_cfg;
+  hal_clock_init(&cfg);
 
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   uint32_t sysclk = hal_clock_get_sysclk();
@@ -164,27 +166,27 @@ void test_hal_clock_get_apb2clk_returns_correct_value(void) {
 
 void test_hal_clock_init_returns_ok_for_hsi(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI,
-                            .hpre_div = RCC_CFGR_HPRE_DIV1,
-                            .ppre1_div = RCC_CFGR_PPRE_DIV1,
-                            .ppre2_div = RCC_CFGR_PPRE_DIV1};
+                            .hpre_div = 1,
+                            .ppre1_div = 1,
+                            .ppre2_div = 1};
   wait_uart_empty();
-  hal_status_t s = hal_clock_init(&cfg, NULL);
+  hal_status_t s = hal_clock_init(&cfg);
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)s);
 }
 
 void test_hal_clock_init_rejects_null_cfg(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
-                           (uint32_t)hal_clock_init(NULL, NULL));
+                           (uint32_t)hal_clock_init(NULL));
 }
 
 void test_hal_clock_init_pll_rejects_null_pll_cfg(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_PLL,
-                            .hpre_div = RCC_CFGR_HPRE_DIV1,
-                            .ppre1_div = RCC_CFGR_PPRE_DIV1,
-                            .ppre2_div = RCC_CFGR_PPRE_DIV1};
+                            .hpre_div = 1,
+                            .ppre1_div = 1,
+                            .ppre2_div = 1};
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
-                           (uint32_t)hal_clock_init(&cfg, NULL));
+                           (uint32_t)hal_clock_init(&cfg));
 }
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
 NAVTEST_CASE_DECL(test_hal_clock_init_hsi);

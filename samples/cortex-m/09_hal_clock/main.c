@@ -43,7 +43,8 @@ hal_clock_config_t cfg = {
 };
 
 int main(void) {
-    hal_clock_init(&cfg, &pll_cfg); /**< Initialize system clock with PLL */
+    cfg.pll = pll_cfg;
+    hal_clock_init(&cfg); /**< Initialize system clock with PLL */
     hal_timebase_init(40);               /**< Initialize SysTick with 40 µs tick */
     hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});               /**< Initialize HAL_UART_2 at 9600 baud */
 

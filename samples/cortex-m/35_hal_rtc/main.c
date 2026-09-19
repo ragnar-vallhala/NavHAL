@@ -82,7 +82,8 @@ static uint16_t put_uint(char *p, uint32_t v, uint8_t width) {
 }
 
 int main(void) {
-  hal_clock_init(&clk_cfg, &pll_cfg);
+  clk_cfg.pll = pll_cfg;
+  hal_clock_init(&clk_cfg);
   hal_timebase_init(1000);
   hal_gpio_set_mode(LED_BUILTIN, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_NONE);
 

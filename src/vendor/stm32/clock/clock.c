@@ -89,15 +89,20 @@ static hal_status_t _toggle_pll_clock(uint8_t state) {
  * source to PLL output.
  *
  * @param cfg     Clock configuration specifying the source; must not be NULL.
- * @param pll_cfg PLL configuration; must not be NULL when the source is PLL.
+ * PLL parameters come from @c cfg->pll when the source is PLL.
  * @return ::HAL_OK on success, ::HAL_ERR_INVALID_ARG on a missing argument.
  */
-static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg,
-                                     const hal_pll_config_t *pll_cfg) {
-  /* cfg is non-NULL: the public layer validated it before dispatching. */
-  if (cfg->source == HAL_CLOCK_SOURCE_PLL && pll_cfg == NULL)
+static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
+  /* A PLL source with no usable PLL parameters is rejected rather than being
+   * programmed: m/n/p are divisors, and a zeroed config would either divide by
+   * zero or wait forever for a lock that cannot happen. This replaces the old
+   * pll_cfg == NULL check, and also catches a present-but-empty config, which
+   * that check let through. */
+  if (cfg->source == HAL_CLOCK_SOURCE_PLL &&
+      (cfg->pll.pll_m == 0u || cfg->pll.pll_n == 0u || cfg->pll.pll_p == 0u))
     return HAL_ERR_INVALID_ARG;
 
+  /* cfg is non-NULL: the public layer validated it before dispatching. */
   // Enable and wait for selected clock source. On a ready-bit timeout, bail out
   // immediately: the system clock is left on the reset HSI rather than being
   // switched onto a source that never came up (which would be a dead clock).
@@ -113,10 +118,10 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg,
   // PLL configuration and enabling (if PLL is selected)
   else if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
     // Enable PLL input source clock and wait for readiness
-    if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSE) {
+    if (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSE) {
       if ((st = _toggle_hse_clock(RCC_ON)) != HAL_OK)
         return st;
-    } else if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSI) {
+    } else if (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSI) {
       if ((st = _toggle_hsi_clock(RCC_ON)) != HAL_OK)
         return st;
     }
@@ -125,7 +130,7 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg,
       return st;
     RCC->PLLCFGR = 0;
     // Set PLL source (HSI=0, HSE=1)
-    if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSI) {
+    if (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSI) {
       RCC->PLLCFGR &= ~RCC_PLLCFGR_SRC;
     } else {
       RCC->PLLCFGR |= RCC_PLLCFGR_SRC;
@@ -133,8 +138,8 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg,
 
     // Set PLL dividers and multipliers
     RCC->PLLCFGR |=
-        RCC_PLLCFGR_PLLM(pll_cfg->pll_m) | RCC_PLLCFGR_PLLN(pll_cfg->pll_n) |
-        RCC_PLLCFGR_PLLP(pll_cfg->pll_p) | RCC_PLLCFGR_PLLQ(pll_cfg->pll_q);
+        RCC_PLLCFGR_PLLM(cfg->pll.pll_m) | RCC_PLLCFGR_PLLN(cfg->pll.pll_n) |
+        RCC_PLLCFGR_PLLP(cfg->pll.pll_p) | RCC_PLLCFGR_PLLQ(cfg->pll.pll_q);
 
     if ((st = _toggle_pll_clock(RCC_ON)) != HAL_OK)
       return st; // PLL never locked — stay on HSI instead of hanging.

@@ -32,6 +32,7 @@
 #define NAVHAL_PORT_DMA_H
 
 #include "common/hal_dma.h"
+#include "common/hal_interrupt.h"
 
 
 #ifdef __cplusplus
@@ -146,5 +147,21 @@ NAVHAL_INLINE void navhal_dma_rx_finish(void *buf, size_t n) {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+
+/**
+ * @brief How one peripheral endpoint is wired to the DMA controller.
+ *
+ * Port-defined, like a clock config: controller/stream/channel is this
+ * family's DMA model and would not fit a part with DMAMUX or bus-master DMA.
+ * A bus driver's DMA table reports this and the shared layer does the rest.
+ */
+typedef struct {
+  hal_dma_controller_t controller; /**< Which controller drives this endpoint. */
+  uint8_t stream;                  /**< Stream index. */
+  uint8_t channel;                 /**< Channel selection. */
+  uint32_t periph_addr;            /**< Peripheral data register address. */
+  hal_irq_t irq;                   /**< Stream completion IRQ. */
+} hal_dma_binding_t;
 
 #endif /* NAVHAL_PORT_DMA_H */

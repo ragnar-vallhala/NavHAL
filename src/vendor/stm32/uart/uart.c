@@ -30,6 +30,7 @@
  */
 
 #include "internal/hal_uart_ops.h"
+#include "internal/hal_uart_dma_ops.h"
 #include "navhal_port_uart.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_gpio.h"
@@ -309,124 +310,47 @@ static _uart_dma_params_t _get_uart_dma_params(hal_uart_t uart, int is_tx) {
   return p;
 }
 
-/**
- * @brief Tracks initialisation state for DMA streams to avoid redundant setups.
- *
- * Indices: UART1_TX=0, UART1_RX=1, UART2_TX=2, UART2_RX=3, UART6_TX=4,
- * UART6_RX=5.
- */
-static uint8_t _uart_dma_initialized[6] = {0};
 
-/** Configured circular RX-buffer length per UART (UART1=0, UART2=1, UART6=2);
- *  0 until hal_uart_init_dma_rx() runs. Used to turn NDTR into a write index. */
-static uint16_t _uart_rx_dma_len[3] = {0};
 
-hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
-                                uint16_t length) {
-  if (!data || length == 0)
-    return HAL_ERR_INVALID_ARG;
 
-  _uart_dma_params_t p = _get_uart_dma_params(uart, 1);
+
+
+
+
+/* The only two vendor facts the shared UART-DMA layer needs. */
+static hal_status_t stm32_uart_dma_binding(hal_uart_t uart, bool tx,
+                                          hal_dma_binding_t *out) {
+  _uart_dma_params_t p = _get_uart_dma_params(uart, tx ? 1 : 0);
   if (!p.controller)
     return HAL_ERR_INVALID_ARG;
 
+  out->controller =
+      (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2;
+  out->stream = p.stream;
+  out->channel = p.channel;
+  out->periph_addr = p.periph_addr;
+  out->irq = (hal_irq_t)p.irq;
+  return HAL_OK;
+}
+
+static hal_status_t stm32_uart_dma_set_request(hal_uart_t uart, bool tx,
+                                              bool on) {
   volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
-  usart->CR3 |= USART_CR3_DMAT;
+  if (!usart)
+    return HAL_ERR_INVALID_ARG;
 
-  int idx = (uart == HAL_UART_1) ? 0 : (uart == HAL_UART_2) ? 2 : 4;
-  hal_dma_config_t cfg = {
-      .controller =
-          (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2,
-      .stream = p.stream,
-      .channel = p.channel,
-      .direction = HAL_DMA_DIR_M2P,
-      .src_addr = (uint32_t)data,
-      .dst_addr = p.periph_addr,
-      .data_count = length,
-      .src_inc = 1,
-      .dst_inc = 0,
-      .data_width = HAL_DMA_DATA_WIDTH_8,
-      .priority = HAL_DMA_PRIORITY_HIGH,
-  };
-
-  if (!_uart_dma_initialized[idx]) {
-    hal_dma_init(&cfg);
-    _uart_dma_initialized[idx] = 1;
-  } else {
-    DMA_Stream_Typedef *s = &p.controller->STREAM[p.stream];
-    /* Safe-Async: Wait for previous transfer before starting new one */
-    while (s->CR & DMA_SxCR_EN)
-      ;
-    s->M0AR = (uint32_t)data;
-    s->NDTR = length;
-  }
-
-  hal_dma_clear_flags(&cfg);
-  hal_interrupt_enable((hal_irq_t)p.irq);
-  hal_dma_start(&cfg);
+  uint32_t bit = tx ? USART_CR3_DMAT : USART_CR3_DMAR;
+  if (on)
+    usart->CR3 |= bit;
+  else
+    usart->CR3 &= ~bit;
   return HAL_OK;
 }
 
-hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
-                                  uint16_t length) {
-  if (!buffer || length == 0)
-    return HAL_ERR_INVALID_ARG;
-
-  _uart_dma_params_t p = _get_uart_dma_params(uart, 0);
-  if (!p.controller)
-    return HAL_ERR_INVALID_ARG;
-
-  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
-  usart->CR3 |= USART_CR3_DMAR;
-
-  hal_dma_config_t cfg = {
-      .controller =
-          (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2,
-      .stream = p.stream,
-      .channel = p.channel,
-      .direction = HAL_DMA_DIR_P2M,
-      .src_addr = p.periph_addr,
-      .dst_addr = (uint32_t)buffer,
-      .data_count = length,
-      .src_inc = 0,
-      .dst_inc = 1,
-      .data_width = HAL_DMA_DATA_WIDTH_8,
-      .priority = HAL_DMA_PRIORITY_MEDIUM,
-      .circular = 1,
-  };
-
-  hal_dma_init(&cfg);
-  hal_dma_start(&cfg);
-
-  int idx = (uart == HAL_UART_1) ? 1 : (uart == HAL_UART_2) ? 3 : 5;
-  _uart_dma_initialized[idx] = 1;
-  _uart_rx_dma_len[_uart_idx(uart)] = length;
-  return HAL_OK;
-}
-
-hal_status_t hal_uart_dma_rx_index(hal_uart_t uart, uint16_t *out_index) {
-  if (!out_index)
-    return HAL_ERR_INVALID_ARG;
-  _uart_dma_params_t p = _get_uart_dma_params(uart, 0);
-  uint16_t len = _uart_rx_dma_len[_uart_idx(uart)];
-  if (!p.controller || len == 0)
-    return HAL_ERR_INVALID_ARG; /* RX DMA not configured for this UART */
-
-  /* NDTR counts down from `len` to 0 as the DMA fills the circular buffer, so
-   * the next-write index is len - NDTR. Reading the correct stream's NDTR is
-   * the whole point — callers must not guess the stream themselves. */
-  uint16_t ndtr = (uint16_t)(p.controller->STREAM[p.stream].NDTR & 0xFFFFu);
-  *out_index = (uint16_t)(len - ndtr);
-  return HAL_OK;
-}
-
-hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s) {
-  if (!s)
-    return HAL_ERR_INVALID_ARG;
-  uint16_t len = 0;
-  while (s[len])
-    len++;
-  return hal_uart_write_dma(uart, (const uint8_t *)s, len);
-}
+/** @brief The STM32 UART-over-DMA backend. */
+const hal_uart_dma_ops_t _hal_uart_dma_ops = {
+    .binding = stm32_uart_dma_binding,
+    .set_request = stm32_uart_dma_set_request,
+};
 
 #endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */

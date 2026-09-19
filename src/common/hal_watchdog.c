@@ -28,6 +28,11 @@
 #include "common/hal_watchdog.h"
 #include "internal/hal_watchdog_ops.h"
 
+/* Matches the gate on the vendor backend: the TEST build globs every
+ * common/hal_*.c regardless of Kconfig, so this layer has to disappear
+ * with the table it dispatches through. */
+#if NAVHAL_CONFIG_DRV_WATCHDOG
+
 hal_status_t hal_watchdog_start(uint32_t timeout_ms) {
   if (timeout_ms == 0u)
     return HAL_ERR_INVALID_ARG;
@@ -45,3 +50,5 @@ bool hal_watchdog_is_running(void) { return _hal_watchdog_ops.is_running(); }
 uint32_t hal_watchdog_max_timeout_ms(void) {
   return _hal_watchdog_ops.max_timeout_ms();
 }
+
+#endif /* NAVHAL_CONFIG_DRV_WATCHDOG */

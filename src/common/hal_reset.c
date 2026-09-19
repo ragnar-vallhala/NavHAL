@@ -28,8 +28,15 @@
 #include "common/hal_reset.h"
 #include "internal/hal_reset_ops.h"
 
+/* Matches the gate on the vendor backend: the TEST build globs every
+ * common/hal_*.c regardless of Kconfig, so this layer has to disappear
+ * with the table it dispatches through. */
+#if NAVHAL_CONFIG_DRV_RESET
+
 hal_status_t hal_reset_init(void) { return _hal_reset_ops.init(); }
 
 uint32_t hal_reset_get_cause(void) { return _hal_reset_ops.get_cause(); }
 
 hal_status_t hal_system_reset(void) { return _hal_reset_ops.system_reset(); }
+
+#endif /* NAVHAL_CONFIG_DRV_RESET */

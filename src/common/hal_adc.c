@@ -30,9 +30,10 @@
 
 #include <stddef.h>
 
+/* NULL config is legal here and means "native resolution defaults" -- see
+ * hal_adc.h. Unlike every other driver's init, it is not an error, so the
+ * shared layer passes it through untouched. */
 hal_status_t hal_adc_init(hal_adc_t adc, const hal_adc_config_t *config) {
-  if (config == NULL)
-    return HAL_ERR_INVALID_ARG;
   return _hal_adc_ops.init(adc, config);
 }
 

@@ -284,6 +284,22 @@ const hal_uart_dma_ops_t _hal_uart_dma_ops = {
     .set_request = stm32f7_uart_dma_set_request,
 };
 
+
+/* ---------------------------------------------------------------------------
+ * USART interrupt vectors.
+ *
+ * Named by this MCU's vector table, so they belong with the driver that owns
+ * the peripheral rather than in the shared arch interrupt file. Each hands
+ * off to the registry so a caller's attached callback runs.
+ * ------------------------------------------------------------------------- */
+void USART1_IRQHandler(void) { hal_interrupt_dispatch(USART1_IRQn); }
+void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }
+/* Slot 39. The F767 vector table has always named this handler, but nothing
+ * defined it, so it resolved to the weak Default_Handler alias and an
+ * interrupt-driven USART3 -- the Nucleo-F767ZI console -- dispatched nowhere. */
+void USART3_IRQHandler(void) { hal_interrupt_dispatch(USART3_IRQn); }
+void USART6_IRQHandler(void) { hal_interrupt_dispatch(USART6_IRQn); }
+
 #endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
 
 /** @brief The F7 UART primitives; every derived write lives in the shared layer. */

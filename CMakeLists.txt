@@ -279,16 +279,19 @@ add_custom_target(copy_compile_commands ALL
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-# Startup file (arch layer). The Cortex-M port ships an explicit startup.s;
-# the AVR port relies on the avr-libc C runtime and has none.
+# Startup file. The vector table names this MCU's peripherals, so it is a
+# family property and lives beside the family's register maps; a board may
+# override it for board-level vectoring. The AVR port relies on the avr-libc
+# C runtime and has none.
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
     set(STARTUP_FILE "")
 elseif(EXISTS "${SRC_BOARD}/startup.s")
-    # The peripheral vector table is MCU-specific, so a board may ship its own
-    # startup.s (e.g. nucleo_f767zi, whose USART3 vector the F401-based arch
-    # table leaves as a literal 0). Prefer it over the arch default.
     set(STARTUP_FILE "${SRC_BOARD}/startup.s")
+elseif(EXISTS "${INCLUDE_FAMILY}/../startup.s")
+    set(STARTUP_FILE "${INCLUDE_FAMILY}/../startup.s")
 else()
+    # Last resort, and correct for an arch whose entry really is architectural:
+    # x86-64 builds its IDT at runtime rather than shipping a static table.
     set(STARTUP_FILE "${SRC_ARCH}/startup/startup.s")
 endif()
 # Export path to parent project if included via add_subdirectory()

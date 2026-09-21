@@ -258,6 +258,5 @@ void Default_Handler(void) {}
 __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 #endif
 
-void USART1_IRQHandler(void) { hal_interrupt_dispatch(USART1_IRQn); }
-void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }
-void USART6_IRQHandler(void) { hal_interrupt_dispatch(USART6_IRQn); }
+/* USART vectors are this MCU's, not the core's, so they are defined by the
+ * vendor's UART backend rather than here. */

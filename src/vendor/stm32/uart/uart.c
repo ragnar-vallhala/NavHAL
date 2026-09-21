@@ -353,4 +353,16 @@ const hal_uart_dma_ops_t _hal_uart_dma_ops = {
     .set_request = stm32_uart_dma_set_request,
 };
 
+
+/* ---------------------------------------------------------------------------
+ * USART interrupt vectors.
+ *
+ * Named by this MCU's vector table, so they belong with the driver that owns
+ * the peripheral rather than in the shared arch interrupt file. Each hands
+ * off to the registry so a caller's attached callback runs.
+ * ------------------------------------------------------------------------- */
+void USART1_IRQHandler(void) { hal_interrupt_dispatch(USART1_IRQn); }
+void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }
+void USART6_IRQHandler(void) { hal_interrupt_dispatch(USART6_IRQn); }
+
 #endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */

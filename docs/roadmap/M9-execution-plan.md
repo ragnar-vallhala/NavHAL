@@ -2,8 +2,8 @@
 
 # M9 — Execution plan: the complete vendor/arch vtable shift
 
-> Status: **in progress** — GPIO landed as the reference; the remaining
-> subsystems + cross-cutting infra are tracked here.
+> Status: **done** — every phase below landed; the verification matrix at
+> the end is what the tree produces today.
 > Parent: @ref roadmap_m9 (the design). Cost mechanics: @ref roadmap_abstraction.
 > Scope: roll the driver-vtable abstraction across **every** HAL subsystem
 > (vendor- and arch-layer) in one cohesive change, plus the LTO release
@@ -165,19 +165,31 @@ common-layer gate is clean rather than an awkward `DRV_TIMER OR DRV_UART`.
 
 **Phase D — conformance + perf harness.**
 
-* **Vtable completeness:** new `tests/portable/conformance/test_vtable.{c,h}`
-  including the `internal/hal_<sub>_ops.h` headers and asserting every
-  `_hal_<sub>_ops.<fn> != NULL`, each block gated by the subsystem's
-  `NAVHAL_HAS_*`. The TEST build already has `include/` on its path and globs
-  the vendor `.c` that defines the symbol, so this links. Register the suite in
-  `tests/main.c`. This makes "did the port really implement the HAL" a build-
-  and link-time gate (design §9.4).
-* **Perf regression:** extend `tests/cap/cycle_counter/` (gated
-  `NAVHAL_HAS_CYCLE_COUNTER`, Cortex-M4) — use `hal_cycle_counter_*` (DWT) to
-  assert (a) the inline hot-path cost is unchanged and (b) under a release/LTO
-  build the dispatched call devirtualises to within the "≤ 2 cycles" budget.
-  AVR side is best-effort/skipped (simavr exposes no host-readable guest
-  cycles).
+* **Vtable completeness:** `tests/portable/conformance/test_vtable.c`, one
+  case per ops table the build links, gated exactly as the shared layer gates
+  the driver. Landed as planned with one change: it does not name each field.
+  Naming them means a table that grows a seventeenth entry stays unchecked
+  until someone remembers this file, so instead each table is walked as an
+  array of function pointers and asserted to contain no null. A self-test
+  proves the detector can fail, since 17 assertions that only ever say yes
+  would look identical to a working suite.
+
+  This is a **runtime** gate, not the build-time one §9.4 assumed. GCC does
+  not warn about missing fields in a designated initializer, which is how
+  every table here is written — verified under `-Wall`, under `-Wextra`, and
+  with `-Wmissing-field-initializers` named explicitly. The flag was added and
+  reverted once that was established.
+
+* **Perf regression:** landed as `tools/check_devirt.sh`, not as the DWT
+  cycle-count assertions described here. Two reasons. Cycle counts on a bench
+  are a flaky gate — they move with flash wait states and bus contention, and
+  a test that fails intermittently gets ignored rather than fixed. And the
+  claim worth guarding is not "how many cycles" but "did the table resolve",
+  which is a static property of the binary: the script builds `hal_blink`
+  under ReleaseLTO on all three arches and fails if any `_hal_*_ops` symbol
+  survives. It also does not count indirect branches, because the ones that
+  remain are application callbacks dispatched from an ISR — see the exit
+  criteria in @ref roadmap_m9.
 
 **Phase E — docs + final verification.** Update @ref roadmap_m9: flip every
 subsystem row to done, document the arch-ops variant and the timebase
@@ -204,8 +216,13 @@ full matrix below.
   `used` / `KEEP`; verify by disassembly and a green release-build PIL run on
   both arches before relying on it.
 * **AVR SRAM pressure.** ~14 `const` ops tables land in RAM (~150–250 B on a
-  2 KB part). Check `.data` after migration; if tight, move AVR tables to
-  PROGMEM (costs an `LPM` per dispatch). Flagged, not done pre-emptively.
+  2 KB part). **Measured, and it is fine:** the six tables an ATmega328P
+  `hal_blink` links occupy 108 B of its 160 B `.data`, ~5% of SRAM. PROGMEM
+  tables were not needed, so the `LPM` per dispatch was not paid.
+
+  The pressure that did bite was flash, in the *test* image, and from the test
+  framework rather than the tables: see the navtest assertion rework in the
+  verification notes below.
 * **Interrupt bounds can't fully hoist** (arch-specific IRQ max) — that check
   stays in the backend; only NULL-callback validation moves up.
 * **Single large change is hard to review/bisect** (accepted) — mitigated by
@@ -218,8 +235,10 @@ counts below are what the tree produces today, not what it produced when this
 plan was written.
 
 * **Host (SIL):** `tools/ntest host` — 24 pure-logic + 65 driver tests.
-* **PIL, both boards:** `bash tools/pil/run.sh nucleo_f401re` (201) and
-  `bash tools/pil/run.sh nucleo_f767zi` (208).
+* **PIL, all three boards:** `bash tools/pil/run.sh nucleo_f401re` (235),
+  `nucleo_f767zi` (245) and `atmega328p` (64). The AVR board is easy to
+  forget and was the only tier that caught the test image outgrowing its
+  flash.
 * **Capability contract:** `tools/ntest cap-contract` — 20 scenarios. This is
   the only job that builds without pinning a vendor, and the only one that
   caught the ACME port becoming the default vendor on Cortex-M4.
@@ -228,8 +247,8 @@ plan was written.
 * **HIL, when a board is attached:** `bash tools/hil/run.sh nucleo_f401re`
   (184 on silicon). Needs `tools/hil/99-navhal-stlink.rules` installed, or a
   board's console stays root-owned and the runner reports it as absent.
-* **Disassembly spot-check:** `-Os -flto` leaves zero indirect dispatches in
-  `hal_blink` on both arches.
+* **Devirtualisation:** `tools/check_devirt.sh` — builds `hal_blink` under
+  ReleaseLTO on m4, m7 and avr and fails if any ops table survives the link.
 * **Lint:** `tools/lint_commits.sh origin/main..HEAD`.
 
 What each tier can and cannot catch is worth stating, because relying on the
@@ -243,3 +262,14 @@ wrong one cost time during this migration:
   changing under them. Only cap-contract did.
 * A stale build directory reports the previous run's result. Reconfigure from
   scratch when a build-system change is in play.
+* An empty UART log is not necessarily a firmware hang. Renode opens a Monitor
+  socket on port 1234 unless told otherwise — the port every gdbserver and
+  QEMU gdb stub also wants — and aborts at startup if it is taken, which
+  reaches the runner as no output at all. `tools/renode/run_tests.sh` now
+  takes a free port.
+* Flash on the ATmega328P is the binding constraint for the test image, and
+  the test *framework* dominates it. avr-gcc never merges two identical
+  `PSTR`s, so an assertion macro that wrote `_NT_PSTR(__FILE__)` inline put a
+  full copy of an absolute path at every assertion site: 35 KB of conformance
+  object on a part with 32 KB of flash. One file string per translation unit
+  plus out-of-line `_navtest_fail_*` helpers brought that to 6.2 KB.

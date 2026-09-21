@@ -84,6 +84,20 @@ void test_host_clock_apb2_prescaler(void) {
   TEST_ASSERT_EQUAL_UINT32(8000000u, hal_clock_get_apb2clk());
 }
 
+/* Only the rejection paths run here: a successful init waits on a PLL lock
+ * bit the simulated MMIO never sets. The solver's positive path is exercised
+ * on target instead, by the sample that configures its clock this way. */
+void test_host_clock_init_hz_rejects_unreachable(void) {
+  host_mmio_reset();
+  /* Above the part's ceiling, and a target no integer N lands on exactly. */
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_clock_init_hz(HAL_CLOCK_SOURCE_HSI, 400000000u));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_clock_init_hz(HAL_CLOCK_SOURCE_HSI, 0u));
+}
+
 void test_host_clock_init_rejects_null(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
                            (uint32_t)hal_clock_init(NULL));
@@ -100,6 +114,7 @@ NAVTEST_CASE_DECL(test_host_clock_ahb_prescaler);
 NAVTEST_CASE_DECL(test_host_clock_apb1_prescaler);
 NAVTEST_CASE_DECL(test_host_clock_apb2_prescaler);
 NAVTEST_CASE_DECL(test_host_clock_init_rejects_null);
+NAVTEST_CASE_DECL(test_host_clock_init_hz_rejects_unreachable);
 
 static const navtest_case_t clock_driver_cases[] = {
     NAVTEST_CASE(test_host_clock_sysclk_hsi),
@@ -110,6 +125,7 @@ static const navtest_case_t clock_driver_cases[] = {
     NAVTEST_CASE(test_host_clock_apb1_prescaler),
     NAVTEST_CASE(test_host_clock_apb2_prescaler),
     NAVTEST_CASE(test_host_clock_init_rejects_null),
+    NAVTEST_CASE(test_host_clock_init_hz_rejects_unreachable),
 };
 
 const navtest_suite_t test_clock_driver_suite = {

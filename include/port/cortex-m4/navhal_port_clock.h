@@ -41,6 +41,20 @@ static inline uint32_t hal_clock_get_apb2clk(void) {
   return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_APB2);
 }
 
+/**
+ * @brief Configure the PLL for a target SYSCLK instead of raw dividers.
+ *
+ * Picking PLLM/N/P by hand is where a clock config goes quietly wrong: the
+ * VCO has a legal range and a wrong N can still produce the right SYSCLK
+ * while running the PLL out of spec. This solves for them.
+ *
+ * @param pll_input ::HAL_CLOCK_SOURCE_HSI or ::HAL_CLOCK_SOURCE_HSE.
+ * @param target_hz Desired SYSCLK. Must be exactly reachable.
+ * @return ::HAL_ERR_INVALID_ARG if no legal PLL setting hits it.
+ */
+hal_status_t hal_clock_init_hz(hal_clock_source_t pll_input,
+                               uint32_t target_hz);
+
 /* Deprecated two-argument init — retained as a backward-compat shim. */
 #include "compat/clock_compat.h"
 

@@ -319,6 +319,68 @@ static uint32_t stm32_clock_get_bus_clock(uint8_t bus) {
   }
 }
 
+
+/* PLL solving, RM0368 §6.3.2: VCO input must land in 1..2 MHz, VCO output in
+ * 100000000..432000000 MHz, and PLLP is one of 2/4/6/8. Picking these by hand is
+ * where a clock config goes quietly wrong -- 09_hal_clock shipped an N that
+ * put the VCO below its minimum while still producing the right SYSCLK. */
+#define PLL_VCO_IN_HZ 1000000U
+#define PLL_VCO_MIN_HZ 100000000U
+#define PLL_VCO_MAX_HZ 432000000U
+#define PLL_SYSCLK_MAX_HZ 216000000U
+
+static hal_status_t _solve_pll(hal_clock_source_t input_src, uint32_t target_hz,
+                               hal_pll_config_t *out) {
+  if (target_hz == 0u || target_hz > PLL_SYSCLK_MAX_HZ)
+    return HAL_ERR_INVALID_ARG;
+
+  uint32_t in = (input_src == HAL_CLOCK_SOURCE_HSE) ? HSE_FREQ_HZ
+                                                    : HSI_FREQ_HZ;
+
+  /* A 1 MHz VCO input gives the finest N granularity the part allows, and
+   * divides exactly for both the 8 MHz HSE and the 16 MHz HSI. */
+  if ((in % PLL_VCO_IN_HZ) != 0u)
+    return HAL_ERR_INVALID_ARG;
+  uint32_t m = in / PLL_VCO_IN_HZ;
+  if (m < 2u || m > 63u)
+    return HAL_ERR_INVALID_ARG;
+
+  for (uint32_t p = 2u; p <= 8u; p += 2u) {
+    uint64_t vco = (uint64_t)target_hz * p;
+    if (vco < PLL_VCO_MIN_HZ || vco > PLL_VCO_MAX_HZ)
+      continue;
+
+    uint32_t n = (uint32_t)(vco / PLL_VCO_IN_HZ);
+    if (n < 50u || n > 432u)
+      continue;
+    /* Reject a target the integer N cannot hit exactly. */
+    if ((uint64_t)n * PLL_VCO_IN_HZ != vco)
+      continue;
+
+    out->input_src = input_src;
+    out->pll_m = (uint8_t)m;
+    out->pll_n = (uint16_t)n;
+    out->pll_p = (uint8_t)p;
+    /* 48 MHz for USB where the VCO allows it, else the nearest legal Q. */
+    uint32_t q = (uint32_t)(vco / 48000000u);
+    out->pll_q = (uint8_t)((q >= 2u && q <= 15u) ? q : 7u);
+    return HAL_OK;
+  }
+  return HAL_ERR_INVALID_ARG;
+}
+
+hal_status_t hal_clock_init_hz(hal_clock_source_t pll_input,
+                               uint32_t target_hz) {
+  hal_clock_config_t cfg = {0};
+  cfg.source = HAL_CLOCK_SOURCE_PLL;
+
+  hal_status_t st = _solve_pll(pll_input, target_hz, &cfg.pll);
+  if (st != HAL_OK)
+    return st;
+
+  return hal_clock_init(&cfg);
+}
+
 const hal_clock_ops_t _hal_clock_ops = {
     .init = stm32_clock_init,
     .get_sysclk = stm32_clock_get_sysclk,

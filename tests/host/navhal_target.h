@@ -48,6 +48,10 @@
 #define NAVHAL_CONFIG_DRV_DWT       0
 #define NAVHAL_CONFIG_DRV_SDIO      0
 #define NAVHAL_CONFIG_DRV_UART_DMA  0
+/* The boot watcher is pure logic and links against a stubbed hal_system_reset
+ * (test_boot_sniffer.c), so both can be on here without touching hardware. */
+#define NAVHAL_CONFIG_DRV_RESET     1
+#define NAVHAL_CONFIG_BOOT_SNIFFER  1
 #define NAVHAL_CONFIG_DRV_I2C_DMA   0
 #define NAVHAL_CONFIG_DRV_SDIO_DMA  0
 /* MPU ON: the driver suite exercises the real mpu.c against the SCS page that

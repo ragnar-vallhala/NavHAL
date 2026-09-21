@@ -33,6 +33,7 @@
 #include "portable/conformance/test_conformance.h"
 #include "portable/conformance/test_vtable.h"
 
+#include "cap/boot/test_boot.h"
 #include "cap/cache/test_cache.h"
 #include "cap/dma/test_dma.h"
 #include "cap/eth/test_eth.h"
@@ -111,6 +112,9 @@ static const navtest_suite_t *const all_suites[] = {
                                   __FILE__/msg strings out of AVR .data). */
     &test_vtable_suite,        /* every linked ops table is fully filled in */
     &test_timebase_suite,
+#if NAVHAL_CONFIG_BOOT_SNIFFER
+    &test_boot_suite,
+#endif
 #if NAVHAL_CONFIG_DRV_DMA
     &test_dma_suite,
 #endif

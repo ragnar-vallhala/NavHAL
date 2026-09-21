@@ -155,13 +155,67 @@ include("${_NAVHAL_ARCH_FILE}")
 # deprecated NAVHAL_HAS_* aliases) ambient, so drivers gate on them without any
 # #include and without the old navhal_port_config.h -> _*_ENABLED bridge.
 set(NAVHAL_FORCE_INCLUDE "-include ${GENERATED_NAVHAL_TARGET}")
-set(CMAKE_C_FLAGS "${ARCH_C_FLAGS} -Wall -std=c11 ${NAVHAL_FORCE_INCLUDE}")
-set(CMAKE_ASM_FLAGS "${ARCH_ASM_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${ARCH_LINK_FLAGS}")
+
+# ---- Build profiles -------------------------------------------------------
+# Three, selected with -DCMAKE_BUILD_TYPE=<name>:
+#
+#   Debug       -O0 -g          stepping matches the source line for line.
+#                               The default, and what the test and PIL tiers
+#                               run, so a failure is debuggable as it stands.
+#   Release     -Os -DNDEBUG    what ships. On an MCU the binding constraint
+#                               is flash, not instruction count, which is why
+#                               this is -Os and not CMake's usual -O3.
+#   ReleaseLTO  -Os -flto       Release plus link-time optimisation, which is
+#                               what collapses the driver vtable: the ops
+#                               tables are const and resolved at link time, so
+#                               every dispatch devirtualises into a direct
+#                               call and most inline away entirely.
+#
+# Requires -ffreestanding (set per arch) and src/utils/freestanding.c: above
+# -O0 GCC emits memcpy/memset for aggregate copies, and -nostdlib supplies no
+# libc to satisfy them.
+set(NAVHAL_BUILD_TYPES Debug Release ReleaseLTO)
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "NavHAL build profile" FORCE)
+endif()
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${NAVHAL_BUILD_TYPES})
+
+if(NOT CMAKE_BUILD_TYPE IN_LIST NAVHAL_BUILD_TYPES)
+    message(FATAL_ERROR
+        "Unknown CMAKE_BUILD_TYPE '${CMAKE_BUILD_TYPE}'. "
+        "NavHAL defines: ${NAVHAL_BUILD_TYPES}")
+endif()
+
+set(CMAKE_C_FLAGS_DEBUG          "-O0 -g")
+set(CMAKE_C_FLAGS_RELEASE        "-Os -DNDEBUG")
+set(CMAKE_C_FLAGS_RELEASELTO     "-Os -flto -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG        "${CMAKE_C_FLAGS_DEBUG}")
+set(CMAKE_CXX_FLAGS_RELEASE      "${CMAKE_C_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_RELEASELTO   "${CMAKE_C_FLAGS_RELEASELTO}")
+set(CMAKE_ASM_FLAGS_DEBUG        "-g")
+set(CMAKE_ASM_FLAGS_RELEASE      "")
+set(CMAKE_ASM_FLAGS_RELEASELTO   "")
+# The link step needs -flto too, and the optimisation level with it: GCC runs
+# the whole-program passes at link time, so omitting it there silently gives
+# an -O0 final image.
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG        "")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE      "")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASELTO   "-Os -flto")
+
+message(STATUS "NavHAL build profile: ${CMAKE_BUILD_TYPE}")
+
+# Append rather than assign: these are added to whatever the caller passed on
+# the command line, so -DCMAKE_C_FLAGS=... survives instead of being silently
+# discarded. CMake puts the per-build-type flags after these, so a build type
+# still decides the optimisation level.
+string(APPEND CMAKE_C_FLAGS " ${ARCH_C_FLAGS} -Wall -std=c11 ${NAVHAL_FORCE_INCLUDE}")
+string(APPEND CMAKE_ASM_FLAGS " ${ARCH_ASM_FLAGS}")
+string(APPEND CMAKE_EXE_LINKER_FLAGS " ${ARCH_LINK_FLAGS}")
 # C++ shares the arch flags; a C++ TU only appears in the C++ sample, which
 # does enable_language(CXX). Bare-metal: no exceptions / RTTI / cxa-atexit.
-set(CMAKE_CXX_FLAGS
-    "${ARCH_C_FLAGS} -Wall -std=c++17 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics ${NAVHAL_FORCE_INCLUDE}")
+string(APPEND CMAKE_CXX_FLAGS
+    " ${ARCH_C_FLAGS} -Wall -std=c++17 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics ${NAVHAL_FORCE_INCLUDE}")
 # subdirectories are commented, they will be added as code is added
 if(NOT STANDALONE)
 add_subdirectory(${SRC_DIR})

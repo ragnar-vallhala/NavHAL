@@ -26,7 +26,11 @@ else()
     message(STATUS "FPU: Software emulation (${CMAKE_SYSTEM_PROCESSOR})")
 endif()
 
-set(ARCH_C_FLAGS    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS} -O0 -g")
+# -ffreestanding: -nostdlib is a linker flag and tells the compiler nothing,
+# so without this GCC still assumes a hosted libc and will rewrite an
+# ordinary loop into a call to strlen/memset. hal_strlen was compiling into
+# a call to strlen at -Os, which then failed to link.
+set(ARCH_C_FLAGS    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS} -ffreestanding")
 set(ARCH_ASM_FLAGS  "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
 set(ARCH_LINK_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}")
 

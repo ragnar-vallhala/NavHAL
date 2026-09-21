@@ -28,11 +28,6 @@ void abort(void) {
   }
 }
 
-void *memcpy(void *dest, const void *src, unsigned int n) {
-  char *d = dest;
-  const char *s = src;
-  while (n--) {
-    *d++ = *s++;
-  }
-  return dest;
-}
+/* memcpy and the other compiler-required builtins now come from
+ * src/utils/freestanding.c, which the test ELF links like any other HAL
+ * source. Defining one here too is a duplicate symbol. */

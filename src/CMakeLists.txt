@@ -3,6 +3,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
 set(COMMON_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/conversion.c
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/util.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/freestanding.c
 )
 
 # Shared public driver layers (M9 driver vtable): validate + dispatch to the

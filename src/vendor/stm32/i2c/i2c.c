@@ -31,6 +31,7 @@
  */
 
 #include "internal/hal_i2c_ops.h"
+#include "internal/hal_i2c_dma_ops.h"
 #include "navhal_port_i2c.h"
 #include "navhal_port_clock.h"
 #include "family/i2c_reg.h"
@@ -55,7 +56,7 @@ static void (*_i2c_dma_rx_callback)(void) = NULL;
 static hal_dma_config_t _active_i2c_dma_config;
 static void _i2c_dma_irq_handler(void);
 
-hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
+static hal_status_t stm32_i2c_dma_read_regs(hal_i2c_bus_t bus, uint8_t dev_addr,
                                    uint8_t reg, const hal_dma_config_t *dma_cfg,
                                    void (*callback)(void)) {
   I2C_Reg_Typedef *I2Cx =
@@ -154,6 +155,60 @@ static void _i2c_dma_irq_handler(void) {
     }
   }
 }
+
+
+/* ---------------------------------------------------------------------------
+ * DMA wiring, RM0368 Table 28 (DMA1 request mapping, STM32F401xB/C, xD/E).
+ *
+ * Every I2C request on this part is on DMA1; Table 29 (DMA2) lists no I2C at
+ * all, so the controller is never DMA2 here.
+ *
+ * Several requests have a second stream option -- I2C1_RX is stream 0 or
+ * stream 5, I2C1_TX is 6 or 7 -- and this reports the first. A caller that
+ * needs the other because something else holds the default can move it with
+ * hal_i2c_dma_set_binding().
+ *
+ *   bus    RX stream/ch   TX stream/ch
+ *   I2C1   0 / 1          6 / 1
+ *   I2C2   2 / 7          7 / 7
+ *   I2C3   1 / 1          4 / 3
+ * ------------------------------------------------------------------------- */
+static hal_status_t stm32_i2c_dma_default_binding(hal_i2c_bus_t bus, bool tx,
+                                                  hal_dma_binding_t *out) {
+  uint8_t stream;
+  uint8_t channel;
+
+  switch (bus) {
+  case HAL_I2C_1:
+    stream = tx ? 6u : 0u;
+    channel = 1u;
+    break;
+  case HAL_I2C_2:
+    stream = tx ? 7u : 2u;
+    channel = 7u;
+    break;
+  case HAL_I2C_3:
+    stream = tx ? 4u : 1u;
+    channel = tx ? 3u : 1u;
+    break;
+  default:
+    return HAL_ERR_INVALID_ARG;
+  }
+
+  out->controller = HAL_DMA_CONTROLLER_1;
+  out->stream = stream;
+  out->channel = channel;
+  /* DR is the data register both directions move through. */
+  out->periph_addr = (uint32_t)&I2C_GET_BASE(bus)->DR;
+  out->irq = (hal_irq_t)0; /* the driver attaches its own stream handler */
+  return HAL_OK;
+}
+
+/** @brief The STM32F4 I2C-over-DMA backend. */
+const hal_i2c_dma_ops_t _hal_i2c_dma_ops = {
+    .default_binding = stm32_i2c_dma_default_binding,
+    .read_regs = stm32_i2c_dma_read_regs,
+};
 
 #endif
 static hal_status_t stm32_i2c_init(hal_i2c_bus_t bus,

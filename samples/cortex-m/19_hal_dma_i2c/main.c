@@ -105,20 +105,9 @@ int main(void) {
    * DMA'd buffer never touches a neighbouring cache line. */
   uint8_t rx_buf[32] NAVHAL_DMA_ALIGN;
 
-  // Configure DMA for HAL_I2C_1 RX (DMA1, Stream 0, Channel 1)
-  hal_dma_config_t i2c_dma_cfg = {
-      .controller = HAL_DMA_CONTROLLER_1,
-      .stream = 0,
-      .channel = 1,
-      .direction = HAL_DMA_DIR_P2M,
-      .src_addr = 0, // set by hal_i2c_read_regs_dma to the I2C RX data register
-      .dst_addr = (uint32_t)rx_buf,
-      .data_count = 30,
-      .src_inc = 0,
-      .dst_inc = 1,
-      .data_width = HAL_DMA_DATA_WIDTH_8,
-      .priority = HAL_DMA_PRIORITY_HIGH,
-      .circular = 0};
+  /* No DMA config here any more: the driver knows this bus is wired to DMA1
+   * stream 0 channel 1 (RM0368 Table 28) and builds the descriptor itself.
+   * hal_i2c_dma_set_binding() moves it if something else wants that stream. */
 
   uint32_t start_time = hal_timebase_get_tick();
 
@@ -126,7 +115,7 @@ int main(void) {
     dma_rx_complete = false;
 
     hal_status_t stat = hal_i2c_read_regs_dma(
-        I2C_BUS, BMX160_I2C_ADDR, 0x04, &i2c_dma_cfg, on_dma_complete);
+        I2C_BUS, BMX160_I2C_ADDR, 0x04, rx_buf, 30, on_dma_complete);
     if (stat != HAL_OK) {
       hal_uart_print(HAL_UART_2, "DMA Transaction start failed on iteration: ");
       hal_uart_write_int(HAL_UART_2, i);

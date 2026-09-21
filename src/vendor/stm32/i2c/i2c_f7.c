@@ -35,6 +35,7 @@
 #include "navhal_port_i2c.h"
 
 #include "internal/hal_i2c_ops.h"
+#include "internal/hal_i2c_dma_ops.h"
 #include "navhal_port_gpio.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
@@ -219,7 +220,7 @@ static hal_irq_t _dma1_stream_irq(uint8_t s) {
   }
 }
 
-hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
+static hal_status_t stm32f7_i2c_dma_read_regs(hal_i2c_bus_t bus, uint8_t dev_addr,
                                    uint8_t reg, const hal_dma_config_t *dma_cfg,
                                    void (*callback)(void)) {
   if (dma_cfg == NULL)
@@ -289,6 +290,25 @@ static void _i2c_dma_irq_handler(void) {
   if (_i2c_dma_rx_callback)
     _i2c_dma_rx_callback();
 }
+
+
+/* The F7 DMA request mapping is a different table from the F4's, and no F767
+ * reference manual is in datasheets/ to check it against. Guessing a stream
+ * would fail silently on hardware, so this reports that the mapping is not
+ * established rather than inventing one. Fill it in from RM0410 Table 27. */
+static hal_status_t stm32f7_i2c_dma_default_binding(hal_i2c_bus_t bus, bool tx,
+                                                    hal_dma_binding_t *out) {
+  (void)bus;
+  (void)tx;
+  (void)out;
+  return HAL_ERR_NOT_SUPPORTED;
+}
+
+/** @brief The STM32F7 I2C-over-DMA backend. */
+const hal_i2c_dma_ops_t _hal_i2c_dma_ops = {
+    .default_binding = stm32f7_i2c_dma_default_binding,
+    .read_regs = stm32f7_i2c_dma_read_regs,
+};
 
 #endif /* NAVHAL_CONFIG_DRV_I2C_DMA */
 

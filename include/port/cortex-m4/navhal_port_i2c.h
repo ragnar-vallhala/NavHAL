@@ -29,6 +29,8 @@
 #define NAVHAL_PORT_I2C_H
 
 #include "common/hal_i2c.h"
+
+#include <stdbool.h>
 #include "navhal_port_config.h"
 
 
@@ -48,10 +50,38 @@ extern "C" {
  * @param callback Invoked when the DMA transfer completes.
  * @return ::HAL_OK once the sequence is started, or an error status.
  */
+/**
+ * @brief Read @p length bytes from @p reg over DMA, then call @p callback.
+ *
+ * The DMA wiring comes from the bus's binding, so a caller no longer supplies
+ * a ::hal_dma_config_t. See ::hal_i2c_dma_set_binding to move a transfer off
+ * its default stream.
+ */
 hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
-                                   uint8_t reg,
-                                   const hal_dma_config_t *dma_cfg,
-                                   void (*callback)(void));
+                                   uint8_t reg, uint8_t *buffer,
+                                   uint16_t length, void (*callback)(void));
+
+/**
+ * @brief The DMA wiring this bus and direction will use.
+ *
+ * The reference-manual default, or the override installed by
+ * ::hal_i2c_dma_set_binding.
+ *
+ * @param tx true for the transmit request, false for receive.
+ * @return ::HAL_ERR_NOT_SUPPORTED on a port whose mapping is not established.
+ */
+hal_status_t hal_i2c_dma_get_binding(hal_i2c_bus_t bus, bool tx,
+                                     hal_dma_binding_t *out);
+
+/**
+ * @brief Override the DMA wiring for a bus and direction.
+ *
+ * Several I2C requests have a second stream option -- I2C1_RX is DMA1 stream
+ * 0 or stream 5 -- so this exists for when something else already holds the
+ * default. Pass NULL to restore it.
+ */
+hal_status_t hal_i2c_dma_set_binding(hal_i2c_bus_t bus, bool tx,
+                                     const hal_dma_binding_t *binding);
 #endif
 
 #ifdef __cplusplus

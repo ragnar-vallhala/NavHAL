@@ -164,16 +164,15 @@ static void print_startup_message(void) {
   hal_uart_write_char(NAVTEST_UART, 0x1B); // ESC
   hal_uart_write_char(NAVTEST_UART, '[');
   hal_uart_write_char(NAVTEST_UART, 'H');
-  const char *msg = "\r\n"
-                    "|========================================|\r\n"
-                    "|    NAVrobotec Private Limited          |\r\n"
-                    "|          Project: NAVHAL               |\r\n"
-                    "|     Starting Unit Tests...             |\r\n"
-                    "|========================================|\r\n";
-
-  for (const char *p = msg; *p != '\0'; p++) {
-    hal_uart_write_char(NAVTEST_UART, *p);
-  }
+  /* _NT_PSTR keeps the banner in flash on AVR: a plain literal is copied into
+   * SRAM at startup, and on a 2 KB part a quarter kilobyte of box drawing is
+   * not a good use of it. */
+  navtest_write_P(_NT_PSTR("\r\n"
+                           "|========================================|\r\n"
+                           "|    NAVrobotec Private Limited          |\r\n"
+                           "|          Project: NAVHAL               |\r\n"
+                           "|     Starting Unit Tests...             |\r\n"
+                           "|========================================|\r\n"));
 }
 
 int main(void) {
@@ -195,12 +194,12 @@ int main(void) {
     total_tests += all_suites[i]->count;
   }
 
-  hal_uart_print(NAVTEST_UART, "\n\n=========== FINAL RESULTS ===========\n\n");
-  hal_uart_print(NAVTEST_UART, "Total tests run: ");
+  navtest_write_P(_NT_PSTR("\n\n=========== FINAL RESULTS ===========\n\n"));
+  navtest_write_P(_NT_PSTR("Total tests run: "));
   _navtest_print_uint32(total_tests);
-  hal_uart_print(NAVTEST_UART, "\nTotal failures:  ");
+  navtest_write_P(_NT_PSTR("\nTotal failures:  "));
   _navtest_print_uint32((uint32_t)failed);
-  hal_uart_print(NAVTEST_UART, "\n");
+  navtest_write_P(_NT_PSTR("\n"));
 
   return failed;
 }

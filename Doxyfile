@@ -2388,7 +2388,8 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             = NAVHAL_CONFIG_DRV_ADC:=1 \
+PREDEFINED             = NAVHAL_CONFIG_BOOT_SNIFFER:=1 \
+                         NAVHAL_CONFIG_DRV_ADC:=1 \
                          NAVHAL_CONFIG_DRV_CACHE:=1 \
                          NAVHAL_CONFIG_DRV_CLOCK:=1 \
                          NAVHAL_CONFIG_DRV_CRC:=1 \

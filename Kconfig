@@ -85,6 +85,27 @@ config DRV_CRC
       (Cortex-M4/M7); on the ATmega328P, which has no CRC peripheral, it is a
       bitwise software CRC-32 fallback.
 
+config BOOT_SNIFFER
+    bool "Enable boot block and console watcher"
+    depends on DRV_RESET
+    default n
+    help
+      Compile the hal_boot_* API: a boot block in uninitialised RAM that
+      survives a reset, and a matcher that watches a received byte stream for
+      a magic sequence and reboots into the bootloader when it sees one.
+
+      This is the way back into a board whose application is misbehaving, so
+      the bytes must reach the matcher from an interrupt or from a DMA ring
+      walked by one. Feeding it from a polling loop works until the loop stops
+      running, which is the moment it was needed.
+
+      Requires DRV_RESET, which is how the request is acted on, and a .noinit
+      section in the board's linker script, which is what lets the request
+      survive the reset. Entering the bootloader is not itself privileged --
+      the bootloader verifies signatures -- but anyone who can write to the
+      console can reboot the board, so hal_boot_entry_disable() exists for
+      states where that must not happen.
+
 endmenu
 
 menu "HAL Drivers Configuration"

@@ -179,6 +179,20 @@ config SAMPLE_36_HAL_WATCHDOG
     select DRV_WATCHDOG
     select DRV_UART
 
+config SAMPLE_37_HAL_BOOT_SNIFFER
+    bool "37_hal_boot_sniffer"
+    depends on ARCH_CORTEX_M4 && FAMILY_STM32F4
+    select DRV_CLOCK
+    select DRV_GPIO
+    select DRV_INTERRUPT
+    select DRV_TIMEBASE
+    select DRV_UART
+    select DRV_DMA
+    select DRV_UART_DMA
+    select DRV_RESET
+    select DRV_USB_CDC
+    select BOOT_SNIFFER
+
 config SAMPLE_35_HAL_RTC
     bool "35_hal_rtc"
     depends on ARCH_CORTEX_M4 && FAMILY_STM32F4
@@ -252,3 +266,4 @@ config SAMPLE
     default "hal_usb_cdc" if SAMPLE_34_HAL_USB_CDC
     default "hal_rtc" if SAMPLE_35_HAL_RTC
     default "hal_watchdog" if SAMPLE_36_HAL_WATCHDOG
+    default "hal_boot_sniffer" if SAMPLE_37_HAL_BOOT_SNIFFER

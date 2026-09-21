@@ -46,6 +46,7 @@ hal_adc
 hal_usb_cdc
 hal_rtc
 hal_watchdog
+hal_boot_sniffer
 hal_x86_hello
 hal_x86_timing
 hal_x86_interrupt
@@ -90,6 +91,7 @@ portable/33_hal_adc
 cortex-m/34_hal_usb_cdc
 cortex-m/35_hal_rtc
 portable/36_hal_watchdog
+cortex-m/37_hal_boot_sniffer
 x86/00_hal_x86_hello
 x86/01_hal_x86_timing
 x86/02_hal_x86_interrupt

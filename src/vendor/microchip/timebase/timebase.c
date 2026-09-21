@@ -27,6 +27,19 @@
  */
 
 #include "common/hal_timer.h"
+#include "internal/hal_timebase_ops.h"
+
+/* Forward declarations: several of these call each other (micros from tick,
+ * delays from both), and they are static now. */
+static hal_status_t avr_timebase_init(uint32_t tick_us);
+static uint32_t avr_timebase_get_tick(void);
+static uint32_t avr_timebase_get_tick_duration_us(void);
+static uint32_t avr_timebase_get_reload_value(void);
+static uint32_t avr_timebase_get_micros(void);
+static uint32_t avr_timebase_get_millis(void);
+static void avr_timebase_delay_us(uint32_t us);
+static void avr_timebase_delay_ms(uint32_t ms);
+static hal_status_t avr_timebase_set_callback(hal_timebase_callback_t cb);
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -46,7 +59,7 @@ struct presc {
 static const struct presc k_presc[] = {
     {1, 1}, {8, 2}, {64, 3}, {256, 4}, {1024, 5}};
 
-hal_status_t hal_timebase_init(uint32_t tick_us) {
+static hal_status_t avr_timebase_init(uint32_t tick_us) {
   if (tick_us == 0)
     return HAL_ERR_INVALID_ARG;
 
@@ -85,7 +98,7 @@ ISR(TIMER0_COMPA_vect) {
     s_callback();
 }
 
-uint32_t hal_timebase_get_tick(void) {
+static uint32_t avr_timebase_get_tick(void) {
   uint32_t t;
   uint8_t sreg = SREG;
   cli(); /* 32-bit read is non-atomic on an 8-bit core. */
@@ -94,29 +107,43 @@ uint32_t hal_timebase_get_tick(void) {
   return t;
 }
 
-uint32_t hal_timebase_get_tick_duration_us(void) { return s_tick_us; }
+static uint32_t avr_timebase_get_tick_duration_us(void) { return s_tick_us; }
 
-uint32_t hal_timebase_get_reload_value(void) { return s_reload; }
+static uint32_t avr_timebase_get_reload_value(void) { return s_reload; }
 
-uint32_t hal_timebase_get_millis(void) {
-  return (hal_timebase_get_tick() * s_tick_us) / 1000UL;
+static uint32_t avr_timebase_get_millis(void) {
+  return (avr_timebase_get_tick() * s_tick_us) / 1000UL;
 }
 
-uint32_t hal_timebase_get_micros(void) {
-  return hal_timebase_get_tick() * s_tick_us;
+static uint32_t avr_timebase_get_micros(void) {
+  return avr_timebase_get_tick() * s_tick_us;
 }
 
-hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb) {
+static hal_status_t avr_timebase_set_callback(hal_timebase_callback_t cb) {
   s_callback = cb; /* NULL clears the callback. */
   return HAL_OK;
 }
 
-void hal_delay_ms(uint32_t ms) {
+static void avr_timebase_delay_ms(uint32_t ms) {
   while (ms--)
     _delay_ms(1);
 }
 
-void hal_delay_us(uint32_t us) {
+static void avr_timebase_delay_us(uint32_t us) {
   while (us--)
     _delay_us(1);
 }
+
+
+/** @brief The ATmega328P Timer0 timebase backend. */
+const hal_timebase_ops_t _hal_timebase_ops = {
+    .init = avr_timebase_init,
+    .get_tick = avr_timebase_get_tick,
+    .get_tick_duration_us = avr_timebase_get_tick_duration_us,
+    .get_reload_value = avr_timebase_get_reload_value,
+    .get_micros = avr_timebase_get_micros,
+    .get_millis = avr_timebase_get_millis,
+    .delay_us = avr_timebase_delay_us,
+    .delay_ms = avr_timebase_delay_ms,
+    .set_callback = avr_timebase_set_callback,
+};

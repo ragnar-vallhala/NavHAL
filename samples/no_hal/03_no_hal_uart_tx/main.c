@@ -16,7 +16,6 @@
  */
 
 #include <stdint.h>
-#define CORTEX_M4
 #include "navhal.h"
 
 // Peripheral base addresses
@@ -132,7 +131,8 @@ hal_pll_config_t pll_cfg = {
 int main(void)
 {
 
-    hal_clock_init(&clk_cfg, &pll_cfg);
+    clk_cfg.pll = pll_cfg;
+    hal_clock_init(&clk_cfg);
 
     uart2_init_nh();
     hal_gpio_setmode(GPIO_PA06, GPIO_INPUT, GPIO_PULLUP);

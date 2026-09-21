@@ -25,7 +25,6 @@
  * - Reads it back and verifies the data integrity.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 int main(void) {
@@ -37,7 +36,8 @@ int main(void) {
                               .pll_q = 7};
   hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
-  hal_clock_init(&clk_cfg, &pll_cfg);
+  clk_cfg.pll = pll_cfg;
+  hal_clock_init(&clk_cfg);
   hal_timebase_init(1000);
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=115200});
 
@@ -69,8 +69,10 @@ int main(void) {
   hal_uart_write_string(HAL_UART_2, "Disk Initialized.\n\r");
 
   /* 4. Prepare Test Data */
-  uint8_t write_buf[512] __attribute__((aligned(4)));
-  uint8_t read_buf[512] __attribute__((aligned(4)));
+  /* Cache-line aligned for safe clean/invalidate under the D-cache; 512 is
+   * already a cache-line multiple. */
+  uint8_t write_buf[512] NAVHAL_DMA_ALIGN;
+  uint8_t read_buf[512] NAVHAL_DMA_ALIGN;
   for (int i = 0; i < 512; i++)
     write_buf[i] = (uint8_t)i;
   for (int i = 0; i < 512; i++)

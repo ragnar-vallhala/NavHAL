@@ -21,8 +21,8 @@
  *
  * @details
  * Standardized DMA API (see @c docs/api_standardization.md). Configures and
- * controls DMA streams. The entire API is compiled only when @c _DMA_ENABLED
- * is defined (see @c NAVHAL_HAS_DMA).
+ * controls DMA streams. The entire API is compiled only when @c NAVHAL_CONFIG_DRV_DMA
+ * is defined (see @c NAVHAL_CONFIG_DRV_DMA).
  *
  * ### Typical usage
  * @code
@@ -60,7 +60,7 @@
 extern "C" {
 #endif
 
-#ifdef _DMA_ENABLED
+#if NAVHAL_CONFIG_DRV_DMA
 
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
@@ -187,6 +187,32 @@ bool hal_dma_transfer_complete(const hal_dma_config_t *cfg);
  */
 hal_status_t hal_dma_clear_flags(const hal_dma_config_t *cfg);
 
+/**
+ * @brief Re-point an already-initialised stream at a new buffer.
+ *
+ * Lets a driver start another transfer without reconfiguring the stream.
+ * Waits for any in-flight transfer on that stream to finish first.
+ *
+ * @param cfg   Stream identity (controller/stream); addresses are taken from
+ *              @p addr and @p count rather than from @p cfg.
+ * @param addr  Memory address for the transfer.
+ * @param count Number of data items.
+ */
+hal_status_t hal_dma_set_memory(const hal_dma_config_t *cfg, uint32_t addr,
+                                uint16_t count);
+
+/**
+ * @brief Data items still outstanding on a stream.
+ *
+ * Counts down to zero as the transfer proceeds, so a circular-buffer consumer
+ * derives its write index as @c count @c - @c remaining.
+ *
+ * @param cfg       Stream identity.
+ * @param remaining Out-parameter, must not be NULL.
+ */
+hal_status_t hal_dma_remaining(const hal_dma_config_t *cfg,
+                               uint16_t *remaining);
+
 /* -------------------------------------------------------------------------- *
  * Deprecated — pre-standardization DMA type names. Retained as a
  * backward-compat alias behind NAVHAL_DEPRECATED.
@@ -204,14 +230,16 @@ typedef hal_dma_fifo_threshold_t dma_fifo_threshold_t
     NAVHAL_DEPRECATED("use hal_dma_fifo_threshold_t");
 typedef hal_dma_config_t dma_config_t NAVHAL_DEPRECATED("use hal_dma_config_t");
 
-#endif /* _DMA_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_DMA */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
 /* Port-specific bits: register map, deprecated-function compat shim. */
+#if NAVHAL_CONFIG_DRV_DMA
 #include "navhal_port_dma.h"
+#endif
 
 
 /** @} */ /* end of group HAL_DMA */

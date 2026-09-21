@@ -105,3 +105,44 @@ int navtest_run_suite(const navtest_suite_t *suite) {
 
   return (int)_navtest.failures;
 }
+
+/* -------------------------------------------------------------------------
+ * Failure reporting (declared in navtest.h)
+ *
+ * Out of line so an assertion costs a compare and a call at its site, and so
+ * each of these message strings exists once in the image. See the comment
+ * above the declarations for why that mattered.
+ * ---------------------------------------------------------------------- */
+void _navtest_fail_eq_u32(const char *file, uint32_t line, uint32_t expected,
+                          uint32_t actual) {
+  navtest_write_P(_NT_PSTR("  Expected: "));
+  _navtest_print_uint32(expected);
+  navtest_write_P(_NT_PSTR("  Got: "));
+  _navtest_print_uint32(actual);
+  navtest_write_P(_NT_PSTR("\r\n"));
+  _navtest_fail(file, line, _NT_PSTR("TEST_ASSERT_EQUAL_UINT32"));
+}
+
+void _navtest_fail_true(const char *file, uint32_t line) {
+  _navtest_fail(file, line, _NT_PSTR("TEST_ASSERT_TRUE: condition is false"));
+}
+
+void _navtest_fail_false(const char *file, uint32_t line) {
+  _navtest_fail(file, line, _NT_PSTR("TEST_ASSERT_FALSE: condition is true"));
+}
+
+void _navtest_fail_not_null(const char *file, uint32_t line) {
+  _navtest_fail(file, line, _NT_PSTR("TEST_ASSERT_NOT_NULL: pointer is NULL"));
+}
+
+void _navtest_fail_bits(const char *file, uint32_t line, uint32_t mask,
+                        uint32_t val, bool bits_high) {
+  navtest_write_P(_NT_PSTR("  Mask: "));
+  _navtest_print_uint32(mask);
+  navtest_write_P(_NT_PSTR("  Val:  "));
+  _navtest_print_uint32(val);
+  navtest_write_P(_NT_PSTR("\r\n"));
+  _navtest_fail(file, line,
+                bits_high ? _NT_PSTR("TEST_ASSERT_BITS_HIGH: bits not set")
+                          : _NT_PSTR("TEST_ASSERT_BITS_LOW: bits not cleared"));
+}

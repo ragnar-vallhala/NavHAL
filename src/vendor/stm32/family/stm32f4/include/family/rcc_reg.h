@@ -105,6 +105,9 @@ typedef struct {
 #define RCC_CR_PLLON (1 << RCC_CR_PLL_ON_BIT)   /**< Enable PLL */
 #define RCC_CR_PLLRDY (1 << RCC_CR_PLL_READY_BIT) /**< PLL ready flag */
 
+/* RCC_AHB2ENR masks */
+#define RCC_AHB2ENR_OTGFSEN (1 << 7) /**< USB OTG full-speed clock enable */
+
 /* RCC_PLLCFGR bit positions */
 #define RCC_PLLCFGR_SRC_BIT 22  /**< PLL source selection bit */
 #define RCC_PLLCFGR_PLLM_BIT 0  /**< PLLM bits */
@@ -163,6 +166,25 @@ typedef enum {
 
 
 
+
+
+/**
+ * @name RCC_CSR reset-cause flags
+ *
+ * Sticky: they accumulate across resets until RMVF clears them, so firmware
+ * that never clears reports the union of everything that has ever reset the
+ * part. Reading and clearing belongs in hal_reset_init().
+ * @{
+ */
+#define RCC_CSR_RMVF (1U << 24)      /**< Write 1 to clear every flag below. */
+#define RCC_CSR_BORRSTF (1U << 25)   /**< Brown-out reset. */
+#define RCC_CSR_PINRSTF (1U << 26)   /**< NRST pin. */
+#define RCC_CSR_PORRSTF (1U << 27)   /**< Power-on / power-down. */
+#define RCC_CSR_SFTRSTF (1U << 28)   /**< Software (SYSRESETREQ). */
+#define RCC_CSR_IWDGRSTF (1U << 29)  /**< Independent watchdog. */
+#define RCC_CSR_WWDGRSTF (1U << 30)  /**< Window watchdog. */
+#define RCC_CSR_LPWRRSTF (1U << 31)  /**< Illegal low-power-mode entry. */
+/** @} */
 
 #ifdef __cplusplus
 } /* extern "C" */

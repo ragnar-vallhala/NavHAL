@@ -20,7 +20,6 @@
  * @brief Standardized hal_gpio_* API tests (success + error paths).
  */
 
-#define CORTEX_M4
 #include "navhal_port_gpio.h"
 #include "family/gpio_reg.h"
 #include "family/rcc_reg.h"

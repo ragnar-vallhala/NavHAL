@@ -271,16 +271,27 @@ Conventions:
 
 ### Capability gating
 
-Optional code stays in the same header, guarded by generated macros:
+Optional code stays in the same header, guarded by a single macro family,
+`NAVHAL_CONFIG_<KCONFIG_SYMBOL>` — a 1:1 mirror of the Kconfig `.config`:
 
 ```c
-#if NAVHAL_HAS_DMA
+#if NAVHAL_CONFIG_DRV_DMA
 hal_status_t hal_uart_write_dma(hal_uart_id_t id, const uint8_t *buf, size_t len);
 #endif
 ```
 
-`NAVHAL_HAS_DMA`, `NAVHAL_HAS_FPU`, etc. are emitted into `navhal_target.h` by
-the Kconfig→header generator from the corresponding `CONFIG_DRV_*` symbols.
+The Kconfig→header generator emits every symbol as `NAVHAL_CONFIG_*` (always
+`0`/`1`) into `navhal_target.h`, and the build **force-includes** that header
+into every translation unit (`-include`, Linux autoconf-style), so the macros
+are ambient — no `#include` and no `_*_ENABLED` bridge. Always test with `#if`
+(never `#ifdef`: the macros are always defined). The FPU cap is
+`NAVHAL_CONFIG_USE_FPU`.
+
+> **Deprecated:** the older `NAVHAL_HAS_*` capability names (with renames like
+> `DRV_DWT`→`CYCLE_COUNTER`) are retained **only** as thin aliases of the
+> matching `NAVHAL_CONFIG_*` macro, for out-of-tree consumers. New in-tree code
+> MUST use `NAVHAL_CONFIG_DRV_*`. The alias map lives in `NAVHAL_HAS_MAP`
+> (`tools/kconfig.py`).
 
 ---
 
@@ -372,7 +383,7 @@ With the API surface frozen by Phase 2, grow `tests/` to cover the whole
 standardized `hal_*` API — every function, success and `hal_status_t` error
 paths — plus a host-runnable subset and CI. Built before Phases 3–4 so those
 mechanical refactors are provably behavior-preserving, and it doubles as the
-conformance harness for the M6 AVR port. See M2+ in `docs/execution_plan.md`.
+conformance harness for the M6 AVR port.
 
 **Phase 3 — Directory restructure.**
 Split `core/cortex-m4/` into `arch/armv7e-m/`, `vendor/stm32/`,

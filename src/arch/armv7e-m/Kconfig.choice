@@ -4,3 +4,6 @@
 
 config ARCH_CORTEX_M4
     bool "Cortex-M4"
+
+config ARCH_CORTEX_M7
+    bool "Cortex-M7"

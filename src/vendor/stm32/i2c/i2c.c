@@ -30,6 +30,8 @@
  *   I²C3 -> PA8 (SCL) / PB4 (SDA)
  */
 
+#include "internal/hal_i2c_ops.h"
+#include "internal/hal_i2c_dma_ops.h"
 #include "navhal_port_i2c.h"
 #include "navhal_port_clock.h"
 #include "family/i2c_reg.h"
@@ -45,16 +47,16 @@ static uint8_t __i2c_init_status = 0;
 
 static int _wait_flag(volatile uint32_t *reg, uint32_t mask);
 
-uint8_t hal_i2c_get_init_status(void) { return __i2c_init_status; }
+static uint8_t stm32_i2c_get_init_status(void) { return __i2c_init_status; }
 
-#ifdef _I2C_BACKEND_DMA
+#if NAVHAL_CONFIG_DRV_I2C_DMA
 #include "navhal_port_interrupt.h"
 
 static void (*_i2c_dma_rx_callback)(void) = NULL;
 static hal_dma_config_t _active_i2c_dma_config;
 static void _i2c_dma_irq_handler(void);
 
-hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
+static hal_status_t stm32_i2c_dma_read_regs(hal_i2c_bus_t bus, uint8_t dev_addr,
                                    uint8_t reg, const hal_dma_config_t *dma_cfg,
                                    void (*callback)(void)) {
   I2C_Reg_Typedef *I2Cx =
@@ -154,8 +156,75 @@ static void _i2c_dma_irq_handler(void) {
   }
 }
 
+
+/* ---------------------------------------------------------------------------
+ * DMA wiring, RM0368 Table 28 (DMA1 request mapping, STM32F401xB/C, xD/E).
+ *
+ * Every I2C request on this part is on DMA1; Table 29 (DMA2) lists no I2C at
+ * all, so the controller is never DMA2 here.
+ *
+ * Several requests have a second stream option -- I2C1_RX is stream 0 or
+ * stream 5, I2C1_TX is 6 or 7 -- and this reports the first. A caller that
+ * needs the other because something else holds the default can move it with
+ * hal_i2c_dma_set_binding().
+ *
+ *   bus    RX stream/ch   TX stream/ch
+ *   I2C1   0 / 1          6 / 1
+ *   I2C2   2 / 7          7 / 7
+ *   I2C3   1 / 1          4 / 3
+ * ------------------------------------------------------------------------- */
+static hal_status_t stm32_i2c_dma_default_binding(hal_i2c_bus_t bus, bool tx,
+                                                  hal_dma_binding_t *out) {
+  uint8_t stream;
+  uint8_t channel;
+
+  switch (bus) {
+  case HAL_I2C_1:
+    stream = tx ? 6u : 0u;
+    channel = 1u;
+    break;
+  case HAL_I2C_2:
+    stream = tx ? 7u : 2u;
+    channel = 7u;
+    break;
+  case HAL_I2C_3:
+    stream = tx ? 4u : 1u;
+    channel = tx ? 3u : 1u;
+    break;
+  default:
+    return HAL_ERR_INVALID_ARG;
+  }
+
+  out->controller = HAL_DMA_CONTROLLER_1;
+  out->stream = stream;
+  out->channel = channel;
+  /* DR is the data register both directions move through. */
+  out->periph_addr = (uint32_t)&I2C_GET_BASE(bus)->DR;
+  out->irq = (hal_irq_t)0; /* the driver attaches its own stream handler */
+  return HAL_OK;
+}
+
+/** @brief The STM32F4 I2C-over-DMA backend. */
+const hal_i2c_dma_ops_t _hal_i2c_dma_ops = {
+    .default_binding = stm32_i2c_dma_default_binding,
+    .read_regs = stm32_i2c_dma_read_regs,
+};
+
 #endif
-hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config) {
+/* I2C_GET_BASE is arithmetic on a base address, so it cannot fail and cannot
+ * be used as a validity check. The set of buses is a property of the part, so
+ * the range lives here rather than in the shared layer. */
+#define STM32_I2C_BUS_COUNT 3u
+
+static inline bool _i2c_bus_valid(hal_i2c_bus_t bus) {
+  return (uint32_t)bus < STM32_I2C_BUS_COUNT;
+}
+
+static hal_status_t stm32_i2c_init(hal_i2c_bus_t bus,
+                                   const hal_i2c_config_t *config) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
+  /* config non-NULL: validated by the public layer. */
   if (__i2c_init_status & (1 << bus))
     return HAL_ERR_NOT_INITIALIZED; // avoid reintialization
 
@@ -211,7 +280,9 @@ hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config) {
   }
 }
 
-hal_status_t hal_i2c_deinit(hal_i2c_bus_t bus) {
+static hal_status_t stm32_i2c_deinit(hal_i2c_bus_t bus) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
 
   // Disable the peripheral and assert/release the software reset so the next
@@ -262,8 +333,11 @@ static hal_status_t _i2c_write_data(hal_i2c_bus_t bus, uint8_t data) {
     return HAL_OK;
 }
 
-hal_status_t hal_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
-                           const uint8_t *data, uint16_t len) {
+static hal_status_t stm32_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                    const uint8_t *data, uint16_t len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
+  /* data non-NULL: validated by the public layer. */
   hal_status_t status;
 
   // Generate START condition
@@ -293,11 +367,14 @@ hal_status_t hal_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
   return HAL_OK;
 }
 
-hal_status_t hal_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr, uint8_t *data,
-                          uint16_t len) {
+static hal_status_t stm32_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                   uint8_t *data, uint16_t len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
+  /* data non-NULL: validated by the public layer. */
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
 
-  if (len == 0 || data == NULL)
+  if (len == 0)
     return HAL_ERR_IO;
 
   // Generate start condition
@@ -336,13 +413,16 @@ hal_status_t hal_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr, uint8_t *data,
   return HAL_OK;
 }
 
-hal_status_t hal_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
-                                const uint8_t *tx_data, uint16_t tx_len,
-                                uint8_t *rx_data, uint16_t rx_len) {
+static hal_status_t stm32_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                         const uint8_t *tx_data, uint16_t tx_len,
+                                         uint8_t *rx_data, uint16_t rx_len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
+  /* tx_data and rx_data non-NULL: validated by the public layer. */
   hal_status_t status;
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
 
-  if (rx_len == 0 || rx_data == NULL)
+  if (rx_len == 0)
     return HAL_ERR_IO;
 
   // --- Write phase ---
@@ -460,3 +540,12 @@ hal_status_t hal_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
 
   return HAL_OK;
 }
+
+const hal_i2c_ops_t _hal_i2c_ops = {
+    .init = stm32_i2c_init,
+    .deinit = stm32_i2c_deinit,
+    .write = stm32_i2c_write,
+    .read = stm32_i2c_read,
+    .write_read = stm32_i2c_write_read,
+    .get_init_status = stm32_i2c_get_init_status,
+};

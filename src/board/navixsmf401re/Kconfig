@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Board identity string for NAVIXSM-F401RE. Sourced at top level.
+
+config BOARD
+    string
+    default "navixsmf401re" if BOARD_NAVIXSM_F401RE

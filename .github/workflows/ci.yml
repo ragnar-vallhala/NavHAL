@@ -26,6 +26,7 @@ jobs:
     outputs:
       run-cortex-m: ${{ steps.compute.outputs.run-cortex-m }}
       run-avr:      ${{ steps.compute.outputs.run-avr }}
+      run-x86:      ${{ steps.compute.outputs.run-x86 }}
     steps:
       - uses: actions/checkout@v4
       - name: Classify the diff
@@ -37,15 +38,24 @@ jobs:
             cortex-m-only:
               - 'src/arch/armv7e-m/**'
               - 'src/vendor/stm32/**'
+              - 'src/board/nucleo_f401re/**'
+              - 'src/board/navixsmf401re/**'
+              - 'src/board/nucleo_f767zi/**'
               - 'include/port/cortex-m4/**'
+              - 'include/port/cortex-m7/**'
               - 'tests/arch/cortex-m4/**'
+              - 'tests/arch/cortex-m7/**'
               - 'samples/cortex-m/**'
               - 'cmake/toolchains/arm-none-eabi-toolchain.cmake'
+              - 'cmake/toolchains/arm-none-eabi-f767-toolchain.cmake'
               - 'cmake/defconfigs/cortex-m4_*'
+              - 'cmake/defconfigs/cortex-m7_*'
               - 'tools/renode/**'
+              - 'tools/build_all_f767_samples.sh'
               - 'tools/pil/boards/nucleo_f401re.conf'
             avr-only:
               - 'src/arch/avr/**'
+              - 'src/board/atmega328p/**'
               - 'src/vendor/microchip/**'
               - 'include/port/avr/**'
               - 'tests/arch/avr/**'
@@ -53,27 +63,42 @@ jobs:
               - 'cmake/defconfigs/avr_*'
               - 'tools/simavr/**'
               - 'tools/pil/boards/atmega328p.conf'
+            x86-only:
+              - 'src/arch/x86_64/**'
+              - 'src/vendor/pc/**'
+              - 'src/board/qemu/**'
+              - 'include/port/x86_64/**'
+              - 'cmake/toolchains/x86_64-qemu-toolchain.cmake'
+              - 'cmake/defconfigs/x86_64_*'
+              - 'tools/qemu/**'
+              - 'samples/x86/**'
       - name: Compute run flags
         id: compute
         run: |
           # Defaults: run everything (push / dispatch / cron / safety).
           run_cm=true
           run_avr=true
+          run_x86=true
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             cm_only="${{ steps.filter.outputs.cortex-m-only }}"
             avr_only="${{ steps.filter.outputs.avr-only }}"
-            # If only cortex-m-only matched (no other path), AVR jobs can sit out.
-            if [ "$cm_only" = "true" ] && [ "$avr_only" = "false" ]; then
-              run_avr=false
-            elif [ "$avr_only" = "true" ] && [ "$cm_only" = "false" ]; then
-              run_cm=false
+            x86_only="${{ steps.filter.outputs.x86-only }}"
+            n=0
+            [ "$cm_only" = "true" ]  && n=$((n + 1))
+            [ "$avr_only" = "true" ] && n=$((n + 1))
+            [ "$x86_only" = "true" ] && n=$((n + 1))
+            # Exactly one arch's files changed → only that arch runs; the others
+            # sit out. Zero matches (common code) or >1 (mixed PR) → run all.
+            if [ "$n" -eq 1 ]; then
+              run_cm=$cm_only
+              run_avr=$avr_only
+              run_x86=$x86_only
             fi
-            # Both false → diff was common (headers/tools/etc.) → run both.
-            # Both true → mixed PR → run both.
           fi
           echo "run-cortex-m=$run_cm" >> "$GITHUB_OUTPUT"
           echo "run-avr=$run_avr"     >> "$GITHUB_OUTPUT"
-          echo "dispatch: run-cortex-m=$run_cm run-avr=$run_avr"
+          echo "run-x86=$run_x86"     >> "$GITHUB_OUTPUT"
+          echo "dispatch: run-cortex-m=$run_cm run-avr=$run_avr run-x86=$run_x86"
 
   # Enforce Conventional Commits on every commit added in a PR. Catches
   # --no-verify bypasses of the local .githooks/commit-msg hook. Only runs
@@ -96,12 +121,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Configure host build
-        run: cmake -B build-host -S tests/host
-      - name: Build host tests
-        run: cmake --build build-host -j
-      - name: Run host tests
-        run: ./build-host/tests_host
+      - name: Host tests (SIL)
+        run: tools/ntest host
 
   # Cross-compile the on-target navtest ELF. Uploads the binary as a
   # workflow artifact so the (separate) renode.yml workflow can consume
@@ -132,10 +153,55 @@ jobs:
           name: tests-elf
           path: build-test/tests
           retention-days: 7
+      # The sample matrix and the build above both target the family's default
+      # board, so nothing else in CI compiles a second board's board.h. Build
+      # the NAVIXSM defconfig too, with the drivers only it has the hardware
+      # for, so its pin map and their register trees stay honest. Last in the
+      # job because it seeds .config, which the steps above expect to be absent.
+      - name: Build on-target ELF (NAVIXSM-F401RE)
+        run: |
+          cp cmake/defconfigs/cortex-m4_stm32f4_navixsmf401re.defconfig .config
+          printf 'CONFIG_DRV_RTC=y\nCONFIG_DRV_USB_CDC=y\n' >> .config
+          cmake -B build-test-navixsm -DTEST=ON
+          cmake --build build-test-navixsm --target tests -j
+          arm-none-eabi-size build-test-navixsm/tests
+          rm -f .config
+
+  # Same as build-on-target but for the STM32F767ZI (Cortex-M7) port: builds
+  # the on-target navtest ELF under the F767 toolchain so a break in the F7
+  # driver tree or its test build is caught independently of the PIL run.
+  build-on-target-f767:
+    name: Build on-target ELF (F767)
+    runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-cortex-m == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arm-none-eabi toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+      - name: Install kconfiglib
+        run: pip install kconfiglib
+      - name: Configure
+        run: cmake -B build-test-f767 -DTEST=ON -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi-f767-toolchain.cmake
+      - name: Build tests
+        run: cmake --build build-test-f767 --target tests -j
+      - name: Report ELF size
+        run: arm-none-eabi-size build-test-f767/tests
+      - name: Upload F767 tests.elf
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-elf-f767
+          path: build-test-f767/tests
+          retention-days: 7
 
   # NOTE: PIL (Renode + simavr) runs live in `.github/workflows/renode.yml`,
   # gated on the same push + pull_request events. Those jobs run their
-  # own dispatch and pick the boards matrix accordingly.
+  # own dispatch and pick the boards matrix accordingly. The F767 PIL job
+  # there enables DRV_SDIO (via the board conf's TEST_EXTRA_CONFIG) so the
+  # SDIO block round-trip runs in CI.
 
   # NAVHAL_HAS_* capability contract — verifies that disabling a cap in
   # Kconfig actually drops its driver symbols from the test ELF, AND that
@@ -156,7 +222,7 @@ jobs:
       - name: Install kconfiglib
         run: pip install kconfiglib
       - name: Run cap contract tests
-        run: tools/test_cap_contract.sh
+        run: tools/ntest cap-contract
 
   # Catches missing `select` clauses on SAMPLE_* Kconfig entries: a sample
   # that needs DRV_SDIO but doesn't select it will silently fall back to
@@ -177,7 +243,7 @@ jobs:
       - name: Install kconfiglib
         run: pip install kconfiglib
       - name: Build every sample
-        run: tools/build_all_samples.sh
+        run: tools/ntest samples m4
 
   # Same idea but on the AVR (ATmega328P) port. Builds only samples in
   # samples/portable/ — those are the contract for "runs on both arches".
@@ -197,7 +263,73 @@ jobs:
       - name: Install kconfiglib
         run: pip install kconfiglib
       - name: Build every portable sample under AVR config
-        run: tools/build_all_avr_samples.sh
+        run: tools/ntest samples avr
+
+  # Same idea on the STM32F767ZI (Cortex-M7) port. Builds the portable-sample
+  # tier under the F767 toolchain/defconfig so the F7 port can't bit-rot.
+  # (samples/cortex-m/ is skipped — some select M4-only features; see the
+  # script header.)
+  sample-matrix-f767:
+    name: Build all F767 samples
+    runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-cortex-m == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arm-none-eabi toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+      - name: Install kconfiglib
+        run: pip install kconfiglib
+      - name: Build every portable sample under F767 config
+        run: tools/ntest samples m7
+
+  # Bare-metal x86-64 port: build the samples, boot each in QEMU (headless via a
+  # GRUB multiboot2 ISO), and assert the expected line on COM1. Catches boot /
+  # clock / interrupt regressions that a build-only check can't see.
+  x86-smoke:
+    name: x86-64 QEMU smoke
+    runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-x86 == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install QEMU + GRUB + build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            qemu-system-x86 grub-pc-bin grub-common xorriso mtools ninja-build
+      - name: Install kconfiglib
+        run: pip install kconfiglib
+      - name: Boot samples in QEMU and assert serial output
+        run: |
+          tools/qemu/smoke.sh hal_x86_hello     "Hello from NavHAL on x86-64 (QEMU)!"
+          tools/qemu/smoke.sh hal_x86_timing    "elapsed ms over delay(500):"
+          tools/qemu/smoke.sh hal_x86_interrupt "hal_timebase_get_tick:"
+
+  # The vtable's cost-of-abstraction claim, enforced rather than asserted:
+  # under LTO every ops table must resolve away entirely. Builds one sample
+  # per arch, so it is cheap; the script skips an arch whose toolchain is
+  # absent rather than failing.
+  devirt:
+    name: Devirtualisation (LTO)
+    runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-cortex-m == 'true' || needs.dispatch.outputs.run-avr == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi \
+            gcc-avr avr-libc binutils-avr
+      - name: Install kconfiglib
+        run: pip install kconfiglib
+      - name: Every ops table resolves away under LTO
+        run: tools/check_devirt.sh
 
   # M8 §8.1 — Single required-status-check name to put on branch
   # protection. Succeeds if every per-PR job either passed or was
@@ -214,9 +346,13 @@ jobs:
       - commit-lint
       - host-tests
       - build-on-target
+      - build-on-target-f767
       - cap-contract
       - sample-matrix
       - sample-matrix-avr
+      - sample-matrix-f767
+      - x86-smoke
+      - devirt
     steps:
       - name: Aggregate per-job results (success or skipped == ok)
         run: |
@@ -232,9 +368,13 @@ jobs:
           check commit-lint       "${{ needs.commit-lint.result }}"
           check host-tests        "${{ needs.host-tests.result }}"
           check build-on-target   "${{ needs.build-on-target.result }}"
+          check build-on-target-f767 "${{ needs.build-on-target-f767.result }}"
           check cap-contract      "${{ needs.cap-contract.result }}"
-          check sample-matrix     "${{ needs.sample-matrix.result }}"
-          check sample-matrix-avr "${{ needs.sample-matrix-avr.result }}"
+          check sample-matrix      "${{ needs.sample-matrix.result }}"
+          check sample-matrix-avr  "${{ needs.sample-matrix-avr.result }}"
+          check sample-matrix-f767 "${{ needs.sample-matrix-f767.result }}"
+          check x86-smoke          "${{ needs.x86-smoke.result }}"
+          check devirt             "${{ needs.devirt.result }}"
           if [ "$fail" -eq 0 ]; then
             echo "CI green."
           fi

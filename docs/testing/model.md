@@ -80,9 +80,9 @@ in the `.resc` file as they're discovered — and in
 
 | | |
 |---|---|
-| **Substrate** | Real silicon — currently a Nucleo-F401RE attached over its built-in ST-Link/V2-1. |
-| **What runs** | The same on-target ELF that PIL uses, this time flashed to the chip's internal flash and executing on the actual Cortex-M4. |
-| **Entry point** | `tools/run_target_tests.sh [port] [baud] [timeout]` — configures `TEST=ON`, builds, opens the serial console, starts `tools/uart_capture.py` in the background, then runs `make flash_tests` which performs a software reset that kicks off the test run. |
+| **Substrate** | Real silicon — Nucleo-F401RE (Cortex-M4) and Nucleo-F767ZI (Cortex-M7) over their built-in ST-Link/V2-1. |
+| **What runs** | The same on-target ELF that PIL uses, this time flashed to the chip's internal flash and executing on the actual Cortex-M core. |
+| **Entry point** | `tools/hil/run.sh <board>` (or `--all`) — matches a connected probe to the board by STM32 chip-id, seeds the board's caps, builds `TEST=ON`, flashes over ST-Link, and captures the console via `tools/hil/uart_capture.py`, exiting on the navtest failure count. Board defs live in `tools/hil/boards/*.conf`, mirroring `tools/pil/`. (`tools/hil/run_target_tests.sh [port] [baud] [timeout]` is the legacy single-board helper.) |
 | **Speed** | A few seconds to build + flash + run the suite to completion. |
 | **Output** | USART2 from the chip → ST-Link VCP → host `/dev/ttyACM0` → captured to stdout. Exit code is the navtest failure count. |
 | **What it catches** | Real-peripheral semantics — bit-positions in registers that the Renode model abstracts over (the GPIO OSPEEDR bug that PR10 fixed was found here), real NVIC pending-bit acceptance, ST-Link / RCC clock-tree quirks, actual interrupt latency. |
@@ -116,6 +116,12 @@ When a new PIL backend lands (e.g. simulavr for an extra AVR variant,
 or QEMU for a future Cortex-A port) it stays on the GitHub-hosted
 tier as long as the wall-clock fits. If it grows past ~10 min, move
 that single job to self-hosted and keep the per-PR jobs hosted.
+
+## Conformance — orthogonal to the triangle
+
+`tests/portable/conformance/` asserts that the HAL *contract* holds, not
+that a given driver works, so it cuts across SIL, PIL and HIL rather than
+sitting inside one of them. It has its own page: @ref conformance.
 
 ## What sits *above* this triangle
 

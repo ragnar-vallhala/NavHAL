@@ -1,0 +1,46 @@
+# NavHAL HIL bench — ST-Link access for the test runner.
+#
+# tools/hil/run.sh needs two things from a board: st-flash talking to the
+# ST-Link, and read/write on the Virtual COM Port that carries the test
+# console. Distributions usually ship rules for the first and leave the second
+# to TAG+="uaccess", which grants an ACL to whoever is logged in on the seat.
+# That works until it doesn't: a probe that enumerates outside a seat session
+# gets no ACL, its VCP stays root:root 0600, and run.sh reports the board as
+# absent. On a bench with several boards the symptom is one of them silently
+# dropping out.
+#
+# This makes it deterministic: group ownership rather than an ACL, so a member
+# of plugdev can use any attached ST-Link regardless of how it enumerated.
+#
+# Install:
+#     sudo cp tools/hil/99-navhal-stlink.rules /etc/udev/rules.d/
+#     sudo udevadm control --reload-rules
+#     sudo udevadm trigger --subsystem-match=tty --action=add
+#
+# Replug anything already attached whose VCP is still root-owned; a rule
+# cannot retroactively fix a node udev has already finished with.
+#
+# Requires the user to be in plugdev:  id -nG | grep plugdev
+
+# --- the debug probe itself (st-flash, st-info) ---------------------------
+# 3744 = ST-Link V1, 3748 = V2, 374a/374b = V2.1, 374e/374f/3753/3754 = V3.
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3744", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374a", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374e", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3753", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3754", MODE="0660", GROUP="plugdev"
+
+# --- the Virtual COM Port the test console comes out of -------------------
+# SUBSYSTEM=="tty" with ATTRS{} walks up to the USB parent, so this covers the
+# CDC interface whatever number it lands on. This is the line the shipped
+# rules leave to uaccess, and the one whose absence makes a board look
+# disconnected to run.sh.
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374a", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374e", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3753", MODE="0660", GROUP="plugdev"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3754", MODE="0660", GROUP="plugdev"

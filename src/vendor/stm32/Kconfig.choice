@@ -6,4 +6,4 @@
 
 config VENDOR_STM32
     bool "STM32"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7

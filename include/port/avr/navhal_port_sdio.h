@@ -20,7 +20,7 @@
  * @brief AVR / ATmega328P SDIO port header.
  *
  * The ATmega328P has no SDIO peripheral. @c common/hal_sdio.h gates its whole
- * body on @c _SDIO_ENABLED, which the AVR port never defines, so the SDIO API
+ * body on @c NAVHAL_CONFIG_DRV_SDIO, which the AVR port never defines, so the SDIO API
  * collapses to nothing. This header exists only to satisfy the include.
  */
 

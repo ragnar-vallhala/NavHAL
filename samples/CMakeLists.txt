@@ -36,7 +36,20 @@ hal_sdio_perf
 hal_uart_dma_bridge
 hal_spi_esp_bridge
 hal_dwt
+hal_mpu
 hal_blink_cpp
+hal_eth
+hal_eth_bridge
+hal_eth_echo
+hal_mpu_fault
+hal_adc
+hal_usb_cdc
+hal_rtc
+hal_watchdog
+hal_x86_hello
+hal_x86_timing
+hal_x86_interrupt
+hal_x86_echo
 )
 set(SAMPLE_DIRS
 no_hal/01_no_hal_blink
@@ -67,7 +80,20 @@ cortex-m/23_hal_sdio_perf
 cortex-m/24_hal_uart_dma_bridge
 portable/25_hal_spi_esp_bridge
 cortex-m/26_hal_dwt
+cortex-m/28_hal_mpu
 portable/27_hal_blink_cpp
+cortex-m/29_hal_eth
+cortex-m/30_hal_eth_bridge
+cortex-m/31_hal_eth_echo
+cortex-m/32_hal_mpu_fault
+portable/33_hal_adc
+cortex-m/34_hal_usb_cdc
+cortex-m/35_hal_rtc
+portable/36_hal_watchdog
+x86/00_hal_x86_hello
+x86/01_hal_x86_timing
+x86/02_hal_x86_interrupt
+x86/03_hal_x86_echo
 )
 
 # Check if sample is defined

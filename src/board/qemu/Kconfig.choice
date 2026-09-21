@@ -1,0 +1,7 @@
+# vim: ft=kconfig
+# Target-board choice entry for the QEMU PC. Sourced inside the root
+# "Target Board" choice. Visible only when its family is selected.
+
+config BOARD_QEMU
+    bool "qemu"
+    depends on FAMILY_PC

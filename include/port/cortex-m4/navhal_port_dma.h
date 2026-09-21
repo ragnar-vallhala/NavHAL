@@ -23,20 +23,21 @@
  * The public DMA API lives in @c common/hal_dma.h, which includes this
  * header. This file carries the STM32F4 DMA register map and the
  * deprecated-function-name compat shim. The entire body is compiled only
- * when @c _DMA_ENABLED is defined.
+ * when @c NAVHAL_CONFIG_DRV_DMA is defined.
  */
 
 #ifndef NAVHAL_PORT_DMA_H
 #define NAVHAL_PORT_DMA_H
 
 #include "common/hal_dma.h"
+#include "common/hal_interrupt.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef _DMA_ENABLED
+#if NAVHAL_CONFIG_DRV_DMA
 
 #include "family/dma_reg.h"
 
@@ -44,10 +45,58 @@ extern "C" {
  * backward-compat alias behind NAVHAL_DEPRECATED. */
 #include "compat/dma_compat.h"
 
-#endif /* _DMA_ENABLED */
+/* DMA memory classifier + coherency helpers — no-ops on the Cortex-M4, which
+ * has neither an L1 data cache nor tightly-coupled memory. The signatures match
+ * the M7 port (include/port/cortex-m7/navhal_port_dma.h) so shared driver code
+ * (e.g. sdio.c) calls them unconditionally and pays nothing here. */
+#include "common/navhal_compiler.h"
+#include <stddef.h>
+
+typedef enum {
+  NAVHAL_DMA_MEM_ITCM,
+  NAVHAL_DMA_MEM_DTCM,
+  NAVHAL_DMA_MEM_CACHED,
+} navhal_dma_mem_t;
+
+NAVHAL_INLINE navhal_dma_mem_t navhal_dma_mem_class(const void *addr) {
+  (void)addr;
+  return NAVHAL_DMA_MEM_CACHED;
+}
+NAVHAL_INLINE hal_status_t navhal_dma_tx_prepare(const void *buf, size_t n) {
+  (void)buf;
+  (void)n;
+  return HAL_OK;
+}
+NAVHAL_INLINE hal_status_t navhal_dma_rx_guard(const void *buf) {
+  (void)buf;
+  return HAL_OK;
+}
+NAVHAL_INLINE void navhal_dma_rx_finish(void *buf, size_t n) {
+  (void)buf;
+  (void)n;
+}
+
+/**
+ * @brief How one peripheral endpoint is wired to the DMA controller.
+ *
+ * Port-defined, like a clock config: controller/stream/channel is this
+ * family's DMA model and would not fit a part with DMAMUX or bus-master DMA.
+ * A bus driver's DMA table reports this and the shared layer does the rest.
+ */
+typedef struct {
+  hal_dma_controller_t controller; /**< Which controller drives this endpoint. */
+  uint8_t stream;                  /**< Stream index. */
+  uint8_t channel;                 /**< Channel selection. */
+  uint32_t periph_addr;            /**< Peripheral data register address. */
+  hal_irq_t irq;                   /**< Stream completion IRQ. */
+} hal_dma_binding_t;
+
+#endif /* NAVHAL_CONFIG_DRV_DMA */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+
+
 
 #endif /* NAVHAL_PORT_DMA_H */

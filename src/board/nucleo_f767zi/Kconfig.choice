@@ -1,0 +1,8 @@
+# vim: ft=kconfig
+# Target-board choice entry for Nucleo-F767ZI (M7 §7.2).
+# Sourced inside the root "Target Board" choice. Visible only when its
+# family is selected, so it auto-selects then.
+
+config BOARD_NUCLEO_F767ZI
+    bool "nucleo_f767zi"
+    depends on FAMILY_STM32F7

@@ -106,6 +106,19 @@ jobs:
   # to differ today; the job records the diff and warns. When that
   # plumbing lands, flip the `continue-on-error` below to false so
   # bit-reproducibility becomes a hard gate.
+  # Host-tier line coverage via gcov/gcovr (ntest coverage). --gate enforces the
+  # per-area floors in ntest's COVERAGE_FLOORS (empty today => report-only, so
+  # this is informational until floors are set).
+  coverage:
+    name: Coverage (host, gcov)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install gcovr
+        run: pip install gcovr
+      - name: Coverage
+        run: tools/ntest coverage --gate
+
   reproducible-build:
     name: Reproducible build (soft)
     runs-on: ubuntu-latest
@@ -147,7 +160,7 @@ jobs:
   release-gate-complete:
     name: Release gate complete
     runs-on: ubuntu-latest
-    needs: [license-headers, doxygen-strict, sanitizer-host, reproducible-build]
+    needs: [license-headers, doxygen-strict, sanitizer-host, coverage, reproducible-build]
     if: always()
     steps:
       - name: Aggregate results

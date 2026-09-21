@@ -27,7 +27,7 @@
  * (possibly prescaled) system clock, so all bus-frequency queries return it.
  */
 
-#include "common/hal_clock.h"
+#include "internal/hal_clock_ops.h"
 
 #include <avr/io.h>
 #include <avr/power.h>
@@ -37,11 +37,8 @@
 /** @brief Active CLKPS divider exponent (0 = /1 ... 8 = /256). */
 static uint8_t s_prescaler_log2 = 0;
 
-hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
-                            const hal_pll_config_t *pll_cfg) {
-  (void)pll_cfg; /* No PLL on the ATmega328P. */
-  if (cfg == NULL)
-    return HAL_ERR_INVALID_ARG;
+static hal_status_t avr_clock_init(const hal_clock_config_t *cfg) {
+  /* cfg is non-NULL: the public layer validated it before dispatching. */
   if (cfg->prescaler_log2 > 8) /* CLKPS encodes /1 .. /256. */
     return HAL_ERR_INVALID_ARG;
 
@@ -51,12 +48,25 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
   return HAL_OK;
 }
 
-uint32_t hal_clock_get_sysclk(void) {
+static uint32_t avr_clock_get_sysclk(void) {
   return (uint32_t)F_CPU >> s_prescaler_log2;
 }
 
-uint32_t hal_clock_get_ahbclk(void) { return hal_clock_get_sysclk(); }
 
-uint32_t hal_clock_get_apb1clk(void) { return hal_clock_get_sysclk(); }
 
-uint32_t hal_clock_get_apb2clk(void) { return hal_clock_get_sysclk(); }
+
+/* No bus hierarchy: every peripheral runs from the core clock, so there is
+ * nothing for hal_clock_get_bus_clock to report. Callers use get_sysclk. */
+static uint8_t avr_clock_get_bus_count(void) { return 0u; }
+
+static uint32_t avr_clock_get_bus_clock(uint8_t bus) {
+  (void)bus;
+  return 0u;
+}
+
+const hal_clock_ops_t _hal_clock_ops = {
+    .init = avr_clock_init,
+    .get_sysclk = avr_clock_get_sysclk,
+    .get_bus_count = avr_clock_get_bus_count,
+    .get_bus_clock = avr_clock_get_bus_clock,
+};

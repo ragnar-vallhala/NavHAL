@@ -23,7 +23,7 @@
 #include "common/hal_diskio.h"
 #include "navhal_port_sdio.h"
 
-#ifdef _SDIO_ENABLED
+#if NAVHAL_CONFIG_DRV_SDIO
 
 static hal_disk_status_t disk_stat = HAL_DISK_STATUS_NOINIT;
 
@@ -51,7 +51,7 @@ hal_disk_result_t hal_disk_read(uint8_t pdrv, uint8_t *buff, uint32_t sector,
   if (disk_stat & HAL_DISK_STATUS_NOINIT)
     return HAL_DISK_RES_NOTRDY;
 
-#ifdef _SDIO_BACKEND_DMA
+#if NAVHAL_CONFIG_DRV_SDIO_DMA
   if (count == 1) {
     if (hal_sdio_wait_sync(hal_sdio_read_block_async(sector, buff)) != HAL_SDIO_OK) {
       return HAL_DISK_RES_ERROR;
@@ -82,7 +82,7 @@ hal_disk_result_t hal_disk_write(uint8_t pdrv, const uint8_t *buff,
   if (disk_stat & HAL_DISK_STATUS_NOINIT)
     return HAL_DISK_RES_NOTRDY;
 
-#ifdef _SDIO_BACKEND_DMA
+#if NAVHAL_CONFIG_DRV_SDIO_DMA
   if (count <= 4) {
     /* Small writes — safer to use single block */
     while (count--) {
@@ -133,4 +133,4 @@ hal_disk_result_t hal_disk_ioctl(uint8_t pdrv, uint8_t cmd, void *buff) {
   }
 }
 
-#endif /* _SDIO_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_SDIO */

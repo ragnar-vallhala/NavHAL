@@ -2,8 +2,7 @@
 
 # NavHAL — Testing Guide
 
-**Companion to:** `docs/api_standardization.md`, `docs/execution_plan.md`,
-`docs/m2_plus_plan.md`.
+**Companion to:** `docs/api_standardization.md`.
 
 NavHAL has three test entry points, each used for a different purpose:
 
@@ -78,26 +77,34 @@ tools/renode/run_tests.sh build/tests
 Exit code is the number of failures (0 = green, non-zero = red). The
 captured UART log is echoed to stdout for context.
 
-### 2b. Flash to a Nucleo-F401RE
+### 2b. Flash to real hardware (HIL)
 
-Single-command flow — build, flash, capture USART2, and exit on the
-navtest failure count:
+Board-driven flow — build, flash the matching board over its ST-Link, and
+capture its console, exiting on the navtest failure count. Each board is
+matched to a connected probe by STM32 chip-id, so several boards can be
+attached at once:
 
 ```sh
-tools/run_target_tests.sh                # /dev/ttyACM0 @ 9600, 120 s timeout
-tools/run_target_tests.sh /dev/ttyACM1   # override port
+tools/hil/run.sh --list            # known boards
+tools/hil/run.sh nucleo_f401re     # one board (Cortex-M4)
+tools/hil/run.sh nucleo_f767zi     # one board (Cortex-M7)
+tools/hil/run.sh --all             # every board with a hardware match
 ```
 
-Or the unwrapped pieces (useful if you already have a serial console
-attached):
+Each board's opt-in caps, toolchain, and console baud live in
+`tools/hil/boards/<board>.conf`; adding a board is one new `.conf` file.
+This mirrors the PIL layout under `tools/pil/`.
+
+The simpler single-board helper (explicit port, F401 defaults) is still
+available:
 
 ```sh
-cmake --build build --target flash_tests
-# then watch USART2 (PA2/PA3 on the Arduino-style header) at 9600 8N1.
+tools/hil/run_target_tests.sh                # /dev/ttyACM0 @ 9600, 120 s
+tools/hil/run_target_tests.sh /dev/ttyACM1   # override port
 ```
 
 The on-target binary returns from `main` — it does not loop
-indefinitely, so `tools/uart_capture.py` exits cleanly with the
+indefinitely, so `tools/hil/uart_capture.py` exits cleanly with the
 failure count (0 = green) the moment it sees the summary.
 
 ---
@@ -196,7 +203,7 @@ static const navtest_suite_t *const all_suites[] = {
 
 ### Coverage bar
 
-Per `docs/m2_plus_plan.md`:
+The tiering rule:
 
 - Every public function in `include/core/cortex-m4/<driver>.h` has at
   least one success-path test.

@@ -23,7 +23,7 @@
  * Backed by the Cortex-M4 DWT unit on the current port; the public API is
  * named @c hal_cycle_counter_* so it stays architecture-neutral (a target
  * without DWT can provide an equivalent counter, or gate the feature off via
- * @c NAVHAL_HAS_CYCLE_COUNTER).
+ * @c NAVHAL_CONFIG_DRV_DWT).
  */
 
 #ifndef HAL_DWT_H
@@ -100,7 +100,9 @@ void hal_cycle_counter_delay_us(uint32_t us);
 #endif
 
 /* Port-specific bits (compat shim, deprecated names). */
+#if NAVHAL_CONFIG_DRV_DWT
 #include "navhal_port_dwt.h"
+#endif
 
 
 /** @} */ /* end of group HAL_CYCLE_COUNTER */

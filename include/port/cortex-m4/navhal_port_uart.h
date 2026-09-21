@@ -29,17 +29,20 @@
 #define NAVHAL_PORT_UART_H
 
 #include "common/hal_uart.h"
+
+#include <stdbool.h>
 #include "navhal_port_config.h"
 #include "family/uart_reg.h"
+/* hal_dma_binding_t, for the DMA binding accessors below. */
+#include "navhal_port_dma.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* The _UART_BACKEND_DMA selector is derived in navhal_port_config.h from
-   NAVHAL_HAS_UART_DMA so that the UART driver's DMA paths can be disabled
-   independently of other DMA users. */
+/* NAVHAL_CONFIG_DRV_UART_DMA is force-included (from navhal_target.h) and lets
+   the UART driver's DMA paths be disabled independently of other DMA users. */
 
 /* -------------------------------------------------------------------------- *
  * IDLE-line interrupt → callback (DMA-independent).
@@ -69,9 +72,32 @@ hal_status_t hal_uart_detach_idle_callback(hal_uart_t uart);
 /* -------------------------------------------------------------------------- *
  * DMA-backed UART API — available only when the DMA backend is enabled.
  * -------------------------------------------------------------------------- */
-#if defined(_DMA_ENABLED) && defined(_UART_BACKEND_DMA)
+#if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
 
-/** @brief Transmit a byte buffer using DMA (buffer must stay valid). */
+/**
+ * @brief The DMA wiring this UART and direction will use.
+ *
+ * The reference-manual default, or the override installed by
+ * ::hal_uart_dma_set_binding.
+ *
+ * @param uart UART instance.
+ * @param tx   true for the transmit request, false for receive.
+ * @param out  Receives the binding; must not be NULL.
+ */
+hal_status_t hal_uart_dma_get_binding(hal_uart_t uart, bool tx,
+                                      hal_dma_binding_t *out);
+
+/**
+ * @brief Override the DMA wiring for a UART and direction.
+ *
+ * Several USART requests have a second stream on this part -- USART1_RX is
+ * DMA2 stream 2 or 5, USART6_RX is stream 1 or 2, USART6_TX is 6 or 7 -- so
+ * the default is not the only option when something else holds that stream.
+ * Pass NULL to restore it.
+ */
+hal_status_t hal_uart_dma_set_binding(hal_uart_t uart, bool tx,
+                                      const hal_dma_binding_t *binding);
+
 hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
                                 uint16_t length);
 /** @brief Set up a UART for DMA-based circular reception. */
@@ -92,7 +118,7 @@ hal_status_t hal_uart_dma_rx_index(hal_uart_t uart, uint16_t *out_index);
 /** @brief Transmit a null-terminated string using DMA. */
 hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 
-#endif /* _DMA_ENABLED && _UART_BACKEND_DMA */
+#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
 
 #ifdef __cplusplus
 } /* extern "C" */

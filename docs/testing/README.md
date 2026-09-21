@@ -5,8 +5,7 @@
 # NavHAL — Testing Report
 
 **Status:** Current as of 2026-05-21
-**Companion to:** `docs/api_standardization.md`, `docs/execution_plan.md`,
-`docs/m2_plus_plan.md`.
+**Companion to:** `docs/api_standardization.md`.
 
 This folder is the canonical write-up of how NavHAL is tested today. It
 follows the verification ladder commonly used in

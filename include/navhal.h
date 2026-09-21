@@ -35,9 +35,9 @@
 
 /* Release version (SemVer) — the version of this NavHAL distribution. */
 #define VERSION_MAJOR 0
-#define VERSION_MINOR 2
-#define VERSION_PATCH 7
-#define VERSION "0.2.3"
+#define VERSION_MINOR 3
+#define VERSION_PATCH 2
+#define VERSION "0.3.1-dev"
 
 /**
  * @brief NavHAL public-API contract version.
@@ -80,18 +80,28 @@ extern "C" {
 
 #include "common/hal_spi.h"
 
+#include "common/hal_adc.h"
+
 #include "common/hal_interrupt.h"
 
 #include "common/hal_fpu.h"
 
 #include "common/hal_config.h"
 
+#include "common/hal_cache.h"
 #include "common/hal_crc.h"
 #include "common/hal_diskio.h"
 #include "common/hal_dma.h"
 #include "common/hal_dwt.h"
+#include "common/hal_eth.h"
 #include "common/hal_flash.h"
+#include "common/hal_mpu.h"
+#include "common/hal_reset.h"
+#include "common/hal_rtc.h"
 #include "common/hal_sdio.h"
+#include "common/hal_tcm.h"
+#include "common/hal_usb_cdc.h"
+#include "common/hal_watchdog.h"
 
 
 #ifdef __cplusplus

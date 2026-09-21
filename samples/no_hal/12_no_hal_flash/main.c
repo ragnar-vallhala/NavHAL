@@ -17,7 +17,6 @@
 
 #include "navhal_port_uart.h"
 #include <stdint.h>
-#define CORTEX_M4
 #include "navhal.h"
 
 #define FLASH_BASE        0x40023C00UL

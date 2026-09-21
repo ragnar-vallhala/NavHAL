@@ -10,20 +10,51 @@ if(CONFIG_DRV_GPIO)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/gpio/gpio.c)
 endif()
 if(CONFIG_DRV_CLOCK)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
+    # STM32F7 needs PWR over-drive + frequency-scaled flash wait states + APB
+    # bus-limit prescalers to run above the F4's ~84 MHz ceiling, so it ships a
+    # dedicated clock driver. Selected by family; F4 clock.c stays untouched.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
+    endif()
 endif()
 if(CONFIG_DRV_UART)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
+    # The STM32F7 USART IP (ISR/RDR/TDR) differs from the F4 (SR/DR), so the F7
+    # port ships its own driver file. Selecting by family here keeps the frozen
+    # F4 uart.c untouched. (To be unified under the vendor-backend vtable in M9.)
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
+    endif()
+endif()
+if(CONFIG_DRV_TIMEBASE)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/timebase/timebase.c)
 endif()
 if(CONFIG_DRV_TIMER)
     list(APPEND HAL_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/timer/timer.c
-        ${SRC_ARCH}/timebase/timebase.c
     )
 endif()
 
-# Startup is arch-layer code; always linked in.
-list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)
+# The vector table is an MCU property, so it lives with the family whose
+# peripherals it names -- not in the arch tree, where it would be one vendor's
+# table imposed on every ARMv7E-M port. A board may still override it for
+# genuinely board-level vectoring.
+if(EXISTS ${SRC_BOARD}/startup.s)
+    list(APPEND HAL_SOURCES ${SRC_BOARD}/startup.s)
+elseif(EXISTS ${INCLUDE_FAMILY}/../startup.s)
+    list(APPEND HAL_SOURCES ${INCLUDE_FAMILY}/../startup.s)
+else()
+    message(FATAL_ERROR
+        "No startup.s for family '${CONFIG_FAMILY}'. A port supplies its own "
+        "vector table: add src/vendor/${VENDOR}/family/${CONFIG_FAMILY}/startup.s")
+endif()
+# Shared C reset path (Reset_Handler + memory bring-up + boot hooks); the .s
+# above now carries only the MCU-specific vector table. (The TEST build globs
+# ${SRC_ARCH}/*.c and picks this up automatically.)
+list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/boot.c)
 
 if(CONFIG_DRV_INTERRUPT)
     list(APPEND HAL_SOURCES ${SRC_ARCH}/interrupt/interrupt.c)
@@ -32,10 +63,35 @@ if(CONFIG_DRV_PWM)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/pwm/pwm.c)
 endif()
 if(CONFIG_DRV_I2C)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c)
+    # F7 I²C is a different IP (TIMINGR / ISR-ICR / CR2-framed), so a full
+    # rewrite. Selected by family; the F4 legacy i2c.c stays untouched.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/i2c/i2c.c)
+    endif()
+endif()
+if(CONFIG_DRV_ADC)
+    # The classic STM32 SAR ADC IP is register-compatible across F4 and F7, so a
+    # single adc.c serves both (the family adc_reg.h supplies the unit count).
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/adc/adc.c)
 endif()
 if(CONFIG_DRV_SPI)
-    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spi/spi.c)
+    # F7 SPI puts the frame size in CR2.DS (+ FRXTH for byte FIFO access), not
+    # the F4's CR1.DFF — a separate driver. Selected by family; F4 spi.c stays.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spi/spi_f7.c)
+    else()
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spi/spi.c)
+    endif()
+endif()
+if(CONFIG_DRV_RTC)
+    # The RTC IP is register-compatible across F4 and F7, so one driver serves both.
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/rtc/rtc.c)
+endif()
+if(CONFIG_DRV_USB_CDC)
+    # F4-only: the OTG_FS device core driving a CDC-ACM virtual serial port.
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/usb/usb_cdc.c)
 endif()
 if(CONFIG_DRV_FLASH)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/flash/flash.c)
@@ -46,6 +102,14 @@ endif()
 if(CONFIG_DRV_FPU)
     list(APPEND HAL_SOURCES ${SRC_ARCH}/fpu/fpu.c)
 endif()
+if(CONFIG_DRV_RESET)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/reset/reset.c)
+endif()
+if(CONFIG_DRV_WATCHDOG)
+    # The WWDG entry points live in the same file behind CONFIG_DRV_WWDG; they
+    # are the same peripheral family and share the timeout arithmetic.
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/watchdog/watchdog.c)
+endif()
 if(CONFIG_DRV_CRC)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/crc/crc.c)
 endif()
@@ -55,6 +119,18 @@ if(CONFIG_DRV_SDIO)
 endif()
 if(CONFIG_DRV_DWT)
     list(APPEND HAL_SOURCES ${SRC_ARCH}/dwt/dwt.c)
+endif()
+if(CONFIG_DRV_MPU)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/mpu/mpu.c)
+endif()
+if(CONFIG_DRV_CACHE)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/cache/cache.c)
+endif()
+if(CONFIG_DRV_ETH)
+    # F7-only: the ETH MAC + its dedicated DMA against an RMII PHY.
+    if(CONFIG_FAMILY_STM32F7)
+        list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/eth/eth_f7.c)
+    endif()
 endif()
 
 add_library(hal STATIC

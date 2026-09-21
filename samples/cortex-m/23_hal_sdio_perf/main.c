@@ -25,7 +25,6 @@
  * - Reads them back and profiles the time taken.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 // Wait for a number of ms using systick
@@ -61,14 +60,15 @@ int main(void) {
                               .pll_q = 7};
   hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
-  hal_clock_init(&clk_cfg, &pll_cfg);
+  clk_cfg.pll = pll_cfg;
+  hal_clock_init(&clk_cfg);
   hal_timebase_init(1000);
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=115200});
 
   delay(100);
 
   hal_uart_write_string(HAL_UART_2, "\n\r--- NavHAL SDIO Perf Test ---\n\r");
-#ifdef _DMA_ENABLED
+#if NAVHAL_CONFIG_DRV_DMA
   hal_uart_write_string(HAL_UART_2, "DMA Mode: ENABLED\n\r");
 #else
   hal_uart_write_string(HAL_UART_2, "DMA Mode: DISABLED (Polling)\n\r");
@@ -101,7 +101,7 @@ int main(void) {
 
   /* 4. Prepare Test Data */
   // Use a 64KB buffer (128 sectors) to test multi-block performance
-  static uint8_t buf[CHUNK_SIZE * 512] __attribute__((aligned(4)));
+  static uint8_t buf[CHUNK_SIZE * 512] NAVHAL_DMA_ALIGN; /* cache-line aligned for D-cache */
   for (int i = 0; i < (CHUNK_SIZE * 512); i++) {
     buf[i] = (uint8_t)(i & 0xFF);
   }

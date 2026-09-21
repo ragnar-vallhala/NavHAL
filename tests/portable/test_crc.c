@@ -20,7 +20,6 @@
  * @brief CRC unit tests for NavTest.
  */
 
-#define CORTEX_M4
 #include "test_crc.h"
 #include "common/hal_config.h"
 #include "navhal_port_crc.h"

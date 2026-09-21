@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Device-family choice entry for ACME1.
+
+config FAMILY_ACME1
+    bool "ACME1"
+    depends on VENDOR_ACME

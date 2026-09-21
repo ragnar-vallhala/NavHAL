@@ -25,7 +25,6 @@
  * - Sends CMD0 (GO_IDLE_STATE) to reset the card.
  */
 
-#define CORTEX_M4
 #include "navhal.h"
 
 /**
@@ -43,7 +42,8 @@ hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
 int main(void) {
   /* Initialize System Clocks (Required for SDIO 48MHz clock) */
-  hal_clock_init(&clk_cfg, &pll_cfg);
+  clk_cfg.pll = pll_cfg;
+  hal_clock_init(&clk_cfg);
 
   /* Initialize System Tick and HAL_UART_2 for logging */
   hal_timebase_init(1000);

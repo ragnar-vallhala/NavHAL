@@ -1,0 +1,14 @@
+# vim: ft=kconfig
+# Vendor choice entry for the ACME reference port.
+#
+# This port exists to keep the M9 exit criterion honest: adding a vendor must
+# be new files plus an ops table, with no edit to any existing HAL source. It
+# is built in CI and implements GPIO only.
+
+config VENDOR_ACME
+    bool "ACME (reference port)"
+    depends on ARCH_CORTEX_M4
+    help
+      A minimal Cortex-M4 vendor with a flat memory-mapped GPIO block. Not
+      real silicon: it is the worked example a new port is copied from, and
+      the proof that the driver vtable is the whole vendor surface.

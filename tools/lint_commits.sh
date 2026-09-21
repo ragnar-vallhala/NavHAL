@@ -37,10 +37,26 @@ fi
 TMP=$(mktemp)
 trap 'rm -f "$TMP"' EXIT
 
-# Commits before Conventional-Commits enforcement (commit 15218ec added the
-# commit-msg hook + this CI check) were never linted. An integration PR that
-# imports trunk history (e.g. main -> stable) re-walks that history and must not
-# fail on it. Grandfather anything strictly older than the enforcement commit.
+# Only lint commits genuinely NEW to this PR. An integration / back-merge PR
+# (main <-> stable) re-walks a sibling branch's history; those commits were
+# already gated when they first landed (or are pre-enforcement legacy that can't
+# be retro-fixed without rewriting released history). Skip anything reachable
+# from a long-lived branch. The CI checkout may only have the PR base, so fetch
+# the siblings best-effort.
+for _br in main stable; do
+  git rev-parse -q --verify "origin/${_br}" >/dev/null 2>&1 \
+    || git fetch -q origin "${_br}:refs/remotes/origin/${_br}" 2>/dev/null || true
+done
+already_accepted() {  # 0 if commit $1 is reachable from a long-lived branch
+  for _br in main stable; do
+    git rev-parse -q --verify "origin/${_br}" >/dev/null 2>&1 || continue
+    git merge-base --is-ancestor "$1" "origin/${_br}" 2>/dev/null && return 0
+  done
+  return 1
+}
+
+# Fallback for shallow checkouts where sibling refs are unavailable: grandfather
+# anything strictly older than the Conventional-Commits enforcement commit.
 ENFORCED_SINCE=$(git rev-parse -q --verify 15218ec^ 2>/dev/null || true)
 
 PASS=0
@@ -48,6 +64,11 @@ FAIL=0
 SKIP=0
 while read -r sha; do
   git log -1 --format="%B" "$sha" > "$TMP"
+  if already_accepted "$sha"; then
+    printf '  \033[33mSKIP\033[0m %s  %s (already on main/stable)\n' "${sha:0:8}" "$(head -n1 "$TMP")"
+    SKIP=$((SKIP+1))
+    continue
+  fi
   if [ -n "$ENFORCED_SINCE" ] && git merge-base --is-ancestor "$sha" "$ENFORCED_SINCE" 2>/dev/null; then
     printf '  \033[33mSKIP\033[0m %s  %s (pre-enforcement)\n' "${sha:0:8}" "$(head -n1 "$TMP")"
     SKIP=$((SKIP+1))

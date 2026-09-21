@@ -95,12 +95,12 @@ typedef struct {
 #define USART_SR_NE (1 << 2)   ///< Noise Error
 #define USART_SR_ORE (1 << 3)  ///< Overrun Error
 
-/* CR3 DMA enable bits (only meaningful when _DMA_ENABLED and _UART_BACKEND_DMA
+/* CR3 DMA enable bits (only meaningful when NAVHAL_CONFIG_DRV_DMA and NAVHAL_CONFIG_DRV_UART_DMA
  * are defined) */
-#ifdef _DMA_ENABLED
+#if NAVHAL_CONFIG_DRV_DMA
 #define USART_CR3_DMAT (1 << 7) ///< DMA enable for transmitter
 #define USART_CR3_DMAR (1 << 6) ///< DMA enable for receiver
-#endif                          /* _DMA_ENABLED */
+#endif                          /* NAVHAL_CONFIG_DRV_DMA */
 
 
 #ifdef __cplusplus

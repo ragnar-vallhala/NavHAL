@@ -25,7 +25,6 @@
  * the TX register frees.
  */
 
-#define CORTEX_M4
 #include "test_uart_protocol.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_uart.h"

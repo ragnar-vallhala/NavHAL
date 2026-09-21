@@ -1,0 +1,19 @@
+# vim: ft=kconfig
+# Board identity string for Nucleo-F767ZI (M7 §7.2). Sourced at top level.
+
+config BOARD
+    string
+    default "nucleo_f767zi" if BOARD_NUCLEO_F767ZI
+
+# STM32F767ZI tightly-coupled-memory extents. Fixed silicon facts (RM0410 §2),
+# not user options — the DMA memory classifier (navhal_port_dma.h) reads them
+# to tell coherency-free DTCM from cacheable SRAM once the D-cache is on. TCM
+# base addresses are Cortex-M7 architectural and live in the port header; only
+# the sizes are chip-specific, so they belong to the board.
+config ITCM_SIZE
+    hex
+    default 0x4000 if BOARD_NUCLEO_F767ZI      # 16 KB instruction TCM
+
+config DTCM_SIZE
+    hex
+    default 0x20000 if BOARD_NUCLEO_F767ZI      # 128 KB data TCM

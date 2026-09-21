@@ -44,12 +44,10 @@ The Related Pages tab is structured top-down — start here:
 
 - **Testing & verification**
   - @subpage testing
+  - @subpage conformance
 
-- **Project planning (historical)**
-  - @subpage exec_plan
-  - @subpage m2_plus_plan
-  - @subpage m5_avr_readiness
-  - @subpage m5_conformance
+- **Roadmap**
+  - @subpage roadmap
 
 ## Supported toolchains
 

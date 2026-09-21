@@ -9,8 +9,10 @@ mainmenu "NavHAL Configuration System"
 # Each choice sources the ports' "Kconfig.choice" members. Their
 # mutual-exclusion default falls out of the `depends on` chain
 # (arch ▶ vendor ▶ family ▶ board): exactly one member is visible per
-# parent selection, and a choice auto-selects its single visible member,
-# so no per-port "default X if PARENT" lines are needed here.
+# parent selection, and a choice auto-selects its single visible member.
+# Where a parent has two or more visible members the tie is broken by a
+# "default X if PARENT" on the choice below — otherwise source order decides,
+# which shifts under anyone who adds a port.
 
 menu "Target Platform Configuration"
 
@@ -24,6 +26,14 @@ endchoice
 
 choice
     prompt "Vendor"
+    # A choice defaults to the first visible member sourced, i.e. alphabetically,
+    # so the default moves whenever a vendor is added ahead of the current one.
+    # The ACME reference port did exactly that on Cortex-M4 and silently became
+    # the default, which is the same trap the board choice below documents.
+    # Name the reference vendor per arch instead of relying on sort order.
+    default VENDOR_STM32 if ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    default VENDOR_MICROCHIP if ARCH_AVR8
+    default VENDOR_PC if ARCH_X86_64
     help
       Select the silicon vendor.
 source "src/vendor/*/Kconfig.choice"
@@ -40,6 +50,12 @@ endchoice
 
 choice
     prompt "Target Board"
+    # A choice with several visible members defaults to the first one sourced,
+    # i.e. alphabetically — so once a family has more than one board the default
+    # moves whenever a board is added. A choice default has to be a property of
+    # the choice itself (it does not parse inside a sourced member fragment), so
+    # a family that ships more than one board names its reference board here.
+    default BOARD_NUCLEO_F401RE if FAMILY_STM32F4
     help
       Select the target development board.
 source "src/board/*/Kconfig.choice"
@@ -62,15 +78,17 @@ menu "System & Features Configuration"
 osource "src/arch/*/Kconfig.features"
 
 config DRV_CRC
-    bool "Enable Hardware CRC Unit"
+    bool "Enable CRC support"
     default n
     help
-      Enables hardware cyclic redundancy check unit support.
+      Provides the hal_crc_* API. Backed by the hardware CRC unit on STM32
+      (Cortex-M4/M7); on the ATmega328P, which has no CRC peripheral, it is a
+      bitwise software CRC-32 fallback.
 
 endmenu
 
 menu "HAL Drivers Configuration"
-    depends on ARCH_CORTEX_M4 || ARCH_AVR8
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8 || ARCH_X86_64
 
 config DRV_CLOCK
     bool "Enable Clock Driver"
@@ -84,29 +102,47 @@ config DRV_GPIO
     bool "Enable GPIO Driver"
     default y
 
+config DRV_TIMEBASE
+    bool "Enable timebase (tick, millis/micros, delays)"
+    default y
+    select DRV_CLOCK
+    help
+      Provides hal_timebase_* and hal_delay_*. Distinct from DRV_TIMER: every
+      port has a timebase (SysTick, Timer0, the TSC), but not every port
+      implements the general-purpose hal_timer_* peripheral API. Gating both
+      on one symbol meant a port had to claim a timer driver it lacked in
+      order to get delays.
+
 config DRV_TIMER
     bool "Enable Timer Driver"
     default y
     select DRV_CLOCK
-    select DRV_INTERRUPT
+    select DRV_TIMEBASE
+    # The MCU timer peripheral raises an update IRQ via the NVIC. The x86
+    # timebase is polled TSC (no IRQ), so the interrupt select is MCU-only;
+    # the PIT-IRQ timer path arrives with the x86 interrupt slice.
+    select DRV_INTERRUPT if ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
 
 config DRV_UART
     bool "Enable UART Driver"
     default y
-    select DRV_GPIO
-    select DRV_CLOCK
-    select DRV_INTERRUPT
+    # MCU UARTs need pin-mux (GPIO), a clock gate, and the NVIC. The PC 16550
+    # is a fixed I/O-port device needing none of these, so the selects are
+    # gated to the MCU arches.
+    select DRV_GPIO if ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
+    select DRV_CLOCK if ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
+    select DRV_INTERRUPT if ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
 
 config DRV_UART_DMA
     bool "Enable DMA-backed UART API"
-    default y if DRV_UART && ARCH_CORTEX_M4
-    depends on DRV_UART
-    select DRV_DMA if ARCH_CORTEX_M4
+    default y if DRV_UART && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    depends on DRV_UART && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    select DRV_DMA
     help
       Compile the hal_uart_write_dma / init_dma_rx variants. Disable to
       drop the DMA backend from a DMA-enabled build (e.g. to save flash
       when DMA is only used by other drivers). Enabling this is what pulls
-      DRV_DMA in for the UART driver on Cortex-M4 — DRV_UART itself does
+      DRV_DMA in for the UART driver on Cortex-M4/M7 — DRV_UART itself does
       not require DMA.
 
 config DRV_I2C
@@ -117,18 +153,25 @@ config DRV_I2C
 
 config DRV_I2C_DMA
     bool "Enable DMA-backed I2C API"
-    default y if DRV_I2C && ARCH_CORTEX_M4
-    depends on DRV_I2C
-    select DRV_DMA if ARCH_CORTEX_M4
+    default y if DRV_I2C && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    depends on DRV_I2C && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    select DRV_DMA
     help
       Compile hal_i2c_read_regs_dma. Disable to drop the DMA backend
-      from a DMA-enabled I2C build.
+      from a DMA-enabled I2C build. On the F7 the read phase uses the
+      CR1.RXDMAEN request with AUTOEND framing.
 
 config DRV_SPI
     bool "Enable SPI Driver"
     default n
     select DRV_GPIO
     select DRV_TIMER
+
+config DRV_ADC
+    bool "Enable ADC Driver"
+    default n
+    select DRV_CLOCK
+    select DRV_GPIO
 
 config DRV_PWM
     bool "Enable PWM Driver"
@@ -138,7 +181,7 @@ config DRV_PWM
 
 config DRV_SDIO
     bool "Enable SDIO Driver"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     select DRV_CLOCK
     select DRV_GPIO
@@ -147,16 +190,94 @@ config DRV_SDIO
 
 config DRV_SDIO_DMA
     bool "Enable DMA-backed SDIO async API"
-    default y if DRV_SDIO && ARCH_CORTEX_M4
-    depends on DRV_SDIO
-    select DRV_DMA if ARCH_CORTEX_M4
+    default y if DRV_SDIO && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    depends on DRV_SDIO && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    select DRV_DMA
     help
       Compile the hal_sdio_*_async block-transfer variants. Disable to
       restrict SDIO to the polled (synchronous) API.
 
+      The F7 SDMMC IP is register-identical to the F4 SDIO and shares the
+      same driver, so the async path is available on both cores. DMA buffers
+      are coherent while the L1 D-cache is disabled (the current default);
+      when it is enabled they must be cleaned/invalidated or placed in DTCM
+      (NAVHAL_DTCM_NOINIT).
+
+config DRV_RTC
+    bool "Enable RTC Driver"
+    # F4 only: rtc.c includes family/rtc_reg.h and family/exti_reg.h, which
+    # exist under stm32f4 alone. The F7 RTC is near enough the same IP that the
+    # driver should port, but until those headers land, offering the symbol on
+    # M7 only buys a build that fails at the first include.
+    depends on FAMILY_STM32F4
+    default n
+    select DRV_CLOCK
+    select DRV_INTERRUPT
+    help
+      Compile the hal_rtc_* API: a calendar in the always-on backup domain that
+      keeps time across a reset, plus its 20 backup registers. Runs from the
+      board's 32.768 kHz crystal when there is one, otherwise the internal RC.
+
+config DRV_USB_CDC
+    bool "Enable USB CDC-ACM Device Driver"
+    depends on FAMILY_STM32F4
+    default n
+    select DRV_CLOCK
+    select DRV_GPIO
+    select DRV_INTERRUPT
+    help
+      Compile the hal_usb_cdc_* API: the target enumerates as a USB full-speed
+      virtual serial port (/dev/ttyACM0) on the OTG_FS peripheral. Requires the
+      RCC PLL Q output to be exactly 48 MHz; hal_usb_cdc_init() refuses to run
+      otherwise.
+
+config DRV_RESET
+    bool "Enable Reset Driver"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
+    default n
+    help
+      Compile the hal_reset_* API: reset the MCU, and read why it last reset
+      (power-on, pin, brown-out, software, watchdog). The cause flags are
+      sticky in hardware, so hal_reset_init() latches and clears them — call it
+      early. Pairs with DRV_WATCHDOG: the watchdog recovers the board, the
+      cause is how the next boot knows it had to.
+
+config DRV_WATCHDOG
+    bool "Enable Watchdog Driver"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
+    default n
+    help
+      Compile the hal_watchdog_* API: the independent watchdog (IWDG on STM32,
+      WDT on AVR), which runs from its own oscillator and so still fires when
+      the system clock has died. It cannot be stopped once started — that is
+      the point, and it is why nothing in the API offers a stop.
+
+config DRV_WWDG
+    bool "Enable Window Watchdog API"
+    depends on DRV_WATCHDOG && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)
+    default n
+    help
+      Compile the hal_wwdg_* variants on top of the watchdog driver. The window
+      watchdog treats an early kick as a fault too, so it catches a loop running
+      free that the independent watchdog is blind to. STM32 only: the ATmega328P
+      has one watchdog and no window on it.
+
 config DRV_FLASH
     bool "Enable Flash Driver"
     default n
+
+config DRV_ETH
+    bool "Enable Ethernet MAC Driver"
+    depends on ARCH_CORTEX_M7
+    default n
+    select DRV_CLOCK
+    select DRV_GPIO
+    select DRV_INTERRUPT
+    help
+      Compile the frame-level Ethernet MAC API (hal_eth_*). The MAC uses its
+      own dedicated DMA with descriptor rings, independent of DRV_DMA. RMII/MII
+      GPIOs and the PHY (MDIO) are brought up by the driver. Cortex-M7 only
+      (the STM32F767 ETH IP).
 
 endmenu
 

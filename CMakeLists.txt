@@ -91,7 +91,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # disagree: bumping one without the other is a release-process bug, not
 # something we want to silently build. This check runs on every configure,
 # including when NavHAL is consumed as a submodule.
-set(NAVHAL_VERSION 0.2.7) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
+set(NAVHAL_VERSION 0.3.2) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/navhal.h" _navhal_h)
 string(REGEX MATCH "#define[ \t]+VERSION_MAJOR[ \t]+([0-9]+)" _ "${_navhal_h}")
 set(_navhal_h_major "${CMAKE_MATCH_1}")
@@ -150,13 +150,75 @@ if(NOT EXISTS "${_NAVHAL_ARCH_FILE}")
 endif()
 include("${_NAVHAL_ARCH_FILE}")
 
-set(CMAKE_C_FLAGS "${ARCH_C_FLAGS} -Wall -std=c11")
-set(CMAKE_ASM_FLAGS "${ARCH_ASM_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${ARCH_LINK_FLAGS}")
+# Force-include the Kconfig-generated navhal_target.h into every C/C++ TU
+# (Linux `-include autoconf.h` style). This makes NAVHAL_CONFIG_* (and the
+# deprecated NAVHAL_HAS_* aliases) ambient, so drivers gate on them without any
+# #include and without the old navhal_port_config.h -> _*_ENABLED bridge.
+set(NAVHAL_FORCE_INCLUDE "-include ${GENERATED_NAVHAL_TARGET}")
+
+# ---- Build profiles -------------------------------------------------------
+# Three, selected with -DCMAKE_BUILD_TYPE=<name>:
+#
+#   Debug       -Og -g          debuggable without the size blow-up -O0 causes.
+#                               The default, and what the test and PIL tiers
+#                               run. -Og rather than -O0 because the AVR has
+#                               32 KB of flash and -O0 more than doubled the
+#                               image; -Og measured the same size as -Os on a
+#                               loop, while keeping the debug experience.
+#   Release     -Os -DNDEBUG    what ships. On an MCU the binding constraint
+#                               is flash, not instruction count, which is why
+#                               this is -Os and not CMake's usual -O3.
+#   ReleaseLTO  -Os -flto       Release plus link-time optimisation, which is
+#                               what collapses the driver vtable: the ops
+#                               tables are const and resolved at link time, so
+#                               every dispatch devirtualises into a direct
+#                               call and most inline away entirely.
+#
+# Requires -ffreestanding (set per arch) and src/utils/freestanding.c: above
+# -O0 GCC emits memcpy/memset for aggregate copies, and -nostdlib supplies no
+# libc to satisfy them.
+set(NAVHAL_BUILD_TYPES Debug Release ReleaseLTO)
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "NavHAL build profile" FORCE)
+endif()
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${NAVHAL_BUILD_TYPES})
+
+if(NOT CMAKE_BUILD_TYPE IN_LIST NAVHAL_BUILD_TYPES)
+    message(FATAL_ERROR
+        "Unknown CMAKE_BUILD_TYPE '${CMAKE_BUILD_TYPE}'. "
+        "NavHAL defines: ${NAVHAL_BUILD_TYPES}")
+endif()
+
+set(CMAKE_C_FLAGS_DEBUG          "-Og -g")
+set(CMAKE_C_FLAGS_RELEASE        "-Os -DNDEBUG")
+set(CMAKE_C_FLAGS_RELEASELTO     "-Os -flto -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG        "${CMAKE_C_FLAGS_DEBUG}")
+set(CMAKE_CXX_FLAGS_RELEASE      "${CMAKE_C_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_RELEASELTO   "${CMAKE_C_FLAGS_RELEASELTO}")
+set(CMAKE_ASM_FLAGS_DEBUG        "-g")
+set(CMAKE_ASM_FLAGS_RELEASE      "")
+set(CMAKE_ASM_FLAGS_RELEASELTO   "")
+# The link step needs -flto too, and the optimisation level with it: GCC runs
+# the whole-program passes at link time, so omitting it there silently gives
+# an -O0 final image.
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG        "")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE      "")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASELTO   "-Os -flto")
+
+message(STATUS "NavHAL build profile: ${CMAKE_BUILD_TYPE}")
+
+# Append rather than assign: these are added to whatever the caller passed on
+# the command line, so -DCMAKE_C_FLAGS=... survives instead of being silently
+# discarded. CMake puts the per-build-type flags after these, so a build type
+# still decides the optimisation level.
+string(APPEND CMAKE_C_FLAGS " ${ARCH_C_FLAGS} -Wall -std=c11 ${NAVHAL_FORCE_INCLUDE}")
+string(APPEND CMAKE_ASM_FLAGS " ${ARCH_ASM_FLAGS}")
+string(APPEND CMAKE_EXE_LINKER_FLAGS " ${ARCH_LINK_FLAGS}")
 # C++ shares the arch flags; a C++ TU only appears in the C++ sample, which
 # does enable_language(CXX). Bare-metal: no exceptions / RTTI / cxa-atexit.
-set(CMAKE_CXX_FLAGS
-    "${ARCH_C_FLAGS} -Wall -std=c++17 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics")
+string(APPEND CMAKE_CXX_FLAGS
+    " ${ARCH_C_FLAGS} -Wall -std=c++17 -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics ${NAVHAL_FORCE_INCLUDE}")
 # subdirectories are commented, they will be added as code is added
 if(NOT STANDALONE)
 add_subdirectory(${SRC_DIR})
@@ -217,12 +279,25 @@ add_custom_target(copy_compile_commands ALL
         ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-# Startup file (arch layer). The Cortex-M port ships an explicit startup.s;
-# the AVR port relies on the avr-libc C runtime and has none.
+# Startup file. The vector table names this MCU's peripherals, so it is a
+# family property and lives beside the family's register maps; a board may
+# override it for board-level vectoring. The AVR port relies on the avr-libc
+# C runtime and has none.
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
     set(STARTUP_FILE "")
-else()
+elseif(EXISTS "${SRC_BOARD}/startup.s")
+    set(STARTUP_FILE "${SRC_BOARD}/startup.s")
+elseif(EXISTS "${INCLUDE_FAMILY}/../startup.s")
+    set(STARTUP_FILE "${INCLUDE_FAMILY}/../startup.s")
+elseif(EXISTS "${SRC_ARCH}/startup/startup.s")
+    # Correct for an arch whose entry really is architectural: x86-64 builds
+    # its IDT at runtime rather than shipping a static table.
     set(STARTUP_FILE "${SRC_ARCH}/startup/startup.s")
+else()
+    message(FATAL_ERROR
+        "No startup.s for ${VENDOR}/${FAMILY}. The vector table names this "
+        "MCU's peripherals, so a port supplies its own: add "
+        "src/vendor/${VENDOR}/family/${FAMILY}/startup.s")
 endif()
 # Export path to parent project if included via add_subdirectory()
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
@@ -255,12 +330,43 @@ if(TEST)
   file(GLOB          TEST_ARCH_SRC      ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/*.c)
   set(TEST_SRC ${TEST_FRAMEWORK_SRC} ${TEST_PORTABLE_SRC} ${TEST_CAP_SRC} ${TEST_ARCH_SRC})
 
+  # The test ELF exercises every driver on the arch, so it globs all backend
+  # sources regardless of CONFIG_DRV_* (the gating only shapes firmware
+  # builds). The M9 shared public layers (src/common/hal_*.c) are part of the
+  # same HAL surface, so glob them here too — they are excluded from the
+  # `common` OBJECT library under TEST (see src/CMakeLists.txt) to avoid a
+  # double definition. Capability-gated single-arch layers self-omit via their
+  # NAVHAL_HAS_* guard when the backend is absent on this arch.
   file(GLOB_RECURSE HAL_SRC
     ${SRC_VENDOR}/*.c
     ${SRC_ARCH}/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/common/hal_*.c
   )
+  # The TEST build globs ALL vendor sources regardless of Kconfig, so the STM32
+  # tree contributes both the F4 uart.c and the F7 uart_f7.c — which define the
+  # same hal_uart_* symbols and each only compiles against its own family's
+  # register layout. Keep exactly the one matching the target family.
+  if(CONFIG_FAMILY_STM32F7)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/uart/uart.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/clock/clock.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/spi/spi.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/i2c/i2c.c)
+  else()
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/uart/uart_f7.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/clock/clock_f7.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/spi/spi_f7.c)
+    list(REMOVE_ITEM HAL_SRC ${SRC_VENDOR}/i2c/i2c_f7.c)
+  endif()
   message("Files: ${HAL_SRC}")
   add_compile_definitions(UNITY_OUTPUT_COLOR TEST)
+  # Per-processor identity for the arch-generic test harness (tests/main.c,
+  # navtest_target.h). cortex-m4 and cortex-m7 share the ISA but differ in
+  # white-box register tests and console UART instance.
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m4")
+    add_compile_definitions(NAVTEST_ARCH_CORTEX_M4)
+  elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "cortex-m7")
+    add_compile_definitions(NAVTEST_ARCH_CORTEX_M7)
+  endif()
   add_executable(tests ${TEST_SRC} ${STARTUP_FILE})
 
   # Per-arch test linker + flags. NAVHAL_TEST_LINKER_FLAGS,

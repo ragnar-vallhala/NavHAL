@@ -1,0 +1,8 @@
+# vim: ft=kconfig
+# Device-family choice entry for the PC platform. x86 peripherals are
+# ISA-standard (16550/8254/8259), not chipset-specific, so a single "pc"
+# family covers them. Sourced inside the root "Vendor Device Family" choice.
+
+config FAMILY_PC
+    bool "PC (standard peripherals)"
+    depends on VENDOR_PC

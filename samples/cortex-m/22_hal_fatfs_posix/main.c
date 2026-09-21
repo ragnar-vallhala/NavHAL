@@ -22,7 +22,6 @@
 
 #include "navhal_port_timer.h"
 #include <stdint.h>
-#define CORTEX_M4
 #include "navhal.h"
 #include "utils/util.h"
 #include "utils/v_fs.h"
@@ -36,7 +35,8 @@ int main(void) {
                               .pll_q = 7};
   hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
-  hal_clock_init(&clk_cfg, &pll_cfg);
+  clk_cfg.pll = pll_cfg;
+  hal_clock_init(&clk_cfg);
   hal_timebase_init(1000);
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=115200});
 
@@ -114,7 +114,7 @@ int main(void) {
       ;
   }
 
-  uint8_t read_buf[1024 * 6] __attribute__((aligned(4)));
+  uint8_t read_buf[1024 * 6] NAVHAL_DMA_ALIGN; /* cache-line aligned for SDIO DMA */
   hal_memset(read_buf, 0, sizeof(read_buf));
   int read_bytes = v_read(fd, read_buf, 1024 * 6);
   if (read_bytes > 0) {

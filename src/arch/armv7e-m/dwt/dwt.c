@@ -26,7 +26,7 @@
  */
 
 #include "navhal_port_config.h"
-#ifdef _DWT_ENABLED
+#if NAVHAL_CONFIG_DRV_DWT
 
 #include "navhal_port_clock.h"
 #include "navhal_port_dwt.h"
@@ -40,13 +40,19 @@ hal_status_t hal_cycle_counter_init(void) {
   // 1. Enable CoreDebug TRCENA
   CoreDebug->DEMCR |= CORE_DEBUG_DEMCR_TRCENA_BIT;
 
-  // 2. Clear cycle counter
+  // 2. Unlock the DWT. The Cortex-M7 DWT ships with its CoreSight software
+  //    lock engaged, which silently drops the CYCCNTENA write below, so the
+  //    counter never runs without this. The M4 DWT has no lock — the write is
+  //    a no-op there — so the sequence is identical for both cores.
+  DWT_LAR = DWT_LAR_UNLOCK_KEY;
+
+  // 3. Clear cycle counter
   DWT->CYCCNT = 0;
 
-  // 3. Enable CYCCNTENA
+  // 4. Enable CYCCNTENA
   DWT->CTRL |= DWT_CTRL_CYCCNTENA_BIT;
 
-  // 4. Cache cycles-per-microsecond. hal_clock_init must run before this.
+  // 5. Cache cycles-per-microsecond. hal_clock_init must run before this.
   uint32_t hz = hal_clock_get_sysclk();
   _cycles_per_us = hz / 1000000U;
   if (_cycles_per_us == 0) {
@@ -79,4 +85,4 @@ void hal_cycle_counter_delay_us(uint32_t us) {
   hal_cycle_counter_delay(us * _cycles_per_us);
 }
 
-#endif /* _DWT_ENABLED */
+#endif /* NAVHAL_CONFIG_DRV_DWT */

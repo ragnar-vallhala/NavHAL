@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Board identity string for the ACME devkit.
+
+config BOARD
+    string
+    default "acme_devkit" if BOARD_ACME_DEVKIT

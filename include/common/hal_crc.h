@@ -22,7 +22,7 @@
  * @details
  * Standardized CRC API (see @c docs/api_standardization.md). On the Cortex-M4
  * port this is backed either by the STM32F4 hardware CRC unit (when
- * @c _CRC_HW_ENABLED is defined) or by a software fallback — the API is
+ * @c NAVHAL_CONFIG_DRV_CRC is defined) or by a software fallback — the API is
  * identical in both cases.
  *
  * ### Typical usage
@@ -106,7 +106,9 @@ hal_status_t hal_crc_reset(void);
 
 /* Port-specific bits (currently none for CRC; header retained for the
  * existing @c #include "navhal_port_crc.h" path). */
+#if NAVHAL_CONFIG_DRV_CRC
 #include "navhal_port_crc.h"
+#endif
 
 
 /** @} */ /* end of group HAL_CRC */

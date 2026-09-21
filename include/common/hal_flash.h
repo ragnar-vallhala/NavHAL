@@ -113,7 +113,9 @@ typedef hal_status_t FlashStatus_t NAVHAL_DEPRECATED("use hal_status_t");
 #endif
 
 /* Port-specific bits (compat shim with deprecated function names). */
+#if NAVHAL_CONFIG_DRV_FLASH
 #include "navhal_port_flash.h"
+#endif
 
 
 /** @} */ /* end of group HAL_FLASH */

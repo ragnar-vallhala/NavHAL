@@ -18,12 +18,11 @@ endif()
 if(CONFIG_DRV_CLOCK)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
 endif()
+if(CONFIG_DRV_TIMEBASE)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/timebase/timebase.c)
+endif()
 if(CONFIG_DRV_TIMER)
-    # The ATmega328P timebase is Timer0-backed (a vendor peripheral, unlike
-    # the Cortex-M SysTick); the general-purpose timer driver uses Timer1
-    # and Timer2.
     list(APPEND HAL_SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/timebase/timebase.c
         ${CMAKE_CURRENT_SOURCE_DIR}/timer/timer.c
     )
 endif()
@@ -38,6 +37,15 @@ if(CONFIG_DRV_I2C)
 endif()
 if(CONFIG_DRV_SPI)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/spi/spi.c)
+endif()
+if(CONFIG_DRV_ADC)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/adc/adc.c)
+endif()
+if(CONFIG_DRV_RESET)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/reset/reset.c)
+endif()
+if(CONFIG_DRV_WATCHDOG)
+    list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/watchdog/watchdog.c)
 endif()
 if(CONFIG_DRV_CRC)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/crc/crc.c)

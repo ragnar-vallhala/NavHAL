@@ -14,16 +14,21 @@
 config CMAKE_SYSTEM_PROCESSOR
     string
     default "cortex-m4" if ARCH_CORTEX_M4
+    default "cortex-m7" if ARCH_CORTEX_M7
 
 config ARCH_ISA
     string
     default "armv7e-m" if ARCH_CORTEX_M4
+    default "armv7e-m" if ARCH_CORTEX_M7
 
 config TOOLCHAIN_PREFIX
     default "arm-none-eabi-" if ARCH_CORTEX_M4
+    default "arm-none-eabi-" if ARCH_CORTEX_M7
 
 config FLASHER
     default "st-flash" if ARCH_CORTEX_M4
+    default "st-flash" if ARCH_CORTEX_M7
 
 config FLASH_ADDRESS
     default "0x8000000" if ARCH_CORTEX_M4
+    default "0x8000000" if ARCH_CORTEX_M7

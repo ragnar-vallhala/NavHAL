@@ -9,14 +9,14 @@
 
 config USE_FPU
     bool "Enable Hardware FPU Compiler Flags"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     help
       Enable hardware Floating Point Unit compiler and linker flags.
 
 config DRV_DMA
     bool "Enable Direct Memory Access (DMA)"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     select DRV_INTERRUPT
     help
@@ -24,14 +24,45 @@ config DRV_DMA
 
 config DRV_DWT
     bool "Enable Debug Watchpoint and Trace (DWT)"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     help
       Enables the DWT counter for high-resolution timing.
 
 config DRV_FPU
     bool "Enable FPU Driver Extension"
-    depends on ARCH_CORTEX_M4
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
     default n
     help
       Enables compilation of hardware FPU runtime setup files.
+
+config DRV_MPU
+    bool "Enable Memory Protection Unit (MPU)"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    default n
+    help
+      Enables the ARMv7-M Memory Protection Unit driver (region-based
+      access control). Region count is silicon-dependent (8 on M4,
+      16 on M7) and read at runtime from MPU_TYPE.DREGION.
+
+config DRV_CACHE
+    bool "Enable L1 cache driver (Cortex-M7)"
+    depends on ARCH_CORTEX_M7
+    default n
+    help
+      Enables the hal_cache driver for the Cortex-M7 L1 caches: the
+      instruction cache (hal_icache_enable, a hazard-free performance win) and
+      the data cache (hal_dcache_enable plus the clean/invalidate maintenance
+      the DMA drivers use to stay coherent). The Cortex-M4 has no L1 cache, so
+      this option is not offered there.
+
+config USE_TCM
+    bool "Enable tightly-coupled memory placement (Cortex-M7)"
+    depends on ARCH_CORTEX_M7
+    default n
+    help
+      Activates the NAVHAL_ITCM / NAVHAL_DTCM / NAVHAL_DTCM_NOINIT placement
+      attributes (common/hal_tcm.h), letting code and data be pinned into the
+      Cortex-M7's 0-wait instruction/data TCMs. The board startup copies the
+      .itcm / .dtcm sections from flash at reset. M4 has no TCM, so this option
+      is not offered there; with it off, the attributes are no-ops.

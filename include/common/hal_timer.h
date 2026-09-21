@@ -149,7 +149,25 @@ hal_status_t hal_timer_disable_channel(hal_timer_t timer, uint32_t channel);
 /** @brief Get a timer's current base frequency in Hz. */
 uint32_t hal_timer_get_frequency(hal_timer_t timer);
 /** @brief Set a timer's prescaler (PSC). */
+/**
+ * @brief Set a timer's prescaler.
+ * @deprecated The argument means different things per port -- the STM32 PSC
+ *             register value, so a divider of prescaler+1, but a divider
+ *             snapped to the nearest achievable value on AVR. Use
+ *             ::hal_timer_set_divider, which is divide-by-N everywhere.
+ */
 hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler);
+
+/**
+ * @brief Set a timer's effective clock divider.
+ *
+ * Divide-by-N on every port. A port whose hardware offers only a fixed set of
+ * dividers uses the closest one it has.
+ *
+ * @param timer   Timer identifier.
+ * @param divider Clock divider; must be non-zero.
+ */
+hal_status_t hal_timer_set_divider(hal_timer_t timer, uint32_t divider);
 /** @brief Set a timer's auto-reload (ARR). */
 hal_status_t hal_timer_set_auto_reload(hal_timer_t timer,
                                        uint32_t auto_reload);
@@ -161,7 +179,9 @@ uint32_t hal_timer_get_auto_reload(hal_timer_t timer);
 #endif
 
 /* Port-specific bits: SysTick / RCC register defines, vector-table entries. */
+#if NAVHAL_CONFIG_DRV_TIMER
 #include "navhal_port_timer.h"
+#endif
 
 
 /** @} */ /* end of group HAL_TIMER */

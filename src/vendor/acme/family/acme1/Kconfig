@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Family identity string for ACME1.
+
+config FAMILY
+    string
+    default "acme1" if FAMILY_ACME1

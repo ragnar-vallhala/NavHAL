@@ -1,0 +1,1014 @@
+#!/usr/bin/env python3
+# Copyright (C) 2025 NAVRobotec Pvt Ltd
+# Author: Ragnar Vallhala
+# SPDX-License-Identifier: Apache-2.0
+#
+# ntest — the NavHAL test orchestrator.
+#
+# One entry point over every test tier so you don't juggle a dozen scripts:
+#
+#     ntest host                 SIL — host unit + real-driver-on-host suites
+#     ntest pil   <board|--all>  PIL — build + run in the emulator (Renode/simavr)
+#     ntest hil   <board|--all>  HIL — build + flash + capture a real board
+#     ntest samples <arch|--all> build every sample the arch admits
+#     ntest cap-contract         link-time capability symbol contract
+#     ntest coverage [--gate]    host gcov/gcovr line coverage (+ optional floor)
+#     ntest all [--hil]          everything runnable here
+#     ntest list                 the catalog (boards, host suites, arches)
+#     ntest                      interactive TUI (a TTY) / `all` (piped)
+#
+# It reads the existing board registry (tools/{hil,pil}/boards/*.conf), owns the
+# single `cmake -DTEST=ON` recipe and the one `Total failures:` parser, and
+# shells to the emulator backends (tools/renode, tools/simavr) and st-flash.
+# Zero third-party deps except pyserial (only for `hil`, only when a board is
+# attached) and gcovr (only for `coverage`).
+
+import argparse
+import os
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+HIL_BOARDS = os.path.join(REPO, "tools", "hil", "boards")
+PIL_BOARDS = os.path.join(REPO, "tools", "pil", "boards")
+
+# Per top-level src/ area floor (%). --gate fails if a covered area drops below.
+COVERAGE_FLOORS = {}  # e.g. {"src/vendor/stm32": 60.0}; empty = report only.
+
+# ----------------------------------------------------------------------------
+# tiny terminal colour
+# ----------------------------------------------------------------------------
+_TTY = sys.stdout.isatty()
+
+
+def c(s, col):
+    if not _TTY:
+        return s
+    codes = {"g": 32, "r": 31, "y": 33, "b": 34, "d": 2, "bold": 1}
+    return f"\033[{codes[col]}m{s}\033[0m"
+
+
+def hdr(s):
+    print(c(f"\n== {s} ==", "bold"))
+
+
+def die(msg, code=2):
+    sys.stderr.write(f"ntest: {msg}\n")
+    sys.exit(code)
+
+
+def run(cmd, **kw):
+    """Run a command, streaming to our stdout. Returns the CompletedProcess."""
+    kw.setdefault("cwd", REPO)
+    return subprocess.run(cmd, **kw)
+
+
+def run_cap(cmd, timeout=None, **kw):
+    """Run capturing combined output; returns (rc, text)."""
+    kw.setdefault("cwd", REPO)
+    try:
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                           timeout=timeout, **kw)
+        return p.returncode, p.stdout.decode(errors="replace")
+    except subprocess.TimeoutExpired as e:
+        out = (e.stdout or b"").decode(errors="replace")
+        return 124, out
+
+
+# ----------------------------------------------------------------------------
+# board registry — merge tools/{hil,pil}/boards/*.conf into one view
+# ----------------------------------------------------------------------------
+def _parse_conf(path):
+    """Parse a KEY=VALUE shell conf (quotes stripped) into a dict."""
+    d = {}
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, _, v = line.partition("=")
+            k = k.strip()
+            v = v.strip()
+            if len(v) >= 2 and v[0] in "\"'" and v[-1] == v[0]:
+                v = v[1:-1]
+            d[k] = v
+    return d
+
+
+def registry():
+    """{board: {"hil": {...} or None, "pil": {...} or None}}"""
+    reg = {}
+    for mode, d in (("hil", HIL_BOARDS), ("pil", PIL_BOARDS)):
+        if not os.path.isdir(d):
+            continue
+        for fn in sorted(os.listdir(d)):
+            if not fn.endswith(".conf"):
+                continue
+            board = fn[:-5]
+            reg.setdefault(board, {"hil": None, "pil": None})
+            reg[board][mode] = _parse_conf(os.path.join(d, fn))
+    return reg
+
+
+def boards_for(mode):
+    return [b for b, m in sorted(registry().items()) if m.get(mode)]
+
+
+# ----------------------------------------------------------------------------
+# config resolver — seed .config = DEFCONFIG + extra caps, restore after
+# ----------------------------------------------------------------------------
+class ConfigScope:
+    """Stash .config, write DEFCONFIG + TEST_EXTRA_CONFIG, restore on exit.
+
+    defconfig may be None (e.g. the AVR PIL conf carries none): then we leave
+    .config absent so the top-level CMake seeds it from the toolchain's
+    NAVHAL_DEFCONFIG. Either way any pre-existing .config is stashed on the way
+    in and restored on the way out — so a stale .config from an earlier run can
+    never leak into this build."""
+
+    def __init__(self, defconfig, extra=""):
+        self.defconfig = os.path.join(REPO, defconfig) if defconfig else None
+        self.extra = extra
+        self.saved = None
+        self.dotcfg = os.path.join(REPO, ".config")
+
+    def __enter__(self):
+        if os.path.exists(self.dotcfg):
+            self.saved = tempfile.mktemp()
+            shutil.move(self.dotcfg, self.saved)
+        if self.defconfig:
+            with open(self.defconfig) as f:
+                body = f.read()
+            for kv in self.extra.split():
+                body += kv + "\n"
+            with open(self.dotcfg, "w") as f:
+                f.write(body)
+        elif self.extra:
+            # no base defconfig but caps requested: write just the caps (rare)
+            with open(self.dotcfg, "w") as f:
+                f.write("".join(kv + "\n" for kv in self.extra.split()))
+        # else: leave .config absent -> CMake seeds from the toolchain defconfig
+        return self
+
+    def __exit__(self, *exc):
+        if self.saved and os.path.exists(self.saved):
+            shutil.move(self.saved, self.dotcfg)
+        elif os.path.exists(self.dotcfg):
+            os.remove(self.dotcfg)
+
+
+# ----------------------------------------------------------------------------
+# the one build recipe
+# ----------------------------------------------------------------------------
+def build_test_elf(build_dir, toolchain, quiet=True):
+    """cmake -DTEST=ON [toolchain] && cmake --build --target tests. .config must
+    already be seeded by a ConfigScope. Returns (ok, build_path)."""
+    bp = os.path.join(REPO, build_dir)
+    shutil.rmtree(bp, ignore_errors=True)
+    cfg = ["cmake", "-B", build_dir, "-DTEST=ON"]
+    if toolchain:
+        cfg.append(f"-DCMAKE_TOOLCHAIN_FILE={toolchain}")
+    out = subprocess.DEVNULL if quiet else None
+    if run(cfg, stdout=out, stderr=out).returncode != 0:
+        return False, bp
+    if run(["cmake", "--build", build_dir, "--target", "tests", "-j"],
+           stdout=out, stderr=out).returncode != 0:
+        return False, bp
+    return True, bp
+
+
+# ----------------------------------------------------------------------------
+# navtest output parser (the single source of truth for pass/fail)
+# ----------------------------------------------------------------------------
+_SUM_FAIL = re.compile(r"Total failures:\s*(\d+)")
+_SUM_TOT = re.compile(r"Total tests run:\s*(\d+)")
+_SUITE = re.compile(r"\[(\d+) tests \| (\d+) failed \| (\d+) passed\]")
+
+
+def parse_navtest(text):
+    """-> (found_summary, total, failures). failures=None if no summary line."""
+    mf = _SUM_FAIL.search(text)
+    mt = _SUM_TOT.search(text)
+    if not mf:
+        # host binaries have no 'Total failures' line; fall back to suite lines
+        tot = fail = 0
+        seen = False
+        for m in _SUITE.finditer(text):
+            seen = True
+            tot += int(m.group(1))
+            fail += int(m.group(2))
+        return seen, tot, (fail if seen else None)
+    return True, (int(mt.group(1)) if mt else 0), int(mf.group(1))
+
+
+# ----------------------------------------------------------------------------
+# result model + summary table
+# ----------------------------------------------------------------------------
+class Result:
+    def __init__(self, name, ok, total=None, failed=None, note=""):
+        self.name, self.ok, self.total, self.failed, self.note = \
+            name, ok, total, failed, note
+
+
+def summary(results):
+    print(c("\n== summary ==", "bold"))
+    w = max((len(r.name) for r in results), default=8)
+    anyfail = False
+    for r in results:
+        if r.ok:
+            tag = c("PASS", "g")
+        else:
+            tag = c("FAIL", "r")
+            anyfail = True
+        cnt = ""
+        if r.total is not None:
+            cnt = f"{r.total - (r.failed or 0)}/{r.total}"
+        print(f"  {r.name.ljust(w)}  {tag}  {cnt.ljust(9)} {c(r.note, 'd')}")
+    return not anyfail
+
+
+# ============================================================================
+# RUNNERS
+# ============================================================================
+def run_host(args):
+    """SIL: build + run tests_host and tests_host_drivers."""
+    hdr("host / SIL")
+    bp = os.path.join(REPO, "build-host")
+    shutil.rmtree(bp, ignore_errors=True)
+    if run(["cmake", "-B", "build-host", "-S", "tests/host"],
+           stdout=subprocess.DEVNULL).returncode != 0:
+        return [Result("host", False, note="configure failed")]
+    if run(["cmake", "--build", "build-host", "-j"],
+           stdout=subprocess.DEVNULL).returncode != 0:
+        return [Result("host", False, note="build failed")]
+    results = []
+    exes = ["tests_host", "tests_host_drivers"]
+    if getattr(args, "logic_only", False):
+        exes = ["tests_host"]
+    if getattr(args, "drivers_only", False):
+        exes = ["tests_host_drivers"]
+    for exe in exes:
+        path = os.path.join(bp, exe)
+        if not os.path.exists(path):
+            results.append(Result(exe, False, note="not built"))
+            continue
+        rc, out = run_cap([path])
+        sys.stdout.write(out)
+        _, tot, fail = parse_navtest(out)
+        fail = fail if fail is not None else (0 if rc == 0 else rc)
+        results.append(Result(exe, rc == 0 and fail == 0, tot, fail))
+    return results
+
+
+def _emu_backend(board, conf):
+    """Build the test ELF for a PIL board and run it via its RUNNER, return Result."""
+    tc = conf.get("TOOLCHAIN_FILE")
+    bd = conf.get("BUILD_DIR", f"build-pil-{board}")
+    runner = conf.get("RUNNER")
+    if not (tc and runner):
+        return Result(f"pil:{board}", False, note="conf missing TOOLCHAIN_FILE/RUNNER")
+    print(c(f"-- pil:{board} — build ({conf.get('ARCH','?')})", "d"))
+    with ConfigScope(conf.get("DEFCONFIG"), conf.get("TEST_EXTRA_CONFIG", "")):
+        ok, bp = build_test_elf(bd, tc)
+    if not ok:
+        return Result(f"pil:{board}", False, note="build failed")
+    elf = os.path.join(bp, "tests")
+    env = dict(os.environ)
+    if conf.get("RESC"):
+        env["RESC"] = conf["RESC"]
+    print(c(f"-- pil:{board} — {os.path.basename(runner)}", "d"))
+    rc, out = run_cap([os.path.join(REPO, runner), elf], timeout=300, env=env)
+    _, tot, fail = parse_navtest(out)
+    if fail is None:
+        return Result(f"pil:{board}", False, note="no summary (emu timeout?)")
+    return Result(f"pil:{board}", fail == 0, tot, fail)
+
+
+def run_pil(args):
+    hdr("pil / emulator")
+    reg = registry()
+    targets = boards_for("pil") if (args.all or args.board in (None, "all")) else [args.board]
+    if not targets:
+        die("no PIL boards")
+    out = []
+    for b in targets:
+        conf = reg.get(b, {}).get("pil")
+        if not conf:
+            out.append(Result(f"pil:{b}", False, note="no pil conf"))
+            continue
+        out.append(_emu_backend(b, conf))
+    return out
+
+
+# --- HIL: chip-id probe + flash + serial capture ---------------------------
+def _st_probe(chipid):
+    """Return (stlink_serial, ttyACM_port) for a connected probe whose target
+    matches chipid, or (None, None)."""
+    rc, out = run_cap(["st-info", "--probe"])
+    if rc != 0:
+        return None, None
+    serial = None
+    cur = None
+    for line in out.splitlines():
+        line = line.strip()
+        if line.startswith("serial:"):
+            cur = line.split()[1]
+        elif line.startswith("chipid:") and cur:
+            if line.split()[1].lower() == chipid.lower():
+                serial = cur
+                break
+    if not serial:
+        return None, None
+    for p in sorted(_glob_ttyacm()):
+        rc, info = run_cap(["udevadm", "info", "-q", "property", "-n", p])
+        for line in info.splitlines():
+            if line.startswith("ID_SERIAL_SHORT=") and line.split("=", 1)[1] == serial:
+                return serial, p
+    return serial, None
+
+
+def _glob_ttyacm():
+    import glob
+    return glob.glob("/dev/ttyACM*")
+
+
+def _port_vid(port):
+    """USB idVendor of a tty (lowercase hex), or '' — how we fingerprint an AVR
+    board's USB-serial bridge, the AVR analogue of an ST-Link chip-id."""
+    rc, info = run_cap(["udevadm", "info", "-q", "property", "-n", port])
+    for line in info.splitlines():
+        if line.startswith("ID_VENDOR_ID="):
+            return line.split("=", 1)[1].strip().lower()
+    return ""
+
+
+def _find_usb_serial(vids):
+    """First /dev/ttyUSB*|ttyACM* whose USB idVendor is in `vids`, or None."""
+    import glob
+    want = {v.strip().lower() for v in vids if v.strip()}
+    for p in sorted(glob.glob("/dev/ttyUSB*") + glob.glob("/dev/ttyACM*")):
+        if _port_vid(p) in want:
+            return p
+    return None
+
+
+def _serial_capture(port, baud, timeout_s, reset_dtr=False):
+    """Read until 'Total failures: N'; stream to stdout. -> (text, failures|None)."""
+    try:
+        import serial
+    except ImportError:
+        die("pyserial not installed (apt install python3-serial)", 2)
+    ser = serial.Serial(port, baud, timeout=1)
+    if reset_dtr:
+        # Arduino-style auto-reset: pulse DTR so the just-flashed program
+        # restarts from main() while we're already listening.
+        ser.dtr = False
+        time.sleep(0.1)
+        ser.reset_input_buffer()
+        ser.dtr = True
+    deadline = time.time() + timeout_s
+    buf = b""
+    rx = re.compile(rb"Total failures:\s*(\d+)")
+    while time.time() < deadline:
+        chunk = ser.read(1024)
+        if not chunk:
+            continue
+        sys.stdout.buffer.write(chunk)
+        sys.stdout.flush()
+        buf += chunk
+        m = rx.search(buf)
+        if m:
+            ser.close()
+            txt = buf.decode(errors="replace")
+            mt = re.search(r"Total tests run:\s*(\d+)", txt)
+            return txt, int(m.group(1)), (int(mt.group(1)) if mt else None)
+    ser.close()
+    return buf.decode(errors="replace"), None, None
+
+
+# OpenOCD prints this to gdb's console on every breakpoint stop, interleaved
+# with the target's own output. It would otherwise land between a label and the
+# number that follows it and break the totals regexes below.
+_OCD_NOISE = re.compile(r"halted: PC: 0x[0-9a-f]+\n?")
+
+
+def _swd_capture(elf, ocd_args, timeout_s):
+    """Run the test ELF with no serial console: flash and drive it over SWD,
+    reading the console strings out of the target as it prints them.
+
+    A board whose debug probe has no virtual COM port (a bare ST-Link/V2, or a
+    custom board that never routed its console UART) still has to be testable.
+    Breaking on hal_uart_write_string and printing the argument reconstructs the
+    same transcript the wire would have carried. -> (text, failures|None, total).
+    """
+    ocd = subprocess.Popen(["openocd"] + shlex.split(ocd_args),
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    script = None
+    try:
+        with tempfile.NamedTemporaryFile("w", suffix=".gdb", delete=False) as f:
+            script = f.name
+            f.write(
+                "set confirm off\n"
+                "set pagination off\n"
+                "set print elements 0\n"
+                "target extended-remote localhost:3333\n"
+                "monitor reset halt\n"
+                "load\n"
+                "monitor reset halt\n"
+                # navhal_post_main runs once main() returns, so it is where the
+                # suite is over and the totals have already been printed.
+                "break navhal_post_main\n"
+                "break hal_uart_write_string\n"
+                "commands 2\n"
+                "  silent\n"
+                '  printf "%s", s\n'
+                "  continue\n"
+                "end\n"
+                "continue\n"
+                "monitor reset halt\n"
+                "detach\n"
+                "quit\n")
+        try:
+            out = subprocess.run(["gdb-multiarch", "-batch", "-x", script, elf],
+                                 cwd=REPO, capture_output=True, text=True,
+                                 timeout=timeout_s).stdout
+        except subprocess.TimeoutExpired:
+            return "", None, None
+    finally:
+        ocd.terminate()
+        if script:
+            os.unlink(script)
+    txt = _OCD_NOISE.sub("", out)
+    sys.stdout.write(txt)
+    m = re.search(r"Total failures:\s*(\d+)", txt)
+    if not m:
+        return txt, None, None
+    mt = re.search(r"Total tests run:\s*(\d+)", txt)
+    return txt, int(m.group(1)), (int(mt.group(1)) if mt else None)
+
+
+def _hil_one(board, conf):
+    """Route to the ST-Link (ARM) or avrdude (AVR) flow by the board's ARCH."""
+    if conf.get("ARCH", "").lower().startswith("avr"):
+        return _hil_avr(board, conf)
+    return _hil_arm(board, conf)
+
+
+def _hil_avr(board, conf):
+    """AVR HIL: match the board by USB vendor id, flash with avrdude, capture."""
+    tc = conf.get("TOOLCHAIN_FILE")
+    bd = conf.get("BUILD_DIR", f"build-hil-{board}")
+    mcu = conf.get("MCU", "atmega328p")
+    prog = conf.get("PROGRAMMER", "arduino")
+    # CH340 (1a86) / FT232 (0403) / official Uno (2341) are the usual bridges.
+    vids = conf.get("USB_VID", "1a86,0403,2341").split(",")
+    if not tc:
+        return Result(f"hil:{board}", False, note="conf missing TOOLCHAIN_FILE")
+    port = conf["PORT"] if conf.get("PORT") and os.path.exists(conf.get("PORT", "")) \
+        else _find_usb_serial(vids)
+    if not port:
+        return Result(f"hil:{board}", True, note=c("SKIP no board", "y"))  # honest skip
+    print(c(f"-- hil:{board} — avr on {port} — build", "d"))
+    with ConfigScope(conf.get("DEFCONFIG"), conf.get("TEST_EXTRA_CONFIG", "")):
+        ok, bp = build_test_elf(bd, tc)
+    if not ok:
+        return Result(f"hil:{board}", False, note="build failed")
+    elf = os.path.join(bp, "tests")
+    hexp = elf + ".hex"
+    if run(["avr-objcopy", "-O", "ihex", elf, hexp],
+           stdout=subprocess.DEVNULL).returncode != 0:
+        return Result(f"hil:{board}", False, note="objcopy failed")
+    ubaud = conf.get("UPLOAD_BAUD", "115200")
+    print(c(f"-- hil:{board} — avrdude -c {prog} -p {mcu} @ {ubaud}", "d"))
+    flash = ["avrdude", "-c", prog, "-p", mcu, "-P", port, "-b", ubaud,
+             "-D", "-U", f"flash:w:{hexp}:i"]
+    if run(flash, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0:
+        return Result(f"hil:{board}", False, note="avrdude flash failed")
+    baud = int(conf.get("BAUD", "9600"))
+    to = int(conf.get("TIMEOUT", "60"))
+    print(c(f"-- hil:{board} — capture {port} @ {baud}", "d"))
+    _, fail, tot = _serial_capture(port, baud, to, reset_dtr=True)
+    if fail is None:
+        return Result(f"hil:{board}", False, note="capture timeout")
+    return Result(f"hil:{board}", fail == 0, total=tot, failed=fail)
+
+
+def _hil_arm(board, conf):
+    chipid = conf.get("CHIPID")
+    tc = conf.get("TOOLCHAIN_FILE")
+    bd = conf.get("BUILD_DIR", f"build-hil-{board}")
+    if not (chipid and tc and conf.get("DEFCONFIG")):
+        return Result(f"hil:{board}", False, note="conf missing CHIPID/TOOLCHAIN/DEFCONFIG")
+    swd = conf.get("CONSOLE", "").lower() == "swd"
+    serial, port = _st_probe(chipid)
+    if not serial:
+        return Result(f"hil:{board}", True, note=c("SKIP no board", "y"))  # honest skip
+    if not port and not swd:
+        # Boards of the same family share a chipid, so a probe match is not a
+        # board match. A console-over-UART board always brings its VCP along;
+        # no VCP means this probe belongs to one of the others.
+        return Result(f"hil:{board}", True, note=c("SKIP no VCP for this probe", "y"))
+    print(c(f"-- hil:{board} — probe {serial} @ {port or 'swd'} — build", "d"))
+    with ConfigScope(conf["DEFCONFIG"], conf.get("TEST_EXTRA_CONFIG", "")):
+        ok, bp = build_test_elf(bd, tc)
+    if not ok:
+        return Result(f"hil:{board}", False, note="build failed")
+    elf = os.path.join(bp, "tests")
+    if swd:
+        to = int(conf.get("TIMEOUT", "300"))
+        ocd_args = conf.get("OPENOCD_ARGS",
+                            "-f interface/stlink.cfg -f target/stm32f4x.cfg")
+        print(c(f"-- hil:{board} — flash + capture over swd", "d"))
+        _, fail, tot = _swd_capture(elf, ocd_args, to)
+        if fail is None:
+            return Result(f"hil:{board}", False, note="swd capture timeout")
+        return Result(f"hil:{board}", fail == 0, total=tot, failed=fail)
+    binp = elf + ".bin"
+    objcopy = "arm-none-eabi-objcopy"
+    if run([objcopy, "-O", "binary", elf, binp], stdout=subprocess.DEVNULL).returncode != 0:
+        return Result(f"hil:{board}", False, note="objcopy failed")
+    faddr = conf.get("FLASH_ADDR", "0x08000000")
+    print(c(f"-- hil:{board} — flash {faddr}", "d"))
+    if run(["st-flash", "--serial", serial, "--reset", "write", binp, faddr],
+           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0:
+        return Result(f"hil:{board}", False, note="flash failed")
+    baud = int(conf.get("BAUD", "9600"))
+    to = int(conf.get("TIMEOUT", "120"))
+    print(c(f"-- hil:{board} — capture {port} @ {baud}", "d"))
+    _, fail, tot = _serial_capture(port, baud, to)
+    if fail is None:
+        return Result(f"hil:{board}", False, note="capture timeout")
+    return Result(f"hil:{board}", fail == 0, total=tot, failed=fail)
+
+
+def run_hil(args):
+    hdr("hil / hardware")
+    reg = registry()
+    targets = boards_for("hil") if (args.all or args.board in (None, "all")) else [args.board]
+    if not targets:
+        die("no HIL boards")
+    return [_hil_one(b, reg[b]["hil"]) if reg.get(b, {}).get("hil")
+            else Result(f"hil:{b}", False, note="no hil conf") for b in targets]
+
+
+# --- samples ---------------------------------------------------------------
+ARCH_TOOLCHAIN = {
+    # Pinned, not None: with no toolchain file there is no NAVHAL_DEFCONFIG,
+    # so the board falls out of the Kconfig choice default — and that moves
+    # whenever a board is added to the family. The matrix has to name its board.
+    "ARCH_CORTEX_M4": "cmake/toolchains/arm-none-eabi-toolchain.cmake",
+    "ARCH_CORTEX_M7": "cmake/toolchains/arm-none-eabi-f767-toolchain.cmake",
+    "ARCH_AVR8": "cmake/toolchains/avr-toolchain.cmake",
+}
+ARCH_ALIASES = {"m4": "ARCH_CORTEX_M4", "f401": "ARCH_CORTEX_M4",
+                "m7": "ARCH_CORTEX_M7", "f767": "ARCH_CORTEX_M7",
+                "avr": "ARCH_AVR8", "atmega": "ARCH_AVR8"}
+
+
+def _samples_for(arch):
+    rc, out = run_cap([os.path.join(REPO, "tools", "samples_for_arch.sh"), arch])
+    return out.split() if rc == 0 else []
+
+
+def _sample_matrix(arch):
+    tc = ARCH_TOOLCHAIN[arch]
+    slugs = _samples_for(arch)
+    if not slugs:
+        return Result(f"samples:{arch}", False, note="no samples")
+    bd = "build-ntest-sample"
+    npass = nfail = 0
+    fails = []
+    for slug in slugs:
+        shutil.rmtree(os.path.join(REPO, bd), ignore_errors=True)
+        if os.path.exists(os.path.join(REPO, ".config")):
+            os.remove(os.path.join(REPO, ".config"))
+        cfg = ["cmake", "-B", bd, "-DSAMPLE=" + slug]
+        if tc:
+            cfg.append(f"-DCMAKE_TOOLCHAIN_FILE={tc}")
+        okc = run(cfg, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
+        okb = okc and run(["cmake", "--build", bd, "-j"],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
+        if okb:
+            npass += 1
+            print("  " + c("OK  ", "g") + slug)
+        else:
+            nfail += 1
+            fails.append(slug)
+            print("  " + c("FAIL", "r") + " " + slug)
+    shutil.rmtree(os.path.join(REPO, bd), ignore_errors=True)
+    if os.path.exists(os.path.join(REPO, ".config")):
+        os.remove(os.path.join(REPO, ".config"))
+    note = ("failed: " + " ".join(fails)) if fails else ""
+    return Result(f"samples:{arch.replace('ARCH_', '').lower()}", nfail == 0,
+                  npass + nfail, nfail, note)
+
+
+def run_samples(args):
+    hdr("samples")
+    if args.all or args.arch in (None, "all"):
+        arches = ["ARCH_CORTEX_M4", "ARCH_CORTEX_M7", "ARCH_AVR8"]
+    else:
+        a = ARCH_ALIASES.get(args.arch.lower(), args.arch.upper())
+        if a not in ARCH_TOOLCHAIN:
+            die(f"unknown arch '{args.arch}' (m4|m7|avr)")
+        arches = [a]
+    return [_sample_matrix(a) for a in arches]
+
+
+# --- cap-contract: link-time symbol presence/absence -----------------------
+# Orchestrates the standalone test_cap_contract.sh (its 3-scenario nm checks are
+# self-contained; ntest just fronts it, as it does the emulator backends).
+def run_cap_contract(args):
+    hdr("capability contract")
+    script = os.path.join(REPO, "tools", "test_cap_contract.sh")
+    if not os.path.exists(script):
+        return [Result("cap-contract", False, note="script missing")]
+    rc, out = run_cap([script])
+    sys.stdout.write(out)
+    m = re.search(r"pass=(\d+)\s+fail=(\d+)", out)
+    if m:
+        npass, nfail = int(m.group(1)), int(m.group(2))
+        return [Result("cap-contract", rc == 0 and nfail == 0, npass + nfail, nfail)]
+    return [Result("cap-contract", rc == 0)]
+
+
+# --- coverage: host gcov + gcovr ------------------------------------------
+def run_coverage(args):
+    hdr("coverage / host gcov")
+    if not shutil.which("gcovr"):
+        die("gcovr not installed (pip install gcovr)")
+    bd = "build-host-cov"
+    bp = os.path.join(REPO, bd)
+    shutil.rmtree(bp, ignore_errors=True)
+    covflags = "--coverage -O0 -g"
+    cfg = ["cmake", "-B", bd, "-S", "tests/host",
+           f"-DCMAKE_C_FLAGS={covflags}", f"-DCMAKE_EXE_LINKER_FLAGS=--coverage"]
+    if run(cfg, stdout=subprocess.DEVNULL).returncode != 0:
+        return [Result("coverage", False, note="configure failed")]
+    if run(["cmake", "--build", bd, "-j"], stdout=subprocess.DEVNULL).returncode != 0:
+        return [Result("coverage", False, note="build failed")]
+    for exe in ("tests_host", "tests_host_drivers"):
+        p = os.path.join(bp, exe)
+        if os.path.exists(p):
+            run_cap([p])  # generate .gcda
+    rc, out = run_cap(["gcovr", "--root", REPO, "--filter", "src/",
+                       "--print-summary", "--decisions", bd])
+    sys.stdout.write(out)
+    # parse the gcovr 'lines: NN.N%' summary line
+    m = re.search(r"lines:\s*([\d.]+)%", out)
+    pct = float(m.group(1)) if m else 0.0
+    ok = True
+    if getattr(args, "gate", False) and COVERAGE_FLOORS:
+        rc2, jout = run_cap(["gcovr", "--root", REPO, "--filter", "src/",
+                             "--json-summary", bd])
+        ok = _coverage_gate(jout)
+    shutil.rmtree(bp, ignore_errors=True)
+    return [Result("coverage", ok, note=f"lines {pct:.1f}%")]
+
+
+def _coverage_gate(json_text):
+    import json
+    try:
+        data = json.loads(json_text)
+    except Exception:
+        return True
+    agg = {}
+    for f in data.get("files", []):
+        fn = f.get("filename", "")
+        for area in COVERAGE_FLOORS:
+            if fn.startswith(area):
+                a = agg.setdefault(area, [0, 0])
+                a[0] += f.get("line_covered", 0)
+                a[1] += f.get("line_total", 0)
+    ok = True
+    for area, floor in COVERAGE_FLOORS.items():
+        cov, tot = agg.get(area, [0, 0])
+        pct = 100.0 * cov / tot if tot else 100.0
+        tag = "ok" if pct >= floor else "BELOW FLOOR"
+        if pct < floor:
+            ok = False
+        print(f"  {area:28} {pct:5.1f}%  floor {floor:5.1f}  {tag}")
+    return ok
+
+
+# --- all / list ------------------------------------------------------------
+def run_all(args):
+    results = []
+    results += run_host(args)
+    for a in ("ARCH_CORTEX_M4", "ARCH_CORTEX_M7", "ARCH_AVR8"):
+        results.append(_sample_matrix(a))
+    results += run_cap_contract(args)
+    for b in boards_for("pil"):
+        conf = registry()[b]["pil"]
+        results.append(_emu_backend(b, conf))
+    if getattr(args, "hil", False):
+        for b in boards_for("hil"):
+            results.append(_hil_one(b, registry()[b]["hil"]))
+    return results
+
+
+def run_list(args):
+    reg = registry()
+    print(c("boards:", "bold"))
+    for b, m in sorted(reg.items()):
+        modes = ",".join(k for k in ("hil", "pil") if m.get(k))
+        arch = (m.get("hil") or m.get("pil") or {}).get("ARCH", "?")
+        print(f"  {b:22} arch={arch:10} modes=[{modes}]")
+    print(c("\nhost suites:", "bold"))
+    print("  tests_host, tests_host_drivers")
+    print(c("\nsample arches:", "bold"))
+    print("  m4, m7, avr")
+    return []
+
+
+# ============================================================================
+# TUI (curses)
+# ============================================================================
+_ANSI = re.compile(r"\x1b\[[0-9;?]*[a-zA-Z]")
+
+
+class _TuiAction:
+    """One runnable tier. We drive it by re-invoking ourselves as a subprocess
+    (`ntest <argv>`) and streaming its output into a pane — so nothing ever
+    leaves curses and each tier keeps its own live log + result."""
+
+    def __init__(self, label, argv):
+        self.label, self.argv = label, argv
+        self.status = "idle"          # idle | running | pass | fail | skip
+        self.log = []                 # decoded, ANSI-stripped lines
+        self.result = ""              # scraped one-line summary
+
+    GLYPH = {"idle": "·", "running": "▶", "pass": "✔", "fail": "✘", "skip": "–"}
+    PAIR = {"idle": 4, "running": 3, "pass": 1, "fail": 2, "skip": 3}
+
+
+def _tui_build_actions():
+    specs = [("host  · SIL", ["host"])]
+    for b in boards_for("pil"):
+        specs.append((f"pil   · {b}", ["pil", b]))
+    for b in boards_for("hil"):
+        specs.append((f"hil   · {b}", ["hil", b]))
+    for lbl, a in (("m4", "m4"), ("m7", "m7"), ("avr", "avr")):
+        specs.append((f"sample· {lbl}", ["samples", a]))
+    specs.append(("cap-contract", ["cap-contract"]))
+    specs.append(("coverage", ["coverage"]))
+    return [_TuiAction(lbl, argv) for lbl, argv in specs]
+
+
+def run_tui(args):
+    try:
+        import curses
+    except ImportError:
+        die("curses unavailable; use `ntest all`")
+
+    actions = _tui_build_actions()
+    self_path = os.path.abspath(__file__)
+
+    def spawn(a):
+        a.status, a.log, a.result = "running", [], ""
+        env = dict(os.environ, PYTHONUNBUFFERED="1", NO_COLOR="1")
+        p = subprocess.Popen([sys.executable, self_path, *a.argv], cwd=REPO,
+                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
+        os.set_blocking(p.stdout.fileno(), False)
+        return p
+
+    def drain(p, a, rbuf):
+        """Pull whatever's ready off the pipe into a.log; return leftover bytes."""
+        eof = False
+        while True:
+            try:
+                chunk = os.read(p.stdout.fileno(), 65536)
+            except (BlockingIOError, InterruptedError):
+                break
+            if chunk == b"":
+                eof = True
+                break
+            rbuf += chunk
+            *lines, rbuf = rbuf.split(b"\n")
+            for ln in lines:
+                a.log.append(_ANSI.sub("", ln.decode(errors="replace")).rstrip())
+        return rbuf, eof
+
+    def finalize(p, a, rbuf):
+        if rbuf.strip():
+            a.log.append(_ANSI.sub("", rbuf.decode(errors="replace")).rstrip())
+        rc = p.returncode
+        # scrape the summary table / totals the child printed
+        joined = "\n".join(a.log)
+        skipped = "SKIP no board" in joined
+        m = re.findall(r"(PASS|FAIL)\s+(\d+)/(\d+)", joined)
+        if m:
+            tot = sum(int(x[2]) for x in m)
+            passed = sum(int(x[1]) for x in m)
+            a.result = f"{passed}/{tot} across {len(m)} suite(s)"
+        else:
+            mm = re.search(r"lines:\s*([\d.]+)%", joined)
+            a.result = f"lines {mm.group(1)}%" if mm else "(no summary)"
+        a.status = "skip" if (rc == 0 and skipped) else ("pass" if rc == 0 else "fail")
+        if skipped:
+            a.result = "no board attached"
+
+    def loop(scr):
+        curses.curs_set(0)
+        curses.start_color()
+        curses.use_default_colors()
+        curses.init_pair(1, curses.COLOR_GREEN, -1)
+        curses.init_pair(2, curses.COLOR_RED, -1)
+        curses.init_pair(3, curses.COLOR_YELLOW, -1)
+        curses.init_pair(4, -1, -1)
+        scr.timeout(80)
+
+        sel = 0
+        proc = None
+        running = None
+        rbuf = b""
+        queue = []
+        foff = 0          # log scroll: lines held back from the tail (0 = follow)
+
+        def put(y, x, s, attr=0, maxx=None):
+            h, w = scr.getmaxyx()
+            if y < 0 or y >= h or x >= w:
+                return
+            s = s[: (maxx if maxx is not None else w) - x]
+            if x + len(s) >= w:            # never touch the bottom-right cell
+                s = s[: w - x - 1]
+            try:
+                scr.addstr(y, x, s, attr)
+            except curses.error:
+                pass
+
+        def box(y0, x0, y1, x1, title, focus):
+            tattr = curses.A_BOLD | (curses.color_pair(3) if focus else 0)
+            put(y0, x0, "┌" + "─" * (x1 - x0 - 1) + "┐")
+            for y in range(y0 + 1, y1):
+                put(y, x0, "│"); put(y, x1, "│")
+            put(y1, x0, "└" + "─" * (x1 - x0 - 1) + "┘")
+            put(y0, x0 + 2, f" {title} ", tattr)
+
+        while True:
+            # ---- pump the running child -------------------------------------
+            if proc:
+                rbuf, eof = drain(proc, actions[running], rbuf)
+                if proc.poll() is not None and eof:
+                    finalize(proc, actions[running], rbuf)
+                    proc, running, rbuf = None, None, b""
+            if proc is None and queue:
+                running = queue.pop(0)
+                proc = spawn(actions[running])
+                sel, foff = running, 0
+
+            # ---- draw -------------------------------------------------------
+            scr.erase()
+            h, w = scr.getmaxyx()
+            Lw = max(22, min(40, w // 3))
+            busy = actions[running].label if running is not None else None
+            head = "ntest"
+            put(0, 0, head, curses.A_BOLD)
+            put(0, len(head) + 2,
+                (f"running {busy}…" if busy else "idle"),
+                curses.color_pair(3) if busy else curses.A_DIM)
+            foot = " ↑↓ move · ⏎/r run · a all · x stop · ⇧J/K scroll · g/G ends · q quit "
+            put(h - 1, 0, foot, curses.A_DIM)
+
+            splity = max(6, h - 8)            # result box gets ~7 rows
+            body_bot = h - 2
+            # panes
+            box(1, 0, splity - 1, Lw, "tests", False)
+            box(splity, 0, body_bot, Lw, "result", False)
+            log_focus = foff > 0
+            box(1, Lw + 1, body_bot, w - 1, "logs", log_focus)
+
+            # tests list
+            for i, a in enumerate(actions):
+                y = 2 + i
+                if y >= splity - 1:
+                    break
+                g = _TuiAction.GLYPH[a.status]
+                attr = curses.color_pair(_TuiAction.PAIR[a.status])
+                sattr = curses.A_REVERSE if i == sel else attr
+                put(y, 2, f"{g} {a.label}", sattr, maxx=Lw)
+
+            # result of the selected action
+            a = actions[sel]
+            put(splity + 1, 2, a.label, curses.A_BOLD, maxx=Lw)
+            st = a.status.upper()
+            put(splity + 2, 2, st, curses.color_pair(_TuiAction.PAIR[a.status]), maxx=Lw)
+            if a.result:
+                for k, seg in enumerate(_wrap(a.result, Lw - 3)):
+                    put(splity + 3 + k, 2, seg, 0, maxx=Lw)
+
+            # logs of the selected action (auto-follow tail unless scrolled)
+            log = actions[sel].log
+            rows = body_bot - 2
+            top = max(0, len(log) - rows - foff)
+            view = log[top: top + rows]
+            for k, ln in enumerate(view):
+                put(2 + k, Lw + 2, ln, 0, maxx=w - 1)
+
+            scr.refresh()
+
+            # ---- input ------------------------------------------------------
+            ch = scr.getch()
+            if ch == -1:
+                continue
+            if ch in (ord("q"), 27):
+                if proc:
+                    proc.terminate()
+                break
+            elif ch in (curses.KEY_DOWN, ord("j")):
+                sel = (sel + 1) % len(actions); foff = 0
+            elif ch in (curses.KEY_UP, ord("k")):
+                sel = (sel - 1) % len(actions); foff = 0
+            elif ch in (curses.KEY_ENTER, 10, 13, ord("r")):
+                if actions[sel].status != "running" and sel not in queue:
+                    queue.append(sel)
+            elif ch == ord("a"):
+                for i in range(len(actions)):
+                    if actions[i].status != "running" and i not in queue:
+                        queue.append(i)
+            elif ch == ord("x"):
+                if proc:
+                    proc.terminate()
+                    actions[running].status = "fail"
+                    actions[running].result = "stopped"
+                    proc, running, rbuf, queue = None, None, b"", []
+            elif ch in (curses.KEY_PPAGE, ord("K")):
+                foff += max(1, (h - 4) // 2)
+            elif ch in (curses.KEY_NPAGE, ord("J")):
+                foff = max(0, foff - max(1, (h - 4) // 2))
+            elif ch == ord("g"):
+                foff = 10 ** 9
+            elif ch == ord("G"):
+                foff = 0
+
+    curses.wrapper(loop)
+    return []
+
+
+def _wrap(s, width):
+    return [s[i:i + width] for i in range(0, len(s), max(1, width))] or [""]
+
+
+# ============================================================================
+# CLI
+# ============================================================================
+def main():
+    p = argparse.ArgumentParser(prog="ntest", description="NavHAL test orchestrator")
+    sub = p.add_subparsers(dest="cmd")
+
+    sp = sub.add_parser("host", help="SIL host suites")
+    sp.add_argument("--logic-only", action="store_true")
+    sp.add_argument("--drivers-only", action="store_true")
+    sp.set_defaults(fn=run_host)
+
+    sp = sub.add_parser("pil", help="emulator (Renode/simavr)")
+    sp.add_argument("board", nargs="?", default=None)
+    sp.add_argument("--all", action="store_true", help="every PIL board")
+    sp.set_defaults(fn=run_pil)
+
+    sp = sub.add_parser("hil", help="real board")
+    sp.add_argument("board", nargs="?", default=None)
+    sp.add_argument("--all", action="store_true", help="every HIL board")
+    sp.set_defaults(fn=run_hil)
+
+    sp = sub.add_parser("samples", help="build sample matrix")
+    sp.add_argument("arch", nargs="?", default=None)
+    sp.add_argument("--all", action="store_true", help="every arch")
+    sp.set_defaults(fn=run_samples)
+
+    sp = sub.add_parser("cap-contract", help="capability symbol contract")
+    sp.set_defaults(fn=run_cap_contract)
+
+    sp = sub.add_parser("coverage", help="host gcov coverage")
+    sp.add_argument("--gate", action="store_true", help="fail below floors")
+    sp.set_defaults(fn=run_coverage)
+
+    sp = sub.add_parser("all", help="everything runnable here")
+    sp.add_argument("--hil", action="store_true", help="also flash attached boards")
+    sp.set_defaults(fn=run_all)
+
+    sub.add_parser("list", help="show catalog").set_defaults(fn=run_list)
+    sub.add_parser("tui", help="interactive").set_defaults(fn=run_tui)
+
+    args = p.parse_args()
+    if not args.cmd:
+        # bare invocation: TUI on a terminal, else run everything
+        if sys.stdin.isatty() and sys.stdout.isatty():
+            return run_tui(args) or sys.exit(0)
+        args.fn = run_all
+        args.hil = False
+
+    results = args.fn(args)
+    if not results:  # list / tui
+        sys.exit(0)
+    ok = summary(results)
+    sys.exit(0 if ok else 1)
+
+
+if __name__ == "__main__":
+    main()

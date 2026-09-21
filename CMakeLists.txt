@@ -159,9 +159,12 @@ set(NAVHAL_FORCE_INCLUDE "-include ${GENERATED_NAVHAL_TARGET}")
 # ---- Build profiles -------------------------------------------------------
 # Three, selected with -DCMAKE_BUILD_TYPE=<name>:
 #
-#   Debug       -O0 -g          stepping matches the source line for line.
+#   Debug       -Og -g          debuggable without the size blow-up -O0 causes.
 #                               The default, and what the test and PIL tiers
-#                               run, so a failure is debuggable as it stands.
+#                               run. -Og rather than -O0 because the AVR has
+#                               32 KB of flash and -O0 more than doubled the
+#                               image; -Og measured the same size as -Os on a
+#                               loop, while keeping the debug experience.
 #   Release     -Os -DNDEBUG    what ships. On an MCU the binding constraint
 #                               is flash, not instruction count, which is why
 #                               this is -Os and not CMake's usual -O3.
@@ -187,7 +190,7 @@ if(NOT CMAKE_BUILD_TYPE IN_LIST NAVHAL_BUILD_TYPES)
         "NavHAL defines: ${NAVHAL_BUILD_TYPES}")
 endif()
 
-set(CMAKE_C_FLAGS_DEBUG          "-O0 -g")
+set(CMAKE_C_FLAGS_DEBUG          "-Og -g")
 set(CMAKE_C_FLAGS_RELEASE        "-Os -DNDEBUG")
 set(CMAKE_C_FLAGS_RELEASELTO     "-Os -flto -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG        "${CMAKE_C_FLAGS_DEBUG}")

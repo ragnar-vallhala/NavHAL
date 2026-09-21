@@ -10,7 +10,10 @@ set(AVR_MCU   "${FAMILY}")
 set(AVR_F_CPU "16000000UL")
 message(STATUS "AVR: -mmcu=${AVR_MCU}, F_CPU=${AVR_F_CPU}")
 
-set(ARCH_C_FLAGS    "-mmcu=${AVR_MCU} -DF_CPU=${AVR_F_CPU} -Os -g")
+# Optimisation level comes from the build profile, not from here: a level
+# hardcoded in ARCH_C_FLAGS is silently overridden by the profile flags
+# that CMake appends after it.
+set(ARCH_C_FLAGS    "-mmcu=${AVR_MCU} -DF_CPU=${AVR_F_CPU}")
 set(ARCH_ASM_FLAGS  "-mmcu=${AVR_MCU}")
 set(ARCH_LINK_FLAGS "-mmcu=${AVR_MCU}")
 

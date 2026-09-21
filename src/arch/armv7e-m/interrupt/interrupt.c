@@ -27,6 +27,12 @@
  */
 
 #include "navhal_port_interrupt.h"
+#include "internal/hal_interrupt_ops.h"
+
+/* Forward declaration: enable_with_priority (a Cortex-M port extension, not a
+ * table entry) sets the priority before unmasking, and is defined above it. */
+static hal_status_t armv7em_interrupt_set_priority(hal_irq_t irq,
+                                                   uint8_t priority);
 #include "common/hal_status.h"
 #include <stdint.h>
 
@@ -40,14 +46,14 @@ hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq,
 
   // Set the priority BEFORE enabling so the line can never fire at the
   // reset-default priority 0 (unmaskable) in the window before it is set.
-  hal_interrupt_set_priority(irq, priority);
+  armv7em_interrupt_set_priority(irq, priority);
 
   uint32_t irq_num = (uint32_t)irq;
   NVIC->ISER[irq_num / 32] |= (1U << (irq_num % 32));
   return HAL_OK;
 }
 
-hal_status_t hal_interrupt_enable(hal_irq_t irq) {
+static hal_status_t armv7em_interrupt_enable(hal_irq_t irq) {
   // Default to a maskable mid-range priority rather than the NVIC reset
   // default of 0 (most urgent, unmaskable by an RTOS BASEPRI critical
   // section, which makes a *_from_isr call from such an IRQ able to corrupt
@@ -55,7 +61,7 @@ hal_status_t hal_interrupt_enable(hal_irq_t irq) {
   return hal_interrupt_enable_with_priority(irq, HAL_IRQ_PRIORITY_DEFAULT);
 }
 
-hal_status_t hal_interrupt_disable(hal_irq_t irq) {
+static hal_status_t armv7em_interrupt_disable(hal_irq_t irq) {
   if (irq < 0)
     return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
 
@@ -64,7 +70,7 @@ hal_status_t hal_interrupt_disable(hal_irq_t irq) {
   return HAL_OK;
 }
 
-hal_status_t hal_interrupt_clear_pending(hal_irq_t irq) {
+static hal_status_t armv7em_interrupt_clear_pending(hal_irq_t irq) {
   if (irq < 0)
     return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
 
@@ -73,7 +79,7 @@ hal_status_t hal_interrupt_clear_pending(hal_irq_t irq) {
   return HAL_OK;
 }
 
-bool hal_interrupt_is_pending(hal_irq_t irq) {
+static bool armv7em_interrupt_is_pending(hal_irq_t irq) {
   if (irq < 0)
     return false;
 
@@ -81,7 +87,7 @@ bool hal_interrupt_is_pending(hal_irq_t irq) {
   return ((NVIC->ISPR[irq_num / 32] >> (irq_num % 32)) & 1U) != 0U;
 }
 
-hal_status_t hal_interrupt_attach_callback(hal_irq_t irq,
+static hal_status_t armv7em_interrupt_attach_callback(hal_irq_t irq,
                                            hal_interrupt_callback_t callback) {
   if (irq < 0 || irq >= MAX_IRQ)
     return HAL_ERR_INVALID_ARG;
@@ -89,14 +95,14 @@ hal_status_t hal_interrupt_attach_callback(hal_irq_t irq,
   return HAL_OK;
 }
 
-hal_status_t hal_interrupt_detach_callback(hal_irq_t irq) {
+static hal_status_t armv7em_interrupt_detach_callback(hal_irq_t irq) {
   if (irq < 0 || irq >= MAX_IRQ)
     return HAL_ERR_INVALID_ARG;
   irq_callbacks[(uint32_t)irq] = 0;
   return HAL_OK;
 }
 
-void hal_interrupt_dispatch(hal_irq_t irq) {
+static void armv7em_interrupt_dispatch(hal_irq_t irq) {
   if (irq < 0 || irq >= MAX_IRQ)
     return;
   if (irq_callbacks[(uint32_t)irq])
@@ -140,7 +146,7 @@ void hal_irq_default_dispatch(void) {
 #define __NVIC_PRIO_BITS 4
 #define PRIORITY_MASK ((1UL << __NVIC_PRIO_BITS) - 1)
 
-hal_status_t hal_interrupt_set_priority(hal_irq_t irq, uint8_t priority) {
+static hal_status_t armv7em_interrupt_set_priority(hal_irq_t irq, uint8_t priority) {
   // Normalize to top 4 bits (0-15 effective priority levels)
   uint32_t prio = (priority & PRIORITY_MASK) << (8 - __NVIC_PRIO_BITS);
 
@@ -176,7 +182,7 @@ hal_status_t hal_interrupt_set_priority(hal_irq_t irq, uint8_t priority) {
   return HAL_OK;
 }
 
-uint8_t hal_interrupt_get_priority(hal_irq_t irq) {
+static uint8_t armv7em_interrupt_get_priority(hal_irq_t irq) {
   if (irq >= 0) {
     // External interrupts
     return NVIC->IPR[(uint32_t)irq] >> 4; // only upper 4 bits are valid
@@ -209,11 +215,11 @@ uint8_t hal_interrupt_get_priority(hal_irq_t irq) {
   }
 }
 
-void hal_interrupt_enable_global(uint32_t state) {
+static void armv7em_interrupt_enable_global(uint32_t state) {
   __asm volatile("msr primask, %0" : : "r"(state) : "memory");
 }
 
-uint32_t hal_interrupt_disable_global(void) {
+static uint32_t armv7em_interrupt_disable_global(void) {
   uint32_t state;
   __asm volatile("mrs %0, primask" : "=r"(state));
   __asm volatile("cpsid i" : : : "memory");
@@ -228,7 +234,7 @@ void hal_cpu_idle(void) {
   __asm volatile("wfi" : : : "memory");
 }
 
-void hal_interrupt_clear_all_pending(void) {
+static void armv7em_interrupt_clear_all_pending(void) {
   /* STM32F401RE wires IRQs 0..81 (NVIC ICPR words 0..2). Writing past
    * that range is a no-op on real silicon but produces "unhandled
    * write" warnings in Renode's NVIC model. Keep the loop tight to the
@@ -256,7 +262,25 @@ __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 #else
 void Default_Handler(void) {}
 __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
+
+
 #endif
 
 /* USART vectors are this MCU's, not the core's, so they are defined by the
  * vendor's UART backend rather than here. */
+
+/** @brief The ARMv7E-M NVIC interrupt backend. */
+const hal_interrupt_ops_t _hal_interrupt_ops = {
+    .enable = armv7em_interrupt_enable,
+    .disable = armv7em_interrupt_disable,
+    .attach_callback = armv7em_interrupt_attach_callback,
+    .detach_callback = armv7em_interrupt_detach_callback,
+    .dispatch = armv7em_interrupt_dispatch,
+    .disable_global = armv7em_interrupt_disable_global,
+    .enable_global = armv7em_interrupt_enable_global,
+    .set_priority = armv7em_interrupt_set_priority,
+    .get_priority = armv7em_interrupt_get_priority,
+    .is_pending = armv7em_interrupt_is_pending,
+    .clear_pending = armv7em_interrupt_clear_pending,
+    .clear_all_pending = armv7em_interrupt_clear_all_pending,
+};

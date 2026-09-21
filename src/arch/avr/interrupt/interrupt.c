@@ -37,6 +37,7 @@
  */
 
 #include "navhal_port_interrupt.h"
+#include "internal/hal_interrupt_ops.h"
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -52,42 +53,42 @@ static inline bool irq_in_range(hal_irq_t irq) {
 
 /* ---- Per-IRQ control: not a thing on the AVR's flat vector table -------- */
 
-hal_status_t hal_interrupt_enable(hal_irq_t irq) {
+static hal_status_t avr_interrupt_enable(hal_irq_t irq) {
   (void)irq;
   return HAL_ERR_NOT_SUPPORTED;
 }
 
-hal_status_t hal_interrupt_disable(hal_irq_t irq) {
+static hal_status_t avr_interrupt_disable(hal_irq_t irq) {
   (void)irq;
   return HAL_ERR_NOT_SUPPORTED;
 }
 
-hal_status_t hal_interrupt_clear_pending(hal_irq_t irq) {
+static hal_status_t avr_interrupt_clear_pending(hal_irq_t irq) {
   (void)irq;
   return HAL_ERR_NOT_SUPPORTED;
 }
 
-bool hal_interrupt_is_pending(hal_irq_t irq) {
+static bool avr_interrupt_is_pending(hal_irq_t irq) {
   (void)irq;
   return false;
 }
 
 /* ---- Priority: the AVR has none; accept and ignore --------------------- */
 
-hal_status_t hal_interrupt_set_priority(hal_irq_t irq, uint8_t priority) {
+static hal_status_t avr_interrupt_set_priority(hal_irq_t irq, uint8_t priority) {
   (void)irq;
   (void)priority;
   return HAL_OK;
 }
 
-uint8_t hal_interrupt_get_priority(hal_irq_t irq) {
+static uint8_t avr_interrupt_get_priority(hal_irq_t irq) {
   (void)irq;
   return 0;
 }
 
 /* ---- Callback table ---------------------------------------------------- */
 
-hal_status_t hal_interrupt_attach_callback(hal_irq_t irq,
+static hal_status_t avr_interrupt_attach_callback(hal_irq_t irq,
                                            hal_interrupt_callback_t callback) {
   if (!irq_in_range(irq))
     return HAL_ERR_INVALID_ARG;
@@ -95,31 +96,47 @@ hal_status_t hal_interrupt_attach_callback(hal_irq_t irq,
   return HAL_OK;
 }
 
-hal_status_t hal_interrupt_detach_callback(hal_irq_t irq) {
+static hal_status_t avr_interrupt_detach_callback(hal_irq_t irq) {
   if (!irq_in_range(irq))
     return HAL_ERR_INVALID_ARG;
   s_callbacks[irq] = NULL;
   return HAL_OK;
 }
 
-void hal_interrupt_dispatch(hal_irq_t irq) {
+static void avr_interrupt_dispatch(hal_irq_t irq) {
   if (irq_in_range(irq) && s_callbacks[irq] != NULL)
     s_callbacks[irq]();
 }
 
 /* ---- Global interrupt enable (SREG I-bit) ------------------------------ */
 
-uint32_t hal_interrupt_disable_global(void) {
+static uint32_t avr_interrupt_disable_global(void) {
   uint8_t saved = SREG;
   cli();
   return saved;
 }
 
-void hal_interrupt_enable_global(uint32_t state) {
+static void avr_interrupt_enable_global(uint32_t state) {
   /* Restoring the whole SREG restores the I-bit to its prior value. */
   SREG = (uint8_t)state;
 }
 
-void hal_interrupt_clear_all_pending(void) {
+static void avr_interrupt_clear_all_pending(void) {
   /* No NVIC-style "clear all pending" register exists on the AVR. */
 }
+
+/** @brief The AVR interrupt backend. */
+const hal_interrupt_ops_t _hal_interrupt_ops = {
+    .enable = avr_interrupt_enable,
+    .disable = avr_interrupt_disable,
+    .attach_callback = avr_interrupt_attach_callback,
+    .detach_callback = avr_interrupt_detach_callback,
+    .dispatch = avr_interrupt_dispatch,
+    .disable_global = avr_interrupt_disable_global,
+    .enable_global = avr_interrupt_enable_global,
+    .set_priority = avr_interrupt_set_priority,
+    .get_priority = avr_interrupt_get_priority,
+    .is_pending = avr_interrupt_is_pending,
+    .clear_pending = avr_interrupt_clear_pending,
+    .clear_all_pending = avr_interrupt_clear_all_pending,
+};

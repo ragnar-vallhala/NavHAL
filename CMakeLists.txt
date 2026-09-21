@@ -289,10 +289,15 @@ elseif(EXISTS "${SRC_BOARD}/startup.s")
     set(STARTUP_FILE "${SRC_BOARD}/startup.s")
 elseif(EXISTS "${INCLUDE_FAMILY}/../startup.s")
     set(STARTUP_FILE "${INCLUDE_FAMILY}/../startup.s")
-else()
-    # Last resort, and correct for an arch whose entry really is architectural:
-    # x86-64 builds its IDT at runtime rather than shipping a static table.
+elseif(EXISTS "${SRC_ARCH}/startup/startup.s")
+    # Correct for an arch whose entry really is architectural: x86-64 builds
+    # its IDT at runtime rather than shipping a static table.
     set(STARTUP_FILE "${SRC_ARCH}/startup/startup.s")
+else()
+    message(FATAL_ERROR
+        "No startup.s for ${VENDOR}/${FAMILY}. The vector table names this "
+        "MCU's peripherals, so a port supplies its own: add "
+        "src/vendor/${VENDOR}/family/${FAMILY}/startup.s")
 endif()
 # Export path to parent project if included via add_subdirectory()
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)

@@ -51,16 +51,28 @@ esac
 # then the /dev/ttyACM* that belongs to that same ST-Link.
 detect_probe() {  # $1 = chipid (e.g. 0x451); sets DETECTED_SERIAL / DETECTED_PORT
   local want="$1"
-  DETECTED_SERIAL=$(st-info --probe 2>/dev/null | awk -v want="$want" '
+  # Every probe with this chip-id, not just the first: a bench can hold more
+  # than one board of a family (NavHAL has two F401 configs), and the first
+  # match is not necessarily the one whose ST-Link exposes a usable ttyACM.
+  local serials
+  serials=$(st-info --probe 2>/dev/null | awk -v want="$want" '
     /serial:/ {s=$2}
-    /chipid:/ {if ($2==want) {print s; exit}}')
-  [ -n "$DETECTED_SERIAL" ] || return 1
+    /chipid:/ {if ($2==want) print s}')
+  [ -n "$serials" ] || return 1
+
+  DETECTED_SERIAL=""
   DETECTED_PORT=""
-  local p ps
-  for p in /dev/ttyACM*; do
-    [ -e "$p" ] || continue
-    ps=$(udevadm info -q property -n "$p" 2>/dev/null | sed -n 's/^ID_SERIAL_SHORT=//p')
-    if [ "$ps" = "$DETECTED_SERIAL" ]; then DETECTED_PORT="$p"; break; fi
+  local cand p ps
+  for cand in $serials; do
+    for p in /dev/ttyACM*; do
+      [ -e "$p" ] || continue
+      ps=$(udevadm info -q property -n "$p" 2>/dev/null | sed -n 's/^ID_SERIAL_SHORT=//p')
+      if [ "$ps" = "$cand" ] && [ -r "$p" ] && [ -w "$p" ]; then
+        DETECTED_SERIAL="$cand"
+        DETECTED_PORT="$p"
+        break 2
+      fi
+    done
   done
   [ -n "$DETECTED_PORT" ] || return 2
 }

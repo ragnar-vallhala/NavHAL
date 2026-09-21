@@ -17,10 +17,22 @@
 
 #include "test_conformance.h"
 
+#include "navtest_target.h" /* NAVTEST_UART */
+
 #include "common/hal_features.h"
 #include "common/hal_status.h"
 #include "common/hal_gpio.h"
 #include "common/hal_clock.h"
+
+#if NAVHAL_CONFIG_DRV_TIMER
+#include "common/hal_timer.h"
+#endif
+#if NAVHAL_CONFIG_DRV_FLASH
+#include "common/hal_flash.h"
+#endif
+#if NAVHAL_CONFIG_DRV_ADC
+#include "common/hal_adc.h"
+#endif
 
 #if NAVHAL_CONFIG_DRV_UART
 #include "common/hal_uart.h"
@@ -39,6 +51,26 @@
 #endif
 #if NAVHAL_CONFIG_DRV_SDIO
 #include "common/hal_sdio.h"
+#endif
+
+
+/* ---------------------------------------------------------------------------
+ * Argument contract: every fallible call taking a pointer rejects NULL, and
+ * does so before touching hardware. M9 moved these checks into the shared
+ * layer precisely so the answer is the same on every port; this is what says
+ * whether that held.
+ * ------------------------------------------------------------------------- */
+
+#if NAVHAL_CONFIG_DRV_FLASH
+static uint8_t flash_buf[4];
+static uint8_t flash_size = sizeof(flash_buf);
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+static uint16_t dma_left;
+static const hal_dma_config_t dma_cfg = {0};
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+#define TEST_CONF_TIMER TIM2
 #endif
 
 /* -------------------------------------------------------------------------- *
@@ -251,6 +283,138 @@ void test_conformance_cap_macros_are_defined(void) {
   TEST_ASSERT_EQUAL_UINT32(NAVHAL_CONFIG_DRV_SDIO, NAVHAL_HAS_SDIO);
 }
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+
+#if NAVHAL_CONFIG_DRV_ADC
+
+void test_conformance_adc_read_rejects_null_out(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_adc_read(HAL_ADC_1, 0u, NULL));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_ADC */
+
+
+#if NAVHAL_CONFIG_DRV_FLASH
+
+void test_conformance_flash_save_rejects_null_value(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_flash_save(0u, NULL, 1u));
+}
+
+void test_conformance_flash_read_rejects_null_value(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_flash_read(0u, NULL, &flash_size));
+}
+
+void test_conformance_flash_read_rejects_null_size(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_flash_read(0u, flash_buf, NULL));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_FLASH */
+
+
+#if NAVHAL_CONFIG_DRV_I2C
+
+void test_conformance_i2c_write_rejects_null_data(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_i2c_write(HAL_I2C_1, 0x10u, NULL, 1u));
+}
+
+void test_conformance_i2c_read_rejects_null_data(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_i2c_read(HAL_I2C_1, 0x10u, NULL, 1u));
+}
+
+void test_conformance_i2c_write_read_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_i2c_write_read(HAL_I2C_1, 0x10u, NULL, 1u, NULL, 1u));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_I2C */
+
+
+#if NAVHAL_CONFIG_DRV_SPI
+
+void test_conformance_spi_transmit_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_spi_transmit(HAL_SPI_1, NULL, 1u, 0u));
+}
+
+void test_conformance_spi_receive_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_spi_receive(HAL_SPI_1, NULL, 1u, 0u));
+}
+
+void test_conformance_spi_xfer_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_spi_transmit_receive(HAL_SPI_1, NULL, NULL, 1u, 0u));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_SPI */
+
+
+#if NAVHAL_CONFIG_DRV_UART
+
+void test_conformance_uart_write_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_uart_write(NAVTEST_UART, NULL, 1u));
+}
+
+void test_conformance_uart_write_string_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_uart_write_string(NAVTEST_UART, NULL));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_UART */
+
+
+#if NAVHAL_CONFIG_DRV_DMA
+
+void test_conformance_dma_start_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_dma_start(NULL));
+}
+
+void test_conformance_dma_stop_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_dma_stop(NULL));
+}
+
+void test_conformance_dma_clear_flags_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_dma_clear_flags(NULL));
+}
+
+void test_conformance_dma_set_memory_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_dma_set_memory(NULL, 0u, 1u));
+}
+
+void test_conformance_dma_remaining_rejects_null_cfg(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_dma_remaining(NULL, &dma_left));
+}
+
+void test_conformance_dma_remaining_rejects_null_out(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_dma_remaining(&dma_cfg, NULL));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_DMA */
+
+
+#if NAVHAL_CONFIG_DRV_PWM
+
+void test_conformance_pwm_start_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_pwm_start(NULL));
+}
+
+void test_conformance_pwm_stop_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_pwm_stop(NULL));
+}
+
+void test_conformance_pwm_set_duty_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_pwm_set_duty_cycle(NULL, 50u));
+}
+
+void test_conformance_pwm_set_frequency_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_pwm_set_frequency(NULL, 1000u));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_PWM */
+
+
+#if NAVHAL_CONFIG_DRV_TIMER
+
+void test_conformance_timer_init_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_timer_init(TEST_CONF_TIMER, NULL));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_TIMER */
+
 NAVTEST_CASE_DECL(test_conformance_status_ok_is_zero);
 NAVTEST_CASE_DECL(test_conformance_status_errors_distinct);
 NAVTEST_CASE_DECL(test_conformance_status_fits_uint8);
@@ -266,6 +430,75 @@ NAVTEST_CASE_DECL(test_conformance_pwm_init_rejects_null);
 NAVTEST_CASE_DECL(test_conformance_sdio_init_rejects_null);
 NAVTEST_CASE_DECL(test_conformance_null_init_is_idempotent);
 NAVTEST_CASE_DECL(test_conformance_cap_macros_are_defined);
+#if NAVHAL_CONFIG_DRV_ADC
+NAVTEST_CASE_DECL(test_conformance_adc_read_rejects_null_out);
+#endif
+#if NAVHAL_CONFIG_DRV_FLASH
+NAVTEST_CASE_DECL(test_conformance_flash_save_rejects_null_value);
+#endif
+#if NAVHAL_CONFIG_DRV_FLASH
+NAVTEST_CASE_DECL(test_conformance_flash_read_rejects_null_value);
+#endif
+#if NAVHAL_CONFIG_DRV_FLASH
+NAVTEST_CASE_DECL(test_conformance_flash_read_rejects_null_size);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+NAVTEST_CASE_DECL(test_conformance_i2c_write_rejects_null_data);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+NAVTEST_CASE_DECL(test_conformance_i2c_read_rejects_null_data);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+NAVTEST_CASE_DECL(test_conformance_i2c_write_read_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_SPI
+NAVTEST_CASE_DECL(test_conformance_spi_transmit_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_SPI
+NAVTEST_CASE_DECL(test_conformance_spi_receive_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_SPI
+NAVTEST_CASE_DECL(test_conformance_spi_xfer_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_UART
+NAVTEST_CASE_DECL(test_conformance_uart_write_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_UART
+NAVTEST_CASE_DECL(test_conformance_uart_write_string_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+NAVTEST_CASE_DECL(test_conformance_dma_start_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+NAVTEST_CASE_DECL(test_conformance_dma_stop_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+NAVTEST_CASE_DECL(test_conformance_dma_clear_flags_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+NAVTEST_CASE_DECL(test_conformance_dma_set_memory_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_cfg);
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_out);
+#endif
+#if NAVHAL_CONFIG_DRV_PWM
+NAVTEST_CASE_DECL(test_conformance_pwm_start_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_PWM
+NAVTEST_CASE_DECL(test_conformance_pwm_stop_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_PWM
+NAVTEST_CASE_DECL(test_conformance_pwm_set_duty_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_PWM
+NAVTEST_CASE_DECL(test_conformance_pwm_set_frequency_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+NAVTEST_CASE_DECL(test_conformance_timer_init_rejects_null);
+#endif
 
 
 static const navtest_case_t conformance_cases[] = {
@@ -284,6 +517,75 @@ static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_sdio_init_rejects_null),
     NAVTEST_CASE(test_conformance_null_init_is_idempotent),
     NAVTEST_CASE(test_conformance_cap_macros_are_defined),
+#if NAVHAL_CONFIG_DRV_ADC
+    NAVTEST_CASE(test_conformance_adc_read_rejects_null_out),
+#endif
+#if NAVHAL_CONFIG_DRV_FLASH
+    NAVTEST_CASE(test_conformance_flash_save_rejects_null_value),
+#endif
+#if NAVHAL_CONFIG_DRV_FLASH
+    NAVTEST_CASE(test_conformance_flash_read_rejects_null_value),
+#endif
+#if NAVHAL_CONFIG_DRV_FLASH
+    NAVTEST_CASE(test_conformance_flash_read_rejects_null_size),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+    NAVTEST_CASE(test_conformance_i2c_write_rejects_null_data),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+    NAVTEST_CASE(test_conformance_i2c_read_rejects_null_data),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+    NAVTEST_CASE(test_conformance_i2c_write_read_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_SPI
+    NAVTEST_CASE(test_conformance_spi_transmit_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_SPI
+    NAVTEST_CASE(test_conformance_spi_receive_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_SPI
+    NAVTEST_CASE(test_conformance_spi_xfer_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_UART
+    NAVTEST_CASE(test_conformance_uart_write_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_UART
+    NAVTEST_CASE(test_conformance_uart_write_string_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+    NAVTEST_CASE(test_conformance_dma_start_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+    NAVTEST_CASE(test_conformance_dma_stop_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+    NAVTEST_CASE(test_conformance_dma_clear_flags_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+    NAVTEST_CASE(test_conformance_dma_set_memory_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+    NAVTEST_CASE(test_conformance_dma_remaining_rejects_null_cfg),
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+    NAVTEST_CASE(test_conformance_dma_remaining_rejects_null_out),
+#endif
+#if NAVHAL_CONFIG_DRV_PWM
+    NAVTEST_CASE(test_conformance_pwm_start_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_PWM
+    NAVTEST_CASE(test_conformance_pwm_stop_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_PWM
+    NAVTEST_CASE(test_conformance_pwm_set_duty_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_PWM
+    NAVTEST_CASE(test_conformance_pwm_set_frequency_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+    NAVTEST_CASE(test_conformance_timer_init_rejects_null),
+#endif
 };
 
 const navtest_suite_t test_conformance_suite = {

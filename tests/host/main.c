@@ -25,6 +25,7 @@
 
 #include "navtest/navtest.h"
 #include "test_conversion.h"
+#include "test_boot_sniffer.h"
 #include "test_crc_sw.h"
 #include "test_gpio_encoding.h"
 #include "test_hal_status.h"
@@ -36,6 +37,7 @@ static const navtest_suite_t *const host_suites[] = {
     &test_conversion_suite,
     &test_crc_sw_suite,
     &test_gpio_encoding_suite,
+    &test_boot_sniffer_suite,
 };
 
 int main(void) {

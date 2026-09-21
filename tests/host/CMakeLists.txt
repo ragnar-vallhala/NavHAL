@@ -44,6 +44,7 @@ add_executable(tests_host
   test_crc_sw.c
   test_gpio_encoding.c
   test_hal_status.c
+  test_boot_sniffer.c
 
   ${NAVHAL_ROOT}/tests/navtest_state.c
 
@@ -54,6 +55,9 @@ add_executable(tests_host
   # live in the common layer rather than the vendor driver.
   ${NAVHAL_ROOT}/src/common/hal_crc.c
   ${NAVHAL_ROOT}/src/vendor/stm32/crc/crc.c
+  # Boot watcher: portable by construction -- no register access, and the only
+  # hardware it touches is the reset, which the suite stubs out.
+  ${NAVHAL_ROOT}/src/common/hal_boot.c
 )
 target_include_directories(tests_host PRIVATE
   ${NAVHAL_ROOT}/include

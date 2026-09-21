@@ -294,8 +294,23 @@ static void _i2c_dma_irq_handler(void) {
 
 /** @brief The F7 I2C backend. The DMA entry point above stays a public
  *  capability-gated symbol; it is not part of the portable contract. */
+/* The F7 has no CR1.SWRST: clearing PE is itself the reset, per RM0410 --
+ * the peripheral drops its state machine and most of CR2/ISR when disabled.
+ * Same observable contract as the F4 deinit, different mechanism. */
+static hal_status_t stm32f7_i2c_deinit(hal_i2c_bus_t bus) {
+  volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
+  if (!I2C)
+    return HAL_ERR_INVALID_ARG;
+
+  I2C->CR1 &= ~I2C_CR1_PE;
+
+  __i2c_init_status &= (uint8_t)~(1u << bus);
+  return HAL_OK;
+}
+
 const hal_i2c_ops_t _hal_i2c_ops = {
     .init = stm32f7_i2c_init,
+    .deinit = stm32f7_i2c_deinit,
     .write = stm32f7_i2c_write,
     .read = stm32f7_i2c_read,
     .write_read = stm32f7_i2c_write_read,

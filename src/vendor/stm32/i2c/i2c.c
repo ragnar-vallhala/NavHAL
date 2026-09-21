@@ -214,7 +214,7 @@ static hal_status_t stm32_i2c_init(hal_i2c_bus_t bus,
   }
 }
 
-hal_status_t hal_i2c_deinit(hal_i2c_bus_t bus) {
+static hal_status_t stm32_i2c_deinit(hal_i2c_bus_t bus) {
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
 
   // Disable the peripheral and assert/release the software reset so the next
@@ -469,6 +469,7 @@ static hal_status_t stm32_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
 
 const hal_i2c_ops_t _hal_i2c_ops = {
     .init = stm32_i2c_init,
+    .deinit = stm32_i2c_deinit,
     .write = stm32_i2c_write,
     .read = stm32_i2c_read,
     .write_read = stm32_i2c_write_read,

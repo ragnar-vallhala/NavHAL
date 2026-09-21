@@ -43,6 +43,8 @@ extern "C" {
 typedef struct {
   /** Backend for ::hal_i2c_init. NULL @p config rejected upstream. */
   hal_status_t (*init)(hal_i2c_bus_t bus, const hal_i2c_config_t *config);
+  /** Backend for ::hal_i2c_deinit. */
+  hal_status_t (*deinit)(hal_i2c_bus_t bus);
   /** Backend for ::hal_i2c_write. NULL @p data rejected upstream. */
   hal_status_t (*write)(hal_i2c_bus_t bus, uint8_t dev_addr,
                         const uint8_t *data, uint16_t len);

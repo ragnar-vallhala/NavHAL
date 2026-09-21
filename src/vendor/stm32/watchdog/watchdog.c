@@ -27,6 +27,7 @@
 
 #include "common/hal_watchdog.h"
 #include "internal/hal_watchdog_ops.h"
+#include "internal/hal_wwdg_ops.h"
 #include "common/hal_clock.h"
 #include "family/rcc_reg.h"
 #include "family/wdg_reg.h"
@@ -108,10 +109,8 @@ static uint8_t wwdg_reload;  /**< T value written on every kick. */
 static uint8_t wwdg_window;  /**< W value; kicking above it resets the part. */
 static uint8_t wwdg_running;
 
-hal_status_t hal_wwdg_start(uint32_t timeout_ms, uint32_t window_ms) {
-  if (timeout_ms == 0U || window_ms >= timeout_ms)
-    return HAL_ERR_INVALID_ARG;
-
+static hal_status_t stm32_wwdg_start(uint32_t timeout_ms, uint32_t window_ms) {
+  /* timeout_ms != 0 and window_ms < timeout_ms: checked by the shared layer. */
   const uint32_t pclk1 = hal_clock_get_apb1clk();
   if (pclk1 == 0U)
     return HAL_ERR_NOT_INITIALIZED;
@@ -153,7 +152,7 @@ hal_status_t hal_wwdg_start(uint32_t timeout_ms, uint32_t window_ms) {
   return HAL_OK;
 }
 
-hal_status_t hal_wwdg_kick(void) {
+static hal_status_t stm32_wwdg_kick(void) {
   if (!wwdg_running)
     return HAL_ERR_NOT_INITIALIZED;
   /* WDGA is set-only, so writing the counter alone cannot switch it off. */
@@ -161,13 +160,22 @@ hal_status_t hal_wwdg_kick(void) {
   return HAL_OK;
 }
 
-bool hal_wwdg_window_open(void) {
+static bool stm32_wwdg_window_open(void) {
   if (!wwdg_running)
     return false;
   return (WWDG->CR & WWDG_CR_T_MASK) <= wwdg_window;
 }
 
-bool hal_wwdg_is_running(void) { return wwdg_running != 0U; }
+static bool stm32_wwdg_is_running(void) { return wwdg_running != 0U; }
+
+
+/** @brief The STM32 window-watchdog backend. */
+const hal_wwdg_ops_t _hal_wwdg_ops = {
+    .start = stm32_wwdg_start,
+    .kick = stm32_wwdg_kick,
+    .window_open = stm32_wwdg_window_open,
+    .is_running = stm32_wwdg_is_running,
+};
 
 #endif /* NAVHAL_CONFIG_DRV_WWDG */
 

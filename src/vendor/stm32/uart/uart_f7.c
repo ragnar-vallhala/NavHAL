@@ -236,14 +236,6 @@ static _uart_dma_params_t _get_uart_dma_params(hal_uart_t uart, int is_tx) {
   return p;
 }
 
-/* Re-arm cache: index = USARTn*2 + (RX?1:0), n in {1:0, 2:1, 3:2, 6:3}. */
-static int _uart_dma_idx(hal_uart_t uart, int is_tx) {
-  int n = (uart == HAL_UART_1)   ? 0
-          : (uart == HAL_UART_2) ? 1
-          : (uart == HAL_UART_3) ? 2
-                                 : 3;
-  return n * 2 + (is_tx ? 0 : 1);
-}
 
 
 /*

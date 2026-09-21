@@ -38,6 +38,10 @@ hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config) {
   return _hal_i2c_ops.init(bus, config);
 }
 
+hal_status_t hal_i2c_deinit(hal_i2c_bus_t bus) {
+  return _hal_i2c_ops.deinit(bus);
+}
+
 hal_status_t hal_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
                            const uint8_t *data, uint16_t len) {
   if (data == NULL)

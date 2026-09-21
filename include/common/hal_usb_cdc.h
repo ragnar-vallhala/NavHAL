@@ -22,7 +22,7 @@
  * @details
  * The target enumerates as a USB full-speed CDC-ACM device — a virtual COM
  * port (`/dev/ttyACM0` on Linux, a COM port on Windows). There is one such
- * device per target, so — like ::hal_sdio — the functions take no instance id.
+ * device per target, so — like @ref HAL_SDIO — the functions take no instance id.
  *
  * Receive is interrupt-driven into an internal ring buffer: ::hal_usb_cdc_read
  * never blocks and returns what has arrived so far. Transmit copies into the

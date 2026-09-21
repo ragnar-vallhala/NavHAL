@@ -25,7 +25,7 @@
  * operates at the frame level: the caller sends and receives complete Ethernet
  * frames (destination MAC, source MAC, ethertype/length, payload), and a
  * network stack layers on top. There is a single MAC per target, so — like
- * ::hal_sdio — the functions take no instance id.
+ * @ref HAL_SDIO — the functions take no instance id.
  *
  * The MAC drives its own dedicated DMA with descriptor rings, separate from the
  * general-purpose controller in @c hal_dma. Frame transfers are therefore

@@ -42,20 +42,19 @@ extern "C" {
 #include "navhal_port_dma.h"
 
 /**
- * @brief Write a register address then read it back via DMA (non-blocking).
- * @param bus      I²C bus instance.
- * @param dev_addr 7-bit device address.
- * @param reg      Target register address.
- * @param dma_cfg  Fully populated DMA configuration.
- * @param callback Invoked when the DMA transfer completes.
- * @return ::HAL_OK once the sequence is started, or an error status.
- */
-/**
  * @brief Read @p length bytes from @p reg over DMA, then call @p callback.
  *
  * The DMA wiring comes from the bus's binding, so a caller no longer supplies
  * a ::hal_dma_config_t. See ::hal_i2c_dma_set_binding to move a transfer off
  * its default stream.
+ *
+ * @param bus      I²C bus instance.
+ * @param dev_addr 7-bit device address.
+ * @param reg      Target register address.
+ * @param buffer   Destination for the bytes read.
+ * @param length   Number of bytes to read.
+ * @param callback Invoked when the DMA transfer completes.
+ * @return ::HAL_OK once the sequence is started, or an error status.
  */
 hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
                                    uint8_t reg, uint8_t *buffer,
@@ -67,7 +66,9 @@ hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
  * The reference-manual default, or the override installed by
  * ::hal_i2c_dma_set_binding.
  *
- * @param tx true for the transmit request, false for receive.
+ * @param bus I²C bus instance.
+ * @param tx  true for the transmit request, false for receive.
+ * @param out Receives the binding; must not be NULL.
  * @return ::HAL_ERR_NOT_SUPPORTED on a port whose mapping is not established.
  */
 hal_status_t hal_i2c_dma_get_binding(hal_i2c_bus_t bus, bool tx,

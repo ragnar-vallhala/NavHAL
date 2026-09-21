@@ -114,7 +114,7 @@ bool hal_interrupt_is_pending(hal_irq_t irq);
  *
  * For ARMv7-M system exceptions (HardFault, MemManage, BusFault, UsageFault,
  * ...) there is no callback: each has a named weak vector — define a strong
- * @c <Name>_Handler to handle it.
+ * @c NAME_Handler to handle it (@c HardFault_Handler, and so on).
  *
  * @param irq      IRQ number.
  * @param callback Callback function, or NULL to clear.

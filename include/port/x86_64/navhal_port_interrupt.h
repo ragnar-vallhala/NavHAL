@@ -12,7 +12,7 @@
  *
  * @details
  * Implements the core `hal_interrupt_*` contract against the legacy 8259 PIC.
- * IRQ lines are ::hal_irq_t (see family/interrupt_reg.h). The IDT and ISR entry
+ * IRQ lines are @c hal_irq_t (see @c family/interrupt_reg.h). The IDT and ISR entry
  * stubs are the CPU-arch layer (src/arch/x86_64/interrupt); this API is the
  * platform interrupt controller — enabling/disabling lines and dispatching to
  * registered callbacks.

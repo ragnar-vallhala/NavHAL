@@ -22,7 +22,7 @@
  * @details
  * A calendar that keeps running while the rest of the chip is reset, plus a
  * handful of 32-bit registers in the same always-on domain. There is one RTC
- * per target, so — like ::hal_sdio — the functions take no instance id.
+ * per target, so — like @ref HAL_SDIO — the functions take no instance id.
  *
  * The RTC counts from its own low-speed oscillator, not the system clock:
  * an external 32.768 kHz crystal (LSE) if the board has one, otherwise the

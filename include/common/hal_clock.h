@@ -47,18 +47,9 @@ extern "C" {
 
 
 /**
- * @brief Initialize the system clock.
- *
- * @param cfg     Main clock configuration; must not be NULL.
- * @param pll_cfg PLL configuration; must not be NULL when
- *                @c cfg->source is ::HAL_CLOCK_SOURCE_PLL, ignored otherwise.
- * @return ::HAL_OK on success, or ::HAL_ERR_INVALID_ARG if a required
- *         argument is NULL.
+ * @brief Configure the system clock.
  *
  * @note Must be called before using other peripheral clocks.
- */
-/**
- * @brief Configure the system clock.
  *
  * @param cfg Port-defined clock configuration. On ports whose clock is driven
  *            by a PLL the PLL parameters live in @c cfg (see the port's

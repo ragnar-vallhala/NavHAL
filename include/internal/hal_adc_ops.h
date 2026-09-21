@@ -27,7 +27,7 @@
  *
  * Both entries are irreducible: configuring the converter and running a
  * single conversion. Multi-channel or averaged reads, if they ever arrive,
- * belong in the shared layer built on ::read.
+ * belong in the shared layer built on @c read.
  */
 
 #ifndef NAVHAL_INTERNAL_HAL_ADC_OPS_H

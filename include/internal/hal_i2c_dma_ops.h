@@ -26,13 +26,13 @@
  *
  * Two entries, and they are there for different reasons.
  *
- * ::default_binding is the hardware fact the caller used to have to supply.
+ * @c default_binding is the hardware fact the caller used to have to supply.
  * Before this, @c hal_i2c_read_regs_dma took a @c hal_dma_config_t from the
  * application, so application code had to know which controller, stream and
  * channel its I2C bus was wired to. That is a reference-manual property of the
  * silicon, not a decision a caller should be making.
  *
- * ::read_regs stays a backend entry rather than being lifted, because the
+ * @c read_regs stays a backend entry rather than being lifted, because the
  * register sequence around the transfer -- START, address, ADDR clear,
  * restart, then hand off -- genuinely differs between the F4 legacy I2C and
  * the F7 TIMINGR/CR2 generation. That is two implementations of one

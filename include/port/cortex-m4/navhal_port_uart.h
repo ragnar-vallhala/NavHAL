@@ -74,14 +74,15 @@ hal_status_t hal_uart_detach_idle_callback(hal_uart_t uart);
  * -------------------------------------------------------------------------- */
 #if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
 
-/** @brief Transmit a byte buffer using DMA (buffer must stay valid). */
 /**
  * @brief The DMA wiring this UART and direction will use.
  *
  * The reference-manual default, or the override installed by
  * ::hal_uart_dma_set_binding.
  *
- * @param tx true for the transmit request, false for receive.
+ * @param uart UART instance.
+ * @param tx   true for the transmit request, false for receive.
+ * @param out  Receives the binding; must not be NULL.
  */
 hal_status_t hal_uart_dma_get_binding(hal_uart_t uart, bool tx,
                                       hal_dma_binding_t *out);

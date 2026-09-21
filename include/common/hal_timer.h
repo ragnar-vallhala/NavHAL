@@ -164,7 +164,8 @@ hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler);
  * Divide-by-N on every port. A port whose hardware offers only a fixed set of
  * dividers uses the closest one it has.
  *
- * @param divider Must be non-zero.
+ * @param timer   Timer identifier.
+ * @param divider Clock divider; must be non-zero.
  */
 hal_status_t hal_timer_set_divider(hal_timer_t timer, uint32_t divider);
 /** @brief Set a timer's auto-reload (ARR). */

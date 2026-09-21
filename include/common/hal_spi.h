@@ -120,12 +120,6 @@ typedef struct {
 } hal_spi_config_t;
 
 /**
- * @brief Initialize an SPI peripheral in master mode.
- * @param spi    SPI instance.
- * @param config Configuration; must not be NULL.
- * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL config / invalid SPI.
- */
-/**
  * @brief Initialise an SPI instance at the closest bit rate not exceeding
  *        @p target_hz.
  *
@@ -149,6 +143,12 @@ hal_status_t hal_spi_init_hz(hal_spi_instance_t spi,
  */
 uint32_t hal_spi_get_clock_hz(hal_spi_instance_t spi);
 
+/**
+ * @brief Initialize an SPI peripheral in master mode.
+ * @param spi    SPI instance.
+ * @param config Configuration; must not be NULL.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL config / invalid SPI.
+ */
 hal_status_t hal_spi_init(hal_spi_instance_t spi,
                           const hal_spi_config_t *config);
 

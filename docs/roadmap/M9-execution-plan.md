@@ -67,6 +67,24 @@ For each subsystem `<sub>` with a public `hal_<sub>` API:
 Reference to copy: `include/internal/hal_gpio_ops.h`, `src/common/hal_gpio.c`,
 `src/vendor/stm32/gpio/gpio.c`.
 
+### Boundary principle: primitives vs 1:1 dispatch
+
+A 1:1 ops table (one entry per public function) only dedups *validation* — a
+small win. The larger win comes from **inverting the boundary**: where the
+public API is built from portable logic on top of a few hardware operations,
+the vtable should expose just those **primitives** and the common layer should
+implement the rich API **once**. Apply this where there is genuinely shared
+logic to lift; keep the plain 1:1 dispatch where vendors legitimately diverge
+(the 1:1 layer still earns the single-validation-point + conformance seam).
+
+| Subsystem | Treatment | Rationale |
+|---|---|---|
+| uart  | **primitives** (done) | init/enable_irq/write_char/read_char/available; the 6 formatters + read_until live once in the common layer |
+| crc   | **primitives**        | software CRC-32/MPEG-2 is identical across AVR + STM32-software → one shared impl; vtable = HW-accel hook |
+| spi   | **primitives**        | transmit/receive/transmit_receive collapse to shared loops over one `xfer_byte` |
+| i2c   | partial               | write loop lifts; read keeps STM32's N=1/2/>2 framing in the backend |
+| gpio, clock, pwm, timer, flash | **1:1 dispatch** | register pokes or divergent strategies (e.g. flash 2-sector compaction vs EEPROM append) — nothing portable to lift |
+
 ## Scope
 
 ### Vendor-layer (10) — backend in `src/vendor/{stm32,microchip}/<sub>/`

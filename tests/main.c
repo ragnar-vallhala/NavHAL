@@ -31,6 +31,7 @@
 #include "portable/test_flash_raw.h"
 #include "portable/test_timebase.h"
 #include "portable/conformance/test_conformance.h"
+#include "portable/conformance/test_vtable.h"
 
 #include "cap/cache/test_cache.h"
 #include "cap/dma/test_dma.h"
@@ -108,6 +109,7 @@ static const navtest_suite_t *const all_suites[] = {
     &test_conformance_suite,   /* portable HAL-contract assertions; runs
                                   on every arch (navtest PROGMEM keeps
                                   __FILE__/msg strings out of AVR .data). */
+    &test_vtable_suite,        /* every linked ops table is fully filled in */
     &test_timebase_suite,
 #if NAVHAL_CONFIG_DRV_DMA
     &test_dma_suite,

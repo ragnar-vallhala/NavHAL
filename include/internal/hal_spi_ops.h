@@ -56,6 +56,17 @@ typedef struct {
    *         internal iteration guard bounds a stuck transfer).
    */
   hal_status_t (*xfer_byte)(hal_spi_instance_t spi, uint8_t out, uint8_t *in);
+  /**
+   * Frequency feeding this instance's baud-rate divider, in Hz.
+   *
+   * SPI1 hangs off APB2 and SPI2/3 off APB1 on this family, so only the
+   * backend knows. The shared layer uses it to turn a requested bit rate into
+   * a divider, the same way the timer layer turns a frequency into ticks.
+   */
+  uint32_t (*input_clock)(hal_spi_instance_t spi);
+
+  /** The divider selector currently programmed, 0..7 (BR[2:0]). */
+  uint8_t (*get_baudrate)(hal_spi_instance_t spi);
 } hal_spi_ops_t;
 
 /** @brief The active port's SPI primitives (defined by one backend). */

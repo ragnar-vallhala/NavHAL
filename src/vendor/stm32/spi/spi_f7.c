@@ -36,6 +36,7 @@
 #include "navhal_port_spi.h"
 
 #include "internal/hal_spi_ops.h"
+#include "common/hal_clock.h"
 #include "navhal_port_gpio.h"
 #include "family/rcc_reg.h"
 #include "family/spi_reg.h"
@@ -144,7 +145,22 @@ static hal_status_t stm32f7_spi_xfer_byte(hal_spi_instance_t spi, uint8_t out,
 }
 
 /** @brief The F7 SPI primitives; framing loops live in the shared layer. */
+
+/* SPI1 is an APB2 peripheral; SPI2 (and SPI3) hang off APB1. */
+static uint32_t stm32f7_spi_input_clock(hal_spi_instance_t spi) {
+  return (spi == HAL_SPI_1) ? hal_clock_get_apb2clk() : hal_clock_get_apb1clk();
+}
+
+static uint8_t stm32f7_spi_get_baudrate(hal_spi_instance_t spi) {
+  volatile SPI_Reg_Typedef *spi_reg = _get_spi(spi);
+  if (!spi_reg)
+    return 0u;
+  return (uint8_t)((spi_reg->CR1 & SPI_CR1_BR_Msk) >> SPI_CR1_BR_Pos);
+}
+
 const hal_spi_ops_t _hal_spi_ops = {
     .init = stm32f7_spi_init,
     .xfer_byte = stm32f7_spi_xfer_byte,
+    .input_clock = stm32f7_spi_input_clock,
+    .get_baudrate = stm32f7_spi_get_baudrate,
 };

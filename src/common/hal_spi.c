@@ -85,3 +85,38 @@ hal_status_t hal_spi_transmit_receive(hal_spi_instance_t spi,
   }
   return HAL_OK;
 }
+
+/* BR[2:0] selects a divider of 2^(BR+1): 0 -> /2 up to 7 -> /256. */
+#define SPI_BR_MIN 0u
+#define SPI_BR_MAX 7u
+
+uint32_t hal_spi_get_clock_hz(hal_spi_instance_t spi) {
+  uint32_t pclk = _hal_spi_ops.input_clock(spi);
+  if (pclk == 0u)
+    return 0u;
+  return pclk >> ((uint32_t)_hal_spi_ops.get_baudrate(spi) + 1u);
+}
+
+hal_status_t hal_spi_init_hz(hal_spi_instance_t spi,
+                             const hal_spi_config_t *cfg, uint32_t target_hz) {
+  if (cfg == NULL || target_hz == 0u)
+    return HAL_ERR_INVALID_ARG;
+
+  uint32_t pclk = _hal_spi_ops.input_clock(spi);
+  if (pclk == 0u)
+    return HAL_ERR_INVALID_ARG;
+
+  /* Round the rate down, never up: clocking a peripheral past the rate the
+   * caller asked for is the failure that is hard to see on a scope. */
+  uint32_t br;
+  for (br = SPI_BR_MIN; br <= SPI_BR_MAX; br++) {
+    if ((pclk >> (br + 1u)) <= target_hz)
+      break;
+  }
+  if (br > SPI_BR_MAX)
+    return HAL_ERR_INVALID_ARG; /* even /256 is faster than requested */
+
+  hal_spi_config_t local = *cfg;
+  local.baudrate = (hal_spi_baudrate_t)br;
+  return _hal_spi_ops.init(spi, &local);
+}

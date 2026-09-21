@@ -26,6 +26,7 @@
 #include "host_mmio.h"
 #include "navhal_port_spi.h"
 #include "family/spi_reg.h"
+#include "common/hal_clock.h"
 #include "navtest/navtest.h"
 #include <stdint.h>
 
@@ -112,6 +113,53 @@ void test_host_spi_rejects_null_data(void) {
   TEST_ASSERT_TRUE(hal_spi_receive(HAL_SPI_1, NULL, 4, 0) != HAL_OK);
 }
 
+/* The divider solver must never clock the bus faster than asked. The host
+ * clock backend reports a fixed APB frequency, so the expected divider is
+ * exact rather than approximate. */
+void test_host_spi_init_hz_rounds_down(void) {
+  host_mmio_reset();
+  hal_spi_config_t cfg = {.baudrate = HAL_SPI_BAUDRATE_DIV2,
+                          .cpol = HAL_SPI_CPOL_LOW,
+                          .cpha = HAL_SPI_CPHA_1EDGE,
+                          .datasize = HAL_SPI_DATASIZE_8BIT,
+                          .firstbit = HAL_SPI_FIRSTBIT_MSB};
+
+  uint32_t pclk = hal_clock_get_apb2clk();
+  TEST_ASSERT_TRUE(pclk > 0u);
+
+  /* Ask for a rate strictly between /4 and /8; the solver must take /8. */
+  uint32_t between = (pclk / 8u) + ((pclk / 4u) - (pclk / 8u)) / 2u;
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_spi_init_hz(HAL_SPI_1, &cfg, between));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_SPI_BAUDRATE_DIV8 << SPI_CR1_BR_Pos,
+                           s(HAL_SPI_1)->CR1 & SPI_CR1_BR_Msk);
+  TEST_ASSERT_EQUAL_UINT32(pclk / 8u, hal_spi_get_clock_hz(HAL_SPI_1));
+
+  /* An exact divider boundary takes that divider, not the next one down. */
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK, (uint32_t)hal_spi_init_hz(HAL_SPI_1, &cfg, pclk / 4u));
+  TEST_ASSERT_EQUAL_UINT32(pclk / 4u, hal_spi_get_clock_hz(HAL_SPI_1));
+}
+
+void test_host_spi_init_hz_rejects_unreachable(void) {
+  host_mmio_reset();
+  hal_spi_config_t cfg = {.baudrate = HAL_SPI_BAUDRATE_DIV2,
+                          .cpol = HAL_SPI_CPOL_LOW,
+                          .cpha = HAL_SPI_CPHA_1EDGE,
+                          .datasize = HAL_SPI_DATASIZE_8BIT,
+                          .firstbit = HAL_SPI_FIRSTBIT_MSB};
+
+  /* Slower than /256 is not reachable, and zero is not a rate. */
+  uint32_t too_slow = hal_clock_get_apb2clk() / 256u - 1u;
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_spi_init_hz(HAL_SPI_1, &cfg, too_slow));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_spi_init_hz(HAL_SPI_1, &cfg, 0u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_spi_init_hz(HAL_SPI_1, NULL, 1000u));
+}
+
 NAVTEST_CASE_DECL(test_host_spi_init_cr1_fields);
 NAVTEST_CASE_DECL(test_host_spi_init_cr2_datasize_8bit);
 NAVTEST_CASE_DECL(test_host_spi_init_cr2_datasize_16bit);
@@ -119,6 +167,8 @@ NAVTEST_CASE_DECL(test_host_spi_init_rejects_null);
 NAVTEST_CASE_DECL(test_host_spi_transmit_writes_dr);
 NAVTEST_CASE_DECL(test_host_spi_transmit_receive_round_trips_dr);
 NAVTEST_CASE_DECL(test_host_spi_rejects_null_data);
+NAVTEST_CASE_DECL(test_host_spi_init_hz_rounds_down);
+NAVTEST_CASE_DECL(test_host_spi_init_hz_rejects_unreachable);
 
 static const navtest_case_t spi_driver_cases[] = {
     NAVTEST_CASE(test_host_spi_init_cr1_fields),
@@ -128,6 +178,8 @@ static const navtest_case_t spi_driver_cases[] = {
     NAVTEST_CASE(test_host_spi_transmit_writes_dr),
     NAVTEST_CASE(test_host_spi_transmit_receive_round_trips_dr),
     NAVTEST_CASE(test_host_spi_rejects_null_data),
+    NAVTEST_CASE(test_host_spi_init_hz_rounds_down),
+    NAVTEST_CASE(test_host_spi_init_hz_rejects_unreachable),
 };
 
 const navtest_suite_t test_spi_driver_suite = {

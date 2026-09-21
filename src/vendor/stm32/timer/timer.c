@@ -388,6 +388,9 @@ static bool _timer_irq(hal_timer_t timer, hal_irq_t *out) {
 
 static hal_status_t stm32_timer_set_interrupt(hal_timer_t timer, bool on) {
   hal_irq_t irq;
+  if (GET_TIMx_BASE(timer) == NULL)
+    return HAL_ERR_INVALID_ARG;
+
   if (_timer_irq(timer, &irq)) {
     if (on)
       hal_interrupt_enable(irq);
@@ -408,8 +411,14 @@ static hal_status_t stm32_timer_set_interrupt(hal_timer_t timer, bool on) {
 static hal_status_t stm32_timer_set_callback(hal_timer_t timer,
                                              hal_timer_callback_t callback) {
   hal_irq_t irq;
+  if (GET_TIMx_BASE(timer) == NULL)
+    return HAL_ERR_INVALID_ARG;
+
+  /* A real timer whose IRQ line this port does not wire up (TIM1 splits its
+   * update interrupt across several vectors): there is nowhere to attach, and
+   * saying HAL_OK would promise a callback that never fires. */
   if (!_timer_irq(timer, &irq))
-    return HAL_OK;
+    return HAL_ERR_NOT_SUPPORTED;
 
   if (callback != NULL)
     hal_interrupt_attach_callback(irq, callback);

@@ -26,6 +26,14 @@ endchoice
 
 choice
     prompt "Vendor"
+    # A choice defaults to the first visible member sourced, i.e. alphabetically,
+    # so the default moves whenever a vendor is added ahead of the current one.
+    # The ACME reference port did exactly that on Cortex-M4 and silently became
+    # the default, which is the same trap the board choice below documents.
+    # Name the reference vendor per arch instead of relying on sort order.
+    default VENDOR_STM32 if ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    default VENDOR_MICROCHIP if ARCH_AVR8
+    default VENDOR_PC if ARCH_X86_64
     help
       Select the silicon vendor.
 source "src/vendor/*/Kconfig.choice"

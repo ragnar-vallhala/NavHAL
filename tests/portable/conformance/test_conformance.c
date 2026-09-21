@@ -415,6 +415,89 @@ void test_conformance_timer_init_rejects_null(void) {
 
 #endif /* NAVHAL_CONFIG_DRV_TIMER */
 
+
+/* Valid configs, so an instance-id test fails for the reason it says rather
+ * than tripping the NULL check first. */
+#if NAVHAL_CONFIG_DRV_I2C
+static const hal_i2c_config_t conf_i2c_cfg = {.clock_speed = HAL_I2C_SPEED_STANDARD,
+                                              .own_address = I2C_MASTER,
+                                              .acknowledge = true};
+#endif
+#if NAVHAL_CONFIG_DRV_SPI
+static const hal_spi_config_t conf_spi_cfg = {.baudrate = HAL_SPI_BAUDRATE_DIV8,
+                                              .cpol = HAL_SPI_CPOL_LOW,
+                                              .cpha = HAL_SPI_CPHA_1EDGE,
+                                              .datasize = HAL_SPI_DATASIZE_8BIT,
+                                              .firstbit = HAL_SPI_FIRSTBIT_MSB};
+#endif
+#if NAVHAL_CONFIG_DRV_UART
+static const hal_uart_config_t conf_uart_cfg = {.baudrate = 9600u};
+#endif
+
+/* An instance the port does not have is rejected, not poked. Only the backend
+ * knows its own valid range, so this is the half of the argument contract
+ * that deliberately did not move into the shared layer. */
+
+#if NAVHAL_CONFIG_DRV_ADC
+
+void test_conformance_adc_rejects_bad_unit(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_adc_init((hal_adc_t)99, NULL));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_ADC */
+
+
+#if NAVHAL_CONFIG_DRV_I2C
+
+void test_conformance_i2c_init_rejects_bad_bus(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_i2c_init((hal_i2c_bus_t)99, &conf_i2c_cfg));
+}
+
+void test_conformance_i2c_deinit_rejects_bad_bus(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_i2c_deinit((hal_i2c_bus_t)99));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_I2C */
+
+
+#if NAVHAL_CONFIG_DRV_SPI
+
+void test_conformance_spi_init_rejects_bad_instance(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_spi_init((hal_spi_instance_t)99, &conf_spi_cfg));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_SPI */
+
+
+#if NAVHAL_CONFIG_DRV_TIMER
+
+void test_conformance_timer_start_rejects_bad_timer(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_timer_start((hal_timer_t)99));
+}
+
+void test_conformance_timer_stop_rejects_bad_timer(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_timer_stop((hal_timer_t)99));
+}
+
+void test_conformance_timer_reset_rejects_bad_timer(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_timer_reset((hal_timer_t)99));
+}
+
+void test_conformance_timer_set_divider_rejects_zero(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_timer_set_divider(TEST_CONF_TIMER, 0u));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_TIMER */
+
+
+#if NAVHAL_CONFIG_DRV_UART
+
+void test_conformance_uart_init_rejects_bad_instance(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_uart_init((hal_uart_t)99, &conf_uart_cfg));
+}
+
+#endif /* NAVHAL_CONFIG_DRV_UART */
+
 NAVTEST_CASE_DECL(test_conformance_status_ok_is_zero);
 NAVTEST_CASE_DECL(test_conformance_status_errors_distinct);
 NAVTEST_CASE_DECL(test_conformance_status_fits_uint8);
@@ -430,6 +513,33 @@ NAVTEST_CASE_DECL(test_conformance_pwm_init_rejects_null);
 NAVTEST_CASE_DECL(test_conformance_sdio_init_rejects_null);
 NAVTEST_CASE_DECL(test_conformance_null_init_is_idempotent);
 NAVTEST_CASE_DECL(test_conformance_cap_macros_are_defined);
+#if NAVHAL_CONFIG_DRV_ADC
+NAVTEST_CASE_DECL(test_conformance_adc_rejects_bad_unit);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+NAVTEST_CASE_DECL(test_conformance_i2c_init_rejects_bad_bus);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+NAVTEST_CASE_DECL(test_conformance_i2c_deinit_rejects_bad_bus);
+#endif
+#if NAVHAL_CONFIG_DRV_SPI
+NAVTEST_CASE_DECL(test_conformance_spi_init_rejects_bad_instance);
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+NAVTEST_CASE_DECL(test_conformance_timer_start_rejects_bad_timer);
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+NAVTEST_CASE_DECL(test_conformance_timer_stop_rejects_bad_timer);
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+NAVTEST_CASE_DECL(test_conformance_timer_reset_rejects_bad_timer);
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+NAVTEST_CASE_DECL(test_conformance_timer_set_divider_rejects_zero);
+#endif
+#if NAVHAL_CONFIG_DRV_UART
+NAVTEST_CASE_DECL(test_conformance_uart_init_rejects_bad_instance);
+#endif
 #if NAVHAL_CONFIG_DRV_ADC
 NAVTEST_CASE_DECL(test_conformance_adc_read_rejects_null_out);
 #endif
@@ -517,6 +627,33 @@ static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_sdio_init_rejects_null),
     NAVTEST_CASE(test_conformance_null_init_is_idempotent),
     NAVTEST_CASE(test_conformance_cap_macros_are_defined),
+#if NAVHAL_CONFIG_DRV_ADC
+    NAVTEST_CASE(test_conformance_adc_rejects_bad_unit),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+    NAVTEST_CASE(test_conformance_i2c_init_rejects_bad_bus),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C
+    NAVTEST_CASE(test_conformance_i2c_deinit_rejects_bad_bus),
+#endif
+#if NAVHAL_CONFIG_DRV_SPI
+    NAVTEST_CASE(test_conformance_spi_init_rejects_bad_instance),
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+    NAVTEST_CASE(test_conformance_timer_start_rejects_bad_timer),
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+    NAVTEST_CASE(test_conformance_timer_stop_rejects_bad_timer),
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+    NAVTEST_CASE(test_conformance_timer_reset_rejects_bad_timer),
+#endif
+#if NAVHAL_CONFIG_DRV_TIMER
+    NAVTEST_CASE(test_conformance_timer_set_divider_rejects_zero),
+#endif
+#if NAVHAL_CONFIG_DRV_UART
+    NAVTEST_CASE(test_conformance_uart_init_rejects_bad_instance),
+#endif
 #if NAVHAL_CONFIG_DRV_ADC
     NAVTEST_CASE(test_conformance_adc_read_rejects_null_out),
 #endif

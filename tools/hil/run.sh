@@ -16,6 +16,12 @@
 #
 # Requires: arm-none-eabi-gcc, st-flash / st-info (stlink-tools), python3 +
 #           pyserial, and udevadm (to map an ST-Link serial to its ttyACM).
+#
+# A board whose VCP is root-owned looks disconnected here, because the
+# console cannot be read. Distributions leave that to TAG+="uaccess", which
+# is per-seat and does not always apply. Install
+# tools/hil/99-navhal-stlink.rules for group-based access that does not
+# depend on how the probe enumerated.
 
 set -euo pipefail
 
@@ -105,7 +111,13 @@ run_board() {  # $1 = board name; returns the on-target failure count
 
   # Match this board to a connected probe before spending time on a build.
   if ! detect_probe "$CHIPID"; then
-    echo "!! no connected ST-Link with a $CHIPID target (or no ttyACM for it)"
+    echo "!! no connected ST-Link with a $CHIPID target (or no usable ttyACM)"
+    # Distinguish "not plugged in" from "plugged in but the console is
+    # root-owned", because the fix is completely different.
+    if st-info --probe 2>/dev/null | grep -q "$CHIPID"; then
+      echo "!! a $CHIPID probe IS attached, but none has a readable VCP."
+      echo "!! install tools/hil/99-navhal-stlink.rules, then replug the board."
+    fi
     echo "!! skipping $board"
     return 3
   fi

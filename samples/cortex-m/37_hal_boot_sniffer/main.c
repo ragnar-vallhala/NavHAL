@@ -56,6 +56,10 @@
  * printf '\xB0\x07\xC0\xDE\xA5\x3C\x69\x96' > /dev/ttyACM0
  * @endcode
  *
+ * The CDC half needs a board whose USB device port is actually wired. A
+ * Nucleo-64 has none -- its only USB socket belongs to the ST-Link -- so there
+ * the CDC path starts, reports no host, and the UART half is what you drive.
+ *
  * The LED goes out, the board resets, and the banner comes back reporting that
  * the previous boot asked for the loader. Holding the user button refuses the
  * request instead: that is ::hal_boot_entry_disable, which on a vehicle is
@@ -194,9 +198,14 @@ int main(void) {
   hal_uart_attach_idle_callback(BOARD_CONSOLE_UART, on_uart_idle);
 
 #if NAVHAL_CONFIG_DRV_USB_CDC
+  /* A successful init means the peripheral is running, not that anything is
+   * listening: enumeration needs a host on the far end of a USB device port,
+   * and a Nucleo-64 has none -- its only USB socket belongs to the ST-Link.
+   * The loop below reports the connection when one appears, on a board that
+   * has the port wired. */
   if (hal_usb_cdc_init() == HAL_OK) {
     hal_usb_cdc_set_rx_callback(on_cdc_rx);
-    print("CDC up: the same sequence works on /dev/ttyACM* too\r\n");
+    print("CDC started; watching for a host\r\n");
   }
 #endif
 
@@ -204,6 +213,9 @@ int main(void) {
    * entirely in interrupts -- this loop could stop and the sequence would
    * still reboot the board. */
   bool refused = false;
+#if NAVHAL_CONFIG_DRV_USB_CDC
+  bool cdc_up = false;
+#endif
   while (1) {
     bool refuse_now = entry_should_be_refused();
     if (refuse_now != refused) {
@@ -216,6 +228,15 @@ int main(void) {
         print("entry enabled\r\n");
       }
     }
+
+#if NAVHAL_CONFIG_DRV_USB_CDC
+    bool cdc_now = hal_usb_cdc_connected();
+    if (cdc_now != cdc_up) {
+      cdc_up = cdc_now;
+      print(cdc_up ? "CDC enumerated: the sequence works there too\r\n"
+                   : "CDC disconnected\r\n");
+    }
+#endif
 
     hal_gpio_toggle(LED_BUILTIN);
     hal_delay_ms(refused ? 100u : 500u); /* fast blink while refusing */

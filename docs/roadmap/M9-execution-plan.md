@@ -87,31 +87,53 @@ logic to lift; keep the plain 1:1 dispatch where vendors legitimately diverge
 
 ## Scope
 
-### Vendor-layer (10) — backend in `src/vendor/{stm32,microchip}/<sub>/`
+Sixteen ops tables landed, not the ten this section originally listed. The
+differences are worth recording, because each was a wrong call rather than a
+change of mind.
 
-| Subsystem | Both targets? | Notes |
+### Migrated — one table per subsystem
+
+| Subsystem | Backends | Shape |
 |---|---|---|
-| uart          | yes        | NULL cfg + NULL-buffer hoist; baud math stays per-vendor |
-| i2c           | yes        | NULL cfg hoist; bus-init-status tracking stays per-vendor |
-| spi           | yes        | NULL cfg + NULL-buffer hoist |
-| flash         | yes        | NULL value/size-ptr hoist |
-| timer         | yes        | large API (~19 fns); NULL cfg hoist |
-| pwm           | yes        | NULL handle + freq≠0 hoist |
-| clock         | yes        | NULL cfg + NULL pll_cfg hoist |
-| crc           | yes        | NULL cfg hoist |
-| dma           | STM32 only | cap-gated `CONFIG_DRV_DMA`; thin table on Cortex, absent on AVR |
-| sdio + diskio | STM32 only | cap-gated `CONFIG_DRV_SDIO`; two related public headers |
+| gpio | stm32, microchip, acme | 1:1 + inline hot path in the vendor |
+| clock | stm32 (F4/F7), microchip, pc | `{init, get_sysclk, get_bus_count, get_bus_clock}` |
+| crc | stm32, microchip | primitives; one shared software CRC |
+| flash | stm32, microchip | 1:1 |
+| timer | stm32, microchip | inverted, 19 entries to 16 |
+| timebase | armv7e-m, microchip, pc | 1:1; `tick_us != 0` hoisted |
+| interrupt | armv7e-m, avr, pc | 1:1; NULL-callback hoisted |
+| pwm | stm32, microchip | 1:1 |
+| uart | stm32 (F4/F7), microchip, pc | primitives; 6 formatters shared |
+| i2c | stm32 (F4/F7), microchip | 1:1 + `deinit` |
+| spi | stm32 (F4/F7), microchip | primitives, `{init, xfer_byte}` |
+| adc | stm32, microchip | 1:1 |
+| reset | stm32, microchip | 1:1 |
+| watchdog | stm32, microchip | 1:1 |
+| wwdg | stm32 | sibling table, `DRV_WWDG` |
+| uart-dma, i2c-dma | stm32 (F4/F7) | sibling tables; binding op |
 
-### Arch-layer (4) — backend in `src/arch/<isa>/<sub>/`
+### Deliberately not migrated
 
-| Subsystem | Targets | Notes |
-|---|---|---|
-| interrupt | both (NVIC vs AVR vectors) | arch ops table; IRQ-bounds check stays in backend (arch-specific max), NULL-callback check hoists; keep `global_enable`/`disable` inline |
-| timebase  | both (**hybrid**)         | **unify under arch:** move `src/vendor/microchip/timebase/timebase.c` → `src/arch/avr/timebase/`; Cortex already in `src/arch/armv7e-m/timebase/`. Validate `tick_us≠0` in the public layer |
-| fpu       | Cortex only               | thin 1-entry table (contract uniformity + conformance); absent on AVR |
-| dwt       | Cortex only               | thin table; the cycle-counter API the perf test below uses |
+`rtc`, `eth`, `sdio`, `usb_cdc` are STM32-only; `mpu`, `cache`, `dwt`, `fpu`,
+`tcm` are ARMv7E-M arch features; `dma` has one backend. A table over a single
+implementation is indirection for a choice with no alternatives, so this
+section's call to give `dma`, `sdio`, `fpu` and `dwt` "thin tables for contract
+uniformity" was not taken. Revisit when a second implementation appears.
 
-GPIO is the landed reference.
+### Corrections to this section as first written
+
+* **`interrupt` and `timebase` were listed as arch-layer work and nearly
+  skipped.** Both have three or four backends and genuinely earned tables. A
+  survey that looked only under `src/vendor/` missed them.
+* **The instruction to move the AVR timebase to `src/arch/avr/` was wrong.**
+  SysTick is a core peripheral, so the Cortex timebase belongs to arch; the
+  ATmega328P timebase is Timer0 with `ISR(TIMER0_COMPA_vect)`, a vendor
+  peripheral. It is filed correctly where it is. Moving it would have repeated
+  the layering error that put GPIO's hot path, the NVIC and the vector table
+  in the wrong tree.
+* **`DRV_TIMER` gated two different drivers.** The general-purpose
+  `hal_timer_*` and `hal_timebase_*` now have separate symbols, because a port
+  can have a timebase without a timer peripheral — x86 does.
 
 ## Work breakdown
 
@@ -191,16 +213,33 @@ full matrix below.
 
 ## Verification (end-to-end)
 
-Run after each subsystem commit, and the full set before opening the PR:
+Run after each subsystem commit, and every job before opening the PR. The
+counts below are what the tree produces today, not what it produced when this
+plan was written.
 
-* **Host:** `tools/run_host_tests.sh` (currently 24 tests).
-* **PIL, debug, both arches:** `bash tools/pil/run.sh nucleo_f401re` (143) and
-  `bash tools/pil/run.sh atmega328p` (36) — must stay green
-  (behaviour-preserving), plus the new vtable-completeness and perf cases.
-* **PIL, release/LTO, both arches:** proves LTO doesn't drop ISRs and the perf
-  test passes (zero-cost dispatch).
-* **Samples:** `tools/build_all_samples.sh` (28 Cortex) and
-  `tools/build_all_avr_samples.sh` (12 AVR), in both debug and release.
-* **Disassembly spot-check:** a dispatched call (e.g. `hal_gpio_set_mode`)
-  devirtualises to a direct call under `-O2 -flto` on both arches.
-* **Lint:** `tools/lint_commits.sh main..HEAD` green.
+* **Host (SIL):** `tools/ntest host` — 24 pure-logic + 65 driver tests.
+* **PIL, both boards:** `bash tools/pil/run.sh nucleo_f401re` (201) and
+  `bash tools/pil/run.sh nucleo_f767zi` (208).
+* **Capability contract:** `tools/ntest cap-contract` — 20 scenarios. This is
+  the only job that builds without pinning a vendor, and the only one that
+  caught the ACME port becoming the default vendor on Cortex-M4.
+* **Samples:** `tools/ntest samples m4` (34), `m7` (25), `avr` (13).
+* **x86:** the three `tools/qemu/smoke.sh` assertions.
+* **HIL, when a board is attached:** `bash tools/hil/run.sh nucleo_f401re`
+  (184 on silicon). Needs `tools/hil/99-navhal-stlink.rules` installed, or a
+  board's console stays root-owned and the runner reports it as absent.
+* **Disassembly spot-check:** `-Os -flto` leaves zero indirect dispatches in
+  `hal_blink` on both arches.
+* **Lint:** `tools/lint_commits.sh origin/main..HEAD`.
+
+What each tier can and cannot catch is worth stating, because relying on the
+wrong one cost time during this migration:
+
+* PIL does not model real baud or bus timing, so a clock-tree error passes
+  there and garbles the console on hardware.
+* The sample matrices only check that things build. An AVR image doubling in
+  size from `-O0` passed 13/13.
+* Neither PIL nor the samples pin nothing, so both missed a Kconfig default
+  changing under them. Only cap-contract did.
+* A stale build directory reports the previous run's result. Reconfigure from
+  scratch when a build-system change is in play.

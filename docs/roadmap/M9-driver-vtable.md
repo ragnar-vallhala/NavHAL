@@ -2,9 +2,9 @@
 
 # M9 — Driver vtable + vendor-backend abstraction
 
-> Status: **in progress** — GPIO landed as the reference; the HAL-wide
-> rollout, the LTO release config, and the conformance/perf harness are
-> tracked in the execution plan: @ref roadmap_m9_plan.
+> Status: **in progress** — the tables are done and the performance
+> criteria are met and measured; conformance coverage is the remaining
+> work. Detail in the execution plan: @ref roadmap_m9_plan.
 > Scope: introduce a HAL-internal interface between the public
 > `hal_*` API and per-vendor implementations, so adding a new vendor
 > means filling in a vtable, not re-writing every driver from scratch.
@@ -159,17 +159,59 @@ implement the HAL" gate that's missing today.
 * Conformance harness: ~1 week.
 * Total: **~6–7 weeks** of focused work, end to end.
 
+The migration came in broader than this estimate. It covers 16 ops
+tables rather than 8, because `adc`, `reset`, `watchdog`, `wwdg`,
+`interrupt`, `timebase` and the DMA siblings were all multi-backend
+too, and because two of those — `interrupt` and `timebase` — live under
+`src/arch/` and were missed by a scope survey that only looked at
+`src/vendor/`.
+
 ## Exit criteria
 
-* Adding a hypothetical "RP2040 GPIO" port = filling in
-  `rp2040_gpio_ops`, no other code changes. Concrete proof: a
-  one-PR addition of a new vendor's GPIO that's ≤ 300 lines.
-* Conformance harness covers every public `hal_*` function and
-  documents the expected behaviour. Passes on both Cortex-M4 and AVR.
-* No vendor `gpio.c` (or other migrated subsystem) re-implements
-  validation logic that's already in the public layer.
-* Performance: AVR `hal_gpio_set` is ≤ 2 cycles slower than today's
-  inlined version; release builds with `-flto` show no regression.
+* **Met.** Adding a vendor's GPIO = filling in an ops table, no other
+  code changes. Proved by the ACME reference port
+  (`src/vendor/acme/`): 365 lines across 13 new files, of which the
+  driver is 118 and the rest is scaffolding every port needs. Kconfig
+  and CMake discover it by glob and identity string, so neither needed
+  editing.
+
+  What the criterion did not anticipate: the inlined hot path was not
+  covered by it. `hal_gpio_write/read/toggle` lived in the *arch*
+  header, written against STM32's `BSRR`/`IDR`/`ODR`, so a second
+  vendor on the same arch had to emulate another vendor's register
+  layout. They now live with the vendor, beside the register map. A
+  vendor's GPIO contribution is two things it owns: an ops table for
+  configuration, and inline accessors for the hot path.
+
+* **Not met.** Conformance covers 38 of 176 public functions: the
+  NULL-argument contract and instance-id rejection. The rest —
+  getter sanity, init ordering — is the same shape and is what remains
+  of M9.
+
+* **Met.** No migrated backend re-implements validation the shared
+  layer performs. Checked by inspection across all migrated drivers;
+  what remains in backends is register-base and instance-range
+  checking, which only a port can do.
+
+* **Met, and measured rather than asserted.** `hal_gpio_write` is not
+  ≤2 cycles slower, it is identical: a constant pin compiles to one
+  `sbi` on AVR, the same instruction hand-written code emits.
+  Dispatch devirtualises completely under LTO — zero indirect calls
+  remain, on both architectures:
+
+  | Profile | AVR text / indirect | Cortex-M4 text / indirect |
+  |---|---|---|
+  | Debug (`-Og`) | 7910 B / 52 | 17816 B / 56 |
+  | Release (`-Os`) | 6996 B / 18 | 9676 B / 18 |
+  | ReleaseLTO | 838 B / **0** | 3920 B / **0** |
+
+  Measured on `hal_blink`. The byte counts owe as much to `-Os` as to
+  LTO; the indirect-call count is the load-bearing figure. Reaching
+  this needed three build fixes first: the tree could not produce an
+  optimised binary at all, because `-O0` was hardcoded in the arch
+  flags, the root CMakeLists discarded caller-supplied flags, and
+  armv7e-m never passed `-ffreestanding`, so GCC compiled `hal_strlen`
+  into a call to `strlen`.
 
 ## Open questions
 

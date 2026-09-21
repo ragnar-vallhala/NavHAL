@@ -92,6 +92,64 @@ static hal_status_t _toggle_pll_clock(uint8_t state) {
  * PLL parameters come from @c cfg->pll when the source is PLL.
  * @return ::HAL_OK on success, ::HAL_ERR_INVALID_ARG on a missing argument.
  */
+
+#define STM32_HSI_FREQ_HZ 16000000U
+#define STM32_HSE_FREQ_HZ 8000000U
+
+/* The frequency SYSCLK will run at once the switch below completes.
+ * stm32_clock_get_sysclk() reads the registers and so still reports the old
+ * source at the point the bus prescalers are programmed -- sizing them
+ * against that would leave the buses overclocked after the switch. */
+static uint32_t _target_sysclk_hz(const hal_clock_config_t *cfg) {
+  if (cfg->source == HAL_CLOCK_SOURCE_HSE)
+    return STM32_HSE_FREQ_HZ;
+  if (cfg->source != HAL_CLOCK_SOURCE_PLL)
+    return STM32_HSI_FREQ_HZ;
+
+  if (cfg->pll.pll_m == 0u || cfg->pll.pll_p == 0u)
+    return 0u;
+  uint32_t in = (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSE)
+                    ? STM32_HSE_FREQ_HZ
+                    : STM32_HSI_FREQ_HZ;
+  return (in / cfg->pll.pll_m) * cfg->pll.pll_n / cfg->pll.pll_p;
+}
+
+/* Divide-by-N to the RCC field encodings. HPRE skips 32; PPRE tops out at 16.
+ * Returns false for a divider the field cannot express. */
+static bool _hpre_encode(uint16_t div, uint32_t *out) {
+  switch (div) {
+  case 1: *out = RCC_CFGR_HPRE_DIV1; return true;
+  case 2: *out = RCC_CFGR_HPRE_DIV2; return true;
+  case 4: *out = RCC_CFGR_HPRE_DIV4; return true;
+  case 8: *out = RCC_CFGR_HPRE_DIV8; return true;
+  case 16: *out = RCC_CFGR_HPRE_DIV16; return true;
+  case 64: *out = RCC_CFGR_HPRE_DIV64; return true;
+  case 128: *out = RCC_CFGR_HPRE_DIV128; return true;
+  case 256: *out = RCC_CFGR_HPRE_DIV256; return true;
+  case 512: *out = RCC_CFGR_HPRE_DIV512; return true;
+  default: return false;
+  }
+}
+
+static bool _ppre_encode(uint16_t div, uint32_t *out) {
+  switch (div) {
+  case 1: *out = RCC_CFGR_PPRE_DIV1; return true;
+  case 2: *out = RCC_CFGR_PPRE_DIV2; return true;
+  case 4: *out = RCC_CFGR_PPRE_DIV4; return true;
+  case 8: *out = RCC_CFGR_PPRE_DIV8; return true;
+  case 16: *out = RCC_CFGR_PPRE_DIV16; return true;
+  default: return false;
+  }
+}
+
+/* Smallest divider keeping a bus at or under its ceiling. */
+static uint16_t _min_div_for(uint32_t hclk, uint32_t limit_hz) {
+  uint16_t d = 1u;
+  while (d < 16u && (hclk / d) > limit_hz)
+    d = (uint16_t)(d * 2u);
+  return d;
+}
+
 static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   /* A PLL source with no usable PLL parameters is rejected rather than being
    * programmed: m/n/p are divisors, and a zeroed config would either divide by
@@ -155,15 +213,46 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
     (*FLASH_ACR) |= (2 << FLASH_ACR_LATENCY_BIT);
   }
 
-  // Configure AHB, APB1, APB2 prescalers
+  /* Bus prescalers. The config's dividers used to be accepted and discarded;
+   * they are honoured now, with 0 meaning "pick one". Each is clamped to the
+   * bus ceiling from RM0368: AHB and APB2 are 84 MHz, APB1 is 42 MHz, and
+   * overclocking a bus is not something a caller should be able to ask for by
+   * getting the arithmetic wrong. */
+  uint32_t sysclk_hz = _target_sysclk_hz(cfg);
+  if (sysclk_hz == 0u)
+    return HAL_ERR_INVALID_ARG;
+
+  uint16_t hpre_div = (cfg->hpre_div != 0u) ? cfg->hpre_div : 1u;
+  uint32_t hpre;
+  if (!_hpre_encode(hpre_div, &hpre))
+    return HAL_ERR_INVALID_ARG;
+
+  uint32_t hclk = sysclk_hz / hpre_div;
+
+  /* 0 means "leave it to the driver", and that keeps the values this backend
+   * has always programmed rather than the fastest legal ones. Making a field
+   * work should not change the clock tree under firmware that never set it. */
+  uint16_t ppre1_div = (cfg->ppre1_div != 0u) ? cfg->ppre1_div : 2u;
+  uint16_t ppre2_div = (cfg->ppre2_div != 0u) ? cfg->ppre2_div : 2u;
+
+  /* Clamp an explicit request that would exceed the bus limit. */
+  uint16_t ppre1_min = _min_div_for(hclk, 42000000u);
+  uint16_t ppre2_min = _min_div_for(hclk, 84000000u);
+  if (ppre1_div < ppre1_min)
+    ppre1_div = ppre1_min;
+  if (ppre2_div < ppre2_min)
+    ppre2_div = ppre2_min;
+
+  uint32_t ppre1;
+  uint32_t ppre2;
+  if (!_ppre_encode(ppre1_div, &ppre1) || !_ppre_encode(ppre2_div, &ppre2))
+    return HAL_ERR_INVALID_ARG;
+
   (RCC->CFGR) &=
       ~(RCC_CFGR_HPRE_MASK | RCC_CFGR_PPRE1_MASK | RCC_CFGR_PPRE2_MASK);
-
-  (RCC->CFGR) |= (RCC_CFGR_HPRE_DIV1 << RCC_CFGR_HPRE_BIT); // AHB prescaler = 1
-  (RCC->CFGR) |=
-      (RCC_CFGR_PPRE_DIV2 << RCC_CFGR_PPRE1_BIT); // APB1 prescaler = 2
-  (RCC->CFGR) |=
-      (RCC_CFGR_PPRE_DIV2 << RCC_CFGR_PPRE2_BIT); // APB2 prescaler = 2
+  (RCC->CFGR) |= (hpre << RCC_CFGR_HPRE_BIT) |
+                 (ppre1 << RCC_CFGR_PPRE1_BIT) |
+                 (ppre2 << RCC_CFGR_PPRE2_BIT);
 
   // Switch system clock source (each switch-status wait is bounded too).
   if (cfg->source == HAL_CLOCK_SOURCE_HSI) {

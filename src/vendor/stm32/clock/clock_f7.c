@@ -39,6 +39,8 @@
 
 #include "navhal_port_clock.h"
 
+#include <stdbool.h>
+
 #include "internal/hal_clock_ops.h"
 #include "family/flash_reg.h"
 #include "family/rcc_reg.h"
@@ -92,6 +94,19 @@ static void _toggle_pll_clock(uint8_t state) {
 }
 
 /** @brief Resulting PLL output (= HCLK with AHB /1) for the given config, Hz. */
+
+/* Divide-by-N to the RCC PPRE field encoding. */
+static bool _ppre_encode(uint16_t div, uint32_t *out) {
+  switch (div) {
+  case 1: *out = RCC_CFGR_PPRE_DIV1; return true;
+  case 2: *out = RCC_CFGR_PPRE_DIV2; return true;
+  case 4: *out = RCC_CFGR_PPRE_DIV4; return true;
+  case 8: *out = RCC_CFGR_PPRE_DIV8; return true;
+  case 16: *out = RCC_CFGR_PPRE_DIV16; return true;
+  default: return false;
+  }
+}
+
 static uint32_t _pll_output_hz(const hal_pll_config_t *p) {
   if (p->pll_m == 0 || p->pll_p == 0)
     return 0;
@@ -172,10 +187,28 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   }
 
   /* Bus prescalers: AHB /1; APB1 ≤ 54 MHz, APB2 ≤ 108 MHz. */
+  /* Derived from the bus ceilings (APB1 54 MHz, APB2 108 MHz) unless the
+   * caller asked for a specific divider. An explicit request is still clamped
+   * to those ceilings: a config field should not be able to overclock a bus. */
   uint32_t ppre1 = (hclk <= 54000000U)    ? RCC_CFGR_PPRE_DIV1
                    : (hclk <= 108000000U) ? RCC_CFGR_PPRE_DIV2
                                           : RCC_CFGR_PPRE_DIV4;
   uint32_t ppre2 = (hclk <= 108000000U) ? RCC_CFGR_PPRE_DIV1 : RCC_CFGR_PPRE_DIV2;
+
+  if (cfg->ppre1_div != 0u) {
+    uint32_t req;
+    if (!_ppre_encode(cfg->ppre1_div, &req))
+      return HAL_ERR_INVALID_ARG;
+    if ((hclk / cfg->ppre1_div) <= 54000000U)
+      ppre1 = req;
+  }
+  if (cfg->ppre2_div != 0u) {
+    uint32_t req;
+    if (!_ppre_encode(cfg->ppre2_div, &req))
+      return HAL_ERR_INVALID_ARG;
+    if ((hclk / cfg->ppre2_div) <= 108000000U)
+      ppre2 = req;
+  }
 
   RCC->CFGR &= ~(RCC_CFGR_HPRE_MASK | RCC_CFGR_PPRE1_MASK | RCC_CFGR_PPRE2_MASK);
   RCC->CFGR |= (RCC_CFGR_HPRE_DIV1 << RCC_CFGR_HPRE_BIT) |

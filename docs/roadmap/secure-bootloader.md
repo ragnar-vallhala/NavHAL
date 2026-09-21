@@ -141,10 +141,135 @@ count starts clean. The application clears it only after a liveness threshold,
 never at startup, or a crash that happens after `main()` resets its own strike
 count forever.
 
-The magic-sequence matcher takes `(const uint8_t *, uint16_t)`, which is
-already `hal_usb_cdc_rx_callback_t` (`hal_usb_cdc.h:114`), so CDC registers it
-directly. `hal_uart.h` exposes no RX callback, so UART feeds the same function
-from the application's existing drain loop.
+The application-side half of this — how bytes reach the matcher on each
+transport, and when a match is allowed to act — is the boot sniffer below.
+
+## Boot sniffer
+
+The application watches its own console for a magic sequence and reboots into
+the loader when it sees one. This is the entry path that does not need a
+debugger, a button, or a working update protocol in the application.
+
+### What it has to survive
+
+The sniffer exists to recover a board whose application is misbehaving, so the
+requirement that shapes every choice below is that **it keeps working when the
+main loop is wedged**. A sniffer fed from the application's own drain loop dies
+with the application, which is precisely the case it was built for. Every feed
+below is therefore driven from an ISR or from DMA.
+
+### UART — circular DMA plus the IDLE line
+
+The only fully main-loop-independent receive path the HAL has, and both halves
+already exist:
+
+```c
+hal_uart_init_dma_rx(uart, ring, sizeof ring);   /* hardware fills the ring */
+hal_uart_attach_idle_callback(uart, on_idle);    /* ISR on each frame gap */
+
+static void on_idle(void) {                      /* ISR context */
+  uint16_t head;
+  hal_uart_dma_rx_index(uart, &head);
+  for (; tail != head; tail = (uint16_t)((tail + 1u) % sizeof ring))
+    hal_boot_match_byte(ring[tail]);
+}
+```
+
+DMA fills the ring with no CPU involvement and the IDLE interrupt wakes the
+walker on each burst. Neither depends on the application scheduling anything.
+
+Where RX DMA is not configured, the application's existing RX interrupt
+callback feeds `hal_boot_match_byte` one byte at a time — still ISR-driven, so
+still independent of the main loop. Feeding from a polled drain loop works and
+is the wrong choice for anything but development, because it stops sniffing at
+exactly the moment it is needed.
+
+### CDC — registering the callback is a takeover, not an addition
+
+The matcher's signature is already `hal_usb_cdc_rx_callback_t`
+(`hal_usb_cdc.h:114`), so CDC can drive it directly. What the API does not do
+is tee the stream: `hal_usb_cdc_set_rx_callback` delivers bytes to the callback
+**instead of** queueing them for `hal_usb_cdc_read`. An application that
+registers the sniffer naively and also calls `hal_usb_cdc_read` will find its
+own console silently empty.
+
+So the sniffer owns the callback and forwards:
+
+```c
+static void cdc_rx(const uint8_t *d, uint16_t n) {  /* ISR context */
+  for (uint16_t i = 0; i < n; i++)
+    hal_boot_match_byte(d[i]);
+  if (app_rx != NULL)
+    app_rx(d, n);                                   /* chain, never swallow */
+}
+```
+
+### The matcher
+
+One state machine fed a byte at a time, which makes fragmentation irrelevant:
+a DMA chunk boundary, a 64-byte CDC packet and a single interrupt byte all
+behave identically, and a sequence split across two transfers still matches.
+
+```c
+static uint8_t pos;
+
+void hal_boot_match_byte(uint8_t b) {
+  if (b == BOOT_SEQ[pos]) {
+    if (++pos == sizeof BOOT_SEQ)
+      hal_boot_request();
+  } else {
+    pos = (b == BOOT_SEQ[0]) ? 1u : 0u;
+  }
+}
+```
+
+The single-byte retry on mismatch is correct **only if no proper prefix of
+`BOOT_SEQ` is also a suffix of it**; anything else needs a real KMP failure
+table to resync. Eight all-distinct bytes satisfy that by construction, so
+that is the constraint on the constant, and a host test asserts it — otherwise
+someone improves the magic value one day and quietly breaks resync for every
+sequence that arrives mid-stream.
+
+Eight bytes puts a false positive at 2^-64 per stream position, which is why
+no idle-gap framing is required around the sequence.
+
+### Entry is an availability boundary, not a security one
+
+Signature verification is what makes the bootloader safe; the sniffer only
+decides *when* to reboot into it. Entering the loader therefore grants an
+attacker nothing they could not already do by pulling power — but on a vehicle,
+anyone able to write to the console can now reboot it mid-flight, and that is a
+fall out of the sky. The application holds the policy:
+
+```c
+void hal_boot_entry_disable(void);   /* refuse entry; matching continues */
+void hal_boot_entry_enable(void);
+bool hal_boot_entry_is_disabled(void);
+```
+
+The name says entry, because what is disabled is the entry path and not
+booting: `hal_boot_disable` would read as "brick the board". A vehicle calls
+`hal_boot_entry_disable()` when the airframe arms and `hal_boot_entry_enable()`
+when it disarms. The default is enabled, so a board that never calls either
+stays recoverable, which is the right default for the bricked-application case.
+
+This is deliberately not spelled "armed": on an airframe that word already
+means the opposite polarity — the sniffer is disarmed exactly when the vehicle
+is armed — and one identifier carrying two opposite senses is how the check
+eventually gets inverted.
+
+### Acting on a match
+
+`hal_boot_request()` sets `request = BOOT_REQ_LOADER` in `_sboot`, recomputes
+`check` last so a power cut mid-write cannot forge a valid block, issues a
+barrier, and calls `hal_system_reset`. Stage-1 sees the request on the next
+boot and hands over to recovery.
+
+Resetting instantly from an ISR is the wrong default while motors are turning,
+so the application may install a hook that runs first — cut throttle, flush a
+log — after which the reset proceeds. If the hook does not return, the reset
+happens anyway: a wedged application is the case this feature exists for, and
+waiting politely for it would defeat the point.
 
 ## Flash driver work
 
@@ -216,7 +341,9 @@ App verification, UART and CDC update mode, rollback floor in the KV store.
 about a second and has no business on the fast path.
 
 ### Slice 7 — Application integration
-Sniffer wired into both transports, liveness clear of the attempt counter.
+Sniffer wired into both transports — UART on circular DMA plus the IDLE
+callback, CDC on a forwarding RX callback — the `hal_boot_entry_disable`
+policy gate, and the liveness clear of the attempt counter.
 
 ### Slice 8 — Provisioning and lockdown
 Option-byte tool, full RDP1 validation, then RDP2 on production units.
@@ -229,7 +356,11 @@ of trust does not exist until slice 5.
 Per the device-free rule, committed on-target tests must pass on a bare board:
 image verification against fixtures compiled into the test binary, the `_sboot`
 state machine, rollback comparison, and the partition bounds checks all
-qualify. Anything that needs a host feeding an image over a wire is a sample.
+qualify. The matcher is pure logic and belongs on the host tier: feed the
+sequence whole, then split at every possible boundary, preceded by near-misses
+and by partial prefixes, and assert exactly one match — plus the ring walker
+across a wraparound, and the all-distinct-bytes property of `BOOT_SEQ`.
+Anything that needs a host feeding an image over a wire is a sample.
 
 The matrix that must pass at RDP1 before any unit is locked: good boot; corrupt
 app; corrupt stage-2; bad signature on each; rollback rejection; crashloop to
@@ -255,3 +386,7 @@ mid-program.
 * Whether stage-2 should be able to update stage-2, or only stage-1. Self-update
   is convenient and is also the classic way to brick a fleet.
 * F767ZI partition table and whether that port wants the same two-stage shape.
+* Whether a sequence arriving while entry is disabled should be remembered and
+  acted on at the next `hal_boot_entry_enable`. Convenient for "reboot it as
+  soon as it lands"; also a way to arm a reboot the operator has forgotten
+  about.

@@ -20,16 +20,10 @@
  * @brief ACME1 GPIO register block.
  *
  * @details
- * The field names here are not a free choice. @c navhal_port_gpio.h -- an
- * *arch* header, shared by every Cortex-M4 vendor -- implements the inlined
- * hot path (::hal_gpio_write, ::hal_gpio_read, ::hal_gpio_toggle) directly
- * against @c BSRR / @c IDR / @c ODR and the two accessor macros below. A
- * vendor whose GPIO block is shaped differently cannot express itself here;
- * it would have to emulate this layout or fork the arch header.
- *
- * That is a real constraint on the M9 exit criterion: the ops table is not
- * the whole vendor surface, because the hot path was deliberately left out of
- * the table and inlined at the arch layer instead.
+ * Deliberately not shaped like the STM32 block: separate SET, CLR and TGL
+ * registers rather than a half-word BSRR. The point of this port is that a
+ * vendor describes its own silicon, so if this file had to imitate another
+ * vendor to compile, the abstraction would be leaking.
  */
 
 #ifndef ACME1_GPIO_REG_H
@@ -37,7 +31,7 @@
 
 #include <stdint.h>
 
-/** @brief One GPIO port's registers. Field names fixed by the arch header. */
+/** @brief One GPIO port's registers. */
 typedef struct {
   volatile uint32_t MODER;   /**< 2 bits per pin: mode select. */
   volatile uint32_t OTYPER;  /**< 1 bit per pin: push-pull / open-drain. */
@@ -45,7 +39,9 @@ typedef struct {
   volatile uint32_t PUPDR;   /**< 2 bits per pin: pull-up / pull-down. */
   volatile uint32_t IDR;     /**< Input data, read-only. */
   volatile uint32_t ODR;     /**< Output data. */
-  volatile uint32_t BSRR;    /**< Set in the low half, reset in the high half. */
+  volatile uint32_t SET;     /**< Write-1-to-set; other bits unaffected. */
+  volatile uint32_t CLR;     /**< Write-1-to-clear; other bits unaffected. */
+  volatile uint32_t TGL;     /**< Write-1-to-toggle; atomic, unlike ODR ^=. */
   volatile uint32_t AFR[2];  /**< 4 bits per pin: alternate function. */
 } GPIO_Reg_Typedef;
 

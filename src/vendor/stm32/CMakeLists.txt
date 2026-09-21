@@ -29,10 +29,12 @@ if(CONFIG_DRV_UART)
         list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
     endif()
 endif()
+if(CONFIG_DRV_TIMEBASE)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/timebase/timebase.c)
+endif()
 if(CONFIG_DRV_TIMER)
     list(APPEND HAL_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/timer/timer.c
-        ${SRC_ARCH}/timebase/timebase.c
     )
 endif()
 

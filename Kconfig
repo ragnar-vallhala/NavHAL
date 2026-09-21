@@ -94,10 +94,22 @@ config DRV_GPIO
     bool "Enable GPIO Driver"
     default y
 
+config DRV_TIMEBASE
+    bool "Enable timebase (tick, millis/micros, delays)"
+    default y
+    select DRV_CLOCK
+    help
+      Provides hal_timebase_* and hal_delay_*. Distinct from DRV_TIMER: every
+      port has a timebase (SysTick, Timer0, the TSC), but not every port
+      implements the general-purpose hal_timer_* peripheral API. Gating both
+      on one symbol meant a port had to claim a timer driver it lacked in
+      order to get delays.
+
 config DRV_TIMER
     bool "Enable Timer Driver"
     default y
     select DRV_CLOCK
+    select DRV_TIMEBASE
     # The MCU timer peripheral raises an update IRQ via the NVIC. The x86
     # timebase is polled TSC (no IRQ), so the interrupt select is MCU-only;
     # the PIT-IRQ timer path arrives with the x86 interrupt slice.

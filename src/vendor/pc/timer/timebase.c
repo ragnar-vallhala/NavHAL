@@ -15,11 +15,24 @@
  * scale by the calibrated frequency (clock.c) — accurate and available without
  * interrupts. When the interrupt driver is present, hal_timebase_init also
  * programs 8254 PIT channel 0 for a periodic IRQ0 that drives
- * hal_timebase_tick(), so hal_timebase_get_tick() and the registered tick
+ * hal_timebase_tick(), so pc_timebase_get_tick() and the registered tick
  * callback advance from a real hardware interrupt (as SysTick does on Cortex-M).
  */
 
 #include "common/hal_timer.h"
+#include "internal/hal_timebase_ops.h"
+
+/* Forward declarations: several of these call each other (micros from tick,
+ * delays from both), and they are static now. */
+static hal_status_t pc_timebase_init(uint32_t tick_us);
+static uint32_t pc_timebase_get_tick(void);
+static uint32_t pc_timebase_get_tick_duration_us(void);
+static uint32_t pc_timebase_get_reload_value(void);
+static uint32_t pc_timebase_get_micros(void);
+static uint32_t pc_timebase_get_millis(void);
+static void pc_timebase_delay_us(uint32_t us);
+static void pc_timebase_delay_ms(uint32_t ms);
+static hal_status_t pc_timebase_set_callback(hal_timebase_callback_t cb);
 #include "pc_io.h"
 
 #if NAVHAL_CONFIG_DRV_INTERRUPT
@@ -46,7 +59,7 @@ static uint64_t g_cyc_per_ms = 1;
 static volatile uint32_t g_ticks;
 static hal_timebase_callback_t g_cb;
 
-hal_status_t hal_timebase_init(uint32_t tick_us) {
+static hal_status_t pc_timebase_init(uint32_t tick_us) {
   if (tick_us == 0) return HAL_ERR_INVALID_ARG;
   uint64_t hz = pc_tsc_hz();
   g_cyc_per_us = hz / 1000000u;
@@ -64,35 +77,35 @@ hal_status_t hal_timebase_init(uint32_t tick_us) {
   return HAL_OK;
 }
 
-uint32_t hal_timebase_get_micros(void) {
+static uint32_t pc_timebase_get_micros(void) {
   return (uint32_t)((pc_rdtsc() - g_tsc0) / g_cyc_per_us);
 }
 
-uint32_t hal_timebase_get_millis(void) {
+static uint32_t pc_timebase_get_millis(void) {
   return (uint32_t)((pc_rdtsc() - g_tsc0) / g_cyc_per_ms);
 }
 
-uint32_t hal_timebase_get_tick(void) {
+static uint32_t pc_timebase_get_tick(void) {
 #if NAVHAL_CONFIG_DRV_INTERRUPT
   return g_ticks; /* incremented by the PIT IRQ */
 #else
   if (!g_tick_us) return 0;
-  return hal_timebase_get_micros() / g_tick_us;
+  return pc_timebase_get_micros() / g_tick_us;
 #endif
 }
 
-uint32_t hal_timebase_get_tick_duration_us(void) { return g_tick_us; }
+static uint32_t pc_timebase_get_tick_duration_us(void) { return g_tick_us; }
 
 /* No SysTick reload register on x86. */
-uint32_t hal_timebase_get_reload_value(void) { return 0; }
+static uint32_t pc_timebase_get_reload_value(void) { return 0; }
 
-void hal_delay_us(uint32_t us) {
+static void pc_timebase_delay_us(uint32_t us) {
   uint64_t start = pc_rdtsc();
   uint64_t target = (uint64_t)us * g_cyc_per_us;
   while ((pc_rdtsc() - start) < target) __asm__ volatile("pause");
 }
 
-void hal_delay_ms(uint32_t ms) {
+static void pc_timebase_delay_ms(uint32_t ms) {
   uint64_t start = pc_rdtsc();
   uint64_t target = (uint64_t)ms * g_cyc_per_ms;
   while ((pc_rdtsc() - start) < target) __asm__ volatile("pause");
@@ -104,7 +117,21 @@ void hal_timebase_tick(void) {
   if (g_cb) g_cb();
 }
 
-hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb) {
+static hal_status_t pc_timebase_set_callback(hal_timebase_callback_t cb) {
   g_cb = cb;
   return HAL_OK;
 }
+
+
+/** @brief The PC TSC/PIT timebase backend. */
+const hal_timebase_ops_t _hal_timebase_ops = {
+    .init = pc_timebase_init,
+    .get_tick = pc_timebase_get_tick,
+    .get_tick_duration_us = pc_timebase_get_tick_duration_us,
+    .get_reload_value = pc_timebase_get_reload_value,
+    .get_micros = pc_timebase_get_micros,
+    .get_millis = pc_timebase_get_millis,
+    .delay_us = pc_timebase_delay_us,
+    .delay_ms = pc_timebase_delay_ms,
+    .set_callback = pc_timebase_set_callback,
+};

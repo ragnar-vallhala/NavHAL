@@ -6,7 +6,7 @@
 # SSE unit on in long mode before calling C.
 
 set(ARCH_C_FLAGS
-    "-m64 -ffreestanding -fno-pic -fno-pie -mno-red-zone -mcmodel=large -fno-stack-protector -fno-asynchronous-unwind-tables -O0 -g")
+    "-m64 -ffreestanding -fno-pic -fno-pie -mno-red-zone -mcmodel=large -fno-stack-protector -fno-asynchronous-unwind-tables")
 set(ARCH_ASM_FLAGS  "-m64")
 set(ARCH_LINK_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib -no-pie -z max-page-size=0x1000")
 

@@ -20,8 +20,8 @@
  * @brief Host-runnable tests for the software CRC-32/MPEG-2 path.
  *
  * The driver under src/vendor/stm32/crc/crc.c provides a hardware path
- * (when _CRC_HW_ENABLED is defined) and a software lookup-table path
- * otherwise. The host build does not define _CRC_HW_ENABLED, so the same
+ * (when NAVHAL_CONFIG_DRV_CRC is defined) and a software lookup-table path
+ * otherwise. The host build does not define NAVHAL_CONFIG_DRV_CRC, so the same
  * source compiles down to the pure-C software implementation — exercised
  * here against the standardized hal_crc_* API.
  */

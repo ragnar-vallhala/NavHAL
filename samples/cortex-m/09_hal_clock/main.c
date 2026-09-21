@@ -29,21 +29,15 @@
 #include "navhal.h"
 
 /** @brief PLL configuration: 8 MHz HSE -> 168 MHz system clock */
-hal_pll_config_t pll_cfg = {
-    .input_src = HAL_CLOCK_SOURCE_HSE, /**< External 8 MHz crystal */
-    .pll_m = 8,                        /**< PLLM divider */
-    .pll_n = 168,                      /**< PLLN multiplier */
-    .pll_p = 2,                        /**< PLLP division factor */
-    .pll_q = 7                         /**< PLLQ division factor */
-};
+/* This sample used to hand-pick PLLM/N/P: HSE 8 MHz, M=8, N=168, P=2. That
+ * produced the right 84 MHz, but with the VCO at 168 MHz -- below the 192 MHz
+ * minimum RM0368 gives. hal_clock_init_hz solves for a setting that is both
+ * the right frequency and in spec. */
 
 /** @brief System clock source configuration */
-hal_clock_config_t cfg = {
-    .source = HAL_CLOCK_SOURCE_PLL /**< Use PLL as system clock */
-};
 
 int main(void) {
-    hal_clock_init(&cfg, &pll_cfg); /**< Initialize system clock with PLL */
+        hal_clock_init_hz(HAL_CLOCK_SOURCE_HSE, 84000000u);
     hal_timebase_init(40);               /**< Initialize SysTick with 40 µs tick */
     hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});               /**< Initialize HAL_UART_2 at 9600 baud */
 

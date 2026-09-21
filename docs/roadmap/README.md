@@ -39,7 +39,7 @@ summarised below rather than kept as pages; git history has the detail.
 
 | Milestone        | Status      | Scope                                       | Unlocks                                              |
 |---|---|---|---|
-| @subpage roadmap_m9  | planned     | Driver vtable / vendor-backend abstraction  | ~80 % less per-vendor boilerplate; conformance enforced by interface |
+| @subpage roadmap_m9  | in-progress | Driver vtable / vendor-backend abstraction  | ~80 % less per-vendor boilerplate; conformance enforced by interface |
 | @subpage roadmap_m10 | planned     | Port as a registry package                  | Strategic shift away from monorepo. Vendors publish ports independently. |
 | @subpage roadmap_m11 | planned     | `HAL_API_VERSION 2`                         | Subsystem namespaces v1 couldn't anticipate — USB, Ethernet, BLE, AI accelerators |
 | @subpage roadmap_x86 | **done** (core) | Bare-metal x86-64 PC port (QEMU first)  | Running NavHAL on commodity x86; a third ISA exercising the port contract |

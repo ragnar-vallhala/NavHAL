@@ -45,7 +45,8 @@ void print12(void) { hal_uart_print(HAL_UART_2, "Hello World 12\n"); }
 
 int main(void) {
     // Initialize system clock, SysTick, and UART
-    hal_clock_init(&cfg, &pll_cfg);
+    cfg.pll = pll_cfg;
+    hal_clock_init(&cfg);
     hal_timebase_init(1000);  /**< 1 ms tick */
     hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});    /**< HAL_UART_2 at 9600 baud */
 

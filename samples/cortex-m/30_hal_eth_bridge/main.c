@@ -77,7 +77,8 @@ int main(void) {
                           .pll_p = 2,
                           .pll_q = 5}; /* 100 MHz: ETH needs HCLK >= 25 MHz. */
   hal_clock_config_t clk = {.source = HAL_CLOCK_SOURCE_PLL};
-  hal_clock_init(&clk, &pll);
+  clk.pll = pll;
+  hal_clock_init(&clk);
 
   hal_uart_init(CONSOLE, &(hal_uart_config_t){.baudrate = 9600});
   hal_uart_print(CONSOLE, "\r\n[bridge] UART<->Ethernet chat. Type + Enter.\r\n");

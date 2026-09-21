@@ -26,6 +26,14 @@ endchoice
 
 choice
     prompt "Vendor"
+    # A choice defaults to the first visible member sourced, i.e. alphabetically,
+    # so the default moves whenever a vendor is added ahead of the current one.
+    # The ACME reference port did exactly that on Cortex-M4 and silently became
+    # the default, which is the same trap the board choice below documents.
+    # Name the reference vendor per arch instead of relying on sort order.
+    default VENDOR_STM32 if ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    default VENDOR_MICROCHIP if ARCH_AVR8
+    default VENDOR_PC if ARCH_X86_64
     help
       Select the silicon vendor.
 source "src/vendor/*/Kconfig.choice"
@@ -94,10 +102,22 @@ config DRV_GPIO
     bool "Enable GPIO Driver"
     default y
 
+config DRV_TIMEBASE
+    bool "Enable timebase (tick, millis/micros, delays)"
+    default y
+    select DRV_CLOCK
+    help
+      Provides hal_timebase_* and hal_delay_*. Distinct from DRV_TIMER: every
+      port has a timebase (SysTick, Timer0, the TSC), but not every port
+      implements the general-purpose hal_timer_* peripheral API. Gating both
+      on one symbol meant a port had to claim a timer driver it lacked in
+      order to get delays.
+
 config DRV_TIMER
     bool "Enable Timer Driver"
     default y
     select DRV_CLOCK
+    select DRV_TIMEBASE
     # The MCU timer peripheral raises an update IRQ via the NVIC. The x86
     # timebase is polled TSC (no IRQ), so the interrupt select is MCU-only;
     # the PIT-IRQ timer path arrives with the x86 interrupt slice.

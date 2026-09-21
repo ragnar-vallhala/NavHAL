@@ -1,0 +1,15 @@
+# NavHAL defconfig -- ACME reference port (Cortex-M4).
+#
+# The M9 proof port: a vendor that supplies a GPIO ops table and nothing else.
+# GPIO only, so the build exercises exactly the vendor surface under test.
+
+CONFIG_ARCH_CORTEX_M4=y
+CONFIG_VENDOR_ACME=y
+CONFIG_FAMILY_ACME1=y
+CONFIG_BOARD_ACME_DEVKIT=y
+
+CONFIG_DRV_GPIO=y
+CONFIG_DRV_CLOCK=n
+CONFIG_DRV_UART=n
+CONFIG_DRV_TIMER=n
+CONFIG_DRV_INTERRUPT=n

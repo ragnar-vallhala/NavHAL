@@ -25,11 +25,12 @@
  * transmit / receive / full-duplex transfers.
  */
 
+#include "internal/hal_spi_ops.h"
+#include "common/hal_clock.h"
 #include "navhal_port_spi.h"
 #include "navhal_port_gpio.h"
 #include "family/rcc_reg.h"
 #include "family/spi_reg.h"
-#include "navhal_port_timer.h"
 
 static inline volatile SPI_Reg_Typedef *_get_spi(hal_spi_instance_t spi) {
   return (volatile SPI_Reg_Typedef *)GET_SPIx_BASE((uint8_t)spi);
@@ -79,11 +80,9 @@ static void _configure_spi_gpio(hal_spi_instance_t spi) {
   }
 }
 
-hal_status_t hal_spi_init(hal_spi_instance_t spi,
-                          const hal_spi_config_t *config) {
-  if (!config)
-    return HAL_ERR_INVALID_ARG;
-
+static hal_status_t stm32_spi_init(hal_spi_instance_t spi,
+                                   const hal_spi_config_t *config) {
+  /* config non-NULL: validated by the public layer. */
   volatile SPI_Reg_Typedef *spi_reg = _get_spi(spi);
   if (!spi_reg)
     return HAL_ERR_INVALID_ARG;
@@ -128,91 +127,50 @@ hal_status_t hal_spi_init(hal_spi_instance_t spi,
   return HAL_OK;
 }
 
-hal_status_t hal_spi_transmit(hal_spi_instance_t spi, const uint8_t *data,
-                              uint16_t size, uint32_t timeout) {
+/* Bound a stuck flag-wait without a millisecond time source: ~65k spins is
+ * far longer than one byte at any SPI clock, but still terminates. */
+#define STM32_SPI_XFER_GUARD 0xFFFFu
+
+static hal_status_t stm32_spi_xfer_byte(hal_spi_instance_t spi, uint8_t out,
+                                        uint8_t *in) {
   volatile SPI_Reg_Typedef *spi_reg = _get_spi(spi);
-  if (!spi_reg || !data)
+  if (!spi_reg)
     return HAL_ERR_INVALID_ARG;
 
-  uint32_t start_tick = hal_timebase_get_millis();
-
-  for (uint16_t i = 0; i < size; i++) {
-    // Wait for TXE
-    while (!(spi_reg->SR & SPI_SR_TXE)) {
-      if (timeout && (hal_timebase_get_millis() - start_tick > timeout))
-        return HAL_ERR_TIMEOUT;
-    }
-
-    spi_reg->DR = data[i];
-
-    // Optional: Wait for RXNE and read dummy data to clear it
-    while (!(spi_reg->SR & SPI_SR_RXNE)) {
-      if (timeout && (hal_timebase_get_millis() - start_tick > timeout))
-        return HAL_ERR_TIMEOUT;
-    }
-    (void)spi_reg->DR;
-  }
-
-  // Wait for BSY to clear
-  while (spi_reg->SR & SPI_SR_BSY) {
-    if (timeout && (hal_timebase_get_millis() - start_tick > timeout))
+  uint16_t guard = STM32_SPI_XFER_GUARD;
+  while (!(spi_reg->SR & SPI_SR_TXE)) {
+    if (--guard == 0u)
       return HAL_ERR_TIMEOUT;
   }
+  spi_reg->DR = out;
 
-  return HAL_OK;
-}
-
-hal_status_t hal_spi_receive(hal_spi_instance_t spi, uint8_t *data,
-                             uint16_t size, uint32_t timeout) {
-  volatile SPI_Reg_Typedef *spi_reg = _get_spi(spi);
-  if (!spi_reg || !data)
-    return HAL_ERR_INVALID_ARG;
-
-  uint32_t start_tick = hal_timebase_get_millis();
-
-  for (uint16_t i = 0; i < size; i++) {
-    // Send dummy data to trigger clock
-    while (!(spi_reg->SR & SPI_SR_TXE)) {
-      if (timeout && (hal_timebase_get_millis() - start_tick > timeout))
-        return HAL_ERR_TIMEOUT;
-    }
-    spi_reg->DR = 0xFF;
-
-    // Wait for RXNE
-    while (!(spi_reg->SR & SPI_SR_RXNE)) {
-      if (timeout && (hal_timebase_get_millis() - start_tick > timeout))
-        return HAL_ERR_TIMEOUT;
-    }
-    data[i] = (uint8_t)spi_reg->DR;
+  guard = STM32_SPI_XFER_GUARD;
+  while (!(spi_reg->SR & SPI_SR_RXNE)) {
+    if (--guard == 0u)
+      return HAL_ERR_TIMEOUT;
   }
-
+  uint8_t r = (uint8_t)spi_reg->DR;
+  if (in != NULL)
+    *in = r;
   return HAL_OK;
 }
 
-hal_status_t hal_spi_transmit_receive(hal_spi_instance_t spi,
-                                      const uint8_t *tx_data, uint8_t *rx_data,
-                                      uint16_t size, uint32_t timeout) {
+
+/* SPI1 is an APB2 peripheral; SPI2 (and SPI3) hang off APB1. */
+static uint32_t stm32_spi_input_clock(hal_spi_instance_t spi) {
+  return (spi == HAL_SPI_1) ? hal_clock_get_apb2clk() : hal_clock_get_apb1clk();
+}
+
+static uint8_t stm32_spi_get_baudrate(hal_spi_instance_t spi) {
   volatile SPI_Reg_Typedef *spi_reg = _get_spi(spi);
-  if (!spi_reg || !tx_data || !rx_data)
-    return HAL_ERR_INVALID_ARG;
-
-  uint32_t start_tick = hal_timebase_get_millis();
-
-  for (uint16_t i = 0; i < size; i++) {
-    // Wait for TXE
-    while (!(spi_reg->SR & SPI_SR_TXE)) {
-      if (timeout && (hal_timebase_get_millis() - start_tick > timeout))
-        return HAL_ERR_TIMEOUT;
-    }
-    spi_reg->DR = tx_data[i];
-
-    // Wait for RXNE
-    while (!(spi_reg->SR & SPI_SR_RXNE)) {
-      if (timeout && (hal_timebase_get_millis() - start_tick > timeout))
-        return HAL_ERR_TIMEOUT;
-    }
-    rx_data[i] = (uint8_t)spi_reg->DR;
-  }
-
-  return HAL_OK;
+  if (!spi_reg)
+    return 0u;
+  return (uint8_t)((spi_reg->CR1 & SPI_CR1_BR_Msk) >> SPI_CR1_BR_Pos);
 }
+
+const hal_spi_ops_t _hal_spi_ops = {
+    .init = stm32_spi_init,
+    .xfer_byte = stm32_spi_xfer_byte,
+    .input_clock = stm32_spi_input_clock,
+    .get_baudrate = stm32_spi_get_baudrate,
+};

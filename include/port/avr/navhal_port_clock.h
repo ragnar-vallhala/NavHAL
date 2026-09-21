@@ -28,4 +28,7 @@
 
 #include "common/hal_clock.h"
 
+/* Deprecated two-argument init — retained as a backward-compat shim. */
+#include "compat/clock_compat.h"
+
 #endif /* NAVHAL_PORT_CLOCK_H */

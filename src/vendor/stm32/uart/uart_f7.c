@@ -39,6 +39,8 @@
  *       they will need clean/invalidate or DTCM placement (NAVHAL_DTCM_NOINIT).
  */
 
+#include "internal/hal_uart_ops.h"
+#include "internal/hal_uart_dma_ops.h"
 #include "navhal_port_uart.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_gpio.h"
@@ -109,14 +111,15 @@ static void _uart_hw_init(hal_uart_t uart, uint32_t baudrate) {
   usart->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
 }
 
-hal_status_t hal_uart_init(hal_uart_t uart, const hal_uart_config_t *cfg) {
+static hal_status_t stm32f7_uart_init(hal_uart_t uart,
+                                      const hal_uart_config_t *cfg) {
   if (cfg == NULL || _get_usart(uart) == NULL)
     return HAL_ERR_INVALID_ARG;
   _uart_hw_init(uart, cfg->baudrate);
   return HAL_OK;
 }
 
-hal_status_t hal_uart_enable_interrupt(hal_uart_t uart, uint8_t rx_en,
+static hal_status_t stm32f7_uart_enable_interrupt(hal_uart_t uart, uint8_t rx_en,
                                        uint8_t tx_en) {
   volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
   if (!usart)
@@ -140,7 +143,7 @@ hal_status_t hal_uart_enable_interrupt(hal_uart_t uart, uint8_t rx_en,
   return HAL_OK;
 }
 
-hal_status_t hal_uart_write_char(hal_uart_t uart, char c) {
+static hal_status_t stm32f7_uart_write_char(hal_uart_t uart, char c) {
   volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
   if (!usart)
     return HAL_ERR_INVALID_ARG;
@@ -153,74 +156,13 @@ hal_status_t hal_uart_write_char(hal_uart_t uart, char c) {
 }
 
 /** @brief Unified helper: convert a number to decimal text and transmit it. */
-static void _uart_write_number(hal_uart_t uart, uint32_t num, int is_signed) {
-  char buf[12];
-  int i = 0;
 
-  if (is_signed && (int32_t)num < 0) {
-    hal_uart_write_char(uart, '-');
-    num = (uint32_t)(-(int32_t)num);
-  }
 
-  if (num == 0) {
-    hal_uart_write_char(uart, '0');
-    return;
-  }
 
-  while (num > 0) {
-    buf[i++] = (char)('0' + (num % 10));
-    num /= 10;
-  }
 
-  while (i--) {
-    hal_uart_write_char(uart, buf[i]);
-  }
-}
 
-hal_status_t hal_uart_write_int(hal_uart_t uart, int32_t num) {
-  _uart_write_number(uart, (uint32_t)num, 1);
-  return HAL_OK;
-}
 
-hal_status_t hal_uart_write_uint(hal_uart_t uart, uint32_t num) {
-  _uart_write_number(uart, num, 0);
-  return HAL_OK;
-}
-
-hal_status_t hal_uart_write_float(hal_uart_t uart, float num) {
-  if (num < 0) {
-    hal_uart_write_char(uart, '-');
-    num = -num;
-  }
-  uint32_t integer = (uint32_t)num;
-  _uart_write_number(uart, integer, 0);
-  hal_uart_write_char(uart, '.');
-  float fractional = num - (float)integer;
-  // 5 decimal places with rounding
-  _uart_write_number(uart, (uint32_t)(fractional * 100000.0f + 0.5f), 0);
-  return HAL_OK;
-}
-
-hal_status_t hal_uart_write_string(hal_uart_t uart, const char *s) {
-  if (!s)
-    return HAL_ERR_INVALID_ARG;
-  while (*s) {
-    hal_uart_write_char(uart, *s++);
-  }
-  return HAL_OK;
-}
-
-hal_status_t hal_uart_write(hal_uart_t uart, const uint8_t *data,
-                            uint16_t length) {
-  if (!data)
-    return HAL_ERR_INVALID_ARG;
-  for (uint16_t i = 0; i < length; i++) {
-    hal_uart_write_char(uart, (char)data[i]);
-  }
-  return HAL_OK;
-}
-
-char hal_uart_read_char(hal_uart_t uart) {
+static char stm32f7_uart_read_char(hal_uart_t uart) {
   volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
   if (!usart)
     return 0;
@@ -239,28 +181,11 @@ char hal_uart_read_char(hal_uart_t uart) {
   return (char)(usart->RDR & 0xFFU);
 }
 
-bool hal_uart_available(hal_uart_t uart) {
+static bool stm32f7_uart_available(hal_uart_t uart) {
   volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
   return (usart && (usart->ISR & USART_ISR_RXNE));
 }
 
-uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,
-                             char delimiter) {
-  uint32_t i = 0;
-  if (!buffer || maxlen == 0)
-    return 0;
-
-  while (i < maxlen - 1) {
-    while (!hal_uart_available(uart))
-      ;
-    char c = hal_uart_read_char(uart);
-    if (c == delimiter)
-      break;
-    buffer[i++] = c;
-  }
-  buffer[i] = '\0';
-  return i;
-}
 
 /*===========================================================================
  * DMA-backed UART transmit/receive (STM32F7).
@@ -311,67 +236,7 @@ static _uart_dma_params_t _get_uart_dma_params(hal_uart_t uart, int is_tx) {
   return p;
 }
 
-/* Re-arm cache: index = USARTn*2 + (RX?1:0), n in {1:0, 2:1, 3:2, 6:3}. */
-static uint8_t _uart_dma_initialized[8] = {0};
-static int _uart_dma_idx(hal_uart_t uart, int is_tx) {
-  int n = (uart == HAL_UART_1)   ? 0
-          : (uart == HAL_UART_2) ? 1
-          : (uart == HAL_UART_3) ? 2
-                                 : 3;
-  return n * 2 + (is_tx ? 0 : 1);
-}
 
-hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
-                                uint16_t length) {
-  if (!data || length == 0)
-    return HAL_ERR_INVALID_ARG;
-
-  _uart_dma_params_t p = _get_uart_dma_params(uart, 1);
-  if (!p.controller)
-    return HAL_ERR_INVALID_ARG;
-
-  /* Flush the caller's buffer so the DMA transmits the CPU's latest writes
-   * (no-op for DTCM/uncached buffers and cache-off builds; rejects ITCM). */
-  hal_status_t cs = navhal_dma_tx_prepare(data, length);
-  if (cs != HAL_OK)
-    return cs;
-
-  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
-  usart->CR3 |= USART_CR3_DMAT;
-
-  int idx = _uart_dma_idx(uart, 1);
-  hal_dma_config_t cfg = {
-      .controller =
-          (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2,
-      .stream = p.stream,
-      .channel = p.channel,
-      .direction = HAL_DMA_DIR_M2P,
-      .src_addr = (uint32_t)data,
-      .dst_addr = p.periph_addr,
-      .data_count = length,
-      .src_inc = 1,
-      .dst_inc = 0,
-      .data_width = HAL_DMA_DATA_WIDTH_8,
-      .priority = HAL_DMA_PRIORITY_HIGH,
-  };
-
-  if (!_uart_dma_initialized[idx]) {
-    hal_dma_init(&cfg);
-    _uart_dma_initialized[idx] = 1;
-  } else {
-    /* Re-arm: wait for the previous transfer, then repoint memory + count. */
-    DMA_Stream_Typedef *s = &p.controller->STREAM[p.stream];
-    while (s->CR & DMA_SxCR_EN)
-      ;
-    s->M0AR = (uint32_t)data;
-    s->NDTR = length;
-  }
-
-  hal_dma_clear_flags(&cfg);
-  hal_interrupt_enable((hal_irq_t)p.irq);
-  hal_dma_start(&cfg);
-  return HAL_OK;
-}
 
 /*
  * NOTE (D-cache): this is a *circular* RX DMA the CPU reads live, so the driver
@@ -380,51 +245,68 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
  * stays coherent for free — or invalidate the region yourself before each read.
  * The guard below only rejects a DMA-unreachable (ITCM) buffer.
  */
-hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
-                                  uint16_t length) {
-  if (!buffer || length == 0)
-    return HAL_ERR_INVALID_ARG;
 
-  hal_status_t gs = navhal_dma_rx_guard(buffer);
-  if (gs != HAL_OK)
-    return gs;
 
-  _uart_dma_params_t p = _get_uart_dma_params(uart, 0);
+
+/* The only two vendor facts the shared UART-DMA layer needs. */
+static hal_status_t stm32f7_uart_dma_binding(hal_uart_t uart, bool tx,
+                                          hal_dma_binding_t *out) {
+  _uart_dma_params_t p = _get_uart_dma_params(uart, tx ? 1 : 0);
   if (!p.controller)
     return HAL_ERR_INVALID_ARG;
 
-  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
-  usart->CR3 |= USART_CR3_DMAR;
-
-  hal_dma_config_t cfg = {
-      .controller =
-          (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2,
-      .stream = p.stream,
-      .channel = p.channel,
-      .direction = HAL_DMA_DIR_P2M,
-      .src_addr = p.periph_addr,
-      .dst_addr = (uint32_t)buffer,
-      .data_count = length,
-      .src_inc = 0,
-      .dst_inc = 1,
-      .data_width = HAL_DMA_DATA_WIDTH_8,
-      .priority = HAL_DMA_PRIORITY_MEDIUM,
-      .circular = 1,
-  };
-
-  hal_dma_init(&cfg);
-  hal_dma_start(&cfg);
-  _uart_dma_initialized[_uart_dma_idx(uart, 0)] = 1;
+  out->controller =
+      (p.controller == DMA1) ? HAL_DMA_CONTROLLER_1 : HAL_DMA_CONTROLLER_2;
+  out->stream = p.stream;
+  out->channel = p.channel;
+  out->periph_addr = p.periph_addr;
+  out->irq = (hal_irq_t)p.irq;
   return HAL_OK;
 }
 
-hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s) {
-  if (!s)
+static hal_status_t stm32f7_uart_dma_set_request(hal_uart_t uart, bool tx,
+                                              bool on) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  if (!usart)
     return HAL_ERR_INVALID_ARG;
-  uint16_t len = 0;
-  while (s[len])
-    len++;
-  return hal_uart_write_dma(uart, (const uint8_t *)s, len);
+
+  uint32_t bit = tx ? USART_CR3_DMAT : USART_CR3_DMAR;
+  if (on)
+    usart->CR3 |= bit;
+  else
+    usart->CR3 &= ~bit;
+  return HAL_OK;
 }
 
+/** @brief The STM32F7 UART-over-DMA backend. */
+const hal_uart_dma_ops_t _hal_uart_dma_ops = {
+    .binding = stm32f7_uart_dma_binding,
+    .set_request = stm32f7_uart_dma_set_request,
+};
+
+
+/* ---------------------------------------------------------------------------
+ * USART interrupt vectors.
+ *
+ * Named by this MCU's vector table, so they belong with the driver that owns
+ * the peripheral rather than in the shared arch interrupt file. Each hands
+ * off to the registry so a caller's attached callback runs.
+ * ------------------------------------------------------------------------- */
+void USART1_IRQHandler(void) { hal_interrupt_dispatch(USART1_IRQn); }
+void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }
+/* Slot 39. The F767 vector table has always named this handler, but nothing
+ * defined it, so it resolved to the weak Default_Handler alias and an
+ * interrupt-driven USART3 -- the Nucleo-F767ZI console -- dispatched nowhere. */
+void USART3_IRQHandler(void) { hal_interrupt_dispatch(USART3_IRQn); }
+void USART6_IRQHandler(void) { hal_interrupt_dispatch(USART6_IRQn); }
+
 #endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
+
+/** @brief The F7 UART primitives; every derived write lives in the shared layer. */
+const hal_uart_ops_t _hal_uart_ops = {
+    .init = stm32f7_uart_init,
+    .enable_interrupt = stm32f7_uart_enable_interrupt,
+    .write_char = stm32f7_uart_write_char,
+    .read_char = stm32f7_uart_read_char,
+    .available = stm32f7_uart_available,
+};

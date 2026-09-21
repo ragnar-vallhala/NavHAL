@@ -208,6 +208,38 @@ hal_status_t hal_dma_clear_flags(const hal_dma_config_t *cfg) {
   return HAL_OK;
 }
 
+hal_status_t hal_dma_set_memory(const hal_dma_config_t *cfg, uint32_t addr,
+                                uint16_t count) {
+  if (cfg == NULL || count == 0u)
+    return HAL_ERR_INVALID_ARG;
+
+  DMA_Typedef *dma = _get_dma(cfg);
+  if (dma == NULL || cfg->stream > 7u)
+    return HAL_ERR_INVALID_ARG;
+
+  DMA_Stream_Typedef *s = &dma->STREAM[cfg->stream];
+  /* The stream must be idle before M0AR/NDTR are written, or the controller
+   * latches a half-updated descriptor. */
+  while (s->CR & DMA_SxCR_EN)
+    ;
+  s->M0AR = addr;
+  s->NDTR = count;
+  return HAL_OK;
+}
+
+hal_status_t hal_dma_remaining(const hal_dma_config_t *cfg,
+                               uint16_t *remaining) {
+  if (cfg == NULL || remaining == NULL)
+    return HAL_ERR_INVALID_ARG;
+
+  DMA_Typedef *dma = _get_dma(cfg);
+  if (dma == NULL || cfg->stream > 7u)
+    return HAL_ERR_INVALID_ARG;
+
+  *remaining = (uint16_t)(dma->STREAM[cfg->stream].NDTR & 0xFFFFu);
+  return HAL_OK;
+}
+
 /*---------------------------------------------------------------------------
  * Central DMA Interrupt Dispatchers
  * Each stream handler clears peripheral flags and routes to the HAL callback

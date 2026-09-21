@@ -29,20 +29,27 @@ if(CONFIG_DRV_UART)
         list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/uart/uart.c)
     endif()
 endif()
+if(CONFIG_DRV_TIMEBASE)
+    list(APPEND HAL_SOURCES ${SRC_ARCH}/timebase/timebase.c)
+endif()
 if(CONFIG_DRV_TIMER)
     list(APPEND HAL_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/timer/timer.c
-        ${SRC_ARCH}/timebase/timebase.c
     )
 endif()
 
-# Startup glue is arch-layer, but the peripheral vector table is MCU-specific:
-# a board may override with its own startup.s (e.g. nucleo_f767zi, whose USART3
-# vector the F401-based arch table leaves empty). Prefer the board file.
+# The vector table is an MCU property, so it lives with the family whose
+# peripherals it names -- not in the arch tree, where it would be one vendor's
+# table imposed on every ARMv7E-M port. A board may still override it for
+# genuinely board-level vectoring.
 if(EXISTS ${SRC_BOARD}/startup.s)
     list(APPEND HAL_SOURCES ${SRC_BOARD}/startup.s)
+elseif(EXISTS ${INCLUDE_FAMILY}/../startup.s)
+    list(APPEND HAL_SOURCES ${INCLUDE_FAMILY}/../startup.s)
 else()
-    list(APPEND HAL_SOURCES ${SRC_ARCH}/startup/startup.s)
+    message(FATAL_ERROR
+        "No startup.s for family '${CONFIG_FAMILY}'. A port supplies its own "
+        "vector table: add src/vendor/${VENDOR}/family/${CONFIG_FAMILY}/startup.s")
 endif()
 # Shared C reset path (Reset_Handler + memory bring-up + boot hooks); the .s
 # above now carries only the MCU-specific vector table. (The TEST build globs

@@ -78,8 +78,21 @@ TAIL_PID=$!
 # the whole tree — the launcher plus its dotnet/mono child. setsid ships with
 # util-linux on every CI runner and dev box we target; degrade to a plain
 # background run (launcher-pid signalling only) if it is somehow unavailable.
+# Renode always opens a Monitor socket, and with no --port it takes 1234 --
+# the same port every gdbserver and QEMU gdb stub defaults to. One unrelated
+# debug session on the machine and Renode aborts at startup with
+# AddressAlreadyInUse, which reaches this script as an empty UART log and
+# reads exactly like a firmware hang. Ask the kernel for a free port instead
+# of arguing over that one.
+MONITOR_PORT="$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1", 0)); print(s.getsockname()[1]); s.close()' 2>/dev/null || echo 0)"
+RENODE_PORT_ARG=()
+if [[ "$MONITOR_PORT" != "0" ]]; then
+  RENODE_PORT_ARG=(--port "$MONITOR_PORT")
+fi
+
 if command -v setsid >/dev/null 2>&1; then
   setsid renode \
+    "${RENODE_PORT_ARG[@]}" \
     --disable-xwt \
     --hide-log \
     -e "\$bin = @$ELF; \$logfile = @$LOGFILE; i @$RESC" \
@@ -88,6 +101,7 @@ if command -v setsid >/dev/null 2>&1; then
   RENODE_PGID=$RENODE_PID   # setsid makes Renode its own process-group leader
 else
   renode \
+    "${RENODE_PORT_ARG[@]}" \
     --disable-xwt \
     --hide-log \
     -e "\$bin = @$ELF; \$logfile = @$LOGFILE; i @$RESC" \

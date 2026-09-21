@@ -35,6 +35,7 @@
 #define NAVTEST_H
 
 #include <stddef.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -75,6 +76,31 @@ void navtest_write(const char *s);
 #else
 #  define _NT_PSTR(s) (s)
 #  define navtest_write_P navtest_write
+#endif
+
+/* One copy of the file name per translation unit.
+ *
+ * avr-gcc gives every _NT_PSTR its own section and never merges two with the
+ * same contents, so _NT_PSTR(__FILE__) written at each assertion site costs a
+ * full copy of the path -- an absolute build path, ~80 bytes -- per assertion.
+ * A suite with a few hundred of them spends tens of kilobytes on one repeated
+ * string, which is the whole flash of a 32 KB part. Naming the string once
+ * here gives each file exactly one copy. */
+/* __BASE_FILE__, not __FILE__: this lives in a header, and __FILE__ here
+ * would name the header in every failure report. __BASE_FILE__ is the source
+ * file being compiled, which is the file the failing assertion is written in.
+ * GCC and Clang both define it; anything else falls back and reports the
+ * header. */
+#ifndef __BASE_FILE__
+#  define __BASE_FILE__ __FILE__
+#endif
+
+#if defined(__AVR__)
+static const char _navtest_file_str[]
+    __attribute__((__progmem__, __unused__)) = __BASE_FILE__;
+#else
+static const char _navtest_file_str[] __attribute__((__unused__)) =
+    __BASE_FILE__;
 #endif
 
 /* -------------------------------------------------------------------------
@@ -254,6 +280,24 @@ typedef struct {
 int navtest_run_suite(const navtest_suite_t *suite);
 
 /* -------------------------------------------------------------------------
+ * Out-of-line failure reporting
+ *
+ * The reporting path is the expensive half of an assertion: formatting and
+ * printing expected/got is far more code than the comparison that guards it.
+ * Inlined at every site it dominated the image -- the conformance suite alone
+ * outgrew a 32 KB part. These live in navtest_state.c so each assertion site
+ * is a compare and a call, and each message string exists once in the binary
+ * instead of once per use.
+ * ---------------------------------------------------------------------- */
+void _navtest_fail_eq_u32(const char *file, uint32_t line, uint32_t expected,
+                          uint32_t actual);
+void _navtest_fail_true(const char *file, uint32_t line);
+void _navtest_fail_false(const char *file, uint32_t line);
+void _navtest_fail_not_null(const char *file, uint32_t line);
+void _navtest_fail_bits(const char *file, uint32_t line, uint32_t mask,
+                        uint32_t val, bool bits_high);
+
+/* -------------------------------------------------------------------------
  * Assertion macros
  * ---------------------------------------------------------------------- */
 
@@ -261,36 +305,26 @@ int navtest_run_suite(const navtest_suite_t *suite);
   do {                                                                         \
     uint32_t _e = (uint32_t)(expected);                                        \
     uint32_t _a = (uint32_t)(actual);                                          \
-    if (_e != _a) {                                                            \
-      navtest_write_P(_NT_PSTR("  Expected: "));                               \
-      _navtest_print_uint32(_e);                                               \
-      navtest_write_P(_NT_PSTR("  Got: "));                                    \
-      _navtest_print_uint32(_a);                                               \
-      navtest_write_P(_NT_PSTR("\r\n"));                                       \
-      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
-                    _NT_PSTR("TEST_ASSERT_EQUAL_UINT32"));                     \
-    }                                                                          \
+    if (_e != _a)                                                              \
+      _navtest_fail_eq_u32(_navtest_file_str, __LINE__, _e, _a);               \
   } while (0)
 
 #define TEST_ASSERT_NOT_NULL(ptr)                                              \
   do {                                                                         \
     if ((void *)(ptr) == (void *)0)                                            \
-      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
-                    _NT_PSTR("TEST_ASSERT_NOT_NULL: pointer is NULL"));        \
+      _navtest_fail_not_null(_navtest_file_str, __LINE__);                     \
   } while (0)
 
 #define TEST_ASSERT_TRUE(cond)                                                 \
   do {                                                                         \
     if (!(cond))                                                               \
-      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
-                    _NT_PSTR("TEST_ASSERT_TRUE: condition is false"));         \
+      _navtest_fail_true(_navtest_file_str, __LINE__);                         \
   } while (0)
 
 #define TEST_ASSERT_FALSE(cond)                                                \
   do {                                                                         \
     if ((cond))                                                                \
-      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
-                    _NT_PSTR("TEST_ASSERT_FALSE: condition is true"));         \
+      _navtest_fail_false(_navtest_file_str, __LINE__);                        \
   } while (0)
 
 /** Assert that all bits set in @p mask are also set in @p val */
@@ -298,15 +332,8 @@ int navtest_run_suite(const navtest_suite_t *suite);
   do {                                                                         \
     uint32_t _m = (uint32_t)(mask);                                            \
     uint32_t _v = (uint32_t)(val);                                             \
-    if ((_v & _m) != _m) {                                                     \
-      navtest_write_P(_NT_PSTR("  Mask: "));                                   \
-      _navtest_print_uint32(_m);                                               \
-      navtest_write_P(_NT_PSTR("  Val:  "));                                   \
-      _navtest_print_uint32(_v);                                               \
-      navtest_write_P(_NT_PSTR("\r\n"));                                       \
-      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
-                    _NT_PSTR("TEST_ASSERT_BITS_HIGH: bits not set"));          \
-    }                                                                          \
+    if ((_v & _m) != _m)                                                       \
+      _navtest_fail_bits(_navtest_file_str, __LINE__, _m, _v, true);           \
   } while (0)
 
 /** Assert that all bits set in @p mask are cleared in @p val */
@@ -314,15 +341,8 @@ int navtest_run_suite(const navtest_suite_t *suite);
   do {                                                                         \
     uint32_t _m = (uint32_t)(mask);                                            \
     uint32_t _v = (uint32_t)(val);                                             \
-    if ((_v & _m) != 0) {                                                      \
-      navtest_write_P(_NT_PSTR("  Mask: "));                                   \
-      _navtest_print_uint32(_m);                                               \
-      navtest_write_P(_NT_PSTR("  Val:  "));                                   \
-      _navtest_print_uint32(_v);                                               \
-      navtest_write_P(_NT_PSTR("\r\n"));                                       \
-      _navtest_fail(_NT_PSTR(__FILE__), __LINE__,                              \
-                    _NT_PSTR("TEST_ASSERT_BITS_LOW: bits not cleared"));       \
-    }                                                                          \
+    if ((_v & _m) != 0u)                                                       \
+      _navtest_fail_bits(_navtest_file_str, __LINE__, _m, _v, false);          \
   } while (0)
 
 #ifdef __cplusplus

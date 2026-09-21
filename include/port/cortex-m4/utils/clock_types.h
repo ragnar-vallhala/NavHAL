@@ -31,13 +31,30 @@
 #ifndef CLOCK_TYPES_H
 #define CLOCK_TYPES_H
 
-#include "family/rcc_reg.h"
 #include <stdint.h>
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/** @brief This port drives its system clock through a PLL. */
+#define NAVHAL_HAS_CLOCK_PLL 1
+
+/**
+ * @brief Buses this port clocks separately from SYSCLK.
+ *
+ * The portable layer only knows a bus count and an index; the names are the
+ * port's own, because AHB/APB are an STM32 notion and mean nothing on a part
+ * without that hierarchy.
+ */
+typedef enum {
+  HAL_CLOCK_BUS_AHB = 0, ///< AHB / HCLK
+  HAL_CLOCK_BUS_APB1,    ///< APB1 / PCLK1
+  HAL_CLOCK_BUS_APB2,    ///< APB2 / PCLK2
+  HAL_CLOCK_BUS_COUNT    ///< Number of buses this port reports
+} hal_clock_bus_t;
+
 /**
  * @brief Enumeration of possible system clock sources.
  */
@@ -49,15 +66,32 @@ typedef enum {
 } hal_clock_source_t;
 
 /**
+ * @brief PLL configuration.
+ *
+ * SYSCLK = (input / @c pll_m) * @c pll_n / @c pll_p. Only meaningful when
+ * ::hal_clock_config_t::source is ::HAL_CLOCK_SOURCE_PLL.
+ */
+typedef struct {
+  hal_clock_source_t input_src; /**< Clock input source for the PLL. */
+  uint8_t pll_m;                /**< Division factor for the PLL input. */
+  uint16_t pll_n;               /**< Multiplication factor for the PLL VCO. */
+  uint8_t pll_p;                /**< Division factor for the system clock. */
+  uint8_t pll_q;                /**< Division factor for peripheral clocks. */
+} hal_pll_config_t;
+
+/**
  * @brief System clock configuration structure.
  *
- * Selects the clock source to be used as SYSCLK.
+ * Bus dividers are plain divide-by-N values (1, 2, 4, ... ), not register
+ * encodings: the backend maps them onto RCC's field values, so configuring a
+ * clock needs no register header. A divider of 0 is treated as 1.
  */
 typedef struct {
   hal_clock_source_t source; ///< Selected clock source (HSI, HSE, or PLL)
-  rcc_cfgr_hpre_div_t hpre_div;
-  rcc_cfgr_ppre_div_t ppre1_div;
-  rcc_cfgr_ppre_div_t ppre2_div;
+  uint16_t hpre_div;         ///< AHB divider (1..512), divide-by-N
+  uint16_t ppre1_div;        ///< APB1 divider (1..16), divide-by-N
+  uint16_t ppre2_div;        ///< APB2 divider (1..16), divide-by-N
+  hal_pll_config_t pll;      ///< Used when @c source is HAL_CLOCK_SOURCE_PLL
 } hal_clock_config_t;
 
 

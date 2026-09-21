@@ -32,12 +32,25 @@
  */
 
 #include "navhal_port_clock.h"
+#include "internal/hal_timebase_ops.h"
+
+/* Forward declarations: several of these call each other (micros from tick,
+ * delays from both), and they are static now. */
+static hal_status_t armv7em_timebase_init(uint32_t tick_us);
+static uint32_t armv7em_timebase_get_tick(void);
+static uint32_t armv7em_timebase_get_tick_duration_us(void);
+static uint32_t armv7em_timebase_get_reload_value(void);
+static uint32_t armv7em_timebase_get_micros(void);
+static uint32_t armv7em_timebase_get_millis(void);
+static void armv7em_timebase_delay_us(uint32_t us);
+static void armv7em_timebase_delay_ms(uint32_t ms);
+static hal_status_t armv7em_timebase_set_callback(hal_timebase_callback_t cb);
 #include "navhal_port_timer.h"
 #include <stdint.h>
 
 /**
  * @brief Global timebase tick counter (incremented in SysTick_Handler).
- * @note Unit: ticks; tick duration is set by hal_timebase_init().
+ * @note Unit: ticks; tick duration is set by armv7em_timebase_init().
  */
 static volatile uint32_t systick_ticks = 0;
 
@@ -61,7 +74,7 @@ static hal_timebase_callback_t timebase_callback = 0;
  *       to 24 bits. Configures the clock source, enables the SysTick
  *       interrupt and starts the timer.
  */
-hal_status_t hal_timebase_init(uint32_t tick_us) {
+static hal_status_t armv7em_timebase_init(uint32_t tick_us) {
   if (tick_us == 0)
     return HAL_ERR_INVALID_ARG;
 
@@ -85,7 +98,7 @@ hal_status_t hal_timebase_init(uint32_t tick_us) {
  * @param cb Callback function, or NULL to clear.
  * @return ::HAL_OK.
  */
-hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb) {
+static hal_status_t armv7em_timebase_set_callback(hal_timebase_callback_t cb) {
   timebase_callback = cb;
   return HAL_OK;
 }
@@ -98,12 +111,12 @@ hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb) {
  * @note Blocking busy-wait using the timebase tick; waits at least one tick
  *       if the requested delay is smaller than the tick duration.
  */
-void hal_delay_us(uint32_t us) {
-  uint32_t ticks_needed = us / hal_timebase_get_tick_duration_us();
+static void armv7em_timebase_delay_us(uint32_t us) {
+  uint32_t ticks_needed = us / armv7em_timebase_get_tick_duration_us();
   if (ticks_needed == 0)
     ticks_needed = 1;
-  uint32_t start = hal_timebase_get_tick();
-  while (hal_timebase_get_tick() - start < ticks_needed)
+  uint32_t start = armv7em_timebase_get_tick();
+  while (armv7em_timebase_get_tick() - start < ticks_needed)
     __asm__ volatile("nop"); // insert noops in bw
 }
 
@@ -111,25 +124,25 @@ void hal_delay_us(uint32_t us) {
  * @brief Busy-wait for the specified number of milliseconds.
  * @param ms Number of milliseconds to delay.
  */
-void hal_delay_ms(uint32_t ms) { hal_delay_us(ms * 1000); }
+static void armv7em_timebase_delay_ms(uint32_t ms) { armv7em_timebase_delay_us(ms * 1000); }
 
 /** @brief Return the current timebase tick count. */
-uint32_t hal_timebase_get_tick(void) { return systick_ticks; }
+static uint32_t armv7em_timebase_get_tick(void) { return systick_ticks; }
 
 /** @brief Return the configured tick duration in microseconds. */
-uint32_t hal_timebase_get_tick_duration_us(void) { return tick_duration_us; }
+static uint32_t armv7em_timebase_get_tick_duration_us(void) { return tick_duration_us; }
 
 /** @brief Return the SysTick reload value (24-bit). */
-uint32_t hal_timebase_get_reload_value(void) { return tick_reload_value; }
+static uint32_t armv7em_timebase_get_reload_value(void) { return tick_reload_value; }
 
 /** @brief Return elapsed time since timebase start, in milliseconds. */
-uint32_t hal_timebase_get_millis(void) {
-  return hal_timebase_get_micros() / 1000;
+static uint32_t armv7em_timebase_get_millis(void) {
+  return armv7em_timebase_get_micros() / 1000;
 }
 
 /** @brief Return elapsed time since timebase start, in microseconds. */
-uint32_t hal_timebase_get_micros(void) {
-  return hal_timebase_get_tick() * hal_timebase_get_tick_duration_us();
+static uint32_t armv7em_timebase_get_micros(void) {
+  return armv7em_timebase_get_tick() * armv7em_timebase_get_tick_duration_us();
 }
 
 /**
@@ -153,3 +166,17 @@ void hal_timebase_tick(void) {
 #ifndef SUBMODULE
 void SysTick_Handler(void) { hal_timebase_tick(); }
 #endif
+
+
+/** @brief The ARMv7E-M SysTick timebase backend. */
+const hal_timebase_ops_t _hal_timebase_ops = {
+    .init = armv7em_timebase_init,
+    .get_tick = armv7em_timebase_get_tick,
+    .get_tick_duration_us = armv7em_timebase_get_tick_duration_us,
+    .get_reload_value = armv7em_timebase_get_reload_value,
+    .get_micros = armv7em_timebase_get_micros,
+    .get_millis = armv7em_timebase_get_millis,
+    .delay_us = armv7em_timebase_delay_us,
+    .delay_ms = armv7em_timebase_delay_ms,
+    .set_callback = armv7em_timebase_set_callback,
+};

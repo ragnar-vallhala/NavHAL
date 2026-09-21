@@ -15,31 +15,24 @@
  * limitations under the License.
  */
 
-#ifndef BUS_TYPES_H
-#define BUS_TYPES_H
-
 /**
- * @defgroup HAL_UTIL_BUS_TYPES Bus Types
- * @ingroup HAL_UTILS
- * @brief Generic bus-address aliases.
- * @{
+ * @file board.h
+ * @brief ACME devkit board description.
+ *
+ * @details
+ * A reference port carries no real hardware, so this names only what a GPIO
+ * sample needs. Real boards additionally describe their console UART, clock
+ * source and pin map.
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-typedef enum
-{
-    HAL_APB1,
-    HAL_APB2,
-    HAL_AHB1,
-    HAL_AHB2,
-} hal_bus_t;
+#ifndef BOARD_H
+#define BOARD_H
 
+#include "common/hal_gpio.h"
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+/* The board-level names a portable sample expects. A real board also
+ * describes its console UART, clock source and header pin map. */
+#define LED_BUILTIN GPIO_PA05    /**< User LED, port A pin 5. */
+#define LED_ON      HAL_GPIO_HIGH /**< Level that lights ::LED_BUILTIN. */
 
-/** @} */ /* end of group HAL_UTIL_BUS_TYPES */
-#endif // !BUS_TYPES_H
+#endif /* BOARD_H */

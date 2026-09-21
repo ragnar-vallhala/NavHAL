@@ -38,6 +38,10 @@
  */
 
 #include "navhal_port_clock.h"
+
+#include <stdbool.h>
+
+#include "internal/hal_clock_ops.h"
 #include "family/flash_reg.h"
 #include "family/rcc_reg.h"
 #include <stdint.h>
@@ -90,6 +94,19 @@ static void _toggle_pll_clock(uint8_t state) {
 }
 
 /** @brief Resulting PLL output (= HCLK with AHB /1) for the given config, Hz. */
+
+/* Divide-by-N to the RCC PPRE field encoding. */
+static bool _ppre_encode(uint16_t div, uint32_t *out) {
+  switch (div) {
+  case 1: *out = RCC_CFGR_PPRE_DIV1; return true;
+  case 2: *out = RCC_CFGR_PPRE_DIV2; return true;
+  case 4: *out = RCC_CFGR_PPRE_DIV4; return true;
+  case 8: *out = RCC_CFGR_PPRE_DIV8; return true;
+  case 16: *out = RCC_CFGR_PPRE_DIV16; return true;
+  default: return false;
+  }
+}
+
 static uint32_t _pll_output_hz(const hal_pll_config_t *p) {
   if (p->pll_m == 0 || p->pll_p == 0)
     return 0;
@@ -104,13 +121,18 @@ static uint32_t _flash_ws_for(uint32_t hclk) {
   return (ws > 7) ? 7 : ws;
 }
 
-hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
-                            const hal_pll_config_t *pll_cfg) {
-  if (cfg == NULL)
-    return HAL_ERR_INVALID_ARG;
-  if (cfg->source == HAL_CLOCK_SOURCE_PLL && pll_cfg == NULL)
+static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
+  /* A PLL source with no usable PLL parameters is rejected rather than being
+   * programmed: m/n/p are divisors, and a zeroed config would either divide by
+   * zero or wait forever for a lock that cannot happen. This replaces the old
+   * pll_cfg == NULL check, and also catches a present-but-empty config, which
+   * that check let through. */
+  if (cfg->source == HAL_CLOCK_SOURCE_PLL &&
+      (cfg->pll.pll_m == 0u || cfg->pll.pll_n == 0u || cfg->pll.pll_p == 0u))
     return HAL_ERR_INVALID_ARG;
 
+  if (cfg == NULL)
+    return HAL_ERR_INVALID_ARG;
   /* Power up the PWR controller and select voltage Scale 1 (needed before
    * over-drive / high frequency). */
   RCC->APB1ENR |= RCC_APB1ENR_PWREN;
@@ -123,25 +145,25 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
   } else if (cfg->source == HAL_CLOCK_SOURCE_HSI) {
     _toggle_hsi_clock(RCC_ON);
   } else if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
-    if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSE)
+    if (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSE)
       _toggle_hse_clock(RCC_ON);
     else
       _toggle_hsi_clock(RCC_ON);
 
     _toggle_pll_clock(RCC_OFF);
     RCC->PLLCFGR = 0;
-    if (pll_cfg->input_src == HAL_CLOCK_SOURCE_HSI)
+    if (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSI)
       RCC->PLLCFGR &= ~RCC_PLLCFGR_SRC;
     else
       RCC->PLLCFGR |= RCC_PLLCFGR_SRC;
     RCC->PLLCFGR |=
-        RCC_PLLCFGR_PLLM(pll_cfg->pll_m) | RCC_PLLCFGR_PLLN(pll_cfg->pll_n) |
-        RCC_PLLCFGR_PLLP(pll_cfg->pll_p) | RCC_PLLCFGR_PLLQ(pll_cfg->pll_q);
+        RCC_PLLCFGR_PLLM(cfg->pll.pll_m) | RCC_PLLCFGR_PLLN(cfg->pll.pll_n) |
+        RCC_PLLCFGR_PLLP(cfg->pll.pll_p) | RCC_PLLCFGR_PLLQ(cfg->pll.pll_q);
     _toggle_pll_clock(RCC_ON);
   }
 
   /* Target HCLK (AHB prescaler is /1 below). */
-  uint32_t hclk = (cfg->source == HAL_CLOCK_SOURCE_PLL) ? _pll_output_hz(pll_cfg)
+  uint32_t hclk = (cfg->source == HAL_CLOCK_SOURCE_PLL) ? _pll_output_hz(&cfg->pll)
                   : (cfg->source == HAL_CLOCK_SOURCE_HSE) ? HSE_FREQ_HZ
                                                           : HSI_FREQ_HZ;
 
@@ -165,10 +187,28 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
   }
 
   /* Bus prescalers: AHB /1; APB1 ≤ 54 MHz, APB2 ≤ 108 MHz. */
+  /* Derived from the bus ceilings (APB1 54 MHz, APB2 108 MHz) unless the
+   * caller asked for a specific divider. An explicit request is still clamped
+   * to those ceilings: a config field should not be able to overclock a bus. */
   uint32_t ppre1 = (hclk <= 54000000U)    ? RCC_CFGR_PPRE_DIV1
                    : (hclk <= 108000000U) ? RCC_CFGR_PPRE_DIV2
                                           : RCC_CFGR_PPRE_DIV4;
   uint32_t ppre2 = (hclk <= 108000000U) ? RCC_CFGR_PPRE_DIV1 : RCC_CFGR_PPRE_DIV2;
+
+  if (cfg->ppre1_div != 0u) {
+    uint32_t req;
+    if (!_ppre_encode(cfg->ppre1_div, &req))
+      return HAL_ERR_INVALID_ARG;
+    if ((hclk / cfg->ppre1_div) <= 54000000U)
+      ppre1 = req;
+  }
+  if (cfg->ppre2_div != 0u) {
+    uint32_t req;
+    if (!_ppre_encode(cfg->ppre2_div, &req))
+      return HAL_ERR_INVALID_ARG;
+    if ((hclk / cfg->ppre2_div) <= 108000000U)
+      ppre2 = req;
+  }
 
   RCC->CFGR &= ~(RCC_CFGR_HPRE_MASK | RCC_CFGR_PPRE1_MASK | RCC_CFGR_PPRE2_MASK);
   RCC->CFGR |= (RCC_CFGR_HPRE_DIV1 << RCC_CFGR_HPRE_BIT) |
@@ -200,7 +240,7 @@ hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
   return HAL_OK;
 }
 
-uint32_t hal_clock_get_sysclk(void) {
+static uint32_t stm32_clock_get_sysclk(void) {
   uint8_t sws = ((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3;
   switch (sws) {
   case 0:
@@ -246,17 +286,104 @@ static uint32_t _decode_apb_prescaler(uint32_t val) {
   }
 }
 
-uint32_t hal_clock_get_ahbclk(void) {
+static uint32_t stm32_clock_get_ahbclk(void) {
   uint32_t prescaler = ((RCC->CFGR) >> RCC_CFGR_HPRE_BIT) & 0xF;
-  return hal_clock_get_sysclk() / _decode_prescaler(prescaler);
+  return stm32_clock_get_sysclk() / _decode_prescaler(prescaler);
 }
 
-uint32_t hal_clock_get_apb1clk(void) {
+static uint32_t stm32_clock_get_apb1clk(void) {
   uint32_t prescaler = ((RCC->CFGR) >> RCC_CFGR_PPRE1_BIT) & 0x7;
-  return hal_clock_get_sysclk() / _decode_apb_prescaler(prescaler);
+  return stm32_clock_get_sysclk() / _decode_apb_prescaler(prescaler);
 }
 
-uint32_t hal_clock_get_apb2clk(void) {
+static uint32_t stm32_clock_get_apb2clk(void) {
   uint32_t prescaler = ((RCC->CFGR) >> RCC_CFGR_PPRE2_BIT) & 0x7;
-  return hal_clock_get_sysclk() / _decode_apb_prescaler(prescaler);
+  return stm32_clock_get_sysclk() / _decode_apb_prescaler(prescaler);
 }
+
+/** @brief The F7 clock backend, published for the shared layer to dispatch to. */
+static uint8_t stm32_clock_get_bus_count(void) {
+  return (uint8_t)HAL_CLOCK_BUS_COUNT;
+}
+
+static uint32_t stm32_clock_get_bus_clock(uint8_t bus) {
+  switch ((hal_clock_bus_t)bus) {
+  case HAL_CLOCK_BUS_AHB:
+    return stm32_clock_get_ahbclk();
+  case HAL_CLOCK_BUS_APB1:
+    return stm32_clock_get_apb1clk();
+  case HAL_CLOCK_BUS_APB2:
+    return stm32_clock_get_apb2clk();
+  default:
+    return 0u;
+  }
+}
+
+
+/* PLL solving, RM0368 §6.3.2: VCO input must land in 1..2 MHz, VCO output in
+ * 100000000..432000000 MHz, and PLLP is one of 2/4/6/8. Picking these by hand is
+ * where a clock config goes quietly wrong -- 09_hal_clock shipped an N that
+ * put the VCO below its minimum while still producing the right SYSCLK. */
+#define PLL_VCO_IN_HZ 1000000U
+#define PLL_VCO_MIN_HZ 100000000U
+#define PLL_VCO_MAX_HZ 432000000U
+#define PLL_SYSCLK_MAX_HZ 216000000U
+
+static hal_status_t _solve_pll(hal_clock_source_t input_src, uint32_t target_hz,
+                               hal_pll_config_t *out) {
+  if (target_hz == 0u || target_hz > PLL_SYSCLK_MAX_HZ)
+    return HAL_ERR_INVALID_ARG;
+
+  uint32_t in = (input_src == HAL_CLOCK_SOURCE_HSE) ? HSE_FREQ_HZ
+                                                    : HSI_FREQ_HZ;
+
+  /* A 1 MHz VCO input gives the finest N granularity the part allows, and
+   * divides exactly for both the 8 MHz HSE and the 16 MHz HSI. */
+  if ((in % PLL_VCO_IN_HZ) != 0u)
+    return HAL_ERR_INVALID_ARG;
+  uint32_t m = in / PLL_VCO_IN_HZ;
+  if (m < 2u || m > 63u)
+    return HAL_ERR_INVALID_ARG;
+
+  for (uint32_t p = 2u; p <= 8u; p += 2u) {
+    uint64_t vco = (uint64_t)target_hz * p;
+    if (vco < PLL_VCO_MIN_HZ || vco > PLL_VCO_MAX_HZ)
+      continue;
+
+    uint32_t n = (uint32_t)(vco / PLL_VCO_IN_HZ);
+    if (n < 50u || n > 432u)
+      continue;
+    /* Reject a target the integer N cannot hit exactly. */
+    if ((uint64_t)n * PLL_VCO_IN_HZ != vco)
+      continue;
+
+    out->input_src = input_src;
+    out->pll_m = (uint8_t)m;
+    out->pll_n = (uint16_t)n;
+    out->pll_p = (uint8_t)p;
+    /* 48 MHz for USB where the VCO allows it, else the nearest legal Q. */
+    uint32_t q = (uint32_t)(vco / 48000000u);
+    out->pll_q = (uint8_t)((q >= 2u && q <= 15u) ? q : 7u);
+    return HAL_OK;
+  }
+  return HAL_ERR_INVALID_ARG;
+}
+
+hal_status_t hal_clock_init_hz(hal_clock_source_t pll_input,
+                               uint32_t target_hz) {
+  hal_clock_config_t cfg = {0};
+  cfg.source = HAL_CLOCK_SOURCE_PLL;
+
+  hal_status_t st = _solve_pll(pll_input, target_hz, &cfg.pll);
+  if (st != HAL_OK)
+    return st;
+
+  return hal_clock_init(&cfg);
+}
+
+const hal_clock_ops_t _hal_clock_ops = {
+    .init = stm32_clock_init,
+    .get_sysclk = stm32_clock_get_sysclk,
+    .get_bus_count = stm32_clock_get_bus_count,
+    .get_bus_clock = stm32_clock_get_bus_clock,
+};

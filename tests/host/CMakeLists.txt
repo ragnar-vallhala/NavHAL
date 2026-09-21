@@ -49,6 +49,10 @@ add_executable(tests_host
 
   # source under test — pure-logic only (no register access)
   ${NAVHAL_ROOT}/src/utils/conversion.c
+  # CRC: shared public layer (validate + dispatch) + the STM32 software backend
+  # that defines _hal_crc_ops. Both are needed now the public hal_crc_* symbols
+  # live in the common layer rather than the vendor driver.
+  ${NAVHAL_ROOT}/src/common/hal_crc.c
   ${NAVHAL_ROOT}/src/vendor/stm32/crc/crc.c
 )
 target_include_directories(tests_host PRIVATE
@@ -77,6 +81,15 @@ add_executable(tests_host_drivers
   test_mpu.c
 
   ${NAVHAL_ROOT}/tests/navtest_state.c
+
+  # Shared public layer. Every vendor file below now holds only static backend
+  # functions plus its ops table, so all public hal_* symbols come from here.
+  ${NAVHAL_ROOT}/src/common/hal_gpio.c
+  ${NAVHAL_ROOT}/src/common/hal_flash.c
+  ${NAVHAL_ROOT}/src/common/hal_clock.c
+  ${NAVHAL_ROOT}/src/common/hal_uart.c
+  ${NAVHAL_ROOT}/src/common/hal_i2c.c
+  ${NAVHAL_ROOT}/src/common/hal_spi.c
 
   # real driver sources under test
   ${NAVHAL_ROOT}/src/vendor/stm32/gpio/gpio.c

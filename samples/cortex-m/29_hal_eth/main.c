@@ -62,7 +62,8 @@ int main(void) {
                           .pll_p = 2,
                           .pll_q = 5}; /* HSI 16 MHz -> 100 MHz SYSCLK/HCLK. */
   hal_clock_config_t clk = {.source = HAL_CLOCK_SOURCE_PLL};
-  hal_clock_init(&clk, &pll);
+  clk.pll = pll;
+  hal_clock_init(&clk);
 
   hal_uart_init(ETH_CONSOLE, &(hal_uart_config_t){.baudrate = 9600});
   hal_uart_print(ETH_CONSOLE, "\r\n[eth] bring-up, hclk=");

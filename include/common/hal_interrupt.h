@@ -43,9 +43,12 @@ extern "C" {
  * @date 2025-07-20
  */
 #if NAVHAL_CONFIG_DRV_INTERRUPT
-#include "navhal_port_interrupt.h" // Include architecture-specific interrupt definitions
+#include "navhal_port_interrupt.h" // architecture-specific interrupt definitions
+/* Inside the gate with the port header: a vendor that does not implement the
+ * interrupt driver has no reason to ship an interrupt register map, and this
+ * include used to demand one from every port regardless. */
+#include "family/interrupt_reg.h" // vendor interrupt register definitions
 #endif
-#include "family/interrupt_reg.h" // Include architecture-specific interrupt register definitions
 
 #ifdef __cplusplus
 } /* extern "C" */

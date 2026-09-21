@@ -36,6 +36,7 @@
 #if NAVHAL_CONFIG_DRV_WATCHDOG
 
 #include "common/hal_watchdog.h"
+#include "internal/hal_watchdog_ops.h"
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -56,12 +57,12 @@ static const uint16_t wdt_steps_ms[] = {16U,   32U,   64U,   125U,  250U,
 static uint16_t wdt_timeout_ms;
 static uint8_t wdt_running;
 
-uint32_t hal_watchdog_max_timeout_ms(void) {
+static uint32_t avr_watchdog_max_timeout_ms(void) {
   return wdt_steps_ms[WDT_STEP_COUNT - 1U];
 }
 
-hal_status_t hal_watchdog_start(uint32_t timeout_ms) {
-  if (timeout_ms == 0U || timeout_ms > hal_watchdog_max_timeout_ms())
+static hal_status_t avr_watchdog_start(uint32_t timeout_ms) {
+  if (timeout_ms == 0U || timeout_ms > avr_watchdog_max_timeout_ms())
     return HAL_ERR_INVALID_ARG;
 
   /* First step at least as long as the request — never round down, or a caller
@@ -84,15 +85,25 @@ hal_status_t hal_watchdog_start(uint32_t timeout_ms) {
   return HAL_OK;
 }
 
-hal_status_t hal_watchdog_kick(void) {
+static hal_status_t avr_watchdog_kick(void) {
   if (!wdt_running)
     return HAL_ERR_NOT_INITIALIZED;
   wdt_reset();
   return HAL_OK;
 }
 
-uint32_t hal_watchdog_get_timeout_ms(void) { return wdt_timeout_ms; }
+static uint32_t avr_watchdog_get_timeout_ms(void) { return wdt_timeout_ms; }
 
-bool hal_watchdog_is_running(void) { return wdt_running != 0U; }
+static bool avr_watchdog_is_running(void) { return wdt_running != 0U; }
+
+
+/** @brief The AVR watchdog backend. */
+const hal_watchdog_ops_t _hal_watchdog_ops = {
+    .start = avr_watchdog_start,
+    .kick = avr_watchdog_kick,
+    .get_timeout_ms = avr_watchdog_get_timeout_ms,
+    .is_running = avr_watchdog_is_running,
+    .max_timeout_ms = avr_watchdog_max_timeout_ms,
+};
 
 #endif /* NAVHAL_CONFIG_DRV_WATCHDOG */

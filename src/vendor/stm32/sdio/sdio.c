@@ -22,6 +22,7 @@
 #include "family/rcc_reg.h"
 #include "navhal_port_timer.h"
 // #include "navhal_port_uart.h"
+#include <stddef.h>
 #include <stdint.h>
 
 /**
@@ -302,6 +303,11 @@ hal_sdio_error_t hal_sdio_card_init(void) {
 /* ------------------------------------------------------------- */
 
 hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buf) {
+  /* Checked before the card is, so a caller mistake costs nothing: the wait
+   * below polls the card for half a second before it gives up. */
+  if (buf == NULL)
+    return HAL_SDIO_ERROR;
+
   if (!card_is_sdhc)
     addr *= 512;
 
@@ -379,6 +385,9 @@ hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buf) {
 /* WRITE BLOCK */
 /* ------------------------------------------------------------- */
 hal_sdio_error_t hal_sdio_write_block(uint32_t addr, const uint8_t *buf) {
+  if (buf == NULL)
+    return HAL_SDIO_ERROR;
+
   if (!card_is_sdhc)
     addr *= 512;
 

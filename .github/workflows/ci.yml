@@ -309,6 +309,28 @@ jobs:
           tools/qemu/smoke.sh hal_x86_timing    "elapsed ms over delay(500):"
           tools/qemu/smoke.sh hal_x86_interrupt "hal_timebase_get_tick:"
 
+  # The vtable's cost-of-abstraction claim, enforced rather than asserted:
+  # under LTO every ops table must resolve away entirely. Builds one sample
+  # per arch, so it is cheap; the script skips an arch whose toolchain is
+  # absent rather than failing.
+  devirt:
+    name: Devirtualisation (LTO)
+    runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-cortex-m == 'true' || needs.dispatch.outputs.run-avr == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi \
+            gcc-avr avr-libc binutils-avr
+      - name: Install kconfiglib
+        run: pip install kconfiglib
+      - name: Every ops table resolves away under LTO
+        run: tools/check_devirt.sh
+
   # M8 §8.1 — Single required-status-check name to put on branch
   # protection. Succeeds if every per-PR job either passed or was
   # legitimately skipped by the dispatcher. GitHub doesn't treat
@@ -330,6 +352,7 @@ jobs:
       - sample-matrix-avr
       - sample-matrix-f767
       - x86-smoke
+      - devirt
     steps:
       - name: Aggregate per-job results (success or skipped == ok)
         run: |
@@ -351,6 +374,7 @@ jobs:
           check sample-matrix-avr  "${{ needs.sample-matrix-avr.result }}"
           check sample-matrix-f767 "${{ needs.sample-matrix-f767.result }}"
           check x86-smoke          "${{ needs.x86-smoke.result }}"
+          check devirt             "${{ needs.devirt.result }}"
           if [ "$fail" -eq 0 ]; then
             echo "CI green."
           fi

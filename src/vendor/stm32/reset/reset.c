@@ -31,18 +31,17 @@
 #if NAVHAL_CONFIG_DRV_RESET
 
 #include "common/hal_reset.h"
+#include "arch/armv7e-m/core_reg.h"
+#include "internal/hal_reset_ops.h"
 #include "family/rcc_reg.h"
 
-/* SCB_AIRCR. There is no SCB definition in the port headers, and one register
- * does not earn a whole map. */
-#define SCB_AIRCR (*(volatile uint32_t *)0xE000ED0CUL)
-#define SCB_AIRCR_VECTKEY 0x05FA0000U /**< Writes without this key are ignored. */
-#define SCB_AIRCR_SYSRESETREQ (1U << 2)
+/* SCB_AIRCR comes from the arch core header: SYSRESETREQ is ARMv7E-M, not
+ * STM32, and every vendor on this core resets the same way. */
 
 static uint32_t latched_cause;
 static uint8_t cause_valid;
 
-hal_status_t hal_reset_init(void) {
+static hal_status_t stm32_reset_init(void) {
   /* Latch once. A second call must not overwrite the real cause with the
    * zeroes left behind by the first one's RMVF. */
   if (cause_valid)
@@ -78,9 +77,9 @@ hal_status_t hal_reset_init(void) {
   return HAL_OK;
 }
 
-uint32_t hal_reset_get_cause(void) { return latched_cause; }
+static uint32_t stm32_reset_get_cause(void) { return latched_cause; }
 
-hal_status_t hal_system_reset(void) {
+static hal_status_t stm32_reset_system_reset(void) {
   /* Drain the write buffer first: the reset can otherwise land before an
    * earlier store to a peripheral has left the core. */
   __asm volatile("dsb 0xF" ::: "memory");
@@ -90,6 +89,16 @@ hal_status_t hal_system_reset(void) {
     /* The reset is not instantaneous. Spinning here keeps the caller from
      * running on into code that assumes it never returned. */
   }
+
+  return HAL_OK; /* unreachable; the op returns hal_status_t. */
 }
+
+
+/** @brief The STM32 reset backend. */
+const hal_reset_ops_t _hal_reset_ops = {
+    .init = stm32_reset_init,
+    .get_cause = stm32_reset_get_cause,
+    .system_reset = stm32_reset_system_reset,
+};
 
 #endif /* NAVHAL_CONFIG_DRV_RESET */

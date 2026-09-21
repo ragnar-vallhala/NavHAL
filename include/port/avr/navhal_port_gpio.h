@@ -48,40 +48,10 @@ extern "C" {
  *
  * Folds to a single `sbi` / `cbi` when @p pin and @p state are constant.
  */
-static inline void hal_gpio_write(hal_gpio_pin_t pin, hal_gpio_state_t state) {
-  uint8_t bit = (uint8_t)(1u << ((uint8_t)pin & 7u));
-  uint8_t idx = (uint8_t)pin >> 3;
-  volatile uint8_t *port =
-      (idx == 0u) ? &PORTB : (idx == 1u) ? &PORTC : &PORTD;
-  if (state == HAL_GPIO_LOW)
-    *port &= (uint8_t)~bit;
-  else
-    *port |= bit;
-}
-
-/**
- * @brief Read the logic level of a pin (hot path).
- */
-static inline hal_gpio_state_t hal_gpio_read(hal_gpio_pin_t pin) {
-  uint8_t bit = (uint8_t)(1u << ((uint8_t)pin & 7u));
-  uint8_t idx = (uint8_t)pin >> 3;
-  volatile uint8_t *in = (idx == 0u) ? &PINB : (idx == 1u) ? &PINC : &PIND;
-  return (*in & bit) ? HAL_GPIO_HIGH : HAL_GPIO_LOW;
-}
-
-/**
- * @brief Toggle a pin's output level (hot path).
- *
- * Writing a 1 to a PINx bit toggles the matching PORTx bit on the
- * ATmega328P; for a constant @p pin this is a single one-byte store.
- */
-static inline void hal_gpio_toggle(hal_gpio_pin_t pin) {
-  uint8_t bit = (uint8_t)(1u << ((uint8_t)pin & 7u));
-  uint8_t idx = (uint8_t)pin >> 3;
-  volatile uint8_t *pinreg =
-      (idx == 0u) ? &PINB : (idx == 1u) ? &PINC : &PIND;
-  *pinreg = bit;
-}
+/* The inlined hot path is the vendor's: GPIO is silicon, not CPU core.
+ * Two vendors on one arch share nothing here, so the accessors live with the
+ * register map they are written against. */
+#include "family/gpio_inline.h"
 
 #ifdef __cplusplus
 } /* extern "C" */

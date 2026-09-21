@@ -33,17 +33,22 @@
  */
 
 #include "navhal_port_i2c.h"
+
+#include "internal/hal_i2c_ops.h"
+#include "internal/hal_i2c_dma_ops.h"
 #include "navhal_port_gpio.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
 #include "family/i2c_reg.h"
 #include "common/hal_i2c.h"
 
+#include <stdbool.h>
+
 #define I2C_SPIN 100000U /* bounded wait iterations */
 
 static uint8_t __i2c_init_status = 0;
 
-uint8_t hal_i2c_get_init_status(void) { return __i2c_init_status; }
+static uint8_t stm32f7_i2c_get_init_status(void) { return __i2c_init_status; }
 
 static void _cfg_pin(hal_gpio_pin_t pin) {
   hal_gpio_enable_clock(pin);
@@ -87,9 +92,20 @@ static hal_status_t _wait_isr(volatile I2C_Reg_Typedef *I2C, uint32_t flag) {
   return HAL_ERR_TIMEOUT;
 }
 
-hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config) {
-  if (config == NULL)
+/* I2C_GET_BASE is arithmetic on a base address, so it cannot fail and cannot
+ * be used as a validity check. The set of buses is a property of the part, so
+ * the range lives here rather than in the shared layer. */
+#define STM32_I2C_BUS_COUNT 3u
+
+static inline bool _i2c_bus_valid(hal_i2c_bus_t bus) {
+  return (uint32_t)bus < STM32_I2C_BUS_COUNT;
+}
+
+static hal_status_t stm32f7_i2c_init(hal_i2c_bus_t bus,
+                                     const hal_i2c_config_t *config) {
+  if (!_i2c_bus_valid(bus))
     return HAL_ERR_INVALID_ARG;
+  /* config non-NULL: validated by the shared layer. */
   if (__i2c_init_status & (1 << bus))
     return HAL_ERR_NOT_INITIALIZED; /* avoid re-init (matches F4 contract) */
   if (config->own_address != I2C_MASTER)
@@ -110,8 +126,10 @@ hal_status_t hal_i2c_init(hal_i2c_bus_t bus, const hal_i2c_config_t *config) {
   return HAL_OK;
 }
 
-hal_status_t hal_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
+static hal_status_t stm32f7_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
                            const uint8_t *data, uint16_t len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   if (data == NULL || len == 0)
     return HAL_ERR_IO;
   volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
@@ -130,8 +148,11 @@ hal_status_t hal_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
   return s;
 }
 
-hal_status_t hal_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr, uint8_t *data,
+static hal_status_t stm32f7_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr,
+                                     uint8_t *data,
                           uint16_t len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   if (data == NULL || len == 0)
     return HAL_ERR_IO;
   volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
@@ -150,9 +171,11 @@ hal_status_t hal_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr, uint8_t *data,
   return s;
 }
 
-hal_status_t hal_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
+static hal_status_t stm32f7_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
                                 const uint8_t *tx_data, uint16_t tx_len,
                                 uint8_t *rx_data, uint16_t rx_len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   if (tx_data == NULL || rx_data == NULL || tx_len == 0 || rx_len == 0)
     return HAL_ERR_IO;
   volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
@@ -215,7 +238,7 @@ static hal_irq_t _dma1_stream_irq(uint8_t s) {
   }
 }
 
-hal_status_t hal_i2c_read_regs_dma(hal_i2c_bus_t bus, uint8_t dev_addr,
+static hal_status_t stm32f7_i2c_dma_read_regs(hal_i2c_bus_t bus, uint8_t dev_addr,
                                    uint8_t reg, const hal_dma_config_t *dma_cfg,
                                    void (*callback)(void)) {
   if (dma_cfg == NULL)
@@ -286,4 +309,50 @@ static void _i2c_dma_irq_handler(void) {
     _i2c_dma_rx_callback();
 }
 
+
+/* The F7 DMA request mapping is a different table from the F4's, and no F767
+ * reference manual is in datasheets/ to check it against. Guessing a stream
+ * would fail silently on hardware, so this reports that the mapping is not
+ * established rather than inventing one. Fill it in from RM0410 Table 27. */
+static hal_status_t stm32f7_i2c_dma_default_binding(hal_i2c_bus_t bus, bool tx,
+                                                    hal_dma_binding_t *out) {
+  (void)bus;
+  (void)tx;
+  (void)out;
+  return HAL_ERR_NOT_SUPPORTED;
+}
+
+/** @brief The STM32F7 I2C-over-DMA backend. */
+const hal_i2c_dma_ops_t _hal_i2c_dma_ops = {
+    .default_binding = stm32f7_i2c_dma_default_binding,
+    .read_regs = stm32f7_i2c_dma_read_regs,
+};
+
 #endif /* NAVHAL_CONFIG_DRV_I2C_DMA */
+
+/** @brief The F7 I2C backend. The DMA entry point above stays a public
+ *  capability-gated symbol; it is not part of the portable contract. */
+/* The F7 has no CR1.SWRST: clearing PE is itself the reset, per RM0410 --
+ * the peripheral drops its state machine and most of CR2/ISR when disabled.
+ * Same observable contract as the F4 deinit, different mechanism. */
+static hal_status_t stm32f7_i2c_deinit(hal_i2c_bus_t bus) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
+  volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
+  if (!I2C)
+    return HAL_ERR_INVALID_ARG;
+
+  I2C->CR1 &= ~I2C_CR1_PE;
+
+  __i2c_init_status &= (uint8_t)~(1u << bus);
+  return HAL_OK;
+}
+
+const hal_i2c_ops_t _hal_i2c_ops = {
+    .init = stm32f7_i2c_init,
+    .deinit = stm32f7_i2c_deinit,
+    .write = stm32f7_i2c_write,
+    .read = stm32f7_i2c_read,
+    .write_read = stm32f7_i2c_write_read,
+    .get_init_status = stm32f7_i2c_get_init_status,
+};

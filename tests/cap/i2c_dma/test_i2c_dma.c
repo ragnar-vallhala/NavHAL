@@ -37,19 +37,60 @@
 
 static void i2c_dma_rx_complete(void) {}
 
-void test_i2c_dma_rejects_null_cfg(void) {
+static uint8_t i2c_dma_buf[8];
+
+void test_i2c_dma_rejects_null_buffer(void) {
   TEST_ASSERT_EQUAL_UINT32(
       (uint32_t)HAL_ERR_INVALID_ARG,
       (uint32_t)hal_i2c_read_regs_dma(HAL_I2C_1, 0x50, 0x00, NULL,
+                                      sizeof(i2c_dma_buf),
                                       i2c_dma_rx_complete));
+}
+
+void test_i2c_dma_rejects_zero_length(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_i2c_read_regs_dma(HAL_I2C_1, 0x50, 0x00, i2c_dma_buf, 0u,
+                                      i2c_dma_rx_complete));
+}
+
+/* The binding replaces the hal_dma_config_t a caller used to pass in: it is
+ * the driver's to know, and reading it back is how a caller checks which
+ * stream a transfer will use. */
+void test_i2c_dma_binding_is_reported_or_unsupported(void) {
+  hal_dma_binding_t b;
+  hal_status_t st = hal_i2c_dma_get_binding(HAL_I2C_1, false, &b);
+
+  /* A port without an established mapping says so rather than inventing one. */
+  if (st == HAL_ERR_NOT_SUPPORTED)
+    return;
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)st);
+  /* I2C requests live on DMA1 on this family; DMA2 carries none. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_DMA_CONTROLLER_1,
+                           (uint32_t)b.controller);
+  TEST_ASSERT_TRUE(b.stream <= 7u);
+  TEST_ASSERT_TRUE(b.periph_addr != 0u);
+}
+
+void test_i2c_dma_get_binding_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_i2c_dma_get_binding(HAL_I2C_1, false, NULL));
 }
 
 /* PROGMEM slot for each case name on AVR; no-op elsewhere (I²C DMA is
  * Cortex-M only). */
-NAVTEST_CASE_DECL(test_i2c_dma_rejects_null_cfg);
+NAVTEST_CASE_DECL(test_i2c_dma_rejects_null_buffer);
+NAVTEST_CASE_DECL(test_i2c_dma_rejects_zero_length);
+NAVTEST_CASE_DECL(test_i2c_dma_binding_is_reported_or_unsupported);
+NAVTEST_CASE_DECL(test_i2c_dma_get_binding_rejects_null);
 
 static const navtest_case_t i2c_dma_cases[] = {
-    NAVTEST_CASE(test_i2c_dma_rejects_null_cfg),
+    NAVTEST_CASE(test_i2c_dma_rejects_null_buffer),
+    NAVTEST_CASE(test_i2c_dma_rejects_zero_length),
+    NAVTEST_CASE(test_i2c_dma_binding_is_reported_or_unsupported),
+    NAVTEST_CASE(test_i2c_dma_get_binding_rejects_null),
 };
 
 const navtest_suite_t test_i2c_dma_suite = {

@@ -16,9 +16,9 @@ endif()
 if(CONFIG_DRV_CLOCK)
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/clock/clock.c)
 endif()
-if(CONFIG_DRV_TIMER)
-    # TSC-backed timebase (delay/millis), polled. The general-purpose hal_timer_*
-    # (PIT channels) needs IRQs and lands with the interrupt slice.
+if(CONFIG_DRV_TIMEBASE)
+    # TSC-backed timebase (delay/millis), polled. This port has no
+    # general-purpose hal_timer_*, which is why the two are separate symbols.
     list(APPEND HAL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/timer/timebase.c)
 endif()
 if(CONFIG_DRV_INTERRUPT)

@@ -1,0 +1,11 @@
+set(CMAKE_SYSTEM_NAME      Generic)
+set(CMAKE_SYSTEM_PROCESSOR cortex-m4)
+set(CMAKE_C_COMPILER   arm-none-eabi-gcc)
+set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
+set(CMAKE_ASM_COMPILER arm-none-eabi-gcc)
+set(CMAKE_OBJCOPY      arm-none-eabi-objcopy)
+set(CMAKE_SIZE         arm-none-eabi-size)
+set(CMAKE_BINARY_SIZE  arm-none-eabi-size)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(NAVHAL_DEFCONFIG "${CMAKE_CURRENT_LIST_DIR}/../defconfigs/cortex-m4_acme1_acme_devkit.defconfig"
+    CACHE FILEPATH "Kconfig fragment seeded into .config before generation")

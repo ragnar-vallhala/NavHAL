@@ -25,6 +25,7 @@
  * Flash, with compaction between a primary and secondary sector.
  */
 
+#include "internal/hal_flash_ops.h"
 #include "navhal_port_flash.h"
 #include "common/hal_types.h"
 #include "family/flash_reg.h"
@@ -257,10 +258,9 @@ static hal_status_t _flash_compact_storage_(void) {
 
 /* ---- Public API --------------------------------------------------------- */
 
-hal_status_t hal_flash_save(uint8_t key, const uint8_t *value, uint8_t size) {
-  if (size == 0 || value == NULL)
-    return HAL_ERR;
-
+static hal_status_t stm32_flash_save(uint8_t key, const uint8_t *value,
+                                     uint8_t size) {
+  /* value non-NULL and size != 0: validated by the public layer. */
   __IO uint8_t *ptr = _flash_find_next_free();
   if (ptr == NULL) {
     hal_status_t status = _flash_compact_storage_();
@@ -300,13 +300,11 @@ hal_status_t hal_flash_save(uint8_t key, const uint8_t *value, uint8_t size) {
   return status;
 }
 
-hal_status_t hal_flash_read(uint8_t key, uint8_t *value, uint8_t *size) {
-  /* NULL-guard before any dereference. Without this, a NULL `size` made the
-   * not-found path below write `*size = 0` to address 0 — harmless on the
-   * Cortex-M4 / Renode flash model, but a faulting store on real Cortex-M7. */
-  if (value == NULL || size == NULL)
-    return HAL_ERR_INVALID_ARG;
-
+static hal_status_t stm32_flash_read(uint8_t key, uint8_t *value,
+                                     uint8_t *size) {
+  /* value and size non-NULL: validated by the public layer. The not-found path
+   * below stores *size = 0 unguarded, which faults on Cortex-M7 if that ever
+   * stops holding. */
   __IO hal_flash_record_t *last_rec = _flash_find_first_valid_entry_(key);
   if (last_rec == NULL) {
     *size = 0;
@@ -320,7 +318,7 @@ hal_status_t hal_flash_read(uint8_t key, uint8_t *value, uint8_t *size) {
   return HAL_OK;
 }
 
-hal_status_t hal_flash_delete(uint8_t key) {
+static hal_status_t stm32_flash_delete(uint8_t key) {
   __IO hal_flash_record_t *rec = _flash_find_first_valid_entry_(key);
   if (rec == NULL)
     return HAL_ERR; // key not found
@@ -332,12 +330,20 @@ hal_status_t hal_flash_delete(uint8_t key) {
                             sizeof(hal_flash_record_t));
 }
 
-hal_status_t hal_flash_erase(void) {
+static hal_status_t stm32_flash_erase(void) {
   _flash_erase_sector_(PRIMARY_FLASH_SECTOR);
   _flash_erase_sector_(SECONDARY_FLASH_SECTOR);
   return HAL_OK;
 }
 
-bool hal_flash_needs_compaction(void) {
+static bool stm32_flash_needs_compaction(void) {
   return _flash_find_next_free() == NULL;
 }
+
+const hal_flash_ops_t _hal_flash_ops = {
+    .save = stm32_flash_save,
+    .read = stm32_flash_read,
+    .del = stm32_flash_delete,
+    .erase = stm32_flash_erase,
+    .needs_compaction = stm32_flash_needs_compaction,
+};

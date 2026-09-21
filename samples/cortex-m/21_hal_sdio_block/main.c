@@ -36,7 +36,8 @@ int main(void) {
                               .pll_q = 7};
   hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
-  hal_clock_init(&clk_cfg, &pll_cfg);
+  clk_cfg.pll = pll_cfg;
+  hal_clock_init(&clk_cfg);
   hal_timebase_init(1000);
   hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=115200});
 

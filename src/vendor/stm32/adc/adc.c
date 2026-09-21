@@ -31,6 +31,7 @@
  */
 
 #include "navhal_port_adc.h"
+#include "internal/hal_adc_ops.h"
 
 #include "family/adc_reg.h"
 #include "family/rcc_reg.h"
@@ -43,7 +44,7 @@ static inline volatile ADC_Reg_Typedef *_adc(hal_adc_t adc) {
   return GET_ADCx_BASE((uint8_t)adc);
 }
 
-hal_status_t hal_adc_init(hal_adc_t adc, const hal_adc_config_t *config) {
+static hal_status_t stm32_adc_init(hal_adc_t adc, const hal_adc_config_t *config) {
   if ((uint8_t)adc >= ADC_UNIT_COUNT)
     return HAL_ERR_INVALID_ARG;
   volatile ADC_Reg_Typedef *a = _adc(adc);
@@ -70,7 +71,7 @@ hal_status_t hal_adc_init(hal_adc_t adc, const hal_adc_config_t *config) {
   return HAL_OK;
 }
 
-hal_status_t hal_adc_read(hal_adc_t adc, uint8_t channel, uint16_t *out) {
+static hal_status_t stm32_adc_read(hal_adc_t adc, uint8_t channel, uint16_t *out) {
   if (out == NULL || (uint8_t)adc >= ADC_UNIT_COUNT)
     return HAL_ERR_INVALID_ARG;
   volatile ADC_Reg_Typedef *a = _adc(adc);
@@ -88,3 +89,9 @@ hal_status_t hal_adc_read(hal_adc_t adc, uint8_t channel, uint16_t *out) {
   *out = (uint16_t)(a->DR & 0xFFFFU); /* reading DR clears EOC */
   return HAL_OK;
 }
+
+/** @brief The STM32 adc backend. */
+const hal_adc_ops_t _hal_adc_ops = {
+    .init = stm32_adc_init,
+    .read = stm32_adc_read,
+};

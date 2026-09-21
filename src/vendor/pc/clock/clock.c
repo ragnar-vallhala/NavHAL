@@ -19,6 +19,7 @@
  */
 
 #include "common/hal_clock.h"
+#include "internal/hal_clock_ops.h"
 #include "pc_io.h"
 
 #define PIT_INPUT_HZ 1193182u /* 8254 input clock */
@@ -55,17 +56,30 @@ uint64_t pc_tsc_hz(void) {
   return g_tsc_hz;
 }
 
-hal_status_t hal_clock_init(const hal_clock_config_t *cfg,
-                            const hal_pll_config_t *pll_cfg) {
-  (void)pll_cfg; /* no PLL on a PC */
+static hal_status_t pc_clock_init(const hal_clock_config_t *cfg) {
   if (!cfg) return HAL_ERR_INVALID_ARG;
   g_tsc_hz = calibrate_tsc_hz();
   return HAL_OK;
 }
 
-uint32_t hal_clock_get_sysclk(void) { return (uint32_t)pc_tsc_hz(); }
+static uint32_t pc_clock_get_sysclk(void) { return (uint32_t)pc_tsc_hz(); }
 
 /* A PC has no AHB/APB bus hierarchy; report the core (TSC) rate uniformly. */
-uint32_t hal_clock_get_ahbclk(void) { return hal_clock_get_sysclk(); }
-uint32_t hal_clock_get_apb1clk(void) { return hal_clock_get_sysclk(); }
-uint32_t hal_clock_get_apb2clk(void) { return hal_clock_get_sysclk(); }
+
+/** @brief The PC clock backend. A PC has no bus hierarchy, so the bus
+ *  accessors all report the core clock. */
+/* No bus hierarchy: every peripheral runs from the core clock, so there is
+ * nothing for hal_clock_get_bus_clock to report. Callers use get_sysclk. */
+static uint8_t pc_clock_get_bus_count(void) { return 0u; }
+
+static uint32_t pc_clock_get_bus_clock(uint8_t bus) {
+  (void)bus;
+  return 0u;
+}
+
+const hal_clock_ops_t _hal_clock_ops = {
+    .init = pc_clock_init,
+    .get_sysclk = pc_clock_get_sysclk,
+    .get_bus_count = pc_clock_get_bus_count,
+    .get_bus_clock = pc_clock_get_bus_clock,
+};

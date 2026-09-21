@@ -16,6 +16,12 @@
 #
 # Requires: arm-none-eabi-gcc, st-flash / st-info (stlink-tools), python3 +
 #           pyserial, and udevadm (to map an ST-Link serial to its ttyACM).
+#
+# A board whose VCP is root-owned looks disconnected here, because the
+# console cannot be read. Distributions leave that to TAG+="uaccess", which
+# is per-seat and does not always apply. Install
+# tools/hil/99-navhal-stlink.rules for group-based access that does not
+# depend on how the probe enumerated.
 
 set -euo pipefail
 
@@ -51,16 +57,28 @@ esac
 # then the /dev/ttyACM* that belongs to that same ST-Link.
 detect_probe() {  # $1 = chipid (e.g. 0x451); sets DETECTED_SERIAL / DETECTED_PORT
   local want="$1"
-  DETECTED_SERIAL=$(st-info --probe 2>/dev/null | awk -v want="$want" '
+  # Every probe with this chip-id, not just the first: a bench can hold more
+  # than one board of a family (NavHAL has two F401 configs), and the first
+  # match is not necessarily the one whose ST-Link exposes a usable ttyACM.
+  local serials
+  serials=$(st-info --probe 2>/dev/null | awk -v want="$want" '
     /serial:/ {s=$2}
-    /chipid:/ {if ($2==want) {print s; exit}}')
-  [ -n "$DETECTED_SERIAL" ] || return 1
+    /chipid:/ {if ($2==want) print s}')
+  [ -n "$serials" ] || return 1
+
+  DETECTED_SERIAL=""
   DETECTED_PORT=""
-  local p ps
-  for p in /dev/ttyACM*; do
-    [ -e "$p" ] || continue
-    ps=$(udevadm info -q property -n "$p" 2>/dev/null | sed -n 's/^ID_SERIAL_SHORT=//p')
-    if [ "$ps" = "$DETECTED_SERIAL" ]; then DETECTED_PORT="$p"; break; fi
+  local cand p ps
+  for cand in $serials; do
+    for p in /dev/ttyACM*; do
+      [ -e "$p" ] || continue
+      ps=$(udevadm info -q property -n "$p" 2>/dev/null | sed -n 's/^ID_SERIAL_SHORT=//p')
+      if [ "$ps" = "$cand" ] && [ -r "$p" ] && [ -w "$p" ]; then
+        DETECTED_SERIAL="$cand"
+        DETECTED_PORT="$p"
+        break 2
+      fi
+    done
   done
   [ -n "$DETECTED_PORT" ] || return 2
 }
@@ -93,7 +111,13 @@ run_board() {  # $1 = board name; returns the on-target failure count
 
   # Match this board to a connected probe before spending time on a build.
   if ! detect_probe "$CHIPID"; then
-    echo "!! no connected ST-Link with a $CHIPID target (or no ttyACM for it)"
+    echo "!! no connected ST-Link with a $CHIPID target (or no usable ttyACM)"
+    # Distinguish "not plugged in" from "plugged in but the console is
+    # root-owned", because the fix is completely different.
+    if st-info --probe 2>/dev/null | grep -q "$CHIPID"; then
+      echo "!! a $CHIPID probe IS attached, but none has a readable VCP."
+      echo "!! install tools/hil/99-navhal-stlink.rules, then replug the board."
+    fi
     echo "!! skipping $board"
     return 3
   fi

@@ -58,7 +58,7 @@ static const hal_pll_config_t k_pll = {.input_src = HAL_CLOCK_SOURCE_HSI,
 void test_hal_clock_init_hsi(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI};
   wait_uart_empty();
-  hal_clock_init(&cfg, NULL);
+  hal_clock_init(&cfg);
   reinit_console();
   TEST_ASSERT_EQUAL_UINT32(0, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
@@ -66,7 +66,8 @@ void test_hal_clock_init_hsi(void) {
 void test_hal_clock_init_pll(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_PLL};
   wait_uart_empty();
-  hal_clock_init(&cfg, &k_pll);
+  cfg.pll = k_pll;
+  hal_clock_init(&cfg);
   reinit_console();
   TEST_ASSERT_EQUAL_UINT32(2, (RCC->CFGR >> RCC_CFGR_SWS_BIT) & 0x3);
 }
@@ -75,7 +76,7 @@ void test_hal_clock_init_pll(void) {
 void test_hal_clock_get_sysclk_returns_correct_value_hsi(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI};
   wait_uart_empty();
-  hal_clock_init(&cfg, NULL);
+  hal_clock_init(&cfg);
   reinit_console();
   TEST_ASSERT_EQUAL_UINT32(16000000, hal_clock_get_sysclk());
 }
@@ -83,7 +84,8 @@ void test_hal_clock_get_sysclk_returns_correct_value_hsi(void) {
 void test_hal_clock_get_sysclk_returns_correct_value_pll(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_PLL};
   wait_uart_empty();
-  hal_clock_init(&cfg, &k_pll);
+  cfg.pll = k_pll;
+  hal_clock_init(&cfg);
   reinit_console();
   uint32_t expected = (16000000 / k_pll.pll_m) * k_pll.pll_n / k_pll.pll_p;
   TEST_ASSERT_EQUAL_UINT32(expected, hal_clock_get_sysclk());
@@ -128,20 +130,20 @@ void test_hal_clock_get_apb2clk_returns_correct_value(void) {
 void test_hal_clock_init_returns_ok_for_hsi(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_HSI};
   wait_uart_empty();
-  hal_status_t s = hal_clock_init(&cfg, NULL);
+  hal_status_t s = hal_clock_init(&cfg);
   reinit_console();
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)s);
 }
 
 void test_hal_clock_init_rejects_null_cfg(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
-                           (uint32_t)hal_clock_init(NULL, NULL));
+                           (uint32_t)hal_clock_init(NULL));
 }
 
 void test_hal_clock_init_pll_rejects_null_pll_cfg(void) {
   hal_clock_config_t cfg = {.source = HAL_CLOCK_SOURCE_PLL};
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
-                           (uint32_t)hal_clock_init(&cfg, NULL));
+                           (uint32_t)hal_clock_init(&cfg));
 }
 
 NAVTEST_CASE_DECL(test_hal_clock_init_hsi);

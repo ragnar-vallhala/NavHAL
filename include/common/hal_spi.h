@@ -120,6 +120,30 @@ typedef struct {
 } hal_spi_config_t;
 
 /**
+ * @brief Initialise an SPI instance at the closest bit rate not exceeding
+ *        @p target_hz.
+ *
+ * ::hal_spi_config_t::baudrate is a divider selector, so configuring a bit
+ * rate with ::hal_spi_init means knowing which bus clocks the instance and
+ * doing the division by hand. This takes the rate you want instead and picks
+ * the divider, rounding down so the bus is never clocked faster than asked.
+ *
+ * @param spi       Instance.
+ * @param cfg       Configuration; its @c baudrate member is ignored.
+ * @param target_hz Desired bit rate. Must be non-zero.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if no divider reaches
+ *         @p target_hz or the rate is unattainably low.
+ */
+hal_status_t hal_spi_init_hz(hal_spi_instance_t spi,
+                             const hal_spi_config_t *cfg, uint32_t target_hz);
+
+/**
+ * @brief The bit rate an instance is currently clocked at, in Hz.
+ * @return 0 if @p spi is not a valid instance.
+ */
+uint32_t hal_spi_get_clock_hz(hal_spi_instance_t spi);
+
+/**
  * @brief Initialize an SPI peripheral in master mode.
  * @param spi    SPI instance.
  * @param config Configuration; must not be NULL.

@@ -30,7 +30,7 @@
  * ::HAL_SPI_BAUDRATE_DIV256 is clamped to /128.
  */
 
-#include "common/hal_spi.h"
+#include "internal/hal_spi_ops.h"
 
 #include <avr/io.h>
 #include <stdbool.h>
@@ -42,23 +42,26 @@
 static const uint8_t k_spr[8] = {0, 0, 1, 1, 2, 2, 3, 3};
 static const uint8_t k_spi2x[8] = {1, 0, 1, 0, 1, 0, 0, 0};
 
-/** @brief Exchange one byte; false on a (guarded) timeout. */
-static bool spi_xfer(uint8_t out, uint8_t *in) {
+static hal_status_t avr_spi_xfer_byte(hal_spi_instance_t spi, uint8_t out,
+                                      uint8_t *in) {
+  if (spi != HAL_SPI_0)
+    return HAL_ERR_INVALID_ARG;
   SPDR = out;
   uint16_t guard = 0;
   while (!(SPSR & (1u << SPIF))) {
     if (++guard == 0u)
-      return false;
+      return HAL_ERR_TIMEOUT;
   }
   uint8_t r = SPDR;
   if (in != NULL)
     *in = r;
-  return true;
+  return HAL_OK;
 }
 
-hal_status_t hal_spi_init(hal_spi_instance_t spi,
-                          const hal_spi_config_t *config) {
-  if (spi != HAL_SPI_0 || config == NULL)
+static hal_status_t avr_spi_init(hal_spi_instance_t spi,
+                                 const hal_spi_config_t *config) {
+  /* config non-NULL: validated by the public layer. */
+  if (spi != HAL_SPI_0)
     return HAL_ERR_INVALID_ARG;
 
   uint8_t baud = (uint8_t)config->baudrate;
@@ -87,39 +90,7 @@ hal_status_t hal_spi_init(hal_spi_instance_t spi,
   return HAL_OK;
 }
 
-hal_status_t hal_spi_transmit(hal_spi_instance_t spi, const uint8_t *data,
-                              uint16_t size, uint32_t timeout) {
-  (void)timeout; /* AVR SPI uses a coarse iteration guard, not a ms timeout. */
-  if (spi != HAL_SPI_0 || data == NULL)
-    return HAL_ERR_INVALID_ARG;
-  for (uint16_t i = 0; i < size; i++) {
-    if (!spi_xfer(data[i], NULL))
-      return HAL_ERR_TIMEOUT;
-  }
-  return HAL_OK;
-}
-
-hal_status_t hal_spi_receive(hal_spi_instance_t spi, uint8_t *data,
-                             uint16_t size, uint32_t timeout) {
-  (void)timeout;
-  if (spi != HAL_SPI_0 || data == NULL)
-    return HAL_ERR_INVALID_ARG;
-  for (uint16_t i = 0; i < size; i++) {
-    if (!spi_xfer(0xFFu, &data[i])) /* clock out a dummy frame to read. */
-      return HAL_ERR_TIMEOUT;
-  }
-  return HAL_OK;
-}
-
-hal_status_t hal_spi_transmit_receive(hal_spi_instance_t spi,
-                                      const uint8_t *tx_data, uint8_t *rx_data,
-                                      uint16_t size, uint32_t timeout) {
-  (void)timeout;
-  if (spi != HAL_SPI_0 || tx_data == NULL || rx_data == NULL)
-    return HAL_ERR_INVALID_ARG;
-  for (uint16_t i = 0; i < size; i++) {
-    if (!spi_xfer(tx_data[i], &rx_data[i]))
-      return HAL_ERR_TIMEOUT;
-  }
-  return HAL_OK;
-}
+const hal_spi_ops_t _hal_spi_ops = {
+    .init = avr_spi_init,
+    .xfer_byte = avr_spi_xfer_byte,
+};

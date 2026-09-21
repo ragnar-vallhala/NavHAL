@@ -16,4 +16,7 @@
 
 /* Intentionally empty — the public hal_clock_* API is the whole surface. */
 
+/* Deprecated two-argument init — retained as a backward-compat shim. */
+#include "compat/clock_compat.h"
+
 #endif /* NAVHAL_PORT_X86_64_CLOCK_H */

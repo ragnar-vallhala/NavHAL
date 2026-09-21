@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Vendor identity string for the ACME reference port.
+
+config VENDOR
+    string
+    default "acme" if VENDOR_ACME

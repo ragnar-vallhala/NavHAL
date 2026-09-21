@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Target-board choice entry for the ACME devkit (reference port).
+
+config BOARD_ACME_DEVKIT
+    bool "acme_devkit"
+    depends on FAMILY_ACME1

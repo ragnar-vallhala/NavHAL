@@ -42,6 +42,8 @@
 #include "family/i2c_reg.h"
 #include "common/hal_i2c.h"
 
+#include <stdbool.h>
+
 #define I2C_SPIN 100000U /* bounded wait iterations */
 
 static uint8_t __i2c_init_status = 0;
@@ -90,10 +92,20 @@ static hal_status_t _wait_isr(volatile I2C_Reg_Typedef *I2C, uint32_t flag) {
   return HAL_ERR_TIMEOUT;
 }
 
+/* I2C_GET_BASE is arithmetic on a base address, so it cannot fail and cannot
+ * be used as a validity check. The set of buses is a property of the part, so
+ * the range lives here rather than in the shared layer. */
+#define STM32_I2C_BUS_COUNT 3u
+
+static inline bool _i2c_bus_valid(hal_i2c_bus_t bus) {
+  return (uint32_t)bus < STM32_I2C_BUS_COUNT;
+}
+
 static hal_status_t stm32f7_i2c_init(hal_i2c_bus_t bus,
                                      const hal_i2c_config_t *config) {
-  if (config == NULL)
+  if (!_i2c_bus_valid(bus))
     return HAL_ERR_INVALID_ARG;
+  /* config non-NULL: validated by the shared layer. */
   if (__i2c_init_status & (1 << bus))
     return HAL_ERR_NOT_INITIALIZED; /* avoid re-init (matches F4 contract) */
   if (config->own_address != I2C_MASTER)
@@ -116,6 +128,8 @@ static hal_status_t stm32f7_i2c_init(hal_i2c_bus_t bus,
 
 static hal_status_t stm32f7_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
                            const uint8_t *data, uint16_t len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   if (data == NULL || len == 0)
     return HAL_ERR_IO;
   volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
@@ -137,6 +151,8 @@ static hal_status_t stm32f7_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
 static hal_status_t stm32f7_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr,
                                      uint8_t *data,
                           uint16_t len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   if (data == NULL || len == 0)
     return HAL_ERR_IO;
   volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
@@ -158,6 +174,8 @@ static hal_status_t stm32f7_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr,
 static hal_status_t stm32f7_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
                                 const uint8_t *tx_data, uint16_t tx_len,
                                 uint8_t *rx_data, uint16_t rx_len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   if (tx_data == NULL || rx_data == NULL || tx_len == 0 || rx_len == 0)
     return HAL_ERR_IO;
   volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
@@ -318,6 +336,8 @@ const hal_i2c_dma_ops_t _hal_i2c_dma_ops = {
  * the peripheral drops its state machine and most of CR2/ISR when disabled.
  * Same observable contract as the F4 deinit, different mechanism. */
 static hal_status_t stm32f7_i2c_deinit(hal_i2c_bus_t bus) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   volatile I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
   if (!I2C)
     return HAL_ERR_INVALID_ARG;

@@ -211,8 +211,19 @@ const hal_i2c_dma_ops_t _hal_i2c_dma_ops = {
 };
 
 #endif
+/* I2C_GET_BASE is arithmetic on a base address, so it cannot fail and cannot
+ * be used as a validity check. The set of buses is a property of the part, so
+ * the range lives here rather than in the shared layer. */
+#define STM32_I2C_BUS_COUNT 3u
+
+static inline bool _i2c_bus_valid(hal_i2c_bus_t bus) {
+  return (uint32_t)bus < STM32_I2C_BUS_COUNT;
+}
+
 static hal_status_t stm32_i2c_init(hal_i2c_bus_t bus,
                                    const hal_i2c_config_t *config) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   /* config non-NULL: validated by the public layer. */
   if (__i2c_init_status & (1 << bus))
     return HAL_ERR_NOT_INITIALIZED; // avoid reintialization
@@ -270,6 +281,8 @@ static hal_status_t stm32_i2c_init(hal_i2c_bus_t bus,
 }
 
 static hal_status_t stm32_i2c_deinit(hal_i2c_bus_t bus) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
 
   // Disable the peripheral and assert/release the software reset so the next
@@ -322,6 +335,8 @@ static hal_status_t _i2c_write_data(hal_i2c_bus_t bus, uint8_t data) {
 
 static hal_status_t stm32_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
                                     const uint8_t *data, uint16_t len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   /* data non-NULL: validated by the public layer. */
   hal_status_t status;
 
@@ -354,6 +369,8 @@ static hal_status_t stm32_i2c_write(hal_i2c_bus_t bus, uint8_t dev_addr,
 
 static hal_status_t stm32_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr,
                                    uint8_t *data, uint16_t len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   /* data non-NULL: validated by the public layer. */
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);
 
@@ -399,6 +416,8 @@ static hal_status_t stm32_i2c_read(hal_i2c_bus_t bus, uint8_t dev_addr,
 static hal_status_t stm32_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
                                          const uint8_t *tx_data, uint16_t tx_len,
                                          uint8_t *rx_data, uint16_t rx_len) {
+  if (!_i2c_bus_valid(bus))
+    return HAL_ERR_INVALID_ARG;
   /* tx_data and rx_data non-NULL: validated by the public layer. */
   hal_status_t status;
   I2C_Reg_Typedef *I2C = I2C_GET_BASE(bus);

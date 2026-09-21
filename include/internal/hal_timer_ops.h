@@ -75,6 +75,14 @@ typedef struct {
    * never has to guess which meaning applies.
    */
   hal_status_t (*set_prescaler)(hal_timer_t timer, uint32_t prescaler);
+  /**
+   * Set the effective divider, as a divide-by-N value.
+   *
+   * Unambiguous where ::set_prescaler is not: N means N on every port,
+   * whether the hardware takes a register value one less or snaps to a fixed
+   * table. A port that cannot express N exactly gets as close as it can.
+   */
+  hal_status_t (*set_divider)(hal_timer_t timer, uint32_t divider);
   /** Effective divider currently applied (not a register value). */
   uint32_t (*get_divider)(hal_timer_t timer);
   /** Backend for ::hal_timer_set_auto_reload. */

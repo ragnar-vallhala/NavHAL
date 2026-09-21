@@ -247,6 +247,16 @@ static uint32_t stm32_timer_get_divider(hal_timer_t timer) {
  * @param prescaler Prescaler value.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an invalid timer.
  */
+/* PSC divides by PSC+1, so an N-way divide is PSC = N-1. */
+static hal_status_t stm32_timer_set_divider(hal_timer_t timer,
+                                            uint32_t divider) {
+  TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
+  if (tim == NULL || divider == 0u || divider > 0x10000u)
+    return HAL_ERR_INVALID_ARG;
+  tim->PSC = (uint16_t)(divider - 1u);
+  return HAL_OK;
+}
+
 static hal_status_t stm32_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
   TIMx_Reg_Typedef *tim = GET_TIMx_BASE(timer);
   if (tim == NULL)
@@ -539,6 +549,7 @@ const hal_timer_ops_t _hal_timer_ops = {
     .reset = stm32_timer_reset,
     .get_count = stm32_timer_get_count,
     .set_prescaler = stm32_timer_set_prescaler,
+    .set_divider = stm32_timer_set_divider,
     .get_divider = stm32_timer_get_divider,
     .set_auto_reload = stm32_timer_set_auto_reload,
     .get_auto_reload = stm32_timer_get_auto_reload,

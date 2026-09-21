@@ -253,6 +253,18 @@ static hal_status_t avr_timer_set_callback(hal_timer_t timer,
 
 
 
+static hal_status_t avr_timer_set_prescaler(hal_timer_t timer,
+                                            uint32_t prescaler);
+
+/* The AVR's prescaler argument is already a divider snapped to the fixed
+ * table, so divide-by-N is what set_prescaler always did here. */
+static hal_status_t avr_timer_set_divider(hal_timer_t timer,
+                                          uint32_t divider) {
+  if (divider == 0u)
+    return HAL_ERR_INVALID_ARG;
+  return avr_timer_set_prescaler(timer, divider);
+}
+
 static hal_status_t avr_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
   int8_t i = timer_index(timer);
   if (i < 0)
@@ -332,6 +344,7 @@ const hal_timer_ops_t _hal_timer_ops = {
     .reset = avr_timer_reset,
     .get_count = avr_timer_get_count,
     .set_prescaler = avr_timer_set_prescaler,
+    .set_divider = avr_timer_set_divider,
     .get_divider = avr_timer_get_divider,
     .set_auto_reload = avr_timer_set_auto_reload,
     .get_auto_reload = avr_timer_get_auto_reload,

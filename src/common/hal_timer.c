@@ -124,8 +124,18 @@ uint32_t hal_timer_get_frequency(hal_timer_t timer) {
   return clk / divider / (reload + 1u);
 }
 
+/* Kept as-is, including its per-port meaning: on STM32 the argument is the
+ * PSC register value so the divider is prescaler+1, while the AVR snaps it to
+ * the nearest achievable divider. hal_timer_set_divider is the unambiguous
+ * one; this stays for callers that already depend on the old behaviour. */
 hal_status_t hal_timer_set_prescaler(hal_timer_t timer, uint32_t prescaler) {
   return _hal_timer_ops.set_prescaler(timer, prescaler);
+}
+
+hal_status_t hal_timer_set_divider(hal_timer_t timer, uint32_t divider) {
+  if (divider == 0u)
+    return HAL_ERR_INVALID_ARG;
+  return _hal_timer_ops.set_divider(timer, divider);
 }
 
 hal_status_t hal_timer_set_auto_reload(hal_timer_t timer, uint32_t auto_reload) {

@@ -142,13 +142,6 @@ NAVHAL_INLINE void navhal_dma_rx_finish(void *buf, size_t n) {
     hal_dcache_invalidate(buf, n);
 }
 
-#endif /* NAVHAL_CONFIG_DRV_DMA */
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-
 /**
  * @brief How one peripheral endpoint is wired to the DMA controller.
  *
@@ -163,5 +156,13 @@ typedef struct {
   uint32_t periph_addr;            /**< Peripheral data register address. */
   hal_irq_t irq;                   /**< Stream completion IRQ. */
 } hal_dma_binding_t;
+
+#endif /* NAVHAL_CONFIG_DRV_DMA */
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+
 
 #endif /* NAVHAL_PORT_DMA_H */

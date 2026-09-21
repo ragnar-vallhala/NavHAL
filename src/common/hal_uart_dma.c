@@ -49,10 +49,47 @@
 static uint8_t s_tx_armed[UART_SLOTS];
 static uint16_t s_rx_len[UART_SLOTS];
 
+static hal_dma_binding_t s_override[UART_SLOTS][2];
+static bool s_has_override[UART_SLOTS][2];
+
+hal_status_t hal_uart_dma_get_binding(hal_uart_t uart, bool tx,
+                                      hal_dma_binding_t *out) {
+  if (out == NULL || (unsigned)uart >= UART_SLOTS)
+    return HAL_ERR_INVALID_ARG;
+
+  if (s_has_override[uart][tx ? 1u : 0u]) {
+    *out = s_override[uart][tx ? 1u : 0u];
+    return HAL_OK;
+  }
+  return _hal_uart_dma_ops.binding(uart, tx, out);
+}
+
+hal_status_t hal_uart_dma_set_binding(hal_uart_t uart, bool tx,
+                                      const hal_dma_binding_t *binding) {
+  if ((unsigned)uart >= UART_SLOTS)
+    return HAL_ERR_INVALID_ARG;
+
+  /* NULL clears the override and restores the hardware default. */
+  if (binding == NULL) {
+    s_has_override[uart][tx ? 1u : 0u] = false;
+    return HAL_OK;
+  }
+
+  /* Refuse an override for a UART this port has no mapping for. */
+  hal_dma_binding_t probe;
+  hal_status_t st = _hal_uart_dma_ops.binding(uart, tx, &probe);
+  if (st != HAL_OK)
+    return st;
+
+  s_override[uart][tx ? 1u : 0u] = *binding;
+  s_has_override[uart][tx ? 1u : 0u] = true;
+  return HAL_OK;
+}
+
 static hal_status_t _descriptor(hal_uart_t uart, bool tx, uint32_t mem,
                                 uint16_t count, hal_dma_config_t *out) {
   hal_dma_binding_t b;
-  hal_status_t st = _hal_uart_dma_ops.binding(uart, tx, &b);
+  hal_status_t st = hal_uart_dma_get_binding(uart, tx, &b);
   if (st != HAL_OK)
     return st;
 
@@ -102,7 +139,7 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
   }
 
   hal_dma_binding_t b;
-  if (_hal_uart_dma_ops.binding(uart, true, &b) == HAL_OK)
+  if (hal_uart_dma_get_binding(uart, true, &b) == HAL_OK)
     hal_interrupt_enable(b.irq);
 
   hal_dma_clear_flags(&cfg);

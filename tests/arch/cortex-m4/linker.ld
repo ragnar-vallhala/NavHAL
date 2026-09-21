@@ -34,6 +34,19 @@ SECTIONS {
     __zero_table_end__ = .;
   } > FLASH
 
+  /* Survives a warm reset. The startup code zeroes only what the zero table
+     names (_sbss.._ebss) and loads only what the copy table names, and this
+     section is in neither, so its contents carry across a reset and are
+     garbage after a cold boot. hal_boot.c's _sboot lives here; that is the
+     whole mechanism by which one boot leaves a request for the next. */
+  .noinit (NOLOAD) : {
+    . = ALIGN(8);
+    _snoinit = .;
+    KEEP(*(.noinit*))
+    . = ALIGN(8);
+    _enoinit = .;
+  } > RAM
+
   .data : {
     _sdata = .;
     *(.data*)

@@ -31,14 +31,12 @@
 #if NAVHAL_CONFIG_DRV_RESET
 
 #include "common/hal_reset.h"
+#include "arch/armv7e-m/core_reg.h"
 #include "internal/hal_reset_ops.h"
 #include "family/rcc_reg.h"
 
-/* SCB_AIRCR. There is no SCB definition in the port headers, and one register
- * does not earn a whole map. */
-#define SCB_AIRCR (*(volatile uint32_t *)0xE000ED0CUL)
-#define SCB_AIRCR_VECTKEY 0x05FA0000U /**< Writes without this key are ignored. */
-#define SCB_AIRCR_SYSRESETREQ (1U << 2)
+/* SCB_AIRCR comes from the arch core header: SYSRESETREQ is ARMv7E-M, not
+ * STM32, and every vendor on this core resets the same way. */
 
 static uint32_t latched_cause;
 static uint8_t cause_valid;

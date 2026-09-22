@@ -83,6 +83,31 @@ detect_probe() {  # $1 = chipid (e.g. 0x451); sets DETECTED_SERIAL / DETECTED_PO
   [ -n "$DETECTED_PORT" ] || return 2
 }
 
+# The AVR bench has no debug probe: an Arduino-class board is a USB-serial
+# bridge wired to the MCU's bootloader, so the same port both flashes it and
+# carries the test console. Matched by USB vendor id, since the bridge chip
+# varies (CH340 clones, FTDI, genuine 2341) while the board does not.
+detect_avr_port() {  # $1 = comma-separated vendor ids; sets DETECTED_PORT
+  local want="$1" p vid
+  DETECTED_PORT=""
+  DETECTED_SERIAL=""
+  for p in /dev/ttyUSB* /dev/ttyACM*; do
+    [ -e "$p" ] || continue
+    vid=$(udevadm info -q property -n "$p" 2>/dev/null | sed -n 's/^ID_VENDOR_ID=//p')
+    [ -n "$vid" ] || continue
+    case ",$want," in
+      *",$vid,"*)
+        if [ -r "$p" ] && [ -w "$p" ]; then
+          DETECTED_PORT="$p"
+          DETECTED_SERIAL="$vid"
+          return 0
+        fi
+        ;;
+    esac
+  done
+  return 1
+}
+
 run_board() {  # $1 = board name; returns the on-target failure count
   local board="$1"
   local conf="$BOARDS_DIR/$board.conf"
@@ -95,8 +120,16 @@ run_board() {  # $1 = board name; returns the on-target failure count
   # shellcheck source=/dev/null
   . "$conf"
 
+  # CHIPID is what st-info reports, so it is required only for the probe-based
+  # boards. An AVR board is identified by the USB vendor id of its serial
+  # bridge instead, and would never have one.
+  local required="ARCH TOOLCHAIN_FILE BUILD_DIR DEFCONFIG CHIPID"
+  if [ "$ARCH" = "avr" ]; then
+    required="ARCH TOOLCHAIN_FILE BUILD_DIR DEFCONFIG MCU PROGRAMMER USB_VID"
+  fi
+
   local v
-  for v in ARCH TOOLCHAIN_FILE BUILD_DIR DEFCONFIG CHIPID; do
+  for v in $required; do
     if [ -z "${!v:-}" ]; then
       echo "error: $conf is missing required variable $v" >&2
       return 2
@@ -107,10 +140,19 @@ run_board() {  # $1 = board name; returns the on-target failure count
   local flash_addr="${FLASH_ADDR:-0x08000000}"
 
   echo "=================================================================="
-  echo ">> HIL board=$board arch=$ARCH chipid=$CHIPID"
+  echo ">> HIL board=$board arch=$ARCH ${CHIPID:+chipid=$CHIPID}${MCU:+mcu=$MCU}"
 
+  if [ "$ARCH" = "avr" ]; then
+    if ! detect_avr_port "$USB_VID"; then
+      echo "!! no readable USB-serial port with vendor id in [$USB_VID]"
+      echo "!! plug the board in, and check you are in the port's group"
+      echo "!! (dialout for /dev/ttyUSB*, plugdev for /dev/ttyACM*)"
+      echo "!! skipping $board"
+      return 3
+    fi
+    echo ">> port: $DETECTED_PORT (usb vendor $DETECTED_SERIAL) @ $baud"
   # Match this board to a connected probe before spending time on a build.
-  if ! detect_probe "$CHIPID"; then
+  elif ! detect_probe "$CHIPID"; then
     echo "!! no connected ST-Link with a $CHIPID target (or no usable ttyACM)"
     # Distinguish "not plugged in" from "plugged in but the console is
     # root-owned", because the fix is completely different.
@@ -120,8 +162,9 @@ run_board() {  # $1 = board name; returns the on-target failure count
     fi
     echo "!! skipping $board"
     return 3
+  else
+    echo ">> probe: st-link $DETECTED_SERIAL  console $DETECTED_PORT @ $baud"
   fi
-  echo ">> probe: st-link $DETECTED_SERIAL  console $DETECTED_PORT @ $baud"
 
   # Deterministic target config: DEFCONFIG + any opt-in caps. Stash the
   # user's .config and restore on return (mirrors tools/pil/run.sh).
@@ -140,18 +183,38 @@ run_board() {  # $1 = board name; returns the on-target failure count
   echo ">> building test ELF ($BUILD_DIR)"
   cmake -B "$BUILD_DIR" -DTEST=ON -DCMAKE_TOOLCHAIN_FILE="$TOOLCHAIN_FILE" >/dev/null
   cmake --build "$BUILD_DIR" --target tests -j >/dev/null
-  arm-none-eabi-objcopy -O binary "$BUILD_DIR/tests" "$BUILD_DIR/tests.bin"
 
-  # Start the UART reader BEFORE the flash reset so the startup banner is not
-  # missed, then flash the matched probe (its software reset kicks off the run).
-  echo ">> capturing $DETECTED_PORT (timeout ${timeout}s)"
-  python3 "$CAPTURE" "$DETECTED_PORT" "$baud" "$timeout" &
-  local cap=$!
-  sleep 1
-  echo ">> flashing $board (st-link $DETECTED_SERIAL)"
-  st-flash --serial "$DETECTED_SERIAL" --reset write "$BUILD_DIR/tests.bin" "$flash_addr" >/dev/null 2>&1
+  local cap rc=0
+  if [ "$ARCH" = "avr" ]; then
+    avr-objcopy -O ihex "$BUILD_DIR/tests" "$BUILD_DIR/tests.hex"
 
-  local rc=0
+    # One port does both jobs here, so the order has to be the opposite of the
+    # probe boards': flash first, then capture. Opening the port toggles DTR,
+    # which resets the board and restarts the run from its banner -- the same
+    # auto-reset avrdude just used to enter the bootloader.
+    echo ">> flashing $board (avrdude -c $PROGRAMMER -p $MCU)"
+    if ! avrdude -c "$PROGRAMMER" -p "$MCU" -P "$DETECTED_PORT" \
+                 -b "${UPLOAD_BAUD:-115200}" -U "flash:w:$BUILD_DIR/tests.hex:i" \
+                 >/dev/null 2>&1; then
+      echo "!! avrdude failed on $DETECTED_PORT"
+      return 2
+    fi
+    echo ">> capturing $DETECTED_PORT (timeout ${timeout}s)"
+    python3 "$CAPTURE" "$DETECTED_PORT" "$baud" "$timeout" &
+    cap=$!
+  else
+    arm-none-eabi-objcopy -O binary "$BUILD_DIR/tests" "$BUILD_DIR/tests.bin"
+
+    # Start the UART reader BEFORE the flash reset so the startup banner is not
+    # missed, then flash the matched probe (its software reset kicks off the run).
+    echo ">> capturing $DETECTED_PORT (timeout ${timeout}s)"
+    python3 "$CAPTURE" "$DETECTED_PORT" "$baud" "$timeout" &
+    cap=$!
+    sleep 1
+    echo ">> flashing $board (st-link $DETECTED_SERIAL)"
+    st-flash --serial "$DETECTED_SERIAL" --reset write "$BUILD_DIR/tests.bin" "$flash_addr" >/dev/null 2>&1
+  fi
+
   wait "$cap" || rc=$?
   echo ">> $board: uart_capture exit=$rc (0 = all pass, N = failures, 124 = timeout)"
   return "$rc"

@@ -947,7 +947,12 @@ void test_conformance_spi_reports_its_clock(void) {
  * with no summary rather than a failure. */
 static bool _conf_timebase_running(void) {
   uint32_t t0 = hal_timebase_get_tick();
-  for (uint32_t i = 0u; i < 2000000u; ++i) {
+  /* The bound only has to outlast one tick period on the slowest core here,
+   * and every iteration is a call through the ops table plus an interrupt-safe
+   * 32-bit read. On an 8-bit core that is tens of cycles, so a bound chosen
+   * for a 84 MHz Cortex-M costs seconds per call on an ATmega -- once per
+   * timing case, which is what pushed the AVR HIL run past its timeout. */
+  for (uint32_t i = 0u; i < 200000u; ++i) {
     if (hal_timebase_get_tick() != t0) {
       return true;
     }

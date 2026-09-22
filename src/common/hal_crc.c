@@ -64,7 +64,25 @@ hal_status_t hal_crc_reset(void) { return _hal_crc_ops.reset(); }
  * XOR). Shared by every software-CRC port via hal_crc_sw_ops.
  * -------------------------------------------------------------------------- */
 
-static const uint32_t crc32_mpeg2_table[256] = {
+/* On a Harvard core `const` is not enough to keep a table out of RAM: avr-gcc
+ * copies it into SRAM at startup so an ordinary pointer can reach it. One
+ * kilobyte is half an ATmega328P's memory, spent on a lookup table that never
+ * changes -- it left 59 bytes of stack in the test image, which on real
+ * silicon means the stack grows down into .data and corrupts the state the
+ * program is reading. PROGMEM keeps it in flash and costs one LPM per lookup.
+ *
+ * Every other target we build for is von Neumann, where const already means
+ * "in flash" and the accessor is a plain index. */
+#if defined(__AVR__)
+#include <avr/pgmspace.h>
+#define CRC_TABLE_ATTR PROGMEM
+#define CRC_TABLE_READ(i) pgm_read_dword(&crc32_mpeg2_table[(i)])
+#else
+#define CRC_TABLE_ATTR
+#define CRC_TABLE_READ(i) crc32_mpeg2_table[(i)]
+#endif
+
+static const uint32_t crc32_mpeg2_table[256] CRC_TABLE_ATTR = {
     0x00000000, 0x04C11DB7, 0x09823B6E, 0x0D4326D9, 0x130476DC, 0x17C56B6B,
     0x1A864DB2, 0x1E475005, 0x2608EDB8, 0x22C9F00F, 0x2F8AD6D6, 0x2B4BCB61,
     0x350C9B64, 0x31CD86D3, 0x3C8EA00A, 0x384FBDBD, 0x4C11DB70, 0x48D0C6C7,
@@ -130,7 +148,7 @@ uint32_t hal_crc_sw_accumulate(const uint8_t *data, uint32_t len) {
   uint32_t crc = s_sw_current;
   for (uint32_t i = 0; i < len; i++) {
     uint8_t table_index = (uint8_t)((crc >> 24) ^ data[i]);
-    crc = (crc << 8) ^ crc32_mpeg2_table[table_index];
+    crc = (crc << 8) ^ CRC_TABLE_READ(table_index);
   }
   s_sw_current = crc;
   return crc;

@@ -8,7 +8,6 @@ SECTIONS {
   .text : {
     KEEP(*(.isr_vector))   /* interrupt vector table */
     *(.text*)
-    *(.rodata*)
 
     . = ALIGN(4);
     __exidx_start = .;
@@ -32,6 +31,33 @@ SECTIONS {
     __zero_table_start__ = .;
     LONG(_sbss); LONG(_ebss - _sbss);
     __zero_table_end__ = .;
+  } > FLASH
+
+  /* Read-only data in its own output section rather than folded into .text.
+     Both still land in FLASH and stay contiguous, so nothing about the image
+     or its hash changes -- what changes is that they can be told apart.
+
+     Two things that buys. `size` starts reporting code as code: 16 KiB of the
+     F401 test image's "text" was actually rodata, which matters most on the
+     ATmega, where the flash budget is tight and growth needs attributing.
+     And an MPU region can cover data without covering code, so a jump into a
+     lookup table faults instead of executing constants -- _srodata is aligned
+     to 32, the ARMv7-M minimum region size, so that step does not have to come
+     back and move things.
+
+     The copy/zero tables above stay in .text deliberately: they are read by
+     Reset_Handler before anything else runs, and keeping them there is what
+     avoids a spurious RW segment. Splitting rodata out does not add one
+     either -- the linker folds it into the same read+execute LOAD segment,
+     since the two are adjacent in the same region. That is only the ELF
+     view, which nothing on a bare-metal part consults; the MPU works on
+     addresses, and _srodata/_erodata are what it would be given. */
+  .rodata : {
+    . = ALIGN(32);
+    _srodata = .;
+    *(.rodata*)
+    . = ALIGN(32);
+    _erodata = .;
   } > FLASH
 
   /* Survives a warm reset. The startup code zeroes only what the zero table

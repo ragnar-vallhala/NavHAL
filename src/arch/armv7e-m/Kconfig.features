@@ -56,6 +56,27 @@ config DRV_CACHE
       the DMA drivers use to stay coherent). The Cortex-M4 has no L1 cache, so
       this option is not offered there.
 
+config CACHE_AT_BOOT
+    bool "Turn the L1 caches on before main()"
+    depends on DRV_CACHE
+    default y
+    help
+      Enables the instruction and data caches in the startup path, so an
+      application gets them without asking. Measured on a Nucleo-F767ZI at
+      216 MHz, a flash-resident workload runs 2.7x faster with both on.
+
+      Both, or neither: with only one enabled the other path still stalls on
+      flash and the stalls dominate -- the instruction cache alone measured
+      slightly slower than no cache at all (samples/cortex-m/38_hal_flash_art).
+
+      The data cache is only safe because every DMA path in the HAL maintains
+      its buffers: eth cleans and invalidates its descriptors and frames, sdio
+      and i2c go through navhal_dma_{tx_prepare,rx_guard,rx_finish}, and uart
+      does the same plus hal_uart_dma_rx_sync for its ring. An application
+      that hands its own buffer to a HAL DMA call is covered by those. One
+      that drives a peripheral's DMA directly, or reads a ring the HAL filled,
+      has to maintain that buffer itself -- turn this off if that is not done.
+
 config USE_TCM
     bool "Enable tightly-coupled memory placement (Cortex-M7)"
     depends on ARCH_CORTEX_M7

@@ -152,7 +152,15 @@ int main(void) {
   {
     uint32_t acc_l1 = 0u;
     hal_icache_enable();
+    uint32_t cycles_i = time_workload(&acc_l1);
+    print("\r\nI-cache only: ");
+    print_u32(cycles_i);
+    hal_icache_disable();
     hal_dcache_enable();
+    uint32_t cycles_d = time_workload(&acc_l1);
+    print("   D-cache only: ");
+    print_u32(cycles_d);
+    hal_icache_enable();
     uint32_t cycles_l1 = time_workload(&acc_l1);
     /* The number that matters on this family: ART is an ITCM-bus feature and
      * this image runs from AXI, so the L1 caches are where the win is. */

@@ -39,6 +39,14 @@
 #define FLASH_INTERFACE_REGISTER 0x40023C00 /**< Flash Interface base address */
 #define FLASH_ACR_LATENCY_BIT 0             /**< Flash ACR Latency bit position */
 
+/* FLASH_ACR feature bits (RM0410 §3.4.1). The F7 exposes the accelerator as a
+ * single ARTEN rather than the F4's separate instruction and data caches, so
+ * the two families decode differently and code that cares should test for the
+ * bit it needs rather than assume a family. */
+#define FLASH_ACR_PRFTEN (1U << 8) /**< Prefetch enable.                  */
+#define FLASH_ACR_ARTEN  (1U << 9) /**< ART Accelerator enable.           */
+#define FLASH_ACR_ARTRST (1U << 11) /**< ART Accelerator reset.           */
+
 #define FLASH_BASE 0x40023C00UL
 #define FLASH_KEYR (*(volatile uint32_t *)(FLASH_BASE + 0x04))
 #define FLASH_SR (*(volatile uint32_t *)(FLASH_BASE + 0x0C))

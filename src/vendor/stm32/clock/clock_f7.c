@@ -59,10 +59,9 @@
 #define PWR_CSR1_ODSWRDY   (1U << 17)
 #define RCC_APB1ENR_PWREN  (1U << 28)
 
-/* FLASH_ACR feature bits (base + latency-field position come from flash_reg.h). */
+/* The feature bits themselves come from flash_reg.h with the rest of the
+ * register map; only the latency mask is derived here. */
 #define FLASH_ACR_LATENCY_Msk (0xFU << FLASH_ACR_LATENCY_BIT)
-#define FLASH_ACR_PRFTEN      (1U << 8)
-#define FLASH_ACR_ARTEN       (1U << 9)
 
 #define HSI_FREQ_HZ 16000000U
 #define HSE_FREQ_HZ 8000000U /**< Nucleo-F767ZI HSE = 8 MHz ST-LINK MCO. */
@@ -231,9 +230,24 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
       ;
   }
 
-  /* Lower flash wait states AFTER dropping to a slower non-PLL clock. */
+  /* Lower flash wait states AFTER dropping to a slower non-PLL clock.
+   *
+   * PRFTEN and ARTEN are set here too, not just on the PLL path above. The
+   * register resets to 0 and the read-modify-write below preserves whatever
+   * is already there, so a board that only ever runs on HSI or HSE -- never
+   * touching the PLL -- would otherwise keep the accelerator off for its
+   * whole life. The F767 test image is exactly that shape.
+   *
+   * Do not expect this to show up in a benchmark of an ordinary image. Unlike
+   * the F4's, this accelerator serves flash fetched over the ITCM bus at
+   * 0x00200000, and an image linked at 0x08000000 is fetched over AXI --
+   * measured at 1.00x on hardware, which is the honest number. It earns its
+   * keep for code placed in the .itcm section the linker script provides, and
+   * costs nothing otherwise. What pays on this core is the M7's own L1
+   * caches; see samples/cortex-m/38_hal_flash_art. */
   if (cfg->source != HAL_CLOCK_SOURCE_PLL) {
-    *FLASH_ACR = (*FLASH_ACR & ~FLASH_ACR_LATENCY_Msk) |
+    *FLASH_ACR = (*FLASH_ACR & ~FLASH_ACR_LATENCY_Msk) | FLASH_ACR_PRFTEN |
+                 FLASH_ACR_ARTEN |
                  (_flash_ws_for(hclk) << FLASH_ACR_LATENCY_BIT);
   }
 

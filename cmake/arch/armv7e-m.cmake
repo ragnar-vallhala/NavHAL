@@ -32,15 +32,22 @@ endif()
 # a call to strlen at -Os, which then failed to link.
 set(ARCH_C_FLAGS    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS} -ffreestanding")
 set(ARCH_ASM_FLAGS  "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
-set(ARCH_LINK_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib ${FPU_FLAGS}")
+# -L so a board's linker script can INCLUDE the shared section layout by name.
+# A board script carries only its MEMORY block; the layout lives once under
+# src/arch/armv7e-m/link/ instead of being copied into every board.
+set(NAVHAL_LINK_SCRIPT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/arch/armv7e-m/link")
+set(ARCH_LINK_FLAGS
+    "-T ${SRC_BOARD}/linker.ld -L ${NAVHAL_LINK_SCRIPT_DIR} -nostdlib ${FPU_FLAGS}")
 
 # Used by the `if(TEST)` block in the root CMakeLists.txt — each arch picks
 # the linker setup that fits how its test ELF runs (custom linker + nostdlib
 # for bare-metal Cortex; avr-libc-supplied startup for AVR).
 # Per-processor test linker: Cortex-M4 and Cortex-M7 share this ISA fragment
 # but have different memory maps (F401 512K/96K vs F767 2M/512K), so pick the
-# script under the matching tests/arch/<processor>/ dir.
+# script under the matching tests/arch/<processor>/ dir. Those scripts now
+# carry only the memory map and INCLUDE the same section layout the boards do,
+# so the test image and the shipped image are linked the same way.
 set(NAVHAL_TEST_LINKER_FLAGS
-    "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/linker.ld -nostdlib ${FPU_FLAGS}")
+    "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/linker.ld -L ${NAVHAL_LINK_SCRIPT_DIR} -nostdlib ${FPU_FLAGS}")
 set(NAVHAL_TEST_EXTRA_FLAGS  "-march=armv7e-m")
 set(NAVHAL_TEST_NEEDS_LIBGCC TRUE)

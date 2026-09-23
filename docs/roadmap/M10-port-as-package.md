@@ -74,6 +74,8 @@ boards            = ["pico", "pico_w"]
 toolchain_file    = "cmake/toolchains/arm-none-eabi-rp2040.cmake"
 defconfig         = "cmake/defconfigs/rp2040_pico.defconfig"
 kconfig_fragment  = "Kconfig.rp2040"
+linker_script     = "boards/pico/linker.ld"   # NEW; see §10.5
+section_layout    = "cortex-m0.ld"            # NEW; supplied by core
 
 # Optional: capabilities the port claims to implement. Used by the
 # registry UI to filter ports without building them.
@@ -138,6 +140,58 @@ The migration of AVR specifically is the proof-of-concept for the
 whole M10 mechanism: if AVR-as-package works end-to-end, the
 remaining ports are mechanical.
 
+### 10.5 — Memory map and section layout
+
+A port that ships drivers but no memory map is not installable. Where the
+flash and RAM are, how big they are, and what has to be carved out of them
+is the one thing only the vendor knows, and it is exactly what a consumer
+cannot derive from the vtable.
+
+This is not hypothetical today: nothing in the tree is installed or
+exported. `cmake/arch/armv7e-m.cmake` names the script by raw path
+(`-T ${SRC_BOARD}/linker.ld`), so a consumer either builds inside this
+repo or copies the script and owns a fork of it — and a fix made here does
+not reach them.
+
+**The split the port package inherits.** A board owns its `MEMORY` block.
+The section layout is arch-level and shipped by core, INCLUDEd by name and
+resolved with `-L`:
+
+```
+src/arch/armv7e-m/link/cortex-m4.ld     # core ships: layout
+src/board/<board>/linker.ld             # port ships: MEMORY + INCLUDE
+```
+
+A port therefore supplies a few lines, not a hundred. The reference port
+(`src/vendor/acme/`) is the test of that claim: before this split it needed
+a 102-line copy of the section layout, which rather undercut "adding a
+vendor is filling in an ops table".
+
+**Why the layout stays in core rather than travelling with the port.** It
+encodes things the HAL itself depends on and a port has no business
+varying: the copy and zero tables `Reset_Handler` walks, `.noinit` sitting
+outside the zeroed region so the boot block survives a reset, `_srodata`
+aligned for an MPU region. A port that got those wrong would fail in ways
+that look like HAL bugs. When six copies existed in this repo they drifted
+within a single tree; across independently versioned vendor packages they
+would drift faster and the failures would arrive as bug reports here.
+
+**What this forces on §10.3's tiers.** Conformance has to cover the memory
+map, because a port can pass every driver test and still ship a script that
+puts `.noinit` inside the zeroed region — nothing in the vtable suite would
+notice, and the symptom would be a watchdog recovery path that silently
+does not work. The on-target `BOOT` suite already asserts that specific
+property; the tier definition should require it and the equivalent for any
+region the port carves out.
+
+**Open, and worth deciding before this ships.** Boards with an unusual map
+— a bootloader reserving the first sectors, external QSPI, a
+cache-coherency carve-out — need to override or extend the layout rather
+than replace it wholesale, or every such board re-forks the file and we are
+back where we started. The mechanism is not designed yet. A second
+`SECTIONS` block after the `INCLUDE` covers extension; overriding an
+existing section does not work that way and needs an answer.
+
 ## Cost estimate
 
 * `port` kind in Module ABI + spec write-up: **~3 days**.
@@ -161,6 +215,11 @@ remaining ports are mechanical.
   to both repos.
 * The quarantine worker rejects a port that doesn't pass the
   conformance harness on every supported target triple.
+* An installed port supplies a memory map and nothing more of the link:
+  the section layout comes from core, and a port whose `.noinit` lands
+  inside the zeroed region is rejected by conformance rather than
+  discovered later as a boot block that silently does not survive a
+  reset (§10.5).
 
 ## Open questions
 
@@ -176,6 +235,17 @@ remaining ports are mechanical.
 * **Conformance tier upgrades over time**: a community port might
   start tier-3 and reach tier-1 after months. Does the registry
   re-run conformance automatically when a new core ships? (Should.)
+* **Overriding the section layout, not just extending it** (§10.5): a
+  board with a bootloader reserving its first sectors, external QSPI, or
+  a cache-coherency carve-out needs to change the layout rather than
+  append to it. A second `SECTIONS` block after the `INCLUDE` extends;
+  nothing yet overrides. Without an answer, every such board re-forks the
+  layout and the drift this milestone is meant to prevent comes back.
+* **Who owns the layout when core and port versions diverge**: the layout
+  encodes the copy/zero tables `Reset_Handler` walks, so it is really part
+  of the HAL's ABI rather than of the link. A port pinned to
+  `hal_api_version = 1` presumably gets the v1 layout, which makes the
+  layout a versioned artifact the registry has to serve.
 * **Trademark / branding**: "official NavHAL port" — who decides?
   Probably tier-1 + maintainer sign-off; needs a written policy.
 * **Single-vendor lock-in risk**: if an MCU vendor publishes

@@ -46,6 +46,15 @@
 
 #include <stdint.h>
 
+/* Omitted entirely rather than defined to 0 on a part with no cache driver,
+ * so this asks whether it exists before asking what it is. */
+#if defined(NAVHAL_CONFIG_CACHE_AT_BOOT) && NAVHAL_CONFIG_CACHE_AT_BOOT
+#define NAVHAL_BOOT_CACHES 1
+#include "common/hal_cache.h"
+#else
+#define NAVHAL_BOOT_CACHES 0
+#endif
+
 extern int main(void);
 
 /* Linker-emitted tables (see the board / tests/arch linker scripts). Copy
@@ -90,6 +99,18 @@ __attribute__((used)) void Reset_Handler(void) {
   for (uint32_t *z = __zero_table_start__; z < __zero_table_end__; z += 2) {
     zero_words((volatile uint32_t *)z[0], z[1]);
   }
+
+#if NAVHAL_BOOT_CACHES
+  /* Before navhal_boot_post, so an override sees the machine it will actually
+   * run on rather than a slower one. Safe here and not in boot_pre: enabling
+   * the data cache invalidates it, which is a write to state the copy/zero
+   * tables above have now finished setting up.
+   *
+   * Both together or the win does not appear; see CACHE_AT_BOOT in
+   * src/arch/armv7e-m/Kconfig.features. */
+  hal_icache_enable();
+  hal_dcache_enable();
+#endif
 
   navhal_boot_post(); /* inner post: caches / FPU / MPU baseline (globals live) */
   SystemInit();       /* outer pre: VTOR, clock, RTOS (weak; user override) */

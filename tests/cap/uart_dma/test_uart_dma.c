@@ -53,14 +53,81 @@ void test_uart_dma_rejects_null(void) {
       (uint32_t)hal_uart_init_dma_rx(NAVTEST_UART, NULL, 4));
 }
 
+
+/* A ring the driver will invalidate must own whole cache lines, so it is
+ * declared the way a caller has to declare one. Aligned even where there is no
+ * cache: the attribute costs nothing and the example should be copyable. */
+static uint8_t rx_ring[64] NAVHAL_ALIGNED(NAVHAL_CACHE_LINE);
+
+void test_uart_dma_rx_sync_rejects_bad_span(void) {
+  /* No ring registered for an instance the suite never initialised. */
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_dma_rx_sync((hal_uart_t)99, 0u, 1u));
+
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_uart_init_dma_rx(NAVTEST_UART, rx_ring, sizeof rx_ring));
+
+  /* Spans that do not fit the ring: a zero length, a length past the end, and
+   * an offset past the end. Each would otherwise invalidate memory belonging
+   * to something else. */
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_dma_rx_sync(NAVTEST_UART, 0u, 0u));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_dma_rx_sync(NAVTEST_UART, 0u, sizeof rx_ring + 1u));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_dma_rx_sync(NAVTEST_UART, sizeof rx_ring, 1u));
+
+  /* In range, including a span that wraps the end of the ring. */
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK, (uint32_t)hal_uart_dma_rx_sync(NAVTEST_UART, 0u, 8u));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_uart_dma_rx_sync(NAVTEST_UART, sizeof rx_ring - 4u, 8u));
+}
+
+#if NAVHAL_CONFIG_DRV_CACHE
+void test_uart_dma_rx_rejects_unaligned_ring(void) {
+  /* Invalidation works on cache lines, so a ring that shares its first or last
+   * line with another variable would discard that variable's cached value.
+   * Refused while the cache is on rather than corrupting a neighbour later. */
+  if (!hal_dcache_is_enabled()) {
+    return; /* nothing to enforce; the alignment rule is cache-only */
+  }
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_init_dma_rx(NAVTEST_UART, rx_ring + 1u, 32u));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_init_dma_rx(NAVTEST_UART, rx_ring, 33u));
+
+  /* Aligned and a whole number of lines: accepted. */
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_uart_init_dma_rx(NAVTEST_UART, rx_ring, sizeof rx_ring));
+}
+#endif
+
 /* PROGMEM slot for each case name on AVR; no-op elsewhere (UART DMA is
  * Cortex-M only). */
 NAVTEST_CASE_DECL(test_uart_dma_tx_writes);
 NAVTEST_CASE_DECL(test_uart_dma_rejects_null);
+NAVTEST_CASE_DECL(test_uart_dma_rx_sync_rejects_bad_span);
+#if NAVHAL_CONFIG_DRV_CACHE
+NAVTEST_CASE_DECL(test_uart_dma_rx_rejects_unaligned_ring);
+#endif
 
 static const navtest_case_t uart_dma_cases[] = {
     NAVTEST_CASE(test_uart_dma_tx_writes),
     NAVTEST_CASE(test_uart_dma_rejects_null),
+    NAVTEST_CASE(test_uart_dma_rx_sync_rejects_bad_span),
+#if NAVHAL_CONFIG_DRV_CACHE
+    NAVTEST_CASE(test_uart_dma_rx_rejects_unaligned_ring),
+#endif
 };
 
 const navtest_suite_t test_uart_dma_suite = {

@@ -34,9 +34,10 @@
  * @note Default frame configuration: 8 data bits, no parity, 1 stop bit.
  * @note Blocking transfers are polling-mode; the DMA-backed API
  *       (hal_uart_write_dma / init_dma_rx) is at the bottom, gated by
- *       NAVHAL_CONFIG_DRV_UART_DMA. DMA buffers are coherent while the L1
- *       D-cache stays off (the current bring-up default); once it is enabled
- *       they will need clean/invalidate or DTCM placement (NAVHAL_DTCM_NOINIT).
+ *       NAVHAL_CONFIG_DRV_UART_DMA. DMA buffers are maintained by the shared
+ *       layer: TX is cleaned before the transfer, and an RX ring is checked
+ *       for cache-line alignment at init and invalidated span by span through
+ *       hal_uart_dma_rx_sync. Safe with the L1 D-cache on.
  */
 
 #include "internal/hal_uart_ops.h"

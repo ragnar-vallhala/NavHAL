@@ -184,7 +184,11 @@ static void print_startup_message(void) {
 int main(void) {
 #if NAVHAL_CONFIG_DRV_CACHE
   hal_icache_enable(); /* hazard-free perf win; do it before anything else */
-  hal_dcache_enable(); /* invalidates then enables; DMA paths self-maintain */
+  /* Invalidates then enables. The DMA drivers maintain their own buffers:
+   * eth cleans and invalidates its descriptors and frames, sdio and i2c go
+   * through navhal_dma_{tx_prepare,rx_guard,rx_finish}, and uart does the same
+   * plus hal_uart_dma_rx_sync for its ring. */
+  hal_dcache_enable();
 #endif
   hal_uart_init(NAVTEST_UART, &(hal_uart_config_t){.baudrate=9600});
 #if NAVHAL_CONFIG_USE_FPU

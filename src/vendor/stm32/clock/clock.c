@@ -116,6 +116,33 @@ static uint32_t _target_sysclk_hz(const hal_clock_config_t *cfg) {
 
 /* Divide-by-N to the RCC field encodings. HPRE skips 32; PPRE tops out at 16.
  * Returns false for a divider the field cannot express. */
+/* Wait states for a given HCLK at 2.7-3.6 V (RM0368 Table 6: one more per
+ * 30 MHz). Derived rather than hardcoded: the old code wrote 2 for every PLL
+ * config, which is right at 84 MHz by coincidence and wrong for any other
+ * target hal_clock_init_hz will happily accept. */
+static uint32_t _flash_ws_for(uint32_t hclk) {
+  uint32_t ws = (hclk == 0u) ? 0u : (hclk - 1u) / 30000000U;
+  return (ws > 7u) ? 7u : ws;
+}
+
+/* Latency plus the ART Accelerator, written as one value.
+ *
+ * The whole register resets to 0, so prefetch and both caches are off until
+ * something turns them on, and nothing did: every image ran at 84 MHz and 2
+ * wait states with no prefetch, no instruction cache and no data cache.
+ *
+ * The caches are reset while still disabled, which is the only time RM0368
+ * permits it -- a cache re-enabled with stale lines would serve whatever the
+ * previous clock configuration left behind. Write, reset, then enable. */
+static void _flash_set_acr(volatile uint32_t *acr, uint32_t hclk) {
+  uint32_t ws = _flash_ws_for(hclk) << FLASH_ACR_LATENCY_BIT;
+
+  *acr = ws;                                            /* caches off */
+  *acr = ws | FLASH_ACR_ICRST | FLASH_ACR_DCRST;        /* flush both */
+  *acr = ws;                                            /* release reset */
+  *acr = ws | FLASH_ACR_PRFTEN | FLASH_ACR_ICEN | FLASH_ACR_DCEN;
+}
+
 static bool _hpre_encode(uint16_t div, uint32_t *out) {
   switch (div) {
   case 1: *out = RCC_CFGR_HPRE_DIV1; return true;
@@ -209,8 +236,7 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
 
   // When increasing frequency (switching to PLL), increase wait states FIRST
   if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
-    (*FLASH_ACR) &= ~(0x7 << FLASH_ACR_LATENCY_BIT);
-    (*FLASH_ACR) |= (2 << FLASH_ACR_LATENCY_BIT);
+    _flash_set_acr(FLASH_ACR, _target_sysclk_hz(cfg));
   }
 
   /* Bus prescalers. The config's dividers used to be accepted and discarded;
@@ -271,8 +297,9 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   // When decreasing frequency (switching from PLL to HSI/HSE), decrease wait
   // states AFTER
   if (cfg->source != HAL_CLOCK_SOURCE_PLL) {
-    (*FLASH_ACR) &= ~(0x7 << FLASH_ACR_LATENCY_BIT);
-    (*FLASH_ACR) |= (0 << FLASH_ACR_LATENCY_BIT);
+    /* Also the path a board takes when it never uses the PLL at all, which is
+     * why the accelerator is enabled here too rather than only on the way up. */
+    _flash_set_acr(FLASH_ACR, _target_sysclk_hz(cfg));
   }
 
   return HAL_OK;

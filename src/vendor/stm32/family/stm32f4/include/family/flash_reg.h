@@ -28,6 +28,9 @@
  * Macros:
  * - `FLASH_INTERFACE_REGISTER` : Base address of the Flash interface registers.
  * - `FLASH_ACR_LATENCY_BIT`    : Bit position for Flash access latency configuration.
+ * - `FLASH_ACR_PRFTEN/ICEN/DCEN`: the three bits that make up what ST markets
+ *   as the ART Accelerator on this family. Unlike the F7 there is no single
+ *   ARTEN bit; prefetch and the two caches are enabled separately.
  */
 
 #ifndef CORTEX_M4_FLASH_REG_H
@@ -35,6 +38,16 @@
 
 #define FLASH_INTERFACE_REGISTER 0x40023C00 /**< Flash Interface base address */
 #define FLASH_ACR_LATENCY_BIT 0             /**< Flash ACR Latency bit position */
+
+/* FLASH_ACR feature bits (RM0368 §3.5.1). Reset value of the whole register is
+ * 0, so none of these are on until firmware sets them -- at 84 MHz and 2 wait
+ * states that is every instruction fetch stalling. The RST bits clear the
+ * corresponding cache and are only valid while that cache is disabled. */
+#define FLASH_ACR_PRFTEN (1U << 8)  /**< Prefetch enable.                 */
+#define FLASH_ACR_ICEN   (1U << 9)  /**< Instruction cache enable.        */
+#define FLASH_ACR_DCEN   (1U << 10) /**< Data cache enable.               */
+#define FLASH_ACR_ICRST  (1U << 11) /**< Instruction cache reset.         */
+#define FLASH_ACR_DCRST  (1U << 12) /**< Data cache reset.                */
 
 #define FLASH_BASE 0x40023C00UL
 #define FLASH_KEYR (*(volatile uint32_t *)(FLASH_BASE + 0x04))

@@ -78,6 +78,38 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
 /** @brief Set up a UART for DMA-based circular reception. */
 hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
                                   uint16_t length);
+
+/**
+ * @brief Current circular RX write index for a UART set up via
+ *        ::hal_uart_init_dma_rx (i.e. @c length-NDTR on the correct stream).
+ *
+ * Lets consumers track how far the DMA has filled the ring without touching
+ * DMA registers themselves. Valid range is [0, length).
+ *
+ * @param uart       UART previously initialised for DMA RX.
+ * @param out_index  Receives the next-write index.
+ * @return HAL_OK, or HAL_ERR_INVALID_ARG if RX DMA isn't configured / NULL out.
+ */
+hal_status_t hal_uart_dma_rx_index(hal_uart_t uart, uint16_t *out_index);
+
+/**
+ * @brief Make the CPU's view of an RX ring span match what the DMA wrote.
+ *
+ * Invalidates @p len bytes from @p from in the ring registered with
+ * ::hal_uart_init_dma_rx, so a subsequent read returns received data rather
+ * than a cached copy from before the transfer. A wrapped span is handled.
+ *
+ * Call it before reading the ring, on the span between the last consumed index
+ * and ::hal_uart_dma_rx_index. Without a data cache it does nothing, so a
+ * caller that wants to be portable calls it unconditionally.
+ *
+ * @param uart UART previously initialised for DMA RX.
+ * @param from Byte offset into the ring.
+ * @param len  Number of bytes to make visible.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for an unknown UART, a ring that
+ *         was never registered, or a span that does not fit it.
+ */
+hal_status_t hal_uart_dma_rx_sync(hal_uart_t uart, uint16_t from, uint16_t len);
 /** @brief Transmit a null-terminated string using DMA. */
 hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 

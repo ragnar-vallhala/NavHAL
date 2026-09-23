@@ -84,9 +84,15 @@ static hal_pll_config_t pll_cfg = {
 static hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 
 /* The ring the UART's DMA fills. Nothing reads it but the walker below, and
- * nothing writes it but the DMA controller. */
+ * nothing writes it but the DMA controller.
+ *
+ * Cache-line aligned and a whole number of lines. This part has no data cache
+ * so it changes nothing here, but hal_uart_init_dma_rx refuses a ring that is
+ * not, on a part that does -- invalidating a line the ring only half owns
+ * would discard a neighbour's cached value. Written the way it has to be
+ * written to port. */
 #define RX_RING_LEN 128u
-static uint8_t rx_ring[RX_RING_LEN];
+static uint8_t rx_ring[RX_RING_LEN] NAVHAL_ALIGNED(NAVHAL_CACHE_LINE);
 static uint16_t rx_tail;
 
 static void print(const char *s) { hal_uart_write_string(BOARD_CONSOLE_UART, s); }
@@ -109,6 +115,16 @@ static void on_uart_idle(void) { /* ISR context */
   if (hal_uart_dma_rx_index(BOARD_CONSOLE_UART, &head) != HAL_OK) {
     return;
   }
+
+  /* Make the DMA's writes visible before reading them. A no-op without a data
+   * cache, which is why it is called unconditionally rather than guarded: the
+   * guarded version is the one that gets forgotten when the code is ported. */
+  if (head != rx_tail) {
+    uint16_t span = (uint16_t)((head > rx_tail) ? (head - rx_tail)
+                                                : (RX_RING_LEN - rx_tail + head));
+    (void)hal_uart_dma_rx_sync(BOARD_CONSOLE_UART, rx_tail, span);
+  }
+
   while (rx_tail != head) {
     hal_boot_match_byte(rx_ring[rx_tail]);
     rx_tail = (uint16_t)((rx_tail + 1u) % RX_RING_LEN);

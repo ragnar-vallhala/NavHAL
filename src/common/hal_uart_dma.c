@@ -37,8 +37,13 @@
 
 #include "common/hal_dma.h"
 #include "common/hal_interrupt.h"
+#include "common/navhal_compiler.h" /* NAVHAL_CACHE_LINE */
+#if NAVHAL_CONFIG_DRV_CACHE
+#include "common/hal_cache.h"
+#endif
 
 #include <stddef.h>
+#include <stdint.h>
 
 /* hal_uart_t enumerators are USART numbers, not dense indices (F4 uses 1, 2,
  * 6), so these are sparse lookup tables sized by the largest id rather than by
@@ -48,6 +53,7 @@
 /** Per-UART bookkeeping the public API needs but the hardware does not hold. */
 static uint8_t s_tx_armed[UART_SLOTS];
 static uint16_t s_rx_len[UART_SLOTS];
+static uint8_t *s_rx_buf[UART_SLOTS];
 
 static hal_dma_binding_t s_override[UART_SLOTS][2];
 static bool s_has_override[UART_SLOTS][2];
@@ -116,8 +122,16 @@ hal_status_t hal_uart_write_dma(hal_uart_t uart, const uint8_t *data,
   if (data == NULL || length == 0u || (unsigned)uart >= UART_SLOTS)
     return HAL_ERR_INVALID_ARG;
 
+  /* The CPU's most recent writes may still be sitting in the D-cache, and the
+   * DMA reads memory, not the cache. Also rejects an ITCM buffer, which the
+   * controller cannot reach at all. Both are no-ops on a part without a cache,
+   * which is why this is not conditional here. */
+  hal_status_t st = navhal_dma_tx_prepare(data, length);
+  if (st != HAL_OK)
+    return st;
+
   hal_dma_config_t cfg;
-  hal_status_t st = _descriptor(uart, true, (uint32_t)data, length, &cfg);
+  st = _descriptor(uart, true, (uint32_t)data, length, &cfg);
   if (st != HAL_OK)
     return st;
 
@@ -151,8 +165,27 @@ hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
   if (buffer == NULL || length == 0u || (unsigned)uart >= UART_SLOTS)
     return HAL_ERR_INVALID_ARG;
 
+  hal_status_t st = navhal_dma_rx_guard(buffer);
+  if (st != HAL_OK)
+    return st;
+
+  /* A ring the CPU will invalidate has to own whole cache lines. Invalidation
+   * works on lines, not bytes, so a ring sharing its first or last line with
+   * another variable would discard that variable's cached value -- and if the
+   * line were dirty, the write with it. Refusing here beats a corruption that
+   * only appears once the D-cache is switched on.
+   *
+   * Checked only when there is a cache to worry about, so a Cortex-M4 ring
+   * keeps working with any alignment. */
+#if NAVHAL_CONFIG_DRV_CACHE
+  if (hal_dcache_is_enabled() &&
+      (((uintptr_t)buffer & (NAVHAL_CACHE_LINE - 1u)) != 0u ||
+       (length % NAVHAL_CACHE_LINE) != 0u))
+    return HAL_ERR_INVALID_ARG;
+#endif
+
   hal_dma_config_t cfg;
-  hal_status_t st = _descriptor(uart, false, (uint32_t)buffer, length, &cfg);
+  st = _descriptor(uart, false, (uint32_t)buffer, length, &cfg);
   if (st != HAL_OK)
     return st;
 
@@ -165,7 +198,36 @@ hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
     return st;
 
   s_rx_len[uart] = length;
+  s_rx_buf[uart] = buffer;
   return hal_dma_start(&cfg);
+}
+
+hal_status_t hal_uart_dma_rx_sync(hal_uart_t uart, uint16_t from,
+                                  uint16_t len) {
+  if ((unsigned)uart >= UART_SLOTS || s_rx_buf[uart] == NULL)
+    return HAL_ERR_INVALID_ARG;
+
+  uint16_t ring = s_rx_len[uart];
+  if (len == 0u || len > ring || from >= ring)
+    return HAL_ERR_INVALID_ARG;
+
+#if NAVHAL_CONFIG_DRV_CACHE
+  /* Only the CPU's stale copies are discarded: the DMA writes the ring and the
+   * CPU only ever reads it, so no line here is ever dirty and invalidating
+   * cannot lose a write. That is the whole reason this is an invalidate and
+   * not a clean-invalidate.
+   *
+   * A span that wraps is two spans; splitting here keeps the caller from
+   * having to know that a wrapped range is not one contiguous address range. */
+  uint16_t first = (uint16_t)((from + len > ring) ? (ring - from) : len);
+  hal_dcache_invalidate(s_rx_buf[uart] + from, first);
+  if (first < len)
+    hal_dcache_invalidate(s_rx_buf[uart], (size_t)(len - first));
+#else
+  (void)from;
+  (void)len;
+#endif
+  return HAL_OK;
 }
 
 hal_status_t hal_uart_dma_rx_index(hal_uart_t uart, uint16_t *out_index) {

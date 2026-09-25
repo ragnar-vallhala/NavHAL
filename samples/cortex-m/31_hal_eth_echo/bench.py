@@ -66,8 +66,17 @@ def attach_src_mac_filter(sock, mac):
     return buf
 
 
-def make_frame(src_mac, size):
-    payload = b"\xa5" * size
+def make_frame(src_mac, size, tag=0xA5):
+    """One frame whose payload is a single repeated byte, that byte given by tag.
+
+    Repeating one value makes an echoed frame checkable without tracking which
+    frame it was: every payload byte must equal every other. And varying the
+    value between frames is what makes a stale read visible at all -- with a
+    constant fill, a buffer the CPU read out of a cache line left over from an
+    earlier frame holds exactly the bytes it expected, so cache staleness looks
+    identical to correct behaviour.
+    """
+    payload = bytes([tag]) * size
     frame = BOARD_MAC + src_mac + ETYPE_BYTES + struct.pack("!H", size) + payload
     if len(frame) < MIN_FRAME:
         frame += b"\x00" * (MIN_FRAME - len(frame))
@@ -81,16 +90,20 @@ class Receiver(threading.Thread):
         self.lock = threading.Lock()
         self.count = 0
         self.bytes = 0
+        self.corrupt = 0
+        self.expect = None  # set per level: the payload byte being sent
         self._stop = threading.Event()
 
-    def reset(self):
+    def reset(self, expect=None):
         with self.lock:
             self.count = 0
             self.bytes = 0
+            self.corrupt = 0
+            self.expect = expect
 
     def snapshot(self):
         with self.lock:
-            return self.count, self.bytes
+            return self.count, self.bytes, self.corrupt
 
     def stop(self):
         self._stop.set()
@@ -110,10 +123,18 @@ class Receiver(threading.Thread):
                 with self.lock:
                     self.count += 1
                     self.bytes += len(data)
+                    # Payload integrity, which is what a cache-coherency bug
+                    # breaks: the board would echo a frame of the right length
+                    # from the right MAC carrying bytes it read stale.
+                    if self.expect is not None:
+                        n = struct.unpack("!H", data[14:HDR])[0]
+                        body = data[HDR:HDR + n]
+                        if len(body) != n or body != bytes([self.expect]) * n:
+                            self.corrupt += 1
 
 
-def run_level(sock, rx, frame, wire_bytes, target_mbps, dur):
-    rx.reset()
+def run_level(sock, rx, frame, wire_bytes, target_mbps, dur, tag=None):
+    rx.reset(tag)
     sent = 0
     t0 = time.perf_counter()
     deadline = t0 + dur
@@ -144,11 +165,11 @@ def run_level(sock, rx, frame, wire_bytes, target_mbps, dur):
             time.sleep(0.0002)  # yield so the receive thread drains
     tx_dur = time.perf_counter() - t0
     time.sleep(0.3)  # let the last echoes arrive
-    rc, rb = rx.snapshot()
+    rc, rb, corrupt = rx.snapshot()
     offered = sent * wire_bytes * 8 / tx_dur / 1e6
     echoed = rb * 8 / tx_dur / 1e6
     loss = 100.0 * (sent - rc) / sent if sent else 0.0
-    return offered, echoed, loss
+    return offered, echoed, loss, corrupt
 
 
 def main():
@@ -176,14 +197,32 @@ def main():
 
     print(f"[bench] echo bandwidth over {args.iface}, {args.size}-byte payload "
           f"({wire_bytes}-byte L2 frames), {args.dur}s/level")
-    print(f"{'target':>8} {'offered':>10} {'echoed':>10} {'loss':>7}")
-    print(f"{'Mbit/s':>8} {'Mbit/s':>10} {'Mbit/s':>10} {'%':>7}")
-    print("-" * 40)
+    print(f"{'target':>8} {'offered':>10} {'echoed':>10} {'loss':>7} {'bad':>6}")
+    print(f"{'Mbit/s':>8} {'Mbit/s':>10} {'Mbit/s':>10} {'%':>7} {'frames':>6}")
+    print("-" * 47)
+    bad_total = 0
     try:
-        for lvl in LEVELS_MBPS:
-            offered, echoed, loss = run_level(sock, rx, frame, wire_bytes, lvl, args.dur)
+        for i, lvl in enumerate(LEVELS_MBPS):
+            # A different fill byte per level. Constant-fill frames cannot show
+            # a stale read: a buffer left holding the previous frame's bytes is
+            # indistinguishable from one read correctly. Changing the value each
+            # level makes the board's reads checkable.
+            tag = 0x11 + ((i * 0x22) & 0xDD)
+            frame = make_frame(src_mac, args.size, tag)
+            offered, echoed, loss, bad = run_level(
+                sock, rx, frame, wire_bytes, lvl, args.dur, tag)
+            bad_total += bad
             label = "max" if lvl == 0 else str(lvl)
-            print(f"{label:>8} {offered:>10.1f} {echoed:>10.1f} {loss:>7.1f}")
+            print(f"{label:>8} {offered:>10.1f} {echoed:>10.1f} {loss:>7.1f} {bad:>6}")
+        print()
+        if bad_total:
+            print(f"!! {bad_total} echoed frame(s) carried the wrong payload -- "
+                  "the board read bytes the DMA had not made visible to it. "
+                  "That is a cache-maintenance failure, not congestion.")
+        else:
+            print("payload integrity: every echoed frame matched what was sent.")
+            print("Loss at the higher levels is the echo loop saturating; it is "
+                  "the 'bad frames' column that would show a coherency fault.")
     except KeyboardInterrupt:
         pass
     finally:

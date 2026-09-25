@@ -1,0 +1,7 @@
+# vim: ft=kconfig
+# Target-board choice entry for NAVIXDEV (flight-controller v0.0.3).
+# Sourced inside the root "Target Board" choice.
+
+config BOARD_NAVIXDEV
+    bool "navixdev"
+    depends on FAMILY_STM32F4

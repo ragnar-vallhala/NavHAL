@@ -1,0 +1,6 @@
+# vim: ft=kconfig
+# Board identity string for NAVIXDEV. Sourced at top level.
+
+config BOARD
+    string
+    default "navixdev" if BOARD_NAVIXDEV

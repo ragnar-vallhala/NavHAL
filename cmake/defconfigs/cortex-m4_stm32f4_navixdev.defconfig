@@ -1,0 +1,15 @@
+# NavHAL defconfig - ARM Cortex-M4 / STM32F4 / NAVIXDEV (flight controller v0.0.3).
+#
+# The development revision that preceded NAVIXSM-F401RE v0.1.0. Same MCU, but
+# a breakout board rather than an earlier cut of the same flight controller:
+# sensors sit on I2C headers, there is no USB and no LoRa, and twelve PWM
+# outputs come out on headers. See src/board/navixdev/board.h.
+#
+# Minimal Kconfig fragment: selects the arch / vendor / family / board.
+# Everything else (drivers, sample selection, capability flags) cascades
+# from Kconfig defaults.
+
+CONFIG_ARCH_CORTEX_M4=y
+CONFIG_VENDOR_STM32=y
+CONFIG_FAMILY_STM32F4=y
+CONFIG_BOARD_NAVIXDEV=y

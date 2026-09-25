@@ -91,7 +91,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # disagree: bumping one without the other is a release-process bug, not
 # something we want to silently build. This check runs on every configure,
 # including when NavHAL is consumed as a submodule.
-set(NAVHAL_VERSION 0.3.3) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
+set(NAVHAL_VERSION 0.3.4) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/navhal.h" _navhal_h)
 string(REGEX MATCH "#define[ \t]+VERSION_MAJOR[ \t]+([0-9]+)" _ "${_navhal_h}")
 set(_navhal_h_major "${CMAKE_MATCH_1}")
@@ -100,6 +100,15 @@ set(_navhal_h_minor "${CMAKE_MATCH_1}")
 string(REGEX MATCH "#define[ \t]+VERSION_PATCH[ \t]+([0-9]+)" _ "${_navhal_h}")
 set(_navhal_h_patch "${CMAKE_MATCH_1}")
 set(_navhal_h_version "${_navhal_h_major}.${_navhal_h_minor}.${_navhal_h_patch}")
+# The VERSION string is checked too: it is not consumed by the build, so it
+# silently drifted from the integers for two releases before anyone noticed.
+string(REGEX MATCH "#define[ \t]+VERSION[ \t]+\"([^\"]*)\"" _ "${_navhal_h}")
+if(NOT CMAKE_MATCH_1 STREQUAL _navhal_h_version)
+    message(FATAL_ERROR
+        "NavHAL version mismatch: include/navhal.h VERSION string is "
+        "'${CMAKE_MATCH_1}' but VERSION_MAJOR/MINOR/PATCH say "
+        "'${_navhal_h_version}'. Bump all four together.")
+endif()
 if(NOT NAVHAL_VERSION STREQUAL _navhal_h_version)
     message(FATAL_ERROR
         "NavHAL version mismatch: CMakeLists NAVHAL_VERSION='${NAVHAL_VERSION}' but "

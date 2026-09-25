@@ -159,10 +159,20 @@ static void on_cdc_rx(const uint8_t *data, uint16_t len) { /* ISR context */
  */
 static void on_boot_request(void) { hal_gpio_write(LED_BUILTIN, LED_OFF); }
 
-/** The user button stands in for "the airframe is armed". Active low. */
+/* The user button stands in for "the airframe is armed": hold it and a matched
+ * sequence is refused. Not every board has one -- a flight controller has no
+ * room for a dev button -- so where it is absent the gate simply stays open and
+ * the sample demonstrates the matcher rather than the policy. A real vehicle
+ * drives hal_boot_entry_disable from its arming state, not from a pin. */
+#if defined(USER_BUTTON)
+#define BOOT_SAMPLE_HAS_GATE 1
 static bool entry_should_be_refused(void) {
   return hal_gpio_read(USER_BUTTON) == HAL_GPIO_LOW;
 }
+#else
+#define BOOT_SAMPLE_HAS_GATE 0
+static bool entry_should_be_refused(void) { return false; }
+#endif
 
 /* -------------------------------------------------------------------------- *
  * Startup
@@ -187,7 +197,11 @@ static void report_previous_boot(void) {
   print("attempts: ");
   print_u32(hal_boot_get_attempts());
   print("\r\nsend B0 07 C0 DE A5 3C 69 96 to reboot into the loader\r\n");
+#if BOOT_SAMPLE_HAS_GATE
   print("hold the user button to refuse the request instead\r\n\r\n");
+#else
+  print("no user button on this board: entry stays enabled\r\n\r\n");
+#endif
 }
 
 int main(void) {
@@ -197,7 +211,9 @@ int main(void) {
 
   hal_gpio_set_mode(LED_BUILTIN, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_NONE);
   hal_gpio_write(LED_BUILTIN, LED_ON);
+#if BOOT_SAMPLE_HAS_GATE
   hal_gpio_set_mode(USER_BUTTON, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_UP);
+#endif
 
   hal_reset_init(); /* latch and clear the cause before anything else resets */
   hal_boot_block_init();

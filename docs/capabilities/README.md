@@ -4,7 +4,7 @@
 
 What the HAL capability contract reports for each supported MCU. The canonical gate is `NAVHAL_CONFIG_DRV_*` (a 1:1 mirror of Kconfig, force-included into every TU); the `NAVHAL_HAS_*` names below are the **deprecated** aliases kept for out-of-tree consumers. Macro definitions and the contract semantics live in [`../api_standardization.md`](../api_standardization.md); this directory only tracks per-target availability and implementation status.
 
-**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_navixsmf401re &nbsp;·&nbsp; @subpage cap_atmega328p &nbsp;·&nbsp; @subpage cap_stm32f767zi
+**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_navixsmf401re &nbsp;·&nbsp; @subpage cap_navixdev &nbsp;·&nbsp; @subpage cap_atmega328p &nbsp;·&nbsp; @subpage cap_stm32f767zi
 
 ## Symbol legend
 

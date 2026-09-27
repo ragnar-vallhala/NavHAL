@@ -2,7 +2,13 @@
 
 # Secure bootloader
 
-> Status: **planned**
+> Status: **next** — the current track, taken ahead of M10 (2026-09-27).
+> **RDP2 is deferred**: ship and validate at RDP1. That means authenticated
+> updates and crashloop recovery — integrity, not confidentiality. Flash stays
+> readable over SWD and an attacker with physical access can simply reflash, so
+> this is not secure boot until RDP2 lands. The two-stage shape is unaffected:
+> stage-1 is WRP'd and immutable either way. Slice 3 (boot block) shipped in
+> 0.3.x.
 > Scope: a two-stage, signature-verified bootloader for STM32F401RE, with the
 > production part locked at RDP Level 2.
 > Predecessor: none — additive, but it re-partitions flash, so it must land
@@ -323,7 +329,7 @@ crypto, no new behaviour — this is the re-partition on its own.
 Promote the statics, add the bounds check and the watchdog kick in the `BSY`
 poll.
 
-### Slice 3 — Boot block
+### Slice 3 — Boot block — **done, shipped in 0.3.x**
 `hal_boot.h`, `.noinit` in all three scripts, the attempt counter and reset-cause
 accounting, the shared magic-sequence matcher. Testable with no crypto present.
 
@@ -346,7 +352,9 @@ callback, CDC on a forwarding RX callback — the `hal_boot_entry_disable`
 policy gate, and the liveness clear of the attempt counter.
 
 ### Slice 8 — Provisioning and lockdown
-Option-byte tool, full RDP1 validation, then RDP2 on production units.
+Option-byte tool and full RDP1 validation. **RDP2 is deferred** — the step is
+irreversible, so it waits until the RDP1 matrix has run clean on real units and
+there is a reason to take it.
 
 Slices 1–3 are independently useful and carry no cryptographic risk. The chain
 of trust does not exist until slice 5.
@@ -373,7 +381,7 @@ mid-program.
 * Three consecutive watchdog resets land in stage-2 update mode.
 * A bad stage-2 is recoverable over UART with no debugger attached.
 * A power cut at any point during an update leaves the board updatable.
-* An RDP2 unit completes a signed update over CDC.
+* An RDP1 unit completes a signed update over CDC.
 
 ## Open questions
 

@@ -24,14 +24,14 @@ the loop.
 This roadmap is the remaining work to get there. Shipped milestones are
 summarised below rather than kept as pages; git history has the detail.
 
-## Where we are today (post-M8)
+## Where we are today (post-M9)
 
 | | |
 |---|---|
 | Supported MCUs                       | 3 — STM32F401RE (Cortex-M4) · STM32F767ZI (Cortex-M7) · ATmega328P (AVR), plus a bare-metal x86-64 PC target |
-| Built-in CI gates                    | Host tests, cap-contract, sample matrices (both archs), PIL (Renode for Cortex, simavr for AVR), Conventional Commits, release gate on `main → stable` |
+| Built-in CI gates                    | Host tests, cap-contract, sample matrices (both archs), PIL (Renode for Cortex, simavr for AVR), devirtualisation under LTO, out-of-tree consumer build, Conventional Commits, release gate on `main → stable` |
 | Per-MCU PIL dispatcher               | `tools/pil/run.sh <board>` + `tools/pil/boards/<board>.conf` |
-| Distribution model                   | bundled monorepo |
+| Distribution model                   | bundled monorepo; consumable as a source dependency (@ref consuming) |
 | HAL API version                      | `HAL_API_VERSION 1` — frozen |
 | Module ABI                           | v1 draft (`module` + `app` kinds) |
 
@@ -39,19 +39,31 @@ summarised below rather than kept as pages; git history has the detail.
 
 | Milestone        | Status      | Scope                                       | Unlocks                                              |
 |---|---|---|---|
-| @subpage roadmap_m9  | in-progress | Driver vtable / vendor-backend abstraction  | ~80 % less per-vendor boilerplate; conformance enforced by interface |
+| @subpage roadmap_m9  | **done**    | Driver vtable / vendor-backend abstraction  | ~80 % less per-vendor boilerplate; conformance enforced by interface |
 | @subpage roadmap_m10 | planned     | Port as a registry package                  | Strategic shift away from monorepo. Vendors publish ports independently. |
 | @subpage roadmap_m11 | planned     | `HAL_API_VERSION 2`                         | Subsystem namespaces v1 couldn't anticipate — USB, Ethernet, BLE, AI accelerators |
 | @subpage roadmap_x86 | **done** (core) | Bare-metal x86-64 PC port (QEMU first)  | Running NavHAL on commodity x86; a third ISA exercising the port contract |
-| @subpage roadmap_bootloader | planned | Two-stage signed bootloader, RDP2 production lock | Authenticated field updates over UART/CDC; crashloop recovery without physical access |
+| @subpage roadmap_bootloader | **next** | Two-stage signed bootloader, validated at RDP1 | Authenticated field updates over UART/CDC; crashloop recovery without physical access |
 
 M9 is pure engineering on the current monorepo. M10 and M11 are the
 strategic shifts that take NavHAL from "thoughtful HAL for a handful of
 MCUs" to "Arduino-scale".
 
+**The bootloader is the current track, taken ahead of M10** (decided
+2026-09-27). At three MCUs, M10 solves a problem that does not exist yet —
+nobody else is publishing ports — while field updates and crashloop
+recovery are needed to put a vehicle in the air. **RDP2 is deferred**: the
+design ships and is validated at RDP1, which means authenticated updates
+and crashloop recovery — integrity, not confidentiality. Flash stays
+readable over SWD and anyone with physical access can reflash, so it should
+not be described as secure boot until RDP2 lands. The two-stage shape stays
+regardless, since stage-1 is WRP'd and immutable either way.
+
 Already shipped, pages removed: **M7** (modular build), **M8** (CI tiering
 and the portable test framework, including the §8.4 conformance contract the
-pages below still cite), and the **STM32F767ZI** Cortex-M7 port.
+pages below still cite), and the **STM32F767ZI** Cortex-M7 port. **M9** is
+done; its two pages are kept because the vtable contract they specify is
+still the thing ports are written against.
 
 Reference reading: @subpage roadmap_abstraction — how NavHAL abstracts
 per-vendor hardware today, and why the M9 indirection is free under `-flto`.

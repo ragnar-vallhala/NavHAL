@@ -278,6 +278,23 @@ if(TARGET hal AND NAVHAL_LINK_SCRIPT_DIR)
   target_link_options(hal INTERFACE "-L${NAVHAL_LINK_SCRIPT_DIR}")
 endif()
 
+# Carry the force-included target header on the target, for the same reason.
+#
+# navhal_target.h defines every NAVHAL_CONFIG_* symbol, and the public headers
+# are written against them -- hal_dma_binding_t only exists when
+# NAVHAL_CONFIG_DRV_DMA is set, and the type it names comes from a family header
+# that only that branch reaches. So a consumer that includes navhal.h without
+# this flag does not merely lose a feature, it fails to compile:
+#
+#   navhal_port_dma.h: error: unknown type name 'hal_irq_t'
+#
+# It is set in CMAKE_C_FLAGS, which a parent project does not inherit, so the
+# consumer's own translation units never saw it. SHELL: keeps `-include` and its
+# path together as two arguments and stops CMake de-duplicating them.
+if(TARGET hal AND GENERATED_NAVHAL_TARGET)
+  target_compile_options(hal INTERFACE "SHELL:-include ${GENERATED_NAVHAL_TARGET}")
+endif()
+
 add_custom_target(
   clean-all
   COMMAND ${CMAKE_COMMAND} --build . --target clean

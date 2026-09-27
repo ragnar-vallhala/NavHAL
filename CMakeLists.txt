@@ -259,6 +259,25 @@ else()
   # add_subdirectory(${SRC_VENDOR})
 endif()
 
+# Carry the linker-script search path on the target, for consumers.
+#
+# A board's linker.ld is a MEMORY block plus `INCLUDE <arch>.ld`, and ld resolves
+# that name against the current directory and -L paths only -- never against the
+# directory of the script doing the including. So `-T .../board/<b>/linker.ld`
+# alone fails with "cannot open linker script file", and a consumer has no reason
+# to know it also needs -L.
+#
+# NavHAL's own builds get it from ARCH_LINK_FLAGS, but that lands in
+# CMAKE_EXE_LINKER_FLAGS, which is a directory-scoped variable: a parent project
+# doing add_subdirectory() here does not inherit it. An INTERFACE option on the
+# target does travel, so anything that links hal is linkable.
+#
+# Guarded on the variable because it is arch-level: the x86_64 and AVR layouts
+# are self-contained and set no search dir.
+if(TARGET hal AND NAVHAL_LINK_SCRIPT_DIR)
+  target_link_options(hal INTERFACE "-L${NAVHAL_LINK_SCRIPT_DIR}")
+endif()
+
 add_custom_target(
   clean-all
   COMMAND ${CMAKE_COMMAND} --build . --target clean

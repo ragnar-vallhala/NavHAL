@@ -331,6 +331,29 @@ jobs:
       - name: Every ops table resolves away under LTO
         run: tools/check_devirt.sh
 
+  # Every other tier builds NavHAL from inside this repo, where the flags come
+  # from CMAKE_C_FLAGS and CMAKE_EXE_LINKER_FLAGS -- directory-scoped variables
+  # a parent project does not inherit. Anything NavHAL needs and does not put on
+  # the `hal` target is therefore invisible to a consumer *and* to this CI. That
+  # gap shipped twice (0.3.3 linker search path, 0.3.5 force-included config
+  # header), so it gets a tier of its own.
+  consumer:
+    name: Consumer build (out-of-tree)
+    runs-on: ubuntu-latest
+    needs: dispatch
+    if: needs.dispatch.outputs.run-cortex-m == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+      - name: Install kconfiglib
+        run: pip install kconfiglib
+      - name: A downstream project can build against this tree
+        run: tools/check_consumer.sh
+
   # M8 §8.1 — Single required-status-check name to put on branch
   # protection. Succeeds if every per-PR job either passed or was
   # legitimately skipped by the dispatcher. GitHub doesn't treat
@@ -353,6 +376,7 @@ jobs:
       - sample-matrix-f767
       - x86-smoke
       - devirt
+      - consumer
     steps:
       - name: Aggregate per-job results (success or skipped == ok)
         run: |
@@ -365,6 +389,7 @@ jobs:
             esac
           }
           check dispatch          "${{ needs.dispatch.result }}"
+          check consumer          "${{ needs.consumer.result }}"
           check commit-lint       "${{ needs.commit-lint.result }}"
           check host-tests        "${{ needs.host-tests.result }}"
           check build-on-target   "${{ needs.build-on-target.result }}"

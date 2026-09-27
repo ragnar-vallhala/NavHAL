@@ -39,6 +39,9 @@ The Related Pages tab is structured top-down — start here:
   - @subpage naming_conventions
   - @subpage module_abi
 
+- **Using NavHAL**
+  - @subpage consuming
+
 - **Per-target capabilities**
   - @subpage capabilities
 

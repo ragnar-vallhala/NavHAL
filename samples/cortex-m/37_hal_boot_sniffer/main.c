@@ -61,9 +61,10 @@
  * the CDC path starts, reports no host, and the UART half is what you drive.
  *
  * The LED goes out, the board resets, and the banner comes back reporting that
- * the previous boot asked for the loader. Holding the user button refuses the
- * request instead: that is ::hal_boot_entry_disable, which on a vehicle is
- * what the airframe arming does, since rebooting in flight is a fall.
+ * the previous boot asked for the loader. Arming refuses the request instead:
+ * that is ::hal_boot_entry_disable, which on a vehicle is what the airframe
+ * arming does, since rebooting in flight is a fall. Hold the user button where
+ * there is one; where there is not, send 'a' to arm and 'd' to disarm.
  *
  * USB full speed needs exactly 48 MHz, so the PLL is set up first:
  * 8 MHz HSE / M=8 -> 1 MHz, * N=336 -> 336 MHz VCO, / P=4 -> 84 MHz SYSCLK,
@@ -100,8 +101,52 @@ static void print(const char *s) { hal_uart_write_string(BOARD_CONSOLE_UART, s);
 static void print_u32(uint32_t v) { hal_uart_write_uint(BOARD_CONSOLE_UART, v); }
 
 /* -------------------------------------------------------------------------- *
+ * Arming gate
+ * -------------------------------------------------------------------------- */
+
+/* The gate stands in for "the airframe is armed": while it is set, a matched
+ * sequence is refused. A dev board has a button to hold; a flight controller
+ * has no room for one, so there the same policy comes from software -- which is
+ * what a vehicle does in any case, driving hal_boot_entry_disable from its
+ * arming state rather than from a pin. Where there is no button, 'a' and 'd' on
+ * either console stand in for that state, so the policy is still demonstrated
+ * rather than left permanently open. */
+#if defined(USER_BUTTON)
+#define BOOT_SAMPLE_GATE_PIN 1
+#else
+#define BOOT_SAMPLE_GATE_PIN 0
+static volatile bool armed; /* written in ISR context, read in the main loop */
+#endif
+
+static bool entry_should_be_refused(void) {
+#if BOOT_SAMPLE_GATE_PIN
+  return hal_gpio_read(USER_BUTTON) == HAL_GPIO_LOW;
+#else
+  return armed;
+#endif
+}
+
+/* -------------------------------------------------------------------------- *
  * Feeds
  * -------------------------------------------------------------------------- */
+
+/**
+ * Every received byte passes through here, whichever console it arrived on: the
+ * matcher, and on a board with no button the arming gate as well. The arming
+ * bytes are deliberately fed onward too -- the matcher has to see the whole
+ * stream for a sequence that arrives mid-traffic to match, and no byte of
+ * ::hal_boot_seq collides with them.
+ */
+static void feed_byte(uint8_t b) { /* ISR context */
+#if !BOOT_SAMPLE_GATE_PIN
+  if (b == 'a') {
+    armed = true;
+  } else if (b == 'd') {
+    armed = false;
+  }
+#endif
+  hal_boot_match_byte(b);
+}
 
 /**
  * IDLE fires at the end of each burst of bytes. Everything the DMA has landed
@@ -126,7 +171,7 @@ static void on_uart_idle(void) { /* ISR context */
   }
 
   while (rx_tail != head) {
-    hal_boot_match_byte(rx_ring[rx_tail]);
+    feed_byte(rx_ring[rx_tail]);
     rx_tail = (uint16_t)((rx_tail + 1u) % RX_RING_LEN);
   }
 }
@@ -137,9 +182,19 @@ static void on_uart_idle(void) { /* ISR context */
  * for hal_usb_cdc_read, so whatever this does not pass on is lost. Feed the
  * watcher, then echo, in that order: an echo that blocked would otherwise
  * delay the match.
+ *
+ * This walks the packet a byte at a time rather than handing it to
+ * ::hal_boot_feed, because the arming gate has to see the bytes too. A watcher
+ * with nothing else to inspect would pass hal_boot_feed straight in, which is
+ * why that function is shaped as a CDC callback.
  */
 static void on_cdc_rx(const uint8_t *data, uint16_t len) { /* ISR context */
-  hal_boot_feed(data, len);
+  if (data == NULL) {
+    return;
+  }
+  for (uint16_t i = 0u; i < len; ++i) {
+    feed_byte(data[i]);
+  }
   (void)hal_usb_cdc_write(data, len);
 }
 #endif
@@ -158,21 +213,6 @@ static void on_cdc_rx(const uint8_t *data, uint16_t len) { /* ISR context */
  * spent on it is a microsecond the motors are still turning.
  */
 static void on_boot_request(void) { hal_gpio_write(LED_BUILTIN, LED_OFF); }
-
-/* The user button stands in for "the airframe is armed": hold it and a matched
- * sequence is refused. Not every board has one -- a flight controller has no
- * room for a dev button -- so where it is absent the gate simply stays open and
- * the sample demonstrates the matcher rather than the policy. A real vehicle
- * drives hal_boot_entry_disable from its arming state, not from a pin. */
-#if defined(USER_BUTTON)
-#define BOOT_SAMPLE_HAS_GATE 1
-static bool entry_should_be_refused(void) {
-  return hal_gpio_read(USER_BUTTON) == HAL_GPIO_LOW;
-}
-#else
-#define BOOT_SAMPLE_HAS_GATE 0
-static bool entry_should_be_refused(void) { return false; }
-#endif
 
 /* -------------------------------------------------------------------------- *
  * Startup
@@ -197,10 +237,10 @@ static void report_previous_boot(void) {
   print("attempts: ");
   print_u32(hal_boot_get_attempts());
   print("\r\nsend B0 07 C0 DE A5 3C 69 96 to reboot into the loader\r\n");
-#if BOOT_SAMPLE_HAS_GATE
+#if BOOT_SAMPLE_GATE_PIN
   print("hold the user button to refuse the request instead\r\n\r\n");
 #else
-  print("no user button on this board: entry stays enabled\r\n\r\n");
+  print("no user button here: send 'a' to arm and refuse it, 'd' to disarm\r\n\r\n");
 #endif
 }
 
@@ -211,7 +251,7 @@ int main(void) {
 
   hal_gpio_set_mode(LED_BUILTIN, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_NONE);
   hal_gpio_write(LED_BUILTIN, LED_ON);
-#if BOOT_SAMPLE_HAS_GATE
+#if BOOT_SAMPLE_GATE_PIN
   hal_gpio_set_mode(USER_BUTTON, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_UP);
 #endif
 

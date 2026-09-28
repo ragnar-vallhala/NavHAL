@@ -20,7 +20,8 @@
 
 #include "utils/uart_types.h"
 
-/** Console UART: COM1 (0x3F8), wired to QEMU's -serial. */
-#define CONSOLE_UART HAL_UART_1
+/** Console UART: COM1 (0x3F8), wired to QEMU's -serial. Named BOARD_CONSOLE_UART
+ *  like every other board, so portable code and hal_console can find it. */
+#define BOARD_CONSOLE_UART HAL_UART_1
 
 #endif /* NAVHAL_BOARD_QEMU_H */

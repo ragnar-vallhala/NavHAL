@@ -106,6 +106,44 @@ config BOOT_SNIFFER
       console can reboot the board, so hal_boot_entry_disable() exists for
       states where that must not happen.
 
+choice
+    prompt "Console route"
+    default CONSOLE_ROUTE_UART
+    help
+      Which transport carries console output — what hal_console_write() and the
+      on-target test harness print to.
+
+      A console belongs to the board, not to the code that prints: most boards
+      carry theirs on a UART that a debug probe exposes as a virtual COM port,
+      while a flight controller has no room for that header and carries it on its
+      USB device port. This is a config choice rather than a board constant so
+      selecting one is not a code change — the same board can be built with either.
+
+config CONSOLE_ROUTE_UART
+    bool "UART (BOARD_CONSOLE_UART)"
+    help
+      Output goes to the board's console UART.
+
+      This is also the route the SWD capture in tools/ntest depends on: it tests a
+      board whose console reaches no host by breaking on hal_uart_write_string and
+      reading the argument out of the target, so it only sees what passes through
+      the UART driver. A board tested that way must be built with this route, which
+      is why it is the default even on boards whose real console is USB.
+
+config CONSOLE_ROUTE_CDC
+    bool "USB CDC"
+    depends on DRV_USB_CDC
+    help
+      Output goes to the USB device port via hal_usb_cdc, appearing on the host as
+      a /dev/ttyACM* (or COM) port.
+
+      Only offered when DRV_USB_CDC is enabled, since there is nothing to write to
+      otherwise. Note that the peripheral running is not the same as a host being
+      attached: anything written before enumeration completes is dropped, so use
+      hal_console_connected() when the first line matters.
+
+endchoice
+
 endmenu
 
 menu "HAL Drivers Configuration"

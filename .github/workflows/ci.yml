@@ -83,6 +83,11 @@ jobs:
               - 'cmake/arch/**'
               - 'tools/ntest'
               - 'tools/kconfig.py'
+              # The sample registry and its CMake entry point are per-arch data in
+              # a shared file: every arch's sample matrix is built from them, so a
+              # change here can break AVR while only cortex-m paths look touched.
+              - 'samples/Kconfig'
+              - 'samples/CMakeLists.txt'
               - '.github/workflows/**'
             x86-only:
               - 'src/arch/x86_64/**'

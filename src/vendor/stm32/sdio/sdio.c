@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include "board.h"
 #include "navhal_port_sdio.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_gpio.h"
@@ -270,8 +271,42 @@ static hal_sdio_error_t sdio_wait_card_ready(void) {
 /* CARD INIT */
 /* ------------------------------------------------------------- */
 
+bool hal_sdio_card_present(void) {
+#if defined(BOARD_SD_CD)
+  /* Active low: the socket's detect switch closes to ground when a card is
+   * seated. Measured on NAVIXSM-F401RE -- PC5 reads low with either internal
+   * pull applied and a card in, so it is held by the switch rather than
+   * following the pull. Configured on every call because nothing else owns this
+   * pin and a caller may check before hal_sdio_init. */
+  hal_gpio_set_mode(BOARD_SD_CD, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_UP);
+  /* Let the pull-up charge the line before believing it. An inserted card holds
+   * the pin low through a closed switch and settles at once, so a read with no
+   * settling time looks right on a bench with a card in and reports a card that
+   * is not there on an empty slot -- which is the one case this function exists
+   * for. A spin rather than hal_delay_ms: this must work before the timebase is
+   * running, since a caller may check for a card before initialising anything. */
+  for (volatile uint32_t i = 0u; i < 2000u; i++) {
+  }
+  return hal_gpio_read(BOARD_SD_CD) == HAL_GPIO_LOW;
+#else
+  /* No detect pin on this board. Claiming the slot is empty would turn a
+   * working setup into a refusal, so assume a card and let the card commands
+   * report the truth. */
+  return true;
+#endif
+}
+
 hal_sdio_error_t hal_sdio_card_init(void) {
   static uint8_t initialized = 0;
+
+  /* An empty slot is worth its own answer. Without this the identification
+   * commands simply time out, which is the same thing a card present behind a
+   * broken data line reports -- and telling those two apart by hand cost a great
+   * deal of time on exactly this driver. */
+  if (!hal_sdio_card_present()) {
+    return HAL_SDIO_NO_CARD;
+  }
+
   if (initialized) {
     return HAL_SDIO_OK; /* Already initialized, skip handshake */
   }

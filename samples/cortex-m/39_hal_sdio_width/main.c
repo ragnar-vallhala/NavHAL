@@ -250,7 +250,8 @@ static void force_bus(uint32_t widbus, uint32_t clkdiv, uint32_t negedge) {
                 (negedge ? SDIO_CLKCR_NEGEDGE : 0u);
 }
 
-static void attempt(uint8_t bus_width, uint32_t negedge, const char *title) {
+static void attempt(hal_sdio_bus_width_t bus_width, uint32_t negedge,
+                    const char *title) {
   hal_sdio_config_t cfg = {.clock_div = SD_IDENT_DIV, .bus_width = bus_width};
 
   say(title);
@@ -286,7 +287,7 @@ static void attempt(uint8_t bus_width, uint32_t negedge, const char *title) {
     static const uint32_t divs[4] = {118u, 40u, 10u, 2u};
     static const char *rates[4] = {"400 kHz", "1.17 MHz", "4 MHz", "12 MHz"};
     for (unsigned i = 0u; i < 4u; i++) {
-      force_bus(bus_width ? 1u : 0u, divs[i], negedge);
+      force_bus((bus_width == HAL_SDIO_BUS_WIDTH_4BIT) ? 1u : 0u, divs[i], negedge);
       say("  -- CLKDIV ");
       say_uint(divs[i]);
       say(" (");
@@ -319,7 +320,7 @@ static void attempt(uint8_t bus_width, uint32_t negedge, const char *title) {
    * lines creates a deliberate mismatch, so whatever the hardware reports for
    * THIS is the signature of "host wider than card" -- and can be compared
    * against what the 4-bit boot reports. */
-  if (!bus_width) {
+  if (bus_width == HAL_SDIO_BUS_WIDTH_1BIT) {
     force_bus(1u, 2u, negedge);
     say("  -- control: card is 1-bit, host forced to 4-bit --\r\n");
     hal_sdio_error_t e = hal_sdio_read_block(0u, block);
@@ -334,7 +335,7 @@ static void attempt(uint8_t bus_width, uint32_t negedge, const char *title) {
     force_bus(0u, 2u, negedge);
   }
 
-  if (bus_width) {
+  if (bus_width == HAL_SDIO_BUS_WIDTH_4BIT) {
     force_bus(0u, 2u, negedge);
     say("  -- host forced to 1-bit, card left as ACMD6 set it --\r\n");
     hal_sdio_error_t e = hal_sdio_read_block(0u, block);
@@ -357,9 +358,9 @@ static void attempt(uint8_t bus_width, uint32_t negedge, const char *title) {
    * failures: 1-bit transferring all 512 bytes with a bad CRC at 400 kHz and at
    * 12 MHz alike, and 4-bit never seeing a start bit simultaneously on four
    * lines. Speed, flow control and the card itself have all been eliminated. */
-  force_bus(bus_width ? 1u : 0u, 2u, negedge);
+  force_bus((bus_width == HAL_SDIO_BUS_WIDTH_4BIT) ? 1u : 0u, 2u, negedge);
   say("  forced bus        : ");
-  say_uint(bus_width ? 4u : 1u);
+  say_uint((bus_width == HAL_SDIO_BUS_WIDTH_4BIT) ? 4u : 1u);
   say(negedge ? "-bit @ CLKDIV 2, NEGEDGE=1\r\n" : "-bit @ CLKDIV 2, NEGEDGE=0\r\n");
   report_width();
   /* Capacity class is not observable from outside the driver -- card_is_sdhc and
@@ -426,7 +427,7 @@ int main(void) {
 #ifndef DIAG_BUS_WIDTH
 #define DIAG_BUS_WIDTH 1
 #endif
-  attempt(DIAG_BUS_WIDTH, 0u,
+  attempt(DIAG_BUS_WIDTH ? HAL_SDIO_BUS_WIDTH_4BIT : HAL_SDIO_BUS_WIDTH_1BIT, 0u,
           (DIAG_BUS_WIDTH ? "\r\n[single] 4-bit requested, NEGEDGE=0\r\n"
                           : "\r\n[single] 1-bit requested, NEGEDGE=0\r\n"));
 

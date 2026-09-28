@@ -54,7 +54,7 @@ int main(void) {
    * Clock Div = 118 (for 400kHz from 48MHz SDIO Clock)
    * Bus Width = 0 (1-bit mode initially for card detection)
    */
-  hal_sdio_config_t sd_config = {.clock_div = 118, .bus_width = 0};
+  hal_sdio_config_t sd_config = {.clock_div = 118, .bus_width = HAL_SDIO_BUS_WIDTH_1BIT};
 
   hal_uart_write_string(HAL_UART_2, "Initializing SDIO peripheral...\n\r");
   if (hal_sdio_init(&sd_config) == HAL_SDIO_OK) {

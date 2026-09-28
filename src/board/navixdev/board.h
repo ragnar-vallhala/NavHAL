@@ -107,6 +107,7 @@ extern "C" {
 #define BOARD_PWM_TIMER   TIM1
 #define BOARD_PWM_CHANNEL 1
 #define BOARD_PWM_PIN     GPIO_PA08
+#define BOARD_PWM_AF      HAL_GPIO_AF1
 
 /* PWM1 header — TIM1 CH1..CH4 (AF1). */
 #define BOARD_PWM1_TIMER TIM1

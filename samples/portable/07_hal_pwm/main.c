@@ -39,7 +39,7 @@ int main(void) {
    * function; on the AVR the PWM driver owns the fixed OCnx pin, so these
    * two calls are harmless no-ops there. */
   hal_gpio_set_mode(BOARD_PWM_PIN, HAL_GPIO_MODE_AF, HAL_GPIO_PULL_NONE);
-  hal_gpio_set_alternate_function(BOARD_PWM_PIN, HAL_GPIO_AF1);
+  hal_gpio_set_alternate_function(BOARD_PWM_PIN, BOARD_PWM_AF);
 
   hal_pwm_handle_t pwm = {BOARD_PWM_TIMER, BOARD_PWM_CHANNEL};
   hal_pwm_init(&pwm, 15000, 0.10f);

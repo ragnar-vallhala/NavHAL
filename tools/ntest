@@ -397,6 +397,45 @@ def _serial_capture(port, baud, timeout_s, reset_dtr=False):
 _OCD_NOISE = re.compile(r"halted: PC: 0x[0-9a-f]+\n?")
 
 
+def _hil_usb_location(board):
+    """USB location of this board's probe, from the environment.
+
+    Which port a probe is plugged into is a property of one bench, not of the
+    project, so it must not live in a committed board conf -- the same reason
+    this runner matches probes dynamically instead of hardcoding a serial.
+
+        NAVHAL_HIL_LOCATION_<BOARD>=<bus>-<port>   # one named board
+        NAVHAL_HIL_LOCATION=<bus>-<port>           # the only probe on the bench
+
+    Unset is the normal case and changes nothing: the runner falls back to
+    enumerating probes, which is correct on a bench with one of them.
+    """
+    key = "".join(c if c.isalnum() else "_" for c in board).upper()
+    return (os.environ.get(f"NAVHAL_HIL_LOCATION_{key}")
+            or os.environ.get("NAVHAL_HIL_LOCATION"))
+
+
+def _ocd_args(ocd_args, loc):
+    """Split OPENOCD_ARGS, inserting `adapter usb location` after the interface
+    config when a location is pinned.
+
+    It is a pre-init config command and the interface file has to have loaded the
+    driver before it is accepted, so it goes after that -f and not at the end.
+    """
+    args = shlex.split(ocd_args)
+    if not loc:
+        return args
+    out, placed = [], False
+    for a in args:
+        out.append(a)
+        if not placed and a.startswith("interface/"):
+            out += ["-c", f"adapter usb location {loc}"]
+            placed = True
+    if not placed:
+        out += ["-c", f"adapter usb location {loc}"]
+    return out
+
+
 def _swd_capture(elf, ocd_args, timeout_s):
     """Run the test ELF with no serial console: flash and drive it over SWD,
     reading the console strings out of the target as it prints them.
@@ -406,7 +445,7 @@ def _swd_capture(elf, ocd_args, timeout_s):
     Breaking on hal_uart_write_string and printing the argument reconstructs the
     same transcript the wire would have carried. -> (text, failures|None, total).
     """
-    ocd = subprocess.Popen(["openocd"] + shlex.split(ocd_args),
+    ocd = subprocess.Popen(["openocd"] + ocd_args,
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     script = None
     try:
@@ -505,7 +544,18 @@ def _hil_arm(board, conf):
     if not (chipid and tc and conf.get("DEFCONFIG")):
         return Result(f"hil:{board}", False, note="conf missing CHIPID/TOOLCHAIN/DEFCONFIG")
     swd = conf.get("CONSOLE", "").lower() == "swd"
-    serial, port = _st_probe(chipid)
+    # A pinned USB location skips probe enumeration altogether. `st-info --probe`
+    # opens every ST-Link on the bus to read its target's chip-id, which resets
+    # the boards behind the other probes -- so on a bench with more than one, the
+    # act of looking disturbs the boards we are not testing. It is also useless
+    # here: these probes report identical serials, so enumeration cannot tell
+    # them apart anyway. Only the swd path can use this, since it addresses the
+    # probe through OpenOCD rather than st-flash.
+    loc = _hil_usb_location(board) if swd else None
+    if loc:
+        serial, port = f"usb:{loc}", None
+    else:
+        serial, port = _st_probe(chipid)
     if not serial:
         return Result(f"hil:{board}", True, note=c("SKIP no board", "y"))  # honest skip
     if not port and not swd:
@@ -521,8 +571,9 @@ def _hil_arm(board, conf):
     elf = os.path.join(bp, "tests")
     if swd:
         to = int(conf.get("TIMEOUT", "300"))
-        ocd_args = conf.get("OPENOCD_ARGS",
-                            "-f interface/stlink.cfg -f target/stm32f4x.cfg")
+        ocd_args = _ocd_args(conf.get("OPENOCD_ARGS",
+                                      "-f interface/stlink.cfg -f target/stm32f4x.cfg"),
+                             loc)
         print(c(f"-- hil:{board} — flash + capture over swd", "d"))
         _, fail, tot = _swd_capture(elf, ocd_args, to)
         if fail is None:

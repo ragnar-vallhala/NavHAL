@@ -85,7 +85,7 @@ void test_hal_sdio_set_callback_smoke(void) {
 void test_hal_sdio_block_roundtrip_pil(void) {
   NAVTEST_PIL_ONLY();
 
-  hal_sdio_config_t cfg = {.clock_div = 0, .bus_width = 0 /* 1-bit */};
+  hal_sdio_config_t cfg = {.clock_div = 0, .bus_width = HAL_SDIO_BUS_WIDTH_1BIT};
   if (hal_sdio_init(&cfg) != HAL_SDIO_OK) {
     TEST_ASSERT_TRUE(1); /* controller not modelled here */
     return;

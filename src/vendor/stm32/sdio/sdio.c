@@ -35,7 +35,7 @@
 
 static uint32_t sd_rca = 0;
 static uint8_t card_is_sdhc = 0;
-static uint8_t desired_bus_width = 0;
+static hal_sdio_bus_width_t desired_bus_width = HAL_SDIO_BUS_WIDTH_1BIT;
 static hal_sdio_callback_t sd_callback = 0;
 static volatile uint8_t sd_busy = 0;
 static volatile uint8_t dma_done = 0;
@@ -372,7 +372,7 @@ hal_sdio_error_t hal_sdio_card_init(void) {
    * and then every data transfer failed while 1-bit worked perfectly, which is
    * a confusing way to find out. The host width only changes once the card has
    * said it changed. */
-  if (desired_bus_width == 1) {
+  if (desired_bus_width == HAL_SDIO_BUS_WIDTH_4BIT) {
     bool app_ok = hal_sdio_send_command(SD_CMD_APP_CMD, sd_rca, 1) == HAL_SDIO_OK &&
                   !sdio_r1_refused();
     if (app_ok &&

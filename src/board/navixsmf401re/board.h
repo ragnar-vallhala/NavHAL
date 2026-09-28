@@ -61,6 +61,13 @@ extern "C" {
 /* General-purpose timer. */
 #define BOARD_GP_TIMER TIM5
 
+/* The board's PWM output for the portable sample: motor 1, TIM3 CH1 on PB4.
+ * Every PWM pin here is an ESC output -- there is no spare one -- so a sample
+ * driving it is driving a motor channel. That is the board, not a mistake. */
+#define BOARD_PWM_CHANNEL 1
+#define BOARD_PWM_PIN     GPIO_PB04
+#define BOARD_PWM_AF      HAL_GPIO_AF2
+
 /* Motor outputs — TIM3 CH1..CH4 on PB4/PB5/PB0/PB1 (AF2). */
 #define BOARD_PWM_TIMER TIM3
 #define BOARD_MOTOR1    GPIO_PB04

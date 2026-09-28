@@ -89,6 +89,9 @@ extern "C" {
 #define BOARD_PWM_TIMER    TIM1
 #define BOARD_PWM_CHANNEL  1
 #define BOARD_PWM_PIN      GPIO_PB01
+/* Inert here: the AVR PWM driver owns the fixed OC1A pin and the GPIO AF call
+ * is a no-op. Defined so the portable sample needs no per-arch guard. */
+#define BOARD_PWM_AF       HAL_GPIO_AF1
 
 /* I2C bus — the TWI peripheral on PC5 (SCL) / PC4 (SDA). */
 #define BOARD_I2C_BUS  HAL_I2C_0

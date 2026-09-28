@@ -296,6 +296,32 @@ typedef hal_gpio_af_t hal_gpio_alternate_function_t
  */
 typedef hal_gpio_pin hal_gpio_pin_t;
 
+/** @brief Port index for ::HAL_GPIO_PIN — A is 0, B is 1, and so on. */
+#define HAL_GPIO_PORT_A 0
+#define HAL_GPIO_PORT_B 1
+#define HAL_GPIO_PORT_C 2
+#define HAL_GPIO_PORT_D 3
+#define HAL_GPIO_PORT_E 4
+
+/**
+ * @brief Build a ::hal_gpio_pin_t from a port index and a pin number.
+ *
+ * The enumeration above is laid out sixteen pins per port, so a pin is
+ * `port * 16 + pin`. That is what makes a pin expressible as two integers, which
+ * is what lets a build choose one from Kconfig instead of a header editing the
+ * source. The static assertions below tie the arithmetic to the enumeration, so
+ * inserting a name out of order breaks the build rather than silently moving
+ * every pin a configuration names.
+ */
+#define HAL_GPIO_PIN(port, pin) ((hal_gpio_pin_t)((port) * 16 + (pin)))
+
+_Static_assert(HAL_GPIO_PIN(HAL_GPIO_PORT_A, 0) == GPIO_PA00,
+               "hal_gpio_pin is no longer 16 pins per port: HAL_GPIO_PIN is wrong");
+_Static_assert(HAL_GPIO_PIN(HAL_GPIO_PORT_C, 8) == GPIO_PC08,
+               "hal_gpio_pin is no longer 16 pins per port: HAL_GPIO_PIN is wrong");
+_Static_assert(HAL_GPIO_PIN(HAL_GPIO_PORT_D, 2) == GPIO_PD02,
+               "hal_gpio_pin is no longer 16 pins per port: HAL_GPIO_PIN is wrong");
+
 
 #ifdef __cplusplus
 } /* extern "C" */

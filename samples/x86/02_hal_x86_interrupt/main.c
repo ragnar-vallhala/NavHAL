@@ -27,7 +27,7 @@ static void on_tick(void) { app_ticks++; }
 
 int main(void) {
   hal_uart_config_t ucfg = {.baudrate = 115200};
-  hal_uart_init(CONSOLE_UART, &ucfg);
+  hal_uart_init(BOARD_CONSOLE_UART, &ucfg);
 
   hal_clock_config_t ccfg = {.source = HAL_CLOCK_SOURCE_TSC};
   hal_clock_init(&ccfg);
@@ -37,12 +37,12 @@ int main(void) {
 
   hal_delay_ms(500); /* PIT IRQ fires ~500 times during this busy-wait */
 
-  hal_uart_write_string(CONSOLE_UART, "app callback ticks: ");
-  hal_uart_write_uint(CONSOLE_UART, app_ticks);
-  hal_uart_write_string(CONSOLE_UART, "\r\n");
-  hal_uart_write_string(CONSOLE_UART, "hal_timebase_get_tick: ");
-  hal_uart_write_uint(CONSOLE_UART, hal_timebase_get_tick());
-  hal_uart_write_string(CONSOLE_UART, "\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "app callback ticks: ");
+  hal_uart_write_uint(BOARD_CONSOLE_UART, app_ticks);
+  hal_uart_write_string(BOARD_CONSOLE_UART, "\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "hal_timebase_get_tick: ");
+  hal_uart_write_uint(BOARD_CONSOLE_UART, hal_timebase_get_tick());
+  hal_uart_write_string(BOARD_CONSOLE_UART, "\r\n");
 
   for (;;)
     __asm__ volatile("hlt");

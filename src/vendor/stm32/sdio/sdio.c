@@ -135,6 +135,36 @@ hal_sdio_error_t hal_sdio_wait_flag(uint32_t flag, uint32_t timeout) {
   return timeout ? HAL_SDIO_OK : HAL_SDIO_TIMEOUT;
 }
 
+/* R1 card-status error bits: OUT_OF_RANGE(31) ADDRESS_ERROR(30)
+ * BLOCK_LEN_ERROR(29) ERASE_SEQ_ERROR(28) ERASE_PARAM(27) WP_VIOLATION(26)
+ * LOCK_UNLOCK_FAILED(24) COM_CRC_ERROR(23) ILLEGAL_COMMAND(22)
+ * CARD_ECC_FAILED(21) CC_ERROR(20) ERROR(19) CSD_OVERWRITE(16)
+ * WP_ERASE_SKIP(15) AKE_SEQ_ERROR(3).
+ *
+ * CARD_IS_LOCKED(25), CARD_ECC_DISABLED(14), ERASE_RESET(13), CURRENT_STATE(12:9)
+ * and READY_FOR_DATA(8) report state rather than failure and are excluded. */
+#define SD_R1_ERROR_BITS 0xFDF98008U
+
+/* Backstop for the completion wait in hal_sdio_wait_sync when the millisecond
+ * timebase cannot advance -- see the comment there. Order of magnitude only:
+ * a few seconds of spinning at any core frequency this HAL runs at. */
+#define SD_WAIT_SPIN_LIMIT 50000000u
+
+/**
+ * Whether the R1 status just received reports that the card refused the command.
+ *
+ * hal_sdio_send_command answers only "did a response arrive intact" -- CMDREND
+ * set, CRC good. A card that rejects a command still answers, and says so in the
+ * R1 status bits, so a caller that treats CMDREND as consent proceeds on a
+ * command the card never carried out.
+ *
+ * Call this only where the response really is R1. Several commands here ask for
+ * a short response that is not: CMD3 returns R6 (RCA in the top half) and CMD8
+ * returns R7, and reading either through an R1 mask invents errors that are not
+ * there.
+ */
+static bool sdio_r1_refused(void) { return (SDIO->RESP1 & SD_R1_ERROR_BITS) != 0u; }
+
 hal_sdio_error_t hal_sdio_send_command(uint8_t cmd, uint32_t arg, uint32_t resp) {
   SDIO->ICR = 0xFFFFFFFF;
 
@@ -278,13 +308,27 @@ hal_sdio_error_t hal_sdio_card_init(void) {
   if (!card_is_sdhc)
     hal_sdio_send_command(SD_CMD_SET_BLOCKLEN, 512, 1);
 
-  /* Switch to 4-bit mode if requested */
+  /* Switch to 4-bit mode if requested.
+   *
+   * Both halves have to be checked against the card's R1 status, not just
+   * against CMDREND. A card that refuses ACMD6 still answers it, so taking the
+   * response as consent left the host in 4-bit with the card still in 1-bit --
+   * and then every data transfer failed while 1-bit worked perfectly, which is
+   * a confusing way to find out. The host width only changes once the card has
+   * said it changed. */
   if (desired_bus_width == 1) {
-    if (hal_sdio_send_command(SD_CMD_APP_CMD, sd_rca, 1) == HAL_SDIO_OK) {
-      if (hal_sdio_send_command(SD_ACMD_SET_BUS_WIDTH, 2, 1) == HAL_SDIO_OK) {
-        SDIO->CLKCR =
-            (SDIO->CLKCR & ~SDIO_CLKCR_WIDBUS_Msk) | SDIO_CLKCR_WIDBUS_4B;
-      }
+    bool app_ok = hal_sdio_send_command(SD_CMD_APP_CMD, sd_rca, 1) == HAL_SDIO_OK &&
+                  !sdio_r1_refused();
+    if (app_ok &&
+        hal_sdio_send_command(SD_ACMD_SET_BUS_WIDTH, 2, 1) == HAL_SDIO_OK &&
+        !sdio_r1_refused()) {
+      SDIO->CLKCR =
+          (SDIO->CLKCR & ~SDIO_CLKCR_WIDBUS_Msk) | SDIO_CLKCR_WIDBUS_4B;
+    } else {
+      /* Stay in 1-bit: slower, and it works. desired_bus_width is left alone so
+       * a caller asking what it requested still gets an honest answer. */
+      SDIO->CLKCR =
+          (SDIO->CLKCR & ~SDIO_CLKCR_WIDBUS_Msk) | SDIO_CLKCR_WIDBUS_1B;
     }
   }
 
@@ -889,12 +933,30 @@ hal_sdio_error_t hal_sdio_wait_sync(hal_sdio_error_t result) {
     timeout_ms = 1000;
   else
     timeout_ms = 200;
+  /* Two independent ways out, because each covers the other's blind spot.
+   *
+   * The millis deadline is the real one, and it is what the comment below is
+   * about. But it only advances while the timebase interrupt can be taken, and
+   * sd_busy is cleared by the completion interrupt -- so a caller that waits
+   * with interrupts masked gets neither: the clock stands still and the
+   * completion can never arrive. That is not a slow transfer, it is a wait that
+   * cannot succeed, and before this it hung there for good.
+   *
+   * SD_WAIT_SPIN_LIMIT bounds it. The count is coarse on purpose -- it is
+   * magnitude, not milliseconds, and the core frequency is not known here -- and
+   * it never decides anything on a healthy system, where the deadline above
+   * fires long first.
+   *
+   * wfi is gone with it: with the completion interrupt unable to run, wfi can
+   * sleep until some unrelated interrupt happens to become pending, or forever
+   * if none does, which is the hang this bound exists to end. A spin costs power
+   * only on a path where the transfer has already failed. */
+  uint32_t spins = SD_WAIT_SPIN_LIMIT;
   while (sd_busy) {
     if ((uint32_t)(hal_timebase_get_millis() - start) >= timeout_ms)
       break;
-    __asm volatile("wfi");
-    // fallback safety
-    __asm volatile("nop");
+    if (--spins == 0u)
+      break;
   }
 
   /* Decide "did the transfer wedge?" by the COMPLETION FLAG (sd_busy), NOT by
@@ -920,8 +982,12 @@ hal_sdio_error_t hal_sdio_wait_sync(hal_sdio_error_t result) {
           SDIO_MASK_STBITERRIE);
     SDIO->ICR = 0xFFFFFFFF;
     SDIO->DCTRL = 0;
-    if (is_multi_block)
-      hal_sdio_send_command(SD_CMD_STOP_TRANSMISSION, sd_rca, 1);
+    /* Stop the card, whether the transfer was multi-block or not. A block that
+     * was interrupted part-way leaves the card in the data state, and CMD12 is
+     * the only way out of it -- so without this a single failed transfer made
+     * every command after it fail too, in any bus width, which looks exactly
+     * like a driver that cannot read the card at all. */
+    hal_sdio_send_command(SD_CMD_STOP_TRANSMISSION, sd_rca, 1);
     is_multi_block = 0;
     dma_done = 0;
     sdio_done = 0;
@@ -955,6 +1021,15 @@ hal_sdio_error_t hal_sdio_wait_sync(hal_sdio_error_t result) {
         }
       }
     }
+  }
+
+  /* A transfer that reported an error rather than wedging reaches here having
+   * sent no stop: sd_busy was cleared by the completion interrupt, so the block
+   * above did not run, and the OK-guarded block did not either. The card is
+   * still where the failure left it, so stop it here too -- same reasoning as
+   * the wedge path. */
+  if (sd_last_error != HAL_SDIO_OK) {
+    hal_sdio_send_command(SD_CMD_STOP_TRANSMISSION, sd_rca, 1);
   }
 
   /* Always clear: if the transfer errored, the OK-guarded block above was

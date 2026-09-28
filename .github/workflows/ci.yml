@@ -63,6 +63,27 @@ jobs:
               - 'cmake/defconfigs/avr_*'
               - 'tools/simavr/**'
               - 'tools/pil/boards/atmega328p.conf'
+            # Anything here is built by every arch, so a PR touching it must run the
+            # whole matrix whatever else it changes. This exists because the three
+            # filters below answer "did any file of this arch change", NOT "did only
+            # this arch change" -- so without it a PR that edited src/common plus one
+            # arch's board narrowed to that arch and the other two silently sat out.
+            shared:
+              - 'src/common/**'
+              - 'src/utils/**'
+              - 'include/common/**'
+              - 'include/navhal.h'
+              - 'include/navtest/**'
+              - 'tests/portable/**'
+              - 'tests/*.c'
+              - 'Kconfig'
+              - 'Kconfig.*'
+              - 'CMakeLists.txt'
+              - 'src/CMakeLists.txt'
+              - 'cmake/arch/**'
+              - 'tools/ntest'
+              - 'tools/kconfig.py'
+              - '.github/workflows/**'
             x86-only:
               - 'src/arch/x86_64/**'
               - 'src/vendor/pc/**'
@@ -80,6 +101,7 @@ jobs:
           run_avr=true
           run_x86=true
           if [ "${{ github.event_name }}" = "pull_request" ]; then
+            shared="${{ steps.filter.outputs.shared }}"
             cm_only="${{ steps.filter.outputs.cortex-m-only }}"
             avr_only="${{ steps.filter.outputs.avr-only }}"
             x86_only="${{ steps.filter.outputs.x86-only }}"
@@ -87,9 +109,14 @@ jobs:
             [ "$cm_only" = "true" ]  && n=$((n + 1))
             [ "$avr_only" = "true" ] && n=$((n + 1))
             [ "$x86_only" = "true" ] && n=$((n + 1))
-            # Exactly one arch's files changed → only that arch runs; the others
-            # sit out. Zero matches (common code) or >1 (mixed PR) → run all.
-            if [ "$n" -eq 1 ]; then
+            # Narrow to a single arch only when nothing shared changed as well.
+            # The filters say "this arch was touched", not "only this arch was
+            # touched", so a PR carrying both shared code and one arch's files looks
+            # identical to an arch-only PR from n alone.
+            #
+            # Exactly one arch's files changed and nothing shared → only that arch
+            # runs. Zero matches, more than one, or any shared file → run all.
+            if [ "$n" -eq 1 ] && [ "$shared" != "true" ]; then
               run_cm=$cm_only
               run_avr=$avr_only
               run_x86=$x86_only

@@ -150,6 +150,27 @@ hal_sdio_error_t hal_sdio_wait_flag(uint32_t flag, uint32_t timeout) {
  * a few seconds of spinning at any core frequency this HAL runs at. */
 #define SD_WAIT_SPIN_LIMIT 50000000u
 
+/* Hardware data timeout, in card-clock cycles (SDIO_DTIMER).
+ *
+ * Was 0xFFFFFFFF at every site, which is three hours at the 400 kHz
+ * identification clock and six minutes at 21 MHz -- so the DPSM never raised
+ * DTIMEOUT and a dead transfer was detectable only by the software countdown
+ * below, which ran with interrupts masked. The SD specification allows a card
+ * 100 ms to respond to a read, so size it for that at the run clock. */
+#define SD_DATA_TIMEOUT_CLKS 2100000u
+
+/* Polls allowed while draining or filling the FIFO, once the transfer is known
+ * to have started. One 512-byte block needs 49 us at 21 MHz on four lines and
+ * 10.2 ms at 400 kHz on one, so this covers the slowest case with slack while
+ * being two orders of magnitude shorter than the old 5,000,000 -- which is what
+ * used to be spent with interrupts off. */
+#define SD_FIFO_SPIN_LIMIT 500000u
+
+/* Polls allowed waiting for a transfer to start, with interrupts ENABLED. The
+ * FIFO is empty here so nothing can overrun, and DTIMEOUT now fires first in
+ * practice; this only bounds the wait if the DPSM says nothing at all. */
+#define SD_DATA_START_SPINS 2000000u
+
 /**
  * Whether the R1 status just received reports that the card refused the command.
  *
@@ -332,8 +353,16 @@ hal_sdio_error_t hal_sdio_card_init(void) {
     }
   }
 
-  /* Set clock to 21 MHz (SDIOCLK=84MHz / (2+2) = 21MHz) */
-  /* DIV=2 for stable high-speed, keep WIDBUS, enable HWFC */
+  /* Leave identification speed. SDIOCLK is the PLL Q output -- 48 MHz with this
+   * PLL -- so DIV=2 gives 48/(2+2) = 12 MHz. The comment here used to say 21 MHz
+   * from an 84 MHz SDIOCLK, which is the AHB frequency, not the one feeding this
+   * peripheral.
+   *
+   * HWFC_EN is kept, though it is worth knowing it is an errata-affected feature
+   * on this family. Turning it off was tried against a card whose single-block
+   * reads fail with DCRCFAIL and changed nothing, so there is no evidence for
+   * removing it here, and hal_sdio_init's comment says the DMA write path relies
+   * on it. WIDBUS is preserved: the width was agreed with the card above. */
   SDIO->CLKCR = (SDIO->CLKCR & ~(SDIO_CLKCR_CLKDIV | SDIO_CLKCR_HWFC_EN |
                                  SDIO_CLKCR_PWRSAV)) |
                 2 | SDIO_CLKCR_HWFC_EN | SDIO_CLKCR_CLKEN;
@@ -361,7 +390,7 @@ hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buf) {
   SDIO->ICR = 0xFFFFFFFF;
 
   /* Configure DPSM Parameters: DTEN must be enabled for Read */
-  SDIO->DTIMER = 0xFFFFFFFF;
+  SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512;
   SDIO->DCTRL =
       (9 << SDIO_DCTRL_DBLOCKSIZE_Pos) | SDIO_DCTRL_DTDIR | SDIO_DCTRL_DTEN;
@@ -373,8 +402,35 @@ hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buf) {
 
   uint32_t *p = (uint32_t *)buf;
   int words = 128;
-  uint32_t timeout = 5000000;
+  uint32_t timeout = SD_DATA_START_SPINS;
 
+  /* Wait for the transfer to start with interrupts ENABLED. The FIFO is empty,
+   * so there is nothing to overrun, and this is the wait that mattered: held
+   * inside the critical section it starved every other interrupt in the system
+   * for the whole failure timeout -- long enough for a USB host to drop the
+   * device, and on a vehicle long enough to miss control deadlines, on nothing
+   * worse than an SD block that did not arrive. */
+  for (;;) {
+    uint32_t sta = SDIO->STA;
+    if (sta & (SDIO_STA_RXOVERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
+      SDIO->DCTRL = 0;
+      hal_sdio_send_command(SD_CMD_STOP_TRANSMISSION, 0u, 1);
+      return HAL_SDIO_ERROR;
+    }
+    if (sta & (SDIO_STA_RXFIFOHF | SDIO_STA_RXDAVL)) {
+      break;
+    }
+    if (timeout-- == 0u) {
+      SDIO->DCTRL = 0;
+      return HAL_SDIO_TIMEOUT;
+    }
+  }
+
+  /* Only the drain is a critical section, and it has to be one: the FIFO holds
+   * 32 words and the CPU is the only thing emptying it, so a drain preempted
+   * long enough overruns and loses data that cannot be recovered. Bounded by
+   * one block's worth of polls rather than by the failure timeout. */
+  timeout = SD_FIFO_SPIN_LIMIT;
   __asm volatile("cpsid i" : : : "memory");
   while (words > 0 && timeout--) {
     uint32_t sta = SDIO->STA;
@@ -382,6 +438,7 @@ hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buf) {
     if (sta & (SDIO_STA_RXOVERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
       SDIO->DCTRL = 0;
       __asm volatile("cpsie i" : : : "memory");
+      hal_sdio_send_command(SD_CMD_STOP_TRANSMISSION, 0u, 1);
       return HAL_SDIO_ERROR;
     }
 
@@ -390,22 +447,29 @@ hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buf) {
         *p++ = SDIO->FIFO;
         words--;
       }
-      timeout = 5000000;
+      timeout = SD_FIFO_SPIN_LIMIT;
     } else if (sta & SDIO_STA_RXDAVL) {
       *p++ = SDIO->FIFO;
       words--;
-      timeout = 5000000;
+      timeout = SD_FIFO_SPIN_LIMIT;
     }
   }
   __asm volatile("cpsie i" : : : "memory");
 
   if (words > 0) {
     SDIO->DCTRL = 0;
+    /* The card is still streaming a block it thinks we are reading. Leave it
+     * there and every later command fails, whatever the bus width -- which is
+     * how a single failed 4-bit read made a following 1-bit read look broken
+     * too, and made the card's actual width impossible to determine. Same
+     * reasoning as the async path in hal_sdio_wait_sync; this path needed it
+     * just as much and did not have it. */
+    hal_sdio_send_command(SD_CMD_STOP_TRANSMISSION, 0u, 1);
     return HAL_SDIO_TIMEOUT;
   }
 
   /* Wait for DBCKEND (Confirm block CRC passed) */
-  timeout = 5000000;
+  timeout = SD_DATA_START_SPINS;
   while (!(SDIO->STA & SDIO_STA_DBCKEND) && timeout--) {
     uint32_t sta = SDIO->STA;
     if (sta & (SDIO_STA_RXOVERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
@@ -441,7 +505,7 @@ hal_sdio_error_t hal_sdio_write_block(uint32_t addr, const uint8_t *buf) {
   SDIO->ICR = 0xFFFFFFFF;
 
   /* Configure DPSM Parameters */
-  SDIO->DTIMER = 0xFFFFFFFF;
+  SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512;
 
   /* ST Recommended: Enable DTEN BEFORE sending the command */
@@ -454,8 +518,30 @@ hal_sdio_error_t hal_sdio_write_block(uint32_t addr, const uint8_t *buf) {
 
   const uint32_t *p = (const uint32_t *)buf;
   int words = 128;
-  uint32_t timeout = 5000000;
+  uint32_t timeout = SD_DATA_START_SPINS;
 
+  /* Wait for the DPSM to want data with interrupts ENABLED -- same reasoning as
+   * the read path: nothing is in flight yet, so there is nothing to underrun,
+   * and this is the wait that used to hold interrupts off for the whole failure
+   * timeout. */
+  for (;;) {
+    uint32_t sta = SDIO->STA;
+    if (sta & (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
+      SDIO->DCTRL = 0;
+      return HAL_SDIO_ERROR;
+    }
+    if (sta & SDIO_STA_TXFIFOHE) {
+      break;
+    }
+    if (timeout-- == 0u) {
+      SDIO->DCTRL = 0;
+      return HAL_SDIO_TIMEOUT;
+    }
+  }
+
+  /* Only the fill is a critical section: starve the FIFO mid-block and the card
+   * sees an underrun, which corrupts the block it is already committing. */
+  timeout = SD_FIFO_SPIN_LIMIT;
   __asm volatile("cpsid i" : : : "memory");
   while (words > 0 && timeout--) {
     uint32_t sta = SDIO->STA;
@@ -472,7 +558,7 @@ hal_sdio_error_t hal_sdio_write_block(uint32_t addr, const uint8_t *buf) {
         SDIO->FIFO = *p++;
         words--;
       }
-      timeout = 5000000;
+      timeout = SD_FIFO_SPIN_LIMIT;
     }
   }
   __asm volatile("cpsie i" : : : "memory");
@@ -483,7 +569,7 @@ hal_sdio_error_t hal_sdio_write_block(uint32_t addr, const uint8_t *buf) {
   }
 
   /* Wait for DBCKEND (Confirm card received block with good CRC) */
-  timeout = 5000000;
+  timeout = SD_DATA_START_SPINS;
   while (!(SDIO->STA & SDIO_STA_DBCKEND) && timeout--) {
     uint32_t sta = SDIO->STA;
     if (sta & (SDIO_STA_TXUNDERR | SDIO_STA_DCRCFAIL | SDIO_STA_DTIMEOUT)) {
@@ -586,7 +672,7 @@ hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buf) {
   hal_dma_init((const hal_dma_config_t *)&dma2_stream3_cfg);
   hal_interrupt_attach_callback(DMA2_Stream3_IRQn, _sdio_dma_rx_irq_handler);
 
-  SDIO->DTIMER = 0xFFFFFFFF;
+  SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512;
 
   /* Arm the completion rendezvous + SDIO IRQs BEFORE the trigger. The DMA
@@ -660,7 +746,7 @@ hal_sdio_error_t hal_sdio_write_block_async(uint32_t addr, const uint8_t *buf) {
   hal_dma_init((const hal_dma_config_t *)&dma2_stream6_cfg);
   hal_interrupt_attach_callback(DMA2_Stream6_IRQn, _sdio_dma_tx_irq_handler);
 
-  SDIO->DTIMER = 0xFFFFFFFF;
+  SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512;
 
   /* Arm rendezvous + IRQs BEFORE the trigger (see read_block_async). is_multi_block
@@ -733,7 +819,7 @@ hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
   hal_dma_init((const hal_dma_config_t *)&dma2_stream3_cfg);
   hal_interrupt_attach_callback(DMA2_Stream3_IRQn, _sdio_dma_rx_irq_handler);
   SDIO->DCTRL = 0;
-  SDIO->DTIMER = 0xFFFFFFFF;
+  SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512 * count;
 
   /* Arm rendezvous + IRQs BEFORE the trigger (see read_block_async). STBITERRIE
@@ -820,7 +906,7 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
   hal_interrupt_attach_callback(DMA2_Stream6_IRQn, _sdio_dma_tx_irq_handler);
 
   SDIO->ICR = 0xFFFFFFFF;
-  SDIO->DTIMER = 0xFFFFFFFF;
+  SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512 * count;
 
   if (hal_sdio_send_command(SD_CMD_WRITE_MULT_BLOCK, addr, 1)) {

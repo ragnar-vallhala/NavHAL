@@ -82,6 +82,13 @@ static hal_clock_config_t clk_cfg = {.source = HAL_CLOCK_SOURCE_PLL};
 /* 48 MHz / (118 + 2) = 400 kHz, the rate a card must be identified at. */
 #define SD_IDENT_DIV 118
 
+#if NAVHAL_CONFIG_SDIO_HAS_CD
+/* Built from the configuration exactly as the driver does, so this probe cannot
+ * drift from the pin the driver actually reads. */
+#define DIAG_CD_PIN                                                            \
+  HAL_GPIO_PIN(NAVHAL_CONFIG_SDIO_CD_PORT, NAVHAL_CONFIG_SDIO_CD_PIN)
+#endif
+
 static uint8_t block[512];
 
 /* Every line also lands in RAM, at a fixed marker, so the report survives losing
@@ -393,13 +400,13 @@ int main(void) {
    * convention, not this socket's datasheet. Read it with both internal pulls: a
    * line that follows the pull is floating (not connected), one that reads the
    * same either way is being held, and which level it is held at is the answer. */
-#if defined(BOARD_SD_CD)
-  hal_gpio_set_mode(BOARD_SD_CD, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_UP);
+#if NAVHAL_CONFIG_SDIO_HAS_CD
+  hal_gpio_set_mode(DIAG_CD_PIN, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_UP);
   hal_delay_ms(2);
-  bool cd_pu = (hal_gpio_read(BOARD_SD_CD) == HAL_GPIO_HIGH);
-  hal_gpio_set_mode(BOARD_SD_CD, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_DOWN);
+  bool cd_pu = (hal_gpio_read(DIAG_CD_PIN) == HAL_GPIO_HIGH);
+  hal_gpio_set_mode(DIAG_CD_PIN, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_DOWN);
   hal_delay_ms(2);
-  bool cd_pd = (hal_gpio_read(BOARD_SD_CD) == HAL_GPIO_HIGH);
+  bool cd_pd = (hal_gpio_read(DIAG_CD_PIN) == HAL_GPIO_HIGH);
   say("card detect (PC5) : pull-up reads ");
   say(cd_pu ? "HIGH" : "LOW");
   say(", pull-down reads ");
@@ -407,7 +414,7 @@ int main(void) {
   say(cd_pu == cd_pd ? "  -> held, so connected\r\n"
                      : "  -> follows the pull, so floating\r\n");
 #else
-  say("card detect        : board defines no BOARD_SD_CD\r\n");
+  say("card detect        : not configured (CONFIG_SDIO_HAS_CD=n)\r\n");
 #endif
   say("console route      : ");
   say(hal_console_get_route() == HAL_CONSOLE_ROUTE_CDC ? "USB CDC\r\n" : "UART\r\n");

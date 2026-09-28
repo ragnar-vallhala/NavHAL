@@ -247,6 +247,95 @@ config DRV_SDIO
     select DRV_INTERRUPT
     select DRV_TIMER
 
+menu "SDIO pin assignment"
+    depends on DRV_SDIO
+
+comment "Ports are numbered A=0, B=1, C=2, D=3, E=4"
+
+# Why these are configurable at all: every other board detail arrives through
+# src/board/<board>/board.h, but the SDIO driver hardcoded its own pins, so the
+# board layer and the driver could disagree with nothing to catch it -- and
+# BOARD_SD_CD sat defined and unread for as long as the boards existed. Putting
+# them here means a port overrides them the same way it overrides anything else,
+# without editing driver source.
+#
+# A caution that matters more here than for a plain GPIO: these pins are chosen by
+# the alternate-function mux, not freely. SDIO answers on a small fixed set of
+# pins per package, and pointing a signal at a pin the mux cannot route it to
+# produces a build that compiles and a bus that never transfers. Check the
+# datasheet's alternate-function table before changing one, and set
+# SDIO_PIN_AF to whatever AF number that table gives.
+
+config SDIO_PIN_AF
+    int "Alternate function number for the SDIO signals"
+    default 12
+    help
+      AF12 on STM32F4 and F7. The whole bus shares one AF, so this is a single
+      value rather than one per pin.
+
+config SDIO_D0_PORT
+    int "DAT0 port"
+    default 2
+config SDIO_D0_PIN
+    int "DAT0 pin"
+    default 8
+
+config SDIO_D1_PORT
+    int "DAT1 port"
+    default 2
+config SDIO_D1_PIN
+    int "DAT1 pin"
+    default 9
+
+config SDIO_D2_PORT
+    int "DAT2 port"
+    default 2
+config SDIO_D2_PIN
+    int "DAT2 pin"
+    default 10
+
+config SDIO_D3_PORT
+    int "DAT3 port"
+    default 2
+config SDIO_D3_PIN
+    int "DAT3 pin"
+    default 11
+
+config SDIO_CK_PORT
+    int "CLK port"
+    default 2
+config SDIO_CK_PIN
+    int "CLK pin"
+    default 12
+
+config SDIO_CMD_PORT
+    int "CMD port"
+    default 3
+config SDIO_CMD_PIN
+    int "CMD pin"
+    default 2
+
+config SDIO_HAS_CD
+    bool "Board has a card-detect pin"
+    default y if BOARD_NAVIXSM_F401RE || BOARD_NAVIXDEV
+    default n
+    help
+      Card detect is an ordinary GPIO rather than an SDIO signal, so unlike the
+      pins above it can be anywhere -- or absent, which is the default. With it
+      off, hal_sdio_card_present() answers true, because a slot that cannot be
+      observed must not be reported empty.
+
+config SDIO_CD_PORT
+    int "Card-detect port"
+    depends on SDIO_HAS_CD
+    default 2
+config SDIO_CD_PIN
+    int "Card-detect pin"
+    depends on SDIO_HAS_CD
+    default 5
+
+endmenu
+
 config DRV_SDIO_DMA
     bool "Enable DMA-backed SDIO async API"
     default y if DRV_SDIO && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)

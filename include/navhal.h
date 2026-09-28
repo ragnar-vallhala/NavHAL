@@ -87,6 +87,7 @@ extern "C" {
 #include "common/hal_fpu.h"
 
 #include "common/hal_config.h"
+#include "common/hal_console.h"
 
 #include "common/hal_cache.h"
 #include "common/hal_crc.h"

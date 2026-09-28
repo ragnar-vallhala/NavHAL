@@ -21,8 +21,8 @@
 
 int main(void) {
   hal_uart_config_t cfg = {.baudrate = 115200};
-  hal_uart_init(CONSOLE_UART, &cfg);
-  hal_uart_write_string(CONSOLE_UART,
+  hal_uart_init(BOARD_CONSOLE_UART, &cfg);
+  hal_uart_write_string(BOARD_CONSOLE_UART,
                         "Hello from NavHAL on x86-64 (QEMU)!\r\n");
   for (;;)
     __asm__ volatile("hlt");

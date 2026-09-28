@@ -6,6 +6,13 @@ set(COMMON_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/freestanding.c
 )
 
+# Not a driver: the console dispatches to whichever transport the board routed it
+# to, so it is always available and gated on nothing. The TEST build picks it up
+# through its own file(GLOB src/common/*.c) instead -- see the note below.
+if(NOT TEST)
+    list(APPEND COMMON_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/common/hal_console.c)
+endif()
+
 # Shared public driver layers (M9 driver vtable): validate + dispatch to the
 # active backend's ops table. In a normal (sample/firmware) build these are
 # gated on the same CONFIG_DRV_* symbols as the backends, so a firmware that

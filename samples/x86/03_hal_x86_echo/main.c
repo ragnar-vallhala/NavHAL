@@ -21,29 +21,29 @@
 
 int main(void) {
   hal_uart_config_t cfg = {.baudrate = 115200};
-  hal_uart_init(CONSOLE_UART, &cfg);
-  hal_uart_write_string(CONSOLE_UART, "echo ready - type a line:\r\n> ");
+  hal_uart_init(BOARD_CONSOLE_UART, &cfg);
+  hal_uart_write_string(BOARD_CONSOLE_UART, "echo ready - type a line:\r\n> ");
 
   char line[64];
   uint32_t n = 0;
   for (;;) {
-    char c = hal_uart_read_char(CONSOLE_UART);
+    char c = hal_uart_read_char(BOARD_CONSOLE_UART);
     if (c == '\r' || c == '\n') {
       line[n] = '\0';
-      hal_uart_write_string(CONSOLE_UART, "\r\nyou said (");
-      hal_uart_write_uint(CONSOLE_UART, n);
-      hal_uart_write_string(CONSOLE_UART, "): ");
-      hal_uart_write_string(CONSOLE_UART, line);
-      hal_uart_write_string(CONSOLE_UART, "\r\n> ");
+      hal_uart_write_string(BOARD_CONSOLE_UART, "\r\nyou said (");
+      hal_uart_write_uint(BOARD_CONSOLE_UART, n);
+      hal_uart_write_string(BOARD_CONSOLE_UART, "): ");
+      hal_uart_write_string(BOARD_CONSOLE_UART, line);
+      hal_uart_write_string(BOARD_CONSOLE_UART, "\r\n> ");
       n = 0;
     } else if (c == '\b' || c == 0x7F) { /* backspace / delete */
       if (n > 0) {
         n--;
-        hal_uart_write_string(CONSOLE_UART, "\b \b");
+        hal_uart_write_string(BOARD_CONSOLE_UART, "\b \b");
       }
     } else if (n < sizeof(line) - 1) {
       line[n++] = c;
-      hal_uart_write_char(CONSOLE_UART, c); /* live echo */
+      hal_uart_write_char(BOARD_CONSOLE_UART, c); /* live echo */
     }
   }
 }

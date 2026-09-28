@@ -45,6 +45,7 @@
  */
 
 #include "common/hal_config.h" /* NAVHAL_CONFIG_DRV_SDIO: force-included, or pulled here when reachable */
+#include <stdbool.h>
 #include <stdint.h>
 
 
@@ -90,7 +91,8 @@ typedef enum {
   HAL_SDIO_RX_OVERRUN,
   HAL_SDIO_TX_UNDERRUN,
   HAL_SDIO_PENDING,
-  HAL_SDIO_BUSY
+  HAL_SDIO_BUSY,
+  HAL_SDIO_NO_CARD /**< The slot is empty; see ::hal_sdio_card_present. */
 } hal_sdio_error_t;
 
 /**
@@ -115,6 +117,19 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config);
  * @brief Run the full SD-card initialization sequence (CMD0/8/ACMD41/2/3/7).
  * @return Initialization status.
  */
+/**
+ * @brief Whether a card is in the slot.
+ *
+ * Reads the board's card-detect pin, named by @c BOARD_SD_CD. The switch closes
+ * to ground when a card is inserted, so the line reads low with a card present.
+ *
+ * @return @c true when a card is detected, and also on a board that defines no
+ *         @c BOARD_SD_CD — with nothing to read, "no card" cannot be claimed,
+ *         and reporting an absent card that is actually there would be worse
+ *         than not knowing.
+ */
+bool hal_sdio_card_present(void);
+
 hal_sdio_error_t hal_sdio_card_init(void);
 
 /**

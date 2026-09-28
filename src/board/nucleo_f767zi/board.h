@@ -71,6 +71,7 @@ extern "C" {
 #define BOARD_PWM_TIMER    TIM3
 #define BOARD_PWM_CHANNEL  1
 #define BOARD_PWM_PIN      GPIO_PB04
+#define BOARD_PWM_AF       HAL_GPIO_AF2
 
 /* I2C bus — I2C1 on PB8 (SCL) / PB9 (SDA). */
 #define BOARD_I2C_BUS  HAL_I2C_1

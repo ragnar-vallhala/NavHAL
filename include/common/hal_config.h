@@ -53,6 +53,16 @@
 #  endif
 #endif
 
+/* Unconditional on purpose, unlike the guarded include above: every port owes
+ * this header, and one that does not provide it is misconfigured rather than
+ * merely minimal. The __has_include check exists only to say so in those terms
+ * -- a bare "No such file or directory" names the file but not the contract it
+ * belongs to, nor that an empty one is a legitimate answer. */
+#if defined(__has_include)
+#  if !__has_include("navhal_port_config.h")
+#    error "port provides no navhal_port_config.h -- add include/port/<arch>/navhal_port_config.h; it may be empty, see the AVR port"
+#  endif
+#endif
 #include "navhal_port_config.h"
 
 

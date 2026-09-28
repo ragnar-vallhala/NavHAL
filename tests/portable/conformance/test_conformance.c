@@ -899,13 +899,30 @@ static bool _conf_rejected(hal_status_t s) {
   return s == HAL_ERR_INVALID_ARG || s == HAL_ERR_NOT_INITIALIZED;
 }
 
+/* hal_rtc_init is deliberately absent from the list below. NULL is a valid
+ * argument there -- hal_rtc.h documents it as selecting HAL_RTC_CLOCK_AUTO with
+ * the default crystal timeout -- so asserting a rejection tested this suite's
+ * assumption rather than the driver's contract, and failed on hardware for the
+ * right reason. See test_conformance_rtc_accepts_null_config. */
 void test_conformance_rtc_rejects_null(void) {
-  TEST_ASSERT_TRUE(_conf_rejected(hal_rtc_init(NULL)));
   TEST_ASSERT_TRUE(_conf_rejected(hal_rtc_set_datetime(NULL)));
   TEST_ASSERT_TRUE(_conf_rejected(hal_rtc_get_datetime(NULL)));
   TEST_ASSERT_TRUE(
       _conf_rejected(hal_rtc_set_alarm(HAL_RTC_ALARM_A, NULL, NULL)));
   TEST_ASSERT_TRUE(_conf_rejected(hal_rtc_backup_read(0u, NULL)));
+}
+
+void test_conformance_rtc_accepts_null_config(void) {
+  /* The other half of the contract: NULL means "keep whatever oscillator is
+   * running", so the one wrong answer is to reject it.
+   *
+   * Not asserted as success. Whether the calendar comes up depends on an
+   * oscillator this suite cannot assume -- a board with no crystal fitted answers
+   * HAL_ERR_TIMEOUT, which the header documents and which is not a conformance
+   * failure. Non-destructive either way: AUTO never asks for the backup-domain
+   * reset that would clear the calendar and the backup registers. */
+  hal_status_t s = hal_rtc_init(NULL);
+  TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_TIMEOUT);
 }
 
 void test_conformance_rtc_state_queries_are_stable(void) {
@@ -1165,6 +1182,7 @@ NAVTEST_CASE_DECL(test_conformance_wwdg_rejects_impossible_window);
 #endif
 #if NAVHAL_CONFIG_DRV_RTC
 NAVTEST_CASE_DECL(test_conformance_rtc_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_rtc_accepts_null_config);
 #endif
 #if NAVHAL_CONFIG_DRV_RTC
 NAVTEST_CASE_DECL(test_conformance_rtc_state_queries_are_stable);
@@ -1385,6 +1403,7 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_RTC
     NAVTEST_CASE(test_conformance_rtc_rejects_null),
+    NAVTEST_CASE(test_conformance_rtc_accepts_null_config),
 #endif
 #if NAVHAL_CONFIG_DRV_RTC
     NAVTEST_CASE(test_conformance_rtc_state_queries_are_stable),

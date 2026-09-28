@@ -76,7 +76,7 @@ int main(void) {
 
   /* 2. Initialize SDIO */
   hal_sdio_config_t sd_config = {.clock_div = 118,
-                                 .bus_width = 1}; // 4-bit mode requested
+                                 .bus_width = HAL_SDIO_BUS_WIDTH_4BIT};
   if (hal_sdio_init(&sd_config) != HAL_SDIO_OK) {
     hal_uart_write_string(HAL_UART_2, "SDIO Peripheral Init Failed!\n\r");
     while (1)

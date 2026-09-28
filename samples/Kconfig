@@ -193,6 +193,23 @@ config SAMPLE_37_HAL_BOOT_SNIFFER
     select DRV_USB_CDC
     select BOOT_SNIFFER
 
+config SAMPLE_39_HAL_SDIO_WIDTH
+    bool "39_hal_sdio_width"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    select DRV_CLOCK
+    select DRV_UART
+    select DRV_TIMEBASE
+    select DRV_SDIO
+    help
+      Diagnostic: asks a card for 4-bit and then for 1-bit in one run, and prints
+      the card's own R1 status after ACMD6 alongside the WIDBUS the host ended up
+      in. Answers "did the card ever agree to the width the host switched to",
+      which a sample that only reports pass/fail cannot.
+
+      Needs a card in the slot. Prints through hal_console_write, so on a board
+      whose console UART reaches no host, build it with CONFIG_CONSOLE_ROUTE_CDC=y
+      and read it on the USB device port.
+
 config SAMPLE_38_HAL_FLASH_ART
     bool "38_hal_flash_art"
     depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
@@ -276,4 +293,5 @@ config SAMPLE
     default "hal_rtc" if SAMPLE_35_HAL_RTC
     default "hal_watchdog" if SAMPLE_36_HAL_WATCHDOG
     default "hal_flash_art" if SAMPLE_38_HAL_FLASH_ART
+    default "hal_sdio_width" if SAMPLE_39_HAL_SDIO_WIDTH
     default "hal_boot_sniffer" if SAMPLE_37_HAL_BOOT_SNIFFER

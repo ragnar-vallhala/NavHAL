@@ -1,13 +1,21 @@
 # NavHAL arch fragment — AVR8 (ATmega328P et al.).
 #
 # Sourced by the root CMakeLists.txt via `include(cmake/arch/${ARCH_ISA}.cmake)`.
-# AVR has no hardware FPU and no DMA on this family, so FPU_FLAGS stays empty;
-# F_CPU drives the avr-libc timing routines (16 MHz matches the ATmega328P
-# reference board).
+# AVR has no hardware FPU and no DMA on this family, so FPU_FLAGS stays empty.
+#
+# F_CPU drives every timing path on this arch -- UART baud, the timebase, PWM,
+# the I2C SCL divisor and the timer -- and it is the board's crystal, not a chip
+# fact, so it comes from the board's Kconfig. No default here: a board that
+# describes no crystal must say so rather than silently inherit 16 MHz.
 
 set(FPU_FLAGS "")
 set(AVR_MCU   "${FAMILY}")
-set(AVR_F_CPU "16000000UL")
+if(NOT DEFINED CONFIG_NUM_BOARD_XTAL_FREQ_HZ OR CONFIG_NUM_BOARD_XTAL_FREQ_HZ STREQUAL "")
+  message(FATAL_ERROR
+    "AVR board must describe NUM_BOARD_XTAL_FREQ_HZ in its Kconfig; "
+    "F_CPU is derived from it.")
+endif()
+set(AVR_F_CPU "${CONFIG_NUM_BOARD_XTAL_FREQ_HZ}UL")
 message(STATUS "AVR: -mmcu=${AVR_MCU}, F_CPU=${AVR_F_CPU}")
 
 # Optimisation level comes from the build profile, not from here: a level

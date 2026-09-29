@@ -36,8 +36,12 @@ set(ARCH_ASM_FLAGS  "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
 # A board script carries only its MEMORY block; the layout lives once under
 # src/arch/armv7e-m/link/ instead of being copied into every board.
 set(NAVHAL_LINK_SCRIPT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/arch/armv7e-m/link")
+# Named, because a parent project has to link against the same script and has no
+# business knowing it is spelled src/board/<board>/linker.ld -- see the INTERFACE
+# option the root CMakeLists.txt puts on `hal`.
+set(NAVHAL_LINKER_SCRIPT "${SRC_BOARD}/linker.ld")
 set(ARCH_LINK_FLAGS
-    "-T ${SRC_BOARD}/linker.ld -L ${NAVHAL_LINK_SCRIPT_DIR} -nostdlib ${FPU_FLAGS}")
+    "-T ${NAVHAL_LINKER_SCRIPT} -L ${NAVHAL_LINK_SCRIPT_DIR} -nostdlib ${FPU_FLAGS}")
 
 # Used by the `if(TEST)` block in the root CMakeLists.txt — each arch picks
 # the linker setup that fits how its test ELF runs (custom linker + nostdlib

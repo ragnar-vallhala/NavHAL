@@ -53,6 +53,14 @@ execute_process(
             --navhal-target-out ${GENERATED_NAVHAL_TARGET}
             --board-header-out ${GENERATED_BOARD_HEADER}
             --sample-override "${SAMPLE}"
+    # The Kconfig tree sources its fragments by relative path
+    # (`source "src/arch/*/Kconfig.choice"`), and kconfiglib resolves those
+    # against the process's working directory. Without this that is wherever
+    # cmake was invoked from, so NavHAL configured only when someone happened to
+    # run cmake from this directory -- `cmake -S NavHAL -B build` from anywhere
+    # else, and every parent project doing add_subdirectory(extern/NavHAL),
+    # failed on a fragment that was sitting right there.
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     RESULT_VARIABLE KCONFIG_RESULT
 )
 if(NOT KCONFIG_RESULT EQUAL 0)
@@ -282,6 +290,25 @@ endif()
 # are self-contained and set no search dir.
 if(TARGET hal AND NAVHAL_LINK_SCRIPT_DIR)
   target_link_options(hal INTERFACE "-L${NAVHAL_LINK_SCRIPT_DIR}")
+endif()
+
+# And the script itself, by name rather than on the link line: which file
+# describes this board's memory is NavHAL's business, not its consumer's, and
+# without this a parent project has to spell out src/board/<board>/linker.ld and
+# so depends on NavHAL's directory layout.
+#
+# A variable, NOT an INTERFACE link option, because -T does not compose: ld
+# refuses the same script twice ("appears multiple times"), so carrying it on
+# the target would break every consumer that still passes its own -- and would
+# override the different script a TEST build puts in ARCH_LINK_FLAGS. -L above
+# can be an interface option precisely because search paths are additive.
+#
+# CACHE INTERNAL so it survives into the parent scope of an add_subdirectory(),
+# which is where a consumer reads it; the same way the generated config.cmake
+# publishes BOARD and FLASHER.
+if(NAVHAL_LINKER_SCRIPT)
+  set(NAVHAL_LINKER_SCRIPT "${NAVHAL_LINKER_SCRIPT}" CACHE INTERNAL
+      "Linker script for the configured board; pass it to -T")
 endif()
 
 # Carry the force-included target header on the target, for the same reason.

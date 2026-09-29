@@ -234,15 +234,15 @@ Run after each subsystem commit, and every job before opening the PR. The
 counts below are what the tree produces today, not what it produced when this
 plan was written.
 
-* **Host (SIL):** `tools/ntest host` — 24 pure-logic + 65 driver tests.
+* **Host (SIL):** `ctest --test-dir build-host` — 24 pure-logic + 65 driver tests.
 * **PIL, all three boards:** `bash tools/pil/run.sh nucleo_f401re` (235),
   `nucleo_f767zi` (245) and `atmega328p` (64). The AVR board is easy to
   forget and was the only tier that caught the test image outgrowing its
   flash.
-* **Capability contract:** `tools/ntest cap-contract` — 20 scenarios. This is
+* **Capability contract:** `tools/test_cap_contract.sh` — 20 scenarios. This is
   the only job that builds without pinning a vendor, and the only one that
   caught the ACME port becoming the default vendor on Cortex-M4.
-* **Samples:** `tools/ntest samples m4` (34), `m7` (25), `avr` (13).
+* **Samples:** `tools/samples.sh m4` (34), `m7` (25), `avr` (13).
 * **x86:** the three `tools/qemu/smoke.sh` assertions.
 * **HIL, when a board is attached:** `bash tools/hil/run.sh nucleo_f401re`
   (184 on silicon). Needs `tools/hil/99-navhal-stlink.rules` installed, or a

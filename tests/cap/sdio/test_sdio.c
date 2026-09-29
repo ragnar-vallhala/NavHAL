@@ -55,11 +55,32 @@ void test_hal_sdio_write_block_rejects_null_buffer(void) {
   TEST_ASSERT_TRUE(1);
 }
 
+static void print_uint(uint32_t v) {
+  char s[11];
+  uint8_t n = 0;
+  do {
+    s[n++] = (char)('0' + (v % 10u));
+    v /= 10u;
+  } while (v != 0u);
+  while (n != 0u) {
+    const char c[2] = {s[--n], '\0'};
+    navtest_write(c);
+  }
+}
+
 void test_hal_sdio_get_sector_count_returns_value(void) {
   /* Without a card the sector count may be 0 — what matters is the call
-   * returns and doesn't fault. */
+   * returns and doesn't fault.
+   *
+   * The count is printed for the same reason the eth suite prints the PHY id:
+   * on a bench it is the one line that says whether a card was identified at
+   * all, which no assertion here can say without failing a cardless board. */
   uint32_t n = hal_sdio_get_sector_count();
-  (void)n;
+  navtest_write("[sdio card_present=");
+  navtest_write(hal_sdio_card_present() ? "yes" : "no");
+  navtest_write(" sectors=");
+  print_uint(n);
+  navtest_write("]\r\n");
   TEST_ASSERT_TRUE(1);
 }
 

@@ -1,6 +1,6 @@
 @page testing Testing
 
-**Sub-pages:** @subpage test_model &nbsp;·&nbsp; @subpage test_howto &nbsp;·&nbsp; @subpage test_coverage &nbsp;·&nbsp; @subpage test_findings
+**Sub-pages:** @subpage test_model &nbsp;·&nbsp; @subpage test_howto &nbsp;·&nbsp; @subpage test_coverage &nbsp;·&nbsp; @subpage test_findings &nbsp;·&nbsp; @subpage test_vtest
 
 # NavHAL — Testing Report
 

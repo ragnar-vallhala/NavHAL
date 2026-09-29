@@ -81,6 +81,14 @@
 #endif
 #if NAVHAL_CONFIG_DRV_SDIO
 #include "common/hal_sdio.h"
+#include "common/hal_diskio.h"
+#endif
+#if NAVHAL_CONFIG_BOOT_SNIFFER
+#include "common/hal_boot.h"
+#endif
+#include "common/hal_console.h"
+#if NAVHAL_CONFIG_DRV_CRC
+#include "common/hal_crc.h"
 #endif
 
 
@@ -1338,6 +1346,504 @@ NAVTEST_CASE_DECL(test_conformance_pwm_set_frequency_rejects_null);
 #if NAVHAL_CONFIG_DRV_TIMER
 NAVTEST_CASE_DECL(test_conformance_timer_init_rejects_null);
 #endif
+NAVTEST_CASE_DECL(test_conformance_console_getters_are_stable);
+NAVTEST_CASE_DECL(test_conformance_console_write_ignores_null);
+#if NAVHAL_CONFIG_DRV_UART
+NAVTEST_CASE_DECL(test_conformance_uart_writers_reject_bad_instance);
+NAVTEST_CASE_DECL(test_conformance_uart_read_char_answers_on_bad_instance);
+#endif
+#if NAVHAL_CONFIG_DRV_CRC
+NAVTEST_CASE_DECL(test_conformance_crc_init_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_TIMEBASE
+NAVTEST_CASE_DECL(test_conformance_timebase_callback_accepts_null);
+#endif
+#if NAVHAL_CONFIG_DRV_WWDG
+NAVTEST_CASE_DECL(test_conformance_wwdg_kick_needs_a_running_watchdog);
+#endif
+#if NAVHAL_CONFIG_DRV_ETH
+NAVTEST_CASE_DECL(test_conformance_eth_set_callback_accepts_null);
+NAVTEST_CASE_DECL(test_conformance_eth_link_is_up_answers_without_a_mac);
+NAVTEST_CASE_DECL(test_conformance_eth_teardown_is_safe_in_any_order);
+NAVTEST_CASE_DECL(test_conformance_eth_needs_init_before_the_bus);
+#endif
+#if NAVHAL_CONFIG_DRV_USB_CDC
+NAVTEST_CASE_DECL(test_conformance_usb_cdc_getters_are_stable);
+NAVTEST_CASE_DECL(test_conformance_usb_cdc_set_rx_callback_accepts_null);
+NAVTEST_CASE_DECL(test_conformance_usb_cdc_notify_needs_a_host);
+NAVTEST_CASE_DECL(test_conformance_usb_cdc_init_answers_the_same_twice);
+#endif
+#if NAVHAL_CONFIG_DRV_SDIO
+NAVTEST_CASE_DECL(test_conformance_sdio_card_present_is_stable);
+NAVTEST_CASE_DECL(test_conformance_sdio_card_init_answers_for_an_empty_slot);
+NAVTEST_CASE_DECL(test_conformance_sdio_command_needs_the_peripheral);
+NAVTEST_CASE_DECL(test_conformance_sdio_get_response_rejects_bad_register);
+NAVTEST_CASE_DECL(test_conformance_sdio_set_callback_accepts_null);
+NAVTEST_CASE_DECL(test_conformance_disk_rejects_a_drive_that_does_not_exist);
+NAVTEST_CASE_DECL(test_conformance_disk_rejects_a_zero_length_transfer);
+#endif
+#if NAVHAL_CONFIG_DRV_RTC
+NAVTEST_CASE_DECL(test_conformance_rtc_backup_write_rejects_bad_index);
+NAVTEST_CASE_DECL(test_conformance_rtc_set_wakeup_rejects_bad_period);
+NAVTEST_CASE_DECL(test_conformance_rtc_cancel_is_idempotent);
+NAVTEST_CASE_DECL(test_conformance_rtc_get_clock_is_a_documented_source);
+#endif
+#if NAVHAL_CONFIG_DRV_MPU
+NAVTEST_CASE_DECL(test_conformance_mpu_disable_region_rejects_bad_index);
+#endif
+#if NAVHAL_CONFIG_BOOT_SNIFFER
+NAVTEST_CASE_DECL(test_conformance_boot_block_init_validates);
+NAVTEST_CASE_DECL(test_conformance_boot_getters_are_stable);
+NAVTEST_CASE_DECL(test_conformance_boot_entry_gate_round_trips);
+NAVTEST_CASE_DECL(test_conformance_boot_request_is_refused_while_disabled);
+NAVTEST_CASE_DECL(test_conformance_boot_match_ignores_other_traffic);
+NAVTEST_CASE_DECL(test_conformance_boot_clear_and_heal_need_a_valid_block);
+NAVTEST_CASE_DECL(test_conformance_boot_set_prepare_accepts_null);
+#endif
+
+
+#if NAVHAL_CONFIG_BOOT_SNIFFER
+/* ---------------------------------------------------------------------------
+ * Boot sniffer. Every case here runs with entry disabled, because a completed
+ * match calls hal_boot_request and that resets the part -- the refusal is the
+ * half a running suite can assert, and asserting it is how we know the
+ * interlock a console-fed board depends on actually holds.
+ * ------------------------------------------------------------------------- */
+static void _conf_boot_prepare_cb(void) { /* never invoked: entry stays off */ }
+
+void test_conformance_boot_block_init_validates(void) {
+  /* Idempotent by contract: a valid block is left alone, an invalid one is
+   * sealed. Either way the block reads valid afterwards. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
+  TEST_ASSERT_TRUE(hal_boot_block_valid());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
+  TEST_ASSERT_TRUE(hal_boot_block_valid());
+}
+
+void test_conformance_boot_getters_are_stable(void) {
+  uint32_t req = hal_boot_get_request();
+  TEST_ASSERT_EQUAL_UINT32(req, hal_boot_get_request());
+  uint32_t att = hal_boot_get_attempts();
+  TEST_ASSERT_EQUAL_UINT32(att, hal_boot_get_attempts());
+}
+
+void test_conformance_boot_entry_gate_round_trips(void) {
+  bool was = hal_boot_entry_is_disabled();
+
+  hal_boot_entry_disable();
+  TEST_ASSERT_TRUE(hal_boot_entry_is_disabled());
+  hal_boot_entry_enable();
+  TEST_ASSERT_FALSE(hal_boot_entry_is_disabled());
+
+  if (was) {
+    hal_boot_entry_disable();
+  }
+}
+
+void test_conformance_boot_request_is_refused_while_disabled(void) {
+  /* The one call in this file that would reset the board if the interlock did
+   * not hold. Disabled first, so a conformant port answers HAL_ERR_BUSY and
+   * the run continues -- and a port that resets here fails loudly by never
+   * reaching the summary. */
+  bool was = hal_boot_entry_is_disabled();
+
+  hal_boot_entry_disable();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request());
+
+  if (!was) {
+    hal_boot_entry_enable();
+  }
+  hal_boot_match_reset();
+}
+
+void test_conformance_boot_match_ignores_other_traffic(void) {
+  /* A byte that cannot be the sequence's first one cannot advance the match,
+   * whatever the port chose for hal_boot_seq. */
+  const uint8_t not_first = (uint8_t)(hal_boot_seq[0] ^ 0xFFu);
+  bool was = hal_boot_entry_is_disabled();
+  uint32_t before;
+
+  hal_boot_entry_disable();
+  hal_boot_match_reset();
+  before = hal_boot_get_request();
+
+  hal_boot_match_byte(not_first);
+  hal_boot_feed(&not_first, 1u);
+  hal_boot_feed(NULL, 4u); /* NULL is a no-op, not a fault */
+
+  TEST_ASSERT_EQUAL_UINT32(before, hal_boot_get_request());
+
+  hal_boot_match_reset();
+  if (!was) {
+    hal_boot_entry_enable();
+  }
+}
+
+void test_conformance_boot_clear_and_heal_need_a_valid_block(void) {
+  /* Both mutate the block, so both need one: the contract is that they answer
+   * HAL_ERR_NOT_INITIALIZED rather than writing into an unsealed block. After
+   * block_init there is one, and mark_healthy's effect is observable. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_clear_request());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_mark_healthy());
+  TEST_ASSERT_EQUAL_UINT32(0u, hal_boot_get_attempts());
+}
+
+void test_conformance_boot_set_prepare_accepts_null(void) {
+  /* Registration only -- the callback runs on the path to a reset, which this
+   * suite never takes. NULL is how a caller unregisters, so it must be
+   * accepted at both ends, and the slot is left empty on the way out. */
+  hal_boot_set_prepare(NULL);
+  hal_boot_set_prepare(_conf_boot_prepare_cb);
+  hal_boot_set_prepare(NULL);
+  TEST_ASSERT_TRUE(hal_boot_block_valid());
+}
+#endif /* NAVHAL_CONFIG_BOOT_SNIFFER */
+
+
+/* ---------------------------------------------------------------------------
+ * Console, and the UART convenience writers underneath it. The console is the
+ * transport this suite's own output leaves through, so what can be asserted is
+ * the part that does not disturb it: the getters, and that a NULL string is a
+ * no-op rather than a fault.
+ * ------------------------------------------------------------------------- */
+void test_conformance_console_getters_are_stable(void) {
+  bool c = hal_console_connected();
+  TEST_ASSERT_TRUE(c == hal_console_connected());
+
+  hal_console_route_t r = hal_console_get_route();
+  TEST_ASSERT_TRUE(r == hal_console_get_route());
+  /* The route is what the firmware was built with, so it is one of the two the
+   * contract defines -- never a third value a port invented. */
+  TEST_ASSERT_TRUE(r == HAL_CONSOLE_ROUTE_UART || r == HAL_CONSOLE_ROUTE_CDC);
+}
+
+void test_conformance_console_write_ignores_null(void) {
+  /* NULL is a no-op by contract: a console call sits on error paths, where a
+   * fault would destroy the very message explaining what went wrong. */
+  hal_console_write(NULL);
+  hal_console_write("");
+  /* The numeric writers emit without a newline, so the line is closed here and
+   * the transcript stays parseable. */
+  hal_console_write_uint(0u);
+  hal_console_write_hex32(0u);
+  hal_console_write("\r\n");
+  TEST_ASSERT_TRUE(hal_console_get_route() == hal_console_get_route());
+}
+
+#if NAVHAL_CONFIG_DRV_UART
+void test_conformance_uart_writers_reject_bad_instance(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_uart_write_char((hal_uart_t)99, 'x'));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_uart_write_int((hal_uart_t)99, -1));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_uart_write_uint((hal_uart_t)99, 1u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_uart_write_float((hal_uart_t)99, 1.0f));
+}
+
+void test_conformance_uart_read_char_answers_on_bad_instance(void) {
+  /* Only the error path is assertable here: on a real instance read_char
+   * blocks until a byte arrives, and nothing sends one to a board under test.
+   * The contract for an instance that does not exist is to answer 0 rather
+   * than to wait forever for a peripheral that is not there. */
+  TEST_ASSERT_EQUAL_UINT32(0u, (uint32_t)hal_uart_read_char((hal_uart_t)99));
+}
+#endif /* NAVHAL_CONFIG_DRV_UART */
+
+#if NAVHAL_CONFIG_DRV_CRC
+void test_conformance_crc_init_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_crc_init(NULL));
+  /* Twice, because an error path that corrupts state answers differently the
+   * second time. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_crc_init(NULL));
+}
+#endif /* NAVHAL_CONFIG_DRV_CRC */
+
+#if NAVHAL_CONFIG_DRV_TIMEBASE
+static void _conf_timebase_cb(void) { /* registered, then withdrawn */ }
+
+void test_conformance_timebase_callback_accepts_null(void) {
+  /* NULL is how a caller withdraws a tick callback. A port that cannot offer
+   * one says so; what it may not do is fault, or accept NULL and then call
+   * through it from the tick ISR. */
+  hal_status_t s = hal_timebase_set_callback(_conf_timebase_cb);
+  TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED);
+
+  s = hal_timebase_set_callback(NULL);
+  TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED ||
+                   s == HAL_ERR_INVALID_ARG);
+}
+#endif /* NAVHAL_CONFIG_DRV_TIMEBASE */
+
+/* hal_wwdg_* is declared in hal_watchdog.h, which is included above under
+ * DRV_WATCHDOG -- and a port can build the window watchdog without the
+ * independent one, so the header has to be reachable either way. */
+#if NAVHAL_CONFIG_DRV_WWDG && !NAVHAL_CONFIG_DRV_WATCHDOG
+#include "common/hal_watchdog.h"
+#endif
+#if NAVHAL_CONFIG_DRV_WWDG
+void test_conformance_wwdg_kick_needs_a_running_watchdog(void) {
+  /* Nothing in this suite arms a window watchdog -- on most parts it cannot be
+   * stopped again -- so the assertable half is the refusal. Branching on
+   * is_running keeps that true whatever ran before this case. */
+  if (!hal_wwdg_is_running()) {
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_NOT_INITIALIZED,
+                             (uint32_t)hal_wwdg_kick());
+  } else {
+    /* Already armed by something else: kicking is then the safe answer, and
+     * refusing to would be the bug. */
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_wwdg_kick());
+  }
+}
+#endif /* NAVHAL_CONFIG_DRV_WWDG */
+
+
+#if NAVHAL_CONFIG_DRV_RTC
+void test_conformance_rtc_backup_write_rejects_bad_index(void) {
+  /* The register file is finite, and the contract names its size. One past the
+   * end must be refused rather than writing into whatever follows it. */
+  TEST_ASSERT_TRUE(
+      _conf_rejected(hal_rtc_backup_write(HAL_RTC_BACKUP_COUNT, 0u)));
+  TEST_ASSERT_TRUE(_conf_rejected(hal_rtc_backup_write(255u, 0u)));
+}
+
+void test_conformance_rtc_set_wakeup_rejects_bad_period(void) {
+  /* 0 and anything past the documented 65536000 ms ceiling are out of range.
+   * A NULL callback is not -- the header documents it as leaving the timer
+   * running with nothing attached. */
+  TEST_ASSERT_TRUE(_conf_rejected(hal_rtc_set_wakeup(0u, NULL)));
+  TEST_ASSERT_TRUE(_conf_rejected(hal_rtc_set_wakeup(65536001u, NULL)));
+}
+
+void test_conformance_rtc_cancel_is_idempotent(void) {
+  /* Cancelling something that is not running is not an error worth inventing a
+   * state machine for: the answer must be the same both times, whatever it is,
+   * and neither call may leave the driver unable to answer the next one. */
+  hal_status_t a = hal_rtc_cancel_wakeup();
+  hal_status_t b = hal_rtc_cancel_wakeup();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)a, (uint32_t)b);
+
+  hal_status_t c = hal_rtc_cancel_alarm(HAL_RTC_ALARM_A);
+  hal_status_t d = hal_rtc_cancel_alarm(HAL_RTC_ALARM_A);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)c, (uint32_t)d);
+}
+
+void test_conformance_rtc_get_clock_is_a_documented_source(void) {
+  /* Whatever oscillator came up, the answer is one of the four the enum
+   * defines -- and a board with no crystal reports NONE rather than guessing. */
+  hal_rtc_clock_t k = hal_rtc_get_clock();
+  TEST_ASSERT_TRUE(k == HAL_RTC_CLOCK_AUTO || k == HAL_RTC_CLOCK_LSE ||
+                   k == HAL_RTC_CLOCK_LSI || k == HAL_RTC_CLOCK_NONE);
+  TEST_ASSERT_TRUE(k == hal_rtc_get_clock());
+}
+#endif /* NAVHAL_CONFIG_DRV_RTC */
+
+#if NAVHAL_CONFIG_DRV_MPU
+void test_conformance_mpu_disable_region_rejects_bad_index(void) {
+  /* Disabling is the safe direction -- it removes a restriction rather than
+   * adding one -- so the only thing to get wrong is the range check. */
+  uint32_t n = hal_mpu_num_regions();
+  hal_status_t s = hal_mpu_disable_region(n);
+  TEST_ASSERT_TRUE(s == HAL_ERR_INVALID_ARG || s == HAL_ERR_NOT_SUPPORTED);
+  s = hal_mpu_disable_region(0xFFFFFFFFu);
+  TEST_ASSERT_TRUE(s == HAL_ERR_INVALID_ARG || s == HAL_ERR_NOT_SUPPORTED);
+}
+#endif /* NAVHAL_CONFIG_DRV_MPU */
+
+
+#if NAVHAL_CONFIG_DRV_SDIO
+void test_conformance_sdio_card_present_is_stable(void) {
+  /* Answerable before hal_sdio_init by contract -- a caller decides whether to
+   * bring the peripheral up at all from this. Two reads with nothing in
+   * between must agree, whichever way the slot is. */
+  bool p = hal_sdio_card_present();
+  TEST_ASSERT_TRUE(p == hal_sdio_card_present());
+}
+
+void test_conformance_sdio_card_init_answers_for_an_empty_slot(void) {
+  /* An empty slot has its own answer, so that "no card" and "card present
+   * behind a broken data line" are not the same timeout. Branching on
+   * card_present keeps this true on a bench with a card in the socket. */
+  if (!hal_sdio_card_present()) {
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_SDIO_NO_CARD,
+                             (uint32_t)hal_sdio_card_init());
+  } else {
+    hal_sdio_error_t e = hal_sdio_card_init();
+    TEST_ASSERT_TRUE(e == HAL_SDIO_OK || e == HAL_SDIO_ERROR);
+  }
+}
+
+void test_conformance_sdio_command_needs_the_peripheral(void) {
+  /* This suite runs before anything brings the controller up, so the clock
+   * gate is shut here and a command has nowhere to go. Reporting that is the
+   * contract; writing SDIO->ICR/ARG/CMD at a gated peripheral is not.
+   *
+   * CMD13 (SEND_STATUS) rather than CMD0: if a port has somehow initialised
+   * the controller before this point, a status query is harmless, where
+   * GO_IDLE_STATE would reset a card the later SDIO suite is about to use. */
+  hal_sdio_error_t a = hal_sdio_send_command(13u, 0u, 1u);
+  hal_sdio_error_t b = hal_sdio_send_command(13u, 0u, 1u);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)a, (uint32_t)b);
+  TEST_ASSERT_TRUE(a != HAL_SDIO_OK);
+}
+
+void test_conformance_sdio_get_response_rejects_bad_register(void) {
+  /* There are four response registers. An index outside them answers 0 rather
+   * than reading whatever lies past the last one. */
+  TEST_ASSERT_EQUAL_UINT32(0u, hal_sdio_get_response(0u));
+  TEST_ASSERT_EQUAL_UINT32(0u, hal_sdio_get_response(5u));
+  TEST_ASSERT_EQUAL_UINT32(0u, hal_sdio_get_response(255u));
+}
+
+void test_conformance_sdio_set_callback_accepts_null(void) {
+  /* Registration only; NULL is how a caller withdraws. Left empty on the way
+   * out so nothing fires into this suite from a later transfer. */
+  hal_sdio_set_callback(NULL);
+  TEST_ASSERT_TRUE(hal_sdio_card_present() == hal_sdio_card_present());
+}
+
+/* ---------------------------------------------------------------------------
+ * The block backend FatFs sits on. FatFs itself is third-party and portable
+ * (src/utils/fatfs/); what a port supplies is this diskio boundary, and on
+ * STM32 that is the SDIO backend. Drive 0 is the only one that exists, so
+ * every entry point has the same first question to answer, and answering it is
+ * what keeps a mounted filesystem from addressing a drive that is not there.
+ * ------------------------------------------------------------------------- */
+void test_conformance_disk_rejects_a_drive_that_does_not_exist(void) {
+  static uint8_t buf[4];
+
+  /* initialize reports the drive as uninitialised, status reports it as
+   * absent -- two different words for "not drive 0", and both are non-OK,
+   * which is the part a caller acts on. */
+  TEST_ASSERT_TRUE(hal_disk_initialize(1u) != HAL_DISK_STATUS_OK);
+  TEST_ASSERT_TRUE((hal_disk_status(1u) & HAL_DISK_STATUS_NODISK) != 0u);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_DISK_RES_PARERR,
+                           (uint32_t)hal_disk_read(1u, buf, 0u, 1u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_DISK_RES_PARERR,
+                           (uint32_t)hal_disk_write(1u, buf, 0u, 1u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_DISK_RES_PARERR,
+                           (uint32_t)hal_disk_ioctl(1u, 0u, buf));
+}
+
+void test_conformance_disk_rejects_a_zero_length_transfer(void) {
+  /* Zero sectors is a parameter error, not a silent success: a caller that
+   * computed a zero count has a bug, and reporting OK hides it. Checked before
+   * the card is touched, so this holds with an empty slot. */
+  static uint8_t buf[4];
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_DISK_RES_PARERR,
+                           (uint32_t)hal_disk_read(0u, buf, 0u, 0u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_DISK_RES_PARERR,
+                           (uint32_t)hal_disk_write(0u, buf, 0u, 0u));
+}
+#endif /* NAVHAL_CONFIG_DRV_SDIO */
+
+
+#if NAVHAL_CONFIG_DRV_USB_CDC
+void test_conformance_usb_cdc_getters_are_stable(void) {
+  /* With no host attached these answer defaults rather than waiting for an
+   * enumeration that is not coming. Two reads with nothing in between agree. */
+  uint32_t baud = hal_usb_cdc_get_baudrate();
+  TEST_ASSERT_EQUAL_UINT32(baud, hal_usb_cdc_get_baudrate());
+
+  uint8_t line = hal_usb_cdc_get_line_state();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)line,
+                           (uint32_t)hal_usb_cdc_get_line_state());
+
+  uint16_t brk = hal_usb_cdc_get_break_ms();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)brk,
+                           (uint32_t)hal_usb_cdc_get_break_ms());
+}
+
+void test_conformance_usb_cdc_set_rx_callback_accepts_null(void) {
+  hal_status_t s = hal_usb_cdc_set_rx_callback(NULL);
+  TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED);
+}
+
+void test_conformance_usb_cdc_notify_needs_a_host(void) {
+  /* A serial-state notification travels on the interrupt endpoint, which does
+   * not exist until a host has configured the device. Without one the call has
+   * to report that rather than write into an endpoint that is not there. */
+  if (!hal_usb_cdc_connected()) {
+    TEST_ASSERT_TRUE(hal_usb_cdc_notify_serial_state(0u) != HAL_OK);
+  }
+}
+
+void test_conformance_usb_cdc_init_answers_the_same_twice(void) {
+  /* Whether the device can come up is a board question -- the OTG core needs
+   * exactly 48 MHz, and a port whose PLL does not supply it must refuse rather
+   * than enumerate at the wrong bit rate. What is portable is that asking
+   * twice answers the same, so neither branch leaves the driver half-built.
+   *
+   * Skipped entirely when the console is routed through CDC: there the device
+   * being torn down is the wire this suite's own output leaves through. */
+  if (hal_console_get_route() == HAL_CONSOLE_ROUTE_CDC) {
+    TEST_ASSERT_TRUE(true);
+    return;
+  }
+
+  hal_status_t a = hal_usb_cdc_init();
+  hal_status_t b = hal_usb_cdc_init();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)a, (uint32_t)b);
+
+  hal_status_t c = hal_usb_cdc_deinit();
+  hal_status_t d = hal_usb_cdc_deinit();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)c, (uint32_t)d);
+}
+#endif /* NAVHAL_CONFIG_DRV_USB_CDC */
+
+
+#if NAVHAL_CONFIG_DRV_ETH
+/* ---------------------------------------------------------------------------
+ * Ethernet. Every entry point here reaches the MAC, which sits behind a clock
+ * gate that init opens -- so what the contract owes a caller before init is an
+ * answer, not a register access. These cases run whether or not a cable is
+ * plugged in, because none of them needs a link.
+ * ------------------------------------------------------------------------- */
+void test_conformance_eth_set_callback_accepts_null(void) {
+  /* Registration is state, not traffic: withdrawing a callback is legal at any
+   * time, and is how a caller switches from interrupt to polled draining. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_eth_set_callback(NULL));
+}
+
+void test_conformance_eth_link_is_up_answers_without_a_mac(void) {
+  /* bool, so there is no error to return: an uninitialised MAC reports no
+   * link rather than reading a PHY through a peripheral that may be gated. */
+  bool up = hal_eth_link_is_up();
+  TEST_ASSERT_TRUE(up == hal_eth_link_is_up());
+}
+
+void test_conformance_eth_teardown_is_safe_in_any_order(void) {
+  /* stop before start, deinit before init, twice each. A port that pokes
+   * MACCR here is touching a clock-gated peripheral; one that answers is
+   * conformant whichever of the two answers it picks, as long as it picks the
+   * same one both times. */
+  hal_status_t s1 = hal_eth_stop();
+  hal_status_t s2 = hal_eth_stop();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)s1, (uint32_t)s2);
+
+  hal_status_t d1 = hal_eth_deinit();
+  hal_status_t d2 = hal_eth_deinit();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)d1, (uint32_t)d2);
+}
+
+void test_conformance_eth_needs_init_before_the_bus(void) {
+  /* After the teardown above the MAC is down, so this is the uninitialised
+   * state by construction. start and phy_write both have to say so rather than
+   * driving MACCR and MACMIIAR at a peripheral whose clock is off. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_NOT_INITIALIZED,
+                           (uint32_t)hal_eth_start());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_NOT_INITIALIZED,
+                           (uint32_t)hal_eth_phy_write(0u, 0u));
+}
+#endif /* NAVHAL_CONFIG_DRV_ETH */
 
 
 static const navtest_case_t conformance_cases[] = {
@@ -1558,6 +2064,60 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_TIMER
     NAVTEST_CASE(test_conformance_timer_init_rejects_null),
+#endif
+    NAVTEST_CASE(test_conformance_console_getters_are_stable),
+    NAVTEST_CASE(test_conformance_console_write_ignores_null),
+#if NAVHAL_CONFIG_DRV_UART
+    NAVTEST_CASE(test_conformance_uart_writers_reject_bad_instance),
+    NAVTEST_CASE(test_conformance_uart_read_char_answers_on_bad_instance),
+#endif
+#if NAVHAL_CONFIG_DRV_CRC
+    NAVTEST_CASE(test_conformance_crc_init_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_TIMEBASE
+    NAVTEST_CASE(test_conformance_timebase_callback_accepts_null),
+#endif
+#if NAVHAL_CONFIG_DRV_WWDG
+    NAVTEST_CASE(test_conformance_wwdg_kick_needs_a_running_watchdog),
+#endif
+#if NAVHAL_CONFIG_DRV_ETH
+    NAVTEST_CASE(test_conformance_eth_set_callback_accepts_null),
+    NAVTEST_CASE(test_conformance_eth_link_is_up_answers_without_a_mac),
+    NAVTEST_CASE(test_conformance_eth_teardown_is_safe_in_any_order),
+    NAVTEST_CASE(test_conformance_eth_needs_init_before_the_bus),
+#endif
+#if NAVHAL_CONFIG_DRV_USB_CDC
+    NAVTEST_CASE(test_conformance_usb_cdc_getters_are_stable),
+    NAVTEST_CASE(test_conformance_usb_cdc_set_rx_callback_accepts_null),
+    NAVTEST_CASE(test_conformance_usb_cdc_notify_needs_a_host),
+    NAVTEST_CASE(test_conformance_usb_cdc_init_answers_the_same_twice),
+#endif
+#if NAVHAL_CONFIG_DRV_SDIO
+    NAVTEST_CASE(test_conformance_sdio_card_present_is_stable),
+    NAVTEST_CASE(test_conformance_sdio_card_init_answers_for_an_empty_slot),
+    NAVTEST_CASE(test_conformance_sdio_command_needs_the_peripheral),
+    NAVTEST_CASE(test_conformance_sdio_get_response_rejects_bad_register),
+    NAVTEST_CASE(test_conformance_sdio_set_callback_accepts_null),
+    NAVTEST_CASE(test_conformance_disk_rejects_a_drive_that_does_not_exist),
+    NAVTEST_CASE(test_conformance_disk_rejects_a_zero_length_transfer),
+#endif
+#if NAVHAL_CONFIG_DRV_RTC
+    NAVTEST_CASE(test_conformance_rtc_backup_write_rejects_bad_index),
+    NAVTEST_CASE(test_conformance_rtc_set_wakeup_rejects_bad_period),
+    NAVTEST_CASE(test_conformance_rtc_cancel_is_idempotent),
+    NAVTEST_CASE(test_conformance_rtc_get_clock_is_a_documented_source),
+#endif
+#if NAVHAL_CONFIG_DRV_MPU
+    NAVTEST_CASE(test_conformance_mpu_disable_region_rejects_bad_index),
+#endif
+#if NAVHAL_CONFIG_BOOT_SNIFFER
+    NAVTEST_CASE(test_conformance_boot_block_init_validates),
+    NAVTEST_CASE(test_conformance_boot_getters_are_stable),
+    NAVTEST_CASE(test_conformance_boot_entry_gate_round_trips),
+    NAVTEST_CASE(test_conformance_boot_request_is_refused_while_disabled),
+    NAVTEST_CASE(test_conformance_boot_match_ignores_other_traffic),
+    NAVTEST_CASE(test_conformance_boot_clear_and_heal_need_a_valid_block),
+    NAVTEST_CASE(test_conformance_boot_set_prepare_accepts_null),
 #endif
 };
 

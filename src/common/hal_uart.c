@@ -70,12 +70,19 @@ bool hal_uart_available(hal_uart_t uart) {
 
 /* ----- shared logic: built once on top of the primitives ----------------- */
 
+/* These return hal_status_t, so they promise to report a failure. They used to
+ * discard write_char's status and answer HAL_OK unconditionally, which meant a
+ * caller writing to an instance that does not exist was told it had succeeded
+ * -- the one answer that is never true. Each stops at the first failing
+ * character instead: on a bad instance every one of them fails, and spinning
+ * through the rest of the buffer to fail identically helps nobody. */
+
 hal_status_t hal_uart_write(hal_uart_t uart, const uint8_t *data,
                             uint16_t length) {
   if (data == NULL)
     return HAL_ERR_INVALID_ARG;
   for (uint16_t i = 0; i < length; i++)
-    (void)_hal_uart_ops.write_char(uart, (char)data[i]);
+    HAL_OK_OR_RETURN(_hal_uart_ops.write_char(uart, (char)data[i]));
   return HAL_OK;
 }
 
@@ -83,7 +90,7 @@ hal_status_t hal_uart_write_string(hal_uart_t uart, const char *s) {
   if (s == NULL)
     return HAL_ERR_INVALID_ARG;
   while (*s != '\0')
-    (void)_hal_uart_ops.write_char(uart, *s++);
+    HAL_OK_OR_RETURN(_hal_uart_ops.write_char(uart, *s++));
   return HAL_OK;
 }
 
@@ -95,14 +102,14 @@ hal_status_t hal_uart_write_uint(hal_uart_t uart, uint32_t num) {
     num /= 10u;
   } while (num != 0u);
   while (n != 0u)
-    (void)_hal_uart_ops.write_char(uart, buf[--n]);
+    HAL_OK_OR_RETURN(_hal_uart_ops.write_char(uart, buf[--n]));
   return HAL_OK;
 }
 
 hal_status_t hal_uart_write_int(hal_uart_t uart, int32_t num) {
   uint32_t mag;
   if (num < 0) {
-    (void)_hal_uart_ops.write_char(uart, '-');
+    HAL_OK_OR_RETURN(_hal_uart_ops.write_char(uart, '-'));
     /* Two's-complement magnitude — correct even for INT32_MIN. */
     mag = (uint32_t)0 - (uint32_t)num;
   } else {
@@ -116,7 +123,7 @@ hal_status_t hal_uart_write_float(hal_uart_t uart, float num) {
    * digits (rounded). Previously the STM32 backend emitted 5 digits and the
    * AVR backend 3 — a silent divergence this single implementation removes. */
   if (num < 0.0f) {
-    (void)_hal_uart_ops.write_char(uart, '-');
+    HAL_OK_OR_RETURN(_hal_uart_ops.write_char(uart, '-'));
     num = -num;
   }
   uint32_t ip = (uint32_t)num;
@@ -125,12 +132,12 @@ hal_status_t hal_uart_write_float(hal_uart_t uart, float num) {
     ip += 1u;
     fp -= 1000u;
   }
-  (void)hal_uart_write_uint(uart, ip);
-  (void)_hal_uart_ops.write_char(uart, '.');
+  HAL_OK_OR_RETURN(hal_uart_write_uint(uart, ip));
+  HAL_OK_OR_RETURN(_hal_uart_ops.write_char(uart, '.'));
   if (fp < 100u)
-    (void)_hal_uart_ops.write_char(uart, '0');
+    HAL_OK_OR_RETURN(_hal_uart_ops.write_char(uart, '0'));
   if (fp < 10u)
-    (void)_hal_uart_ops.write_char(uart, '0');
+    HAL_OK_OR_RETURN(_hal_uart_ops.write_char(uart, '0'));
   return hal_uart_write_uint(uart, fp);
 }
 

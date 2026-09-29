@@ -82,8 +82,14 @@ cmake_minimum_required(VERSION 3.20)
 project(consumer C ASM)
 add_subdirectory($REPO_ROOT navhal)
 add_executable(consumer src/main.c \${STARTUP_FILE})
+# The script comes from NavHAL by name -- a consumer that spells out
+# src/board/<board>/linker.ld is depending on NavHAL's directory layout, which
+# is the thing this check exists to keep working.
+if(NOT NAVHAL_LINKER_SCRIPT)
+  message(FATAL_ERROR "NavHAL did not export NAVHAL_LINKER_SCRIPT")
+endif()
 target_link_options(consumer PRIVATE
-  "-T" "$REPO_ROOT/src/board/$BOARD/linker.ld" "-nostdlib" "--specs=nosys.specs")
+  "-T" "\${NAVHAL_LINKER_SCRIPT}" "-nostdlib" "--specs=nosys.specs")
 target_link_libraries(consumer PRIVATE hal)
 EOF
 

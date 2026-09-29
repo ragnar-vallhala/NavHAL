@@ -1,0 +1,24 @@
+# Public entry points the conformance suite does not call, and why.
+# Read by tools/conformance_coverage.py; `symbol: reason`, # starts a comment.
+#
+# Two kinds of line, and the difference is the point of the file:
+#
+#   symbol: <reason>        cannot be covered here, and will not be
+#   symbol: debt: <note>    could be, is not yet -- delete the line when it is
+#
+# Neither excuses a NEW entry point: --gate fails on anything in this file
+# nor called by the suite, so the surface cannot grow uncovered behind us.
+# Being absent from the suite is not being untested -- most of the debt below
+# is exercised by its DRV_* cap suite under tests/cap/. What it is missing is
+# the portable check that a DIFFERENT port implements it the same way.
+
+# ---------------------------------------------------------------------------
+# Cannot be covered: the call ends the run, destroys what the run needs, or
+# waits on hardware a bare board does not have.
+# ---------------------------------------------------------------------------
+hal_system_reset: resets the part, which ends the suite mid-run
+hal_flash_erase: erases the sectors holding the KV store and the running image
+hal_sdio_wait_flag: spins on a card that a bare board does not have
+hal_sdio_wait_sync: spins on a card that a bare board does not have
+hal_timebase_tick: the tick ISR's own entry; calling it forges the timebase that the suite's timing cases check against
+hal_console_init: re-initialises the transport the suite prints through, at a rate a portable case cannot know; a wrong one garbles the capture

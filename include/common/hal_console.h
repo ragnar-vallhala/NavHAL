@@ -32,9 +32,9 @@
  *
  * ### The SWD capture depends on the UART route
  *
- * `tools/ntest` can test a board whose console goes nowhere by breaking on
+ * `tools/hil/run.sh` can test a board whose console goes nowhere by breaking on
  * @c hal_uart_write_string and reading the argument out of the target
- * (`_swd_capture`). That only sees output that actually passes through the UART
+ * (`swd_capture`). That only sees output that actually passes through the UART
  * driver. A board routed to CDC produces nothing for it to break on, so
  * `CONSOLE=` in `tools/hil/boards/<board>.conf` has to agree with the route the
  * firmware was built with — they are two halves of one decision.

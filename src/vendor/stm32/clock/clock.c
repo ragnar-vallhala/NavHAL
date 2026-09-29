@@ -28,6 +28,7 @@
  * @date 2025-07-21
  */
 
+#include "board.h"
 #include "internal/hal_clock_ops.h"
 #include "family/flash_reg.h"
 #include "family/rcc_reg.h"
@@ -93,8 +94,10 @@ static hal_status_t _toggle_pll_clock(uint8_t state) {
  * @return ::HAL_OK on success, ::HAL_ERR_INVALID_ARG on a missing argument.
  */
 
-#define STM32_HSI_FREQ_HZ 16000000U
-#define STM32_HSE_FREQ_HZ 8000000U
+/* The oscillators are board components, not chip facts: the HSE crystal in
+ * particular differs per board. Both come from the board's Kconfig. */
+#define STM32_HSI_FREQ_HZ ((uint32_t)BOARD_HSI_FREQ_HZ)
+#define STM32_HSE_FREQ_HZ ((uint32_t)BOARD_HSE_FREQ_HZ)
 
 /* The frequency SYSCLK will run at once the switch below completes.
  * stm32_clock_get_sysclk() reads the registers and so still reports the old
@@ -318,11 +321,11 @@ static uint32_t stm32_clock_get_sysclk(void) {
   uint8_t sws = ((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3;
 
   switch (sws) {
-  case 0:              // HSI selected
-    sysclk = 16000000; // Internal HSI clock frequency
+  case 0: /* HSI */
+    sysclk = STM32_HSI_FREQ_HZ;
     break;
-  case 1:             // HSE selected
-    sysclk = 8000000; // External crystal frequency (should be configurable)
+  case 1: /* HSE */
+    sysclk = STM32_HSE_FREQ_HZ;
     break;
   case 2: // PLL selected
   {
@@ -331,8 +334,7 @@ static uint32_t stm32_clock_get_sysclk(void) {
     uint32_t pll_p = (((RCC->PLLCFGR >> RCC_PLLCFGR_PLLP_BIT) & 0x3) + 1) * 2;
 
     uint32_t pll_src = (RCC->PLLCFGR >> RCC_PLLCFGR_SRC_BIT) & 0x1;
-    uint32_t vco_in =
-        pll_src ? 8000000 : 16000000; // 8MHz for HSE, 16MHz for HSI
+    uint32_t vco_in = pll_src ? STM32_HSE_FREQ_HZ : STM32_HSI_FREQ_HZ;
 
     sysclk = (vco_in / pll_m) * pll_n / pll_p;
     break;
@@ -470,8 +472,8 @@ static hal_status_t _solve_pll(hal_clock_source_t input_src, uint32_t target_hz,
   uint32_t in = (input_src == HAL_CLOCK_SOURCE_HSE) ? STM32_HSE_FREQ_HZ
                                                     : STM32_HSI_FREQ_HZ;
 
-  /* A 1 MHz VCO input gives the finest N granularity the part allows, and
-   * divides exactly for both the 8 MHz HSE and the 16 MHz HSI. */
+  /* A 1 MHz VCO input gives the finest N granularity the part allows. A board
+   * whose oscillator is not a whole number of MHz is rejected below. */
   if ((in % PLL_VCO_IN_HZ) != 0u)
     return HAL_ERR_INVALID_ARG;
   uint32_t m = in / PLL_VCO_IN_HZ;

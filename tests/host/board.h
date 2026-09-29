@@ -80,4 +80,9 @@
 #define BOARD_I2C3_SCL HAL_GPIO_PIN(HAL_GPIO_PORT_A, 8)
 #define BOARD_I2C3_SDA HAL_GPIO_PIN(HAL_GPIO_PORT_C, 9)
 
+/* Oscillators. The Nucleo-F767ZI's values, which the clock driver used to hold
+ * as fixed constants; the suite's PLL expectations are computed from these. */
+#define BOARD_HSI_FREQ_HZ 16000000U
+#define BOARD_HSE_FREQ_HZ 8000000U
+
 #endif /* NAVHAL_TEST_HOST_BOARD_H */

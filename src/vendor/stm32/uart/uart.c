@@ -29,6 +29,7 @@
  * @note All blocking transfers are polling-mode.
  */
 
+#include "board.h"
 #include "internal/hal_uart_ops.h"
 #include "internal/hal_uart_dma_ops.h"
 #include "navhal_port_uart.h"
@@ -56,17 +57,39 @@ static void _enable_uart_clock(hal_uart_t uart) {
     RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
 }
 
+/* USART pin routing, supplied by the board's Kconfig via the generated board.h.
+ * An instance the board does not describe is absent from this table, and
+ * _configure_uart_gpio then touches no pins for it. */
+typedef struct {
+  hal_uart_t uart;
+  hal_gpio_pin tx;
+  hal_gpio_pin rx;
+  hal_gpio_af_t af;
+} uart_pinmap_t;
+
+static const uart_pinmap_t uart_pinmap[] = {
+#if defined(BOARD_USART1_TX)
+    {HAL_UART_1, BOARD_USART1_TX, BOARD_USART1_RX,
+     (hal_gpio_af_t)BOARD_USART1_AF},
+#endif
+#if defined(BOARD_USART2_TX)
+    {HAL_UART_2, BOARD_USART2_TX, BOARD_USART2_RX,
+     (hal_gpio_af_t)BOARD_USART2_AF},
+#endif
+#if defined(BOARD_USART6_TX)
+    {HAL_UART_6, BOARD_USART6_TX, BOARD_USART6_RX,
+     (hal_gpio_af_t)BOARD_USART6_AF},
+#endif
+};
+
 /** @brief Configure the GPIO alternate-function pins for the specified UART. */
 static void _configure_uart_gpio(hal_uart_t uart) {
-  if (uart == HAL_UART_1) {
-    hal_gpio_set_alternate_function(GPIO_PB06, HAL_GPIO_AF7); // TX
-    hal_gpio_set_alternate_function(GPIO_PB07, HAL_GPIO_AF7); // RX
-  } else if (uart == HAL_UART_2) {
-    hal_gpio_set_alternate_function(GPIO_PA02, HAL_GPIO_AF7); // TX
-    hal_gpio_set_alternate_function(GPIO_PA03, HAL_GPIO_AF7); // RX
-  } else if (uart == HAL_UART_6) {
-    hal_gpio_set_alternate_function(GPIO_PC06, HAL_GPIO_AF8); // TX
-    hal_gpio_set_alternate_function(GPIO_PC07, HAL_GPIO_AF8); // RX
+  for (unsigned i = 0u; i < (sizeof uart_pinmap / sizeof uart_pinmap[0]); i++) {
+    if (uart_pinmap[i].uart == uart) {
+      hal_gpio_set_alternate_function(uart_pinmap[i].tx, uart_pinmap[i].af);
+      hal_gpio_set_alternate_function(uart_pinmap[i].rx, uart_pinmap[i].af);
+      return;
+    }
   }
 }
 

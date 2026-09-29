@@ -248,3 +248,57 @@ config PIN_BOARD_SD_CD_PORT
 config PIN_BOARD_SD_CD_PIN
     int
     default 5 if BOARD_NAVIXSM_F401RE
+
+# ---- USART pins ----
+# Which pins each USART uses, and the alternate function that routes it. A
+# USART this board leaves undescribed is absent from the driver's pin table, so
+# the driver configures no pins for it.
+#
+# Constrained by the AF mux: each USART reaches only a few pin pairs. Check the
+# datasheet before changing one, and set the AF that table gives.
+
+config PIN_BOARD_USART1_TX_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART1_TX_PIN
+    int
+    default 6 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART1_RX_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART1_RX_PIN
+    int
+    default 7 if BOARD_NAVIXSM_F401RE
+config NUM_BOARD_USART1_AF
+    int
+    default 7 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART2_TX_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART2_TX_PIN
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART2_RX_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART2_RX_PIN
+    int
+    default 3 if BOARD_NAVIXSM_F401RE
+config NUM_BOARD_USART2_AF
+    int
+    default 7 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART6_TX_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART6_TX_PIN
+    int
+    default 6 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART6_RX_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USART6_RX_PIN
+    int
+    default 7 if BOARD_NAVIXSM_F401RE
+config NUM_BOARD_USART6_AF
+    int
+    default 8 if BOARD_NAVIXSM_F401RE

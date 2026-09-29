@@ -105,6 +105,56 @@ void test_hal_sdio_card_identifies(void) {
   TEST_ASSERT_TRUE(sectors > 0u);
 }
 
+/* 4-bit, which is a question about the board rather than the driver: DAT1..3
+ * have to be wired and soldered for the DPSM's start-bit detect to see all four
+ * lines go low together. On this bench a dry joint on DAT3 moved no data at any
+ * clock while 1-bit worked perfectly, which is the failure this case exists to
+ * catch -- it looks like a driver bug and is not one.
+ *
+ * Skipped under an emulator: a model answers on four lines because it is told
+ * to, so passing there would say nothing about the solder. Read-only, and block
+ * 0 at that, so nothing on the card is touched. */
+void test_hal_sdio_four_bit_transfers(void) {
+  NAVTEST_SKIP_ON_PIL();
+
+  if (!hal_sdio_card_present()) {
+    navtest_write("[sdio slot=empty -- 4-bit not exercised]\r\n");
+    TEST_ASSERT_TRUE(1);
+    return;
+  }
+
+  hal_sdio_config_t cfg = {.clock_div = 0,
+                           .bus_width = HAL_SDIO_BUS_WIDTH_4BIT};
+  if (hal_sdio_init(&cfg) != HAL_SDIO_OK) {
+    navtest_write("[sdio controller not available]\r\n");
+    TEST_ASSERT_TRUE(1);
+    return;
+  }
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_SDIO_OK,
+                           (uint32_t)hal_sdio_card_init());
+
+  /* A 4-bit transfer that actually completes is the whole assertion: with a
+   * broken data line the DPSM never sees its start bit and this times out. */
+  static uint8_t block[512];
+  for (uint32_t i = 0; i < sizeof block; i++) {
+    block[i] = 0xA5; /* so a silent no-op cannot look like a successful read */
+  }
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_SDIO_OK,
+                           (uint32_t)hal_sdio_read_block(0u, block));
+
+  uint32_t untouched = 0;
+  for (uint32_t i = 0; i < sizeof block; i++) {
+    if (block[i] == 0xA5) {
+      untouched++;
+    }
+  }
+  navtest_write("[sdio 4-bit read ok]\r\n");
+  /* Every byte still 0xA5 would mean nothing was written into the buffer. A
+   * card may legitimately hold 0xA5 somewhere, so this rejects only the case
+   * where the whole block is untouched. */
+  TEST_ASSERT_TRUE(untouched < sizeof block);
+}
+
 void test_hal_sdio_get_sector_count_returns_value(void) {
   /* Without a card the sector count may be 0 — what matters is the call
    * returns and doesn't fault.
@@ -229,6 +279,7 @@ NAVTEST_CASE_DECL(test_hal_sdio_init_rejects_null_config);
 NAVTEST_CASE_DECL(test_hal_sdio_read_block_rejects_null_buffer);
 NAVTEST_CASE_DECL(test_hal_sdio_write_block_rejects_null_buffer);
 NAVTEST_CASE_DECL(test_hal_sdio_card_identifies);
+NAVTEST_CASE_DECL(test_hal_sdio_four_bit_transfers);
 NAVTEST_CASE_DECL(test_hal_sdio_get_sector_count_returns_value);
 NAVTEST_CASE_DECL(test_hal_sdio_set_callback_smoke);
 NAVTEST_CASE_DECL(test_hal_sdio_block_roundtrip_pil);
@@ -244,6 +295,7 @@ static const navtest_case_t sdio_cases[] = {
     NAVTEST_CASE(test_hal_sdio_read_block_rejects_null_buffer),
     NAVTEST_CASE(test_hal_sdio_write_block_rejects_null_buffer),
     NAVTEST_CASE(test_hal_sdio_card_identifies),
+    NAVTEST_CASE(test_hal_sdio_four_bit_transfers),
     NAVTEST_CASE(test_hal_sdio_get_sector_count_returns_value),
     NAVTEST_CASE(test_hal_sdio_set_callback_smoke),
     NAVTEST_CASE(test_hal_sdio_block_roundtrip_pil),

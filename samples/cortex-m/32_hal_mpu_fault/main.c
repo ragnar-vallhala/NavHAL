@@ -32,9 +32,10 @@
  * Status is printed on USART3 (ST-LINK VCP, 9600 8N1).
  */
 
+#include "board.h"
 #include "navhal.h"
 
-#define CONSOLE HAL_UART_2
+#define CONSOLE BOARD_CONSOLE_UART
 
 /* Cortex-M7 System Control Block fault registers (not wrapped by the HAL). */
 #define SCB_SHCSR (*(volatile uint32_t *)0xE000ED24u)

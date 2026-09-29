@@ -16,75 +16,75 @@
  */
 
 #include "navhal_port_config.h"
-#include "family/dma_reg.h"
+#include "board.h"
 #include "navhal.h"
 
 #define BUF_SIZE 256
 
-/* Circular DMA RX buffers, read live via NDTR. Cache-line aligned so a D-cache
- * invalidate stays within the buffer. NOTE: on a cache-on build a circular RX
- * buffer read live is only coherent if placed in DTCM (uncached, DMA-reachable)
- * or invalidated before each read — see hal_uart_init_dma_rx. This board (F401,
- * no D-cache) needs neither; the alignment documents the contract. */
-uint8_t u2_rx_buf[BUF_SIZE] NAVHAL_DMA_ALIGN;
-uint8_t u6_rx_buf[BUF_SIZE] NAVHAL_DMA_ALIGN;
+/* Circular DMA RX buffers. Cache-line aligned so a D-cache invalidate stays
+ * within the buffer: on a cache-on build a circular RX buffer read live is only
+ * coherent in DTCM (uncached, DMA-reachable) or if invalidated before each read
+ * -- see hal_uart_init_dma_rx. A part without a D-cache needs neither, and the
+ * alignment documents the contract either way. */
+uint8_t con_rx_buf[BUF_SIZE] NAVHAL_DMA_ALIGN;
+uint8_t aux_rx_buf[BUF_SIZE] NAVHAL_DMA_ALIGN;
 
-uint16_t u2_head = 0;
-uint16_t u6_head = 0;
+uint16_t con_head = 0;
+uint16_t aux_head = 0;
 
 int main(void) {
   hal_timebase_init(1000);
 
-  /* Initialize HAL_UART_2 and HAL_UART_6 at 115200 bps */
-  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=115200});
-  hal_uart_init(HAL_UART_6, &(hal_uart_config_t){.baudrate=115200});
+  hal_uart_init(BOARD_CONSOLE_UART, &(hal_uart_config_t){.baudrate=115200});
+  hal_uart_init(BOARD_AUX_UART, &(hal_uart_config_t){.baudrate=115200});
 
 #if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
   /* Start DMA circular reception for both UARTs */
-  hal_uart_init_dma_rx(HAL_UART_2, u2_rx_buf, BUF_SIZE);
-  hal_uart_init_dma_rx(HAL_UART_6, u6_rx_buf, BUF_SIZE);
+  hal_uart_init_dma_rx(BOARD_CONSOLE_UART, con_rx_buf, BUF_SIZE);
+  hal_uart_init_dma_rx(BOARD_AUX_UART, aux_rx_buf, BUF_SIZE);
 
-  /* Optional start message */
-  hal_uart_write_string_dma(HAL_UART_2, "Bridge Started: HAL_UART_2 <-> HAL_UART_6\r\n");
-  hal_uart_write_string_dma(HAL_UART_6, "Bridge Started: HAL_UART_6 <-> HAL_UART_2\r\n");
+  hal_uart_write_string_dma(BOARD_CONSOLE_UART, "Bridge started: console -> aux\r\n");
+  hal_uart_write_string_dma(BOARD_AUX_UART, "Bridge started: aux -> console\r\n");
 
   while (1) {
-    /* Check HAL_UART_2 RX buffer via DMA NDTR */
-    uint16_t u2_tail = BUF_SIZE - DMA1->STREAM[5].NDTR;
-    if (u2_tail != u2_head) {
-      if (u2_tail > u2_head) {
-        hal_uart_write_dma(HAL_UART_6, &u2_rx_buf[u2_head], u2_tail - u2_head);
+    /* How far the DMA has filled each RX ring. The driver knows which stream
+     * belongs to which UART; reading NDTR here would hardcode that mapping. */
+    uint16_t con_tail = con_head;
+    (void)hal_uart_dma_rx_index(BOARD_CONSOLE_UART, &con_tail);
+    if (con_tail != con_head) {
+      if (con_tail > con_head) {
+        hal_uart_write_dma(BOARD_AUX_UART, &con_rx_buf[con_head], con_tail - con_head);
       } else {
-        hal_uart_write_dma(HAL_UART_6, &u2_rx_buf[u2_head], BUF_SIZE - u2_head);
-        if (u2_tail > 0) {
-          hal_uart_write_dma(HAL_UART_6, &u2_rx_buf[0], u2_tail);
+        hal_uart_write_dma(BOARD_AUX_UART, &con_rx_buf[con_head], BUF_SIZE - con_head);
+        if (con_tail > 0) {
+          hal_uart_write_dma(BOARD_AUX_UART, &con_rx_buf[0], con_tail);
         }
       }
-      u2_head = u2_tail;
+      con_head = con_tail;
     }
 
-    /* Check HAL_UART_6 RX buffer via DMA NDTR */
-    uint16_t u6_tail = BUF_SIZE - DMA2->STREAM[1].NDTR;
-    if (u6_tail != u6_head) {
-      if (u6_tail > u6_head) {
-        hal_uart_write_dma(HAL_UART_2, &u6_rx_buf[u6_head], u6_tail - u6_head);
+    uint16_t aux_tail = aux_head;
+    (void)hal_uart_dma_rx_index(BOARD_AUX_UART, &aux_tail);
+    if (aux_tail != aux_head) {
+      if (aux_tail > aux_head) {
+        hal_uart_write_dma(BOARD_CONSOLE_UART, &aux_rx_buf[aux_head], aux_tail - aux_head);
       } else {
-        hal_uart_write_dma(HAL_UART_2, &u6_rx_buf[u6_head], BUF_SIZE - u6_head);
-        if (u6_tail > 0) {
-          hal_uart_write_dma(HAL_UART_2, &u6_rx_buf[0], u6_tail);
+        hal_uart_write_dma(BOARD_CONSOLE_UART, &aux_rx_buf[aux_head], BUF_SIZE - aux_head);
+        if (aux_tail > 0) {
+          hal_uart_write_dma(BOARD_CONSOLE_UART, &aux_rx_buf[0], aux_tail);
         }
       }
-      u6_head = u6_tail;
+      aux_head = aux_tail;
     }
   }
 #else
   /* Fallback if DMA is not enabled */
   while (1) {
-    if (hal_uart_available(HAL_UART_2)) {
-      hal_uart_write_char(HAL_UART_6, hal_uart_read_char(HAL_UART_2));
+    if (hal_uart_available(BOARD_CONSOLE_UART)) {
+      hal_uart_write_char(BOARD_AUX_UART, hal_uart_read_char(BOARD_CONSOLE_UART));
     }
-    if (hal_uart_available(HAL_UART_6)) {
-      hal_uart_write_char(HAL_UART_2, hal_uart_read_char(HAL_UART_6));
+    if (hal_uart_available(BOARD_AUX_UART)) {
+      hal_uart_write_char(BOARD_CONSOLE_UART, hal_uart_read_char(BOARD_AUX_UART));
     }
   }
 #endif

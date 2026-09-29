@@ -95,12 +95,21 @@ extern "C" {
 #define BOARD_I2C_EXT_SDA GPIO_PB09
 
 /* micro-SD — SDIO 4-bit: D0..D3 PC8/PC9/PC10/PC11, CK PC12, CMD PD2. */
-/* Card detect is not named here. The SDIO driver takes it, and its bus pins, from
- * the "SDIO pin assignment" Kconfig menu -- CONFIG_SDIO_CD_PORT / _PIN, defaulting
- * to PC5 for this board. Naming the pin here as well is what let the board layer
- * and the driver disagree: this macro existed, said PC5, and was read by nothing
- * while the driver hardcoded its own pins. Applications ask
- * hal_sdio_card_present() rather than reading the pin. */
+/* Card detect, derived from the configuration rather than restated.
+ *
+ * The pin itself is CONFIG_SDIO_CD_PORT / _PIN in the "SDIO pin assignment" menu,
+ * which defaults to PC5 for this board and is what the SDIO driver reads. Spelling
+ * it out again here is what used to let the board layer and the driver disagree --
+ * this macro said PC5 while the driver hardcoded its own pins and never looked.
+ * Deriving it keeps the board-layer name applications expect, with one source of
+ * truth behind it.
+ *
+ * Absent when the board is configured without card detect, so code that uses it
+ * needs the same #if the driver does. hal_sdio_card_present() needs no guard. */
+#if NAVHAL_CONFIG_SDIO_HAS_CD
+#define BOARD_SD_CD                                                            \
+  HAL_GPIO_PIN(NAVHAL_CONFIG_SDIO_CD_PORT, NAVHAL_CONFIG_SDIO_CD_PIN)
+#endif
 
 /* USB OTG-FS device — PA11 (DM) / PA12 (DP), VBUS sense on PA9. */
 #define BOARD_USB_DM   GPIO_PA11

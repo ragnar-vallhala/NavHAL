@@ -49,6 +49,6 @@ target_include_directories(hal PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}   # shared pc_io.h (port I/O + TSC)
     ${INCLUDE_PORT}
     ${INCLUDE_FAMILY}
-    ${SRC_BOARD}
+    ${CMAKE_BINARY_DIR}   # generated board.h
     ${CMAKE_BINARY_DIR}
 )

@@ -4,3 +4,247 @@
 config BOARD
     string
     default "navixsmf401re" if BOARD_NAVIXSM_F401RE
+
+# ---- This board's description ----
+#
+# Every macro board.h used to define, as Kconfig symbols. tools/kconfig.py turns
+# these into the board.h that code includes, so this file is the single place the
+# board is described and any value here can be overridden in .config -- including
+# which USART the console is on, which was impossible while it was a header.
+
+# 37 macros
+config PIN_LED_BUILTIN_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_LED_BUILTIN_PIN
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config VAL_LED_ON
+    string
+    default "HAL_GPIO_LOW" if BOARD_NAVIXSM_F401RE
+config VAL_LED_OFF
+    string
+    default "HAL_GPIO_HIGH" if BOARD_NAVIXSM_F401RE
+config PIN_LED_RGB_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_LED_RGB_PIN
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BUZZER_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BUZZER_PIN
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config VAL_BOARD_CONSOLE_UART
+    string
+    default "HAL_UART_2" if BOARD_NAVIXSM_F401RE
+config VAL_BOARD_CONSOLE_UART_IRQ
+    string
+    default "USART2_IRQn" if BOARD_NAVIXSM_F401RE
+config VAL_BOARD_GPS_UART
+    string
+    default "HAL_UART_6" if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_GPS_TX_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_GPS_TX_PIN
+    int
+    default 6 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_GPS_RX_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_GPS_RX_PIN
+    int
+    default 7 if BOARD_NAVIXSM_F401RE
+config VAL_BOARD_GP_TIMER
+    string
+    default "TIM5" if BOARD_NAVIXSM_F401RE
+config NUM_BOARD_PWM_CHANNEL
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_PWM_PIN_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_PWM_PIN_PIN
+    int
+    default 4 if BOARD_NAVIXSM_F401RE
+config VAL_BOARD_PWM_AF
+    string
+    default "HAL_GPIO_AF2" if BOARD_NAVIXSM_F401RE
+config VAL_BOARD_PWM_TIMER
+    string
+    default "TIM3" if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_MOTOR1_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_MOTOR1_PIN
+    int
+    default 4 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_MOTOR2_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_MOTOR2_PIN
+    int
+    default 5 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_MOTOR3_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_MOTOR3_PIN
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_MOTOR4_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_MOTOR4_PIN
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config VAL_BOARD_SPI_BUS
+    string
+    default "HAL_SPI_1" if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SPI_CS_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SPI_CS_PIN
+    int
+    default 4 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_IMU_INT1_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_IMU_INT1_PIN
+    int
+    default 13 if BOARD_NAVIXSM_F401RE
+config VAL_BOARD_LORA_SPI
+    string
+    default "HAL_SPI_2" if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_LORA_NSS_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_LORA_NSS_PIN
+    int
+    default 12 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_LORA_RST_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_LORA_RST_PIN
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_LORA_BUSY_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_LORA_BUSY_PIN
+    int
+    default 8 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_LORA_DIO1_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_LORA_DIO1_PIN
+    int
+    default 15 if BOARD_NAVIXSM_F401RE
+config VAL_BOARD_I2C_BUS
+    string
+    default "HAL_I2C_1" if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_I2C_SCL_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_I2C_SCL_PIN
+    int
+    default 6 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_I2C_SDA_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_I2C_SDA_PIN
+    int
+    default 7 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_I2C_EXT_SCL_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_I2C_EXT_SCL_PIN
+    int
+    default 8 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_I2C_EXT_SDA_PORT
+    int
+    default 1 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_I2C_EXT_SDA_PIN
+    int
+    default 9 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USB_DM_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USB_DM_PIN
+    int
+    default 11 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USB_DP_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USB_DP_PIN
+    int
+    default 12 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USB_VBUS_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USB_VBUS_PIN
+    int
+    default 9 if BOARD_NAVIXSM_F401RE
+config NUM_BOARD_HSI_FREQ_HZ
+    int
+    default 16000000 if BOARD_NAVIXSM_F401RE
+config NUM_BOARD_HSE_FREQ_HZ
+    int
+    default 8000000 if BOARD_NAVIXSM_F401RE
+
+# ---- SDIO ----
+# The bus signals are fixed by the alternate-function mux rather than freely
+# chosen: pointing one at a pin the mux cannot route gives a build that compiles
+# and a bus that never transfers. Check the datasheet before changing one.
+
+config NUM_BOARD_SDIO_AF
+    int
+    default 12 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_D0_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_D0_PIN
+    int
+    default 8 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_D1_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_D1_PIN
+    int
+    default 9 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_D2_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_D2_PIN
+    int
+    default 10 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_D3_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_D3_PIN
+    int
+    default 11 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_CK_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_CK_PIN
+    int
+    default 12 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_CMD_PORT
+    int
+    default 3 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SDIO_CMD_PIN
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+
+# Card detect is an ordinary GPIO, not an SDIO signal, so it can be anywhere.
+# Its presence is the flag: a board that declares it gets BOARD_SD_CD in the
+# generated header, and the driver compiles its card-detect path on that.
+config PIN_BOARD_SD_CD_PORT
+    int
+    default 2 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_SD_CD_PIN
+    int
+    default 5 if BOARD_NAVIXSM_F401RE

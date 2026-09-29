@@ -4,3 +4,23 @@
 config BOARD
     string
     default "acme_devkit" if BOARD_ACME_DEVKIT
+
+# ---- This board's description ----
+#
+# Every macro board.h used to define, as Kconfig symbols; tools/kconfig.py turns
+# them into the board.h that code includes, so this file is the single place the
+# board is described and any value can be overridden in .config.
+#
+# PIN_<name>_PORT/_PIN become HAL_GPIO_PIN(); NUM_<name> an integer; VAL_<name> is
+# emitted verbatim, for spellings no integer can carry.
+
+# 2 macros
+config PIN_LED_BUILTIN_PORT
+    int
+    default 0 if BOARD_ACME_DEVKIT
+config PIN_LED_BUILTIN_PIN
+    int
+    default 5 if BOARD_ACME_DEVKIT
+config VAL_LED_ON
+    string
+    default "HAL_GPIO_HIGH" if BOARD_ACME_DEVKIT

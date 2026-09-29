@@ -192,13 +192,96 @@ void test_eth_link_and_send(void) {
   }
 }
 
+/* TX and RX proven without a peer, by looping the PHY back on itself: a frame
+ * handed to the MAC comes out of the PHY, turns round inside it and arrives back
+ * through the RX descriptors. That covers the descriptor rings, the ETHRAM
+ * placement and the DPSM in both directions -- and it does so with nothing
+ * plugged in, where the cable path above can only ever report what the network
+ * happened to be doing.
+ *
+ * Auto-negotiation is off while looped back: there is no partner to negotiate
+ * with, so the speed and duplex are stated rather than discovered. The PHY is
+ * reset back to negotiating on the way out, or the next run would find a link
+ * that never comes up. */
+void test_eth_phy_loopback_round_trips(void) {
+  NAVTEST_SKIP_ON_PIL(); /* Renode models no ETH MAC. */
+
+  hal_eth_config_t cfg = {
+      .mac_addr = {0x02, 0x00, 0x00, 0x00, 0x00, 0x01},
+      .interface = HAL_ETH_IFACE_RMII,
+      .phy_address = ETH_TEST_PHY_ADDR,
+      .auto_negotiation = true,
+  };
+  hal_status_t s = hal_eth_init(&cfg);
+  TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_INITIALIZED);
+
+  if (hal_eth_phy_write(ETH_PHY_BCR, ETH_PHY_BCR_LOOPBACK |
+                                         ETH_PHY_BCR_SPEED_100 |
+                                         ETH_PHY_BCR_FULLDUPLEX) != HAL_OK) {
+    navtest_write("[eth phy loopback unavailable]\r\n");
+    TEST_ASSERT_TRUE(1);
+    return;
+  }
+  for (volatile uint32_t i = 0u; i < 400000u; i++) { /* let the PHY settle */
+  }
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_eth_start());
+
+  /* A marker in the payload, so what comes back is provably the frame that
+   * went out rather than whatever was already sitting in the ring. */
+  static const uint8_t marker[4] = {0x4E, 0x41, 0x56, 0x4C}; /* "NAVL" */
+  static uint8_t tx[HAL_ETH_MIN_FRAME_LEN];
+  for (uint16_t i = 0; i < HAL_ETH_MIN_FRAME_LEN; i++) {
+    tx[i] = 0x00;
+  }
+  for (uint8_t i = 0; i < 6; i++) {
+    tx[i] = 0xFF;
+    tx[6 + i] = cfg.mac_addr[i];
+  }
+  tx[12] = 0x88;
+  tx[13] = 0xB5;
+  for (uint8_t i = 0; i < 4; i++) {
+    tx[14 + i] = marker[i];
+  }
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_eth_send(tx, sizeof tx));
+
+  static uint8_t rx[HAL_ETH_MAX_FRAME_LEN];
+  uint16_t rx_len = 0;
+  bool got = false;
+  for (uint32_t tries = 0u; tries < 200u && !got; tries++) {
+    if (hal_eth_receive(rx, sizeof rx, &rx_len) == HAL_OK && rx_len >= 18u) {
+      got = rx[12] == 0x88 && rx[13] == 0xB5 && rx[14] == marker[0] &&
+            rx[15] == marker[1] && rx[16] == marker[2] && rx[17] == marker[3];
+    }
+    if (!got) {
+      for (volatile uint32_t i = 0u; i < 100000u; i++) {
+      }
+    }
+  }
+
+  /* Put the PHY back to negotiating before judging, so a failure here does not
+   * also leave the board unable to link on the next run. */
+  (void)hal_eth_phy_write(ETH_PHY_BCR, ETH_PHY_BCR_RESET);
+  for (volatile uint32_t i = 0u; i < 400000u; i++) {
+  }
+  (void)hal_eth_phy_write(ETH_PHY_BCR,
+                          ETH_PHY_BCR_AUTONEG_EN | ETH_PHY_BCR_RESTART_AUTONEG);
+
+  navtest_write(got ? "[eth loopback rx=ok]\r\n" : "[eth loopback rx=NONE]\r\n");
+  TEST_ASSERT_TRUE(got);
+}
+
 NAVTEST_CASE_DECL(test_eth_phy_id_readable);
 NAVTEST_CASE_DECL(test_eth_link_and_send);
+NAVTEST_CASE_DECL(test_eth_phy_loopback_round_trips);
 
 static const navtest_case_t eth_cases[] = {
     NAVTEST_CASE(test_eth_rejects_null_args),
     NAVTEST_CASE(test_eth_phy_id_readable),
     NAVTEST_CASE(test_eth_link_and_send),
+    NAVTEST_CASE(test_eth_phy_loopback_round_trips),
 };
 
 const navtest_suite_t test_eth_suite = {

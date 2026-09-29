@@ -5,3 +5,213 @@
 config BOARD
     string
     default "atmega328p" if BOARD_ATMEGA328P
+
+# ---- This board's description ----
+#
+# Every macro board.h used to define, as Kconfig symbols; tools/kconfig.py turns
+# them into the board.h that code includes. Port indices are relative to this
+# ISA's first port, which is B rather than A -- see GPIO_PORT_BASE.
+#
+# VAL_ carries the spellings no integer can: HAL_IRQ_USART_RX is this console's
+# interrupt and has no instance number, TIM1 and HAL_ADC_0 are names, and
+# BOARD_ADC_PIN is an alias for the A0 pin macro above it.
+
+# 40 macros
+config PIN_LED_BUILTIN_PORT
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_LED_BUILTIN_PIN
+    int
+    default 5 if BOARD_ATMEGA328P
+config VAL_LED_ON
+    string
+    default "HAL_GPIO_HIGH" if BOARD_ATMEGA328P
+config VAL_LED_OFF
+    string
+    default "HAL_GPIO_LOW" if BOARD_ATMEGA328P
+config PIN_USER_BUTTON_PORT
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_USER_BUTTON_PIN
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D0_PORT
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D0_PIN
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_D1_PORT
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D1_PIN
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_D2_PORT
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D2_PIN
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D3_PORT
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D3_PIN
+    int
+    default 3 if BOARD_ATMEGA328P
+config PIN_D4_PORT
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D4_PIN
+    int
+    default 4 if BOARD_ATMEGA328P
+config PIN_D5_PORT
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D5_PIN
+    int
+    default 5 if BOARD_ATMEGA328P
+config PIN_D6_PORT
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D6_PIN
+    int
+    default 6 if BOARD_ATMEGA328P
+config PIN_D7_PORT
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D7_PIN
+    int
+    default 7 if BOARD_ATMEGA328P
+config PIN_D8_PORT
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_D8_PIN
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_D9_PORT
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_D9_PIN
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_D10_PORT
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_D10_PIN
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_D11_PORT
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_D11_PIN
+    int
+    default 3 if BOARD_ATMEGA328P
+config PIN_D12_PORT
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_D12_PIN
+    int
+    default 4 if BOARD_ATMEGA328P
+config PIN_D13_PORT
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_D13_PIN
+    int
+    default 5 if BOARD_ATMEGA328P
+config PIN_A0_PORT
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_A0_PIN
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_A1_PORT
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_A1_PIN
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_A2_PORT
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_A2_PIN
+    int
+    default 2 if BOARD_ATMEGA328P
+config PIN_A3_PORT
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_A3_PIN
+    int
+    default 3 if BOARD_ATMEGA328P
+config PIN_A4_PORT
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_A4_PIN
+    int
+    default 4 if BOARD_ATMEGA328P
+config PIN_A5_PORT
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_A5_PIN
+    int
+    default 5 if BOARD_ATMEGA328P
+config VAL_BOARD_ADC
+    string
+    default "HAL_ADC_0" if BOARD_ATMEGA328P
+config VAL_BOARD_ADC_PIN
+    string
+    default "A0" if BOARD_ATMEGA328P
+config NUM_BOARD_ADC_CHANNEL
+    int
+    default 0 if BOARD_ATMEGA328P
+config VAL_BOARD_CONSOLE_UART
+    string
+    default "HAL_UART_0" if BOARD_ATMEGA328P
+config VAL_BOARD_CONSOLE_UART_IRQ
+    string
+    default "HAL_IRQ_USART_RX" if BOARD_ATMEGA328P
+config VAL_BOARD_GP_TIMER
+    string
+    default "TIM1" if BOARD_ATMEGA328P
+config VAL_BOARD_PWM_TIMER
+    string
+    default "TIM1" if BOARD_ATMEGA328P
+config NUM_BOARD_PWM_CHANNEL
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_BOARD_PWM_PIN_PORT
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_BOARD_PWM_PIN_PIN
+    int
+    default 1 if BOARD_ATMEGA328P
+config VAL_BOARD_PWM_AF
+    string
+    default "HAL_GPIO_AF1" if BOARD_ATMEGA328P
+config VAL_BOARD_I2C_BUS
+    string
+    default "HAL_I2C_0" if BOARD_ATMEGA328P
+config PIN_BOARD_I2C_SCL_PORT
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_BOARD_I2C_SCL_PIN
+    int
+    default 5 if BOARD_ATMEGA328P
+config PIN_BOARD_I2C_SDA_PORT
+    int
+    default 1 if BOARD_ATMEGA328P
+config PIN_BOARD_I2C_SDA_PIN
+    int
+    default 4 if BOARD_ATMEGA328P
+config VAL_BOARD_SPI_BUS
+    string
+    default "HAL_SPI_0" if BOARD_ATMEGA328P
+config PIN_BOARD_SPI_CS_PORT
+    int
+    default 0 if BOARD_ATMEGA328P
+config PIN_BOARD_SPI_CS_PIN
+    int
+    default 2 if BOARD_ATMEGA328P
+config NUM_BOARD_XTAL_FREQ_HZ
+    int
+    default 16000000 if BOARD_ATMEGA328P

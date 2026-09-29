@@ -19,3 +19,6 @@ config FLASHER
 
 config FLASH_ADDRESS
     default "0x0" if ARCH_AVR8
+
+config GPIO_PORT_BASE
+    default "B" if ARCH_AVR8

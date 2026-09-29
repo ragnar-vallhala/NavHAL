@@ -4,3 +4,15 @@
 config BOARD
     string
     default "qemu" if BOARD_QEMU
+
+# ---- This board's description ----
+#
+# A PC has no GPIO, so this board describes only its console: COM1, which QEMU
+# exposes through -serial. tools/kconfig.py turns this into the board.h that code
+# includes -- the generated header's type includes are __has_include-guarded
+# precisely because this port has no utils/gpio_types.h to include.
+
+# 1 macros
+config VAL_BOARD_CONSOLE_UART
+    string
+    default "HAL_UART_1" if BOARD_QEMU

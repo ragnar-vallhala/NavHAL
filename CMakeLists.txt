@@ -292,6 +292,20 @@ if(TARGET hal AND NAVHAL_LINK_SCRIPT_DIR)
   target_link_options(hal INTERFACE "-L${NAVHAL_LINK_SCRIPT_DIR}")
 endif()
 
+# And the script itself, for the same reason: which file describes this board's
+# memory is NavHAL's business, not its consumer's. Without this a parent project
+# has to spell out src/board/<board>/linker.ld, which makes every generated
+# project depend on NavHAL's directory layout.
+#
+# Only when NavHAL is a subproject. Its own executables take -T from
+# ARCH_LINK_FLAGS, and a TEST build swaps a different script in there -- a second
+# -T arriving from the link line would override that one and link the test image
+# to the board's memory map instead.
+if(TARGET hal AND NAVHAL_LINKER_SCRIPT AND
+   NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  target_link_options(hal INTERFACE "SHELL:-T ${NAVHAL_LINKER_SCRIPT}")
+endif()
+
 # Carry the force-included target header on the target, for the same reason.
 #
 # navhal_target.h defines every NAVHAL_CONFIG_* symbol, and the public headers

@@ -8,7 +8,8 @@
 set(ARCH_C_FLAGS
     "-m64 -ffreestanding -fno-pic -fno-pie -mno-red-zone -mcmodel=large -fno-stack-protector -fno-asynchronous-unwind-tables")
 set(ARCH_ASM_FLAGS  "-m64")
-set(ARCH_LINK_FLAGS "-T ${SRC_BOARD}/linker.ld -nostdlib -no-pie -z max-page-size=0x1000")
+set(NAVHAL_LINKER_SCRIPT "${SRC_BOARD}/linker.ld")
+set(ARCH_LINK_FLAGS "-T ${NAVHAL_LINKER_SCRIPT} -nostdlib -no-pie -z max-page-size=0x1000")
 
 # Host-run / on-target test build is not wired for x86 yet; leave the slots the
 # if(TEST) block reads empty so a non-TEST configure is unaffected.

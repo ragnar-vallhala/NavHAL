@@ -28,9 +28,10 @@
  * The MAC data path needs HCLK >= 25 MHz, so the PLL is brought up first.
  */
 
+#include "board.h"
 #include "navhal.h"
 
-#define ETH_CONSOLE HAL_UART_3 /* USART3 = ST-LINK VCP on the Nucleo-144. */
+#define ETH_CONSOLE BOARD_CONSOLE_UART
 #define ETH_ETHERTYPE 0x88B5U  /* local/experimental EtherType. */
 
 static uint8_t s_mac[6] = {0x02, 0x00, 0x00, 0x00, 0x00, 0x01};

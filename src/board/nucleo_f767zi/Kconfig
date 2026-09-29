@@ -556,3 +556,10 @@ config PIN_BOARD_ETH_TXD1_PORT
 config PIN_BOARD_ETH_TXD1_PIN
     int
     default 13 if BOARD_NUCLEO_F767ZI
+
+# ---- Second UART ----
+# Which instance code should use when it needs a UART that is not the console,
+# such as a two-port bridge. Its pins are the BOARD_USART<n>_* set above.
+config VAL_BOARD_AUX_UART
+    string
+    default "HAL_UART_6" if BOARD_NUCLEO_F767ZI

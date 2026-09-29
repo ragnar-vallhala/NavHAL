@@ -21,43 +21,44 @@
  */
 
 #include "navhal_port_clock.h"
+#include "board.h"
 #include "navhal.h"
 
 #define BMX160_I2C_ADDR 0x68
-#define I2C_BUS HAL_I2C_1
-#define I2C_PIN_1 GPIO_PB08 // SCL
-#define I2C_PIN_2 GPIO_PB09 // SDA
+#define I2C_BUS BOARD_I2C_BUS
+#define I2C_PIN_SCL BOARD_I2C_SCL
+#define I2C_PIN_SDA BOARD_I2C_SDA
 
 volatile bool dma_rx_complete = false;
 
 void on_dma_complete(void) { dma_rx_complete = true; }
 
 void unstick_i2c_bus(void) {
-  hal_gpio_set_mode(GPIO_PB08, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_UP);
-  hal_gpio_set_mode(GPIO_PB09, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_UP);
-  hal_gpio_set_output_type(GPIO_PB08, HAL_GPIO_OTYPE_OPEN_DRAIN);
-  hal_gpio_set_output_type(GPIO_PB09, HAL_GPIO_OTYPE_OPEN_DRAIN);
+  hal_gpio_set_mode(I2C_PIN_SCL, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_UP);
+  hal_gpio_set_mode(I2C_PIN_SDA, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_UP);
+  hal_gpio_set_output_type(I2C_PIN_SCL, HAL_GPIO_OTYPE_OPEN_DRAIN);
+  hal_gpio_set_output_type(I2C_PIN_SDA, HAL_GPIO_OTYPE_OPEN_DRAIN);
 
-  hal_gpio_write(GPIO_PB09, HAL_GPIO_HIGH);
+  hal_gpio_write(I2C_PIN_SDA, HAL_GPIO_HIGH);
   for (volatile int i = 0; i < 100; i++)
     ;
 
   for (int i = 0; i < 9; ++i) {
-    hal_gpio_write(GPIO_PB08, HAL_GPIO_LOW);
+    hal_gpio_write(I2C_PIN_SCL, HAL_GPIO_LOW);
     for (volatile int j = 0; j < 200; j++)
       ;
-    hal_gpio_write(GPIO_PB08, HAL_GPIO_HIGH);
+    hal_gpio_write(I2C_PIN_SCL, HAL_GPIO_HIGH);
     for (volatile int j = 0; j < 200; j++)
       ;
   }
 
-  hal_gpio_write(GPIO_PB09, HAL_GPIO_LOW);
+  hal_gpio_write(I2C_PIN_SDA, HAL_GPIO_LOW);
   for (volatile int j = 0; j < 200; j++)
     ;
-  hal_gpio_write(GPIO_PB08, HAL_GPIO_HIGH);
+  hal_gpio_write(I2C_PIN_SCL, HAL_GPIO_HIGH);
   for (volatile int j = 0; j < 200; j++)
     ;
-  hal_gpio_write(GPIO_PB09, HAL_GPIO_HIGH);
+  hal_gpio_write(I2C_PIN_SDA, HAL_GPIO_HIGH);
   for (volatile int j = 0; j < 200; j++)
     ;
 }
@@ -65,22 +66,22 @@ void unstick_i2c_bus(void) {
 int main(void) {
 
   hal_timebase_init(1000);
-  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
+  hal_uart_init(BOARD_CONSOLE_UART, &(hal_uart_config_t){.baudrate=9600});
 
   hal_delay_ms(100);
-  hal_uart_print(HAL_UART_2, "Initializing BMX160 for DMA Benchmark...\n\r");
+  hal_uart_print(BOARD_CONSOLE_UART, "Initializing BMX160 for DMA Benchmark...\n\r");
 
   unstick_i2c_bus();
 
   hal_i2c_config_t i2c_config = {
       .clock_speed = HAL_I2C_SPEED_FAST, .own_address = I2C_MASTER, .acknowledge = true};
 
-  hal_gpio_set_alternate_function(I2C_PIN_1, GPIO_FUNC_I2C);
-  hal_gpio_set_alternate_function(I2C_PIN_2, GPIO_FUNC_I2C);
-  hal_gpio_set_output_type(I2C_PIN_1, HAL_GPIO_OTYPE_OPEN_DRAIN);
-  hal_gpio_set_output_type(I2C_PIN_2, HAL_GPIO_OTYPE_OPEN_DRAIN);
-  hal_gpio_set_output_speed(I2C_PIN_1, HAL_GPIO_SPEED_VERY_HIGH);
-  hal_gpio_set_output_speed(I2C_PIN_2, HAL_GPIO_SPEED_VERY_HIGH);
+  hal_gpio_set_alternate_function(I2C_PIN_SCL, GPIO_FUNC_I2C);
+  hal_gpio_set_alternate_function(I2C_PIN_SDA, GPIO_FUNC_I2C);
+  hal_gpio_set_output_type(I2C_PIN_SCL, HAL_GPIO_OTYPE_OPEN_DRAIN);
+  hal_gpio_set_output_type(I2C_PIN_SDA, HAL_GPIO_OTYPE_OPEN_DRAIN);
+  hal_gpio_set_output_speed(I2C_PIN_SCL, HAL_GPIO_SPEED_VERY_HIGH);
+  hal_gpio_set_output_speed(I2C_PIN_SDA, HAL_GPIO_SPEED_VERY_HIGH);
 
   hal_i2c_init(I2C_BUS, &i2c_config);
 
@@ -99,7 +100,7 @@ int main(void) {
   hal_i2c_write(I2C_BUS, BMX160_I2C_ADDR, tx_buf, 2);
   hal_delay_ms(100);
 
-  hal_uart_print(HAL_UART_2, "Sensors ready. Executing 1000 iteration DMA read...\n\r");
+  hal_uart_print(BOARD_CONSOLE_UART, "Sensors ready. Executing 1000 iteration DMA read...\n\r");
 
   /* 32-byte aligned and size-padded (30->32) so a D-cache invalidate on the
    * DMA'd buffer never touches a neighbouring cache line. */
@@ -117,11 +118,11 @@ int main(void) {
     hal_status_t stat = hal_i2c_read_regs_dma(
         I2C_BUS, BMX160_I2C_ADDR, 0x04, rx_buf, 30, on_dma_complete);
     if (stat != HAL_OK) {
-      hal_uart_print(HAL_UART_2, "DMA Transaction start failed on iteration: ");
-      hal_uart_write_int(HAL_UART_2, i);
-      hal_uart_print(HAL_UART_2, " with error code: ");
-      hal_uart_write_int(HAL_UART_2, stat);
-      hal_uart_print(HAL_UART_2, "\n\r");
+      hal_uart_print(BOARD_CONSOLE_UART, "DMA Transaction start failed on iteration: ");
+      hal_uart_write_int(BOARD_CONSOLE_UART, i);
+      hal_uart_print(BOARD_CONSOLE_UART, " with error code: ");
+      hal_uart_write_int(BOARD_CONSOLE_UART, stat);
+      hal_uart_print(BOARD_CONSOLE_UART, "\n\r");
       break;
     }
 
@@ -136,15 +137,15 @@ int main(void) {
   int16_t ax = (int16_t)((rx_buf[15] << 8) | rx_buf[14]);
   int16_t temp = (int16_t)((rx_buf[29] << 8) | rx_buf[28]);
 
-  hal_uart_print(HAL_UART_2, "\n\r--- Benchmark Complete ---\n\r");
-  hal_uart_print(HAL_UART_2, "Final Sample - A_X: ");
-  hal_uart_write_int(HAL_UART_2, ax);
-  hal_uart_print(HAL_UART_2, " TEMP: ");
-  hal_uart_write_int(HAL_UART_2, temp);
-  hal_uart_print(HAL_UART_2, "\n\r");
-  hal_uart_print(HAL_UART_2, "Total Time for 1000 reads: ");
-  hal_uart_write_int(HAL_UART_2, end_time - start_time);
-  hal_uart_print(HAL_UART_2, " ms\n\r");
+  hal_uart_print(BOARD_CONSOLE_UART, "\n\r--- Benchmark Complete ---\n\r");
+  hal_uart_print(BOARD_CONSOLE_UART, "Final Sample - A_X: ");
+  hal_uart_write_int(BOARD_CONSOLE_UART, ax);
+  hal_uart_print(BOARD_CONSOLE_UART, " TEMP: ");
+  hal_uart_write_int(BOARD_CONSOLE_UART, temp);
+  hal_uart_print(BOARD_CONSOLE_UART, "\n\r");
+  hal_uart_print(BOARD_CONSOLE_UART, "Total Time for 1000 reads: ");
+  hal_uart_write_int(BOARD_CONSOLE_UART, end_time - start_time);
+  hal_uart_print(BOARD_CONSOLE_UART, " ms\n\r");
 
   while (1) {
     hal_delay_ms(1000);

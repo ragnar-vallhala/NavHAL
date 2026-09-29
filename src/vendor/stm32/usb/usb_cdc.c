@@ -47,11 +47,10 @@
 #include "navhal_port_interrupt.h"
 #include <stdint.h>
 
-#ifndef BOARD_HSE_FREQ_HZ
-#define BOARD_HSE_FREQ_HZ 8000000U
-#endif
-#ifndef BOARD_HSI_FREQ_HZ
-#define BOARD_HSI_FREQ_HZ 16000000U
+/* The 48 MHz check below divides the PLL input, so a wrong oscillator silences
+ * enumeration rather than failing loudly. A default here would supply one. */
+#if !defined(BOARD_HSE_FREQ_HZ) || !defined(BOARD_HSI_FREQ_HZ)
+#error "board must describe BOARD_HSE_FREQ_HZ and BOARD_HSI_FREQ_HZ"
 #endif
 
 /* Endpoint plan. The FIFO numbers match the IN endpoint numbers, which is what

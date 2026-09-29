@@ -53,6 +53,14 @@ execute_process(
             --navhal-target-out ${GENERATED_NAVHAL_TARGET}
             --board-header-out ${GENERATED_BOARD_HEADER}
             --sample-override "${SAMPLE}"
+    # The Kconfig tree sources its fragments by relative path
+    # (`source "src/arch/*/Kconfig.choice"`), and kconfiglib resolves those
+    # against the process's working directory. Without this that is wherever
+    # cmake was invoked from, so NavHAL configured only when someone happened to
+    # run cmake from this directory -- `cmake -S NavHAL -B build` from anywhere
+    # else, and every parent project doing add_subdirectory(extern/NavHAL),
+    # failed on a fragment that was sitting right there.
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     RESULT_VARIABLE KCONFIG_RESULT
 )
 if(NOT KCONFIG_RESULT EQUAL 0)

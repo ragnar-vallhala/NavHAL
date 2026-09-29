@@ -17,11 +17,11 @@
 # waits on hardware a bare board does not have.
 # ---------------------------------------------------------------------------
 hal_system_reset: resets the part, which ends the suite mid-run
-hal_boot_request: records the request and resets the part
 hal_flash_erase: erases the sectors holding the KV store and the running image
 hal_sdio_wait_flag: spins on a card that a bare board does not have
 hal_sdio_wait_sync: spins on a card that a bare board does not have
 hal_timebase_tick: the tick ISR's own entry; calling it forges the timebase that the suite's timing cases check against
+hal_console_init: re-initialises the transport the suite prints through, at a rate a portable case cannot know; a wrong one garbles the capture
 
 # ---------------------------------------------------------------------------
 # Debt. Each is reachable from a bare board; nobody has written the case.
@@ -29,30 +29,9 @@ hal_timebase_tick: the tick ISR's own entry; calling it forges the timebase that
 
 # Boot sniffer: byte matching and the attempt counter are pure state, and the
 # entry-enable pair is a flag round-trip. Only hal_boot_request above resets.
-hal_boot_block_init: debt: pure state, needs BOOT_SNIFFER in the conformance config
-hal_boot_block_valid: debt: pure state
-hal_boot_clear_request: debt: pure state
-hal_boot_entry_disable: debt: flag round-trip with entry_is_disabled
-hal_boot_entry_enable: debt: flag round-trip with entry_is_disabled
-hal_boot_entry_is_disabled: debt: flag round-trip
-hal_boot_feed: debt: pure state
-hal_boot_get_attempts: debt: getter sanity
-hal_boot_get_request: debt: getter sanity
-hal_boot_mark_healthy: debt: clears the attempt counter, observable via get_attempts
-hal_boot_match_byte: debt: pure state
-hal_boot_match_reset: debt: pure state
-hal_boot_set_prepare: debt: callback registration
 
 # Console: the suite's own transport. Callable, but a case has to assert on
 # something other than "the output appeared", since the output IS the result.
-hal_console_connected: debt: getter sanity
-hal_console_get_route: debt: getter sanity
-hal_console_init: debt: idempotency
-hal_console_write: debt: argument rejection
-hal_console_write_hex32: debt: argument rejection
-hal_console_write_uint: debt: argument rejection
-
-hal_crc_init: debt: idempotency and repeat-init
 
 # FatFs glue over SDIO. status/ioctl answer without a card; read/write do not.
 hal_disk_initialize: debt: returns a status with no card
@@ -87,11 +66,6 @@ hal_sdio_send_command: debt: argument rejection
 hal_sdio_set_callback: debt: NULL rejection
 
 # UART convenience writers over the same transport as the console.
-hal_uart_read_char: debt: instance-id rejection
-hal_uart_write_char: debt: instance-id rejection
-hal_uart_write_float: debt: instance-id rejection
-hal_uart_write_int: debt: instance-id rejection
-hal_uart_write_uint: debt: instance-id rejection
 
 # USB CDC: the cap suite already asserts what these do with no host attached.
 hal_usb_cdc_deinit: debt: idempotency
@@ -102,5 +76,3 @@ hal_usb_cdc_init: debt: idempotency with no host
 hal_usb_cdc_notify_serial_state: debt: argument rejection
 hal_usb_cdc_set_rx_callback: debt: NULL rejection
 
-hal_timebase_set_callback: debt: NULL rejection
-hal_wwdg_kick: debt: refuses before wwdg_start, which is the safe half

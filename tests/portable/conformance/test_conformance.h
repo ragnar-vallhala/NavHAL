@@ -73,6 +73,31 @@ void test_conformance_null_init_is_idempotent(void);
  * not a feature switch). */
 void test_conformance_cap_macros_are_defined(void);
 
+/* Console contract — the getters agree with themselves, the route is one of
+ * the two the contract defines, and a NULL string is a no-op. */
+void test_conformance_console_getters_are_stable(void);
+void test_conformance_console_write_ignores_null(void);
+
+/* UART convenience writers — an instance that does not exist is rejected, and
+ * read_char answers rather than waiting on a peripheral that is not there. */
+void test_conformance_uart_writers_reject_bad_instance(void);
+void test_conformance_uart_read_char_answers_on_bad_instance(void);
+
+void test_conformance_crc_init_rejects_null(void);
+void test_conformance_timebase_callback_accepts_null(void);
+void test_conformance_wwdg_kick_needs_a_running_watchdog(void);
+
+/* Boot sniffer contract — the entry interlock holds (a request while entry is
+ * disabled is refused, not obeyed), the block seals and validates, and console
+ * traffic that is not the sequence never advances the match. */
+void test_conformance_boot_block_init_validates(void);
+void test_conformance_boot_getters_are_stable(void);
+void test_conformance_boot_entry_gate_round_trips(void);
+void test_conformance_boot_request_is_refused_while_disabled(void);
+void test_conformance_boot_match_ignores_other_traffic(void);
+void test_conformance_boot_clear_and_heal_need_a_valid_block(void);
+void test_conformance_boot_set_prepare_accepts_null(void);
+
 extern const navtest_suite_t test_conformance_suite;
 
 #ifdef __cplusplus

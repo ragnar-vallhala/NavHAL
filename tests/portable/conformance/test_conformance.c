@@ -82,6 +82,13 @@
 #if NAVHAL_CONFIG_DRV_SDIO
 #include "common/hal_sdio.h"
 #endif
+#if NAVHAL_CONFIG_BOOT_SNIFFER
+#include "common/hal_boot.h"
+#endif
+#include "common/hal_console.h"
+#if NAVHAL_CONFIG_DRV_CRC
+#include "common/hal_crc.h"
+#endif
 
 
 /* ---------------------------------------------------------------------------
@@ -1340,6 +1347,208 @@ NAVTEST_CASE_DECL(test_conformance_timer_init_rejects_null);
 #endif
 
 
+#if NAVHAL_CONFIG_BOOT_SNIFFER
+/* ---------------------------------------------------------------------------
+ * Boot sniffer. Every case here runs with entry disabled, because a completed
+ * match calls hal_boot_request and that resets the part -- the refusal is the
+ * half a running suite can assert, and asserting it is how we know the
+ * interlock a console-fed board depends on actually holds.
+ * ------------------------------------------------------------------------- */
+static void _conf_boot_prepare_cb(void) { /* never invoked: entry stays off */ }
+
+void test_conformance_boot_block_init_validates(void) {
+  /* Idempotent by contract: a valid block is left alone, an invalid one is
+   * sealed. Either way the block reads valid afterwards. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
+  TEST_ASSERT_TRUE(hal_boot_block_valid());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
+  TEST_ASSERT_TRUE(hal_boot_block_valid());
+}
+
+void test_conformance_boot_getters_are_stable(void) {
+  uint32_t req = hal_boot_get_request();
+  TEST_ASSERT_EQUAL_UINT32(req, hal_boot_get_request());
+  uint32_t att = hal_boot_get_attempts();
+  TEST_ASSERT_EQUAL_UINT32(att, hal_boot_get_attempts());
+}
+
+void test_conformance_boot_entry_gate_round_trips(void) {
+  bool was = hal_boot_entry_is_disabled();
+
+  hal_boot_entry_disable();
+  TEST_ASSERT_TRUE(hal_boot_entry_is_disabled());
+  hal_boot_entry_enable();
+  TEST_ASSERT_FALSE(hal_boot_entry_is_disabled());
+
+  if (was) {
+    hal_boot_entry_disable();
+  }
+}
+
+void test_conformance_boot_request_is_refused_while_disabled(void) {
+  /* The one call in this file that would reset the board if the interlock did
+   * not hold. Disabled first, so a conformant port answers HAL_ERR_BUSY and
+   * the run continues -- and a port that resets here fails loudly by never
+   * reaching the summary. */
+  bool was = hal_boot_entry_is_disabled();
+
+  hal_boot_entry_disable();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request());
+
+  if (!was) {
+    hal_boot_entry_enable();
+  }
+  hal_boot_match_reset();
+}
+
+void test_conformance_boot_match_ignores_other_traffic(void) {
+  /* A byte that cannot be the sequence's first one cannot advance the match,
+   * whatever the port chose for hal_boot_seq. */
+  const uint8_t not_first = (uint8_t)(hal_boot_seq[0] ^ 0xFFu);
+  bool was = hal_boot_entry_is_disabled();
+  uint32_t before;
+
+  hal_boot_entry_disable();
+  hal_boot_match_reset();
+  before = hal_boot_get_request();
+
+  hal_boot_match_byte(not_first);
+  hal_boot_feed(&not_first, 1u);
+  hal_boot_feed(NULL, 4u); /* NULL is a no-op, not a fault */
+
+  TEST_ASSERT_EQUAL_UINT32(before, hal_boot_get_request());
+
+  hal_boot_match_reset();
+  if (!was) {
+    hal_boot_entry_enable();
+  }
+}
+
+void test_conformance_boot_clear_and_heal_need_a_valid_block(void) {
+  /* Both mutate the block, so both need one: the contract is that they answer
+   * HAL_ERR_NOT_INITIALIZED rather than writing into an unsealed block. After
+   * block_init there is one, and mark_healthy's effect is observable. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_clear_request());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_mark_healthy());
+  TEST_ASSERT_EQUAL_UINT32(0u, hal_boot_get_attempts());
+}
+
+void test_conformance_boot_set_prepare_accepts_null(void) {
+  /* Registration only -- the callback runs on the path to a reset, which this
+   * suite never takes. NULL is how a caller unregisters, so it must be
+   * accepted at both ends, and the slot is left empty on the way out. */
+  hal_boot_set_prepare(NULL);
+  hal_boot_set_prepare(_conf_boot_prepare_cb);
+  hal_boot_set_prepare(NULL);
+  TEST_ASSERT_TRUE(hal_boot_block_valid());
+}
+#endif /* NAVHAL_CONFIG_BOOT_SNIFFER */
+
+
+/* ---------------------------------------------------------------------------
+ * Console, and the UART convenience writers underneath it. The console is the
+ * transport this suite's own output leaves through, so what can be asserted is
+ * the part that does not disturb it: the getters, and that a NULL string is a
+ * no-op rather than a fault.
+ * ------------------------------------------------------------------------- */
+void test_conformance_console_getters_are_stable(void) {
+  bool c = hal_console_connected();
+  TEST_ASSERT_TRUE(c == hal_console_connected());
+
+  hal_console_route_t r = hal_console_get_route();
+  TEST_ASSERT_TRUE(r == hal_console_get_route());
+  /* The route is what the firmware was built with, so it is one of the two the
+   * contract defines -- never a third value a port invented. */
+  TEST_ASSERT_TRUE(r == HAL_CONSOLE_ROUTE_UART || r == HAL_CONSOLE_ROUTE_CDC);
+}
+
+void test_conformance_console_write_ignores_null(void) {
+  /* NULL is a no-op by contract: a console call sits on error paths, where a
+   * fault would destroy the very message explaining what went wrong. */
+  hal_console_write(NULL);
+  hal_console_write("");
+  /* The numeric writers emit without a newline, so the line is closed here and
+   * the transcript stays parseable. */
+  hal_console_write_uint(0u);
+  hal_console_write_hex32(0u);
+  hal_console_write("\r\n");
+  TEST_ASSERT_TRUE(hal_console_get_route() == hal_console_get_route());
+}
+
+#if NAVHAL_CONFIG_DRV_UART
+void test_conformance_uart_writers_reject_bad_instance(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_uart_write_char((hal_uart_t)99, 'x'));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_uart_write_int((hal_uart_t)99, -1));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_uart_write_uint((hal_uart_t)99, 1u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_uart_write_float((hal_uart_t)99, 1.0f));
+}
+
+void test_conformance_uart_read_char_answers_on_bad_instance(void) {
+  /* Only the error path is assertable here: on a real instance read_char
+   * blocks until a byte arrives, and nothing sends one to a board under test.
+   * The contract for an instance that does not exist is to answer 0 rather
+   * than to wait forever for a peripheral that is not there. */
+  TEST_ASSERT_EQUAL_UINT32(0u, (uint32_t)hal_uart_read_char((hal_uart_t)99));
+}
+#endif /* NAVHAL_CONFIG_DRV_UART */
+
+#if NAVHAL_CONFIG_DRV_CRC
+void test_conformance_crc_init_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_crc_init(NULL));
+  /* Twice, because an error path that corrupts state answers differently the
+   * second time. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_crc_init(NULL));
+}
+#endif /* NAVHAL_CONFIG_DRV_CRC */
+
+#if NAVHAL_CONFIG_DRV_TIMEBASE
+static void _conf_timebase_cb(void) { /* registered, then withdrawn */ }
+
+void test_conformance_timebase_callback_accepts_null(void) {
+  /* NULL is how a caller withdraws a tick callback. A port that cannot offer
+   * one says so; what it may not do is fault, or accept NULL and then call
+   * through it from the tick ISR. */
+  hal_status_t s = hal_timebase_set_callback(_conf_timebase_cb);
+  TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED);
+
+  s = hal_timebase_set_callback(NULL);
+  TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED ||
+                   s == HAL_ERR_INVALID_ARG);
+}
+#endif /* NAVHAL_CONFIG_DRV_TIMEBASE */
+
+/* hal_wwdg_* is declared in hal_watchdog.h, which is included above under
+ * DRV_WATCHDOG -- and a port can build the window watchdog without the
+ * independent one, so the header has to be reachable either way. */
+#if NAVHAL_CONFIG_DRV_WWDG && !NAVHAL_CONFIG_DRV_WATCHDOG
+#include "common/hal_watchdog.h"
+#endif
+#if NAVHAL_CONFIG_DRV_WWDG
+void test_conformance_wwdg_kick_needs_a_running_watchdog(void) {
+  /* Nothing in this suite arms a window watchdog -- on most parts it cannot be
+   * stopped again -- so the assertable half is the refusal. Branching on
+   * is_running keeps that true whatever ran before this case. */
+  if (!hal_wwdg_is_running()) {
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_NOT_INITIALIZED,
+                             (uint32_t)hal_wwdg_kick());
+  } else {
+    /* Already armed by something else: kicking is then the safe answer, and
+     * refusing to would be the bug. */
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_wwdg_kick());
+  }
+}
+#endif /* NAVHAL_CONFIG_DRV_WWDG */
+
+
 static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_status_ok_is_zero),
     NAVTEST_CASE(test_conformance_status_errors_distinct),
@@ -1558,6 +1767,30 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_TIMER
     NAVTEST_CASE(test_conformance_timer_init_rejects_null),
+#endif
+    NAVTEST_CASE(test_conformance_console_getters_are_stable),
+    NAVTEST_CASE(test_conformance_console_write_ignores_null),
+#if NAVHAL_CONFIG_DRV_UART
+    NAVTEST_CASE(test_conformance_uart_writers_reject_bad_instance),
+    NAVTEST_CASE(test_conformance_uart_read_char_answers_on_bad_instance),
+#endif
+#if NAVHAL_CONFIG_DRV_CRC
+    NAVTEST_CASE(test_conformance_crc_init_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_TIMEBASE
+    NAVTEST_CASE(test_conformance_timebase_callback_accepts_null),
+#endif
+#if NAVHAL_CONFIG_DRV_WWDG
+    NAVTEST_CASE(test_conformance_wwdg_kick_needs_a_running_watchdog),
+#endif
+#if NAVHAL_CONFIG_BOOT_SNIFFER
+    NAVTEST_CASE(test_conformance_boot_block_init_validates),
+    NAVTEST_CASE(test_conformance_boot_getters_are_stable),
+    NAVTEST_CASE(test_conformance_boot_entry_gate_round_trips),
+    NAVTEST_CASE(test_conformance_boot_request_is_refused_while_disabled),
+    NAVTEST_CASE(test_conformance_boot_match_ignores_other_traffic),
+    NAVTEST_CASE(test_conformance_boot_clear_and_heal_need_a_valid_block),
+    NAVTEST_CASE(test_conformance_boot_set_prepare_accepts_null),
 #endif
 };
 

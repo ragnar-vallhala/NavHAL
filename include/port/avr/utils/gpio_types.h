@@ -71,6 +71,29 @@ typedef enum {
   GPIO_PD07 = 23,
 } hal_gpio_pin;
 
+/* Port indices for ::HAL_GPIO_PIN. This part has no port A, so B is index 0 --
+ * the numbering follows the enumeration above, not the alphabet. */
+#define HAL_GPIO_PORT_B 0
+#define HAL_GPIO_PORT_C 1
+#define HAL_GPIO_PORT_D 2
+
+/**
+ * @brief Build a ::hal_gpio_pin from a port index and a pin number.
+ *
+ * Eight pins per port here, where the Cortex-M ports have sixteen, so the
+ * arithmetic differs and each port defines its own. That is the reason this macro
+ * lives beside the enumeration it indexes rather than anywhere common: a single
+ * definition would have to be wrong for one of them.
+ */
+#define HAL_GPIO_PIN(port, pin) ((hal_gpio_pin)((port) * 8 + (pin)))
+
+_Static_assert(HAL_GPIO_PIN(HAL_GPIO_PORT_B, 0) == GPIO_PB00,
+               "hal_gpio_pin is no longer 8 pins per port: HAL_GPIO_PIN is wrong");
+_Static_assert(HAL_GPIO_PIN(HAL_GPIO_PORT_C, 0) == GPIO_PC00,
+               "hal_gpio_pin is no longer 8 pins per port: HAL_GPIO_PIN is wrong");
+_Static_assert(HAL_GPIO_PIN(HAL_GPIO_PORT_D, 2) == GPIO_PD02,
+               "hal_gpio_pin is no longer 8 pins per port: HAL_GPIO_PIN is wrong");
+
 /** @brief GPIO pin mode. ATmega328P implements INPUT and OUTPUT. */
 typedef enum {
   HAL_GPIO_MODE_INPUT = 0,  /**< Digital input. */

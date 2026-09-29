@@ -63,6 +63,6 @@ target_include_directories(hal PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/../../../include
     ${INCLUDE_PORT}
     ${INCLUDE_FAMILY}
-    ${SRC_BOARD}
+    ${CMAKE_BINARY_DIR}   # generated board.h
     ${CMAKE_BINARY_DIR}
 )

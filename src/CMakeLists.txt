@@ -95,6 +95,6 @@ add_library(common OBJECT ${COMMON_SOURCES})
 target_include_directories(common PRIVATE
     ${INCLUDE_PORT}
     ${INCLUDE_FAMILY}
-    ${SRC_BOARD}
+    ${CMAKE_BINARY_DIR}   # generated board.h
     ${CMAKE_BINARY_DIR}
 )

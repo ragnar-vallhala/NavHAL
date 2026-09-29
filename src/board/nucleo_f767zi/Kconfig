@@ -17,3 +17,305 @@ config ITCM_SIZE
 config DTCM_SIZE
     hex
     default 0x20000 if BOARD_NUCLEO_F767ZI      # 128 KB data TCM
+
+# ---- This board's description ----
+#
+# Every macro board.h used to define, as Kconfig symbols; tools/kconfig.py turns
+# them into the board.h that code includes, so this file is the single place the
+# board is described and any value can be overridden in .config.
+#
+# PIN_<name>_PORT/_PIN become HAL_GPIO_PIN(); NUM_<name> an integer; VAL_<name> is
+# emitted verbatim, for spellings no integer can carry.
+
+# 48 macros
+config PIN_LED_BUILTIN_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_LED_BUILTIN_PIN
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config VAL_LED_ON
+    string
+    default "HAL_GPIO_HIGH" if BOARD_NUCLEO_F767ZI
+config VAL_LED_OFF
+    string
+    default "HAL_GPIO_LOW" if BOARD_NUCLEO_F767ZI
+config PIN_LD1_GREEN_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_LD1_GREEN_PIN
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_LD2_BLUE_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_LD2_BLUE_PIN
+    int
+    default 7 if BOARD_NUCLEO_F767ZI
+config PIN_LD3_RED_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_LD3_RED_PIN
+    int
+    default 14 if BOARD_NUCLEO_F767ZI
+config PIN_USER_BUTTON_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_USER_BUTTON_PIN
+    int
+    default 13 if BOARD_NUCLEO_F767ZI
+config VAL_BOARD_CONSOLE_UART
+    string
+    default "HAL_UART_3" if BOARD_NUCLEO_F767ZI
+config VAL_BOARD_CONSOLE_UART_IRQ
+    string
+    default "USART3_IRQn" if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_CONSOLE_UART_TX_PORT
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_CONSOLE_UART_TX_PIN
+    int
+    default 8 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_CONSOLE_UART_RX_PORT
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_CONSOLE_UART_RX_PIN
+    int
+    default 9 if BOARD_NUCLEO_F767ZI
+config VAL_BOARD_GP_TIMER
+    string
+    default "TIM2" if BOARD_NUCLEO_F767ZI
+config VAL_BOARD_PWM_TIMER
+    string
+    default "TIM3" if BOARD_NUCLEO_F767ZI
+config NUM_BOARD_PWM_CHANNEL
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_PWM_PIN_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_PWM_PIN_PIN
+    int
+    default 4 if BOARD_NUCLEO_F767ZI
+config VAL_BOARD_PWM_AF
+    string
+    default "HAL_GPIO_AF2" if BOARD_NUCLEO_F767ZI
+config VAL_BOARD_I2C_BUS
+    string
+    default "HAL_I2C_1" if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C_SCL_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C_SCL_PIN
+    int
+    default 8 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C_SDA_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C_SDA_PIN
+    int
+    default 9 if BOARD_NUCLEO_F767ZI
+config VAL_BOARD_SPI_BUS
+    string
+    default "HAL_SPI_1" if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SPI_CS_PORT
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SPI_CS_PIN
+    int
+    default 14 if BOARD_NUCLEO_F767ZI
+config PIN_D0_PORT
+    int
+    default 6 if BOARD_NUCLEO_F767ZI
+config PIN_D0_PIN
+    int
+    default 9 if BOARD_NUCLEO_F767ZI
+config PIN_D1_PORT
+    int
+    default 6 if BOARD_NUCLEO_F767ZI
+config PIN_D1_PIN
+    int
+    default 14 if BOARD_NUCLEO_F767ZI
+config PIN_D2_PORT
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_D2_PIN
+    int
+    default 15 if BOARD_NUCLEO_F767ZI
+config PIN_D3_PORT
+    int
+    default 4 if BOARD_NUCLEO_F767ZI
+config PIN_D3_PIN
+    int
+    default 13 if BOARD_NUCLEO_F767ZI
+config PIN_D4_PORT
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_D4_PIN
+    int
+    default 14 if BOARD_NUCLEO_F767ZI
+config PIN_D5_PORT
+    int
+    default 4 if BOARD_NUCLEO_F767ZI
+config PIN_D5_PIN
+    int
+    default 11 if BOARD_NUCLEO_F767ZI
+config PIN_D6_PORT
+    int
+    default 4 if BOARD_NUCLEO_F767ZI
+config PIN_D6_PIN
+    int
+    default 9 if BOARD_NUCLEO_F767ZI
+config PIN_D7_PORT
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_D7_PIN
+    int
+    default 13 if BOARD_NUCLEO_F767ZI
+config PIN_D8_PORT
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_D8_PIN
+    int
+    default 12 if BOARD_NUCLEO_F767ZI
+config PIN_D9_PORT
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config PIN_D9_PIN
+    int
+    default 15 if BOARD_NUCLEO_F767ZI
+config PIN_D10_PORT
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config PIN_D10_PIN
+    int
+    default 14 if BOARD_NUCLEO_F767ZI
+config PIN_D11_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_D11_PIN
+    int
+    default 7 if BOARD_NUCLEO_F767ZI
+config PIN_D12_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_D12_PIN
+    int
+    default 6 if BOARD_NUCLEO_F767ZI
+config PIN_D13_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_D13_PIN
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_D14_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_D14_PIN
+    int
+    default 9 if BOARD_NUCLEO_F767ZI
+config PIN_D15_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_D15_PIN
+    int
+    default 8 if BOARD_NUCLEO_F767ZI
+config PIN_A0_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_A0_PIN
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config PIN_A1_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_A1_PIN
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_A2_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_A2_PIN
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config PIN_A3_PORT
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_A3_PIN
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config PIN_A4_PORT
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_A4_PIN
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_A5_PORT
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_A5_PIN
+    int
+    default 10 if BOARD_NUCLEO_F767ZI
+config VAL_BOARD_ADC
+    string
+    default "HAL_ADC_1" if BOARD_NUCLEO_F767ZI
+config VAL_BOARD_ADC_PIN
+    string
+    default "A0" if BOARD_NUCLEO_F767ZI
+config NUM_BOARD_ADC_CHANNEL
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config NUM_BOARD_HSI_FREQ_HZ
+    int
+    default 16000000 if BOARD_NUCLEO_F767ZI
+config NUM_BOARD_HSE_FREQ_HZ
+    int
+    default 8000000 if BOARD_NUCLEO_F767ZI
+
+# ---- SDIO ----
+# The bus signals are fixed by the alternate-function mux rather than freely
+# chosen: pointing one at a pin the mux cannot route gives a build that compiles
+# and a bus that never transfers. Check the datasheet before changing one.
+# No card socket is fitted, so no BOARD_SD_CD is declared and
+# hal_sdio_card_present() answers true -- a slot that cannot be observed
+# must not be reported empty.
+
+config NUM_BOARD_SDIO_AF
+    int
+    default 12 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_D0_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_D0_PIN
+    int
+    default 8 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_D1_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_D1_PIN
+    int
+    default 9 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_D2_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_D2_PIN
+    int
+    default 10 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_D3_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_D3_PIN
+    int
+    default 11 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_CK_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_CK_PIN
+    int
+    default 12 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_CMD_PORT
+    int
+    default 3 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_SDIO_CMD_PIN
+    int
+    default 2 if BOARD_NUCLEO_F767ZI

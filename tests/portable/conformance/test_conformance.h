@@ -87,6 +87,14 @@ void test_conformance_crc_init_rejects_null(void);
 void test_conformance_timebase_callback_accepts_null(void);
 void test_conformance_wwdg_kick_needs_a_running_watchdog(void);
 
+/* Ethernet — the MAC sits behind a clock gate, so every entry point owes a
+ * caller an answer before init rather than a register access. None of these
+ * needs a cable. */
+void test_conformance_eth_set_callback_accepts_null(void);
+void test_conformance_eth_link_is_up_answers_without_a_mac(void);
+void test_conformance_eth_teardown_is_safe_in_any_order(void);
+void test_conformance_eth_needs_init_before_the_bus(void);
+
 /* USB CDC — the getters answer with no host attached, a notification needs one,
  * and asking whether the device can come up answers the same twice. */
 void test_conformance_usb_cdc_getters_are_stable(void);

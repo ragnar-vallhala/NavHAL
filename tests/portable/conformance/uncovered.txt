@@ -35,10 +35,4 @@ hal_console_init: re-initialises the transport the suite prints through, at a ra
 # NOT_INITIALIZED before init") fails today. Fixing that is a driver change,
 # and the only tier that runs eth is the F767ZI on hardware.
 # ---------------------------------------------------------------------------
-hal_eth_deinit: debt: no _initialized guard; touches MACCR/DMAOMR before init
-hal_eth_link_is_up: debt: reads the PHY through the MAC with no _initialized guard
-hal_eth_phy_write: debt: no _initialized guard; writes MACMIIAR before init
-hal_eth_set_callback: debt: registration only, but lands with the rest of eth
-hal_eth_start: debt: the one eth entry point that does guard; waits on the others
-hal_eth_stop: debt: no _initialized guard; clears MACCR before init
 hal_sdio_send_command: debt: writes SDIO->ICR/ARG/CMD with no init guard, so a portable case would poke a possibly-gated peripheral

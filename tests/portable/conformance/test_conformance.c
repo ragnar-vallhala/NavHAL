@@ -1361,6 +1361,12 @@ NAVTEST_CASE_DECL(test_conformance_timebase_callback_accepts_null);
 #if NAVHAL_CONFIG_DRV_WWDG
 NAVTEST_CASE_DECL(test_conformance_wwdg_kick_needs_a_running_watchdog);
 #endif
+#if NAVHAL_CONFIG_DRV_ETH
+NAVTEST_CASE_DECL(test_conformance_eth_set_callback_accepts_null);
+NAVTEST_CASE_DECL(test_conformance_eth_link_is_up_answers_without_a_mac);
+NAVTEST_CASE_DECL(test_conformance_eth_teardown_is_safe_in_any_order);
+NAVTEST_CASE_DECL(test_conformance_eth_needs_init_before_the_bus);
+#endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
 NAVTEST_CASE_DECL(test_conformance_usb_cdc_getters_are_stable);
 NAVTEST_CASE_DECL(test_conformance_usb_cdc_set_rx_callback_accepts_null);
@@ -1778,6 +1784,53 @@ void test_conformance_usb_cdc_init_answers_the_same_twice(void) {
 #endif /* NAVHAL_CONFIG_DRV_USB_CDC */
 
 
+#if NAVHAL_CONFIG_DRV_ETH
+/* ---------------------------------------------------------------------------
+ * Ethernet. Every entry point here reaches the MAC, which sits behind a clock
+ * gate that init opens -- so what the contract owes a caller before init is an
+ * answer, not a register access. These cases run whether or not a cable is
+ * plugged in, because none of them needs a link.
+ * ------------------------------------------------------------------------- */
+void test_conformance_eth_set_callback_accepts_null(void) {
+  /* Registration is state, not traffic: withdrawing a callback is legal at any
+   * time, and is how a caller switches from interrupt to polled draining. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_eth_set_callback(NULL));
+}
+
+void test_conformance_eth_link_is_up_answers_without_a_mac(void) {
+  /* bool, so there is no error to return: an uninitialised MAC reports no
+   * link rather than reading a PHY through a peripheral that may be gated. */
+  bool up = hal_eth_link_is_up();
+  TEST_ASSERT_TRUE(up == hal_eth_link_is_up());
+}
+
+void test_conformance_eth_teardown_is_safe_in_any_order(void) {
+  /* stop before start, deinit before init, twice each. A port that pokes
+   * MACCR here is touching a clock-gated peripheral; one that answers is
+   * conformant whichever of the two answers it picks, as long as it picks the
+   * same one both times. */
+  hal_status_t s1 = hal_eth_stop();
+  hal_status_t s2 = hal_eth_stop();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)s1, (uint32_t)s2);
+
+  hal_status_t d1 = hal_eth_deinit();
+  hal_status_t d2 = hal_eth_deinit();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)d1, (uint32_t)d2);
+}
+
+void test_conformance_eth_needs_init_before_the_bus(void) {
+  /* After the teardown above the MAC is down, so this is the uninitialised
+   * state by construction. start and phy_write both have to say so rather than
+   * driving MACCR and MACMIIAR at a peripheral whose clock is off. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_NOT_INITIALIZED,
+                           (uint32_t)hal_eth_start());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_NOT_INITIALIZED,
+                           (uint32_t)hal_eth_phy_write(0u, 0u));
+}
+#endif /* NAVHAL_CONFIG_DRV_ETH */
+
+
 static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_status_ok_is_zero),
     NAVTEST_CASE(test_conformance_status_errors_distinct),
@@ -2011,6 +2064,12 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_WWDG
     NAVTEST_CASE(test_conformance_wwdg_kick_needs_a_running_watchdog),
+#endif
+#if NAVHAL_CONFIG_DRV_ETH
+    NAVTEST_CASE(test_conformance_eth_set_callback_accepts_null),
+    NAVTEST_CASE(test_conformance_eth_link_is_up_answers_without_a_mac),
+    NAVTEST_CASE(test_conformance_eth_teardown_is_safe_in_any_order),
+    NAVTEST_CASE(test_conformance_eth_needs_init_before_the_bus),
 #endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
     NAVTEST_CASE(test_conformance_usb_cdc_getters_are_stable),

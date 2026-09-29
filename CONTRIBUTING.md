@@ -72,7 +72,9 @@ cmake --build build-test --target tests -j
 ### Host-runnable test subset (no cross-compiler needed)
 
 ```bash
-tools/run_host_tests.sh
+cmake -S tests/host -B build-host
+cmake --build build-host -j
+ctest --test-dir build-host --output-on-failure
 ```
 
 ## Running the full check suite
@@ -80,13 +82,16 @@ tools/run_host_tests.sh
 This is what CI runs and what `pre-push` runs locally:
 
 ```bash
-tools/run_host_tests.sh         # pure-logic tests under host gcc
+ctest --test-dir build-host     # pure-logic tests under host gcc (configure above)
 tools/test_cap_contract.sh      # NAVHAL_HAS_* link-time gating (Cortex-M4)
-tools/build_all_samples.sh      # every sample declared in Kconfig (Cortex-M4)
-tools/build_all_avr_samples.sh  # every portable sample under the AVR config
+tools/samples.sh m4             # every sample declared in Kconfig (Cortex-M4)
+tools/samples.sh avr            # every portable sample under the AVR config
 ```
 
-A green run of all three is a strong predictor that CI will be green.
+A green run of all four is a strong predictor that CI will be green.
+
+`tools/vtest.sh` runs these and every other tier from one front end — a TUI, or
+`--run` for a batch report. See [docs/testing/vtest.md](docs/testing/vtest.md).
 
 ## Commit message format
 

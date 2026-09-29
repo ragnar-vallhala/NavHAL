@@ -34,7 +34,7 @@ firmware executes on.
 |---|---|
 | **Substrate** | The build host (`gcc` on Linux/macOS). |
 | **What runs** | Driver code that is purely algorithmic, with no register access — e.g. the software CRC-32/MPEG-2 lookup-table path in `src/core/cortex-m4/crc/crc.c`, and the `utils/conversion.c` helpers. |
-| **Entry point** | `tools/run_host_tests.sh` → `build-host/tests_host`. |
+| **Entry point** | `ctest --test-dir build-host` → `tests_host`, `tests_host_drivers`. |
 | **Speed** | < 30 s end-to-end, no toolchain download. |
 | **Output** | navtest's text format to `stdout` (routed via `tests/host/host_backend.c` instead of UART2). |
 | **What it catches** | Algorithmic regressions (CRC table corruption, conversion edge cases), API-contract invariants (`HAL_OK == 0`, `HAL_OK_OR_RETURN` short-circuit semantics), pin-encoding math (`GPIO_GET_PIN` / `GPIO_GET_PORT_NUMBER`). |

@@ -24,16 +24,13 @@ A standalone build that compiles the pure-logic tests with the system
 `gcc` and runs them as a native binary.
 
 ```sh
-tools/run_host_tests.sh
-```
-
-That's a thin wrapper over:
-
-```sh
 cmake -B build-host -S tests/host
 cmake --build build-host -j
-./build-host/tests_host
+ctest --test-dir build-host --output-on-failure
 ```
+
+`ctest` runs both host binaries — `tests_host` and `tests_host_drivers` — and is
+what `vtest` drives this tier through (@ref test_vtest).
 
 What runs:
 - `HAL_STATUS (host)` — `HAL_OK == 0`, `HAL_ERR == 1`, distinct codes,

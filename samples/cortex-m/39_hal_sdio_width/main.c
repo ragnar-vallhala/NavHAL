@@ -185,9 +185,10 @@ static void dump_dpsm(const char *when) {
  * not the host is configured to receive, which is what makes this observable.
  */
 static void find_dead_line(void) {
-  static const hal_gpio_pin pins[4] = {GPIO_PC08, GPIO_PC09, GPIO_PC10, GPIO_PC11};
-  static const char *names[4] = {"    DAT0 (PC8)     : ", "    DAT1 (PC9)     : ",
-                                 "    DAT2 (PC10)    : ", "    DAT3 (PC11)    : "};
+  static const hal_gpio_pin pins[4] = {BOARD_SDIO_D0, BOARD_SDIO_D1,
+                                       BOARD_SDIO_D2, BOARD_SDIO_D3};
+  static const char *names[4] = {"    DAT0 : ", "    DAT1 : ", "    DAT2 : ",
+                                 "    DAT3 : "};
   bool went_low[4] = {false, false, false, false};
 
   say("  -- which line never goes low while the card transmits? --\r\n");

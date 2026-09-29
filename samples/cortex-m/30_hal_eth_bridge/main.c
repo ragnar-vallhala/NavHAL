@@ -34,9 +34,10 @@
  * length field is what tells the receiver the real text size.
  */
 
+#include "board.h"
 #include "navhal.h"
 
-#define CONSOLE HAL_UART_3    /* USART3 = ST-LINK VCP. */
+#define CONSOLE BOARD_CONSOLE_UART
 #define ETH_CHAT_TYPE 0x88B5U /* local/experimental EtherType. */
 #define LINE_MAX 256
 

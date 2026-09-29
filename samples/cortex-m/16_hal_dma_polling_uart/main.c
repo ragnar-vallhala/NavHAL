@@ -32,6 +32,7 @@
  *   [DMA]     Time=~1373 ticks | CPU work=N  (N much greater than 0)
  */
 
+#include "board.h"
 #include "navhal.h"
 
 #define MSG "Hello World\n\r"
@@ -53,7 +54,7 @@ static uint32_t run_polling(int iters) {
   cpu_work_done = 0;
   uint32_t t0 = hal_timebase_get_tick();
   for (int i = 0; i < iters; i++)
-    hal_uart_write_string(HAL_UART_2, MSG);
+    hal_uart_write_string(BOARD_CONSOLE_UART, MSG);
   return hal_timebase_get_tick() - t0;
 }
 
@@ -68,7 +69,7 @@ static uint32_t run_dma_iter(int iters) {
   uint32_t t0 = hal_timebase_get_tick();
   for (int i = 0; i < iters; i++) {
     uint32_t deadline = hal_timebase_get_tick() + 14; /* expected end of this msg */
-    hal_uart_write_dma(HAL_UART_2, (const uint8_t *)MSG, MSG_LEN);
+    hal_uart_write_dma(BOARD_CONSOLE_UART, (const uint8_t *)MSG, MSG_LEN);
     do_cpu_work(deadline); /* use any remaining time in the window */
   }
   return hal_timebase_get_tick() - t0;
@@ -77,43 +78,43 @@ static uint32_t run_dma_iter(int iters) {
 
 int main(void) {
   hal_timebase_init(1000);
-  hal_uart_init(HAL_UART_2, &(hal_uart_config_t){.baudrate=9600});
+  hal_uart_init(BOARD_CONSOLE_UART, &(hal_uart_config_t){.baudrate=9600});
 
-  hal_uart_write_string(HAL_UART_2, "\r\n=== DMA vs Polling Comparison ===\r\n\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "\r\n=== DMA vs Polling Comparison ===\r\n\r\n");
 
   const int ITERS = 100;
 
   /* ---- Polling ---- */
-  hal_uart_write_string(HAL_UART_2, "[POLLING] Running...\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "[POLLING] Running...\r\n");
   uint32_t poll_ticks = run_polling(ITERS);
   uint32_t poll_work = cpu_work_done;
-  hal_uart_write_string(HAL_UART_2, "[POLLING] Time=");
-  hal_uart_print(HAL_UART_2, poll_ticks);
-  hal_uart_write_string(HAL_UART_2, " ticks | CPU work=");
-  hal_uart_print(HAL_UART_2, poll_work);
-  hal_uart_write_string(HAL_UART_2, "\r\n\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "[POLLING] Time=");
+  hal_uart_print(BOARD_CONSOLE_UART, poll_ticks);
+  hal_uart_write_string(BOARD_CONSOLE_UART, " ticks | CPU work=");
+  hal_uart_print(BOARD_CONSOLE_UART, poll_work);
+  hal_uart_write_string(BOARD_CONSOLE_UART, "\r\n\r\n");
 
 #if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
   /* ---- DMA ---- */
-  hal_uart_write_string(HAL_UART_2, "[DMA]     Running...\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "[DMA]     Running...\r\n");
   uint32_t dma_ticks = run_dma_iter(ITERS);
   uint32_t dma_work = cpu_work_done;
-  hal_uart_write_string(HAL_UART_2, "[DMA]     Time=");
-  hal_uart_print(HAL_UART_2, dma_ticks);
-  hal_uart_write_string(HAL_UART_2, " ticks | CPU work=");
-  hal_uart_print(HAL_UART_2, dma_work);
-  hal_uart_write_string(HAL_UART_2, "\r\n\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "[DMA]     Time=");
+  hal_uart_print(BOARD_CONSOLE_UART, dma_ticks);
+  hal_uart_write_string(BOARD_CONSOLE_UART, " ticks | CPU work=");
+  hal_uart_print(BOARD_CONSOLE_UART, dma_work);
+  hal_uart_write_string(BOARD_CONSOLE_UART, "\r\n\r\n");
 
   /* ---- Result ---- */
-  hal_uart_write_string(HAL_UART_2, "=== Result ===\r\n");
-  hal_uart_write_string(HAL_UART_2, "Wall time : similar (baud-limited)\r\n");
-  hal_uart_write_string(HAL_UART_2, "Poll work : ");
-  hal_uart_print(HAL_UART_2, poll_work);
-  hal_uart_write_string(HAL_UART_2, "\r\nDMA work  : ");
-  hal_uart_print(HAL_UART_2, dma_work);
-  hal_uart_write_string(HAL_UART_2, "\r\nDMA frees CPU: YES\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "=== Result ===\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "Wall time : similar (baud-limited)\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "Poll work : ");
+  hal_uart_print(BOARD_CONSOLE_UART, poll_work);
+  hal_uart_write_string(BOARD_CONSOLE_UART, "\r\nDMA work  : ");
+  hal_uart_print(BOARD_CONSOLE_UART, dma_work);
+  hal_uart_write_string(BOARD_CONSOLE_UART, "\r\nDMA frees CPU: YES\r\n");
 #else
-  hal_uart_write_string(HAL_UART_2, "[DMA] Not enabled. Set CONFIG_DRV_DMA in Kconfig\r\n");
+  hal_uart_write_string(BOARD_CONSOLE_UART, "[DMA] Not enabled. Set CONFIG_DRV_DMA in Kconfig\r\n");
 #endif
   return 0;
 }

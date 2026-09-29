@@ -22,7 +22,9 @@
 # read through its debug probe instead (swd_capture). Such a board can also
 # have its probe pinned by USB location, which is a fact about one bench and so
 # lives in the environment — NAVHAL_HIL_LOCATION_<BOARD>=<bus>-<port>, see
-# hil_usb_location.
+# hil_usb_location. A console-over-UART board honours the same pin: its probe's
+# serial is read out of sysfs, so st-flash can be told which one to open
+# without st-info enumerating (and resetting) the rest of the bench.
 #
 # Requires: arm-none-eabi-gcc, st-flash / st-info (stlink-tools), python3 +
 #           pyserial, and udevadm (to map an ST-Link serial to its ttyACM);
@@ -119,6 +121,32 @@ detect_avr_port() {  # $1 = comma-separated vendor ids; sets DETECTED_PORT
     esac
   done
   return 1
+}
+
+# The /dev/ttyACM* that belongs to a given ST-Link serial, or nothing. udevadm
+# reads the kernel's properties; it does not open the device.
+tty_for_serial() {  # $1 = st-link serial
+  local want="$1" p ps
+  for p in /dev/ttyACM*; do
+    [ -e "$p" ] || continue
+    ps=$(udevadm info -q property -n "$p" 2>/dev/null | sed -n 's/^ID_SERIAL_SHORT=//p')
+    if [ "$ps" = "$want" ] && [ -r "$p" ] && [ -w "$p" ]; then
+      printf '%s' "$p"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# The probe's serial as the kernel already recorded it at enumeration time.
+# This is what lets a pinned board be addressed without `st-info --probe`:
+# that command opens every ST-Link on the bus to ask its target for a chip-id,
+# and opening the others resets the boards behind them. The serial is sitting
+# in sysfs, so there is nothing to ask.
+probe_serial_at_location() {  # $1 = <bus>-<port>
+  local f="/sys/bus/usb/devices/$1/serial"
+  [ -r "$f" ] || return 1
+  tr -d '\000' < "$f"
 }
 
 # Which port a probe is plugged into is a property of one bench, not of the
@@ -300,6 +328,27 @@ run_board() {  # $1 = board name; returns the on-target failure count
       fi
       echo ">> probe: st-link $DETECTED_SERIAL -- console over swd"
     fi
+  # A console-over-UART board can be pinned too. st-flash takes a serial rather
+  # than a location, so the location is resolved to one through sysfs -- which
+  # is enough to skip enumeration entirely, and enumeration is the thing that
+  # disturbs the other boards on the bench.
+  elif [ -n "$(hil_usb_location "$board")" ]; then
+    loc=$(hil_usb_location "$board")
+    DETECTED_SERIAL=$(probe_serial_at_location "$loc" || true)
+    if [ -z "$DETECTED_SERIAL" ]; then
+      echo "!! nothing at usb location $loc"
+      echo "!! skipping $board"
+      return 77
+    fi
+    DETECTED_PORT=$(tty_for_serial "$DETECTED_SERIAL" || true)
+    if [ -z "$DETECTED_PORT" ]; then
+      echo "!! probe $DETECTED_SERIAL at $loc brings no readable VCP"
+      echo "!! install tools/hil/99-navhal-stlink.rules, then replug the board."
+      echo "!! skipping $board"
+      return 77
+    fi
+    echo ">> probe: st-link $DETECTED_SERIAL at usb $loc (enumeration skipped)"
+    echo ">> console $DETECTED_PORT @ $baud"
   # Match this board to a connected probe before spending time on a build.
   elif ! detect_probe "$CHIPID"; then
     echo "!! no connected ST-Link with a $CHIPID target (or no usable ttyACM)"

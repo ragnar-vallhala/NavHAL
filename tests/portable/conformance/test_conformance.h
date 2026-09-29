@@ -107,6 +107,7 @@ void test_conformance_usb_cdc_init_answers_the_same_twice(void);
  * rejects a drive that is not there before it touches a card. */
 void test_conformance_sdio_card_present_is_stable(void);
 void test_conformance_sdio_card_init_answers_for_an_empty_slot(void);
+void test_conformance_sdio_command_needs_the_peripheral(void);
 void test_conformance_sdio_get_response_rejects_bad_register(void);
 void test_conformance_sdio_set_callback_accepts_null(void);
 void test_conformance_disk_rejects_a_drive_that_does_not_exist(void);

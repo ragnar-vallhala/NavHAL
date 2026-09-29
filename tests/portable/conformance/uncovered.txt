@@ -22,17 +22,3 @@ hal_sdio_wait_flag: spins on a card that a bare board does not have
 hal_sdio_wait_sync: spins on a card that a bare board does not have
 hal_timebase_tick: the tick ISR's own entry; calling it forges the timebase that the suite's timing cases check against
 hal_console_init: re-initialises the transport the suite prints through, at a rate a portable case cannot know; a wrong one garbles the capture
-
-# ---------------------------------------------------------------------------
-# Debt. Reachable from a bare board; nobody has written the case yet.
-#
-# What is left is one family and one function, and they share a cause: neither
-# is vtable-migrated, so each is a vendor implementation of public API with no
-# shared layer validating in front of it -- which is exactly where a second
-# port drifts. Writing the cases is what found the reason they cannot land yet:
-# only hal_eth_start checks _initialized, so the rest reach the MAC's registers
-# with the peripheral clock possibly gated, and the honest assertion ("answers
-# NOT_INITIALIZED before init") fails today. Fixing that is a driver change,
-# and the only tier that runs eth is the F767ZI on hardware.
-# ---------------------------------------------------------------------------
-hal_sdio_send_command: debt: writes SDIO->ICR/ARG/CMD with no init guard, so a portable case would poke a possibly-gated peripheral

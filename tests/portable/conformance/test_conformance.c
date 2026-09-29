@@ -1376,6 +1376,7 @@ NAVTEST_CASE_DECL(test_conformance_usb_cdc_init_answers_the_same_twice);
 #if NAVHAL_CONFIG_DRV_SDIO
 NAVTEST_CASE_DECL(test_conformance_sdio_card_present_is_stable);
 NAVTEST_CASE_DECL(test_conformance_sdio_card_init_answers_for_an_empty_slot);
+NAVTEST_CASE_DECL(test_conformance_sdio_command_needs_the_peripheral);
 NAVTEST_CASE_DECL(test_conformance_sdio_get_response_rejects_bad_register);
 NAVTEST_CASE_DECL(test_conformance_sdio_set_callback_accepts_null);
 NAVTEST_CASE_DECL(test_conformance_disk_rejects_a_drive_that_does_not_exist);
@@ -1676,6 +1677,20 @@ void test_conformance_sdio_card_init_answers_for_an_empty_slot(void) {
     hal_sdio_error_t e = hal_sdio_card_init();
     TEST_ASSERT_TRUE(e == HAL_SDIO_OK || e == HAL_SDIO_ERROR);
   }
+}
+
+void test_conformance_sdio_command_needs_the_peripheral(void) {
+  /* This suite runs before anything brings the controller up, so the clock
+   * gate is shut here and a command has nowhere to go. Reporting that is the
+   * contract; writing SDIO->ICR/ARG/CMD at a gated peripheral is not.
+   *
+   * CMD13 (SEND_STATUS) rather than CMD0: if a port has somehow initialised
+   * the controller before this point, a status query is harmless, where
+   * GO_IDLE_STATE would reset a card the later SDIO suite is about to use. */
+  hal_sdio_error_t a = hal_sdio_send_command(13u, 0u, 1u);
+  hal_sdio_error_t b = hal_sdio_send_command(13u, 0u, 1u);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)a, (uint32_t)b);
+  TEST_ASSERT_TRUE(a != HAL_SDIO_OK);
 }
 
 void test_conformance_sdio_get_response_rejects_bad_register(void) {
@@ -2080,6 +2095,7 @@ static const navtest_case_t conformance_cases[] = {
 #if NAVHAL_CONFIG_DRV_SDIO
     NAVTEST_CASE(test_conformance_sdio_card_present_is_stable),
     NAVTEST_CASE(test_conformance_sdio_card_init_answers_for_an_empty_slot),
+    NAVTEST_CASE(test_conformance_sdio_command_needs_the_peripheral),
     NAVTEST_CASE(test_conformance_sdio_get_response_rejects_bad_register),
     NAVTEST_CASE(test_conformance_sdio_set_callback_accepts_null),
     NAVTEST_CASE(test_conformance_disk_rejects_a_drive_that_does_not_exist),

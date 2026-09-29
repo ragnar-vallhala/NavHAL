@@ -330,3 +330,52 @@ config PIN_BOARD_USART6_RX_PIN
 config NUM_BOARD_USART6_AF
     int
     default 8 if BOARD_NUCLEO_F401RE
+# ---- SPI pins ----
+# Which pins each SPI uses, and the alternate function that routes it. An SPI
+# this board leaves undescribed is absent from the driver's pin table, so the
+# driver configures no pins for it.
+#
+# Constrained by the AF mux: each SPI reaches only a few pin sets. Check the
+# datasheet before changing one, and set the AF that table gives.
+config PIN_BOARD_SPI1_SCK_PORT
+    int
+    default 0 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI1_SCK_PIN
+    int
+    default 5 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI1_MISO_PORT
+    int
+    default 0 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI1_MISO_PIN
+    int
+    default 6 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI1_MOSI_PORT
+    int
+    default 0 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI1_MOSI_PIN
+    int
+    default 7 if BOARD_NUCLEO_F401RE
+config NUM_BOARD_SPI1_AF
+    int
+    default 5 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI2_SCK_PORT
+    int
+    default 1 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI2_SCK_PIN
+    int
+    default 13 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI2_MISO_PORT
+    int
+    default 1 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI2_MISO_PIN
+    int
+    default 14 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI2_MOSI_PORT
+    int
+    default 1 if BOARD_NUCLEO_F401RE
+config PIN_BOARD_SPI2_MOSI_PIN
+    int
+    default 15 if BOARD_NUCLEO_F401RE
+config NUM_BOARD_SPI2_AF
+    int
+    default 5 if BOARD_NUCLEO_F401RE

@@ -37,6 +37,7 @@
 
 #include "internal/hal_spi_ops.h"
 #include "common/hal_clock.h"
+#include "board.h"
 #include "navhal_port_gpio.h"
 #include "family/rcc_reg.h"
 #include "family/spi_reg.h"
@@ -58,25 +59,41 @@ static void _enable_spi_clock(hal_spi_instance_t spi) {
     RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
 }
 
+/* SPI pin routing, supplied by the board's Kconfig via the generated board.h.
+ * An instance the board does not describe is absent from this table, and
+ * _configure_spi_gpio then touches no pins for it. */
+typedef struct {
+  hal_spi_instance_t spi;
+  hal_gpio_pin_t sck;
+  hal_gpio_pin_t miso;
+  hal_gpio_pin_t mosi;
+  hal_gpio_af_t af;
+} spi_pinmap_t;
+
+static const spi_pinmap_t spi_pinmap[] = {
+#if defined(BOARD_SPI1_SCK)
+    {HAL_SPI_1, BOARD_SPI1_SCK, BOARD_SPI1_MISO, BOARD_SPI1_MOSI,
+     (hal_gpio_af_t)BOARD_SPI1_AF},
+#endif
+#if defined(BOARD_SPI2_SCK)
+    {HAL_SPI_2, BOARD_SPI2_SCK, BOARD_SPI2_MISO, BOARD_SPI2_MOSI,
+     (hal_gpio_af_t)BOARD_SPI2_AF},
+#endif
+};
+
 static void _configure_spi_gpio(hal_spi_instance_t spi) {
-  if (spi == HAL_SPI_1) {
-    /* SPI1: PA5 SCK / PA6 MISO / PA7 MOSI, AF5. */
-    const hal_gpio_pin_t pins[] = {GPIO_PA05, GPIO_PA06, GPIO_PA07};
-    for (unsigned i = 0; i < 3; i++) {
-      hal_gpio_enable_clock(pins[i]);
-      hal_gpio_set_mode(pins[i], HAL_GPIO_MODE_AF, HAL_GPIO_PULL_NONE);
-      hal_gpio_set_alternate_function(pins[i], HAL_GPIO_AF5);
-      hal_gpio_set_output_speed(pins[i], HAL_GPIO_SPEED_VERY_HIGH);
+  for (unsigned i = 0u; i < (sizeof spi_pinmap / sizeof spi_pinmap[0]); i++) {
+    if (spi_pinmap[i].spi != spi)
+      continue;
+    const hal_gpio_pin_t pins[3] = {spi_pinmap[i].sck, spi_pinmap[i].miso,
+                                    spi_pinmap[i].mosi};
+    for (unsigned p = 0u; p < 3u; p++) {
+      hal_gpio_enable_clock(pins[p]);
+      hal_gpio_set_mode(pins[p], HAL_GPIO_MODE_AF, HAL_GPIO_PULL_NONE);
+      hal_gpio_set_alternate_function(pins[p], spi_pinmap[i].af);
+      hal_gpio_set_output_speed(pins[p], HAL_GPIO_SPEED_VERY_HIGH);
     }
-  } else if (spi == HAL_SPI_2) {
-    /* SPI2: PB13 SCK / PB14 MISO / PB15 MOSI, AF5. */
-    const hal_gpio_pin_t pins[] = {GPIO_PB13, GPIO_PB14, GPIO_PB15};
-    for (unsigned i = 0; i < 3; i++) {
-      hal_gpio_enable_clock(pins[i]);
-      hal_gpio_set_mode(pins[i], HAL_GPIO_MODE_AF, HAL_GPIO_PULL_NONE);
-      hal_gpio_set_alternate_function(pins[i], HAL_GPIO_AF5);
-      hal_gpio_set_output_speed(pins[i], HAL_GPIO_SPEED_VERY_HIGH);
-    }
+    return;
   }
 }
 

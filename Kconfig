@@ -124,7 +124,7 @@ config CONSOLE_ROUTE_UART
     help
       Output goes to the board's console UART.
 
-      This is also the route the SWD capture in tools/ntest depends on: it tests a
+      This is also the route the SWD capture in tools/hil/run.sh depends on: it tests a
       board whose console reaches no host by breaking on hal_uart_write_string and
       reading the argument out of the target, so it only sees what passes through
       the UART driver. A board tested that way must be built with this route, which

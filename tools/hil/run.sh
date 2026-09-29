@@ -14,8 +14,19 @@
 # instances), never by a hard-coded ST-Link serial — so a checkout works on
 # any bench. Adding a board is one new .conf file.
 #
+# A board that is not attached exits 77 — the status vtest's check adapter and
+# ctest both read as SKIP. A bench carrying two of the five boards is the
+# normal case, not four failures.
+#
+# A board whose conf sets CONSOLE=swd routed no console UART: it is flashed and
+# read through its debug probe instead (swd_capture). Such a board can also
+# have its probe pinned by USB location, which is a fact about one bench and so
+# lives in the environment — NAVHAL_HIL_LOCATION_<BOARD>=<bus>-<port>, see
+# hil_usb_location.
+#
 # Requires: arm-none-eabi-gcc, st-flash / st-info (stlink-tools), python3 +
-#           pyserial, and udevadm (to map an ST-Link serial to its ttyACM).
+#           pyserial, and udevadm (to map an ST-Link serial to its ttyACM);
+#           openocd + gdb-multiarch for the CONSOLE=swd boards.
 #
 # A board whose VCP is root-owned looks disconnected here, because the
 # console cannot be read. Distributions leave that to TAG+="uaccess", which
@@ -66,8 +77,10 @@ detect_probe() {  # $1 = chipid (e.g. 0x451); sets DETECTED_SERIAL / DETECTED_PO
     /chipid:/ {if ($2==want) print s}')
   [ -n "$serials" ] || return 1
 
-  DETECTED_SERIAL=""
   DETECTED_PORT=""
+  # The first matching probe, whether or not it brings a readable VCP: a board
+  # driven over SWD has none, and only the caller knows whether that matters.
+  DETECTED_SERIAL=${serials%%$'\n'*}
   local cand p ps
   for cand in $serials; do
     for p in /dev/ttyACM*; do
@@ -108,6 +121,105 @@ detect_avr_port() {  # $1 = comma-separated vendor ids; sets DETECTED_PORT
   return 1
 }
 
+# Which port a probe is plugged into is a property of one bench, not of the
+# project, so it lives in the environment and never in a committed board conf:
+#
+#   NAVHAL_HIL_LOCATION_<BOARD>=<bus>-<port>   # one named board
+#   NAVHAL_HIL_LOCATION=<bus>-<port>           # the only probe on the bench
+#
+# Unset is the normal case and changes nothing: the runner falls back to
+# enumerating probes, which is correct on a bench with one of them.
+hil_usb_location() {  # $1 = board name
+  local key
+  key=$(printf '%s' "$1" | tr -c '[:alnum:]' '_' | tr '[:lower:]' '[:upper:]')
+  eval "printf '%s' \"\${NAVHAL_HIL_LOCATION_$key:-\${NAVHAL_HIL_LOCATION:-}}\""
+}
+
+# Run the test ELF on a board with no serial console: flash and drive it over
+# SWD, reading the console strings out of the target as it prints them. A probe
+# with no virtual COM port (a bare ST-LINK/V2, or a board that never routed its
+# console UART) still has to be testable; breaking on hal_uart_write_string and
+# printing the argument reconstructs the transcript the wire would have carried.
+# Prints that transcript, and returns the on-target failure count (124 = the
+# suite never reached its summary).
+swd_capture() {  # $1 = test ELF, $2 = timeout s, $3 = usb location (may be empty)
+  local elf="$1" to="$2" loc="$3" script out rc=0 fails a placed=0
+  local -a ocd=()
+  for a in ${OPENOCD_ARGS:-}; do
+    ocd+=("$a")
+    # `adapter usb location` is a pre-init command that is only accepted once
+    # the interface config has loaded the driver, so it goes after that -f
+    # rather than at the end of the argument list.
+    if [ "$placed" = 0 ] && [ -n "$loc" ]; then
+      case "$a" in
+        interface/*) ocd+=(-c "adapter usb location $loc"); placed=1 ;;
+      esac
+    fi
+  done
+  if [ -n "$loc" ] && [ "$placed" = 0 ]; then
+    ocd+=(-c "adapter usb location $loc")
+  fi
+
+  local ocdlog
+  ocdlog=$(mktemp)
+  openocd "${ocd[@]}" >"$ocdlog" 2>&1 &
+  local ocd_pid=$!
+  # OpenOCD exits at once when the adapter is not there, leaving gdb nothing to
+  # attach to. That is an absent board (77), not a failed suite -- but a
+  # different early exit (its port already in use, a bad config) is a real
+  # error, so report which of the two happened rather than skipping both.
+  sleep 1
+  if ! kill -0 "$ocd_pid" 2>/dev/null; then
+    wait "$ocd_pid" 2>/dev/null || true
+    cat "$ocdlog"
+    if grep -qiE 'no device|unable to find|open failed|no such device' "$ocdlog"; then
+      rm -f "$ocdlog"
+      echo "!! no debug adapter${loc:+ at usb location $loc}"
+      return 77
+    fi
+    rm -f "$ocdlog"
+    return 1
+  fi
+  script=$(mktemp --suffix=.gdb)
+  # navhal_post_main runs once main() returns, so it is where the suite is over
+  # and the totals have already been printed.
+  cat > "$script" <<'GDB'
+set confirm off
+set pagination off
+set print elements 0
+target extended-remote localhost:3333
+monitor reset halt
+load
+monitor reset halt
+break navhal_post_main
+break hal_uart_write_string
+commands 2
+  silent
+  printf "%s", s
+  continue
+end
+continue
+monitor reset halt
+detach
+quit
+GDB
+  out=$(timeout "$to" gdb-multiarch -batch -x "$script" "$elf" 2>/dev/null) || rc=$?
+  kill "$ocd_pid" 2>/dev/null || true
+  wait "$ocd_pid" 2>/dev/null || true
+  rm -f "$script" "$ocdlog"
+
+  # OpenOCD prints this to gdb's console on every breakpoint stop, interleaved
+  # with the target's own output, where it lands between a label and the number
+  # that follows it and breaks the totals match below.
+  out=$(printf '%s' "$out" | sed 's/halted: PC: 0x[0-9a-f]*//g')
+  printf '%s\n' "$out"
+  [ "$rc" != 124 ] || return 124
+  fails=$(printf '%s' "$out" |
+    sed -n 's/.*Total failures:[[:space:]]*\([0-9]\{1,\}\).*/\1/p' | tail -1)
+  [ -n "$fails" ] || return 124
+  return "$fails"
+}
+
 run_board() {  # $1 = board name; returns the on-target failure count
   local board="$1"
   local conf="$BOARDS_DIR/$board.conf"
@@ -139,6 +251,13 @@ run_board() {  # $1 = board name; returns the on-target failure count
   local timeout="${TIMEOUT:-120}"
   local flash_addr="${FLASH_ADDR:-0x08000000}"
 
+  # A board that routed no console UART, and whose probe has no virtual COM
+  # port, is driven over SWD instead -- see swd_capture.
+  local swd=0 loc=""
+  case "$(printf '%s' "${CONSOLE:-}" | tr '[:upper:]' '[:lower:]')" in
+    swd) swd=1 ;;
+  esac
+
   echo "=================================================================="
   echo ">> HIL board=$board arch=$ARCH ${CHIPID:+chipid=$CHIPID}${MCU:+mcu=$MCU}"
 
@@ -148,9 +267,33 @@ run_board() {  # $1 = board name; returns the on-target failure count
       echo "!! plug the board in, and check you are in the port's group"
       echo "!! (dialout for /dev/ttyUSB*, plugdev for /dev/ttyACM*)"
       echo "!! skipping $board"
-      return 3
+      return 77
     fi
     echo ">> port: $DETECTED_PORT (usb vendor $DETECTED_SERIAL) @ $baud"
+  elif [ "$swd" = 1 ]; then
+    # A pinned location addresses the probe through OpenOCD and skips
+    # enumeration entirely. `st-info --probe` opens every ST-Link on the bus to
+    # read its target's chip-id, which resets the boards behind the other
+    # probes -- so on a bench with more than one, the act of looking disturbs
+    # the boards we are not testing. It is also useless when those probes
+    # report identical serials, which the cheap V2 clones do.
+    loc=$(hil_usb_location "$board")
+    DETECTED_SERIAL=""
+    if [ -n "$loc" ]; then
+      echo ">> probe: usb location $loc (enumeration skipped) -- console over swd"
+    else
+      # No VCP is expected here, so a chip-id match with no ttyACM behind it is
+      # still this board -- the opposite of the console-over-UART case below.
+      detect_probe "$CHIPID" || true
+      if [ -z "$DETECTED_SERIAL" ]; then
+        echo "!! no connected ST-Link with a $CHIPID target"
+        echo "!! pin this board's probe with NAVHAL_HIL_LOCATION_<BOARD>=<bus>-<port>"
+        echo "!! to address it without enumerating (see $conf)"
+        echo "!! skipping $board"
+        return 77
+      fi
+      echo ">> probe: st-link $DETECTED_SERIAL -- console over swd"
+    fi
   # Match this board to a connected probe before spending time on a build.
   elif ! detect_probe "$CHIPID"; then
     echo "!! no connected ST-Link with a $CHIPID target (or no usable ttyACM)"
@@ -161,7 +304,7 @@ run_board() {  # $1 = board name; returns the on-target failure count
       echo "!! install tools/hil/99-navhal-stlink.rules, then replug the board."
     fi
     echo "!! skipping $board"
-    return 3
+    return 77
   else
     echo ">> probe: st-link $DETECTED_SERIAL  console $DETECTED_PORT @ $baud"
   fi
@@ -185,6 +328,14 @@ run_board() {  # $1 = board name; returns the on-target failure count
   cmake --build "$BUILD_DIR" --target tests -j >/dev/null
 
   local cap rc=0
+  if [ "$swd" = 1 ]; then
+    # gdb loads the ELF itself, so there is nothing to objcopy and no st-flash.
+    echo ">> flashing + capturing over swd (timeout ${timeout}s)"
+    swd_capture "$BUILD_DIR/tests" "$timeout" "$loc" || rc=$?
+    echo ">> $board: swd_capture exit=$rc (0 = all pass, N = failures, 124 = no summary)"
+    return "$rc"
+  fi
+
   if [ "$ARCH" = "avr" ]; then
     avr-objcopy -O ihex "$BUILD_DIR/tests" "$BUILD_DIR/tests.hex"
 
@@ -226,7 +377,7 @@ if [ "$1" = "--all" ]; then
   for f in "$BOARDS_DIR"/*.conf; do
     [ -f "$f" ] || continue
     b=$(basename "$f" .conf)
-    run_board "$b" || { c=$?; [ "$c" = 3 ] || overall=$((overall + c)); }
+    run_board "$b" || { c=$?; [ "$c" = 77 ] || overall=$((overall + c)); }
   done
   echo "=================================================================="
   echo ">> HIL --all aggregate failure count: $overall"

@@ -371,3 +371,13 @@ config PIN_BOARD_USB_DP_PIN
 config NUM_BOARD_USB_AF
     int
     default 10 if BOARD_NAVIXSM_F401RE
+
+# ---- Second UART ----
+# Which instance code should use when it needs a UART that is not the console,
+# such as a two-port bridge. Its pins are the BOARD_USART<n>_* set above.
+#
+# On this board that is the same instance BOARD_GPS_UART names, so a bridge and
+# the GPS contend for one port; point this at another USART to run both.
+config VAL_BOARD_AUX_UART
+    string
+    default "HAL_UART_6" if BOARD_NAVIXSM_F401RE

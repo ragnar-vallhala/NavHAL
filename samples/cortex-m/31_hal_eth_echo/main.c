@@ -29,9 +29,10 @@
  * throttle the loop and skew the measurement; the host tool does the accounting.
  */
 
+#include "board.h"
 #include "navhal.h"
 
-#define CONSOLE HAL_UART_3
+#define CONSOLE BOARD_CONSOLE_UART
 #define ETH_ECHO_TYPE 0x88B5U
 
 static const uint8_t BOARD_MAC[6] = {0x02, 0x00, 0x00, 0x00, 0x00, 0x01};

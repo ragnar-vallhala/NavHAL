@@ -399,3 +399,10 @@ config PIN_BOARD_USB_DP_PIN
 config NUM_BOARD_USB_AF
     int
     default 10 if BOARD_NUCLEO_F401RE
+
+# ---- Second UART ----
+# Which instance code should use when it needs a UART that is not the console,
+# such as a two-port bridge. Its pins are the BOARD_USART<n>_* set above.
+config VAL_BOARD_AUX_UART
+    string
+    default "HAL_UART_6" if BOARD_NUCLEO_F401RE

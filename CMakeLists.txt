@@ -292,18 +292,23 @@ if(TARGET hal AND NAVHAL_LINK_SCRIPT_DIR)
   target_link_options(hal INTERFACE "-L${NAVHAL_LINK_SCRIPT_DIR}")
 endif()
 
-# And the script itself, for the same reason: which file describes this board's
-# memory is NavHAL's business, not its consumer's. Without this a parent project
-# has to spell out src/board/<board>/linker.ld, which makes every generated
-# project depend on NavHAL's directory layout.
+# And the script itself, by name rather than on the link line: which file
+# describes this board's memory is NavHAL's business, not its consumer's, and
+# without this a parent project has to spell out src/board/<board>/linker.ld and
+# so depends on NavHAL's directory layout.
 #
-# Only when NavHAL is a subproject. Its own executables take -T from
-# ARCH_LINK_FLAGS, and a TEST build swaps a different script in there -- a second
-# -T arriving from the link line would override that one and link the test image
-# to the board's memory map instead.
-if(TARGET hal AND NAVHAL_LINKER_SCRIPT AND
-   NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-  target_link_options(hal INTERFACE "SHELL:-T ${NAVHAL_LINKER_SCRIPT}")
+# A variable, NOT an INTERFACE link option, because -T does not compose: ld
+# refuses the same script twice ("appears multiple times"), so carrying it on
+# the target would break every consumer that still passes its own -- and would
+# override the different script a TEST build puts in ARCH_LINK_FLAGS. -L above
+# can be an interface option precisely because search paths are additive.
+#
+# CACHE INTERNAL so it survives into the parent scope of an add_subdirectory(),
+# which is where a consumer reads it; the same way the generated config.cmake
+# publishes BOARD and FLASHER.
+if(NAVHAL_LINKER_SCRIPT)
+  set(NAVHAL_LINKER_SCRIPT "${NAVHAL_LINKER_SCRIPT}" CACHE INTERNAL
+      "Linker script for the configured board; pass it to -T")
 endif()
 
 # Carry the force-included target header on the target, for the same reason.

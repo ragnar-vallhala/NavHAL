@@ -27,6 +27,8 @@
 #ifndef I2C_TYPES_H
 #define I2C_TYPES_H
 
+#include "utils/gpio_types.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,4 +42,9 @@ typedef enum {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+/* Defined so portable code can name the I2C alternate function, but inert here:
+ * the TWI peripheral owns its pins and hal_gpio_set_alternate_function returns
+ * HAL_ERR_NOT_SUPPORTED on this part, ignoring the value. */
+#define GPIO_FUNC_I2C HAL_GPIO_AF4
+
 #endif /* I2C_TYPES_H */

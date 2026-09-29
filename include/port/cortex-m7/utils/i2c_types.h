@@ -30,6 +30,8 @@
 #ifndef I2C_TYPES_H
 #define I2C_TYPES_H
 
+#include "utils/gpio_types.h"
+
 #include "common/navhal_compiler.h"
 
 
@@ -52,4 +54,8 @@ typedef enum {
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
+/* GPIO alternate function that routes the I2C pins. AF4 for every I2C on this
+ * family; the pins themselves come from the board. */
+#define GPIO_FUNC_I2C HAL_GPIO_AF4
+
 #endif /* I2C_TYPES_H */

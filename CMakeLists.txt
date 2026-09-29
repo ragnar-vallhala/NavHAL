@@ -24,6 +24,11 @@ set(CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.config")
 set(GENERATED_CMAKE "${CMAKE_BINARY_DIR}/config.cmake")
 set(GENERATED_HEADER "${CMAKE_BINARY_DIR}/autoconf.h")
 set(GENERATED_NAVHAL_TARGET "${CMAKE_BINARY_DIR}/navhal_target.h")
+# board.h is generated from the selected board's Kconfig, into the build tree.
+# src/board/<board>/ is deliberately NOT on the include path any more: with both
+# there, `#include "board.h"` would resolve to whichever came first and the
+# generated header would be decoration. One description of a board, one header.
+set(GENERATED_BOARD_HEADER "${CMAKE_BINARY_DIR}/board.h")
 
 # Defconfig seeding. A toolchain file (cmake/toolchains/*.cmake) can set
 # NAVHAL_DEFCONFIG to a Kconfig fragment naming the target arch / vendor /
@@ -46,6 +51,7 @@ execute_process(
             --cmake-out ${GENERATED_CMAKE}
             --header-out ${GENERATED_HEADER}
             --navhal-target-out ${GENERATED_NAVHAL_TARGET}
+            --board-header-out ${GENERATED_BOARD_HEADER}
             --sample-override "${SAMPLE}"
     RESULT_VARIABLE KCONFIG_RESULT
 )
@@ -358,7 +364,7 @@ if(TEST)
     ${CMAKE_CURRENT_SOURCE_DIR}/tests
     ${INCLUDE_PORT}
     ${INCLUDE_FAMILY}
-    ${SRC_BOARD}
+    ${CMAKE_BINARY_DIR}
   )
 
   # Test sources split into tiers (see tests/main.c for the rationale):

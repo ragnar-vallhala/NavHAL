@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include "board.h"
 #include "navhal_port_sdio.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_gpio.h"
@@ -61,25 +62,16 @@ static uint32_t get_sdioclk(void) {
   }
   return hal_clock_get_sysclk();
 }
-/* Bus pins, assembled from the configuration. HAL_GPIO_PIN ties the two integers
- * to the pin enumeration, with static assertions in gpio_types.h so a reordered
- * enumeration breaks the build rather than quietly moving every configured pin. */
-#define SDIO_PIN_D0                                                            \
-  HAL_GPIO_PIN(NAVHAL_CONFIG_SDIO_D0_PORT, NAVHAL_CONFIG_SDIO_D0_PIN)
-#define SDIO_PIN_D1                                                            \
-  HAL_GPIO_PIN(NAVHAL_CONFIG_SDIO_D1_PORT, NAVHAL_CONFIG_SDIO_D1_PIN)
-#define SDIO_PIN_D2                                                            \
-  HAL_GPIO_PIN(NAVHAL_CONFIG_SDIO_D2_PORT, NAVHAL_CONFIG_SDIO_D2_PIN)
-#define SDIO_PIN_D3                                                            \
-  HAL_GPIO_PIN(NAVHAL_CONFIG_SDIO_D3_PORT, NAVHAL_CONFIG_SDIO_D3_PIN)
-#define SDIO_PIN_CK                                                            \
-  HAL_GPIO_PIN(NAVHAL_CONFIG_SDIO_CK_PORT, NAVHAL_CONFIG_SDIO_CK_PIN)
-#define SDIO_PIN_CMD                                                           \
-  HAL_GPIO_PIN(NAVHAL_CONFIG_SDIO_CMD_PORT, NAVHAL_CONFIG_SDIO_CMD_PIN)
-#if NAVHAL_CONFIG_SDIO_HAS_CD
-#define SDIO_PIN_CD                                                            \
-  HAL_GPIO_PIN(NAVHAL_CONFIG_SDIO_CD_PORT, NAVHAL_CONFIG_SDIO_CD_PIN)
-#endif
+/* Pins come from the board, through the generated board.h.
+ *
+ * They used to be written out in this file while board.h named the same pins in a
+ * comment, so the two could disagree with nothing to catch it -- and BOARD_SD_CD
+ * described a real card-detect line that nothing read. board.h is generated from
+ * the board's own Kconfig now, so including it reads the configuration rather
+ * than hardcoding a board.
+ *
+ * BOARD_SD_CD exists only on a board that declares a card-detect pin, and that
+ * presence is the flag -- no separate "has card detect" symbol to keep in step. */
 
 
 hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config) {
@@ -91,12 +83,12 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config) {
    * the same pins in a comment, so the board layer and the driver could disagree
    * with nothing to catch it -- and BOARD_SD_CD was defined and read by nobody for
    * as long as the boards existed. See the "SDIO pin assignment" menu. */
-  hal_gpio_pin pins[] = {SDIO_PIN_D0, SDIO_PIN_D1, SDIO_PIN_D2,
-                         SDIO_PIN_D3, SDIO_PIN_CK, SDIO_PIN_CMD};
+  hal_gpio_pin pins[] = {BOARD_SDIO_D0, BOARD_SDIO_D1, BOARD_SDIO_D2,
+                         BOARD_SDIO_D3, BOARD_SDIO_CK, BOARD_SDIO_CMD};
 
   for (int i = 0; i < 6; i++) {
     hal_gpio_set_alternate_function(pins[i],
-                                    (hal_gpio_af_t)NAVHAL_CONFIG_SDIO_PIN_AF);
+                                    (hal_gpio_af_t)BOARD_SDIO_AF);
   }
 
   for (int i = 0; i < 6; i++) {
@@ -294,13 +286,13 @@ static hal_sdio_error_t sdio_wait_card_ready(void) {
 /* ------------------------------------------------------------- */
 
 bool hal_sdio_card_present(void) {
-#if NAVHAL_CONFIG_SDIO_HAS_CD
+#if defined(BOARD_SD_CD)
   /* Active low: the socket's detect switch closes to ground when a card is
    * seated. Measured on NAVIXSM-F401RE -- PC5 reads low with either internal
    * pull applied and a card in, so it is held by the switch rather than
    * following the pull. Configured on every call because nothing else owns this
    * pin and a caller may check before hal_sdio_init. */
-  hal_gpio_set_mode(SDIO_PIN_CD, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_UP);
+  hal_gpio_set_mode(BOARD_SD_CD, HAL_GPIO_MODE_INPUT, HAL_GPIO_PULL_UP);
   /* Let the pull-up charge the line before believing it. An inserted card holds
    * the pin low through a closed switch and settles at once, so a read with no
    * settling time looks right on a bench with a card in and reports a card that
@@ -309,7 +301,7 @@ bool hal_sdio_card_present(void) {
    * running, since a caller may check for a card before initialising anything. */
   for (volatile uint32_t i = 0u; i < 2000u; i++) {
   }
-  return hal_gpio_read(SDIO_PIN_CD) == HAL_GPIO_LOW;
+  return hal_gpio_read(BOARD_SD_CD) == HAL_GPIO_LOW;
 #else
   /* No detect pin on this board. Claiming the slot is empty would turn a
    * working setup into a refusal, so assume a card and let the card commands

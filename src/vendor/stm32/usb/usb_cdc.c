@@ -721,12 +721,12 @@ hal_status_t hal_usb_cdc_init(void) {
   if (usb_clock_hz() != 48000000U)
     return HAL_ERR_NOT_INITIALIZED;
 
-  /* PA11 = DM, PA12 = DP, both AF10 (OTG_FS). */
-  const hal_gpio_pin_t pins[2] = {GPIO_PA11, GPIO_PA12};
+  /* DM/DP pair and its alternate function, from the board. */
+  const hal_gpio_pin_t pins[2] = {BOARD_USB_DM, BOARD_USB_DP};
   for (uint32_t i = 0; i < 2; i++) {
     hal_gpio_set_output_speed(pins[i], HAL_GPIO_SPEED_VERY_HIGH);
     hal_gpio_set_output_type(pins[i], HAL_GPIO_OTYPE_PUSH_PULL);
-    hal_gpio_set_alternate_function(pins[i], HAL_GPIO_AF10);
+    hal_gpio_set_alternate_function(pins[i], (hal_gpio_af_t)BOARD_USB_AF);
     hal_gpio_set_mode(pins[i], HAL_GPIO_MODE_AF, HAL_GPIO_PULL_NONE);
   }
 

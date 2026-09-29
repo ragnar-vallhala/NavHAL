@@ -41,6 +41,7 @@
 
 #include <stdbool.h>
 
+#include "board.h"
 #include "internal/hal_clock_ops.h"
 #include "family/flash_reg.h"
 #include "family/rcc_reg.h"
@@ -63,8 +64,10 @@
  * register map; only the latency mask is derived here. */
 #define FLASH_ACR_LATENCY_Msk (0xFU << FLASH_ACR_LATENCY_BIT)
 
-#define HSI_FREQ_HZ 16000000U
-#define HSE_FREQ_HZ 8000000U /**< Nucleo-F767ZI HSE = 8 MHz ST-LINK MCO. */
+/* The oscillators are board components, not chip facts: the HSE source in
+ * particular differs per board. Both come from the board's Kconfig. */
+#define HSI_FREQ_HZ ((uint32_t)BOARD_HSI_FREQ_HZ)
+#define HSE_FREQ_HZ ((uint32_t)BOARD_HSE_FREQ_HZ)
 
 /* Internal clock-source toggle helpers (file-local). */
 static void _toggle_hse_clock(uint8_t state) {

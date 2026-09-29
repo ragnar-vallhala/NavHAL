@@ -351,3 +351,23 @@ config PIN_BOARD_SPI2_MOSI_PIN
 config NUM_BOARD_SPI2_AF
     int
     default 5 if BOARD_NAVIXSM_F401RE
+
+# ---- USB OTG pins ----
+# The full-speed transceiver's DM/DP pair and the alternate function that routes
+# it. Fixed by silicon for OTG_FS, but a part with OTG_HS routes it elsewhere,
+# so the board says which pair it wired.
+config PIN_BOARD_USB_DM_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USB_DM_PIN
+    int
+    default 11 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USB_DP_PORT
+    int
+    default 0 if BOARD_NAVIXSM_F401RE
+config PIN_BOARD_USB_DP_PIN
+    int
+    default 12 if BOARD_NAVIXSM_F401RE
+config NUM_BOARD_USB_AF
+    int
+    default 10 if BOARD_NAVIXSM_F401RE

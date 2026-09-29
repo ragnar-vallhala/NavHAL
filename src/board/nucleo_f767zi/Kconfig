@@ -437,3 +437,122 @@ config PIN_BOARD_SPI2_MOSI_PIN
 config NUM_BOARD_SPI2_AF
     int
     default 5 if BOARD_NUCLEO_F767ZI
+
+# ---- USB OTG pins ----
+# The full-speed transceiver's DM/DP pair and the alternate function that routes
+# it. Fixed by silicon for OTG_FS, but a part with OTG_HS routes it elsewhere,
+# so the board says which pair it wired.
+config PIN_BOARD_USB_DM_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_USB_DM_PIN
+    int
+    default 11 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_USB_DP_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_USB_DP_PIN
+    int
+    default 12 if BOARD_NUCLEO_F767ZI
+config NUM_BOARD_USB_AF
+    int
+    default 10 if BOARD_NUCLEO_F767ZI
+
+# ---- I2C pins ----
+# Which pins each I2C bus uses. The alternate function is GPIO_FUNC_I2C for
+# every I2C on this family, so it stays in the driver.
+config PIN_BOARD_I2C1_SCL_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C1_SCL_PIN
+    int
+    default 8 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C1_SDA_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C1_SDA_PIN
+    int
+    default 9 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C2_SCL_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C2_SCL_PIN
+    int
+    default 10 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C2_SDA_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C2_SDA_PIN
+    int
+    default 11 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C3_SCL_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C3_SCL_PIN
+    int
+    default 8 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C3_SDA_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_I2C3_SDA_PIN
+    int
+    default 9 if BOARD_NUCLEO_F767ZI
+
+# ---- Ethernet RMII pins ----
+# The nine RMII signals, all on GPIO_FUNC_ETH. TXD1 is on PB13 rather than the
+# MCU's alternative PG14 because that is what this board routes. MII adds more
+# signals and is not wired here.
+config PIN_BOARD_ETH_REF_CLK_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_REF_CLK_PIN
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_MDIO_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_MDIO_PIN
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_CRS_DV_PORT
+    int
+    default 0 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_CRS_DV_PIN
+    int
+    default 7 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_MDC_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_MDC_PIN
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_RXD0_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_RXD0_PIN
+    int
+    default 4 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_RXD1_PORT
+    int
+    default 2 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_RXD1_PIN
+    int
+    default 5 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_TX_EN_PORT
+    int
+    default 6 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_TX_EN_PIN
+    int
+    default 11 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_TXD0_PORT
+    int
+    default 6 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_TXD0_PIN
+    int
+    default 13 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_TXD1_PORT
+    int
+    default 1 if BOARD_NUCLEO_F767ZI
+config PIN_BOARD_ETH_TXD1_PIN
+    int
+    default 13 if BOARD_NUCLEO_F767ZI

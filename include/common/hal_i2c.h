@@ -61,9 +61,6 @@ typedef enum {
 /** @brief Own-address value selecting master mode. */
 #define I2C_MASTER 0
 
-/** @brief GPIO alternate function for I²C pins. */
-#define GPIO_FUNC_I2C HAL_GPIO_AF4
-
 /**
  * @brief I²C configuration structure.
  */

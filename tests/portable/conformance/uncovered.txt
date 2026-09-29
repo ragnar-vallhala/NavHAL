@@ -24,55 +24,21 @@ hal_timebase_tick: the tick ISR's own entry; calling it forges the timebase that
 hal_console_init: re-initialises the transport the suite prints through, at a rate a portable case cannot know; a wrong one garbles the capture
 
 # ---------------------------------------------------------------------------
-# Debt. Each is reachable from a bare board; nobody has written the case.
+# Debt. Reachable from a bare board; nobody has written the case yet.
+#
+# What is left is one family and one function, and they share a cause: neither
+# is vtable-migrated, so each is a vendor implementation of public API with no
+# shared layer validating in front of it -- which is exactly where a second
+# port drifts. Writing the cases is what found the reason they cannot land yet:
+# only hal_eth_start checks _initialized, so the rest reach the MAC's registers
+# with the peripheral clock possibly gated, and the honest assertion ("answers
+# NOT_INITIALIZED before init") fails today. Fixing that is a driver change,
+# and the only tier that runs eth is the F767ZI on hardware.
 # ---------------------------------------------------------------------------
-
-# Boot sniffer: byte matching and the attempt counter are pure state, and the
-# entry-enable pair is a flag round-trip. Only hal_boot_request above resets.
-
-# Console: the suite's own transport. Callable, but a case has to assert on
-# something other than "the output appeared", since the output IS the result.
-
-# FatFs glue over SDIO. status/ioctl answer without a card; read/write do not.
-hal_disk_initialize: debt: returns a status with no card
-hal_disk_ioctl: debt: argument rejection
-hal_disk_read: debt: argument rejection before the card poll
-hal_disk_status: debt: getter sanity with no card
-hal_disk_write: debt: argument rejection before the card poll
-
-# Ethernet: the getters and the teardown path answer with no PHY link.
-hal_eth_deinit: debt: idempotency
-hal_eth_link_is_up: debt: getter sanity, false with no link
-hal_eth_phy_write: debt: argument rejection
-hal_eth_set_callback: debt: NULL rejection
-hal_eth_start: debt: argument rejection
-hal_eth_stop: debt: idempotency
-
-hal_mpu_disable_region: debt: region-id rejection
-
-# RTC: covered by the DRV_RTC cap suite on two boards and now the F401
-# emulator, but not by the portable per-port check.
-hal_rtc_backup_write: debt: index rejection and round-trip
-hal_rtc_cancel_alarm: debt: idempotency
-hal_rtc_cancel_wakeup: debt: idempotency
-hal_rtc_get_clock: debt: getter sanity
-hal_rtc_set_wakeup: debt: period rejection
-
-# SDIO: the parts that answer before touching the card.
-hal_sdio_card_init: debt: returns HAL_SDIO_NO_CARD with an empty slot
-hal_sdio_card_present: debt: getter sanity, false with an empty slot
-hal_sdio_get_response: debt: argument rejection
-hal_sdio_send_command: debt: argument rejection
-hal_sdio_set_callback: debt: NULL rejection
-
-# UART convenience writers over the same transport as the console.
-
-# USB CDC: the cap suite already asserts what these do with no host attached.
-hal_usb_cdc_deinit: debt: idempotency
-hal_usb_cdc_get_baudrate: debt: getter sanity
-hal_usb_cdc_get_break_ms: debt: getter sanity
-hal_usb_cdc_get_line_state: debt: getter sanity
-hal_usb_cdc_init: debt: idempotency with no host
-hal_usb_cdc_notify_serial_state: debt: argument rejection
-hal_usb_cdc_set_rx_callback: debt: NULL rejection
-
+hal_eth_deinit: debt: no _initialized guard; touches MACCR/DMAOMR before init
+hal_eth_link_is_up: debt: reads the PHY through the MAC with no _initialized guard
+hal_eth_phy_write: debt: no _initialized guard; writes MACMIIAR before init
+hal_eth_set_callback: debt: registration only, but lands with the rest of eth
+hal_eth_start: debt: the one eth entry point that does guard; waits on the others
+hal_eth_stop: debt: no _initialized guard; clears MACCR before init
+hal_sdio_send_command: debt: writes SDIO->ICR/ARG/CMD with no init guard, so a portable case would poke a possibly-gated peripheral

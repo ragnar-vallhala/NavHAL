@@ -140,8 +140,9 @@ hil_usb_location() {  # $1 = board name
 # with no virtual COM port (a bare ST-LINK/V2, or a board that never routed its
 # console UART) still has to be testable; breaking on hal_uart_write_string and
 # printing the argument reconstructs the transcript the wire would have carried.
-# Prints that transcript, and returns the on-target failure count (124 = the
-# suite never reached its summary).
+# Prints that transcript, and returns the on-target failure count. The two
+# codes that are not a count: 124 = the suite never reached its summary,
+# 125 = the probe or target could not be reached at all.
 swd_capture() {  # $1 = test ELF, $2 = timeout s, $3 = usb location (may be empty)
   local elf="$1" to="$2" loc="$3" script out rc=0 fails a placed=0
   local -a ocd=()
@@ -178,7 +179,12 @@ swd_capture() {  # $1 = test ELF, $2 = timeout s, $3 = usb location (may be empt
       return 77
     fi
     rm -f "$ocdlog"
-    return 1
+    # 125, not 1: this function's success codes ARE the on-target failure
+    # count, so returning 1 for "could not talk to the target" reports itself
+    # as one failed test. That is how an idcode mismatch -- a different board
+    # plugged into the pinned location -- read as a passing suite with one bad
+    # case in it.
+    return 125
   fi
   script=$(mktemp --suffix=.gdb)
   # navhal_post_main runs once main() returns, so it is where the suite is over
@@ -332,7 +338,8 @@ run_board() {  # $1 = board name; returns the on-target failure count
     # gdb loads the ELF itself, so there is nothing to objcopy and no st-flash.
     echo ">> flashing + capturing over swd (timeout ${timeout}s)"
     swd_capture "$BUILD_DIR/tests" "$timeout" "$loc" || rc=$?
-    echo ">> $board: swd_capture exit=$rc (0 = all pass, N = failures, 124 = no summary)"
+    echo ">> $board: swd_capture exit=$rc (0 = all pass, N = failures," \
+         "124 = no summary, 125 = probe/target unreachable)"
     return "$rc"
   fi
 

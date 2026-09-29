@@ -19,6 +19,12 @@
 #include "board.h"
 #include "navhal.h"
 
+/* Kconfig keeps this sample out of the menu on a board whose BOARD_AUX_UART is
+ * already committed; this catches -DSAMPLE= naming it anyway. */
+#if !NAVHAL_CONFIG_BOARD_AUX_UART_SPARE
+#error "this sample drives two UARTs, and BOARD_AUX_UART is not spare on this board"
+#endif
+
 #define BUF_SIZE 256
 
 /* Circular DMA RX buffers. Cache-line aligned so a D-cache invalidate stays

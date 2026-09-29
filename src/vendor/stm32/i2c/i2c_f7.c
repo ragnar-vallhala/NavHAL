@@ -36,6 +36,7 @@
 
 #include "internal/hal_i2c_ops.h"
 #include "internal/hal_i2c_dma_ops.h"
+#include "board.h"
 #include "navhal_port_gpio.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
@@ -58,22 +59,34 @@ static void _cfg_pin(hal_gpio_pin_t pin) {
   hal_gpio_set_output_speed(pin, HAL_GPIO_SPEED_HIGH);
 }
 
+/* I2C pin routing, supplied by the board's Kconfig via the generated board.h.
+ * A bus the board does not describe is absent from this table, and
+ * _configure_i2c_gpio then touches no pins for it. */
+typedef struct {
+  hal_i2c_bus_t bus;
+  hal_gpio_pin_t scl;
+  hal_gpio_pin_t sda;
+} i2c_pinmap_t;
+
+static const i2c_pinmap_t i2c_pinmap[] = {
+#if defined(BOARD_I2C1_SCL)
+    {HAL_I2C_1, BOARD_I2C1_SCL, BOARD_I2C1_SDA},
+#endif
+#if defined(BOARD_I2C2_SCL)
+    {HAL_I2C_2, BOARD_I2C2_SCL, BOARD_I2C2_SDA},
+#endif
+#if defined(BOARD_I2C3_SCL)
+    {HAL_I2C_3, BOARD_I2C3_SCL, BOARD_I2C3_SDA},
+#endif
+};
+
 static void _configure_i2c_gpio(hal_i2c_bus_t bus) {
-  switch (bus) {
-  case HAL_I2C_1: /* PB8 SCL / PB9 SDA */
-    _cfg_pin(GPIO_PB08);
-    _cfg_pin(GPIO_PB09);
-    break;
-  case HAL_I2C_2: /* PB10 SCL / PB11 SDA */
-    _cfg_pin(GPIO_PB10);
-    _cfg_pin(GPIO_PB11);
-    break;
-  case HAL_I2C_3: /* PA8 SCL / PC9 SDA */
-    _cfg_pin(GPIO_PA08);
-    _cfg_pin(GPIO_PC09);
-    break;
-  default:
-    break;
+  for (unsigned i = 0u; i < (sizeof i2c_pinmap / sizeof i2c_pinmap[0]); i++) {
+    if (i2c_pinmap[i].bus == bus) {
+      _cfg_pin(i2c_pinmap[i].scl);
+      _cfg_pin(i2c_pinmap[i].sda);
+      return;
+    }
   }
 }
 

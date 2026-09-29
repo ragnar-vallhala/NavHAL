@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-# DEPRECATED shim — superseded by the ntest orchestrator. Kept so existing
-# hooks/CI/muscle-memory keep working. Runs: ntest samples avr
-exec "$(dirname "$0")/ntest" samples avr "$@"
+# DEPRECATED shim — superseded by tools/samples.sh. Kept so existing
+# hooks/CI/muscle-memory keep working. Runs: tools/samples.sh avr
+exec "$(dirname "$0")/samples.sh" avr "$@"

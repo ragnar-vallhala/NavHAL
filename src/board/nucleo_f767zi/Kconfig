@@ -563,3 +563,10 @@ config PIN_BOARD_ETH_TXD1_PIN
 config VAL_BOARD_AUX_UART
     string
     default "HAL_UART_6" if BOARD_NUCLEO_F767ZI
+
+# Whether BOARD_AUX_UART is free for a sample to drive. A board that has already
+# committed that instance to a peripheral says n, and samples needing two UARTs
+# of their own drop out rather than fighting it.
+config BOARD_AUX_UART_SPARE
+    bool
+    default y if BOARD_NUCLEO_F767ZI

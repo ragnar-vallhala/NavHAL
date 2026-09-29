@@ -68,6 +68,43 @@ static void print_uint(uint32_t v) {
   }
 }
 
+/* Identification on real hardware: bring the controller up, run the card
+ * handshake, and read the capacity out of the CSD. Read-only -- CMD0/8/ACMD41/
+ * 2/3/7/9 identify a card, none of them writes to it, so a card in the socket
+ * keeps its contents.
+ *
+ * Skipped with an empty slot, which is what keeps the suite runnable on a bare
+ * board. With a card present, identification failing IS a failure: the detect
+ * line said there is one, so a handshake that does not complete is the driver
+ * or the wiring, not the bench.
+ *
+ * 1-bit, deliberately. Identification happens at 1-bit on every card, so this
+ * is the width that must work everywhere; the 4-bit path is a board question
+ * (it was a dry joint on DAT3 here) and belongs in a case that says so. */
+void test_hal_sdio_card_identifies(void) {
+  if (!hal_sdio_card_present()) {
+    navtest_write("[sdio slot=empty -- identification not exercised]\r\n");
+    TEST_ASSERT_TRUE(1);
+    return;
+  }
+
+  hal_sdio_config_t cfg = {.clock_div = 0,
+                           .bus_width = HAL_SDIO_BUS_WIDTH_1BIT};
+  hal_sdio_error_t e = hal_sdio_init(&cfg);
+  if (e != HAL_SDIO_OK) {
+    navtest_write("[sdio controller not available]\r\n");
+    TEST_ASSERT_TRUE(1);
+    return;
+  }
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_SDIO_OK, (uint32_t)hal_sdio_card_init());
+
+  /* A capacity of zero means the CSD was never cached, which is the shape a
+   * half-finished handshake leaves behind. */
+  uint32_t sectors = hal_sdio_get_sector_count();
+  TEST_ASSERT_TRUE(sectors > 0u);
+}
+
 void test_hal_sdio_get_sector_count_returns_value(void) {
   /* Without a card the sector count may be 0 — what matters is the call
    * returns and doesn't fault.
@@ -191,6 +228,7 @@ void test_sdio_data_clear_is_not_a_blanket_clear(void) {
 NAVTEST_CASE_DECL(test_hal_sdio_init_rejects_null_config);
 NAVTEST_CASE_DECL(test_hal_sdio_read_block_rejects_null_buffer);
 NAVTEST_CASE_DECL(test_hal_sdio_write_block_rejects_null_buffer);
+NAVTEST_CASE_DECL(test_hal_sdio_card_identifies);
 NAVTEST_CASE_DECL(test_hal_sdio_get_sector_count_returns_value);
 NAVTEST_CASE_DECL(test_hal_sdio_set_callback_smoke);
 NAVTEST_CASE_DECL(test_hal_sdio_block_roundtrip_pil);
@@ -205,6 +243,7 @@ static const navtest_case_t sdio_cases[] = {
     NAVTEST_CASE(test_hal_sdio_init_rejects_null_config),
     NAVTEST_CASE(test_hal_sdio_read_block_rejects_null_buffer),
     NAVTEST_CASE(test_hal_sdio_write_block_rejects_null_buffer),
+    NAVTEST_CASE(test_hal_sdio_card_identifies),
     NAVTEST_CASE(test_hal_sdio_get_sector_count_returns_value),
     NAVTEST_CASE(test_hal_sdio_set_callback_smoke),
     NAVTEST_CASE(test_hal_sdio_block_roundtrip_pil),

@@ -39,6 +39,7 @@ extern "C" {
 void test_hal_sdio_init_rejects_null_config(void);
 void test_hal_sdio_read_block_rejects_null_buffer(void);
 void test_hal_sdio_write_block_rejects_null_buffer(void);
+void test_hal_sdio_card_identifies(void);
 void test_hal_sdio_get_sector_count_returns_value(void);
 void test_hal_sdio_set_callback_smoke(void);
 void test_hal_sdio_block_roundtrip_pil(void);

@@ -28,6 +28,7 @@ extern "C" {
 
 void test_eth_rejects_null_args(void);
 void test_eth_phy_id_readable(void);
+void test_eth_link_and_send(void);
 
 extern const navtest_suite_t test_eth_suite;
 

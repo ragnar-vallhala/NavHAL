@@ -96,11 +96,109 @@ void test_eth_phy_id_readable(void) {
 /* PROGMEM slot for each case name on AVR; no-op elsewhere (ETH is
  * Cortex-M7 only). */
 NAVTEST_CASE_DECL(test_eth_rejects_null_args);
+/* The data path, which needs a cable and so reports rather than fails without
+ * one. Everything above this point answers on a bare board; this is the one
+ * case whose result depends on what is plugged in, and it says which.
+ *
+ * It puts exactly one frame on the wire: 60 bytes to the broadcast address,
+ * from the locally-administered MAC this suite already uses, with ethertype
+ * 0x88B5 -- the ethertype IEEE reserves for local experimental use, so nothing
+ * on the network is expected to parse or answer it.
+ *
+ * Receiving is reported, never asserted: a quiet segment owes this board no
+ * traffic, and failing because the network was idle would make the suite a
+ * test of the network. */
+void test_eth_link_and_send(void) {
+  NAVTEST_SKIP_ON_PIL(); /* Renode does not model the ETH MAC. */
+
+  hal_eth_config_t cfg = {
+      .mac_addr = {0x02, 0x00, 0x00, 0x00, 0x00, 0x01},
+      .interface = HAL_ETH_IFACE_RMII,
+      .phy_address = ETH_TEST_PHY_ADDR,
+      .auto_negotiation = true,
+  };
+  hal_status_t s = hal_eth_init(&cfg);
+  TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_INITIALIZED);
+
+  /* Auto-negotiation takes a second or two, and it restarts on the reset that
+   * flashing causes -- init deliberately does not wait for it, so reading the
+   * link once reports "down" on a board whose cable is fine. Poll instead.
+   *
+   * A spin rather than hal_delay_ms: nothing here guarantees a timebase has
+   * been started, and hal_delay_ms never returns without one, which would take
+   * the whole run down with no summary rather than one failed case. */
+  hal_eth_link_t link = {0};
+  for (uint32_t tries = 0u; tries < 500u; tries++) {
+    if (hal_eth_get_link(&link) == HAL_OK && link.up) {
+      break;
+    }
+    for (volatile uint32_t i = 0u; i < 200000u; i++) {
+    }
+  }
+
+  if (!link.up) {
+    navtest_write("[eth link=down -- data path not exercised]\r\n");
+    TEST_ASSERT_TRUE(1);
+    return;
+  }
+
+  navtest_write("[eth link=up ");
+  navtest_write(link.speed == HAL_ETH_SPEED_100M ? "100M" : "10M");
+  navtest_write(link.duplex == HAL_ETH_FULL_DUPLEX ? " full" : " half");
+  navtest_write("]\r\n");
+
+  /* A link means the MAC finished coming up, so start must now succeed --
+   * the branch a cableless bench can only ever see refuse. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_eth_start());
+
+  static uint8_t frame[HAL_ETH_MIN_FRAME_LEN];
+  for (uint16_t i = 0; i < HAL_ETH_MIN_FRAME_LEN; i++) {
+    frame[i] = 0x00;
+  }
+  for (uint8_t i = 0; i < 6; i++) {
+    frame[i] = 0xFF; /* broadcast */
+  }
+  for (uint8_t i = 0; i < 6; i++) {
+    frame[6 + i] = cfg.mac_addr[i];
+  }
+  frame[12] = 0x88; /* local experimental ethertype 1 */
+  frame[13] = 0xB5;
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_eth_send(frame, sizeof frame));
+
+  /* The RX half, polled rather than read once: hal_eth_receive takes the next
+   * completed descriptor and does not block, so a single call right after the
+   * send only ever reports what happened to be in the ring already. Any live
+   * segment carries broadcast traffic within a second or so.
+   *
+   * Reported, never asserted -- a quiet or point-to-point segment owes this
+   * board nothing, and failing then would make this a test of the network. */
+  static uint8_t rx[HAL_ETH_MAX_FRAME_LEN];
+  uint16_t rx_len = 0;
+  for (uint32_t tries = 0u; tries < 400u; tries++) {
+    if (hal_eth_receive(rx, sizeof rx, &rx_len) == HAL_OK && rx_len > 0) {
+      break;
+    }
+    for (volatile uint32_t i = 0u; i < 200000u; i++) {
+    }
+  }
+  if (rx_len > 0) {
+    navtest_write("[eth rx=yes ");
+    print_hex16(rx_len);
+    navtest_write(" bytes]\r\n");
+  } else {
+    navtest_write("[eth rx=none -- quiet segment]\r\n");
+  }
+}
+
 NAVTEST_CASE_DECL(test_eth_phy_id_readable);
+NAVTEST_CASE_DECL(test_eth_link_and_send);
 
 static const navtest_case_t eth_cases[] = {
     NAVTEST_CASE(test_eth_rejects_null_args),
     NAVTEST_CASE(test_eth_phy_id_readable),
+    NAVTEST_CASE(test_eth_link_and_send),
 };
 
 const navtest_suite_t test_eth_suite = {

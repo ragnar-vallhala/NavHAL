@@ -147,6 +147,18 @@ jobs:
       - name: Lint commit messages
         run: tools/lint_commits.sh origin/${{ github.base_ref }}..HEAD
 
+  # The port contract stays checkable: no public entry point may land without
+  # either a conformance case or a line saying why it cannot have one, and no
+  # ops table may land without a completeness case. Reads headers only — no
+  # toolchain, no build. Always runs (arch-independent).
+  conformance-gate:
+    name: Conformance gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Conformance coverage + vtable completeness
+        run: tools/conformance_coverage.py --gate
+
   # Fast pure-logic tests with the host gcc. Self-contained — no toolchain
   # download, no emulator. Always runs (arch-independent).
   host-tests:

@@ -49,6 +49,44 @@ need a v2-aware mode that knows which namespaces a port is claiming.
 A port that compiles, links and blinks an LED but fails this tier is not a
 port. That is the whole point of writing the contract down.
 
+## How much of the surface it covers
+
+The number is measured rather than remembered:
+
+```sh
+tools/conformance_coverage.py          # the counts, and what is missing
+tools/conformance_coverage.py --list   # every entry point and its state
+tools/conformance_coverage.py --gate   # what CI runs
+```
+
+A **public entry point** is a `hal_*` function declared in `include/common/`:
+the surface a port has to implement. The inline hot paths under `include/port/`
+are out — those are a vendor's own accessors, not a shared contract. **Covered**
+means this suite calls it; another tier calling it does not count, because the
+question is whether a *new port* would be caught getting it wrong, and only this
+suite runs everywhere.
+
+Everything else is declared in
+[`tests/portable/conformance/uncovered.txt`](../../tests/portable/conformance/uncovered.txt),
+one line per entry point, in two kinds:
+
+* **cannot be covered** — the call ends the run (`hal_system_reset`), destroys
+  what the run needs (`hal_flash_erase`), or waits on hardware a bare board does
+  not have (`hal_sdio_wait_flag`). Six of these.
+* **debt** — reachable from a bare board, nobody has written the case yet.
+  Delete the line when the case lands. Most of this debt *is* exercised by its
+  `DRV_*` cap suite under `tests/cap/`; what it lacks is the portable check that
+  a different port implements it the same way.
+
+The gate deliberately enforces no threshold — a number invites picking one that
+passes. It fails on three things: an entry point that is neither covered nor
+declared, a declared line the suite has since started calling (a stale excuse),
+and an ops table under `include/internal/` with no completeness case in
+`test_vtable.c`. That last one is the vendor half: `test_vtable.c` walks a
+table's bytes, so a table that *grows* an entry is covered the day it grows, but
+a table that is newly *added* is covered only when someone writes its case — and
+before this, nothing noticed if they did not.
+
 ## Adding to it
 
 New assertions belong here only if they hold for **every** port — if it needs

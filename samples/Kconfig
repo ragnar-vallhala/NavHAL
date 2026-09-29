@@ -119,7 +119,7 @@ config SAMPLE_23_HAL_SDIO_PERF
 
 config SAMPLE_24_HAL_UART_DMA_BRIDGE
     bool "24_hal_uart_dma_bridge"
-    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    depends on (ARCH_CORTEX_M4 || ARCH_CORTEX_M7) && BOARD_AUX_UART_SPARE
 
 config SAMPLE_25_HAL_SPI_ESP_BRIDGE
     bool "25_hal_spi_esp_bridge"

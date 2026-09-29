@@ -46,6 +46,7 @@
 #include "family/interrupt_reg.h"
 #include "family/rcc_reg.h"
 #include "navhal_port_eth.h"
+#include "board.h"
 #include "navhal_port_gpio.h"
 #include "navhal_port_interrupt.h"
 
@@ -121,21 +122,19 @@ static void _cfg_pin(hal_gpio_pin_t pin) {
   hal_gpio_set_output_speed(pin, HAL_GPIO_SPEED_VERY_HIGH);
 }
 
-/* RMII pinout on the Nucleo-F767ZI: REF_CLK PA1, MDIO PA2, MDC PC1, CRS_DV PA7,
- * RXD0 PC4, RXD1 PC5, TX_EN PG11, TXD0 PG13, TXD1 PB13 (all AF11). TXD1 is on
- * PB13, not the MCU's alternative PG14 — this board routes it to PB13. MII adds
- * more signals and is not wired on this board. */
+/* The RMII signals, supplied by the board's Kconfig via the generated board.h.
+ * MII adds more signals and no supported board wires it. */
+static const hal_gpio_pin_t eth_rmii_pins[] = {
+    BOARD_ETH_REF_CLK, BOARD_ETH_MDIO,  BOARD_ETH_CRS_DV,
+    BOARD_ETH_MDC,     BOARD_ETH_RXD0,  BOARD_ETH_RXD1,
+    BOARD_ETH_TX_EN,   BOARD_ETH_TXD0,  BOARD_ETH_TXD1,
+};
+
 static void _cfg_gpio(hal_eth_phy_iface_t iface) {
   (void)iface; /* only RMII is wired on the supported board */
-  _cfg_pin(GPIO_PA01);
-  _cfg_pin(GPIO_PA02);
-  _cfg_pin(GPIO_PA07);
-  _cfg_pin(GPIO_PC01);
-  _cfg_pin(GPIO_PC04);
-  _cfg_pin(GPIO_PC05);
-  _cfg_pin(GPIO_PG11);
-  _cfg_pin(GPIO_PG13);
-  _cfg_pin(GPIO_PB13);
+  for (unsigned i = 0u;
+       i < (sizeof eth_rmii_pins / sizeof eth_rmii_pins[0]); i++)
+    _cfg_pin(eth_rmii_pins[i]);
 }
 
 /* -------------------------------------------------------------------------- */

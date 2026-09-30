@@ -1,0 +1,143 @@
+name: codeql
+
+# Static dataflow/taint analysis of the C sources. Complements the runtime
+# tiers: ci.yml builds and runs, release-gate.yml adds ASan/UBSan on the host
+# suite -- both only see paths a test actually executes. CodeQL tracks data
+# across function boundaries in code no emulator and no board runs here: the
+# ETH DMA descriptor rings, the SDIO block layer, the FatFs glue.
+#
+# CodeQL for C/C++ only sees translation units the build actually compiles, and
+# no single NavHAL build compiles the tree -- the arch and vendor trees are
+# mutually exclusive by construction. Hence one matrix entry per arch, each
+# building what only it builds:
+#
+#   m4   default (F401RE) toolchain: src/common, src/utils, src/arch/armv7e-m,
+#        include/port/cortex-m4, the F4 vendor drivers, tests/arch/cortex-m4.
+#   m7   the F767 toolchain. Overlaps m4 heavily: the two differ by the _f7
+#        driver variants (clock_f7.c, i2c_f7.c, spi_f7.c, uart_f7.c), the M7
+#        port headers and tests/arch/cortex-m7. Four files is a whole database
+#        for little -- until a finding lives in one of them, as the dead
+#        `pll_p == 0` branch in clock_f7.c does, and m4 cannot see it.
+#   avr  src/arch/avr, src/vendor/microchip, include/port/avr. 16-bit int and
+#        PROGMEM, so it is also where a size assumption that holds on 32-bit
+#        surfaces.
+#   x86  src/arch/x86_64, src/vendor/pc. Built as a sample, not as the test ELF:
+#        the on-target test build is not wired for x86 yet
+#        (cmake/arch/x86_64.cmake), so this target compiles no tests/.
+#
+# eth_f7.c and sdio.c land in the m4 database as well as the m7 one -- the vendor
+# source list carries them for both families, with the driver bodies guarded
+# inside. Do not read an m4 alert in them as a misconfigured matrix.
+#
+# The host build (cmake -S tests/host) is deliberately absent: it compiles a
+# hand-picked handful of pure-logic files, every one of which the m4 build
+# compiles too, so it would add a database and no coverage.
+#
+# Two scope caveats worth knowing before editing this file:
+#
+# 1. NO paths-ignore. A codeql-config.yml with `paths-ignore: [src/utils/fatfs]`
+#    would be SILENTLY IGNORED here: those keys only apply to interpreted
+#    languages or to a C/C++ analysis with build-mode `none`, and this is a built
+#    analysis. The only way a path stays out is for the build not to compile it,
+#    which is why vendored third-party code cannot be filtered once a target
+#    needs it. Nothing hits this today -- every defconfig above leaves DRV_FS
+#    off, so src/utils/fatfs/ is not compiled and reports nothing. Enable it in a
+#    target and its findings arrive with no way to exclude them; dismiss them in
+#    the Security tab ("won't fix", they belong upstream), which is sticky per
+#    alert.
+#
+# 2. Do NOT rename a `category` casually. Alerts auto-close only when the SAME
+#    category re-uploads without them, so a rename strands every open alert from
+#    the old category permanently -- and strands the CONFIGURATION too: code
+#    scanning remembers every tool+category it has seen on the default branch,
+#    so the aggregate "Code scanning results / CodeQL" check then reports
+#    "N configurations not found" on every later run (NEUTRAL, blocks nothing,
+#    looks like a broken analysis). Clearing that needs the stranded analyses
+#    deleted by hand:
+#      gh api -X DELETE \
+#        "repos/<owner>/<repo>/code-scanning/analyses/<id>?confirm_delete=true"
+#    Deleting an analysis deletes the results it holds, so that is only safe for
+#    a category nothing uploads to. Prefer not renaming.
+#
+# Not in ci.yml's `ci-required` aggregate, and not narrowed by its changed-files
+# dispatch: this is a baseline, not a per-PR gate. A finding is triaged, not a
+# merge block.
+on:
+  push:
+    branches: [main, stable]
+  pull_request:
+  schedule:
+    # Weekly full run so the default branch keeps a fresh baseline even without
+    # pushes; CodeQL query packs update over time.
+    - cron: '27 4 * * 1'
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: CodeQL (C/C++, ${{ matrix.target }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write   # upload results to the Security tab
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: m4
+            apt: gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+            build: |
+              cmake -B build-codeql -DTEST=ON
+              cmake --build build-codeql --target tests -j
+          - target: m7
+            apt: gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+            build: |
+              cmake -B build-codeql -DTEST=ON \
+                -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi-f767-toolchain.cmake
+              cmake --build build-codeql --target tests -j
+          - target: avr
+            apt: gcc-avr avr-libc binutils-avr
+            build: |
+              cmake -B build-codeql -DTEST=ON \
+                -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/avr-toolchain.cmake
+              cmake --build build-codeql --target tests -j
+          - target: x86
+            # Freestanding ELF64 built with the host gcc -- no cross toolchain.
+            apt: ""
+            build: |
+              cmake -B build-codeql \
+                -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/x86_64-qemu-toolchain.cmake \
+                -DSAMPLE=hal_x86_hello
+              cmake --build build-codeql
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        # kconfiglib: the root build generates the force-included config header
+        # from Kconfig, so no target configures without it.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake make ${{ matrix.apt }}
+          pip install kconfiglib
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: c-cpp
+          # security-and-quality adds the correctness/maintainability queries on
+          # top of the default security set.
+          queries: security-and-quality
+
+      - name: Build (${{ matrix.target }})
+        # Each toolchain file seeds .config from its own NAVHAL_DEFCONFIG, and
+        # the root CMakeLists only seeds when .config is absent -- a fresh
+        # checkout has none, so nothing to clear here. tools/run_codeql.sh does
+        # have to clear it between targets.
+        run: ${{ matrix.build }}
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:c-cpp/target:${{ matrix.target }}"

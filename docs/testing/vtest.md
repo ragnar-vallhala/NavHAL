@@ -43,10 +43,11 @@ vtest reads. Two adapters cover everything here:
   selected. `[host]` is the plain build; `[host-asan]` is the same cases in a
   build dir configured with ASan + UBSan.
 - **`check`** — one command, one verdict, its exit status the result: the sample
-  matrices, the capability contract, coverage, the line count, and one suite per
-  PIL and HIL board. **Exit 77 is SKIP**, which is how a HIL board that is not
-  plugged in reports — a bench carrying two of the five boards is the normal
-  case, not a report with three failures in it.
+  matrices, the capability contract, coverage, the line count, CodeQL, and one
+  suite per PIL and HIL board. **Exit 77 is SKIP**, which is how a HIL board that
+  is not plugged in reports — a bench carrying two of the five boards is the
+  normal case, not a report with three failures in it — and also how `[codeql]`
+  reports on a machine without the CLI bundle installed.
 
 A new board is a new `.conf` under `tools/{pil,hil}/boards/` plus one block in
 `vtest.conf`.
@@ -80,6 +81,14 @@ one tier, so it calls that tier's script — the same one the suite above runs.
 | release-gate.yml `coverage` | `tools/coverage.sh` |
 | release-gate.yml `sanitizer-host` | its own cmake flags (the `[host-asan]` suite locally) |
 | ci.yml `x86-smoke` | `tools/qemu/smoke.sh <sample> <expected>` |
+| codeql.yml | the CodeQL action, one job per arch (see below) |
+
+`codeql.yml` is the one job that does **not** call the local script: the
+analysis has to run inside `github/codeql-action`, which does its own build
+tracing, so the workflow repeats the four build commands rather than invoking
+`tools/run_codeql.sh`. The script exists to run the same four locally — alerts
+otherwise only appear in the Security tab after a push, which is a slow loop for
+triage. Keep the two in step when a build command changes.
 
 `x86-smoke` is deliberately **not** in `vtest.conf`: `smoke.sh` rewrites the
 tree's `.config` and deletes it on the way in, which is fine in a throwaway

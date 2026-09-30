@@ -23,8 +23,11 @@
  * Implements @c common/hal_adc.h on the ATmega328P's single 10-bit SAR ADC,
  * exposed as ::HAL_ADC_0. Reference is AVcc (with the external cap on AREF);
  * the ADC clock is prescaled by /128 so it lands at 125 kHz on a 16 MHz part —
- * inside the 50–200 kHz the converter needs for full accuracy. The resolution
- * field of ::hal_adc_config_t is ignored (the ATmega ADC is fixed at 10-bit).
+ * inside the 50–200 kHz the converter needs for full accuracy. Both fields of
+ * ::hal_adc_config_t are ignored here: the ATmega ADC is fixed at 10-bit, and it
+ * holds its sample for 13.5 ADC clocks with no control over that — at 125 kHz
+ * that is ~108 us, long enough for any source impedance the part's own 10 kohm
+ * recommendation allows, which is why there is nothing to configure.
  * Conversions are blocking with a coarse iteration-count timeout.
  */
 
@@ -39,7 +42,7 @@
 #define ADC_SPIN 60000U
 
 static hal_status_t avr_adc_init(hal_adc_t adc, const hal_adc_config_t *config) {
-  (void)config; /* fixed 10-bit */
+  (void)config; /* fixed 10-bit, fixed 13.5-cycle sample */
   if (adc != HAL_ADC_0)
     return HAL_ERR_INVALID_ARG;
 

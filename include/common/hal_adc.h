@@ -25,6 +25,9 @@
  * ::hal_status_t. This phase covers **blocking, polled, single-channel**
  * conversion — one sample of one regular channel per call.
  *
+ * The sample time is configurable (::hal_adc_sample_time_t) because it has to
+ * match the source's impedance, and getting it wrong is silent.
+ *
  * The result from ::hal_adc_read is the raw right-aligned code. Its width is
  * the unit's resolution: 12-bit (0..4095) on the STM32 parts (configurable down
  * to 6-bit), 10-bit (0..1023) on the ATmega328P. The analog input pin must be
@@ -68,20 +71,60 @@ typedef enum {
 } hal_adc_resolution_t;
 
 /**
+ * @brief Sample-and-hold time, in ADC clock cycles.
+ *
+ * How long the converter connects its sampling capacitor to the pin before it
+ * starts converting. This is not a speed knob: the capacitor has to charge
+ * through the source's own impedance, and a sample too short for the source
+ * yields a code that sags toward zero. Nothing reports that — the reading is
+ * simply, plausibly wrong — so the default here is the longest the unit offers.
+ * At 12 bits the STM32F4/F7 want roughly 3 cycles per 100 ohms of source
+ * impedance: a 1 kohm divider needs ~28, a 3.6 kohm one ~112, and a sensor of
+ * unknown output impedance wants ::HAL_ADC_SAMPLE_DEFAULT.
+ *
+ * @note Unlike ::hal_adc_resolution_t, these values are deliberately **not** the
+ *       register encoding. The STM32 @c SMPR field encodes 3 cycles as 0, which
+ *       would make a zero-initialised ::hal_adc_config_t select the one setting
+ *       that is wrong for most sources. Here 0 is the safe end instead.
+ *
+ * @note Ports whose sample time is fixed ignore this. The ATmega328P holds for
+ *       13.5 ADC clocks and offers no control over it.
+ */
+typedef enum {
+  HAL_ADC_SAMPLE_DEFAULT = 0,  /**< The longest the unit offers. */
+  HAL_ADC_SAMPLE_3_CYCLES,     /**< Sources below ~100 ohms only. */
+  HAL_ADC_SAMPLE_15_CYCLES,    /**< ~500 ohms. */
+  HAL_ADC_SAMPLE_28_CYCLES,    /**< ~1 kohm. */
+  HAL_ADC_SAMPLE_56_CYCLES,    /**< ~1.8 kohm. */
+  HAL_ADC_SAMPLE_84_CYCLES,    /**< ~2.7 kohm. */
+  HAL_ADC_SAMPLE_112_CYCLES,   /**< ~3.6 kohm. */
+  HAL_ADC_SAMPLE_144_CYCLES,   /**< ~4.7 kohm. */
+  HAL_ADC_SAMPLE_480_CYCLES,   /**< ~16 kohm; the STM32F4/F7 maximum. */
+} hal_adc_sample_time_t;
+
+/**
  * @brief ADC unit configuration.
  */
 typedef struct {
-  hal_adc_resolution_t resolution; /**< Conversion width  */
+  hal_adc_resolution_t resolution;   /**< Conversion width  */
+  hal_adc_sample_time_t sample_time; /**< Sample-and-hold time  */
 } hal_adc_config_t;
 
 /**
  * @brief Initialize an ADC unit for polled single-channel conversion.
  *
- * Enables the peripheral clock, selects the conversion resolution, and powers
- * the converter on. Call once per unit before ::hal_adc_read.
+ * Enables the peripheral clock, selects the conversion resolution and the
+ * sample time, and powers the converter on. Call once per unit before
+ * ::hal_adc_read.
+ *
+ * The sample time applies to whichever channel ::hal_adc_read is given, which
+ * is why it is a unit setting here although the silicon keeps it per channel.
+ * A unit read across channels of differing source impedance should be
+ * configured for the slowest of them.
  *
  * @param adc    ADC unit (::HAL_ADC_1.. on STM32, ::HAL_ADC_0 on AVR).
- * @param config Unit configuration, or @c NULL for defaults (native resolution).
+ * @param config Unit configuration, or @c NULL for defaults: native resolution
+ *               and ::HAL_ADC_SAMPLE_DEFAULT.
  * @return ::HAL_OK on success, ::HAL_ERR_INVALID_ARG for an unknown unit.
  */
 hal_status_t hal_adc_init(hal_adc_t adc, const hal_adc_config_t *config);
@@ -94,6 +137,11 @@ hal_status_t hal_adc_init(hal_adc_t adc, const hal_adc_config_t *config);
  * @param out     Receives the raw right-aligned conversion result.
  * @return ::HAL_OK on success, ::HAL_ERR_INVALID_ARG for a null @p out or an
  *         unknown unit, ::HAL_ERR_TIMEOUT if the conversion never completes.
+ *
+ * @note On ::HAL_ERR_TIMEOUT the abandoned conversion may still complete and
+ *       latch its result afterwards. The next call discards it and samples
+ *       again, so a value returned here is always from this call's conversion,
+ *       never the leftover of a previous one.
  */
 hal_status_t hal_adc_read(hal_adc_t adc, uint8_t channel, uint16_t *out);
 

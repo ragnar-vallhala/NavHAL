@@ -28,6 +28,10 @@
  * The ADC clock is prescaled by /4 (`ADC_CCR.ADCPRE`) so ADCCLK stays within the
  * 36 MHz limit across the APB2 frequencies these boards run (F401 ≤ 84 MHz,
  * F767 ≤ 108 MHz). The caller sets the analog pin to `HAL_GPIO_MODE_ANALOG`.
+ *
+ * Sample time comes from `hal_adc_config_t` and is written per channel on every
+ * read (`SMPR1`/`SMPR2`), because the silicon keeps it per channel while the
+ * configuration is per unit.
  */
 
 #include "navhal_port_adc.h"
@@ -36,9 +40,29 @@
 #include "family/adc_reg.h"
 #include "family/rcc_reg.h"
 #include <stddef.h>
+#include <stdint.h>
 
 /** @brief Bounded spin for the end-of-conversion wait. */
 #define ADC_SPIN 1000000U
+
+/* hal_adc_sample_time_t -> SMPR field encoding. The public enum is ordered so
+ * that 0 is the safe end (see hal_adc.h); the silicon encodes 3 cycles as 0, so
+ * the two do not line up and a table is needed rather than a cast. */
+static const uint8_t _smp_bits[] = {
+    7U, /* HAL_ADC_SAMPLE_DEFAULT   -> 480 cycles */
+    0U, /* 3   */
+    1U, /* 15  */
+    2U, /* 28  */
+    3U, /* 56  */
+    4U, /* 84  */
+    5U, /* 112 */
+    6U, /* 144 */
+    7U, /* 480 */
+};
+
+/* Set per unit at init, applied per channel at read: SMPR is a per-channel
+ * field, and the channel is not known until the read. */
+static uint8_t _smp[ADC_UNIT_COUNT];
 
 static inline volatile ADC_Reg_Typedef *_adc(hal_adc_t adc) {
   return GET_ADCx_BASE((uint8_t)adc);
@@ -61,6 +85,12 @@ static hal_status_t stm32_adc_init(hal_adc_t adc, const hal_adc_config_t *config
   a->CR1 = (a->CR1 & ~ADC_CR1_RES_MASK) |
            ((res << ADC_CR1_RES_Pos) & ADC_CR1_RES_MASK);
 
+  uint32_t smp = (config != NULL) ? (uint32_t)config->sample_time
+                                  : (uint32_t)HAL_ADC_SAMPLE_DEFAULT;
+  if (smp >= (sizeof(_smp_bits) / sizeof(_smp_bits[0])))
+    return HAL_ERR_INVALID_ARG;
+  _smp[(uint8_t)adc] = _smp_bits[smp];
+
   /* Single conversion, right-aligned; power the converter on. */
   a->CR2 = ADC_CR2_ADON;
 
@@ -76,8 +106,28 @@ static hal_status_t stm32_adc_read(hal_adc_t adc, uint8_t channel, uint16_t *out
     return HAL_ERR_INVALID_ARG;
   volatile ADC_Reg_Typedef *a = _adc(adc);
 
+  /* Sample time for this channel: SMPR2 holds channels 0-9, SMPR1 channels
+   * 10-18, three bits each. Left at the reset value this is 3 cycles, which is
+   * correct only for a source of about a hundred ohms -- anything higher reads
+   * low, with nothing to say so. */
+  const uint32_t smp = (uint32_t)_smp[(uint8_t)adc];
+  if (channel < 10U) {
+    const uint32_t sh = 3U * (uint32_t)channel;
+    a->SMPR2 = (a->SMPR2 & ~(7U << sh)) | (smp << sh);
+  } else {
+    const uint32_t sh = 3U * ((uint32_t)channel - 10U);
+    a->SMPR1 = (a->SMPR1 & ~(7U << sh)) | (smp << sh);
+  }
+
   a->SQR1 = 0U;                     /* L = 0 -> one conversion in the sequence */
   a->SQR3 = (uint32_t)channel & 0x1FU; /* SQ1 = this channel */
+
+  /* Discard any latched EOC before starting. A read that timed out left its
+   * conversion running, and it finishes and sets EOC regardless -- so without
+   * this, the next read sees EOC already high, skips the wait entirely and
+   * returns the abandoned sample as HAL_OK. The status bits are rc_w0: writing
+   * 1 to a bit leaves it alone, writing 0 clears it. */
+  a->SR &= ~(uint32_t)ADC_SR_EOC;
 
   a->CR2 |= ADC_CR2_SWSTART;        /* start the regular conversion */
   uint32_t spin = ADC_SPIN;

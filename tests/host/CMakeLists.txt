@@ -83,6 +83,7 @@ add_executable(tests_host_drivers
   test_clock_driver.c
   test_flash_driver.c
   test_mpu.c
+  test_adc_driver.c
 
   ${NAVHAL_ROOT}/tests/navtest_state.c
 
@@ -94,6 +95,7 @@ add_executable(tests_host_drivers
   ${NAVHAL_ROOT}/src/common/hal_uart.c
   ${NAVHAL_ROOT}/src/common/hal_i2c.c
   ${NAVHAL_ROOT}/src/common/hal_spi.c
+  ${NAVHAL_ROOT}/src/common/hal_adc.c
 
   # real driver sources under test
   ${NAVHAL_ROOT}/src/vendor/stm32/gpio/gpio.c
@@ -102,6 +104,7 @@ add_executable(tests_host_drivers
   ${NAVHAL_ROOT}/src/vendor/stm32/i2c/i2c_f7.c
   ${NAVHAL_ROOT}/src/vendor/stm32/spi/spi_f7.c
   ${NAVHAL_ROOT}/src/vendor/stm32/flash/flash.c
+  ${NAVHAL_ROOT}/src/vendor/stm32/adc/adc.c
   ${NAVHAL_ROOT}/src/arch/armv7e-m/mpu/mpu.c
   ${NAVHAL_ROOT}/src/utils/util.c
 )

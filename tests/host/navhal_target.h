@@ -39,6 +39,9 @@
 #define NAVHAL_CONFIG_DRV_TIMER     1
 #define NAVHAL_CONFIG_DRV_INTERRUPT 1
 #define NAVHAL_CONFIG_DRV_FLASH     1
+/* ADC: the driver is register-only, and host_mmio maps ADC1's block, so the
+ * sample-time and stale-EOC paths are checkable here (tests_host_drivers). */
+#define NAVHAL_CONFIG_DRV_ADC       1
 /* CRC hardware OFF on host: the pure-logic suite (test_crc_sw.c) exercises the
  * software fallback in crc.c's #else branch; the HW path would touch real CRC
  * registers and fault on x86. */
@@ -59,6 +62,7 @@
 #define NAVHAL_CONFIG_DRV_MPU       1
 
 /* ===== DEPRECATED capability aliases (NAVHAL_HAS_* -> NAVHAL_CONFIG_*) ===== */
+#define NAVHAL_HAS_ADC           NAVHAL_CONFIG_DRV_ADC
 #define NAVHAL_HAS_GPIO          NAVHAL_CONFIG_DRV_GPIO
 #define NAVHAL_HAS_UART          NAVHAL_CONFIG_DRV_UART
 #define NAVHAL_HAS_I2C           NAVHAL_CONFIG_DRV_I2C

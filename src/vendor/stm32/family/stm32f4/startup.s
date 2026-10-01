@@ -268,3 +268,7 @@ Default_Handler:
        genuinely unexpected exception. The C epilogue performs the exception
        return. */
     b hal_irq_default_dispatch
+/* Without a .size the symbol has no extent, and objdump folds this handler into
+   whichever function precedes it -- so a disassembly shows no Default_Handler at
+   all, which is a poor thing to discover while chasing a vector. */
+.size Default_Handler, . - Default_Handler

@@ -33,7 +33,7 @@ name: codeql
 # hand-picked handful of pure-logic files, every one of which the m4 build
 # compiles too, so it would add a database and no coverage.
 #
-# Two scope caveats worth knowing before editing this file:
+# Three scope caveats worth knowing before editing this file:
 #
 # 1. NO paths-ignore. A codeql-config.yml with `paths-ignore: [src/utils/fatfs]`
 #    would be SILENTLY IGNORED here: those keys only apply to interpreted
@@ -58,6 +58,25 @@ name: codeql
 #        "repos/<owner>/<repo>/code-scanning/analyses/<id>?confirm_delete=true"
 #    Deleting an analysis deletes the results it holds, so that is only safe for
 #    a category nothing uploads to. Prefer not renaming.
+#
+# 3. A PR run reporting ZERO results is normal and is not a broken analysis. On
+#    a `pull_request` event code scanning raises alerts only for code inside the
+#    diff, so a PR that touches no C gets "No new alerts in code changed by this
+#    pull request" while all four uploads are recorded with 0 results each -- and
+#    the Security tab stays empty for that branch, because a non-default branch
+#    only accumulates alerts from a `push` run, which this workflow does for main
+#    and stable alone. The baseline comes from the push run after the merge.
+#
+#    Worth spelling out because the first PR here (#101, four non-C files) looked
+#    exactly like a workflow compiling nothing: 0 results against 8 findings from
+#    the same commit locally. What ruled that out was comparing what the build
+#    traced -- 79 objects in CI, the same 79 locally, same translation units --
+#    rather than trusting the counts. The merge then produced 8/9/2/2 for
+#    m4/m7/avr/x86, matching the local run exactly.
+#
+#    So: to see what a change does to the findings, read the push run on main, or
+#    run tools/run_codeql.sh locally. A green PR check means "introduced nothing
+#    new in the lines you touched", not "the tree is clean".
 #
 # Not in ci.yml's `ci-required` aggregate, and not narrowed by its changed-files
 # dispatch: this is a baseline, not a per-PR gate. A finding is triaged, not a

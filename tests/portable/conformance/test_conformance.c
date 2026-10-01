@@ -453,6 +453,31 @@ void test_conformance_dma_detach_callback_rejects_bad_controller(void) {
 
 #endif /* NAVHAL_CONFIG_DRV_DMA */
 
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+/* Lifted out of the port headers, so the gate sees them now. The bindings are
+ * per-port data but the checks are not: a bad bus and a NULL out are refused
+ * the same way everywhere. */
+static uint8_t i2c_dma_buf[2];
+static void _conf_i2c_dma_cb(void) {}
+
+void test_conformance_i2c_dma_get_binding_rejects_null_out(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_i2c_dma_get_binding((hal_i2c_bus_t)0, true, NULL));
+}
+
+void test_conformance_i2c_dma_set_binding_rejects_bad_bus(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_i2c_dma_set_binding((hal_i2c_bus_t)99, true, NULL));
+}
+
+void test_conformance_i2c_read_regs_dma_rejects_null_buffer(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_i2c_read_regs_dma((hal_i2c_bus_t)0, 0x50u, 0x00u, NULL,
+                                                           sizeof(i2c_dma_buf), _conf_i2c_dma_cb));
+}
+#endif /* NAVHAL_CONFIG_DRV_I2C_DMA */
+
+
 
 #if NAVHAL_CONFIG_DRV_PWM
 
@@ -1349,6 +1374,15 @@ NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_cfg);
 #endif
 #if NAVHAL_CONFIG_DRV_DMA
 NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_out);
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+NAVTEST_CASE_DECL(test_conformance_i2c_read_regs_dma_rejects_null_buffer);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+NAVTEST_CASE_DECL(test_conformance_i2c_dma_set_binding_rejects_bad_bus);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+NAVTEST_CASE_DECL(test_conformance_i2c_dma_get_binding_rejects_null_out);
+#endif
 NAVTEST_CASE_DECL(test_conformance_dma_detach_callback_rejects_bad_controller);
 NAVTEST_CASE_DECL(test_conformance_dma_attach_callback_rejects_bad_stream);
 NAVTEST_CASE_DECL(test_conformance_dma_attach_callback_rejects_null_cb);
@@ -2071,6 +2105,15 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_DMA
     NAVTEST_CASE(test_conformance_dma_remaining_rejects_null_out),
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+    NAVTEST_CASE(test_conformance_i2c_read_regs_dma_rejects_null_buffer),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+    NAVTEST_CASE(test_conformance_i2c_dma_set_binding_rejects_bad_bus),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+    NAVTEST_CASE(test_conformance_i2c_dma_get_binding_rejects_null_out),
+#endif
     NAVTEST_CASE(test_conformance_dma_detach_callback_rejects_bad_controller),
     NAVTEST_CASE(test_conformance_dma_attach_callback_rejects_bad_stream),
     NAVTEST_CASE(test_conformance_dma_attach_callback_rejects_null_cb),

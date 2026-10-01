@@ -736,7 +736,7 @@ hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buf) {
   };
 
   hal_dma_init((const hal_dma_config_t *)&dma2_stream3_cfg);
-  hal_interrupt_attach_callback(DMA2_Stream3_IRQn, _sdio_dma_rx_irq_handler);
+  hal_dma_attach_callback(HAL_DMA_CONTROLLER_2, 3, _sdio_dma_rx_irq_handler);
 
   SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512;
@@ -810,7 +810,7 @@ hal_sdio_error_t hal_sdio_write_block_async(uint32_t addr, const uint8_t *buf) {
   };
 
   hal_dma_init((const hal_dma_config_t *)&dma2_stream6_cfg);
-  hal_interrupt_attach_callback(DMA2_Stream6_IRQn, _sdio_dma_tx_irq_handler);
+  hal_dma_attach_callback(HAL_DMA_CONTROLLER_2, 6, _sdio_dma_tx_irq_handler);
 
   SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512;
@@ -883,7 +883,7 @@ hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
   };
 
   hal_dma_init((const hal_dma_config_t *)&dma2_stream3_cfg);
-  hal_interrupt_attach_callback(DMA2_Stream3_IRQn, _sdio_dma_rx_irq_handler);
+  hal_dma_attach_callback(HAL_DMA_CONTROLLER_2, 3, _sdio_dma_rx_irq_handler);
   SDIO->DCTRL = 0;
   SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512 * count;
@@ -969,7 +969,7 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
   };
 
   hal_dma_init((const hal_dma_config_t *)&dma2_stream6_cfg);
-  hal_interrupt_attach_callback(DMA2_Stream6_IRQn, _sdio_dma_tx_irq_handler);
+  hal_dma_attach_callback(HAL_DMA_CONTROLLER_2, 6, _sdio_dma_tx_irq_handler);
 
   SDIO->ICR = 0xFFFFFFFF;
   SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;

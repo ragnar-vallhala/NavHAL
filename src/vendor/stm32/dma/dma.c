@@ -241,14 +241,74 @@ hal_status_t hal_dma_remaining(const hal_dma_config_t *cfg,
 }
 
 /*---------------------------------------------------------------------------
+ * Stream callback ownership
+ *
+ * One slot per stream, owned by this module. Before this existed, a driver
+ * that moved data by DMA reached past the module and put its handler in the
+ * IRQ's single callback slot -- so i2c's DMA handler and anything else wanting
+ * DMA1 stream 0 quietly overwrote one another.
+ *-------------------------------------------------------------------------*/
+
+#define DMA_STREAMS 8U
+#define DMA_CONTROLLERS 2U
+
+static hal_dma_callback_t _stream_cb[DMA_CONTROLLERS][DMA_STREAMS];
+
+/* HAL_DMA_CONTROLLER_1 is 1, so the table index is one less. */
+static inline bool _cb_slot(hal_dma_controller_t c, uint8_t stream,
+                            uint8_t *ci) {
+  if (c != HAL_DMA_CONTROLLER_1 && c != HAL_DMA_CONTROLLER_2)
+    return false;
+  if (stream >= DMA_STREAMS)
+    return false;
+  *ci = (uint8_t)(c - HAL_DMA_CONTROLLER_1);
+  return true;
+}
+
+hal_status_t hal_dma_attach_callback(hal_dma_controller_t controller,
+                                     uint8_t stream, hal_dma_callback_t cb) {
+  uint8_t ci;
+  if (cb == NULL || !_cb_slot(controller, stream, &ci))
+    return HAL_ERR_INVALID_ARG;
+  /* Re-arming with the same callback is how a driver sets up each transfer;
+   * a different one means two owners, which is reported rather than taken. */
+  if (_stream_cb[ci][stream] != NULL && _stream_cb[ci][stream] != cb)
+    return HAL_ERR_BUSY;
+  _stream_cb[ci][stream] = cb;
+  return HAL_OK;
+}
+
+hal_status_t hal_dma_detach_callback(hal_dma_controller_t controller,
+                                     uint8_t stream) {
+  uint8_t ci;
+  if (!_cb_slot(controller, stream, &ci))
+    return HAL_ERR_INVALID_ARG;
+  _stream_cb[ci][stream] = NULL;
+  return HAL_OK;
+}
+
+/*---------------------------------------------------------------------------
  * Central DMA Interrupt Dispatchers
  * Each stream handler clears peripheral flags and routes to the HAL callback
  * system.
  *---------------------------------------------------------------------------*/
 
+/* DMA1 -> HAL_DMA_CONTROLLER_1, for the table index. */
+#define _DMA_CTRL_DMA1 HAL_DMA_CONTROLLER_1
+#define _DMA_CTRL_DMA2 HAL_DMA_CONTROLLER_2
+
+/* The stream's own callback runs first; failing that, the IRQ's callback slot
+ * is still dispatched, so code written against the old route keeps working.
+ * That fallback is deprecated -- use hal_dma_attach_callback. Flags are
+ * cleared after either, as before. */
 #define DMA_ISR_GEN(controller, stream, irqn)                                  \
   void controller##_Stream##stream##_IRQHandler(void) {                        \
-    hal_interrupt_dispatch(irqn);                                              \
+    hal_dma_callback_t _cb =                                                   \
+        _stream_cb[_DMA_CTRL_##controller - HAL_DMA_CONTROLLER_1][stream];     \
+    if (_cb != NULL)                                                           \
+      _cb();                                                                   \
+    else                                                                       \
+      hal_interrupt_dispatch(irqn);                                            \
     _clear_flags(controller, stream);                                          \
   }
 

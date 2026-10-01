@@ -161,6 +161,48 @@ typedef struct {
  * @brief Initialize a DMA stream from @p cfg.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p cfg is NULL.
  */
+/**
+ * @brief Transfer-completion callback for one stream.
+ *
+ * Runs from the stream's interrupt, after the transfer and before the driver
+ * clears the stream's flags.
+ */
+typedef void (*hal_dma_callback_t)(void);
+
+/**
+ * @brief Attach a callback to one DMA stream.
+ *
+ * The DMA driver owns its stream vectors; this is how anything else -- a
+ * driver that moves its data by DMA, or application code -- asks to be told a
+ * transfer finished. It replaces reaching past the module with
+ * ::hal_interrupt_attach_callback on a DMAx_StreamY IRQ, which worked only
+ * because there is exactly one callback slot per IRQ, and so silently unhooked
+ * whoever held it first.
+ *
+ * Attaching the callback already attached is a no-op, so a driver may re-arm
+ * per transfer. Attaching a *different* one without detaching returns
+ * ::HAL_ERR_BUSY rather than taking the stream: two owners of one stream is a
+ * configuration error, and finding out at attach time beats finding out when
+ * the other owner's transfer never completes. In-tree, i2c claims DMA1 streams
+ * 0 and 5, and sdio claims DMA2 streams 3 and 6.
+ *
+ * @param controller DMA controller.
+ * @param stream     Stream index [0..7].
+ * @param cb         Callback, non-NULL.
+ * @return ::HAL_OK, ::HAL_ERR_INVALID_ARG for a bad stream or a NULL callback,
+ *         ::HAL_ERR_BUSY if a different callback is already attached.
+ */
+hal_status_t hal_dma_attach_callback(hal_dma_controller_t controller,
+                                     uint8_t stream, hal_dma_callback_t cb);
+
+/**
+ * @brief Release a stream's callback.
+ * @return ::HAL_OK (also when nothing was attached), ::HAL_ERR_INVALID_ARG for
+ *         a bad stream.
+ */
+hal_status_t hal_dma_detach_callback(hal_dma_controller_t controller,
+                                     uint8_t stream);
+
 hal_status_t hal_dma_init(const hal_dma_config_t *cfg);
 
 /**

@@ -106,6 +106,7 @@ static uint8_t flash_size = sizeof(flash_buf);
 #if NAVHAL_CONFIG_DRV_DMA
 static uint16_t dma_left;
 static const hal_dma_config_t dma_cfg = {0};
+static void _conf_dma_cb(void) {}
 #endif
 #if NAVHAL_CONFIG_DRV_TIMER
 #define TEST_CONF_TIMER TIM2
@@ -430,6 +431,24 @@ void test_conformance_dma_remaining_rejects_null_cfg(void) {
 
 void test_conformance_dma_remaining_rejects_null_out(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_dma_remaining(&dma_cfg, NULL));
+}
+
+/* The stream callback belongs to the DMA module; these are the refusals that
+ * make a wrong claim visible instead of silent. The BUSY case needs a real
+ * table and lives in the DRV_DMA cap suite. */
+void test_conformance_dma_attach_callback_rejects_null_cb(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 0u, NULL));
+}
+
+void test_conformance_dma_attach_callback_rejects_bad_stream(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 8u, _conf_dma_cb));
+}
+
+void test_conformance_dma_detach_callback_rejects_bad_controller(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_dma_detach_callback((hal_dma_controller_t)9, 0u));
 }
 
 #endif /* NAVHAL_CONFIG_DRV_DMA */
@@ -1330,6 +1349,9 @@ NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_cfg);
 #endif
 #if NAVHAL_CONFIG_DRV_DMA
 NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_out);
+NAVTEST_CASE_DECL(test_conformance_dma_detach_callback_rejects_bad_controller);
+NAVTEST_CASE_DECL(test_conformance_dma_attach_callback_rejects_bad_stream);
+NAVTEST_CASE_DECL(test_conformance_dma_attach_callback_rejects_null_cb);
 #endif
 #if NAVHAL_CONFIG_DRV_PWM
 NAVTEST_CASE_DECL(test_conformance_pwm_start_rejects_null);
@@ -2049,6 +2071,9 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_DMA
     NAVTEST_CASE(test_conformance_dma_remaining_rejects_null_out),
+    NAVTEST_CASE(test_conformance_dma_detach_callback_rejects_bad_controller),
+    NAVTEST_CASE(test_conformance_dma_attach_callback_rejects_bad_stream),
+    NAVTEST_CASE(test_conformance_dma_attach_callback_rejects_null_cb),
 #endif
 #if NAVHAL_CONFIG_DRV_PWM
     NAVTEST_CASE(test_conformance_pwm_start_rejects_null),

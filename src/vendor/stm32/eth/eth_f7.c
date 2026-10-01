@@ -139,9 +139,28 @@ static void _cfg_gpio(hal_eth_phy_iface_t iface) {
 
 /* -------------------------------------------------------------------------- */
 
+/* Every entry point below reaches ETH_MAC / ETH_DMA, which sit behind the AHB1
+ * clock gate hal_eth_init opens. Reached before init they read and write a
+ * peripheral whose clock may be off; only hal_eth_start checked.
+ *
+ * The gate is what they test, not _initialized. init enables the clock early
+ * and can still fail after that -- a PHY that never leaves reset, no cable --
+ * and MDIO is legitimately usable in exactly that state: reading the PHY id is
+ * how a caller finds out which of the two happened. Gating MDIO on a completed
+ * init took that away, and the eth suite caught it by reading 0x0000 for a PHY
+ * that had answered a moment earlier.
+ *
+ * Argument checks stay ahead of the gate check -- hal_eth_phy_read(.., NULL) is
+ * answered before init and has to keep answering INVALID_ARG. */
+static bool eth_clock_on(void) {
+  return (RCC->AHB1ENR & ETH_AHB1ENR_ETHMACEN) != 0u;
+}
+
 hal_status_t hal_eth_phy_read(uint8_t reg, uint16_t *out) {
   if (out == NULL)
     return HAL_ERR_INVALID_ARG;
+  if (!eth_clock_on())
+    return HAL_ERR_NOT_INITIALIZED;
   uint32_t spin = ETH_SPIN;
   while ((ETH_MAC->MACMIIAR & ETH_MACMIIAR_MB) && spin--)
     ;
@@ -163,6 +182,8 @@ hal_status_t hal_eth_phy_read(uint8_t reg, uint16_t *out) {
 }
 
 hal_status_t hal_eth_phy_write(uint8_t reg, uint16_t val) {
+  if (!eth_clock_on())
+    return HAL_ERR_NOT_INITIALIZED;
   uint32_t spin = ETH_SPIN;
   while ((ETH_MAC->MACMIIAR & ETH_MACMIIAR_MB) && spin--)
     ;
@@ -242,6 +263,8 @@ static void _init_rings(void) {
 hal_status_t hal_eth_set_mac_address(const uint8_t mac[HAL_ETH_MAC_ADDR_LEN]) {
   if (mac == NULL)
     return HAL_ERR_INVALID_ARG;
+  if (!eth_clock_on())
+    return HAL_ERR_NOT_INITIALIZED;
   for (uint8_t i = 0; i < HAL_ETH_MAC_ADDR_LEN; i++)
     _mac[i] = mac[i];
   ETH_MAC->MACA0HR = ((uint32_t)mac[5] << 8) | (uint32_t)mac[4];
@@ -253,6 +276,8 @@ hal_status_t hal_eth_set_mac_address(const uint8_t mac[HAL_ETH_MAC_ADDR_LEN]) {
 hal_status_t hal_eth_get_mac_address(uint8_t mac[HAL_ETH_MAC_ADDR_LEN]) {
   if (mac == NULL)
     return HAL_ERR_INVALID_ARG;
+  if (!eth_clock_on())
+    return HAL_ERR_NOT_INITIALIZED;
   for (uint8_t i = 0; i < HAL_ETH_MAC_ADDR_LEN; i++)
     mac[i] = _mac[i];
   return HAL_OK;
@@ -344,6 +369,8 @@ hal_status_t hal_eth_init(const hal_eth_config_t *config) {
 static void _eth_irq_handler(void);
 
 hal_status_t hal_eth_start(void) {
+  /* Not the clock gate: moving traffic needs the init that configures the MAC
+   * to have finished, which a powered-but-unconfigured peripheral has not. */
   if (!_initialized)
     return HAL_ERR_NOT_INITIALIZED;
 
@@ -370,6 +397,8 @@ hal_status_t hal_eth_start(void) {
 }
 
 hal_status_t hal_eth_stop(void) {
+  if (!eth_clock_on())
+    return HAL_ERR_NOT_INITIALIZED;
   ETH_DMA->DMAOMR &= ~(ETH_DMAOMR_ST | ETH_DMAOMR_SR);
   ETH_MAC->MACCR &= ~(ETH_MACCR_RE | ETH_MACCR_TE);
   hal_interrupt_disable((hal_irq_t)ETH_IRQn);
@@ -378,6 +407,10 @@ hal_status_t hal_eth_stop(void) {
 }
 
 hal_status_t hal_eth_deinit(void) {
+  /* Nothing powered, nothing to release -- and a partial init that left the
+   * clock on must still be tearable down, which _initialized would refuse. */
+  if (!eth_clock_on())
+    return HAL_OK;
   hal_eth_stop();
   RCC->AHB1ENR &= ~(ETH_AHB1ENR_ETHMACEN | ETH_AHB1ENR_ETHMACTXEN |
                     ETH_AHB1ENR_ETHMACRXEN);
@@ -388,6 +421,8 @@ hal_status_t hal_eth_deinit(void) {
 hal_status_t hal_eth_send(const uint8_t *frame, uint16_t len) {
   if (frame == NULL || len < HAL_ETH_MIN_FRAME_LEN || len > HAL_ETH_MAX_FRAME_LEN)
     return HAL_ERR_INVALID_ARG;
+  if (!eth_clock_on())
+    return HAL_ERR_NOT_INITIALIZED;
   if (!_started)
     return HAL_ERR_NOT_INITIALIZED;
 
@@ -414,6 +449,8 @@ hal_status_t hal_eth_send(const uint8_t *frame, uint16_t len) {
 hal_status_t hal_eth_receive(uint8_t *buf, uint16_t max_len, uint16_t *out_len) {
   if (buf == NULL || out_len == NULL)
     return HAL_ERR_INVALID_ARG;
+  if (!eth_clock_on())
+    return HAL_ERR_NOT_INITIALIZED;
   if (!_started)
     return HAL_ERR_NOT_INITIALIZED;
   *out_len = 0;
@@ -451,6 +488,8 @@ hal_status_t hal_eth_receive(uint8_t *buf, uint16_t max_len, uint16_t *out_len) 
 }
 
 bool hal_eth_link_is_up(void) {
+  if (!eth_clock_on())
+    return false;
   uint16_t bsr = 0;
   /* The link-status bit latches low; read twice for the current state. */
   hal_eth_phy_read(ETH_PHY_BSR, &bsr);
@@ -461,6 +500,8 @@ bool hal_eth_link_is_up(void) {
 hal_status_t hal_eth_get_link(hal_eth_link_t *out) {
   if (out == NULL)
     return HAL_ERR_INVALID_ARG;
+  if (!eth_clock_on())
+    return HAL_ERR_NOT_INITIALIZED;
   out->up = hal_eth_link_is_up();
   /* When auto-negotiating, refresh the cached mode from the PHY and resync the
    * MAC to it once the link is up (init did not block on negotiation). */

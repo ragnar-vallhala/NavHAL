@@ -160,37 +160,36 @@
     .word  SDIO_IRQHandler            /* 49. SDIO */
     .word  TIM5_IRQHandler            /* 50. TIM5 */
     .word  Default_Handler            /* 51. SPI3 */
-    /*Done till above*/
-    .word  0                       /* 69. Reserved */
-    .word  0                       /* 70. Reserved */
-    .word  0                       /* 71. Reserved */
-    .word  0                       /* 72. Reserved */
-    .word  DMA2_Stream0_IRQHandler /* 73. DMA2 Stream 0 */
-    .word  DMA2_Stream1_IRQHandler /* 74. DMA2 Stream 1 */
-    .word  DMA2_Stream2_IRQHandler /* 75. DMA2 Stream 2 */
-    .word  DMA2_Stream3_IRQHandler  /* 76. DMA2 Stream 3 */
-    .word  DMA2_Stream4_IRQHandler /* 77. DMA2 Stream 4 */
-    .word  0                       /* 78. Reserved */
+    .word  0                          /* 52. Reserved */
+    .word  0                          /* 53. Reserved */
+    .word  0                          /* 54. Reserved */
+    .word  0                          /* 55. Reserved */
+    .word  DMA2_Stream0_IRQHandler    /* 56. DMA2 Stream 0 */
+    .word  DMA2_Stream1_IRQHandler    /* 57. DMA2 Stream 1 */
+    .word  DMA2_Stream2_IRQHandler    /* 58. DMA2 Stream 2 */
+    .word  DMA2_Stream3_IRQHandler    /* 59. DMA2 Stream 3 */
+    .word  DMA2_Stream4_IRQHandler    /* 60. DMA2 Stream 4 */
+    .word  0                          /* 61. Reserved */
+    .word  0                          /* 62. Reserved */
+    .word  0                          /* 63. Reserved */
+    .word  0                          /* 64. Reserved */
+    .word  0                          /* 65. Reserved */
+    .word  0                          /* 66. Reserved */
+    .word  Default_Handler            /* 67. USB OTG FS */
+    .word  DMA2_Stream5_IRQHandler    /* 68. DMA2 Stream 5 */
+    .word  DMA2_Stream6_IRQHandler    /* 69. DMA2 Stream 6 */
+    .word  DMA2_Stream7_IRQHandler    /* 70. DMA2 Stream 7 */
+    .word  USART6_IRQHandler          /* 71. USART6 */
+    .word  Default_Handler            /* 72. I2C3 Event */
+    .word  Default_Handler            /* 73. I2C3 Error */
+    .word  0                          /* 74. Reserved */
+    .word  0                          /* 75. Reserved */
+    .word  0                          /* 76. Reserved */
+    .word  0                          /* 77. Reserved */
+    .word  Default_Handler            /* 78. FPU */
     .word  0                       /* 79. Reserved */
     .word  0                       /* 80. Reserved */
-    .word  0                       /* 81. Reserved */
-    .word  0                       /* 82. Reserved */
-    .word  0                       /* 83. Reserved */
-    .word  Default_Handler /* 84. USB OTG FS */
-    .word  DMA2_Stream5_IRQHandler /* 85. DMA2 Stream 5 */
-    .word  DMA2_Stream6_IRQHandler /* 86. DMA2 Stream 6 */
-    .word  DMA2_Stream7_IRQHandler /* 87. DMA2 Stream 7 */
-    .word  USART6_IRQHandler /* 88. USART6 */
-    .word  Default_Handler /* 89. I2C3 Event */
-    .word  Default_Handler /* 90. I2C3 Error */
-    .word  0                       /* 91. Reserved */
-    .word  0                       /* 92. Reserved */
-    .word  0                       /* 93. Reserved */
-    .word  0                       /* 94. Reserved */
-    .word  Default_Handler /* 95. FPU */
-    .word  0                       /* 96. Reserved */
-    .word  0                       /* 97. Reserved */
-    .word  Default_Handler /* 98. SPI4 */
+    .word  Default_Handler            /* 81. SPI4 */
 
 
 /*
@@ -268,3 +267,7 @@ Default_Handler:
        genuinely unexpected exception. The C epilogue performs the exception
        return. */
     b hal_irq_default_dispatch
+/* Without a .size the symbol has no extent, and objdump folds this handler into
+   whichever function precedes it -- so a disassembly shows no Default_Handler at
+   all, which is a poor thing to discover while chasing a vector. */
+.size Default_Handler, . - Default_Handler

@@ -277,3 +277,7 @@ Default_Handler:
        invokes the registered callback for the active IRQ, or traps on a
        genuinely unexpected exception. */
     b hal_irq_default_dispatch
+/* Without a .size the symbol has no extent, and objdump folds this handler into
+   whichever function precedes it -- so a disassembly shows no Default_Handler at
+   all, which is a poor thing to discover while chasing a vector. */
+.size Default_Handler, . - Default_Handler

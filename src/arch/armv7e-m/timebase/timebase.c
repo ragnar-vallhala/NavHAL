@@ -149,9 +149,8 @@ static uint32_t armv7em_timebase_get_micros(void) {
  * @brief Advance the timebase by one tick and run the registered callback.
  *
  * This is the body of the SysTick ISR, factored out so an embedding RTOS that
- * owns the SysTick vector (SUBMODULE builds, where the handler below is
- * compiled out) can keep the NavHAL timebase alive by calling this from its
- * own SysTick_Handler. Without it `systick_ticks` never advances and every
+ * owns the SysTick vector (overriding the weak handler below with its own) can
+ * keep the NavHAL timebase alive by calling this from its own SysTick_Handler. Without it `systick_ticks` never advances and every
  * hal_delay_*() busy-wait spins forever.
  */
 void hal_timebase_tick(void) {
@@ -162,10 +161,14 @@ void hal_timebase_tick(void) {
 
 /**
  * @brief SysTick exception handler — drives the timebase tick.
+ *
+ * Weak rather than absent under -DSUBMODULE: an RTOS that owns SysTick defines
+ * its own strongly and wins, while a build that does not keeps a working
+ * timebase instead of a link error against the startup vector table. An RTOS
+ * taking the vector must call hal_timebase_tick() from it, or every
+ * hal_delay_*() spins forever.
  */
-#ifndef SUBMODULE
-void SysTick_Handler(void) { hal_timebase_tick(); }
-#endif
+__attribute__((weak)) void SysTick_Handler(void) { hal_timebase_tick(); }
 
 
 /** @brief The ARMv7E-M SysTick timebase backend. */

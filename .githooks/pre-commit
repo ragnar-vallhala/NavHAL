@@ -17,7 +17,14 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 
 echo "[pre-commit] host tests..."
-tools/run_host_tests.sh >/dev/null
+# Quiet unless something breaks, and then everything: a hook that prints a
+# build log on every commit is a hook people pass --no-verify to.
+if ! out=$(cmake -S tests/host -B build-host 2>&1 &&
+           cmake --build build-host -j 2>&1 &&
+           ctest --test-dir build-host --output-on-failure 2>&1); then
+  printf '%s\n' "$out" >&2
+  exit 1
+fi
 
 echo "[pre-commit] kconfig configure..."
 BUILD=$(mktemp -d)

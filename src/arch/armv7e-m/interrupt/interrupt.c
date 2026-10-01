@@ -244,27 +244,32 @@ static void armv7em_interrupt_clear_all_pending(void) {
   }
 }
 
-#ifndef SUBMODULE
+/* System (internal) exceptions get their own named weak vectors — override any
+ * with a strong definition. No Default_Handler routing for these.
+ *
+ * Unconditional, and weak, which is the whole mechanism: an embedding RTOS that
+ * owns PendSV/SVCall/SysTick simply defines them strongly and its versions win.
+ * These were once wrapped in `#ifndef SUBMODULE`, which did the same job twice
+ * and broke the build the second time: the startup vector table still names all
+ * nine, so -DSUBMODULE (what nav passes when a dependency owns the vectors) left
+ * the link with nine undefined references to its own vectors.
+ *
+ * Default_Handler is deliberately NOT here. The startup file defines it, weakly,
+ * as a tail-branch into hal_irq_default_dispatch -- the IPSR-based fallback that
+ * dispatches any IRQ with an attached callback. A second definition in this file
+ * either raced it (two weak definitions: whichever the link order reached first
+ * won) or, under -DSUBMODULE where this one was strong, silently replaced the
+ * fallback with an empty stub. Attach and enable would still report success and
+ * no interrupt would ever reach its callback. */
 __attribute__((weak)) void PendSV_Handler(void) {}
 __attribute__((weak)) void HardFault_Handler(void) {}
 __attribute__((weak)) void SVCall_Handler(void) {}
-/* System (internal) exceptions get their own named weak vectors, like
- * HardFault above — override any with a strong definition. No Default_Handler
- * routing for these. */
 __attribute__((weak)) void NMI_Handler(void) {}
 __attribute__((weak)) void MemManage_Handler(void) {}
 __attribute__((weak)) void BusFault_Handler(void) {}
 __attribute__((weak)) void UsageFault_Handler(void) {}
 __attribute__((weak)) void DebugMon_Handler(void) {}
-__attribute__((weak)) void Default_Handler(void) {}
 __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
-
-#else
-void Default_Handler(void) {}
-__attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
-
-
-#endif
 
 /* USART vectors are this MCU's, not the core's, so they are defined by the
  * vendor's UART backend rather than here. */

@@ -143,7 +143,18 @@ void hal_sdio_set_callback(hal_sdio_callback_t callback) { sd_callback = callbac
 /* COMMAND HANDLING */
 /* ------------------------------------------------------------- */
 
+/* The controller sits behind the APB2 clock gate hal_sdio_init opens, and the
+ * entry points below are all reachable before that. Reading or writing a gated
+ * peripheral is not an answer a caller can use, so they report instead -- the
+ * same defect, and the same fix, as the ETH MAC's. */
+static bool sdio_clock_on(void) {
+  return (RCC->APB2ENR & RCC_APB2ENR_SDIOEN) != 0u;
+}
+
 hal_sdio_error_t hal_sdio_wait_flag(uint32_t flag, uint32_t timeout) {
+  if (!sdio_clock_on())
+    return HAL_SDIO_ERROR;
+
   while (!(SDIO->STA & flag) && timeout)
     timeout--;
 
@@ -202,6 +213,9 @@ hal_sdio_error_t hal_sdio_wait_flag(uint32_t flag, uint32_t timeout) {
 static bool sdio_r1_refused(void) { return (SDIO->RESP1 & SD_R1_ERROR_BITS) != 0u; }
 
 hal_sdio_error_t hal_sdio_send_command(uint8_t cmd, uint32_t arg, uint32_t resp) {
+  if (!sdio_clock_on())
+    return HAL_SDIO_ERROR;
+
   SDIO->ICR = 0xFFFFFFFF;
 
   SDIO->ARG = arg;
@@ -244,6 +258,9 @@ hal_sdio_error_t hal_sdio_send_command(uint8_t cmd, uint32_t arg, uint32_t resp)
 }
 
 uint32_t hal_sdio_get_response(uint8_t reg) {
+  if (!sdio_clock_on())
+    return 0u;
+
   switch (reg) {
   case 1:
     return SDIO->RESP1;

@@ -160,6 +160,19 @@ typedef void (*hal_eth_callback_t)(hal_eth_event_t event);
  * @return ::HAL_OK on success; ::HAL_ERR_INVALID_ARG if @p config is NULL;
  *         ::HAL_ERR_NOT_INITIALIZED if already initialized; ::HAL_ERR_TIMEOUT if
  *         the PHY does not respond.
+ *
+ * @note **This returns before the link is up, by design.** It starts
+ *       auto-negotiation and does not wait for it, so a board with no cable
+ *       comes up promptly instead of stalling for seconds at boot. Negotiation
+ *       then takes a second or two, and it restarts on every reset -- including
+ *       the one a debugger causes when it flashes the part.
+ *
+ *       So @c hal_eth_init returning ::HAL_OK does not mean there is a link,
+ *       and reading ::hal_eth_get_link once straight afterwards reports one
+ *       that is down on a board whose cable is fine. Poll it until it comes up,
+ *       or act on the transition; @c samples/cortex-m/29_hal_eth does the
+ *       former. ::hal_eth_start may be called either way -- the MAC is happy to
+ *       be running before a peer appears.
  */
 hal_status_t hal_eth_init(const hal_eth_config_t *config);
 
@@ -229,12 +242,20 @@ hal_status_t hal_eth_receive(uint8_t *buf, uint16_t max_len, uint16_t *out_len);
  * @brief Read the current link state.
  * @param out Destination; must not be NULL.
  * @return ::HAL_OK, or an error status.
+ *
+ * @note A snapshot, not a wait. For the second or two after ::hal_eth_init --
+ *       and after every reset, since that restarts negotiation -- this reports
+ *       a link that is down on a cable that is fine. Callers poll; see the note
+ *       on ::hal_eth_init.
  */
 hal_status_t hal_eth_get_link(hal_eth_link_t *out);
 
 /**
  * @brief Fast link-up check.
  * @return True if the PHY link is up. (Hot-path getter — no error channel.)
+ *
+ * @note Same snapshot semantics as ::hal_eth_get_link: false right after init
+ *       means "not yet", not "no cable".
  */
 bool hal_eth_link_is_up(void);
 

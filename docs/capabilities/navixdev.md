@@ -99,7 +99,19 @@ bash tools/hil/run.sh navixdev
 Debug is a bare ST-LINK/V2, which carries no virtual COM port, and this board
 has no USB device port of its own, so the suite is driven over SWD
 (`CONSOLE=swd`). Every console string costs a breakpoint round-trip, which is
-why the timeout is 600 s rather than the Nucleo's seconds.
+why the timeout is 1200 s rather than the Nucleo's seconds.
+
+On v0.0.3 silicon the suite is **247 tests, 0 failures** — about three minutes
+of capture. It is 17 fewer than navixsmf401re because USB is not routed on this
+revision, so `DRV_USB_CDC` is absent from this board's HIL set.
+
+The bench carries two bare ST-LINK/V2 probes that report the same serial, so
+pin this board's probe by USB location rather than letting the runner enumerate
+(enumerating opens every probe and resets the board behind the other one):
+
+```
+NAVHAL_HIL_LOCATION_NAVIXDEV=<bus>-<port> bash tools/hil/run.sh navixdev
+```
 
 A USB-serial adapter on the UART1 header (`3V3`, `GND`, `PA2` TX, `PA3` RX) is
 the faster console if one is to hand. The board config is

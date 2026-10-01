@@ -61,7 +61,7 @@ write, and the argument printed out through the debug port. That is what
 selects.
 
 ```sh
-tools/ntest hil navixsmf401re      # whole on-target suite, over SWD
+tools/hil/run.sh navixsmf401re     # whole on-target suite, over SWD
 ```
 
 Every console string costs a breakpoint round-trip, so this takes minutes where
@@ -77,10 +77,12 @@ tools/hil/usb_cdc_check.py
 ## Caveats and known limitations
 
 * The board shares chip id `0x433` with the Nucleo-F401RE, so `st-info --probe`
-  cannot tell them apart. `tools/ntest hil` disambiguates by whether the probe
-  brings a VCP along, which works for these two but is not a general answer.
+  cannot tell them apart. `tools/hil/run.sh` disambiguates by whether the probe
+  brings a VCP along, which works for these two but is not a general answer;
+  pinning the probe by USB location (`NAVHAL_HIL_LOCATION_<BOARD>`) is the
+  general one, and it also stops the runner enumerating probes at all.
 * LSE start-up was measured at 7–10 s from cold, which is slow for a 32.768 kHz
   crystal — worth checking the load capacitors (22 pF against a crystal wanting
   ~15 pF would explain it) before trusting the default timeout.
 * CI builds this board's test ELF but nothing runs it; the hardware results in
-  this page come from a local `ntest hil` run.
+  this page come from a local `tools/hil/run.sh` run.

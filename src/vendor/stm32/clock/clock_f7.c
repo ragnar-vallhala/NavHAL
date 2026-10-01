@@ -71,9 +71,9 @@
 
 /* Internal clock-source toggle helpers (file-local). */
 /* Spin budget for a ready flag. The F4 driver has carried one since 0.3.x; this
- * file spun forever, which is the wrong failure for a clock that does not
- * start: no console, no fallback, no way to tell a dead oscillator from a hung
- * core. On timeout the caller backs out and the system stays on the reset HSI. */
+ * file span forever, which is the wrong failure for a clock that does not start:
+ * no console, no fallback, no way to tell a dead oscillator from a hung core.
+ * On timeout the caller backs out and the system stays on the reset HSI. */
 #define CLOCK_READY_TIMEOUT 1000000UL
 
 /* Spin until `cond` is false or the budget elapses; return HAL_ERR_TIMEOUT from
@@ -88,9 +88,23 @@
   } while (0)
 
 static hal_status_t _toggle_hse_clock(uint8_t state) {
-  if (state)
+  if (state) {
+#if NAVHAL_CONFIG_BOARD_HSE_BYPASS
+    /* See clock.c: a driven clock on OSC_IN needs HSEBYP, and HSEBYP is
+     * writable only while HSEON is clear. */
+    /* Only when the bit actually has to change. HSEON cannot be cleared while
+     * HSE drives the system clock, directly or through the PLL, so an
+     * unconditional clear here spins until the wait gives up and leaves a
+     * re-init running on raw HSE -- which is what a second hal_clock_init on a
+     * board already clocked from HSE does. */
+    if ((RCC->CR & RCC_CR_HSEBYP) == 0u) {
+      RCC->CR &= ~RCC_CR_HSEON;
+    WAIT_OR_TIMEOUT((RCC->CR & RCC_CR_HSERDY) != 0);
+      RCC->CR |= RCC_CR_HSEBYP;
+    }
+#endif
     RCC->CR |= RCC_CR_HSEON;
-  else
+  } else
     RCC->CR &= ~RCC_CR_HSEON;
   WAIT_OR_TIMEOUT(((RCC->CR & RCC_CR_HSERDY) != 0) != (state));
   return HAL_OK;

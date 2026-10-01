@@ -70,29 +70,60 @@
 #define HSE_FREQ_HZ ((uint32_t)BOARD_HSE_FREQ_HZ)
 
 /* Internal clock-source toggle helpers (file-local). */
-static void _toggle_hse_clock(uint8_t state) {
-  if (state)
+/* Spin budget for a ready flag. The F4 driver has carried one since 0.3.x; this
+ * file span forever, which is the wrong failure for a clock that does not start:
+ * no console, no fallback, no way to tell a dead oscillator from a hung core.
+ * On timeout the caller backs out and the system stays on the reset HSI. */
+#define CLOCK_READY_TIMEOUT 1000000UL
+
+/* Spin until `cond` is false or the budget elapses; return HAL_ERR_TIMEOUT from
+ * the enclosing function. */
+#define WAIT_OR_TIMEOUT(cond)                                                  \
+  do {                                                                         \
+    uint32_t _to = CLOCK_READY_TIMEOUT;                                        \
+    while (cond) {                                                             \
+      if (--_to == 0u)                                                         \
+        return HAL_ERR_TIMEOUT;                                                \
+    }                                                                          \
+  } while (0)
+
+static hal_status_t _toggle_hse_clock(uint8_t state) {
+  if (state) {
+#if NAVHAL_CONFIG_BOARD_HSE_BYPASS
+    /* See clock.c: a driven clock on OSC_IN needs HSEBYP, and HSEBYP is
+     * writable only while HSEON is clear. */
+    /* Only when the bit actually has to change. HSEON cannot be cleared while
+     * HSE drives the system clock, directly or through the PLL, so an
+     * unconditional clear here spins until the wait gives up and leaves a
+     * re-init running on raw HSE -- which is what a second hal_clock_init on a
+     * board already clocked from HSE does. */
+    if ((RCC->CR & RCC_CR_HSEBYP) == 0u) {
+      RCC->CR &= ~RCC_CR_HSEON;
+    WAIT_OR_TIMEOUT((RCC->CR & RCC_CR_HSERDY) != 0);
+      RCC->CR |= RCC_CR_HSEBYP;
+    }
+#endif
     RCC->CR |= RCC_CR_HSEON;
-  else
+  } else
     RCC->CR &= ~RCC_CR_HSEON;
-  while (((RCC->CR & RCC_CR_HSERDY) != 0) != (state))
-    ;
+  WAIT_OR_TIMEOUT(((RCC->CR & RCC_CR_HSERDY) != 0) != (state));
+  return HAL_OK;
 }
-static void _toggle_hsi_clock(uint8_t state) {
+static hal_status_t _toggle_hsi_clock(uint8_t state) {
   if (state)
     RCC->CR |= RCC_CR_HSION;
   else
     RCC->CR &= ~RCC_CR_HSION;
-  while (((RCC->CR & RCC_CR_HSIRDY) != 0) != (state))
-    ;
+  WAIT_OR_TIMEOUT(((RCC->CR & RCC_CR_HSIRDY) != 0) != (state));
+  return HAL_OK;
 }
-static void _toggle_pll_clock(uint8_t state) {
+static hal_status_t _toggle_pll_clock(uint8_t state) {
   if (state)
     RCC->CR |= RCC_CR_PLLON;
   else
     RCC->CR &= ~RCC_CR_PLLON;
-  while (((RCC->CR & RCC_CR_PLLRDY) != 0) != (state))
-    ;
+  WAIT_OR_TIMEOUT(((RCC->CR & RCC_CR_PLLRDY) != 0) != (state));
+  return HAL_OK;
 }
 
 /** @brief Resulting PLL output (= HCLK with AHB /1) for the given config, Hz. */
@@ -141,18 +172,26 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   (void)RCC->APB1ENR; /* ensure the enable has taken effect */
   PWR_CR1 = (PWR_CR1 & ~PWR_CR1_VOS_Msk) | PWR_CR1_VOS_SCALE1;
 
-  /* Enable and wait for the selected source. */
+  /* Enable and wait for the selected source. On a ready-bit timeout, bail out
+   * immediately: the system clock is left on the reset HSI rather than being
+   * switched onto a source that never came up. Same contract as clock.c. */
+  hal_status_t st;
   if (cfg->source == HAL_CLOCK_SOURCE_HSE) {
-    _toggle_hse_clock(RCC_ON);
+    if ((st = _toggle_hse_clock(RCC_ON)) != HAL_OK)
+      return st;
   } else if (cfg->source == HAL_CLOCK_SOURCE_HSI) {
-    _toggle_hsi_clock(RCC_ON);
+    if ((st = _toggle_hsi_clock(RCC_ON)) != HAL_OK)
+      return st;
   } else if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
     if (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSE)
-      _toggle_hse_clock(RCC_ON);
+      st = _toggle_hse_clock(RCC_ON);
     else
-      _toggle_hsi_clock(RCC_ON);
+      st = _toggle_hsi_clock(RCC_ON);
+    if (st != HAL_OK)
+      return st;
 
-    _toggle_pll_clock(RCC_OFF);
+    if ((st = _toggle_pll_clock(RCC_OFF)) != HAL_OK)
+      return st;
     RCC->PLLCFGR = 0;
     if (cfg->pll.input_src == HAL_CLOCK_SOURCE_HSI)
       RCC->PLLCFGR &= ~RCC_PLLCFGR_SRC;
@@ -161,7 +200,8 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
     RCC->PLLCFGR |=
         RCC_PLLCFGR_PLLM(cfg->pll.pll_m) | RCC_PLLCFGR_PLLN(cfg->pll.pll_n) |
         RCC_PLLCFGR_PLLP(cfg->pll.pll_p) | RCC_PLLCFGR_PLLQ(cfg->pll.pll_q);
-    _toggle_pll_clock(RCC_ON);
+    if ((st = _toggle_pll_clock(RCC_ON)) != HAL_OK)
+      return st;
   }
 
   /* Target HCLK (AHB prescaler is /1 below). */
@@ -172,11 +212,9 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   /* Engage over-drive before raising the frequency past 180 MHz. */
   if (cfg->source == HAL_CLOCK_SOURCE_PLL && hclk > 180000000U) {
     PWR_CR1 |= PWR_CR1_ODEN;
-    while (!(PWR_CSR1 & PWR_CSR1_ODRDY))
-      ;
+    WAIT_OR_TIMEOUT(!(PWR_CSR1 & PWR_CSR1_ODRDY));
     PWR_CR1 |= PWR_CR1_ODSWEN;
-    while (!(PWR_CSR1 & PWR_CSR1_ODSWRDY))
-      ;
+    WAIT_OR_TIMEOUT(!(PWR_CSR1 & PWR_CSR1_ODSWRDY));
   }
 
   volatile uint32_t *const FLASH_ACR =
@@ -219,18 +257,15 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   /* Switch the system clock source. */
   if (cfg->source == HAL_CLOCK_SOURCE_HSI) {
     RCC->CFGR &= ~(0x3 << RCC_CFGR_SW_BIT);
-    while ((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 0)
-      ;
+    WAIT_OR_TIMEOUT((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 0);
   } else if (cfg->source == HAL_CLOCK_SOURCE_HSE) {
     RCC->CFGR &= ~(0x3 << RCC_CFGR_SW_BIT);
     RCC->CFGR |= (1 << RCC_CFGR_SW_BIT);
-    while ((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 1)
-      ;
+    WAIT_OR_TIMEOUT((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 1);
   } else { /* PLL */
     RCC->CFGR &= ~(0x3 << RCC_CFGR_SW_BIT);
     RCC->CFGR |= (2 << RCC_CFGR_SW_BIT);
-    while ((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 2)
-      ;
+    WAIT_OR_TIMEOUT((((RCC->CFGR) >> RCC_CFGR_SWS_BIT) & 0x3) != 2);
   }
 
   /* Lower flash wait states AFTER dropping to a slower non-PLL clock.

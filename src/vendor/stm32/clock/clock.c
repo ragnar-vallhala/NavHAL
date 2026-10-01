@@ -58,6 +58,26 @@
  * the ready bit never reaches `state`. */
 static hal_status_t _toggle_hse_clock(uint8_t state) {
   if (state) {
+#if NAVHAL_CONFIG_BOARD_HSE_BYPASS
+    /* This board is fed a driven clock on OSC_IN with nothing across OSC_OUT --
+     * a Nucleo takes it from the on-board ST-LINK's MCO pin, the crystal
+     * footprint being unpopulated. Asking the oscillator to drive a crystal
+     * that is not there leaves HSERDY low until the wait below gives up.
+     *
+     * HSEBYP is writable only while HSEON is clear, so clear it and let HSERDY
+     * fall first. Skipping that turns a configuration error into silence: the
+     * write is ignored, HSE still never readies, and the .config says bypass. */
+    /* Only when the bit actually has to change. HSEON cannot be cleared while
+     * HSE drives the system clock, directly or through the PLL, so an
+     * unconditional clear here spins until the wait gives up and leaves a
+     * re-init running on raw HSE -- which is what a second hal_clock_init on a
+     * board already clocked from HSE does. */
+    if ((RCC->CR & RCC_CR_HSEBYP) == 0u) {
+      RCC->CR &= ~RCC_CR_HSEON;
+    WAIT_OR_TIMEOUT((RCC->CR & RCC_CR_HSERDY) != 0);
+      RCC->CR |= RCC_CR_HSEBYP;
+    }
+#endif
     RCC->CR |= RCC_CR_HSEON;
   } else
     RCC->CR &= ~RCC_CR_HSEON;

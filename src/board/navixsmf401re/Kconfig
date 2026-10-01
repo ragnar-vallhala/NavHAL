@@ -194,6 +194,18 @@ config NUM_BOARD_HSE_FREQ_HZ
     int
     default 8000000 if BOARD_NAVIXSM_F401RE
 
+# ---- HSE source ----
+# How the 8 MHz above reaches OSC_IN, which the frequency alone cannot say. A
+# fitted crystal is driven by the oscillator across OSC_IN/OSC_OUT; a board
+# without one is fed a square wave on OSC_IN only -- a Nucleo takes it from the
+# on-board ST-LINK's MCO pin, since the crystal footprint is left unpopulated.
+# The second case needs RCC_CR.HSEBYP set before HSEON, and without it HSERDY
+# never rises: hal_clock_init times out and leaves the system on HSI, so every
+# derived rate is wrong and USB loses its exact 48 MHz.
+config BOARD_HSE_BYPASS
+    bool
+    default n if BOARD_NAVIXSM_F401RE
+
 # ---- SDIO ----
 # The bus signals are fixed by the alternate-function mux rather than freely
 # chosen: pointing one at a pin the mux cannot route gives a build that compiles

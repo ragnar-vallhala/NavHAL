@@ -351,11 +351,31 @@ else()
   message(STATUS "Doxygen not found. 'doc' target will not be available.")
 endif()
 
-add_custom_target(copy_compile_commands ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_BINARY_DIR}/compile_commands.json
-        ${CMAKE_SOURCE_DIR}/compile_commands.json
-)
+# One build tree owns the repo-root compile_commands.json, and it is `build/`.
+# This target is ALL, and every tier script configures a tree of its own --
+# build-host, build-x86, the per-board trees in tools/pil and tools/samples --
+# so whichever ran last used to win. After an AVR tier that left the editor
+# resolving the whole repo against 21 ATmega translation units, and everything
+# else reported undeclared.
+#
+# Pass -DNAVHAL_EXPORT_COMPILE_COMMANDS=ON to hand ownership to another tree
+# (an IDE's, say), or =OFF to leave the root file alone.
+if(CMAKE_BINARY_DIR STREQUAL "${CMAKE_SOURCE_DIR}/build")
+    set(_navhal_cc_default ON)
+else()
+    set(_navhal_cc_default OFF)
+endif()
+option(NAVHAL_EXPORT_COMPILE_COMMANDS
+       "Copy this tree's compile_commands.json to the repo root"
+       ${_navhal_cc_default})
+
+if(NAVHAL_EXPORT_COMPILE_COMMANDS)
+    add_custom_target(copy_compile_commands ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_BINARY_DIR}/compile_commands.json
+            ${CMAKE_SOURCE_DIR}/compile_commands.json
+    )
+endif()
 
 # Startup file. The vector table names this MCU's peripherals, so it is a
 # family property and lives beside the family's register maps; a board may

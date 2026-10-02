@@ -230,6 +230,7 @@ static hal_status_t stm32f7_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
  *===========================================================================*/
 #if NAVHAL_CONFIG_DRV_I2C_DMA
 #include "navhal_port_dma.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 
 static void (*_i2c_dma_rx_callback)(void) = NULL;

@@ -36,15 +36,18 @@
  * ::HAL_ERR_NOT_SUPPORTED; priority calls are accepted and ignored.
  */
 
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include "internal/hal_interrupt_ops.h"
+#include "internal/hal_interrupt_table.h"
 
 #include <avr/interrupt.h>
+#include <avr/sleep.h>
 #include <avr/io.h>
 #include <stddef.h>
 
-/** @brief Per-IRQ callback table, indexed by ::hal_irq_t (slot 0 unused). */
-static hal_interrupt_callback_t s_callbacks[HAL_IRQ_COUNT];
+/* The callback table lives in the common layer now; this port kept its own
+ * copy of the same bounds check and indexed call. */
 
 /** @brief True for an IRQ value that indexes a valid callback slot. */
 static inline bool irq_in_range(hal_irq_t irq) {
@@ -145,9 +148,12 @@ static bool avr_interrupt_is_pending(hal_irq_t irq) {
 
 /* ---- Priority: the AVR has none; accept and ignore --------------------- */
 
+/* The AVR fixes priority by vector position, so there is nothing to set -- but
+ * a line that does not exist is still refused rather than accepted silently. */
 static hal_status_t avr_interrupt_set_priority(hal_irq_t irq, uint8_t priority) {
-  (void)irq;
   (void)priority;
+  if (!irq_in_range(irq))
+    return HAL_ERR_INVALID_ARG;
   return HAL_OK;
 }
 
@@ -158,24 +164,26 @@ static uint8_t avr_interrupt_get_priority(hal_irq_t irq) {
 
 /* ---- Callback table ---------------------------------------------------- */
 
-static hal_status_t avr_interrupt_attach_callback(hal_irq_t irq,
-                                           hal_interrupt_callback_t callback) {
-  if (!irq_in_range(irq))
-    return HAL_ERR_INVALID_ARG;
-  s_callbacks[irq] = callback;
-  return HAL_OK;
-}
-
-static hal_status_t avr_interrupt_detach_callback(hal_irq_t irq) {
-  if (!irq_in_range(irq))
-    return HAL_ERR_INVALID_ARG;
-  s_callbacks[irq] = NULL;
-  return HAL_OK;
-}
-
 static void avr_interrupt_dispatch(hal_irq_t irq) {
-  if (irq_in_range(irq) && s_callbacks[irq] != NULL)
-    s_callbacks[irq]();
+  /* Nothing to acknowledge: the AVR clears a vector's flag as it enters the
+   * handler, and the flags that need clearing by hand are the ones no vector
+   * was taken for. */
+  (void)navhal_irq_invoke(irq);
+}
+
+/* SLEEP with the I-bit clear does not wake, so unlike Cortex-M's WFI this has
+ * to enable interrupts across the instruction and put the caller's state back
+ * afterwards. sei takes effect after the following instruction, which is what
+ * makes sei+sleep atomic: no interrupt can land between them and leave the
+ * core asleep with the wake condition already gone. A handler may therefore
+ * run before this returns, where on Cortex-M it would stay pending. */
+static void avr_cpu_idle(void) {
+  uint8_t sreg = SREG;
+  sleep_enable();
+  sei();
+  sleep_cpu();
+  sleep_disable();
+  SREG = sreg;
 }
 
 /* ---- Global interrupt enable (SREG I-bit) ------------------------------ */
@@ -210,9 +218,8 @@ static void avr_interrupt_clear_all_pending(void) {
 const hal_interrupt_ops_t _hal_interrupt_ops = {
     .enable = avr_interrupt_enable,
     .disable = avr_interrupt_disable,
-    .attach_callback = avr_interrupt_attach_callback,
-    .detach_callback = avr_interrupt_detach_callback,
     .dispatch = avr_interrupt_dispatch,
+    .cpu_idle = avr_cpu_idle,
     .disable_global = avr_interrupt_disable_global,
     .enable_global = avr_interrupt_enable_global,
     .set_priority = avr_interrupt_set_priority,

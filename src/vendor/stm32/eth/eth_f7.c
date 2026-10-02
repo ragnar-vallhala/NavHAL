@@ -48,6 +48,7 @@
 #include "navhal_port_eth.h"
 #include "board.h"
 #include "navhal_port_gpio.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 
 #define ETH_SPIN 1000000U /* bounded wait iterations for MDIO / DMA reset */

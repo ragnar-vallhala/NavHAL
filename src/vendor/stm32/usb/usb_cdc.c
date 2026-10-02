@@ -44,6 +44,7 @@
 #include "family/rcc_reg.h"
 #include "family/usb_reg.h"
 #include "navhal_port_gpio.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include <stdint.h>
 

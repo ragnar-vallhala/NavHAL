@@ -31,6 +31,7 @@
 
 #include "navhal_port_dma.h"
 #include "family/dma_reg.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include "family/rcc_reg.h"
 #include <stdint.h>

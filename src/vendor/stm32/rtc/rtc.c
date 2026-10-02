@@ -35,6 +35,7 @@
 #include "family/rcc_reg.h"
 #include "family/rtc_reg.h"
 #include "navhal_port_clock.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include <stdint.h>
 

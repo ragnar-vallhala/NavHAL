@@ -187,7 +187,9 @@ set(NAVHAL_FORCE_INCLUDE "-include ${GENERATED_NAVHAL_TARGET}")
 #                               run. -Og rather than -O0 because the AVR has
 #                               32 KB of flash and -O0 more than doubled the
 #                               image; -Og measured the same size as -Os on a
-#                               loop, while keeping the debug experience.
+#                               loop, while keeping the debug experience. The
+#                               AVR is the exception and builds Debug at -Os --
+#                               see the flag block below for the measurement.
 #   Release     -Os -DNDEBUG    what ships. On an MCU the binding constraint
 #                               is flash, not instruction count, which is why
 #                               this is -Os and not CMake's usual -O3.
@@ -213,7 +215,16 @@ if(NOT CMAKE_BUILD_TYPE IN_LIST NAVHAL_BUILD_TYPES)
         "NavHAL defines: ${NAVHAL_BUILD_TYPES}")
 endif()
 
-set(CMAKE_C_FLAGS_DEBUG          "-Og -g")
+# -Og everywhere with flash to spare, -Os on the AVR, which has none: the
+# on-target test image is 28588 bytes of text at -Os and overflows the 32K part
+# at -Og. The note below measured the two as equal on a loop, and on a loop they
+# are; across a whole image -Og costs about 3.4K in inlining and spill code,
+# which is the difference between a tier that runs and one that will not link.
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
+    set(CMAKE_C_FLAGS_DEBUG      "-Os -g")
+else()
+    set(CMAKE_C_FLAGS_DEBUG      "-Og -g")
+endif()
 set(CMAKE_C_FLAGS_RELEASE        "-Os -DNDEBUG")
 set(CMAKE_C_FLAGS_RELEASELTO     "-Os -flto -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG        "${CMAKE_C_FLAGS_DEBUG}")

@@ -44,6 +44,7 @@
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
 #include <avr/io.h>
+#include <avr/pgmspace.h>
 #include <stddef.h>
 
 /* The callback table lives in the common layer now; this port kept its own
@@ -56,14 +57,86 @@ static inline bool irq_in_range(hal_irq_t irq) {
 
 /* ---- Per-IRQ control: not a thing on the AVR's flat vector table -------- */
 
+/* Per-interrupt enable. There is no NVIC: each enable bit lives in the
+ * peripheral that raises the interrupt, so this is the same shape as the flag
+ * table below -- a register and a bit.
+ *
+ * `w1c` is the part that is easy to get wrong. Some enable bits share a
+ * register with a flag that clears when 1 is written to it: ADIE sits beside
+ * ADIF, ACIE beside ACI, TWIE beside TWINT, WDIE beside WDIF. A plain
+ * `*reg |= mask` reads that flag back as 1 and writes it straight out again,
+ * clearing a pending interrupt as a side effect of enabling one. So those bits
+ * are masked to 0 on the way out, and enabling an interrupt never discards one.
+ */
+typedef struct {
+  volatile uint8_t *reg;
+  uint8_t mask;
+  uint8_t w1c;
+} avr_irq_mask_t;
+
+/* In flash, not a switch: twenty-five cases of immediate loads overflowed the
+ * 32K part by 860 bytes once the test image was linked. A row is four bytes and
+ * the lookup is an index. */
+typedef struct {
+  uint16_t reg; /* SFR address; 0 means this line has no enable bit */
+  uint8_t mask;
+  uint8_t w1c;
+} avr_irq_mask_row_t;
+
+static const avr_irq_mask_row_t _irq_masks[HAL_IRQ_COUNT] PROGMEM = {
+    [HAL_IRQ_INT0] = {(uint16_t)(uintptr_t)&EIMSK, 1u << INT0, 0},
+    [HAL_IRQ_INT1] = {(uint16_t)(uintptr_t)&EIMSK, 1u << INT1, 0},
+    [HAL_IRQ_PCINT0] = {(uint16_t)(uintptr_t)&PCICR, 1u << PCIE0, 0},
+    [HAL_IRQ_PCINT1] = {(uint16_t)(uintptr_t)&PCICR, 1u << PCIE1, 0},
+    [HAL_IRQ_PCINT2] = {(uint16_t)(uintptr_t)&PCICR, 1u << PCIE2, 0},
+    [HAL_IRQ_WDT] = {(uint16_t)(uintptr_t)&WDTCSR, 1u << WDIE, 1u << WDIF},
+    [HAL_IRQ_TIMER2_COMPA] = {(uint16_t)(uintptr_t)&TIMSK2, 1u << OCIE2A, 0},
+    [HAL_IRQ_TIMER2_COMPB] = {(uint16_t)(uintptr_t)&TIMSK2, 1u << OCIE2B, 0},
+    [HAL_IRQ_TIMER2_OVF] = {(uint16_t)(uintptr_t)&TIMSK2, 1u << TOIE2, 0},
+    [HAL_IRQ_TIMER1_CAPT] = {(uint16_t)(uintptr_t)&TIMSK1, 1u << ICIE1, 0},
+    [HAL_IRQ_TIMER1_COMPA] = {(uint16_t)(uintptr_t)&TIMSK1, 1u << OCIE1A, 0},
+    [HAL_IRQ_TIMER1_COMPB] = {(uint16_t)(uintptr_t)&TIMSK1, 1u << OCIE1B, 0},
+    [HAL_IRQ_TIMER1_OVF] = {(uint16_t)(uintptr_t)&TIMSK1, 1u << TOIE1, 0},
+    [HAL_IRQ_TIMER0_COMPA] = {(uint16_t)(uintptr_t)&TIMSK0, 1u << OCIE0A, 0},
+    [HAL_IRQ_TIMER0_COMPB] = {(uint16_t)(uintptr_t)&TIMSK0, 1u << OCIE0B, 0},
+    [HAL_IRQ_TIMER0_OVF] = {(uint16_t)(uintptr_t)&TIMSK0, 1u << TOIE0, 0},
+    [HAL_IRQ_SPI_STC] = {(uint16_t)(uintptr_t)&SPCR, 1u << SPIE, 0},
+    [HAL_IRQ_USART_RX] = {(uint16_t)(uintptr_t)&UCSR0B, 1u << RXCIE0, 0},
+    [HAL_IRQ_USART_UDRE] = {(uint16_t)(uintptr_t)&UCSR0B, 1u << UDRIE0, 0},
+    [HAL_IRQ_USART_TX] = {(uint16_t)(uintptr_t)&UCSR0B, 1u << TXCIE0, 0},
+    [HAL_IRQ_ADC] = {(uint16_t)(uintptr_t)&ADCSRA, 1u << ADIE, 1u << ADIF},
+    [HAL_IRQ_EE_READY] = {(uint16_t)(uintptr_t)&EECR, 1u << EERIE, 0},
+    [HAL_IRQ_ANALOG_COMP] = {(uint16_t)(uintptr_t)&ACSR, 1u << ACIE, 1u << ACI},
+    [HAL_IRQ_TWI] = {(uint16_t)(uintptr_t)&TWCR, 1u << TWIE, 1u << TWINT},
+    [HAL_IRQ_SPM_READY] = {(uint16_t)(uintptr_t)&SPMCSR, 1u << SPMIE, 0},
+};
+
+static bool _mask_of(hal_irq_t irq, avr_irq_mask_t *m) {
+  if (!irq_in_range(irq))
+    return false;
+  uint16_t reg = pgm_read_word(&_irq_masks[irq].reg);
+  if (reg == 0u)
+    return false;
+  m->reg = (volatile uint8_t *)(uintptr_t)reg;
+  m->mask = pgm_read_byte(&_irq_masks[irq].mask);
+  m->w1c = pgm_read_byte(&_irq_masks[irq].w1c);
+  return true;
+}
+
 static hal_status_t avr_interrupt_enable(hal_irq_t irq) {
-  (void)irq;
-  return HAL_ERR_NOT_SUPPORTED;
+  avr_irq_mask_t m;
+  if (!irq_in_range(irq) || !_mask_of(irq, &m))
+    return HAL_ERR_INVALID_ARG;
+  *m.reg = (uint8_t)((*m.reg & (uint8_t)~m.w1c) | m.mask);
+  return HAL_OK;
 }
 
 static hal_status_t avr_interrupt_disable(hal_irq_t irq) {
-  (void)irq;
-  return HAL_ERR_NOT_SUPPORTED;
+  avr_irq_mask_t m;
+  if (!irq_in_range(irq) || !_mask_of(irq, &m))
+    return HAL_ERR_INVALID_ARG;
+  *m.reg = (uint8_t)(*m.reg & (uint8_t)~(m.w1c | m.mask));
+  return HAL_OK;
 }
 
 /* ---- Pending flags -----------------------------------------------------
@@ -91,37 +164,58 @@ typedef struct {
   bool clearable;        /**< Clearable without a side effect. */
 } avr_irq_flag_t;
 
+/* Same shape and the same reason as _irq_masks: in flash, indexed, not a
+ * switch. `flag_only` says every bit in the register is a flag, so a single-bit
+ * write leaves the neighbours standing; `clearable` says the flag can be
+ * cleared on its own terms at all -- TWINT releases the TWI bus when written,
+ * and the USART and SPI flags clear by reading their data registers. */
+#define AVR_FLAG_ONLY 0x01u
+#define AVR_CLEARABLE 0x02u
+
+typedef struct {
+  uint16_t reg; /* SFR address; 0 means this line has no flag */
+  uint8_t mask;
+  uint8_t bits;
+} avr_irq_flag_row_t;
+
+static const avr_irq_flag_row_t _irq_flags[HAL_IRQ_COUNT] PROGMEM = {
+    [HAL_IRQ_INT0] = {(uint16_t)(uintptr_t)&EIFR, 1u << INTF0, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_INT1] = {(uint16_t)(uintptr_t)&EIFR, 1u << INTF1, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_PCINT0] = {(uint16_t)(uintptr_t)&PCIFR, 1u << PCIF0, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_PCINT1] = {(uint16_t)(uintptr_t)&PCIFR, 1u << PCIF1, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_PCINT2] = {(uint16_t)(uintptr_t)&PCIFR, 1u << PCIF2, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_WDT] = {(uint16_t)(uintptr_t)&WDTCSR, 1u << WDIF, AVR_CLEARABLE},
+    [HAL_IRQ_TIMER2_COMPA] = {(uint16_t)(uintptr_t)&TIFR2, 1u << OCF2A, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_TIMER2_COMPB] = {(uint16_t)(uintptr_t)&TIFR2, 1u << OCF2B, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_TIMER2_OVF] = {(uint16_t)(uintptr_t)&TIFR2, 1u << TOV2, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_TIMER1_CAPT] = {(uint16_t)(uintptr_t)&TIFR1, 1u << ICF1, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_TIMER1_COMPA] = {(uint16_t)(uintptr_t)&TIFR1, 1u << OCF1A, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_TIMER1_COMPB] = {(uint16_t)(uintptr_t)&TIFR1, 1u << OCF1B, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_TIMER1_OVF] = {(uint16_t)(uintptr_t)&TIFR1, 1u << TOV1, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_TIMER0_COMPA] = {(uint16_t)(uintptr_t)&TIFR0, 1u << OCF0A, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_TIMER0_COMPB] = {(uint16_t)(uintptr_t)&TIFR0, 1u << OCF0B, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_TIMER0_OVF] = {(uint16_t)(uintptr_t)&TIFR0, 1u << TOV0, AVR_FLAG_ONLY | AVR_CLEARABLE},
+    [HAL_IRQ_ADC] = {(uint16_t)(uintptr_t)&ADCSRA, 1u << ADIF, AVR_CLEARABLE},
+    [HAL_IRQ_ANALOG_COMP] = {(uint16_t)(uintptr_t)&ACSR, 1u << ACI, AVR_CLEARABLE},
+    [HAL_IRQ_USART_TX] = {(uint16_t)(uintptr_t)&UCSR0A, 1u << TXC0, AVR_CLEARABLE},
+    [HAL_IRQ_SPI_STC] = {(uint16_t)(uintptr_t)&SPSR, 1u << SPIF, 0},
+    [HAL_IRQ_USART_RX] = {(uint16_t)(uintptr_t)&UCSR0A, 1u << RXC0, 0},
+    [HAL_IRQ_USART_UDRE] = {(uint16_t)(uintptr_t)&UCSR0A, 1u << UDRE0, 0},
+    [HAL_IRQ_TWI] = {(uint16_t)(uintptr_t)&TWCR, 1u << TWINT, 0},
+};
+
 static bool _flag_of(hal_irq_t irq, avr_irq_flag_t *f) {
-  switch (irq) {
-  case HAL_IRQ_INT0:         *f = (avr_irq_flag_t){&EIFR,   1u << INTF0, true,  true};  return true;
-  case HAL_IRQ_INT1:         *f = (avr_irq_flag_t){&EIFR,   1u << INTF1, true,  true};  return true;
-  case HAL_IRQ_PCINT0:       *f = (avr_irq_flag_t){&PCIFR,  1u << PCIF0, true,  true};  return true;
-  case HAL_IRQ_PCINT1:       *f = (avr_irq_flag_t){&PCIFR,  1u << PCIF1, true,  true};  return true;
-  case HAL_IRQ_PCINT2:       *f = (avr_irq_flag_t){&PCIFR,  1u << PCIF2, true,  true};  return true;
-  case HAL_IRQ_WDT:          *f = (avr_irq_flag_t){&WDTCSR, 1u << WDIF,  false, true};  return true;
-  case HAL_IRQ_TIMER2_COMPA: *f = (avr_irq_flag_t){&TIFR2,  1u << OCF2A, true,  true};  return true;
-  case HAL_IRQ_TIMER2_COMPB: *f = (avr_irq_flag_t){&TIFR2,  1u << OCF2B, true,  true};  return true;
-  case HAL_IRQ_TIMER2_OVF:   *f = (avr_irq_flag_t){&TIFR2,  1u << TOV2,  true,  true};  return true;
-  case HAL_IRQ_TIMER1_CAPT:  *f = (avr_irq_flag_t){&TIFR1,  1u << ICF1,  true,  true};  return true;
-  case HAL_IRQ_TIMER1_COMPA: *f = (avr_irq_flag_t){&TIFR1,  1u << OCF1A, true,  true};  return true;
-  case HAL_IRQ_TIMER1_COMPB: *f = (avr_irq_flag_t){&TIFR1,  1u << OCF1B, true,  true};  return true;
-  case HAL_IRQ_TIMER1_OVF:   *f = (avr_irq_flag_t){&TIFR1,  1u << TOV1,  true,  true};  return true;
-  case HAL_IRQ_TIMER0_COMPA: *f = (avr_irq_flag_t){&TIFR0,  1u << OCF0A, true,  true};  return true;
-  case HAL_IRQ_TIMER0_COMPB: *f = (avr_irq_flag_t){&TIFR0,  1u << OCF0B, true,  true};  return true;
-  case HAL_IRQ_TIMER0_OVF:   *f = (avr_irq_flag_t){&TIFR0,  1u << TOV0,  true,  true};  return true;
-  case HAL_IRQ_ADC:          *f = (avr_irq_flag_t){&ADCSRA, 1u << ADIF,  false, true};  return true;
-  case HAL_IRQ_ANALOG_COMP:  *f = (avr_irq_flag_t){&ACSR,   1u << ACI,   false, true};  return true;
-  case HAL_IRQ_USART_TX:     *f = (avr_irq_flag_t){&UCSR0A, 1u << TXC0,  false, true};  return true;
-  /* Readable, but not clearable on their own terms. */
-  case HAL_IRQ_SPI_STC:      *f = (avr_irq_flag_t){&SPSR,   1u << SPIF,  false, false}; return true;
-  case HAL_IRQ_USART_RX:     *f = (avr_irq_flag_t){&UCSR0A, 1u << RXC0,  false, false}; return true;
-  case HAL_IRQ_USART_UDRE:   *f = (avr_irq_flag_t){&UCSR0A, 1u << UDRE0, false, false}; return true;
-  case HAL_IRQ_TWI:          *f = (avr_irq_flag_t){&TWCR,   1u << TWINT, false, false}; return true;
-  /* No flag at all: both are level conditions, not latched events. */
-  case HAL_IRQ_EE_READY:
-  case HAL_IRQ_SPM_READY:
-  default:                   return false;
-  }
+  if (!irq_in_range(irq))
+    return false;
+  uint16_t reg = pgm_read_word(&_irq_flags[irq].reg);
+  if (reg == 0u)
+    return false;
+  uint8_t bits = pgm_read_byte(&_irq_flags[irq].bits);
+  f->reg = (volatile uint8_t *)(uintptr_t)reg;
+  f->mask = pgm_read_byte(&_irq_flags[irq].mask);
+  f->flag_only = (bits & AVR_FLAG_ONLY) != 0u;
+  f->clearable = (bits & AVR_CLEARABLE) != 0u;
+  return true;
 }
 
 static hal_status_t avr_interrupt_clear_pending(hal_irq_t irq) {

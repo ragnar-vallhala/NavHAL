@@ -44,6 +44,12 @@ extern "C" {
  */
 #if NAVHAL_CONFIG_DRV_INTERRUPT
 #include "navhal_port_interrupt.h" // architecture-specific interrupt definitions
+/* The deprecated-name shims. They live here rather than in the port header
+ * because the shim includes that header for the declarations it wraps, and
+ * the two including each other is a cycle -- which compiles, thanks to the
+ * include guards, and which clang-tidy's misc-header-include-cycle reports
+ * at every call site that opens one of them. */
+#include "compat/interrupt_compat.h"
 /* Inside the gate with the port header: a vendor that does not implement the
  * interrupt driver has no reason to ship an interrupt register map, and this
  * include used to demand one from every port regardless. */

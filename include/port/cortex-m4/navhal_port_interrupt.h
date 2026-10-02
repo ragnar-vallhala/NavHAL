@@ -162,7 +162,6 @@ void hal_interrupt_clear_all_pending(void);
 void hal_cpu_idle(void);
 
 /* Deprecated pre-standardization interrupt names — retained as a backward-compat alias. */
-#include "compat/interrupt_compat.h"
 
 
 #ifdef __cplusplus

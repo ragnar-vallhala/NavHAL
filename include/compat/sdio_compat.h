@@ -32,6 +32,16 @@
 
 #include "common/navhal_compiler.h"
 #include <stdint.h>
+/* The declarations these wrappers call. Circular -- the port header pulls this
+ * shim in at its end -- which the include guards make safe either way round,
+ * and without it the file only compiles when reached through that header: a
+ * clang-based editor opening it directly reports every call undeclared. */
+#include "navhal_port_sdio.h"
+
+/* Compiled only where the driver is, exactly as the public header is: a shim
+ * over an API that is switched off cannot compile, and an editor opening
+ * this file with the driver off would show every reference dangling. */
+#if NAVHAL_CONFIG_DRV_SDIO
 
 
 #ifdef __cplusplus
@@ -135,6 +145,8 @@ sdio_write_blocks_async(uint32_t addr, const uint8_t *buffer, uint32_t count) {
 }
 #endif /* NAVHAL_CONFIG_DRV_SDIO_DMA */
 
+
+#endif /* NAVHAL_CONFIG_DRV_SDIO */
 
 #ifdef __cplusplus
 } /* extern "C" */

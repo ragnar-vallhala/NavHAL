@@ -255,6 +255,37 @@ config DRV_SDIO
     select DRV_INTERRUPT
     select DRV_TIMER
 
+config FS_LFN
+    bool "FatFs long file names (LFN)"
+    depends on DRV_SDIO
+    default n
+    help
+      Without this, FAT has only 8.3 short names, which the spec stores
+      uppercase: mkdir shtest creates SHTEST, data.txt reads back as
+      DATA.TXT, and anything longer than 8.3 is refused outright.
+
+      Enabling it costs flash for the code-page conversion tables in
+      ffunicode.c (a few KB for CP437, the configured page), and RAM for a
+      static working buffer of (FS_LFN_MAX + 1) * 2 bytes. FILINFO.fname
+      grows to FS_LFN_MAX + 1, so a consumer that copies a dirent into a
+      fixed buffer -- VFS_NAME_MAX in vaios -- must grow it to match.
+
+      The buffer is static (FatFs FF_USE_LFN=1), which is not thread-safe;
+      that is sound here because the VFS worker is single-threaded. A
+      multi-threaded caller needs the stack or heap variants instead.
+
+      Default n so small builds stay small.
+
+config FS_LFN_MAX
+    int "Longest file name, in characters"
+    depends on FS_LFN
+    default 64
+    range 12 255
+    help
+      Sizes both the FatFs working buffer and FILINFO.fname. 255 is the
+      full LFN specification and costs 512 bytes of RAM; 64 covers real
+      names at a quarter of that.
+
 config DRV_SDIO_DMA
     bool "Enable DMA-backed SDIO async API"
     default y if DRV_SDIO && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)

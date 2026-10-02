@@ -82,6 +82,41 @@ def public_entry_points():
     return out
 
 
+PORT_DIR = os.path.join(REPO, "include", "port")
+
+
+def port_entry_points():
+    """{port: {symbol}} for every hal_* its headers declare.
+
+    The gate reads include/common, so a symbol declared only in a port header is
+    invisible to it. Most such symbols are real capability differences -- UART
+    over DMA and SDIO's async paths exist on the STM32 parts and nowhere else --
+    and demanding portable coverage of those would be demanding the ATmega grow
+    a DMA controller. They are listed, not failed.
+
+    A symbol EVERY port declares separately is the different case: that is a
+    common entry point wearing a port's clothes, and it belongs in
+    include/common/ where the gate can see it.
+    """
+    out = {}
+    if not os.path.isdir(PORT_DIR):
+        return out
+    for port in sorted(os.listdir(PORT_DIR)):
+        d = os.path.join(PORT_DIR, port)
+        if not os.path.isdir(d):
+            continue
+        syms = set()
+        for fn in sorted(os.listdir(d)):
+            if not fn.endswith(".h"):
+                continue
+            with open(os.path.join(d, fn), errors="replace") as f:
+                text = strip_directives(strip_comments(f.read()))
+            text = re.sub(r"\bstatic\s+inline\b[^;{]*\{", " ", text)
+            syms |= {m.group(1) for m in _DECL.finditer(text)}
+        out[port] = syms
+    return out
+
+
 def called_symbols(path):
     with open(path, errors="replace") as f:
         text = strip_comments(f.read())
@@ -152,6 +187,16 @@ def main():
     print(f"undeclared gaps     : {len(gaps)}")
     print(f"ops tables unchecked: {len(table_gaps)}")
 
+    ports = port_entry_points()
+    port_only = {p: (syms - set(public)) for p, syms in ports.items()}
+    everywhere = sorted(set.intersection(*port_only.values())) if port_only else []
+    specific = (sorted(set().union(*port_only.values()) - set(everywhere))
+                if port_only else [])
+    print(f"port-header only    : {len(specific) + len(everywhere)}")
+    for sym in specific:
+        who = ",".join(p for p, v in port_only.items() if sym in v)
+        print(f"      {sym:42s} {who}")
+
     if args.list:
         for sym in sorted(public):
             if sym in covered:
@@ -186,7 +231,16 @@ def main():
         print("\nAdd ASSERT_TABLE_COMPLETE for it, or a port can ship the "
               "table half-filled and link fine.")
 
-    if args.gate and (gaps or stale or table_gaps):
+    if everywhere:
+        print(f"\n{len(everywhere)} symbol(s) declared by EVERY port header:")
+        for sym in everywhere:
+            print(f"  {sym}")
+        print("\nEvery port declares these, so they are not a capability "
+              "difference:")
+        print("move them to include/common/, where the gate reads, and cover "
+              "them.")
+
+    if args.gate and (gaps or stale or table_gaps or everywhere):
         return 1
     return 0
 

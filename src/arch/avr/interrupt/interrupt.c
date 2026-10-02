@@ -63,14 +63,84 @@ static hal_status_t avr_interrupt_disable(hal_irq_t irq) {
   return HAL_ERR_NOT_SUPPORTED;
 }
 
+/* ---- Pending flags -----------------------------------------------------
+ *
+ * There is no central pending register: each vector's flag lives in its own
+ * peripheral. Two kinds of home, and the difference decides how to clear one:
+ *
+ *   flag-only registers (EIFR, PCIFR, TIFR0/1/2) hold nothing but write-1-to-
+ *     clear flags, so writing the single bit clears exactly that flag.
+ *   mixed registers (ADCSRA, ACSR, WDTCSR, UCSR0A) hold control bits too, so
+ *     the bit has to be OR'd in -- writing it alone would reconfigure or
+ *     disable the peripheral.
+ *
+ * Several vectors have no flag that can be cleared this way at all. Their
+ * flags clear as a side effect of reading or writing a data register -- USART
+ * RXC0 on reading UDR0, SPIF on reading SPSR then SPDR -- and TWINT, which is
+ * write-1-to-clear, also releases the TWI bus and starts the next operation,
+ * which is not something a generic "clear pending" may do. Those report
+ * HAL_ERR_NOT_SUPPORTED rather than pretending. */
+
+typedef struct {
+  volatile uint8_t *reg; /**< Where the flag lives, NULL if it has none. */
+  uint8_t mask;          /**< The flag's bit. */
+  bool flag_only;        /**< Register holds only w1c flags. */
+  bool clearable;        /**< Clearable without a side effect. */
+} avr_irq_flag_t;
+
+static bool _flag_of(hal_irq_t irq, avr_irq_flag_t *f) {
+  switch (irq) {
+  case HAL_IRQ_INT0:         *f = (avr_irq_flag_t){&EIFR,   1u << INTF0, true,  true};  return true;
+  case HAL_IRQ_INT1:         *f = (avr_irq_flag_t){&EIFR,   1u << INTF1, true,  true};  return true;
+  case HAL_IRQ_PCINT0:       *f = (avr_irq_flag_t){&PCIFR,  1u << PCIF0, true,  true};  return true;
+  case HAL_IRQ_PCINT1:       *f = (avr_irq_flag_t){&PCIFR,  1u << PCIF1, true,  true};  return true;
+  case HAL_IRQ_PCINT2:       *f = (avr_irq_flag_t){&PCIFR,  1u << PCIF2, true,  true};  return true;
+  case HAL_IRQ_WDT:          *f = (avr_irq_flag_t){&WDTCSR, 1u << WDIF,  false, true};  return true;
+  case HAL_IRQ_TIMER2_COMPA: *f = (avr_irq_flag_t){&TIFR2,  1u << OCF2A, true,  true};  return true;
+  case HAL_IRQ_TIMER2_COMPB: *f = (avr_irq_flag_t){&TIFR2,  1u << OCF2B, true,  true};  return true;
+  case HAL_IRQ_TIMER2_OVF:   *f = (avr_irq_flag_t){&TIFR2,  1u << TOV2,  true,  true};  return true;
+  case HAL_IRQ_TIMER1_CAPT:  *f = (avr_irq_flag_t){&TIFR1,  1u << ICF1,  true,  true};  return true;
+  case HAL_IRQ_TIMER1_COMPA: *f = (avr_irq_flag_t){&TIFR1,  1u << OCF1A, true,  true};  return true;
+  case HAL_IRQ_TIMER1_COMPB: *f = (avr_irq_flag_t){&TIFR1,  1u << OCF1B, true,  true};  return true;
+  case HAL_IRQ_TIMER1_OVF:   *f = (avr_irq_flag_t){&TIFR1,  1u << TOV1,  true,  true};  return true;
+  case HAL_IRQ_TIMER0_COMPA: *f = (avr_irq_flag_t){&TIFR0,  1u << OCF0A, true,  true};  return true;
+  case HAL_IRQ_TIMER0_COMPB: *f = (avr_irq_flag_t){&TIFR0,  1u << OCF0B, true,  true};  return true;
+  case HAL_IRQ_TIMER0_OVF:   *f = (avr_irq_flag_t){&TIFR0,  1u << TOV0,  true,  true};  return true;
+  case HAL_IRQ_ADC:          *f = (avr_irq_flag_t){&ADCSRA, 1u << ADIF,  false, true};  return true;
+  case HAL_IRQ_ANALOG_COMP:  *f = (avr_irq_flag_t){&ACSR,   1u << ACI,   false, true};  return true;
+  case HAL_IRQ_USART_TX:     *f = (avr_irq_flag_t){&UCSR0A, 1u << TXC0,  false, true};  return true;
+  /* Readable, but not clearable on their own terms. */
+  case HAL_IRQ_SPI_STC:      *f = (avr_irq_flag_t){&SPSR,   1u << SPIF,  false, false}; return true;
+  case HAL_IRQ_USART_RX:     *f = (avr_irq_flag_t){&UCSR0A, 1u << RXC0,  false, false}; return true;
+  case HAL_IRQ_USART_UDRE:   *f = (avr_irq_flag_t){&UCSR0A, 1u << UDRE0, false, false}; return true;
+  case HAL_IRQ_TWI:          *f = (avr_irq_flag_t){&TWCR,   1u << TWINT, false, false}; return true;
+  /* No flag at all: both are level conditions, not latched events. */
+  case HAL_IRQ_EE_READY:
+  case HAL_IRQ_SPM_READY:
+  default:                   return false;
+  }
+}
+
 static hal_status_t avr_interrupt_clear_pending(hal_irq_t irq) {
-  (void)irq;
-  return HAL_ERR_NOT_SUPPORTED;
+  avr_irq_flag_t f;
+  if (!irq_in_range(irq) || !_flag_of(irq, &f))
+    return HAL_ERR_INVALID_ARG;
+  if (!f.clearable)
+    return HAL_ERR_NOT_SUPPORTED;
+  if (f.flag_only)
+    *f.reg = f.mask; /* the other bits are flags too: writing 0 leaves them */
+  else
+    *f.reg |= f.mask; /* control bits share the register and must survive */
+  return HAL_OK;
 }
 
 static bool avr_interrupt_is_pending(hal_irq_t irq) {
-  (void)irq;
-  return false;
+  avr_irq_flag_t f;
+  if (!irq_in_range(irq) || !_flag_of(irq, &f))
+    return false; /* no flag exists; not the same as "not pending", but a bool
+                   * cannot say so and the vectors without one are level
+                   * conditions that are never latched */
+  return (*f.reg & f.mask) != 0u;
 }
 
 /* ---- Priority: the AVR has none; accept and ignore --------------------- */
@@ -122,7 +192,18 @@ static void avr_interrupt_enable_global(uint32_t state) {
 }
 
 static void avr_interrupt_clear_all_pending(void) {
-  /* No NVIC-style "clear all pending" register exists on the AVR. */
+  /* No single register does it, so clear the flag-only registers, which is
+   * every latched external and timer event. Deliberately not included: TWINT,
+   * because clearing it releases the TWI bus mid-transfer; the USART and SPI
+   * flags, which clear by touching their data registers; and ADIF/ACI/WDIF,
+   * which share a register with control bits and so would need a
+   * read-modify-write each -- hal_interrupt_clear_pending does those one at a
+   * time, where the caller has asked for that one. */
+  EIFR = (1u << INTF0) | (1u << INTF1);
+  PCIFR = (1u << PCIF0) | (1u << PCIF1) | (1u << PCIF2);
+  TIFR0 = (1u << OCF0A) | (1u << OCF0B) | (1u << TOV0);
+  TIFR1 = (1u << ICF1) | (1u << OCF1A) | (1u << OCF1B) | (1u << TOV1);
+  TIFR2 = (1u << OCF2A) | (1u << OCF2B) | (1u << TOV2);
 }
 
 /** @brief The AVR interrupt backend. */

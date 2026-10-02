@@ -24,6 +24,11 @@ import os, re, sys
 
 ROOTS = ("src/vendor", "src/arch")
 CALL = re.compile(r"hal_interrupt_attach_callback\s*\(\s*([^,]+?)\s*,")
+# A module defining another module's vector is the same violation from the other
+# direction, and the one that is easy to miss: src/arch carried a weak empty
+# DMA1_Stream6_IRQHandler for a year. A system exception has no owner here, so
+# an unmatched name is simply skipped, as with an attach the table does not name.
+DEFN = re.compile(r"^\s*(?:__attribute__\(\(weak\)\)\s*)?void\s+([A-Z][A-Za-z0-9_]*)_IRQHandler\s*\(void\)", re.M)
 
 # IRQ-name prefix -> the module directory that owns it.
 OWNER = [
@@ -54,15 +59,26 @@ def module_of(path):
     return parts[-2] if len(parts) >= 2 else ""
 
 def main():
-    violations, unresolved, checked = [], [], 0
+    violations, unresolved, defined, checked = [], [], [], 0
     for root in ROOTS:
         for dirpath, _, files in os.walk(root):
             for fn in files:
                 if not fn.endswith(".c"):
                     continue
                 path = os.path.join(dirpath, fn)
-                # the interrupt backend is where the table lives
-                if os.sep + "interrupt" + os.sep in path:
+                # the interrupt backend is where the table lives, so an attach
+                # there is expected -- but a vector definition is not.
+                skip_attach = os.sep + "interrupt" + os.sep in path
+                with open(path, errors="replace") as fh:
+                    body = fh.read()
+                for m in DEFN.finditer(body):
+                    vec = m.group(1)
+                    own = owner_of(vec + "_IRQn")
+                    mod = module_of(path)
+                    if own is not None and own != mod:
+                        n = body.count("\n", 0, m.start()) + 1
+                        defined.append((path, n, vec, own, mod))
+                if skip_attach:
                     continue
                 with open(path, errors="replace") as fh:
                     for n, line in enumerate(fh, 1):
@@ -83,6 +99,15 @@ def main():
     print(f"  IRQ not a literal (reported, not failed) : {len(unresolved)}")
     for path, n, arg, mod in unresolved:
         print(f"      {path}:{n}  {arg}  (in {mod})")
+    print(f"vector definitions in a module that does not own them : {len(defined)}")
+    if defined:
+        print()
+        for path, n, vec, own, mod in defined:
+            print(f"  {path}:{n}")
+            print(f"      defines {vec}_IRQHandler, owned by {own}, from {mod}")
+            print(f"      move it to src/vendor/*/{own}/ -- the module that")
+            print(f"      services the peripheral clears its own flags")
+        return 1
     if violations:
         print(f"\n{len(violations)} module(s) reaching into another's vector:")
         for path, n, arg, own, mod in violations:

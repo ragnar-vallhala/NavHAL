@@ -272,7 +272,6 @@ __attribute__((weak)) void MemManage_Handler(void) {}
 __attribute__((weak)) void BusFault_Handler(void) {}
 __attribute__((weak)) void UsageFault_Handler(void) {}
 __attribute__((weak)) void DebugMon_Handler(void) {}
-__attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 
 /* USART vectors are this MCU's, not the core's, so they are defined by the
  * vendor's UART backend rather than here. */

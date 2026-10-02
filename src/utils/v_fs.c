@@ -149,6 +149,35 @@ int v_unlink(const char *path) {
   return -(int)res;
 }
 
+int v_rename(const char *from, const char *to) {
+  if (from == NULL || to == NULL)
+    return -1;
+  FRESULT res = f_rename(from, to);
+  if (res == FR_OK)
+    return 0;
+  return -(int)res;
+}
+
+int v_getfree(const char *drive, uint32_t *total_kib, uint32_t *free_kib) {
+  DWORD nfree = 0;
+  FATFS *fs = NULL;
+  FRESULT res = f_getfree(drive ? drive : "", &nfree, &fs);
+  if (res != FR_OK)
+    return -(int)res;
+#if FF_MAX_SS == FF_MIN_SS
+  const uint64_t sector = FF_MAX_SS;
+#else
+  const uint64_t sector = fs->ssize;
+#endif
+  /* n_fatent counts the two reserved FAT entries; the rest are data clusters */
+  uint64_t per_cluster = (uint64_t)fs->csize * sector;
+  if (total_kib)
+    *total_kib = (uint32_t)((uint64_t)(fs->n_fatent - 2) * per_cluster / 1024u);
+  if (free_kib)
+    *free_kib = (uint32_t)((uint64_t)nfree * per_cluster / 1024u);
+  return 0;
+}
+
 int v_sync(v_fd_t fd) {
   if (fd < 0 || fd >= MAX_OPEN_FILES || !file_in_use[fd])
     return -1;

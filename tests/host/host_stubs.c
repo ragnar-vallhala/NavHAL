@@ -25,6 +25,7 @@
  */
 
 #include "common/hal_status.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include <stdint.h>
 
@@ -39,5 +40,24 @@ hal_status_t hal_interrupt_enable(hal_irq_t irq) {
 }
 hal_status_t hal_interrupt_disable(hal_irq_t irq) {
   (void)irq;
+  return HAL_OK;
+}
+
+/* The drivers under test own their vectors, so linking one pulls in the
+ * registry it dispatches through. There is no NVIC here and no way for a host
+ * suite to raise an interrupt, so these only have to exist: what the suite
+ * checks against the simulated MMIO is the register writes around them --
+ * IDLEIE set on attach, cleared on detach. */
+void hal_interrupt_dispatch(hal_irq_t irq) { (void)irq; }
+
+hal_status_t hal_interrupt_attach_callback(hal_irq_t irq, void (*cb)(void)) {
+  (void)irq;
+  (void)cb;
+  return HAL_OK;
+}
+
+hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq, uint8_t prio) {
+  (void)irq;
+  (void)prio;
   return HAL_OK;
 }

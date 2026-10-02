@@ -152,7 +152,18 @@ void hal_interrupt_enable_global(uint32_t state);
 uint32_t hal_interrupt_disable_global(void);
 
 /**
- * @brief Clear the pending flag of every NVIC interrupt.
+ * @brief Leave nothing pending.
+ *
+ * The result is the contract -- after this call, no line is pending -- and how
+ * a port reaches it is its own business. An NVIC clears the lot with three
+ * ICPR writes; a part whose flags live in their peripherals walks them. A
+ * portable loop in this layer would have cost the NVIC up to 82 iterations for
+ * nothing, which is why this is a port op rather than a derived one.
+ *
+ * Flags that cannot be cleared without a side effect are left alone, and
+ * ::hal_interrupt_clear_pending names them one at a time: the AVR's TWINT
+ * releases the TWI bus when written, and the USART and SPI flags clear by
+ * reading their data registers.
  */
 void hal_interrupt_clear_all_pending(void);
 

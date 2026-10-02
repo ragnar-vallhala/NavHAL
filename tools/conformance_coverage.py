@@ -48,8 +48,20 @@ _DECL = re.compile(
     r"(?<![\w*])(?<!\(\*)(hal_[a-z0-9_]+)\s*\([^;{)]*\)?[^;{]*;", re.S)
 
 
+# A function-like macro is not an entry point, and leaving it in costs more than
+# a false positive: `#define hal_uart_print(uart, val) _Generic(...)` ends without
+# a semicolon, so _DECL -- which spans newlines -- ran from the macro name to the
+# next `;` anywhere below, swallowing the real declarations in between and
+# reporting the macro in their place. Directives go before matching.
+_DIRECTIVE = re.compile(r"^[ \t]*#(?:[^\n\\]|\\\n|\\[^\n])*", re.M)
+
+
 def strip_comments(text):
     return _COMMENT.sub(" ", text)
+
+
+def strip_directives(text):
+    return _DIRECTIVE.sub(" ", text)
 
 
 def public_entry_points():
@@ -63,6 +75,7 @@ def public_entry_points():
             text = strip_comments(f.read())
         # Drop inline definitions before matching: a body means the port does
         # not supply it, so it is not part of the surface a port implements.
+        text = strip_directives(text)
         text = re.sub(r"\bstatic\s+inline\b[^;{]*\{", " ", text)
         for m in _DECL.finditer(text):
             out.setdefault(m.group(1), fn)

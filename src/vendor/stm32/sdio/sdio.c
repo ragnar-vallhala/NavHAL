@@ -16,14 +16,19 @@
  */
 
 #include "board.h"
+#include "common/hal_sdio.h"
 #include "navhal_port_sdio.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
 #include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include "family/rcc_reg.h"
+#include "common/hal_timer.h"
 #include "navhal_port_timer.h"
-// #include "navhal_port_uart.h"
+// #include "common/hal_uart.h"
+#include "navhal_port_uart.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -699,6 +704,7 @@ uint32_t hal_sdio_get_sector_count(void) {
 }
 
 #if NAVHAL_CONFIG_DRV_SDIO_DMA
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
 // #include "navhal_port_uart.h"
 

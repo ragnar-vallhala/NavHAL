@@ -32,8 +32,11 @@
 #include "board.h"
 #include "internal/hal_uart_ops.h"
 #include "internal/hal_uart_dma_ops.h"
+#include "common/hal_uart.h"
 #include "navhal_port_uart.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
 #include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
@@ -41,6 +44,7 @@
 #include "family/uart_reg.h"
 #include <stdint.h>
 #if NAVHAL_CONFIG_DRV_UART_DMA
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
 #endif
 

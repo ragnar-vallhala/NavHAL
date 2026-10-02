@@ -27,8 +27,10 @@
  */
 
 #include "internal/hal_pwm_ops.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
+#include "common/hal_timer.h"
 #include "navhal_port_timer.h"
 #include <stdint.h>
 

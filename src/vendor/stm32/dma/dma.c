@@ -29,6 +29,7 @@
 #include "navhal_port_config.h"
 #if NAVHAL_CONFIG_DRV_DMA
 
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
 #include "family/dma_reg.h"
 #include "common/hal_interrupt.h"

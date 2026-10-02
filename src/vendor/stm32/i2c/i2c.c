@@ -33,6 +33,7 @@
 #include "internal/hal_i2c_ops.h"
 #include "internal/hal_i2c_dma_ops.h"
 #include "navhal_port_i2c.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "family/i2c_reg.h"
 #include "family/rcc_reg.h"

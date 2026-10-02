@@ -28,6 +28,6 @@
 #ifndef NAVHAL_PORT_TIMER_H
 #define NAVHAL_PORT_TIMER_H
 
-#include "common/hal_timer.h"
+#include "common/hal_timer_types.h"
 
 #endif /* NAVHAL_PORT_TIMER_H */

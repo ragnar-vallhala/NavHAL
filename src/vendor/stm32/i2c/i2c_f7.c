@@ -37,7 +37,9 @@
 #include "internal/hal_i2c_ops.h"
 #include "internal/hal_i2c_dma_ops.h"
 #include "board.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
 #include "family/i2c_reg.h"
@@ -229,6 +231,7 @@ static hal_status_t stm32f7_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
  * fires the caller's callback.
  *===========================================================================*/
 #if NAVHAL_CONFIG_DRV_I2C_DMA
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
 #include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"

@@ -30,6 +30,7 @@
 #if NAVHAL_CONFIG_DRV_SDIO
 
 #include "family/sdio_reg.h"
+#include "common/hal_sdio.h"
 #include "navhal_port_sdio.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"

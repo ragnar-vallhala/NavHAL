@@ -47,6 +47,7 @@
 #include "family/rcc_reg.h"
 #include "navhal_port_eth.h"
 #include "board.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
 #include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"

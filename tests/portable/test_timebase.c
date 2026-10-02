@@ -20,6 +20,7 @@
  * @brief Standardized hal_timebase_* API tests.
  */
 
+#include "common/hal_timer.h"
 #include "navhal_port_timer.h"
 #include "navtest/navtest.h"
 #include "test_timebase.h"

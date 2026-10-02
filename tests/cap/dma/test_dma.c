@@ -25,6 +25,7 @@
 #include "common/hal_features.h"
 #if NAVHAL_CONFIG_DRV_DMA
 
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
 #include "family/rcc_reg.h"
 #include "navtest/navtest.h"

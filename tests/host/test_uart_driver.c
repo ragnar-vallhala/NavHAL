@@ -24,6 +24,7 @@
  */
 
 #include "host_mmio.h"
+#include "common/hal_uart.h"
 #include "navhal_port_uart.h"
 #include "family/uart_reg.h"
 #include "family/rcc_reg.h"

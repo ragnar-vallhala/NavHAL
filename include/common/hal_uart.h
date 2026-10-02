@@ -38,6 +38,7 @@
  */
 
 #include "common/hal_status.h"
+#include "common/hal_uart_types.h"
 #include "common/navhal_compiler.h"
 #include "utils/uart_types.h" /* port-resolved ::hal_uart_t instance enum */
 #include <stdbool.h>
@@ -48,10 +49,6 @@
 extern "C" {
 #endif
 
-/** @brief UART configuration passed to ::hal_uart_init. */
-typedef struct {
-  uint32_t baudrate; /**< Baud rate in bits per second. */
-} hal_uart_config_t;
 
 /**
  * @brief Initialize a UART peripheral (8N1, transmitter + receiver enabled).
@@ -154,6 +151,15 @@ uint32_t hal_uart_read_until(hal_uart_t uart, char *buffer, uint32_t maxlen,
 /* Port-specific bits: DMA-backed API behind @c NAVHAL_CONFIG_DRV_DMA, compat shim. */
 #if NAVHAL_CONFIG_DRV_UART
 #include "navhal_port_uart.h"
+
+/* The deprecated-name shims are static inline wrappers over the API above,
+ * so they are included here rather than from the port header: a wrapper
+ * cannot be defined before the function it forwards to is declared, and
+ * reaching back for the API from inside the port header is what made this
+ * include graph circular. */
+#if defined(NAVHAL_PORT_UART_COMPAT)
+#include "compat/uart_compat.h"
+#endif
 #endif
 
 

@@ -26,7 +26,9 @@
  */
 
 #include "test_uart_protocol.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
+#include "common/hal_uart.h"
 #include "navhal_port_uart.h"
 #include "family/uart_reg.h"
 #include "navtest/navtest.h"

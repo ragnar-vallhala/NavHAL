@@ -310,22 +310,100 @@ const hal_uart_dma_ops_t _hal_uart_dma_ops = {
 };
 
 
+#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
+
 /* ---------------------------------------------------------------------------
- * USART interrupt vectors.
- *
- * Named by this MCU's vector table, so they belong with the driver that owns
- * the peripheral rather than in the shared arch interrupt file. Each hands
- * off to the registry so a caller's attached callback runs.
+ * USART interrupt vectors. Outside the UART-DMA guard deliberately -- see the
+ * F4 driver for why. Slot 39 (USART3) is the Nucleo-F767ZI console: the F767
+ * vector table has always named the handler, and for a while nothing defined
+ * it, so it resolved to the weak Default_Handler alias.
  * ------------------------------------------------------------------------- */
 void USART1_IRQHandler(void) { hal_interrupt_dispatch(USART1_IRQn); }
 void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }
-/* Slot 39. The F767 vector table has always named this handler, but nothing
- * defined it, so it resolved to the weak Default_Handler alias and an
- * interrupt-driven USART3 -- the Nucleo-F767ZI console -- dispatched nowhere. */
 void USART3_IRQHandler(void) { hal_interrupt_dispatch(USART3_IRQn); }
 void USART6_IRQHandler(void) { hal_interrupt_dispatch(USART6_IRQn); }
 
-#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
+/* ---------------------------------------------------------------------------
+ * Idle-line callback.
+ *
+ * Same contract as the F4, different clear: the F7 status register is
+ * read-only and a flag is cleared by writing 1 to its ICR bit, where the F4
+ * needed a read of SR followed by a read of DR. The write-1-to-clear is the
+ * safer of the two -- the F4's dummy DR read would steal a byte that arrived
+ * between the two reads, which is why that port clears before arming.
+ * ------------------------------------------------------------------------- */
+
+/** UART -> index into the per-UART table (UART1=0, UART2=1, UART3=2, UART6=3). */
+static inline int _uart_idx(hal_uart_t uart) {
+  return (uart == HAL_UART_1)   ? 0
+         : (uart == HAL_UART_3) ? 2
+         : (uart == HAL_UART_6) ? 3
+                                : 1;
+}
+
+static void (*_uart_idle_cb[4])(void) = {0};
+
+static void _uart_idle_handle(hal_uart_t uart) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  if (!usart)
+    return;
+  if (usart->ISR & USART_ISR_IDLE) {
+    usart->ICR = USART_ICR_IDLECF;
+    void (*cb)(void) = _uart_idle_cb[_uart_idx(uart)];
+    if (cb)
+      cb();
+  }
+}
+
+/* The interrupt registry takes a void(void) callback, so one thin trampoline
+ * per USART line carries the UART identity. */
+static void _uart_idle_irq_usart1(void) { _uart_idle_handle(HAL_UART_1); }
+static void _uart_idle_irq_usart2(void) { _uart_idle_handle(HAL_UART_2); }
+static void _uart_idle_irq_usart3(void) { _uart_idle_handle(HAL_UART_3); }
+static void _uart_idle_irq_usart6(void) { _uart_idle_handle(HAL_UART_6); }
+
+hal_status_t hal_uart_attach_idle_callback(hal_uart_t uart,
+                                           void (*callback)(void)) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  if (!usart || !callback)
+    return HAL_ERR_INVALID_ARG;
+
+  hal_irq_t irq;
+  void (*trampoline)(void);
+  if (uart == HAL_UART_1) {
+    irq = USART1_IRQn;
+    trampoline = _uart_idle_irq_usart1;
+  } else if (uart == HAL_UART_3) {
+    irq = USART3_IRQn;
+    trampoline = _uart_idle_irq_usart3;
+  } else if (uart == HAL_UART_6) {
+    irq = USART6_IRQn;
+    trampoline = _uart_idle_irq_usart6;
+  } else {
+    irq = USART2_IRQn;
+    trampoline = _uart_idle_irq_usart2;
+  }
+
+  _uart_idle_cb[_uart_idx(uart)] = callback;
+  hal_interrupt_attach_callback(irq, trampoline);
+
+  usart->ICR = USART_ICR_IDLECF; /* drop a stale IDLE before arming */
+  usart->CR1 |= USART_CR1_IDLEIE;
+
+  /* Maskable (BASEPRI-managed) priority so the callback may call an RTOS
+   * *_from_isr primitive -- same contract as the DMA-completion ISRs. */
+  hal_interrupt_enable_with_priority(irq, HAL_IRQ_PRIORITY_DEFAULT);
+  return HAL_OK;
+}
+
+hal_status_t hal_uart_detach_idle_callback(hal_uart_t uart) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  if (!usart)
+    return HAL_ERR_INVALID_ARG;
+  usart->CR1 &= ~USART_CR1_IDLEIE;
+  _uart_idle_cb[_uart_idx(uart)] = NULL;
+  return HAL_OK;
+}
 
 /** @brief The F7 UART primitives; every derived write lives in the shared layer. */
 const hal_uart_ops_t _hal_uart_ops = {

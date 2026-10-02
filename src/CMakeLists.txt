@@ -84,6 +84,13 @@ if(CONFIG_DRV_SDIO)
         ${CMAKE_CURRENT_SOURCE_DIR}/utils/fatfs/diskio.c
         ${CMAKE_CURRENT_SOURCE_DIR}/utils/fatfs/ff.c
     )
+    # Only with LFN on: it carries the code-page conversion tables, and with
+    # short names FatFs never calls them.
+    if(CONFIG_FS_LFN)
+        list(APPEND COMMON_SOURCES
+            ${CMAKE_CURRENT_SOURCE_DIR}/utils/fatfs/ffunicode.c
+        )
+    endif()
 endif()
 
 add_library(common OBJECT ${COMMON_SOURCES})

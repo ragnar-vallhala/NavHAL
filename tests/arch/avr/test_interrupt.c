@@ -32,6 +32,7 @@
 #include "test_interrupt.h"
 #include "navhal.h"
 #include <avr/io.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 /* Force a Timer1 overflow within two counts rather than waiting out 65536 of
@@ -102,11 +103,66 @@ void test_avr_clear_pending_rejects_a_flagless_vector(void) {
   TEST_ASSERT_TRUE(!hal_interrupt_is_pending(HAL_IRQ_EE_READY));
 }
 
+/* Per-interrupt enable lives in the peripheral that raises it -- there is no
+ * NVIC -- so Timer1 overflow means TOIE1 in TIMSK1. */
+void test_avr_enable_sets_the_peripheral_mask_bit(void) {
+  TIMSK1 = 0;
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK, (uint32_t)hal_interrupt_enable(HAL_IRQ_TIMER1_OVF));
+  TEST_ASSERT_BITS_HIGH(1u << TOIE1, TIMSK1);
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK, (uint32_t)hal_interrupt_disable(HAL_IRQ_TIMER1_OVF));
+  TEST_ASSERT_BITS_LOW(1u << TOIE1, TIMSK1);
+}
+
+/* Does this environment model write-1-to-clear, or does it store the byte?
+ *
+ * The discriminator is a write of ZERO to a flag that is genuinely set: on
+ * silicon only a 1 clears, so the flag stands; a model that treats the register
+ * as storage clears it. Measured on both simulators available here -- simavr and
+ * avr-gdb's built-in one -- and both store, which is why this cannot simply
+ * assert, and why NAVTEST_SKIP_ON_PIL is no help: that probes the Cortex DWT and
+ * is a no-op on this part. The semantics are probed instead of the environment,
+ * so the case runs wherever the semantics are real.
+ */
+static bool _w1c_is_modelled(void) {
+  _overflow_timer1(); /* raises TOV1 for real, by running the timer */
+  TIFR1 = 0x00u;      /* hardware ignores a zero write */
+  bool faithful = (TIFR1 & (uint8_t)(1u << TOV1)) != 0u;
+  TIFR1 = (uint8_t)(1u << TOV1); /* leave nothing pending either way */
+  return faithful;
+}
+
+/* Clearing one flag must leave its neighbours in the same register standing --
+ * the difference between a single-bit write and a careless read-modify-write. */
+void test_avr_clear_pending_leaves_neighbours_standing(void) {
+  if (!_w1c_is_modelled()) {
+    TEST_ASSERT_TRUE(1); /* the environment cannot answer; not a failure */
+    return;
+  }
+
+  OCR1A = 0xFFFFu; /* so TCNT1 passing 0xFFFF raises OCF1A alongside TOV1 */
+  _overflow_timer1();
+  if ((TIFR1 & (uint8_t)(1u << OCF1A)) == 0u) {
+    TEST_ASSERT_TRUE(1); /* could not stage the neighbour */
+    return;
+  }
+
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_interrupt_clear_pending(HAL_IRQ_TIMER1_OVF));
+  TEST_ASSERT_BITS_LOW((uint8_t)(1u << TOV1), TIFR1);
+  TEST_ASSERT_BITS_HIGH((uint8_t)(1u << OCF1A), TIFR1);
+  TIFR1 = (uint8_t)(1u << OCF1A); /* tidy up */
+}
+
 NAVTEST_CASE_DECL(test_avr_is_pending_sees_a_latched_flag);
 NAVTEST_CASE_DECL(test_avr_clear_pending_clears_one_flag);
 NAVTEST_CASE_DECL(test_avr_clear_all_pending_clears_the_latched_flags);
 NAVTEST_CASE_DECL(test_avr_clear_pending_refuses_a_side_effect_flag);
 NAVTEST_CASE_DECL(test_avr_clear_pending_rejects_a_flagless_vector);
+NAVTEST_CASE_DECL(test_avr_enable_sets_the_peripheral_mask_bit);
+NAVTEST_CASE_DECL(test_avr_clear_pending_leaves_neighbours_standing);
 
 static const navtest_case_t avr_interrupt_cases[] = {
     NAVTEST_CASE(test_avr_is_pending_sees_a_latched_flag),
@@ -114,6 +170,8 @@ static const navtest_case_t avr_interrupt_cases[] = {
     NAVTEST_CASE(test_avr_clear_all_pending_clears_the_latched_flags),
     NAVTEST_CASE(test_avr_clear_pending_refuses_a_side_effect_flag),
     NAVTEST_CASE(test_avr_clear_pending_rejects_a_flagless_vector),
+    NAVTEST_CASE(test_avr_enable_sets_the_peripheral_mask_bit),
+    NAVTEST_CASE(test_avr_clear_pending_leaves_neighbours_standing),
 };
 
 const navtest_suite_t test_avr_interrupt_suite = {

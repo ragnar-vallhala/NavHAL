@@ -22,6 +22,10 @@
 
 #include "navtest/navtest.h"
 
+void test_avr_enable_sets_the_peripheral_mask_bit(void);
+
+void test_avr_clear_pending_leaves_neighbours_standing(void);
+
 extern const navtest_suite_t test_avr_interrupt_suite;
 
 #endif /* NAVTEST_ARCH_AVR_TEST_INTERRUPT_H */

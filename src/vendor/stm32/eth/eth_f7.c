@@ -283,8 +283,15 @@ hal_status_t hal_eth_get_mac_address(uint8_t mac[HAL_ETH_MAC_ADDR_LEN]) {
   return HAL_OK;
 }
 
-hal_status_t hal_eth_set_callback(hal_eth_callback_t callback) {
+hal_status_t hal_eth_attach_callback(hal_eth_callback_t callback) {
+  if (callback == NULL)
+    return HAL_ERR_INVALID_ARG;
   _cb = callback;
+  return HAL_OK;
+}
+
+hal_status_t hal_eth_detach_callback(void) {
+  _cb = NULL;
   return HAL_OK;
 }
 

@@ -179,8 +179,8 @@ static void sdio_test_cb(hal_sdio_error_t err) {
 
 void test_hal_sdio_set_callback_smoke(void) {
   s_sdio_cb_hits = 0;
-  hal_sdio_set_callback(sdio_test_cb);
-  hal_sdio_set_callback(NULL); /* re-clear */
+  hal_sdio_attach_callback(sdio_test_cb);
+  hal_sdio_detach_callback(); /* re-clear */
   TEST_ASSERT_TRUE(1);
 }
 

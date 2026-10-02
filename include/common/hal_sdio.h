@@ -46,6 +46,11 @@
 
 #include "common/hal_config.h" /* NAVHAL_CONFIG_DRV_SDIO: force-included, or pulled here when reachable */
 #include <stdbool.h>
+/* hal_status_t and NAVHAL_DEPRECATED arrived with the attach/detach pair:
+ * every callback function here used to return void. */
+#include "common/hal_status.h"
+#include "common/navhal_compiler.h"
+#include <stddef.h>
 #include <stdint.h>
 
 
@@ -119,7 +124,24 @@ typedef void (*hal_sdio_callback_t)(hal_sdio_error_t error);
  * @brief Set the callback for asynchronous SDIO operations.
  * @param callback Function invoked when an async operation completes.
  */
-void hal_sdio_set_callback(hal_sdio_callback_t callback);
+/**
+ * @brief Attach the completion callback for asynchronous SDIO operations.
+ * @param callback Non-NULL; pass ::hal_sdio_detach_callback to clear.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
+ */
+hal_status_t hal_sdio_attach_callback(hal_sdio_callback_t callback);
+
+/** @brief Clear the completion callback. @return ::HAL_OK. */
+hal_status_t hal_sdio_detach_callback(void);
+
+/** @deprecated Use ::hal_sdio_attach_callback / ::hal_sdio_detach_callback. */
+NAVHAL_DEPRECATED("use hal_sdio_attach_callback")
+static inline void hal_sdio_set_callback(hal_sdio_callback_t callback) {
+  if (callback == NULL)
+    (void)hal_sdio_detach_callback();
+  else
+    (void)hal_sdio_attach_callback(callback);
+}
 
 /**
  * @brief Initialize the SDIO peripheral and its GPIOs.

@@ -109,7 +109,7 @@ void test_usb_cdc_break_is_zero_without_host(void) {
 
 void test_usb_cdc_rx_callback_accepts_null(void) {
   /* NULL is how a caller detaches. */
-  TEST_ASSERT_EQUAL_UINT32(HAL_OK, hal_usb_cdc_set_rx_callback(NULL));
+  TEST_ASSERT_EQUAL_UINT32(HAL_OK, hal_usb_cdc_detach_rx_callback());
 }
 
 void test_usb_cdc_init_requires_48mhz(void) {

@@ -37,10 +37,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-/** @deprecated Use hal_sdio_set_callback(). */
-NAVHAL_DEPRECATED("use hal_sdio_set_callback")
+/** @deprecated Use hal_sdio_attach_callback(). */
+NAVHAL_DEPRECATED("use hal_sdio_attach_callback")
 static inline void sdio_set_callback(hal_sdio_callback_t callback) {
-  hal_sdio_set_callback(callback);
+  /* Current name, not hal_sdio_set_callback, which is deprecated itself. */
+  if (callback == NULL)
+    (void)hal_sdio_detach_callback();
+  else
+    (void)hal_sdio_attach_callback(callback);
 }
 
 /** @deprecated Use hal_sdio_init(). */

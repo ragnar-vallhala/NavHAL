@@ -82,10 +82,16 @@ static inline uint32_t hal_get_micros(void) {
   return hal_timebase_get_micros();
 }
 
-/** @deprecated Use hal_timebase_set_callback(). */
-NAVHAL_DEPRECATED("use hal_timebase_set_callback")
+/** @deprecated Use hal_timebase_attach_callback(). */
+NAVHAL_DEPRECATED("use hal_timebase_attach_callback")
 static inline void hal_systick_set_callback(hal_timebase_callback_t cb) {
-  hal_timebase_set_callback(cb);
+  /* Points at the current name, not at hal_timebase_set_callback, which is
+   * itself deprecated now -- a chain of shims sends a caller from one
+   * deprecation to the next. */
+  if (cb == NULL)
+    (void)hal_timebase_detach_callback();
+  else
+    (void)hal_timebase_attach_callback(cb);
 }
 
 

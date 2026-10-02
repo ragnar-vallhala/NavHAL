@@ -869,6 +869,12 @@ void test_conformance_eth_rejects_null(void) {
   /* init/start/stop are not called: with no PHY attached they wait on a link
    * that never comes up. */
 }
+/* Attaching NULL is an argument error now that clearing has its own call; the
+ * old set_callback(NULL) had to mean "clear", so neither could be asserted. */
+void test_conformance_eth_attach_callback_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_eth_attach_callback(NULL));
+}
+
 #endif /* NAVHAL_CONFIG_DRV_ETH */
 
 #if NAVHAL_CONFIG_DRV_SDIO
@@ -881,6 +887,12 @@ void test_conformance_sdio_rejects_null(void) {
   TEST_ASSERT_EQUAL_UINT32(0u, hal_sdio_get_sector_count());
   /* card_init, wait_flag and wait_sync all block without a card. */
 }
+/* Attaching NULL is an argument error now that clearing has its own call; the
+ * old set_callback(NULL) had to mean "clear", so neither could be asserted. */
+void test_conformance_sdio_attach_callback_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_sdio_attach_callback(NULL));
+}
+
 #endif /* NAVHAL_CONFIG_DRV_SDIO */
 
 #if NAVHAL_CONFIG_DRV_USB_CDC
@@ -902,6 +914,12 @@ void test_conformance_usb_cdc_reports_disconnected(void) {
     TEST_ASSERT_EQUAL_UINT32(0u, (uint32_t)hal_usb_cdc_available());
   }
 }
+/* Attaching NULL is an argument error now that clearing has its own call; the
+ * old set_callback(NULL) had to mean "clear", so neither could be asserted. */
+void test_conformance_usb_cdc_attach_rx_callback_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_usb_cdc_attach_rx_callback(NULL));
+}
+
 #endif /* NAVHAL_CONFIG_DRV_USB_CDC */
 
 #if NAVHAL_CONFIG_DRV_WATCHDOG
@@ -1374,6 +1392,15 @@ NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_cfg);
 #endif
 #if NAVHAL_CONFIG_DRV_DMA
 NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_out);
+#if NAVHAL_CONFIG_DRV_USB_CDC
+NAVTEST_CASE_DECL(test_conformance_usb_cdc_attach_rx_callback_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_SDIO
+NAVTEST_CASE_DECL(test_conformance_sdio_attach_callback_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_ETH
+NAVTEST_CASE_DECL(test_conformance_eth_attach_callback_rejects_null);
+#endif
 #if NAVHAL_CONFIG_DRV_I2C_DMA
 NAVTEST_CASE_DECL(test_conformance_i2c_read_regs_dma_rejects_null_buffer);
 #endif
@@ -1628,10 +1655,10 @@ void test_conformance_timebase_callback_accepts_null(void) {
   /* NULL is how a caller withdraws a tick callback. A port that cannot offer
    * one says so; what it may not do is fault, or accept NULL and then call
    * through it from the tick ISR. */
-  hal_status_t s = hal_timebase_set_callback(_conf_timebase_cb);
+  hal_status_t s = hal_timebase_attach_callback(_conf_timebase_cb);
   TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED);
 
-  s = hal_timebase_set_callback(NULL);
+  s = hal_timebase_detach_callback();
   TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED ||
                    s == HAL_ERR_INVALID_ARG);
 }
@@ -1760,7 +1787,7 @@ void test_conformance_sdio_get_response_rejects_bad_register(void) {
 void test_conformance_sdio_set_callback_accepts_null(void) {
   /* Registration only; NULL is how a caller withdraws. Left empty on the way
    * out so nothing fires into this suite from a later transfer. */
-  hal_sdio_set_callback(NULL);
+  hal_sdio_detach_callback();
   TEST_ASSERT_TRUE(hal_sdio_card_present() == hal_sdio_card_present());
 }
 
@@ -1818,7 +1845,7 @@ void test_conformance_usb_cdc_getters_are_stable(void) {
 }
 
 void test_conformance_usb_cdc_set_rx_callback_accepts_null(void) {
-  hal_status_t s = hal_usb_cdc_set_rx_callback(NULL);
+  hal_status_t s = hal_usb_cdc_detach_rx_callback();
   TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED);
 }
 
@@ -1866,7 +1893,7 @@ void test_conformance_eth_set_callback_accepts_null(void) {
   /* Registration is state, not traffic: withdrawing a callback is legal at any
    * time, and is how a caller switches from interrupt to polled draining. */
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
-                           (uint32_t)hal_eth_set_callback(NULL));
+                           (uint32_t)hal_eth_detach_callback());
 }
 
 void test_conformance_eth_link_is_up_answers_without_a_mac(void) {
@@ -2105,6 +2132,15 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_DMA
     NAVTEST_CASE(test_conformance_dma_remaining_rejects_null_out),
+#if NAVHAL_CONFIG_DRV_USB_CDC
+    NAVTEST_CASE(test_conformance_usb_cdc_attach_rx_callback_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_SDIO
+    NAVTEST_CASE(test_conformance_sdio_attach_callback_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_ETH
+    NAVTEST_CASE(test_conformance_eth_attach_callback_rejects_null),
+#endif
 #if NAVHAL_CONFIG_DRV_I2C_DMA
     NAVTEST_CASE(test_conformance_i2c_read_regs_dma_rejects_null_buffer),
 #endif

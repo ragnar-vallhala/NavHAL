@@ -38,8 +38,10 @@
  */
 
 #include "common/hal_status.h"
+#include "common/navhal_compiler.h"
 #include "common/hal_types.h"
 #include "utils/timer_types.h"
+#include <stddef.h>
 #include <stdint.h>
 
 
@@ -89,7 +91,22 @@ void hal_timebase_tick(void);
  * @param cb Callback function, or NULL to clear.
  * @return ::HAL_OK.
  */
-hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb);
+/**
+ * @brief Attach the per-tick callback.
+ * @param cb Non-NULL; use ::hal_timebase_detach_callback to clear.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
+ */
+hal_status_t hal_timebase_attach_callback(hal_timebase_callback_t cb);
+
+/** @brief Clear the per-tick callback. @return ::HAL_OK. */
+hal_status_t hal_timebase_detach_callback(void);
+
+/** @deprecated Use ::hal_timebase_attach_callback / ::hal_timebase_detach_callback. */
+NAVHAL_DEPRECATED("use hal_timebase_attach_callback")
+static inline hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb) {
+  return (cb == NULL) ? hal_timebase_detach_callback()
+                      : hal_timebase_attach_callback(cb);
+}
 
 /** @brief Busy-wait delay for @p ms milliseconds. */
 void hal_delay_ms(uint32_t ms);

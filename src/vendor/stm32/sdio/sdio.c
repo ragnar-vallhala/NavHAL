@@ -137,7 +137,17 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config) {
   return HAL_SDIO_OK;
 }
 
-void hal_sdio_set_callback(hal_sdio_callback_t callback) { sd_callback = callback; }
+hal_status_t hal_sdio_attach_callback(hal_sdio_callback_t callback) {
+  if (callback == NULL)
+    return HAL_ERR_INVALID_ARG;
+  sd_callback = callback;
+  return HAL_OK;
+}
+
+hal_status_t hal_sdio_detach_callback(void) {
+  sd_callback = NULL;
+  return HAL_OK;
+}
 
 /* ------------------------------------------------------------- */
 /* COMMAND HANDLING */

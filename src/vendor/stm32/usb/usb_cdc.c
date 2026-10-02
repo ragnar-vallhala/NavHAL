@@ -895,8 +895,15 @@ uint16_t hal_usb_cdc_read(uint8_t *buffer, uint16_t maxlen) {
 
 uint16_t hal_usb_cdc_available(void) { return ring_used(); }
 
-hal_status_t hal_usb_cdc_set_rx_callback(hal_usb_cdc_rx_callback_t cb) {
+hal_status_t hal_usb_cdc_attach_rx_callback(hal_usb_cdc_rx_callback_t cb) {
+  if (cb == NULL)
+    return HAL_ERR_INVALID_ARG;
   rx_cb = cb;
+  return HAL_OK;
+}
+
+hal_status_t hal_usb_cdc_detach_rx_callback(void) {
+  rx_cb = NULL;
   return HAL_OK;
 }
 

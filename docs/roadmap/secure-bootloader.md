@@ -383,14 +383,89 @@ mid-program.
 * A power cut at any point during an update leaves the board updatable.
 * An RDP1 unit completes a signed update over CDC.
 
+## Measured — slice 4a
+
+Everything below is from a Nucleo-F401RE at 84 MHz, `Release` (`-Os`), cycles
+read from DWT CYCCNT. Each candidate verified the same Ed25519 signature over a
+32-byte digest; a valid one, so the whole verify runs rather than an early
+reject. All three accepted that signature and all three rejected it with one bit
+flipped, which is also the first interop check between them.
+
+| Implementation | Flash (verify only) | .bss | Cycles | Time |
+|---|---|---|---|---|
+| **Monocypher 4.0.2** | **10,768** | 0 | **2,456,320** | **29.2 ms** |
+| TweetNaCl 20140427 | 5,588 | 96 | 95,192,514 | 1,133 ms |
+| compact25519 (c25519) | 4,918 | 0 | 136,291,886 | 1,623 ms |
+
+**Decision: Monocypher.** It costs about twice the flash of the other two and
+runs 39× and 55× faster. The two small ones are not slow in a way that trades
+against anything -- a single verify at over a second is ten times the whole boot
+budget on its own, before the app is hashed.
+
+Flash figures are verify-only: `-ffunction-sections` with `--gc-sections`, no
+`mem*` (the HAL supplies those in `src/utils/freestanding.c`), and no signing or
+key generation, none of which stage-1 performs.
+
+### The image digest is not free the way the table above suggests
+
+| Stage-1 crypto content | Flash | Against verify-only |
+|---|---|---|
+| Ed25519 verify only | 10,768 | — |
+| plus SHA-512 for the image | 10,826 | **+58** |
+| plus BLAKE2b for the image | 26,800 | +16,032 |
+
+Ed25519 contains SHA-512 by construction (RFC 8032 hashes `R ‖ A ‖ M` with it),
+so reusing it for the image digest costs 58 bytes. BLAKE2b, despite being in
+Monocypher's core and the faster hash per byte, pulls 16 KB -- half the stage-1
+budget -- so it is out on size alone.
+
+SHA-256 as specified above is the remaining option and is **not yet measured**:
+it needs an implementation this tree does not carry, roughly 1.3 KB, and would
+need validating against its own vectors in slice 4b.
+
+### Hash throughput, and what it does to the boot-latency estimate
+
+| Hash | Cycles/byte | 384 KiB app | Flash cost here |
+|---|---|---|---|
+| SHA-512 (already linked) | 144.4 | **676 ms** | +58 B |
+| BLAKE2b | 59.0 | 276 ms | +16 KB |
+| SHA-256 | not measured | ~340 ms if it is 2× SHA-512 | ~1.3 KB |
+
+Measured over 64 KiB read from flash, which is what the real hash does, so the
+flash wait states are in the number rather than hidden by a RAM-resident buffer.
+
+**The ~170 ms estimate in Open questions below does not survive this.** Verify
+is 29 ms and the app hash dominates: 676 ms with SHA-512, or around 370 ms total
+if SHA-256 lands at twice SHA-512's rate. Both are several times the estimate,
+so the question of whether to weaken the guarantee to "verified once, recorded
+in KV" is live now rather than later, and it should be settled before slice 1
+fixes the partition table.
+
+Stage-1's 32 KiB has to hold the 10.8 KB of crypto plus startup, clock, the
+flash driver, UART recovery and the verify logic. That leaves about 21 KB, which
+looks workable but is not roomy.
+
+### Reproducing
+
+A throwaway sample flashed to the board, deliberately not committed: it needed
+the candidates vendored at scratch paths, and slice 4b is where the chosen one
+lands in-tree with its test vectors. The method is one warm call, then three
+timed verifies -- all three runs agreed to within two cycles, which is how the
+measurement says it is sound.
+
 ## Open questions
 
-* Which Ed25519 implementation — stage-1 fitting in 32 KiB depends on it, and a
-  miss changes the partition table. Resolve in slice 4, before slice 1 is hard
-  to undo.
-* Measured boot latency. The estimate is ~170 ms for the app hash plus verify at
-  84 MHz; if it lands materially higher, the app hash may need to move behind a
-  "verified once, recorded in KV" scheme, which weakens the guarantee.
+* ~~Which Ed25519 implementation~~ — **resolved: Monocypher**, 10,768 bytes and
+  29.2 ms on the F401. See Measured above.
+* Boot latency — **measured, and materially higher than the estimate**. Verify
+  is 29 ms; the app hash is 676 ms with SHA-512 or an estimated ~340 ms with a
+  SHA-256 this tree does not yet carry, against an estimate of ~170 ms for the
+  pair. So the "verified once, recorded in KV" scheme is now a decision to take
+  rather than a contingency, and which hash the image uses is part of it.
+* Whether the image digest stays SHA-256. It is the right choice on speed and
+  the wrong one on flash: SHA-512 is already linked by Ed25519 and costs 58
+  bytes to reuse, where SHA-256 costs about 1.3 KB of a budget with ~21 KB left
+  for everything that is not crypto. Measure SHA-256 before deciding.
 * Whether stage-2 should be able to update stage-2, or only stage-1. Self-update
   is convenient and is also the classic way to brick a fleet.
 * F767ZI partition table and whether that port wants the same two-stage shape.

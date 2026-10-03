@@ -47,6 +47,28 @@ extern "C" {
 /* -------------------------------------------------------------------------- *
  * DMA-backed UART API — available only when the DMA backend is enabled.
  * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- *
+ * IDLE-line interrupt -> callback (DMA-independent), as on the F4 port.
+ *
+ * Wakes a consumer on the gap after a burst instead of polling; with circular
+ * DMA RX, the end-of-burst event that drains the ring.
+ * -------------------------------------------------------------------------- */
+
+/**
+ * @brief Enable the UART IDLE-line interrupt and route it to @p callback.
+ *
+ * The IDLE flag is cleared (ICR.IDLECF) before @p callback runs. The line is
+ * enabled at a maskable (BASEPRI-managed) priority, so @p callback may call an
+ * RTOS @c *_from_isr primitive.
+ *
+ * @return HAL_OK, or HAL_ERR_INVALID_ARG for an unknown UART / NULL callback.
+ */
+hal_status_t hal_uart_attach_idle_callback(hal_uart_t uart,
+                                           void (*callback)(void));
+
+/** @brief Disable the IDLE-line interrupt and clear the registered callback. */
+hal_status_t hal_uart_detach_idle_callback(hal_uart_t uart);
+
 #if NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA
 
 /**
@@ -110,6 +132,24 @@ hal_status_t hal_uart_dma_rx_index(hal_uart_t uart, uint16_t *out_index);
  *         was never registered, or a span that does not fit it.
  */
 hal_status_t hal_uart_dma_rx_sync(hal_uart_t uart, uint16_t from, uint16_t len);
+
+/**
+ * @brief Call @p callback from the RX DMA stream's interrupt at the half-way
+ *        and wrap points of the ring set up by ::hal_uart_init_dma_rx.
+ *
+ * With ::hal_uart_attach_idle_callback (the end of a burst), these are the
+ * events a ring consumer drains on: a burst longer than the ring raises them
+ * before DMA can overwrite unread data, which idle alone cannot promise. The
+ * line is enabled at a maskable priority, so @p callback may call an RTOS
+ * @c *_from_isr primitive; the stream's flags are cleared after it returns.
+ *
+ * @param uart      Target UART.
+ * @param callback  Invoked from ISR context; NULL detaches and disables.
+ * @return HAL_OK, or HAL_ERR_INVALID_ARG for an unknown UART / no RX stream.
+ */
+hal_status_t hal_uart_dma_rx_attach_callback(hal_uart_t uart,
+                                             void (*callback)(void));
+
 /** @brief Transmit a null-terminated string using DMA. */
 hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 

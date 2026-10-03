@@ -80,6 +80,7 @@ typedef struct {
 #define USART_CR1_UE     (1 << 0)  ///< USART enable
 #define USART_CR1_RE     (1 << 2)  ///< Receiver enable
 #define USART_CR1_TE     (1 << 3)  ///< Transmitter enable
+#define USART_CR1_IDLEIE (1 << 4)  ///< IDLE interrupt enable
 #define USART_CR1_RXNEIE (1 << 5)  ///< RXNE interrupt enable
 #define USART_CR1_TCIE   (1 << 6)  ///< Transmission-complete interrupt enable
 #define USART_CR1_TXEIE  (1 << 7)  ///< TXE interrupt enable

@@ -36,8 +36,8 @@
 /* Release version (SemVer) — the version of this NavHAL distribution. */
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 3
-#define VERSION_PATCH 12
-#define VERSION "0.3.12"
+#define VERSION_PATCH 13
+#define VERSION "0.3.13"
 
 /**
  * @brief NavHAL public-API contract version.

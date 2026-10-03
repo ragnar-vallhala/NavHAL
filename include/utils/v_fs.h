@@ -53,12 +53,19 @@ extern "C" {
 typedef int v_fd_t;
 typedef int v_dir_t;
 
-/* FatFS short (8.3) names: 12 chars + NUL (FF_USE_LFN = 0). */
+/* A directory entry's name, NUL included: 8.3 (12 + NUL) without long file
+ * names, and as long as CONFIG_FS_LFN_MAX allows with them. It follows the
+ * option rather than staying at 13, which cut every long name in a listing to
+ * 12 characters. navhal_target.h is force-included, so the macros are here. */
+#if defined(NAVHAL_CONFIG_FS_LFN) && NAVHAL_CONFIG_FS_LFN
+#define V_NAME_MAX (NAVHAL_CONFIG_FS_LFN_MAX + 1)
+#else
 #define V_NAME_MAX 13
+#endif
 
 /** @brief One directory entry returned by v_readdir(). */
 typedef struct {
-  char name[V_NAME_MAX]; /**< file/dir name (8.3) */
+  char name[V_NAME_MAX]; /**< file/dir name (8.3, or long with FS_LFN) */
   uint32_t size;         /**< file size in bytes (0 for directories) */
   uint8_t is_dir;        /**< 1 if this entry is a directory */
 } v_dirent_t;
@@ -128,6 +135,28 @@ int v_mkdir(const char *path);
  * @brief Delete a file or directory.
  */
 int v_unlink(const char *path);
+
+/**
+ * @brief Rename or move a file or directory (FatFs f_rename).
+ * @param from Existing path.
+ * @param to   New path, on the same drive; must not exist yet.
+ * @return 0 on success, negative FatFs error code otherwise (-FR_EXIST when
+ *         @p to is already there, -FR_NO_FILE when @p from is not).
+ */
+int v_rename(const char *from, const char *to);
+
+/**
+ * @brief Size and free space of a mounted drive (FatFs f_getfree).
+ * @param drive     Drive, e.g. "0:".
+ * @param total_kib Out: usable size in KiB (data clusters); may be NULL.
+ * @param free_kib  Out: free space in KiB; may be NULL.
+ * @return 0 on success, negative FatFs error code otherwise.
+ *
+ * The first call after a mount may scan the whole FAT to count free clusters,
+ * which on a large card takes a while; FatFs caches the count after that
+ * (FF_FS_NOFSINFO 0).
+ */
+int v_getfree(const char *drive, uint32_t *total_kib, uint32_t *free_kib);
 
 /**
  * @brief Flush cached data to a file.

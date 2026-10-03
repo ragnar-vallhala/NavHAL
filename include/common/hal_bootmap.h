@@ -40,6 +40,7 @@
 #ifndef HAL_BOOTMAP_H
 #define HAL_BOOTMAP_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -98,6 +99,53 @@ _Static_assert(HAL_BOOTMAP_APP_BASE + HAL_BOOTMAP_APP_SIZE == 0x08080000UL,
                "the app must end at the top of the 512 KiB part");
 _Static_assert(HAL_BOOTMAP_HEADER_SIZE % 512UL == 0UL,
                "a payload vector table needs 512-byte alignment for VTOR");
+
+
+/* ---- Image header ------------------------------------------------------- *
+ *
+ * Stage-2 and the app each carry one; stage-1 does not. The signature covers
+ * the header's first 12 bytes and the body, so version and length cannot be
+ * edited without invalidating it.
+ */
+
+/**
+ * @brief Image header magic, "NHIM" in a little-endian hex dump.
+ *
+ * Deliberately not ::HAL_BOOT_MAGIC. That one marks the boot block in .noinit
+ * RAM, and its "uninitialised SRAM could hold this by chance" reasoning is about
+ * a different structure in a different memory. Sharing one value would make a
+ * stray RAM pattern look like a valid image header and vice versa.
+ */
+#define HAL_BOOTMAP_IMAGE_MAGIC 0x4D49484EUL
+
+/**
+ * @brief The signed image header, as it sits in flash.
+ *
+ * @c digest covers @c magic, @c version and @c length followed by the body --
+ * the first 12 bytes of this structure, not all of it, because the signature
+ * and the padding cannot be inside what they protect.
+ */
+typedef struct {
+  uint32_t magic;    /**< ::HAL_BOOTMAP_IMAGE_MAGIC. */
+  uint32_t version;  /**< Monotonic; checked against the KV rollback floor. */
+  uint32_t length;   /**< Body bytes after the header. Clamped to the
+                          partition maximum BEFORE it bounds the hash: an
+                          unvalidated length is how a verifier gets walked off
+                          the end of flash into bytes an attacker chose. */
+  uint8_t digest[32]; /**< SHA-256 over the 12 bytes above, then the body. */
+  uint8_t sig[64];    /**< Ed25519 over @c digest. */
+  uint8_t pad[HAL_BOOTMAP_HEADER_SIZE - 12u - 32u - 64u];
+} hal_boot_image_header_t;
+
+/** @brief Bytes of this header the digest covers, before the body. */
+#define HAL_BOOTMAP_SIGNED_PREFIX 12u
+
+_Static_assert(sizeof(hal_boot_image_header_t) == HAL_BOOTMAP_HEADER_SIZE,
+               "the image header must fill the space before the payload");
+_Static_assert(offsetof(hal_boot_image_header_t, digest) == 0x0C,
+               "digest must sit at +0x0C, where the format says");
+_Static_assert(offsetof(hal_boot_image_header_t, sig) == 0x2C,
+               "signature must sit at +0x2C, where the format says");
 
 #endif /* NAVHAL_CONFIG_FAMILY_STM32F4 */
 

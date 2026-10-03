@@ -172,6 +172,16 @@ jobs:
           cmake --build build-host -j
           ctest --test-dir build-host --output-on-failure
 
+      - name: Signing tool round trip
+        shell: bash
+        run: |
+          # Signs an image with the vendored Monocypher, then verifies it with
+          # the firmware's own hal_boot_hash and hal_boot_ed25519_verify, and
+          # requires a flipped byte to break it.
+          cmake -S tools/sign -B build-sign
+          cmake --build build-sign -j
+          ctest --test-dir build-sign --output-on-failure
+
   # Cross-compile the on-target navtest ELF. Uploads the binary as a
   # workflow artifact so the (separate) renode.yml workflow can consume
   # it without rebuilding. Cortex-M specific.

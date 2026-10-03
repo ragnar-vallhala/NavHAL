@@ -490,7 +490,24 @@ Two costs of watching CDC from boot, accepted deliberately:
   bug in stage-2 is an update. UART rx, for comparison, is 32 bytes.
 
 Functional validation needs a board with a USB device connector; the Nucleo-64
-does not carry one, so the CDC half of stage-1 is exercised on the navixsm.
+does not carry one, so the CDC half of stage-1 is exercised on the navixsm,
+whose HIL config already enables the driver.
+
+**Renode cannot stand in for that.** Its STM32F4 platform has no USB controller
+model -- only `Tag <0x50000000, 0x5003FFFF> "USB_OTG_FS"`, a stub whose own
+comment says it exists so CubeMX init passes -- and no Renode platform declares a
+USB device model at all. The one piece of USB machinery it ships is a host-side
+USB/IP server used for the nRF52840 Arduino flow, which synthesises a device for
+the host and bypasses the target's peripheral. The PIL tier does compile the CDC
+driver (`CONFIG_DRV_USB_CDC=y` on the F401) and does run its argument checks
+against those tagged registers, so what is missing is enumeration and transfer,
+not the code path's existence.
+
+That makes one thing a requirement rather than a nicety: **the wait for
+enumeration has to be bounded.** A stage-1 that blocks until a USB host answers
+never boots on a unit with nothing plugged in, and never boots under Renode
+either. The CDC watch window gets a deadline, and expiry is an ordinary outcome
+that falls through to the jump -- not an error.
 
 ## Open questions
 

@@ -106,8 +106,13 @@ SECTIONS {
     *(.data*)
     . = ALIGN(4);
     _edata = .;
-    *(.init*)
-    *(.fini*)
+    /* KEEP: with --gc-sections a C++ global constructor is only reachable from
+     * .init_array, which the startup code walks rather than calls directly, so
+     * the collector drops it and the object is never constructed. No sample
+     * relies on one today -- the C++ sample's globals are constexpr on purpose --
+     * which is exactly why this is easy to get wrong later. */
+    KEEP(*(.init*))
+    KEEP(*(.fini*))
   } > RAM AT> FLASH
 
   .bss : {

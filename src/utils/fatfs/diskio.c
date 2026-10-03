@@ -22,6 +22,9 @@
 
 #include "diskio.h"
 #include "common/hal_diskio.h"
+#if defined(NAVHAL_CONFIG_FS_RTC) && NAVHAL_CONFIG_FS_RTC
+#include "common/hal_rtc.h"
+#endif
 
 DSTATUS disk_status(uint8_t pdrv) {
   hal_disk_status_t status = hal_disk_status(pdrv);
@@ -116,9 +119,20 @@ DRESULT disk_ioctl(uint8_t pdrv, uint8_t cmd, void *buff) {
   return (res == HAL_DISK_RES_OK) ? RES_OK : RES_ERROR;
 }
 
-/* FatFS requires a get_fattime function if not provided by user */
+/* The time FatFs stamps a file with, packed as FAT wants it: year-1980 (7
+ * bits), month, day, hour, minute, second/2. Weak, so a consumer with a better
+ * clock can provide its own. With CONFIG_FS_RTC it reads the calendar; until
+ * the RTC is up (hal_rtc_get_datetime says so, without blocking) and without
+ * the option, it is a fixed 2024-01-01 00:00:00. */
 __attribute__((weak)) uint32_t get_fattime(void) {
-  /* Returns a fixed time for now: 2024-01-01 00:00:00 */
+#if defined(NAVHAL_CONFIG_FS_RTC) && NAVHAL_CONFIG_FS_RTC
+  hal_rtc_datetime_t dt;
+  if (hal_rtc_get_datetime(&dt) == HAL_OK && dt.year >= 1980u &&
+      dt.month >= 1u && dt.month <= 12u && dt.day >= 1u && dt.day <= 31u)
+    return ((uint32_t)(dt.year - 1980u) << 25) | ((uint32_t)dt.month << 21) |
+           ((uint32_t)dt.day << 16) | ((uint32_t)dt.hour << 11) |
+           ((uint32_t)dt.minute << 5) | ((uint32_t)dt.second >> 1);
+#endif
   return ((uint32_t)(2024 - 1980) << 25) | ((uint32_t)1 << 21) |
          ((uint32_t)1 << 16);
 }

@@ -158,6 +158,13 @@ hal_status_t hal_dma_init(const hal_dma_config_t *cfg) {
   /* Transfer-complete interrupt enable (useful for ISR-driven usage) */
   cr |= DMA_SxCR_TCIE;
 
+  /* A circular stream also reports the half-way point. With TC, that is the
+   * two events a ring consumer drains on (hal_uart_dma_rx_attach_callback):
+   * one half is free to read while DMA fills the other. Like TCIE, it raises
+   * nothing until the stream's NVIC line is enabled. */
+  if (cfg->circular)
+    cr |= DMA_SxCR_HTIE;
+
   s->CR = cr;
 
   /* 7. Build FCR value */

@@ -133,10 +133,33 @@ hal_status_t hal_usb_cdc_init(void);
 hal_status_t hal_usb_cdc_deinit(void);
 
 /**
- * @brief Whether the host has enumerated the device and opened the port.
+ * @brief Whether a host has enumerated the device and opened the port.
  * @return true once the device is configured and the host has asserted DTR.
+ *
+ * This is the "can I talk to someone" question, and the right one for a console
+ * or an echo loop: a board plugged into a powered hub with nothing reading the
+ * port is enumerated but not listened to. For "is a host there at all", which is
+ * what a bootloader asks before deciding whether to wait, see
+ * ::hal_usb_cdc_enumerated.
  */
 bool hal_usb_cdc_connected(void);
+
+/**
+ * @brief Whether enumeration has finished -- a host is present and the device is
+ *        configured, whether or not anything has opened the port.
+ *
+ * Separate from ::hal_usb_cdc_connected because the two answer different
+ * questions and a bootloader needs this one. DTR arrives only when an
+ * application opens the port, so a loader waiting for @c connected would wait
+ * out its whole window on a board plugged into a charger, and a window long
+ * enough for someone to start a terminal would delay every boot by seconds.
+ * Enumeration needs no application at all and completes in a few hundred
+ * milliseconds.
+ *
+ * @return true when the host has set a configuration and the device is not
+ *         suspended.
+ */
+bool hal_usb_cdc_enumerated(void);
 
 /**
  * @brief Send a byte buffer to the host.

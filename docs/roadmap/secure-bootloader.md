@@ -524,14 +524,22 @@ the archive has been scanned, and the link fails without it.
 
 Two costs of watching CDC from boot, accepted deliberately:
 
-* **Enumeration is on the fast path**, and costs less than the estimate said.
-  Measured on the navixsm running the CDC sample: the device is back on the bus
-  290 ms after a reset drops it off and the host's tty node appears at 330 ms,
-  three runs inside 10 ms of each other. That is reset to host-visible, so it
-  includes the firmware's own startup and the host's enumeration -- an upper
-  bound on what the device contributes. Against a 676 ms app hash it is the
-  second term, not the first; the estimate of roughly a second was wrong by
-  about 3x and the earlier claim that enumeration dominates boot time with it.
+* **Enumeration is on the fast path, and costs about 495 ms.** Measured from
+  inside the firmware on the navixsm: `hal_usb_cdc_init()` to
+  `hal_usb_cdc_enumerated()` returning true is 494,504 us. An earlier host-side
+  figure of 290 ms -- sysfs losing and regaining the device across a reset -- is
+  the wrong measurement to budget against: it starts when the device drops off
+  the bus rather than when the firmware begins, and the device-side number is
+  what stage-1 experiences. Against a 371 ms app hash with SHA-256, enumeration
+  is now the *largest* single term, not the second.
+
+* **Do not wait on DTR.** `hal_usb_cdc_connected()` requires it, and DTR arrives
+  only when an application opens the port -- measured at 8.4 s in the same run,
+  which was simply when a human got round to it. A board plugged into a charger
+  never asserts it at all. `hal_usb_cdc_enumerated()` exists for this: same
+  state without the DTR term, true as soon as a host has set a configuration.
+  A window of roughly 750 ms covers the measured 495 ms with margin for a slower
+  host or an intervening hub.
 * **The USB stack is in the permanent stage.** Stage-1 is write-protected, so a
   bug in 2.8 KB of USB and CDC code cannot be fixed in the field, where the same
   bug in stage-2 is an update. UART rx, for comparison, is 32 bytes.

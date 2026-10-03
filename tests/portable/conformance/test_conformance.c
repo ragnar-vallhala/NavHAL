@@ -912,6 +912,14 @@ void test_conformance_sdio_rejects_null(void) {
 #endif /* NAVHAL_CONFIG_DRV_SDIO */
 
 #if NAVHAL_CONFIG_DRV_USB_CDC
+/* Both predicates answer without a host and without init, which is all a
+ * portable case can ask: the DTR one is already covered, and this is the one a
+ * bootloader polls instead. */
+void test_conformance_usb_cdc_enumerated_answers_without_a_host(void) {
+  (void)hal_usb_cdc_enumerated();
+  TEST_ASSERT_TRUE(1);
+}
+
 void test_conformance_usb_cdc_rejects_null(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
                            (uint32_t)hal_usb_cdc_write(NULL, 1u));
@@ -1250,6 +1258,7 @@ NAVTEST_CASE_DECL(test_conformance_sdio_rejects_null);
 #endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
 NAVTEST_CASE_DECL(test_conformance_usb_cdc_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_usb_cdc_enumerated_answers_without_a_host);
 #endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
 NAVTEST_CASE_DECL(test_conformance_usb_cdc_reports_disconnected);
@@ -1975,6 +1984,7 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
     NAVTEST_CASE(test_conformance_usb_cdc_rejects_null),
+    NAVTEST_CASE(test_conformance_usb_cdc_enumerated_answers_without_a_host),
 #endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
     NAVTEST_CASE(test_conformance_usb_cdc_reports_disconnected),

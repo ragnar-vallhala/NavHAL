@@ -249,7 +249,13 @@ data transfer. */
 /  To enable exFAT, also LFN needs to be enabled. (FF_USE_LFN >= 1)
 /  Note that enabling exFAT discards ANSI C (C89) compatibility. */
 
+/* Driven by Kconfig (CONFIG_FS_RTC): with the RTC, timestamps come from
+ * get_fattime() (diskio.c), which reads it; without, one fixed date. */
+#if defined(NAVHAL_CONFIG_FS_RTC) && NAVHAL_CONFIG_FS_RTC
+#define FF_FS_NORTC 0
+#else
 #define FF_FS_NORTC 1
+#endif
 #define FF_NORTC_MON 1
 #define FF_NORTC_MDAY 1
 #define FF_NORTC_YEAR 2022

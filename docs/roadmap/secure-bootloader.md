@@ -35,7 +35,7 @@ embedded public key differs.
 | Slots | **single, no A/B** | A second slot needs the app under 192 KiB on this part. The crashloop counter plus the RX sniffer cover the realistic failure modes at a fraction of the flash. |
 | Signature | **Ed25519 over a SHA-256 digest** | Asymmetric is mandatory: a shared HMAC key is extractable through SWD on a dev board and would then sign anything. SHA-256 rather than SHA-512 roughly halves the per-boot hash of a 384 KiB app. |
 | Integrity | **SHA-256 in the image, CRC-32 as a cheap pre-check** | `hal_crc` is hardware-backed and rejects a truncated transfer in microseconds before the expensive hash runs. |
-| Stage-1 transport | **UART only** | Every byte in stage-1 is permanent. USB enumeration and the CDC class belong in the replaceable stage. |
+| Stage-1 transport | **UART and CDC, both watched from boot** | A board that can be flashed over CDC should be recoverable over CDC: needing a UART to rescue a USB-only unit is a recovery path that is not there when it is wanted. Decided against the original UART-only line, whose reasoning is kept below as the cost being accepted. |
 | Boot-mode signalling | **`.noinit` block in SRAM** | Survives reset for free — `Reset_Handler` only zeroes what the linker's zero table lists (`boot.c:90`). |
 | Rollback floor | **KV store key** | Already exists; no new persistence mechanism. Meaningful only once RDP2 stops an attacker erasing it. |
 
@@ -453,6 +453,45 @@ lands in-tree with its test vectors. The method is one warm call, then three
 timed verifies -- all three runs agreed to within two cycles, which is how the
 measurement says it is sound.
 
+### Stage-1 budget, measured
+
+A probe that calls each layer stage-1 needs, on an F401 at `-Os` with
+`-ffunction-sections -fdata-sections -Wl,--gc-sections`:
+
+| Layer | text | Added |
+|---|---|---|
+| vectors, startup, jump | 1,984 | — |
+| + clock to 84 MHz | 4,288 | +2,304 |
+| + UART tx | 5,312 | +1,024 |
+| + UART rx | 5,344 | +32 |
+| + flash KV (attempt accounting) | 6,304 | +960 |
+| + watchdog kick | 6,656 | +352 |
+| + Ed25519 verify and SHA-512 | 17,504 | +10,848 |
+| **+ USB CDC** | **20,288** | **+2,784** |
+
+20,288 of 32,768, or 17,788 with LTO. Either leaves 12 KB or more spare, so the
+backend choice is not forced by size: compact25519 would save about 6 KB and cost
+1.6 s per verify, which buys nothing here.
+
+**Section garbage collection is the whole difference.** Without those flags the
+same image is about 57 KB, because Monocypher's primitives share a translation
+unit and nothing is dropped. Stage-1's build must set them; the arch linker
+script already `KEEP`s `.isr_vector`, so it is safe. LTO additionally needs
+`-Wl,-u,memset`: it synthesises a call that cannot see the freestanding one once
+the archive has been scanned, and the link fails without it.
+
+Two costs of watching CDC from boot, accepted deliberately:
+
+* **Enumeration is on the fast path.** It is roughly a second, against a 29 ms
+  verify and a 676 ms app hash, so it dominates boot time and makes the latency
+  question below sharper rather than softer.
+* **The USB stack is in the permanent stage.** Stage-1 is write-protected, so a
+  bug in 2.8 KB of USB and CDC code cannot be fixed in the field, where the same
+  bug in stage-2 is an update. UART rx, for comparison, is 32 bytes.
+
+Functional validation needs a board with a USB device connector; the Nucleo-64
+does not carry one, so the CDC half of stage-1 is exercised on the navixsm.
+
 ## Open questions
 
 * ~~Which Ed25519 implementation~~ — **resolved: Monocypher**, 10,768 bytes and
@@ -460,7 +499,8 @@ measurement says it is sound.
 * Boot latency — **measured, and materially higher than the estimate**. Verify
   is 29 ms; the app hash is 676 ms with SHA-512 or an estimated ~340 ms with a
   SHA-256 this tree does not yet carry, against an estimate of ~170 ms for the
-  pair. So the "verified once, recorded in KV" scheme is now a decision to take
+  pair. Watching CDC from boot adds roughly a second of USB enumeration on top,
+  which makes it the largest single term in the boot time. So the "verified once, recorded in KV" scheme is now a decision to take
   rather than a contingency, and which hash the image uses is part of it.
 * Whether the image digest stays SHA-256. It is the right choice on speed and
   the wrong one on flash: SHA-512 is already linked by Ed25519 and costs 58

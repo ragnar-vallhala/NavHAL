@@ -123,4 +123,21 @@ SECTIONS {
   _heap_end   = ORIGIN(RAM) + LENGTH(RAM);
   _sidata = LOADADDR(.data);
   _estack = ORIGIN(RAM) + LENGTH(RAM);
+
+  /* Where this image actually ends in flash: the .data initialisers are the last
+   * thing stored there, loaded from flash into RAM at startup. */
+  _eflash = LOADADDR(.data) + SIZEOF(.data);
+
 }
+
+/* The KV store erases whole sectors. If those sectors fall inside this image,
+ * the first hal_flash_save() erases the code running it -- which is what moving
+ * the store to sectors 2-3 would have done to a 45 KB test image linked flat
+ * from 0x08000000. CMake passes the store's extent; a build that does not gets
+ * zeros here and the check stands down. Top level, because ld does not take a
+ * bare ASSERT inside SECTIONS.
+ */
+PROVIDE(__kv_start = 0);
+PROVIDE(__kv_end = 0);
+ASSERT(__kv_end == 0 || _eflash <= __kv_start || ORIGIN(FLASH) >= __kv_end,
+       "image overlaps the flash KV store -- move CONFIG_FLASH_KV_*_SECTOR outside this image, or link the image into its own partition")

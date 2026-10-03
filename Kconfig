@@ -255,6 +255,33 @@ config DRV_SDIO
     select DRV_INTERRUPT
     select DRV_TIMER
 
+config FLASH_KV_PRIMARY_SECTOR
+    int "Flash KV primary sector"
+    depends on DRV_FLASH
+    default 6
+    range 0 7
+    help
+      Which flash sector the key-value store keeps its primary copy in. It must
+      lie OUTSIDE the running image: the store erases whole sectors, so a store
+      inside the image means the first save erases the code doing the saving.
+
+      6 and 7 suit a flat image linked from 0x08000000, which is every build
+      today -- the on-target test image alone reaches 0x0800b248.
+
+      2 and 3 are the bootloader layout, where the application is linked into its
+      own partition at 0x08020000 and the low sectors belong to stage-1 and the
+      store. See include/common/hal_bootmap.h. The linker refuses an image that
+      overlaps whichever pair is configured.
+
+config FLASH_KV_SECONDARY_SECTOR
+    int "Flash KV secondary sector"
+    depends on DRV_FLASH
+    default 7
+    range 0 7
+    help
+      The second sector, erased independently so a compaction never leaves the
+      store without a readable copy. Must differ from the primary.
+
 config BOOT_CRYPTO
     bool "Bootloader signature verification (Ed25519)"
     depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7

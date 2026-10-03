@@ -25,6 +25,7 @@
  * Flash, with compaction between a primary and secondary sector.
  */
 
+#include "common/hal_watchdog.h"
 #include "internal/hal_flash_ops.h"
 #include "navhal_port_flash.h"
 #include "common/hal_types.h"
@@ -44,9 +45,36 @@
 
 /* ---- Internal low-level flash primitives -------------------------------- */
 
-static void _flash_wait_(void) {
-  while (FLASH_SR & FLASH_SR_BSY)
-    ;
+/* A backstop, not a timeout: the point is that a flash controller which never
+ * clears BSY cannot hang the caller forever. A 128 KiB sector erase can approach
+ * 2 s on this part, so the cap is deliberately far beyond any real operation --
+ * tripping it means the peripheral is wedged, which is a different failure from
+ * "this erase is slow".
+ *
+ * The watchdog kick is the part that matters in a bootloader. The IWDG keeps
+ * running across a system reset and is cleared only by a power-on reset, so a
+ * loader inherits whatever timeout the application set -- possibly 100 ms --
+ * while the erase it is about to do takes twenty times that. Without a kick in
+ * here, every update on a watchdog-enabled board resets mid-erase and comes back
+ * to a half-erased partition.
+ *
+ * The status is ignored on purpose: a kick that reports NOT_INITIALIZED means
+ * this build has no watchdog running to feed, which is not this function's
+ * problem. See hal_flash_raw_program for the case the driver cannot see.
+ */
+#define FLASH_BSY_SPINS 40000000UL
+
+static hal_status_t _flash_wait_(void) {
+  uint32_t spins = FLASH_BSY_SPINS;
+  while (FLASH_SR & FLASH_SR_BSY) {
+    if (--spins == 0u)
+      return HAL_ERR_TIMEOUT;
+#if NAVHAL_CONFIG_DRV_WATCHDOG
+    if ((spins & 0xFFFFu) == 0u)
+      (void)hal_watchdog_kick();
+#endif
+  }
+  return HAL_OK;
 }
 
 static void _flash_unlock_(void) {
@@ -60,18 +88,18 @@ static void _flash_lock_(void) { FLASH_CR |= FLASH_CR_LOCK; }
 
 static void _flash_erase_sector_(uint8_t sector) {
   _flash_unlock_();
-  _flash_wait_();
+  (void)_flash_wait_();
   FLASH_CR &= ~FLASH_CR_SNB_Msk;
   FLASH_CR |= FLASH_CR_SER | ((sector & 0xF) << FLASH_CR_SNB_Pos);
   FLASH_CR |= FLASH_CR_STRT;
-  _flash_wait_();
+  (void)_flash_wait_();
   FLASH_CR &= ~FLASH_CR_SER;
   _flash_lock_();
 }
 
 static NAVHAL_UNUSED void _flash_program_word_(uint32_t addr, uint32_t data) {
   _flash_unlock_();
-  _flash_wait_();
+  (void)_flash_wait_();
   FLASH_CR &= ~FLASH_CR_PSIZE_Msk;
   FLASH_CR |= (0x2U << FLASH_CR_PSIZE_Pos); // x32 programming
   FLASH_CR |= FLASH_CR_PG;
@@ -84,14 +112,14 @@ static NAVHAL_UNUSED void _flash_program_word_(uint32_t addr, uint32_t data) {
    * controller first. Harmless on Cortex-M4. */
   NAVHAL_FLASH_DSB();
 
-  _flash_wait_();
+  (void)_flash_wait_();
   FLASH_CR &= ~FLASH_CR_PG;
   _flash_lock_();
 }
 
 static void _flash_program_half_word_(uint32_t addr, uint16_t data) {
   _flash_unlock_();
-  _flash_wait_();
+  (void)_flash_wait_();
   FLASH_CR &= ~FLASH_CR_PSIZE_Msk;
   FLASH_CR |= (0x1U << FLASH_CR_PSIZE_Pos); // x16 programming
   FLASH_CR |= FLASH_CR_PG;
@@ -101,7 +129,7 @@ static void _flash_program_half_word_(uint32_t addr, uint16_t data) {
    * variant above for why this is required). Harmless on Cortex-M4. */
   NAVHAL_FLASH_DSB();
 
-  _flash_wait_();
+  (void)_flash_wait_();
   FLASH_CR &= ~FLASH_CR_PG;
   _flash_lock_();
 }
@@ -338,6 +366,108 @@ static hal_status_t stm32_flash_erase(void) {
 
 static bool stm32_flash_needs_compaction(void) {
   return _flash_find_next_free() == NULL;
+}
+
+/* ---- Raw partition access, for a loader writing an image ---------------- */
+
+/* Which sectors a loader may erase or program. Stage-1 is the root of trust and
+ * write-protected; the key/value store owns its own two sectors. Everything else
+ * -- stage-2 and the application -- is fair game. Derived from the sector map
+ * rather than from hal_bootmap.h so this stays true if the partition moves: what
+ * matters is the ownership rule, not the addresses. */
+static bool _raw_sector_allowed(uint8_t sector) {
+  if (sector > 7u)
+    return false;
+  if (sector <= 1u)
+    return false; /* stage-1, WRP'd */
+  if (sector == (uint8_t)PRIMARY_FLASH_SECTOR ||
+      sector == (uint8_t)SECONDARY_FLASH_SECTOR)
+    return false; /* the KV store's, and it erases them itself */
+  return true;
+}
+
+/* STM32F4 512K map: four 16K, one 64K, three 128K. */
+static uint32_t _sector_base(uint8_t sector) {
+  static const uint32_t base[8] = {0x08000000UL, 0x08004000UL, 0x08008000UL,
+                                   0x0800C000UL, 0x08010000UL, 0x08020000UL,
+                                   0x08040000UL, 0x08060000UL};
+  return base[sector & 7u];
+}
+
+static uint32_t _sector_size(uint8_t sector) {
+  static const uint32_t size[8] = {0x4000UL,  0x4000UL,  0x4000UL,  0x4000UL,
+                                   0x10000UL, 0x20000UL, 0x20000UL, 0x20000UL};
+  return size[sector & 7u];
+}
+
+/* Every sector the range touches must be one the caller owns. Checking the whole
+ * range rather than its first address is the point: a write that starts inside
+ * the app and runs past its end would otherwise be half-accepted. */
+static bool _raw_range_allowed(uint32_t addr, uint32_t len) {
+  if (len == 0u)
+    return false;
+  uint32_t end = addr + len; /* exclusive */
+  if (end < addr)
+    return false; /* wrapped */
+  for (uint8_t s = 0u; s < 8u; s++) {
+    uint32_t b = _sector_base(s);
+    uint32_t e = b + _sector_size(s);
+    bool overlaps = (addr < e) && (end > b);
+    if (overlaps && !_raw_sector_allowed(s))
+      return false;
+  }
+  /* and it must lie inside the part at all */
+  return addr >= _sector_base(0) && end <= (_sector_base(7) + _sector_size(7));
+}
+
+hal_status_t hal_flash_raw_erase_sector(uint8_t sector) {
+  if (!_raw_sector_allowed(sector))
+    return HAL_ERR_INVALID_ARG;
+
+  _flash_unlock_();
+  hal_status_t st = _flash_wait_();
+  if (st != HAL_OK) {
+    _flash_lock_();
+    return st;
+  }
+  FLASH_CR &= ~FLASH_CR_SNB_Msk;
+  FLASH_CR |= ((uint32_t)sector << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk;
+  FLASH_CR |= FLASH_CR_SER;
+  FLASH_CR |= FLASH_CR_STRT;
+  NAVHAL_FLASH_DSB();
+  st = _flash_wait_();
+  FLASH_CR &= ~FLASH_CR_SER;
+  _flash_lock_();
+  return st;
+}
+
+hal_status_t hal_flash_raw_program(uint32_t addr, const void *data,
+                                   uint32_t len) {
+  if (data == NULL)
+    return HAL_ERR_INVALID_ARG;
+  if ((addr & 1u) != 0u || (len & 1u) != 0u)
+    return HAL_ERR_INVALID_ARG; /* half-word granularity */
+  if (!_raw_range_allowed(addr, len))
+    return HAL_ERR_INVALID_ARG;
+
+  const uint8_t *src = (const uint8_t *)data;
+  _flash_unlock_();
+  hal_status_t st = _flash_wait_();
+  for (uint32_t off = 0u; st == HAL_OK && off < len; off += 2u) {
+    /* The source may be unaligned, so the half-word is assembled by byte. */
+    uint16_t hw = (uint16_t)((uint16_t)src[off] | ((uint16_t)src[off + 1u] << 8));
+    FLASH_CR &= ~FLASH_CR_PSIZE_Msk;
+    FLASH_CR |= (0x1UL << FLASH_CR_PSIZE_Pos); /* 16-bit */
+    FLASH_CR |= FLASH_CR_PG;
+    *(__IO uint16_t *)(addr + off) = hw;
+    NAVHAL_FLASH_DSB();
+    st = _flash_wait_();
+    FLASH_CR &= ~FLASH_CR_PG;
+    if (st == HAL_OK && *(__IO uint16_t *)(addr + off) != hw)
+      st = HAL_ERR_IO; /* programmed, did not read back */
+  }
+  _flash_lock_();
+  return st;
 }
 
 const hal_flash_ops_t _hal_flash_ops = {

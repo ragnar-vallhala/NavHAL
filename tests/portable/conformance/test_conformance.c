@@ -58,6 +58,20 @@
 #include "common/hal_timer.h"
 #endif
 #if NAVHAL_CONFIG_DRV_FLASH
+/* Mirrors the driver's own fallback: an unset Kconfig int arrives as an empty
+ * define, not as absent. */
+#if defined(NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR) &&                          \
+    (NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR + 0) > 0
+#define NAVHAL_CONFORMANCE_KV_PRIMARY NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR
+#else
+#define NAVHAL_CONFORMANCE_KV_PRIMARY 6
+#endif
+#if defined(NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR) &&                        \
+    (NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR + 0) > 0
+#define NAVHAL_CONFORMANCE_KV_SECONDARY NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR
+#else
+#define NAVHAL_CONFORMANCE_KV_SECONDARY 7
+#endif
 #include "common/hal_flash.h"
 #endif
 #if NAVHAL_CONFIG_DRV_ADC
@@ -354,6 +368,64 @@ void test_conformance_flash_read_rejects_null_value(void) {
 
 void test_conformance_flash_read_rejects_null_size(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_flash_read(0u, flash_buf, NULL));
+}
+
+
+/* The raw partition API refuses what a loader must never touch. Every one of
+ * these is an argument check, so none of them writes flash -- the erase and
+ * program paths themselves want a board with the driver enabled, which no test
+ * config has yet. */
+void test_conformance_flash_raw_erase_refuses_stage1(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_erase_sector(0u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_erase_sector(1u));
+}
+
+void test_conformance_flash_raw_erase_refuses_a_sector_that_does_not_exist(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_erase_sector(8u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_erase_sector(255u));
+}
+
+/* The key/value store erases its own sectors; a loader reaching into them would
+ * take the attempt counter and the rollback floor with it. */
+void test_conformance_flash_raw_erase_refuses_the_kv_sectors(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_flash_raw_erase_sector((uint8_t)NAVHAL_CONFORMANCE_KV_PRIMARY));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_flash_raw_erase_sector((uint8_t)NAVHAL_CONFORMANCE_KV_SECONDARY));
+}
+
+void test_conformance_flash_raw_program_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x08020000UL, NULL, 2u));
+}
+
+/* Half-word granularity, so an odd address or length is refused rather than
+ * rounded -- rounding would write a byte the caller did not ask for. */
+void test_conformance_flash_raw_program_rejects_odd_address_or_length(void) {
+  static const uint8_t two[2] = {0xAA, 0x55};
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x08020001UL, two, 2u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x08020000UL, two, 1u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x08020000UL, two, 0u));
+}
+
+/* The whole range is checked, not just where it starts: a write that begins in
+ * stage-2 and runs backwards into stage-1 is the interesting case. */
+void test_conformance_flash_raw_program_rejects_a_range_reaching_stage1(void) {
+  static const uint8_t buf[4] = {0};
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_flash_raw_program(0x08007FFEUL, buf, 4u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x07FFFFFEUL, buf, 4u));
 }
 
 #endif /* NAVHAL_CONFIG_DRV_FLASH */
@@ -1288,6 +1360,12 @@ NAVTEST_CASE_DECL(test_conformance_flash_read_rejects_null_value);
 #endif
 #if NAVHAL_CONFIG_DRV_FLASH
 NAVTEST_CASE_DECL(test_conformance_flash_read_rejects_null_size);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_erase_refuses_stage1);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_erase_refuses_a_sector_that_does_not_exist);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_erase_refuses_the_kv_sectors);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_program_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_program_rejects_odd_address_or_length);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_program_rejects_a_range_reaching_stage1);
 #endif
 #if NAVHAL_CONFIG_DRV_I2C
 NAVTEST_CASE_DECL(test_conformance_i2c_write_rejects_null_data);
@@ -2007,6 +2085,12 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_FLASH
     NAVTEST_CASE(test_conformance_flash_read_rejects_null_size),
+    NAVTEST_CASE(test_conformance_flash_raw_erase_refuses_stage1),
+    NAVTEST_CASE(test_conformance_flash_raw_erase_refuses_a_sector_that_does_not_exist),
+    NAVTEST_CASE(test_conformance_flash_raw_erase_refuses_the_kv_sectors),
+    NAVTEST_CASE(test_conformance_flash_raw_program_rejects_null),
+    NAVTEST_CASE(test_conformance_flash_raw_program_rejects_odd_address_or_length),
+    NAVTEST_CASE(test_conformance_flash_raw_program_rejects_a_range_reaching_stage1),
 #endif
 #if NAVHAL_CONFIG_DRV_I2C
     NAVTEST_CASE(test_conformance_i2c_write_rejects_null_data),

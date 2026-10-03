@@ -3,14 +3,10 @@
 # Secure bootloader
 
 > Status: **next** — the current track, taken ahead of M10 (2026-09-27).
-> **RDP2 is deferred**: ship and validate at RDP1. That means authenticated
-> updates and crashloop recovery — integrity, not confidentiality. Flash stays
-> readable over SWD and an attacker with physical access can simply reflash, so
-> this is not secure boot until RDP2 lands. The two-stage shape is unaffected:
-> stage-1 is WRP'd and immutable either way. Slice 3 (boot block) shipped in
-> 0.3.x.
-> Scope: a two-stage, signature-verified bootloader for STM32F401RE, with the
-> production part locked at RDP Level 2.
+> **RDP1 is the ceiling. RDP2 is not used, on any unit, ever** — see the rule
+> below. Slice 3 (boot block) shipped in 0.3.x.
+> Scope: a two-stage, signature-verified bootloader for STM32F401RE, shipping at
+> RDP Level 1.
 > Predecessor: none — additive, but it re-partitions flash, so it must land
 > before any board ships with an app larger than 256 KiB.
 > Unlocks: authenticated field updates over UART and USB CDC; crashloop
@@ -19,35 +15,58 @@
 ## Goal
 
 Firmware that only runs images signed by NAVRobotec, updatable over the links
-the drone already has, and recoverable when the application crashes. The
-production part runs at RDP Level 2 — no SWD, option bytes frozen — so the
-design is shaped by one fact: **whatever is immutable is immutable forever.**
+the drone already has, and recoverable when the application crashes.
 
-SWD stays open during development. That is a bench convenience, not part of the
-threat model; the code is identical at every protection level and only the
-embedded public key differs.
+## The RDP rule
+
+**Units ship at RDP Level 1. RDP Level 2 is never set.** The provisioning tool
+refuses it rather than offering it, and that is a rule rather than a default.
+
+Level 2 is irreversible: no SWD, option bytes frozen, no system bootloader. A
+single defect in a write-protected stage-1 would then be unfixable on every unit
+carrying it, and a returned board could not be attached to at all. The protection
+it adds over Level 1 is not worth a fleet that cannot be diagnosed or rescued.
+
+Level 1 gives what is actually wanted: flash and backup SRAM cannot be read
+through a debugger, and recovering full debug access costs a mass erase, so an
+attacker gets a blank part rather than the firmware. The unit stays serviceable,
+because that erase is a path back.
+
+### Signing does not depend on any of this
+
+Signature verification and readout protection are independent. Stage-1 accepts an
+image because it carries a valid signature over its digest, and that is true at
+Level 0 on a bench and at Level 1 in the field — the code is identical and only
+the embedded public key differs. RDP decides who can read flash or bypass the
+loader through the debug port; signing decides what the device will run through
+its own update path. Neither waits for the other, and the signing work is
+complete and useful without any option byte being set.
+
+What RDP1 adds is that an attacker with a probe cannot read the image out, and
+what it does not add is immutability against someone willing to mass-erase the
+part. That is understood and accepted.
 
 ## Design decisions (load-bearing)
 
 | Decision | Choice | Why |
 |---|---|---|
-| Stage count | **two** | RDP2 is irreversible. A USB CDC stack frozen for the life of the product is not an acceptable risk; only the trust anchor is frozen. |
+| Stage count | **two** | A USB CDC stack carried in the write-protected stage would be frozen for the life of the product. Only the trust anchor goes in stage-1; everything replaceable lives in stage-2. |
 | Slots | **single, no A/B** | A second slot needs the app under 192 KiB on this part. The crashloop counter plus the RX sniffer cover the realistic failure modes at a fraction of the flash. |
 | Signature | **Ed25519 over a SHA-256 digest** | Asymmetric is mandatory: a shared HMAC key is extractable through SWD on a dev board and would then sign anything. SHA-256 rather than SHA-512 roughly halves the per-boot hash of a 384 KiB app. |
 | Integrity | **SHA-256 in the image, CRC-32 as a cheap pre-check** | `hal_crc` is hardware-backed and rejects a truncated transfer in microseconds before the expensive hash runs. |
 | Stage-1 transport | **UART and CDC, both watched from boot** | A board that can be flashed over CDC should be recoverable over CDC: needing a UART to rescue a USB-only unit is a recovery path that is not there when it is wanted. Decided against the original UART-only line, whose reasoning is kept below as the cost being accepted. |
 | Boot-mode signalling | **`.noinit` block in SRAM** | Survives reset for free — `Reset_Handler` only zeroes what the linker's zero table lists (`boot.c:90`). |
-| Rollback floor | **KV store key** | Already exists; no new persistence mechanism. Meaningful only once RDP2 stops an attacker erasing it. |
+| Rollback floor | **KV store key** | Already exists; no new persistence mechanism. It stops a signed-but-old image being accepted through the update path, which is the attack it is for. Someone with a probe can still mass-erase the part, and that is out of scope at RDP1. |
 
 ## What is deliberately NOT in this bootloader
 
 * **A/B slots and rollback-on-failure** — see above. Revisiting means
   re-partitioning, so the decision is recorded rather than left open.
-* **Firmware encryption** — buys nothing while SWD is open in dev, and at RDP2
+* **Firmware encryption** — buys nothing while SWD is open in dev, and at RDP1
   the readout it would protect against is already blocked.
 * **Delta or partial updates** — the app spans 128 KiB sectors; that is the
   smallest erasable unit up there.
-* **ROM DFU / BOOT0 fallback** — unreachable at RDP2.
+* **ROM DFU / BOOT0 fallback** — at RDP1 the system bootloader cannot read flash, and stage-1's own recovery covers the same need over links the board already has.
 
 ## Flash partition (STM32F401RE, 512 KiB)
 
@@ -76,7 +95,7 @@ declares the full 512 KiB while the KV store squats at `0x08040000`, so an app
 over 256 KiB silently collides with it today, and a KV compaction erasing
 sector 6 would take app code with it.
 
-Stage-1 carries no header. It is the root of trust, protected by WRP and RDP2
+Stage-1 carries no header. It is the root of trust, protected by WRP
 rather than by a signature, and the CPU boots straight into its vector table.
 
 F767ZI has a different sector map and needs its own table before that port
@@ -334,19 +353,21 @@ uses: four times fewer program cycles at 3.3 V.
 
 ## Provisioning
 
-RDP2 freezes the option bytes, WRP and BOR included, so the order is one-way:
+Nothing here is one-way, which is the point of stopping at Level 1:
 
 1. Flash stage-1, stage-2 and app over SWD
 2. Set WRP on sectors 0–1
 3. Set BOR level — a browned-out core executing garbage bypasses every check
    above, and this is the cheapest mitigation available
-4. Set RDP2 **last**
+4. Set RDP Level 1 **last**
 
-Steps 2 and 3 are permanent once step 4 runs.
+Every step is reversible at the cost of a mass erase, so a unit that comes back
+can be rescued and a provisioning mistake costs a reflash rather than a board.
+The tool refuses RDP Level 2; see the RDP rule above.
 
-Three tiers: development at RDP0 with SWD, validation at RDP1, production at
-RDP2. RDP1 blocks readout but downgrading mass-erases, so those boards stay
-recoverable and are where the full matrix runs before any unit is locked.
+Two tiers rather than three: development at RDP0 with SWD open, and shipped units
+at RDP1. There is no production tier beyond that, so the matrix that runs at RDP1
+is the one that gates a release rather than a rehearsal for a stricter state.
 
 ## Slices
 
@@ -382,9 +403,9 @@ callback, CDC on a forwarding RX callback — the `hal_boot_entry_disable`
 policy gate, and the liveness clear of the attempt counter.
 
 ### Slice 8 — Provisioning and lockdown
-Option-byte tool and full RDP1 validation. **RDP2 is deferred** — the step is
-irreversible, so it waits until the RDP1 matrix has run clean on real units and
-there is a reason to take it.
+Option-byte tool and the full RDP1 validation matrix. The tool sets WRP, BOR and
+RDP Level 1, and **refuses Level 2** -- the rule is enforced in the thing that
+would otherwise make the mistake, not just written down.
 
 Slices 1–3 are independently useful and carry no cryptographic risk. The chain
 of trust does not exist until slice 5.

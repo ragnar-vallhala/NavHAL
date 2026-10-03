@@ -82,6 +82,36 @@ rather than by a signature, and the CPU boots straight into its vector table.
 F767ZI has a different sector map and needs its own table before that port
 adopts this.
 
+### Linker scripts, one per image
+
+`src/board/nucleo_f401re/boot/` holds `stage1.ld`, `stage2.ld` and `app.ld`.
+Each is a MEMORY block over the region that image owns plus `INCLUDE
+cortex-m4.ld`, the same shape as a board script, so the section layout stays
+shared. Pass one with `-T`, and `-L src/arch/armv7e-m/link` so ld can find the
+include -- ld resolves an INCLUDE against the search path, never against the
+directory of the script doing the including.
+
+Verified by linking a stub with each:
+
+| Script | Vector table | Partition |
+|---|---|---|
+| `stage1.ld` | `0x08000000` | sectors 0-1, no header |
+| `stage2.ld` | `0x08010200` | sector 4, base + 512 header |
+| `app.ld` | `0x08020200` | sectors 5-7, base + 512 header |
+
+The header offset is what keeps the payload's vector table 512-byte aligned,
+which VTOR requires.
+
+With these, **the KV store at sectors 2-3 stops colliding with anything**:
+stage-1 ends below `0x08008000`, stage-2 and the app begin above `0x0800FFFF`.
+All three link with `CONFIG_FLASH_KV_PRIMARY_SECTOR=2` and `=3`, where a flat
+image over 32 KiB is refused. That is the dependency the partition had on the
+scripts, and it is now discharged.
+
+The numbers are repeated from `hal_bootmap.h` because a linker script cannot
+include a C header; if the two ever disagree, the header is the one that is
+right, and its static assertions are what keep it honest.
+
 ## Image format
 
 Stage-2 and the app share one header; the signature covers it.

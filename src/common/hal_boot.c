@@ -27,6 +27,7 @@
  */
 
 #include "common/hal_boot.h"
+#include <stdint.h>
 
 #if NAVHAL_CONFIG_BOOT_SNIFFER
 
@@ -97,6 +98,20 @@ hal_status_t hal_boot_clear_request(void) {
 
 uint32_t hal_boot_get_attempts(void) {
   return hal_boot_block_valid() ? _sboot.attempts : 0u;
+}
+
+hal_status_t hal_boot_account_attempt(void) {
+  if (!hal_boot_block_valid()) {
+    return HAL_ERR_NOT_INITIALIZED;
+  }
+  uint32_t a = _sboot.attempts;
+  if (a < UINT32_MAX) {
+    a++;
+  }
+  /* Saturating, not wrapping: at 0xFFFFFFFF the next increment would read as a
+   * clean count and hand a crashlooping board back to the image crashing it. */
+  block_seal(_sboot.request, a);
+  return HAL_OK;
 }
 
 hal_status_t hal_boot_mark_healthy(void) {

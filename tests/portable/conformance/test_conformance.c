@@ -1485,6 +1485,7 @@ NAVTEST_CASE_DECL(test_conformance_boot_entry_gate_round_trips);
 NAVTEST_CASE_DECL(test_conformance_boot_request_is_refused_while_disabled);
 NAVTEST_CASE_DECL(test_conformance_boot_match_ignores_other_traffic);
 NAVTEST_CASE_DECL(test_conformance_boot_clear_and_heal_need_a_valid_block);
+NAVTEST_CASE_DECL(test_conformance_boot_attempt_counts_and_clears);
 NAVTEST_CASE_DECL(test_conformance_boot_set_prepare_accepts_null);
 #endif
 
@@ -1574,6 +1575,19 @@ void test_conformance_boot_clear_and_heal_need_a_valid_block(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_clear_request());
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_mark_healthy());
+  TEST_ASSERT_EQUAL_UINT32(0u, hal_boot_get_attempts());
+}
+
+/* The loader's half of the crashloop defence, portable because the counter lives
+ * in the shared boot block and not in anything device-specific. Left clean on the
+ * way out: a suite that bumped the count and walked away would send the next boot
+ * of this board to recovery. */
+void test_conformance_boot_attempt_counts_and_clears(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
+  uint32_t before = hal_boot_get_attempts();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_account_attempt());
+  TEST_ASSERT_EQUAL_UINT32(before + 1u, hal_boot_get_attempts());
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_mark_healthy());
   TEST_ASSERT_EQUAL_UINT32(0u, hal_boot_get_attempts());
 }
@@ -2211,6 +2225,7 @@ static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_boot_request_is_refused_while_disabled),
     NAVTEST_CASE(test_conformance_boot_match_ignores_other_traffic),
     NAVTEST_CASE(test_conformance_boot_clear_and_heal_need_a_valid_block),
+    NAVTEST_CASE(test_conformance_boot_attempt_counts_and_clears),
     NAVTEST_CASE(test_conformance_boot_set_prepare_accepts_null),
 #endif
 };

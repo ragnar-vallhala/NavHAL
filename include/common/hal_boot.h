@@ -150,6 +150,27 @@ uint32_t hal_boot_get_attempts(void);
  */
 hal_status_t hal_boot_mark_healthy(void);
 
+/**
+ * @brief Count this boot attempt, before handing control to the next image.
+ *
+ * A loader calls this on the way past: the counter it raises is what makes a
+ * crashloop recoverable. An image that boots, faults and resets raises it again,
+ * and once it reaches ::HAL_BOOT_MAX_ATTEMPTS the loader stops handing control
+ * over and goes to recovery instead.
+ *
+ * Nothing else raises it. ::hal_boot_mark_healthy is the other half -- the
+ * application clears the count once it has proven it is alive, never at startup,
+ * or a fault that happens after main() resets its own strike count forever.
+ *
+ * Saturates rather than wrapping. A counter that rolls over to zero would hand a
+ * crashlooping board back to the image that is crashing, which is the one
+ * outcome this exists to prevent.
+ *
+ * @return ::HAL_OK, or ::HAL_ERR_NOT_INITIALIZED if the block is not valid --
+ *         call ::hal_boot_block_init first.
+ */
+hal_status_t hal_boot_account_attempt(void);
+
 /* -------------------------------------------------------------------------- *
  * Watcher
  * -------------------------------------------------------------------------- */

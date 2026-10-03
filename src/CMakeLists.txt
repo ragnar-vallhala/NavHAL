@@ -83,17 +83,23 @@ endif()
 # link, so the choice is enforced here as well as in Kconfig.
 if(CONFIG_BOOT_CRYPTO)
     set(CRYPTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils/crypto)
+    # The image digest is backend-independent: one SHA-256 for all three, because
+    # the signature is made over it and must still verify after a reconfigure.
+    list(APPEND COMMON_SOURCES
+        ${CRYPTO_DIR}/boot_hash.c
+        ${CRYPTO_DIR}/sha256/sha256.c)
+    set(CRYPTO_INCLUDES ${CRYPTO_DIR}/sha256)
     if(CONFIG_BOOT_ED25519_MONOCYPHER)
         list(APPEND COMMON_SOURCES
             ${CRYPTO_DIR}/backend_monocypher.c
             ${CRYPTO_DIR}/monocypher/monocypher.c
             ${CRYPTO_DIR}/monocypher/monocypher-ed25519.c)
-        set(CRYPTO_INCLUDES ${CRYPTO_DIR}/monocypher)
+        list(APPEND CRYPTO_INCLUDES ${CRYPTO_DIR}/monocypher)
     elseif(CONFIG_BOOT_ED25519_TWEETNACL)
         list(APPEND COMMON_SOURCES
             ${CRYPTO_DIR}/backend_tweetnacl.c
             ${CRYPTO_DIR}/tweetnacl/tweetnacl.c)
-        set(CRYPTO_INCLUDES ${CRYPTO_DIR}/tweetnacl)
+        list(APPEND CRYPTO_INCLUDES ${CRYPTO_DIR}/tweetnacl)
     elseif(CONFIG_BOOT_ED25519_COMPACT25519)
         list(APPEND COMMON_SOURCES
             ${CRYPTO_DIR}/backend_compact25519.c
@@ -104,7 +110,7 @@ if(CONFIG_BOOT_CRYPTO)
             ${CRYPTO_DIR}/compact25519/c25519/f25519.c
             ${CRYPTO_DIR}/compact25519/c25519/fprime.c
             ${CRYPTO_DIR}/compact25519/c25519/sha512.c)
-        set(CRYPTO_INCLUDES ${CRYPTO_DIR}/compact25519)
+        list(APPEND CRYPTO_INCLUDES ${CRYPTO_DIR}/compact25519)
     else()
         message(FATAL_ERROR
             "CONFIG_BOOT_CRYPTO is set but no Ed25519 backend is selected")

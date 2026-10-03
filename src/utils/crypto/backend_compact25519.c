@@ -27,7 +27,6 @@
  */
 #include "common/hal_boot_crypto.h"
 #include "compact_ed25519.h"
-#include "c25519/sha512.h"
 #include <string.h>
 
 hal_status_t hal_boot_ed25519_verify(const uint8_t *sig, const uint8_t *pk,
@@ -37,19 +36,3 @@ hal_status_t hal_boot_ed25519_verify(const uint8_t *sig, const uint8_t *pk,
   return compact_ed25519_verify(sig, pk, msg, len) ? HAL_OK : HAL_ERR;
 }
 
-hal_status_t hal_boot_hash(uint8_t *out, const uint8_t *data, size_t len) {
-  if (out == NULL || (data == NULL && len != 0u))
-    return HAL_ERR_INVALID_ARG;
-
-  struct sha512_state s;
-  sha512_init(&s);
-
-  size_t off = 0;
-  while (len - off >= SHA512_BLOCK_SIZE) {
-    sha512_block(&s, data + off);
-    off += SHA512_BLOCK_SIZE;
-  }
-  sha512_final(&s, data + off, len);
-  sha512_get(&s, out, 0, HAL_BOOT_DIGEST_SIZE);
-  return HAL_OK;
-}

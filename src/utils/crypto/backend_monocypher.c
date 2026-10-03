@@ -31,9 +31,3 @@ hal_status_t hal_boot_ed25519_verify(const uint8_t *sig, const uint8_t *pk,
   return crypto_ed25519_check(sig, pk, msg, len) == 0 ? HAL_OK : HAL_ERR;
 }
 
-hal_status_t hal_boot_hash(uint8_t *out, const uint8_t *data, size_t len) {
-  if (out == NULL || (data == NULL && len != 0u))
-    return HAL_ERR_INVALID_ARG;
-  crypto_sha512(out, data, len);
-  return HAL_OK;
-}

@@ -43,8 +43,7 @@ extern "C" {
 /** @brief Ed25519 public key, signature and image digest sizes, in bytes. */
 #define HAL_BOOT_PUBKEY_SIZE 32u
 #define HAL_BOOT_SIG_SIZE    64u
-#define HAL_BOOT_DIGEST_SIZE 64u /**< SHA-512; the image digest reuses the hash
-                                      Ed25519 already carries. */
+#define HAL_BOOT_DIGEST_SIZE 32u /**< SHA-256. */
 
 /**
  * @brief Verify an Ed25519 signature over @p msg.
@@ -67,9 +66,14 @@ hal_status_t hal_boot_ed25519_verify(const uint8_t *sig, const uint8_t *pk,
 /**
  * @brief Hash @p len bytes of @p data into @p out.
  *
- * SHA-512, because Ed25519 contains it by construction: reusing it costs 58
- * bytes of flash where a separate SHA-256 costs about 1.3 KB. It is the slower
- * hash per byte, which is the trade -- see the roadmap's measurements.
+ * SHA-256, and the same one whichever backend is selected -- the signature is
+ * made over this digest, so a signed image has to verify after a reconfigure.
+ * It is not Ed25519's internal SHA-512, which stays where it is.
+ *
+ * Chosen over reusing that SHA-512: the app hash is the dominant term in boot
+ * time, 676 ms for a 384 KiB image at 144.4 cycles/byte, and SHA-256 is the
+ * faster hash. The cost is about 1.3 KB of flash against 58 bytes, which
+ * stage-1 can afford -- see the roadmap's measured budget.
  *
  * @param out  ::HAL_BOOT_DIGEST_SIZE bytes.
  */

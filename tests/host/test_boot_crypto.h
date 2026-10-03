@@ -29,7 +29,9 @@ void test_boot_crypto_corpus_was_found(void);
 void test_boot_crypto_every_backend_accepts_every_valid_signature(void);
 void test_boot_crypto_every_backend_rejects_every_invalid_signature(void);
 void test_boot_crypto_malleability_is_what_kconfig_claims(void);
-void test_boot_crypto_the_three_hashes_agree(void);
+void test_boot_crypto_digest_matches_fips_180_4(void);
+void test_boot_crypto_digest_handles_a_long_message(void);
+void test_boot_crypto_hash_rejects_a_null_out(void);
 
 extern const navtest_suite_t test_boot_crypto_suite;
 

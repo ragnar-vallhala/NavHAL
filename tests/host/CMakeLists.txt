@@ -61,6 +61,9 @@ add_executable(tests_host
   ${NAVHAL_ROOT}/src/common/hal_boot.c
   # All three Ed25519 backends at once: the corpus has to run against each, and
   # only one of them can wear the hal_boot_crypto symbols per build.
+  # the image digest and its entry point, which the suite checks against FIPS
+  ${NAVHAL_ROOT}/src/utils/crypto/boot_hash.c
+  ${NAVHAL_ROOT}/src/utils/crypto/sha256/sha256.c
   ${NAVHAL_ROOT}/src/utils/crypto/monocypher/monocypher.c
   ${NAVHAL_ROOT}/src/utils/crypto/monocypher/monocypher-ed25519.c
   ${NAVHAL_ROOT}/src/utils/crypto/tweetnacl/tweetnacl.c
@@ -75,6 +78,7 @@ add_executable(tests_host
 target_compile_definitions(tests_host PRIVATE
   BOOT_VECTORS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/vectors/ed25519_check")
 target_include_directories(tests_host PRIVATE
+  ${NAVHAL_ROOT}/src/utils/crypto/sha256
   ${NAVHAL_ROOT}/src/utils/crypto/monocypher
   ${NAVHAL_ROOT}/src/utils/crypto/tweetnacl
   ${NAVHAL_ROOT}/src/utils/crypto/compact25519

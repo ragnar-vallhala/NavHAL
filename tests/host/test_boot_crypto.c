@@ -38,6 +38,7 @@
 #include <string.h>
 
 #include "c25519/sha512.h"
+#include "common/hal_boot_crypto.h"
 #include "compact_ed25519.h"
 #include "monocypher-ed25519.h"
 #include "tweetnacl.h"
@@ -216,46 +217,62 @@ void test_boot_crypto_malleability_is_what_kconfig_claims(void) {
   TEST_ASSERT_EQUAL_UINT32(4u, (uint32_t)c[BK_COMPACT].malleable_accepted);
 }
 
-/* The three SHA-512s have to agree, or the image digest depends on which backend
- * was configured -- and a signed image would stop verifying on a reconfigure. */
-void test_boot_crypto_the_three_hashes_agree(void) {
-  static const unsigned char msg[77] =
-      "the image digest must not depend on which backend was configured today";
-  unsigned char a[64], b[64], d[64];
+/* The image digest, through the entry point stage-1 calls, against the FIPS
+ * 180-4 known answers. It is one implementation for every backend now, so what
+ * matters is that it is the right SHA-256 -- not that three of them agree. */
+static int digest_is(const char *msg, size_t len, const char *want_hex) {
+  uint8_t out[HAL_BOOT_DIGEST_SIZE];
+  char got[2 * HAL_BOOT_DIGEST_SIZE + 1];
+  if (hal_boot_hash(out, (const uint8_t *)msg, len) != HAL_OK)
+    return 0;
+  for (size_t i = 0; i < sizeof out; i++)
+    sprintf(got + 2 * i, "%02x", out[i]);
+  return strcmp(got, want_hex) == 0;
+}
 
-  crypto_sha512(a, msg, sizeof msg);
-  crypto_hash(b, msg, sizeof msg);
+void test_boot_crypto_digest_matches_fips_180_4(void) {
+  TEST_ASSERT_EQUAL_UINT32(32u, (uint32_t)HAL_BOOT_DIGEST_SIZE);
+  TEST_ASSERT_TRUE(digest_is(
+      "", 0, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
+  TEST_ASSERT_TRUE(digest_is(
+      "abc", 3,
+      "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"));
+  TEST_ASSERT_TRUE(digest_is(
+      "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq", 56,
+      "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"));
+}
 
-  struct sha512_state st;
-  sha512_init(&st);
-  size_t off = 0;
-  while (sizeof msg - off >= SHA512_BLOCK_SIZE) {
-    sha512_block(&st, msg + off);
-    off += SHA512_BLOCK_SIZE;
-  }
-  sha512_final(&st, msg + off, sizeof msg);
-  sha512_get(&st, d, 0, 64);
+/* A million 'a' is the vector that catches a broken length or block boundary,
+ * which the short ones pass straight over. */
+void test_boot_crypto_digest_handles_a_long_message(void) {
+  static char million[1000000];
+  memset(million, 'a', sizeof million);
+  TEST_ASSERT_TRUE(digest_is(
+      million, sizeof million,
+      "cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0"));
+}
 
-  /* navtest has no memory-compare assertion, and a byte-wise loop reports which
-   * byte differs rather than just that something did. */
-  for (int i = 0; i < 64; i++) {
-    TEST_ASSERT_EQUAL_UINT32((uint32_t)a[i], (uint32_t)b[i]);
-    TEST_ASSERT_EQUAL_UINT32((uint32_t)a[i], (uint32_t)d[i]);
-  }
+void test_boot_crypto_hash_rejects_a_null_out(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_boot_hash(NULL, (const uint8_t *)"x", 1));
 }
 
 NAVTEST_CASE_DECL(test_boot_crypto_corpus_was_found);
 NAVTEST_CASE_DECL(test_boot_crypto_every_backend_accepts_every_valid_signature);
 NAVTEST_CASE_DECL(test_boot_crypto_every_backend_rejects_every_invalid_signature);
 NAVTEST_CASE_DECL(test_boot_crypto_malleability_is_what_kconfig_claims);
-NAVTEST_CASE_DECL(test_boot_crypto_the_three_hashes_agree);
+NAVTEST_CASE_DECL(test_boot_crypto_digest_matches_fips_180_4);
+NAVTEST_CASE_DECL(test_boot_crypto_digest_handles_a_long_message);
+NAVTEST_CASE_DECL(test_boot_crypto_hash_rejects_a_null_out);
 
 static const navtest_case_t _cases[] = {
     NAVTEST_CASE(test_boot_crypto_corpus_was_found),
     NAVTEST_CASE(test_boot_crypto_every_backend_accepts_every_valid_signature),
     NAVTEST_CASE(test_boot_crypto_every_backend_rejects_every_invalid_signature),
     NAVTEST_CASE(test_boot_crypto_malleability_is_what_kconfig_claims),
-    NAVTEST_CASE(test_boot_crypto_the_three_hashes_agree),
+    NAVTEST_CASE(test_boot_crypto_digest_matches_fips_180_4),
+    NAVTEST_CASE(test_boot_crypto_digest_handles_a_long_message),
+    NAVTEST_CASE(test_boot_crypto_hash_rejects_a_null_out),
 };
 
 const navtest_suite_t test_boot_crypto_suite = {

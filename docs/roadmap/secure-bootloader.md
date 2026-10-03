@@ -406,7 +406,7 @@ Flash figures are verify-only: `-ffunction-sections` with `--gc-sections`, no
 `mem*` (the HAL supplies those in `src/utils/freestanding.c`), and no signing or
 key generation, none of which stage-1 performs.
 
-### The image digest is not free the way the table above suggests
+### The image digest: SHA-256, decided and measured
 
 | Stage-1 crypto content | Flash | Against verify-only |
 |---|---|---|
@@ -419,27 +419,38 @@ so reusing it for the image digest costs 58 bytes. BLAKE2b, despite being in
 Monocypher's core and the faster hash per byte, pulls 16 KB -- half the stage-1
 budget -- so it is out on size alone.
 
-SHA-256 as specified above is the remaining option and is **not yet measured**:
-it needs an implementation this tree does not carry, roughly 1.3 KB, and would
-need validating against its own vectors in slice 4b.
+**SHA-256 it is**, and it costs less and saves more than the estimate said: 896
+bytes of flash (640 text, 256 rodata) against a guess of 1.3 KB, and 79.15
+cycles/byte against SHA-512's 144.4 -- so a 384 KiB app hashes in 371 ms rather
+than 676 ms. 305 ms for 896 bytes, with 11 KB of stage-1 still unused.
+
+It is one implementation for every backend, not per-backend: the signature is
+made over this digest, so a signed image has to keep verifying if the backend is
+reconfigured. Ed25519's internal SHA-512 stays where it is and is untouched by
+this.
+
+Checked against the FIPS 180-4 known answers before being vendored -- empty,
+"abc", the 56-byte case and 1,000,000 'a' -- and `tests/host/test_boot_crypto.c`
+keeps all four, driven through `hal_boot_hash` rather than the implementation, so
+the entry point stage-1 actually calls is the thing under test.
 
 ### Hash throughput, and what it does to the boot-latency estimate
 
 | Hash | Cycles/byte | 384 KiB app | Flash cost here |
 |---|---|---|---|
-| SHA-512 (already linked) | 144.4 | **676 ms** | +58 B |
+| **SHA-256 (chosen)** | **79.2** | **371 ms** | **+896 B** |
+| SHA-512 (already linked) | 144.4 | 676 ms | +58 B |
 | BLAKE2b | 59.0 | 276 ms | +16 KB |
-| SHA-256 | not measured | ~340 ms if it is 2× SHA-512 | ~1.3 KB |
 
 Measured over 64 KiB read from flash, which is what the real hash does, so the
 flash wait states are in the number rather than hidden by a RAM-resident buffer.
 
-**The ~170 ms estimate in Open questions below does not survive this.** Verify
-is 29 ms and the app hash dominates: 676 ms with SHA-512, or around 370 ms total
-if SHA-256 lands at twice SHA-512's rate. Both are several times the estimate,
-so the question of whether to weaken the guarantee to "verified once, recorded
-in KV" is live now rather than later, and it should be settled before slice 1
-fixes the partition table.
+**The ~170 ms estimate in Open questions below does not survive this.** Measured,
+the boot path is a 371 ms app hash, about 300 ms of USB enumeration and a 29 ms
+verify -- roughly 700 ms, four times the estimate. Whether that is worth
+weakening the guarantee to "verified once, recorded in KV" is now a judgement
+about 700 ms rather than an open measurement, and the hash is already the cheaper
+of the two large terms.
 
 Stage-1's 32 KiB has to hold the 10.8 KB of crypto plus startup, clock, the
 flash driver, UART recovery and the verify logic. That leaves about 21 KB, which
@@ -466,8 +477,9 @@ A probe that calls each layer stage-1 needs, on an F401 at `-Os` with
 | + UART rx | 5,344 | +32 |
 | + flash KV (attempt accounting) | 6,304 | +960 |
 | + watchdog kick | 6,656 | +352 |
-| + Ed25519 verify and SHA-512 | 17,504 | +10,848 |
-| **+ USB CDC** | **20,288** | **+2,784** |
+| + Ed25519 verify (SHA-512 comes with it) | 17,504 | +10,848 |
+| + USB CDC | 20,288 | +2,784 |
+| **+ SHA-256 for the image digest** | **~21,184** | **+896** |
 
 20,288 of 32,768, or 17,788 with LTO. Either leaves 12 KB or more spare, so the
 backend choice is not forced by size: compact25519 would save about 6 KB and cost
@@ -524,6 +536,8 @@ that falls through to the jump -- not an error.
 
 ## Open questions
 
+* ~~Whether the image digest stays SHA-256~~ — **resolved: yes**, 896 bytes and
+  79.2 cycles/byte, which halves the dominant boot term. See Measured above.
 * ~~Which Ed25519 implementation~~ — **resolved: Monocypher**, 10,768 bytes and
   29.2 ms on the F401. See Measured above.
 * Boot latency — **measured, and materially higher than the estimate**. Verify

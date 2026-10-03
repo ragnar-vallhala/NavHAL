@@ -167,6 +167,67 @@ static hal_status_t stm32f7_uart_enable_interrupt(hal_uart_t uart, uint8_t rx_en
   return HAL_OK;
 }
 
+/* --- IDLE-line callback ------------------------------------------------------
+ * As on the F4 port, but the F7 USART clears IDLE through ICR rather than by an
+ * SR-then-DR read, so no data register access (and no stolen byte) is needed. */
+static void (*_uart_idle_cb[4])(void); /* USART1, 2, 3, 6 */
+
+static int _uart_idle_slot(hal_uart_t uart) {
+  return uart == HAL_UART_1 ? 0 : uart == HAL_UART_2 ? 1
+       : uart == HAL_UART_3 ? 2 : uart == HAL_UART_6 ? 3 : -1;
+}
+
+static void _uart_idle_handle(hal_uart_t uart) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  if (!usart || !(usart->ISR & USART_ISR_IDLE))
+    return; /* the shared USART line, raised for something else */
+  usart->ICR = USART_ICR_IDLECF;
+  void (*cb)(void) = _uart_idle_cb[_uart_idle_slot(uart)];
+  if (cb)
+    cb();
+}
+
+/* The interrupt registry takes a void(void) callback, so one thin trampoline
+ * per USART line carries the UART identity. */
+static void _uart_idle_irq_usart1(void) { _uart_idle_handle(HAL_UART_1); }
+static void _uart_idle_irq_usart2(void) { _uart_idle_handle(HAL_UART_2); }
+static void _uart_idle_irq_usart3(void) { _uart_idle_handle(HAL_UART_3); }
+static void _uart_idle_irq_usart6(void) { _uart_idle_handle(HAL_UART_6); }
+
+hal_status_t hal_uart_attach_idle_callback(hal_uart_t uart,
+                                           void (*callback)(void)) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  int slot = _uart_idle_slot(uart);
+  if (!usart || slot < 0 || !callback)
+    return HAL_ERR_INVALID_ARG;
+
+  static void (*const tramp[4])(void) = {
+      _uart_idle_irq_usart1, _uart_idle_irq_usart2, _uart_idle_irq_usart3,
+      _uart_idle_irq_usart6};
+  static const hal_irq_t irqs[4] = {USART1_IRQn, USART2_IRQn, USART3_IRQn,
+                                    USART6_IRQn};
+  _uart_idle_cb[slot] = callback;
+  hal_interrupt_attach_callback(irqs[slot], tramp[slot]);
+
+  usart->ICR = USART_ICR_IDLECF; /* a stale IDLE would fire at once */
+  usart->CR1 |= USART_CR1_IDLEIE;
+
+  /* Maskable (BASEPRI-managed) priority so the callback may call an RTOS
+   * *_from_isr primitive -- same contract as the DMA-completion ISRs. */
+  hal_interrupt_enable_with_priority(irqs[slot], HAL_IRQ_PRIORITY_DEFAULT);
+  return HAL_OK;
+}
+
+hal_status_t hal_uart_detach_idle_callback(hal_uart_t uart) {
+  volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
+  int slot = _uart_idle_slot(uart);
+  if (!usart || slot < 0)
+    return HAL_ERR_INVALID_ARG;
+  usart->CR1 &= ~USART_CR1_IDLEIE;
+  _uart_idle_cb[slot] = NULL;
+  return HAL_OK;
+}
+
 static hal_status_t stm32f7_uart_write_char(hal_uart_t uart, char c) {
   volatile UARTx_Reg_Typedef *usart = _get_usart(uart);
   if (!usart)

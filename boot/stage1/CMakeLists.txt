@@ -30,7 +30,7 @@ string(JOIN ", 0x" _pk_joined ${_pk_bytes})
 set(STAGE1_PUBKEY_INIT "0x${_pk_joined}")
 configure_file(stage1_pubkey.h.in ${CMAKE_CURRENT_BINARY_DIR}/stage1_pubkey.h @ONLY)
 
-add_executable(stage1 main.c)
+add_executable(stage1 main.c recovery.c verify.c)
 target_include_directories(stage1 PRIVATE ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(stage1 PRIVATE
   -Wl,--start-group

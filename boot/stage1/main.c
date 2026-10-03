@@ -34,7 +34,8 @@
 #include "common/hal_boot_crypto.h"
 #include "common/hal_bootmap.h"
 #include "navhal.h"
-#include "stage1_pubkey.h"
+#include "recovery.h"
+#include "verify.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -75,34 +76,6 @@ static void say_u32(uint32_t v) {
   say(out);
 }
 
-/* Verify the image at @p base against @p max_body. The order matters: magic,
- * then the length bound, then the hash, then the signature. Hashing before the
- * length is checked is how a verifier gets walked off the end of flash into
- * bytes an attacker chose. */
-static bool image_is_good(uint32_t base, uint32_t max_body) {
-  const hal_boot_image_header_t *h = (const hal_boot_image_header_t *)base;
-
-  if (h->magic != (uint32_t)HAL_BOOTMAP_IMAGE_MAGIC)
-    return false;
-  if (h->length == 0u || h->length > max_body)
-    return false;
-
-  /* The digest covers the header's first 12 bytes and then the body, which are
-   * not contiguous -- the padding sits between them -- so the hash is fed in two
-   * parts rather than over one range. */
-  uint8_t digest[HAL_BOOT_DIGEST_SIZE];
-  if (hal_boot_hash_split(digest, (const uint8_t *)base,
-                          HAL_BOOTMAP_SIGNED_PREFIX,
-                          (const uint8_t *)(base + HAL_BOOTMAP_HEADER_SIZE),
-                          h->length) != HAL_OK)
-    return false;
-
-  if (memcmp(digest, h->digest, sizeof digest) != 0)
-    return false;
-
-  return hal_boot_ed25519_verify(h->sig, stage1_pubkey, digest,
-                                 sizeof digest) == HAL_OK;
-}
 
 /* Hand control to an image: its vector table first, then its stack and entry
  * point. VTOR has to move before the jump or the new image's interrupts would
@@ -121,9 +94,65 @@ static void jump_to(uint32_t payload_base) {
     ; /* not reached */
 }
 
-/* Recovery. Slice 5b adds the receive protocol; for now it reports which
- * transport is available and waits, which is still better than jumping into an
- * image that failed to verify. */
+/* The two transports, as recovery wants them: one byte in, one byte out. Both
+ * poll rather than interrupt -- stage-1 has no business installing handlers it
+ * then has to tear down before the jump, and a loader waiting for bytes has
+ * nothing better to do. */
+
+static bool uart_get(uint8_t *out) {
+  /* Bounded so a silent line does not wedge the session: a host that stops
+   * mid-frame should cost a resync, not a reset. 2 s, because a human typing a
+   * command by hand is a legitimate case. */
+  uint32_t t0 = hal_timebase_get_millis();
+  while (hal_timebase_get_millis() - t0 < 2000u) {
+    (void)hal_watchdog_kick();
+    if (hal_uart_available(BOARD_CONSOLE_UART)) {
+      *out = (uint8_t)hal_uart_read_char(BOARD_CONSOLE_UART);
+      return true;
+    }
+  }
+  return false;
+}
+
+static void uart_put(uint8_t b) {
+  (void)hal_uart_write_char(BOARD_CONSOLE_UART, (char)b);
+}
+
+#if NAVHAL_CONFIG_DRV_USB_CDC
+static uint8_t cdc_rx_buf[64];
+static volatile uint16_t cdc_rx_head;
+static volatile uint16_t cdc_rx_tail;
+
+static void cdc_rx(const uint8_t *data, uint16_t len) {
+  for (uint16_t i = 0; i < len; i++) {
+    uint16_t next = (uint16_t)((cdc_rx_head + 1u) % sizeof cdc_rx_buf);
+    if (next == cdc_rx_tail)
+      return; /* full: drop rather than overwrite unread bytes */
+    cdc_rx_buf[cdc_rx_head] = data[i];
+    cdc_rx_head = next;
+  }
+}
+
+static bool cdc_get(uint8_t *out) {
+  uint32_t t0 = hal_timebase_get_millis();
+  while (hal_timebase_get_millis() - t0 < 2000u) {
+    (void)hal_watchdog_kick();
+    if (cdc_rx_tail != cdc_rx_head) {
+      *out = cdc_rx_buf[cdc_rx_tail];
+      cdc_rx_tail = (uint16_t)((cdc_rx_tail + 1u) % sizeof cdc_rx_buf);
+      return true;
+    }
+  }
+  return false;
+}
+
+static void cdc_put(uint8_t b) {
+  (void)hal_usb_cdc_write(&b, 1u);
+}
+#endif
+
+/* Recovery: say why, bring up whichever transports exist, then serve frames
+ * until a RUN command resets the board. Never returns. */
 static void recovery(const char *why) {
   say("\r\nstage1: recovery (");
   say(why);
@@ -132,19 +161,45 @@ static void recovery(const char *why) {
 #if NAVHAL_CONFIG_DRV_USB_CDC
   /* Enumerated, not connected: DTR needs an application to open the port, and a
    * board on a charger never asserts it. Bounded, because nothing may be
-   * attached at all. */
+   * attached at all -- expiry is an ordinary outcome and UART still works. */
   (void)hal_usb_cdc_init();
+  (void)hal_usb_cdc_set_rx_callback(cdc_rx);
   uint32_t waited = 0u;
   while (!hal_usb_cdc_enumerated() && waited < STAGE1_CDC_WINDOW_MS) {
     hal_delay_ms(10u);
     waited += 10u;
     (void)hal_watchdog_kick();
   }
-  say(hal_usb_cdc_enumerated() ? "stage1: cdc up\r\n" : "stage1: cdc absent\r\n");
+  bool cdc = hal_usb_cdc_enumerated();
+  say(cdc ? "stage1: cdc up\r\n" : "stage1: cdc absent\r\n");
+#else
+  const bool cdc = false;
+#endif
+
+  say("stage1: waiting for an image\r\n");
+
+  /* Whichever speaks first wins the session. Trying UART first costs one timeout
+   * when the host is on USB, which is 2 s of a recovery that is already manual. */
+  static const recovery_transport_t uart_t = {.get = uart_get, .put = uart_put};
+#if NAVHAL_CONFIG_DRV_USB_CDC
+  static const recovery_transport_t cdc_t = {.get = cdc_get, .put = cdc_put};
 #endif
 
   for (;;) {
+    uint8_t b;
     (void)hal_watchdog_kick();
+
+    if (hal_uart_available(BOARD_CONSOLE_UART)) {
+      recovery_serve(&uart_t); /* never returns */
+    }
+#if NAVHAL_CONFIG_DRV_USB_CDC
+    if (cdc && cdc_rx_tail != cdc_rx_head) {
+      recovery_serve(&cdc_t); /* never returns */
+    }
+#else
+    (void)cdc;
+    (void)b;
+#endif
   }
 }
 
@@ -178,7 +233,7 @@ int main(void) {
   if (hal_boot_get_attempts() >= HAL_BOOT_MAX_ATTEMPTS)
     recovery("crashloop");
 
-  if (!image_is_good(HAL_BOOTMAP_STAGE2_BASE, HAL_BOOTMAP_STAGE2_USABLE))
+  if (!stage1_image_is_good(HAL_BOOTMAP_STAGE2_BASE, HAL_BOOTMAP_STAGE2_USABLE))
     recovery("stage-2 did not verify");
 
   /* Counted before the jump, not after: an image that faults immediately would

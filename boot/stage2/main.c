@@ -27,6 +27,7 @@
  * checked before jumping here.
  */
 #include "board.h"
+#include "common/hal_boot.h"
 #include "navhal.h"
 
 int main(void) {
@@ -44,6 +45,14 @@ int main(void) {
   while (hal_timebase_get_millis() - t0 < 50u)
     ;
   hal_uart_print(BOARD_CONSOLE_UART, "stage2: systick runs from our vectors\r\n");
+
+  /* The application's half of the crashloop contract: clear the strike count
+   * only after proving liveness, never at startup. A stage that cleared it
+   * immediately would reset its own counter every boot, and a crash a second
+   * later would never be counted. */
+  hal_delay_ms(2000u);
+  (void)hal_boot_mark_healthy();
+  hal_uart_print(BOARD_CONSOLE_UART, "stage2: healthy, strikes cleared\r\n");
 
   for (;;) {
     hal_uart_print(BOARD_CONSOLE_UART, "stage2: alive\r\n");

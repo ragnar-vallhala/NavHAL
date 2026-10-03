@@ -75,7 +75,11 @@ hal_status_t hal_boot_ed25519_verify(const uint8_t *sig, const uint8_t *pk,
  * faster hash. The cost is about 1.3 KB of flash against 58 bytes, which
  * stage-1 can afford -- see the roadmap's measured budget.
  *
- * @param out  ::HAL_BOOT_DIGEST_SIZE bytes.
+ * @param out  ::HAL_BOOT_DIGEST_SIZE bytes of digest.
+ * @param data Bytes to hash; may be NULL only when @p len is 0.
+ * @param len  Length of @p data in bytes.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL destination or a NULL
+ *         source with a non-zero length.
  */
 hal_status_t hal_boot_hash(uint8_t *out, const uint8_t *data, size_t len);
 
@@ -90,7 +94,14 @@ hal_status_t hal_boot_hash(uint8_t *out, const uint8_t *data, size_t len);
  *
  * Equivalent to hashing @p a followed by @p b. Either length may be zero.
  *
- * @param out ::HAL_BOOT_DIGEST_SIZE bytes.
+ * @param out   ::HAL_BOOT_DIGEST_SIZE bytes of digest.
+ * @param a     First range -- the image header's signed prefix. May be NULL
+ *              only when @p a_len is 0.
+ * @param a_len Length of @p a in bytes.
+ * @param b     Second range -- the body. May be NULL only when @p b_len is 0.
+ * @param b_len Length of @p b in bytes.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL destination or a NULL
+ *         range with a non-zero length.
  */
 hal_status_t hal_boot_hash_split(uint8_t *out, const uint8_t *a, size_t a_len,
                                 const uint8_t *b, size_t b_len);

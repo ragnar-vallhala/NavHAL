@@ -37,7 +37,7 @@
  */
 #include "common/hal_bootmap.h"
 #include "monocypher-ed25519.h"
-#include "sha256.h"
+#include "common/hal_boot_crypto.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -166,11 +166,9 @@ int main(int argc, char **argv) {
 
   /* The digest covers the first 12 bytes of the header, then the body -- the
    * same order and extent the verifier uses. */
-  SHA256_CTX ctx;
-  sha256_init(&ctx);
-  sha256_update(&ctx, (const uint8_t *)&h, HAL_BOOTMAP_SIGNED_PREFIX);
-  sha256_update(&ctx, body, body_len);
-  sha256_final(&ctx, h.digest);
+  if (hal_boot_hash_split(h.digest, (const uint8_t *)&h,
+                          HAL_BOOTMAP_SIGNED_PREFIX, body, body_len) != HAL_OK)
+    return die("hashing failed");
 
   crypto_ed25519_sign(h.sig, sk, h.digest, sizeof h.digest);
   crypto_wipe(sk, sk_len);

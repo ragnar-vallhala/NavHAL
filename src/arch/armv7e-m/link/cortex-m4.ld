@@ -97,6 +97,15 @@ SECTIONS {
     . = ALIGN(8);
     _snoinit = .;
     KEEP(*(.noinit*))
+    /* Reserved whether or not THIS image declares any .noinit, because the boot
+       block is shared between images at a fixed address. An image that links no
+       hal_boot.c -- a stage-2 that only verifies and jumps, say -- would
+       otherwise start its .data and .bss at 0x20000000 and zero the block the
+       loader just wrote. The symptom is not a crash: the attempt counter silently
+       resets every boot, so the crashloop limit can never be reached and the one
+       defence against a crashlooping image is quietly absent.
+       HAL_BOOT_BLOCK_RESERVE must be at least sizeof(hal_boot_block_t). */
+    . = _snoinit + 16;
     . = ALIGN(8);
     _enoinit = .;
   } > RAM

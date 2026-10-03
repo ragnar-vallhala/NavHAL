@@ -79,6 +79,22 @@ hal_status_t hal_boot_ed25519_verify(const uint8_t *sig, const uint8_t *pk,
  */
 hal_status_t hal_boot_hash(uint8_t *out, const uint8_t *data, size_t len);
 
+/**
+ * @brief Hash two ranges as if they were one.
+ *
+ * What an image digest needs, and the reason this exists rather than a caller
+ * concatenating: the signature covers the header's first 12 bytes and then the
+ * body, and those are not next to each other -- the header's padding sits
+ * between them. The body can be 384 KiB, so copying the two together to hash
+ * them is not an option on a part with 96 KiB of RAM.
+ *
+ * Equivalent to hashing @p a followed by @p b. Either length may be zero.
+ *
+ * @param out ::HAL_BOOT_DIGEST_SIZE bytes.
+ */
+hal_status_t hal_boot_hash_split(uint8_t *out, const uint8_t *a, size_t a_len,
+                                const uint8_t *b, size_t b_len);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

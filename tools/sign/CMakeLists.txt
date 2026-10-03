@@ -32,7 +32,7 @@ set(CRYPTO_SRC
   ${CRYPTO}/sha256/sha256.c
 )
 
-add_executable(navhal_sign navhal_sign.c ${CRYPTO_SRC})
+add_executable(navhal_sign navhal_sign.c ${CRYPTO}/boot_hash.c ${CRYPTO_SRC})
 
 # The check: the tool's output has to satisfy the target's verifier, and a single
 # flipped byte has to break it. Linking boot_hash.c and the Monocypher backend is

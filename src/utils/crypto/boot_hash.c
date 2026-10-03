@@ -43,3 +43,18 @@ hal_status_t hal_boot_hash(uint8_t *out, const uint8_t *data, size_t len) {
   sha256_final(&ctx, out);
   return HAL_OK;
 }
+
+hal_status_t hal_boot_hash_split(uint8_t *out, const uint8_t *a, size_t a_len,
+                                const uint8_t *b, size_t b_len) {
+  if (out == NULL || (a == NULL && a_len != 0u) || (b == NULL && b_len != 0u))
+    return HAL_ERR_INVALID_ARG;
+
+  SHA256_CTX ctx;
+  sha256_init(&ctx);
+  if (a_len != 0u)
+    sha256_update(&ctx, a, a_len);
+  if (b_len != 0u)
+    sha256_update(&ctx, b, b_len);
+  sha256_final(&ctx, out);
+  return HAL_OK;
+}

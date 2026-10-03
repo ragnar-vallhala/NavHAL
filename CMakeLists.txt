@@ -297,6 +297,27 @@ endif()
 # build. So when -DTEST=ON, skip samples/ and src/vendor/ entirely.
 if(TEST)
   message(STATUS "TEST=ON — skipping samples/ and src/vendor/ (test build is self-contained)")
+elseif(BOOT_IMAGE)
+  # A bootloader image rather than a sample: same HAL, its own partition and so
+  # its own linker script. -DBOOT_IMAGE=stage1 builds boot/stage1.
+  #
+  # Separate from SAMPLE because these are not samples -- one of them ends up
+  # write-protected -- and because each owns a region of flash rather than the
+  # whole part.
+  message(STATUS "Boot image selected: ${BOOT_IMAGE}")
+  set(_boot_ld "${SRC_BOARD}/boot/${BOOT_IMAGE}.ld")
+  if(NOT EXISTS "${_boot_ld}")
+    message(FATAL_ERROR
+      "No linker script for BOOT_IMAGE='${BOOT_IMAGE}' on board '${BOARD}'. "
+      "Expected: ${_boot_ld}")
+  endif()
+  # -T does not compose, so the board script is replaced rather than added to.
+  string(REPLACE "-T ${NAVHAL_LINKER_SCRIPT}" "-T ${_boot_ld}"
+         CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+  message(STATUS "Boot image linker script: ${_boot_ld}")
+  add_subdirectory(${SRC_VENDOR})
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/boot/${BOOT_IMAGE})
+  set(SOURCES ${CORE_SOURCES} ${BOARD_SOURCES} ${VENDOR_SOURCES})
 elseif(SAMPLE AND NOT STANDALONE)
   message(STATUS "Sample selected: ${SAMPLE} (with HAL)")
   message(STATUS  "Linker flag: ${CMAKE_EXE_LINKER_FLAGS}")

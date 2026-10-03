@@ -242,6 +242,38 @@ void test_boot_crypto_digest_matches_fips_180_4(void) {
       "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"));
 }
 
+/* The property that matters for an image: hashing two ranges must equal hashing
+ * their concatenation, because the signing tool feeds the header and body as two
+ * pieces while a verifier reads them from two addresses. If these ever disagreed,
+ * every signed image would fail on target and verify on the host. */
+void test_boot_crypto_split_hash_equals_whole(void) {
+  static const char whole[] = "the header prefix and then the body, as one range";
+  const size_t n = sizeof whole - 1u;
+  uint8_t a[HAL_BOOT_DIGEST_SIZE], b[HAL_BOOT_DIGEST_SIZE];
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_boot_hash(a, (const uint8_t *)whole, n));
+
+  /* Split at 12, the offset the image format actually uses. */
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_boot_hash_split(b, (const uint8_t *)whole, 12u,
+                                    (const uint8_t *)whole + 12u, n - 12u));
+  for (int i = 0; i < HAL_BOOT_DIGEST_SIZE; i++)
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)a[i], (uint32_t)b[i]);
+
+  /* An empty first or second range is still the same hash. */
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_boot_hash_split(b, NULL, 0u, (const uint8_t *)whole, n));
+  for (int i = 0; i < HAL_BOOT_DIGEST_SIZE; i++)
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)a[i], (uint32_t)b[i]);
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_boot_hash_split(NULL, (const uint8_t *)whole,
+                                                        n, NULL, 0u));
+}
+
 /* A million 'a' is the vector that catches a broken length or block boundary,
  * which the short ones pass straight over. */
 void test_boot_crypto_digest_handles_a_long_message(void) {
@@ -263,6 +295,7 @@ NAVTEST_CASE_DECL(test_boot_crypto_every_backend_rejects_every_invalid_signature
 NAVTEST_CASE_DECL(test_boot_crypto_malleability_is_what_kconfig_claims);
 NAVTEST_CASE_DECL(test_boot_crypto_digest_matches_fips_180_4);
 NAVTEST_CASE_DECL(test_boot_crypto_digest_handles_a_long_message);
+NAVTEST_CASE_DECL(test_boot_crypto_split_hash_equals_whole);
 NAVTEST_CASE_DECL(test_boot_crypto_hash_rejects_a_null_out);
 
 static const navtest_case_t _cases[] = {
@@ -272,6 +305,7 @@ static const navtest_case_t _cases[] = {
     NAVTEST_CASE(test_boot_crypto_malleability_is_what_kconfig_claims),
     NAVTEST_CASE(test_boot_crypto_digest_matches_fips_180_4),
     NAVTEST_CASE(test_boot_crypto_digest_handles_a_long_message),
+    NAVTEST_CASE(test_boot_crypto_split_hash_equals_whole),
     NAVTEST_CASE(test_boot_crypto_hash_rejects_a_null_out),
 };
 

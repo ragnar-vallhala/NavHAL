@@ -32,3 +32,4 @@ hal_console_init: re-initialises the transport the suite prints through, at a ra
 # 1.6 s on the slowest.
 hal_boot_ed25519_verify: debt: validated on host against the Wycheproof corpus for all three backends; no portable case because CONFIG_BOOT_CRYPTO is off by default
 hal_boot_hash: debt: same -- host-validated, and the three backends' SHA-512 outputs are asserted equal there
+hal_boot_hash_split: debt: same as hal_boot_hash -- CONFIG_BOOT_CRYPTO is off by default, and tests/host/test_boot_crypto.c asserts the property that matters, that splitting a range equals hashing it whole

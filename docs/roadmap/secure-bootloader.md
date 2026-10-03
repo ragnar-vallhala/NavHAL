@@ -482,9 +482,14 @@ the archive has been scanned, and the link fails without it.
 
 Two costs of watching CDC from boot, accepted deliberately:
 
-* **Enumeration is on the fast path.** It is roughly a second, against a 29 ms
-  verify and a 676 ms app hash, so it dominates boot time and makes the latency
-  question below sharper rather than softer.
+* **Enumeration is on the fast path**, and costs less than the estimate said.
+  Measured on the navixsm running the CDC sample: the device is back on the bus
+  290 ms after a reset drops it off and the host's tty node appears at 330 ms,
+  three runs inside 10 ms of each other. That is reset to host-visible, so it
+  includes the firmware's own startup and the host's enumeration -- an upper
+  bound on what the device contributes. Against a 676 ms app hash it is the
+  second term, not the first; the estimate of roughly a second was wrong by
+  about 3x and the earlier claim that enumeration dominates boot time with it.
 * **The USB stack is in the permanent stage.** Stage-1 is write-protected, so a
   bug in 2.8 KB of USB and CDC code cannot be fixed in the field, where the same
   bug in stage-2 is an update. UART rx, for comparison, is 32 bytes.
@@ -503,6 +508,14 @@ driver (`CONFIG_DRV_USB_CDC=y` on the F401) and does run its argument checks
 against those tagged registers, so what is missing is enumeration and transfer,
 not the code path's existence.
 
+What the navixsm does cover, with `tools/hil/usb_cdc_check.py` against the CDC
+sample: enumeration, both interfaces, a byte-exact 16 KiB echo at 372 KiB/s, a
+packet-boundary transfer, survival of a break, line-coding round-trip, the bulk
+endpoint pair, and halt then clear-halt with the endpoint recovering. Nine checks,
+all passing. They are worth running against the right firmware -- the same script
+reports three failures against a board flashed with something else, which says
+nothing about the driver.
+
 That makes one thing a requirement rather than a nicety: **the wait for
 enumeration has to be bounded.** A stage-1 that blocks until a USB host answers
 never boots on a unit with nothing plugged in, and never boots under Renode
@@ -516,8 +529,9 @@ that falls through to the jump -- not an error.
 * Boot latency — **measured, and materially higher than the estimate**. Verify
   is 29 ms; the app hash is 676 ms with SHA-512 or an estimated ~340 ms with a
   SHA-256 this tree does not yet carry, against an estimate of ~170 ms for the
-  pair. Watching CDC from boot adds roughly a second of USB enumeration on top,
-  which makes it the largest single term in the boot time. So the "verified once, recorded in KV" scheme is now a decision to take
+  pair. Watching CDC from boot adds a measured ~300 ms of USB
+  enumeration, which makes the app hash the term worth attacking rather than the
+  USB stack. So the "verified once, recorded in KV" scheme is now a decision to take
   rather than a contingency, and which hash the image uses is part of it.
 * Whether the image digest stays SHA-256. It is the right choice on speed and
   the wrong one on flash: SHA-512 is already linked by Ed25519 and costs 58

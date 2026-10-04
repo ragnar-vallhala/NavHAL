@@ -50,6 +50,7 @@
 #define FLASH_ACR_DCRST  (1U << 12) /**< Data cache reset.                */
 
 #define FLASH_BASE 0x40023C00UL
+#define FLASH_ACR (*(volatile uint32_t *)(FLASH_BASE + 0x00))
 #define FLASH_KEYR (*(volatile uint32_t *)(FLASH_BASE + 0x04))
 #define FLASH_SR (*(volatile uint32_t *)(FLASH_BASE + 0x0C))
 #define FLASH_CR (*(volatile uint32_t *)(FLASH_BASE + 0x10))

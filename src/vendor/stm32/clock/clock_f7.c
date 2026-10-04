@@ -217,12 +217,13 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
     WAIT_OR_TIMEOUT(!(PWR_CSR1 & PWR_CSR1_ODSWRDY));
   }
 
-  volatile uint32_t *const FLASH_ACR =
-      (volatile uint32_t *)(FLASH_INTERFACE_REGISTER);
+  /* Named for what it is: family/flash_reg.h now exports FLASH_ACR as the
+   * register itself, the way it exports FLASH_CR. */
+  volatile uint32_t *const acr = (volatile uint32_t *)(FLASH_INTERFACE_REGISTER);
 
   /* Raise flash wait states BEFORE switching to a faster clock. */
   if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
-    *FLASH_ACR = (*FLASH_ACR & ~FLASH_ACR_LATENCY_Msk) | FLASH_ACR_PRFTEN |
+    *acr = (*acr & ~FLASH_ACR_LATENCY_Msk) | FLASH_ACR_PRFTEN |
                  FLASH_ACR_ARTEN | (_flash_ws_for(hclk) << FLASH_ACR_LATENCY_BIT);
   }
 
@@ -284,7 +285,7 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
    * costs nothing otherwise. What pays on this core is the M7's own L1
    * caches; see samples/cortex-m/38_hal_flash_art. */
   if (cfg->source != HAL_CLOCK_SOURCE_PLL) {
-    *FLASH_ACR = (*FLASH_ACR & ~FLASH_ACR_LATENCY_Msk) | FLASH_ACR_PRFTEN |
+    *acr = (*acr & ~FLASH_ACR_LATENCY_Msk) | FLASH_ACR_PRFTEN |
                  FLASH_ACR_ARTEN |
                  (_flash_ws_for(hclk) << FLASH_ACR_LATENCY_BIT);
   }

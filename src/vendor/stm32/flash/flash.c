@@ -86,6 +86,43 @@ static void _flash_unlock_(void) {
 
 static void _flash_lock_(void) { FLASH_CR |= FLASH_CR_LOCK; }
 
+/* Flush the flash accelerator after an erase.
+ *
+ * RM0368 3.5.1 (F4): the data cache can still hold lines from a sector that has
+ * just been erased, so a read of that sector returns what was there before -- the
+ * erase succeeded in flash and the reader cannot see it. A sector that held code
+ * leaves the instruction cache equally stale, so both are reset. A reset is only
+ * permitted while the cache is disabled, which is why this is four writes.
+ *
+ * The F7 exposes one ART accelerator rather than two caches (RM0410 3.4.1), so
+ * there is one enable and one reset bit to work with. Note that the Cortex-M7's
+ * own L1 data cache sits above this and is not what these bits touch: on that
+ * part a read-after-erase also wants the cache driver, which is why the test
+ * that found this is F4-only for now.
+ *
+ * Prefetch and the wait states are left alone: clock.c owns them, and clearing
+ * the latency here would be a far worse bug than the one this fixes.
+ *
+ * Found by a test that erased a sector and read it back: it saw the pattern it
+ * had programmed a step earlier, with the erase reporting success.
+ */
+static void _flash_cache_flush_(void) {
+#if defined(FLASH_ACR_DCEN)
+  const uint32_t enables = FLASH_ACR_ICEN | FLASH_ACR_DCEN;
+  const uint32_t resets = FLASH_ACR_ICRST | FLASH_ACR_DCRST;
+#else
+  const uint32_t enables = FLASH_ACR_ARTEN;
+  const uint32_t resets = FLASH_ACR_ARTRST;
+#endif
+  uint32_t keep = FLASH_ACR & ~(enables | resets);
+  uint32_t on = FLASH_ACR & enables;
+
+  FLASH_ACR = keep;           /* off: a reset is only valid while disabled */
+  FLASH_ACR = keep | resets;  /* reset */
+  FLASH_ACR = keep;           /* release */
+  FLASH_ACR = keep | on;      /* back on, but only what was on before */
+}
+
 static void _flash_erase_sector_(uint8_t sector) {
   _flash_unlock_();
   (void)_flash_wait_();
@@ -95,6 +132,7 @@ static void _flash_erase_sector_(uint8_t sector) {
   (void)_flash_wait_();
   FLASH_CR &= ~FLASH_CR_SER;
   _flash_lock_();
+  _flash_cache_flush_();
 }
 
 static NAVHAL_UNUSED void _flash_program_word_(uint32_t addr, uint32_t data) {
@@ -438,6 +476,7 @@ hal_status_t hal_flash_raw_erase_sector(uint8_t sector) {
   st = _flash_wait_();
   FLASH_CR &= ~FLASH_CR_SER;
   _flash_lock_();
+  _flash_cache_flush_();
   return st;
 }
 

@@ -22,43 +22,97 @@
  * Linked at 0x08020200 behind its own signed header, reached only because
  * stage-2 verified it and found its version at or above the rollback floor.
  *
- * It plays the application's half of the crashloop contract: clear the strike
- * count once it has proven it is alive, never at startup. Slice 7 adds the real
- * article -- the sniffer on both transports and the entry policy gate.
+ * It plays the application's three parts of the contract, which no loader can
+ * play for it: clear the strike count once it has proven it is alive, watch both
+ * links for the sequence that asks for the loader, and refuse that request while
+ * it would be dangerous to honour.
  */
 #include "board.h"
 #include "common/hal_boot.h"
 #include "navhal.h"
+
+#define LIVENESS_MS 3000u
+#define APP_WATCHDOG_MS 2000u
+
+static void say(const char *s) { hal_uart_print(BOARD_CONSOLE_UART, s); }
+
+#if NAVHAL_CONFIG_DRV_USB_CDC
+/* Forwarding rather than registering hal_boot_feed directly: the callback takes
+ * the stream over instead of tapping it, so an application that registers the
+ * matcher as its own callback can never read CDC again. */
+static void cdc_rx(const uint8_t *data, uint16_t len) {
+  hal_boot_feed(data, len);
+  /* An application with a CDC protocol of its own would consume data here too. */
+}
+#endif
+
+/* Kick while waiting, so a delay is never what trips the watchdog. */
+static void wait_ms(uint32_t ms) {
+  for (uint32_t i = 0; i < ms; i += 50u) {
+    hal_delay_ms(50u);
+    (void)hal_watchdog_kick();
+  }
+}
 
 int main(void) {
   hal_clock_init_hz(HAL_CLOCK_SOURCE_HSE, 84000000u);
   hal_timebase_init(1000u);
   hal_uart_init(BOARD_CONSOLE_UART, &(hal_uart_config_t){.baudrate = 115200});
 
-  hal_uart_print(BOARD_CONSOLE_UART, "app: running, verified by stage2\r\n");
-
   /* The watchdog is already running: stage-2 started it and the IWDG cannot be
    * stopped, only re-periodised. An application that ignores it is reset on the
    * loader's timeout -- which is how this was found, with the board rebooting
-   * every eight seconds while printing happily. Adopting it sets a period that
-   * suits the application rather than the loader. */
-  (void)hal_watchdog_start(2000u);
+   * every eight seconds while printing happily. */
+  (void)hal_watchdog_start(APP_WATCHDOG_MS);
+
+  say("app: running, verified by stage2\r\n");
+
+#if NAVHAL_CONFIG_DRV_USB_CDC
+  /* Stage-2 may hand over an already enumerated peripheral; init is a no-op
+   * then. Watching both links matters because the one an operator has is not
+   * always the one the board was flashed through. */
+  (void)hal_usb_cdc_init();
+  (void)hal_usb_cdc_set_rx_callback(cdc_rx);
+#endif
 
   /* Liveness first. An application that cleared its strikes at startup would
    * reset the counter every boot, and a fault one second later would never be
-   * counted -- the crashloop would be invisible to the thing meant to catch it. */
-  for (int i = 0; i < 30; i++) { /* 3 s, kicking as it goes */
-    hal_delay_ms(100u);
-    (void)hal_watchdog_kick();
-  }
+   * counted -- the crashloop would be invisible to the thing meant to catch it.
+   * Up to here a reset leaves the strike standing, which is the point. */
+  say("app: proving liveness\r\n");
+  wait_ms(LIVENESS_MS);
   (void)hal_boot_mark_healthy();
-  hal_uart_print(BOARD_CONSOLE_UART, "app: healthy, strikes cleared\r\n");
+  say("app: healthy, strikes cleared\r\n");
 
+  say("app: watching both links for the loader sequence\r\n");
+
+  bool armed = false;
   for (;;) {
-    hal_uart_print(BOARD_CONSOLE_UART, "app: alive\r\n");
-    for (int i = 0; i < 10; i++) {
-      hal_delay_ms(100u);
-      (void)hal_watchdog_kick();
+    (void)hal_watchdog_kick();
+
+    while (hal_uart_available(BOARD_CONSOLE_UART)) {
+      uint8_t b = (uint8_t)hal_uart_read_char(BOARD_CONSOLE_UART);
+      /* 'a' and 'd' stand in for an airframe arming and disarming. A real
+       * vehicle calls these from the arming path, not from its console. */
+      if (b == 'a') {
+        armed = true;
+        hal_boot_entry_disable();
+        say("app: armed -- loader entry refused\r\n");
+      } else if (b == 'd') {
+        armed = false;
+        hal_boot_entry_enable();
+        say("app: disarmed -- loader entry allowed\r\n");
+      } else {
+        /* Does not return if it completes the sequence and entry is allowed. */
+        hal_boot_match_byte(b);
+      }
+    }
+
+    static uint32_t last = 0;
+    uint32_t now = hal_timebase_get_millis();
+    if (now - last >= 2000u) {
+      last = now;
+      say(armed ? "app: alive (armed)\r\n" : "app: alive\r\n");
     }
   }
 }

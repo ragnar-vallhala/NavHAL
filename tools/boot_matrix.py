@@ -21,10 +21,15 @@ very little, and the three-image chain already does that every time it starts.
 
 What this does NOT cover is read protection. Every case here runs at RDP0,
 because setting RDP1 costs a mass erase to undo -- it loses flash and the
-key-value store. The RDP1 pass is the same matrix on a provisioned unit, and the
-only thing it adds is that none of this depends on being able to read flash over
-SWD. Signing does not depend on RDP, which is why these results stand on their
-own.
+key-value store. Signing does not depend on RDP, which is why these results stand
+on their own.
+
+The RDP1 pass cannot be driven from here, and not for want of trying: at RDP1
+flash is inaccessible while a debugger is attached, so the first openocd command
+halts the firmware with pc = 0xfffffffe and only a power cycle brings it back.
+Everything this script does between cases is an openocd command. A read-protected
+run is therefore console-only, by hand, with the images already in place -- see
+the roadmap for what one such run established.
 
   tools/boot_matrix.py --location 3-1 --port /dev/ttyACM0 --key k.sec \\
       --stage1 s1.bin --stage2 s2.bin --app app.bin

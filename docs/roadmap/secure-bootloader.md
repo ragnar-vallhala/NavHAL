@@ -641,6 +641,40 @@ never boots on a unit with nothing plugged in, and never boots under Renode
 either. The CDC watch window gets a deadline, and expiry is an ordinary outcome
 that falls through to the jump -- not an error.
 
+## The RDP1 pass, measured
+
+The six functional cases run at RDP0 (`tools/boot_matrix.py`). The read-protected
+pass was run separately on a provisioned F401, and it establishes two things and
+discovers two more.
+
+Established:
+
+* The whole chain boots unchanged under RDP1. With WRP on sectors 0-1, BOR at
+  level 3 and RDP at Level 1 (`OPTCR = 0x0FFC55E1`), the console showed stage-1
+  verifying stage-2, stage-2 verifying the app at version 9 against a floor of 9,
+  and the app running. Nothing about verification changes, which is the claim that
+  signing is orthogonal to read protection -- now measured rather than asserted.
+* The provisioning is reversible, as the rule requires. Lifting RDP1 performs the
+  mass erase, clearing WRP makes the part flashable again, and the board came back
+  to its exact original option bytes (`0x0FFFAAED`) and a working chain.
+
+Discovered, and both matter operationally:
+
+* **Attaching a debugger at RDP1 locks the running firmware up.** Flash is
+  inaccessible while the debug port is connected, so the core's next vector fetch
+  fails and it halts with `pc = 0xfffffffe, msp = 0xfffffffc`. One `mdw` of the
+  option bytes was enough. Detaching did not revive it and neither did a reset
+  over SWD: the part wants a power cycle. So RDP1 validation is console-only --
+  any openocd command, even a read, ends the run it was meant to observe.
+* **WRP on sectors 0-1 blocks reflashing stage-1**, which is the point of it, but
+  it means provisioning order matters: clearing write protection is a separate
+  step before any stage-1 update, and the tool does it.
+
+Not established: a field update over the protocol while at RDP1 -- the only
+update path a shipped unit has. The attempt was spoiled by the debugger attach
+above, and re-running it needs a power cycle at the bench rather than anything
+that can be driven over SWD. It is the one case left.
+
 ## Open questions
 
 Resolved:

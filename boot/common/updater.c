@@ -16,12 +16,13 @@
  */
 
 /**
- * @file recovery.c
- * @brief The frame server. See recovery.h for the format and why it is this dull.
+ * @file updater.c
+ * @brief The frame server. See updater.h for the format and why it is this dull.
+ *
+ * One copy, two stages. Stage-1 points it at stage-2, stage-2 points it at the
+ * app, and neither has its own version of a protocol that a host has to match.
  */
-#include "recovery.h"
-
-#include "verify.h"
+#include "updater.h"
 
 #include "common/hal_boot.h"
 #include "common/hal_bootmap.h"
@@ -29,11 +30,6 @@
 #include "common/hal_watchdog.h"
 
 #include <string.h>
-
-/* Stage-2 is the only partition stage-1 will write. */
-#define TARGET_BASE   HAL_BOOTMAP_STAGE2_BASE
-#define TARGET_SIZE   HAL_BOOTMAP_STAGE2_SIZE
-#define TARGET_SECTOR 4u /* sectors 0-1 are stage-1, 2-3 the KV store */
 
 /* Set by a successful erase, cleared by a reset. A write before an erase is
  * refused rather than attempted: programming into un-erased flash yields the AND
@@ -120,7 +116,8 @@ static void reply(const recovery_transport_t *t, uint8_t status, uint8_t code) {
   t->put(code);
 }
 
-static uint8_t do_write(const uint8_t *payload, uint16_t len) {
+static uint8_t do_write(const updater_target_t *tgt, const uint8_t *payload,
+                        uint16_t len) {
   if (len < 5u || len > RECOVERY_MAX_PAYLOAD)
     return RECOVERY_ERR_LEN;
   if (!erased)
@@ -133,15 +130,16 @@ static uint8_t do_write(const uint8_t *payload, uint16_t len) {
   /* Both ends checked, and against the partition rather than against flash: the
    * raw API refuses stage-1 and the KV sectors anyway, but a loader should know
    * its own bounds rather than rely on being stopped. */
-  if (off > TARGET_SIZE || n > TARGET_SIZE - off)
+  if (off > tgt->size || n > tgt->size - off)
     return RECOVERY_ERR_RANGE;
 
-  if (hal_flash_raw_program(TARGET_BASE + off, &payload[4], n) != HAL_OK)
+  if (hal_flash_raw_program(tgt->base + off, &payload[4], n) != HAL_OK)
     return RECOVERY_ERR_FLASH;
   return RECOVERY_ERR_NONE;
 }
 
-void recovery_serve(const recovery_transport_t *t) {
+void updater_serve(const recovery_transport_t *t,
+                   const updater_target_t *tgt) {
   static uint8_t payload[RECOVERY_MAX_PAYLOAD];
   uint8_t cmd = 0;
   uint16_t len = 0;
@@ -163,17 +161,25 @@ void recovery_serve(const recovery_transport_t *t) {
       reply(t, RECOVERY_ACK, (uint8_t)RECOVERY_VERSION);
       break;
 
-    case RECOVERY_CMD_ERASE:
-      if (hal_flash_raw_erase_sector((uint8_t)TARGET_SECTOR) != HAL_OK) {
-        reply(t, RECOVERY_NAK, RECOVERY_ERR_FLASH);
-      } else {
-        erased = true;
-        reply(t, RECOVERY_ACK, RECOVERY_ERR_NONE);
+    case RECOVERY_CMD_ERASE: {
+      /* Every sector of the partition, because a 384 KiB app spans three of them
+       * and a half-erased partition is the one state that looks like a transfer
+       * fault rather than an incomplete erase. */
+      uint8_t err = RECOVERY_ERR_NONE;
+      for (uint8_t i = 0; i < tgt->sector_count; i++) {
+        (void)hal_watchdog_kick(); /* a 128 KiB erase outlasts any sane timeout */
+        if (hal_flash_raw_erase_sector(tgt->sectors[i]) != HAL_OK) {
+          err = RECOVERY_ERR_FLASH;
+          break;
+        }
       }
+      erased = (err == RECOVERY_ERR_NONE);
+      reply(t, erased ? RECOVERY_ACK : RECOVERY_NAK, err);
       break;
+    }
 
     case RECOVERY_CMD_WRITE: {
-      uint8_t err = do_write(payload, len);
+      uint8_t err = do_write(tgt, payload, len);
       reply(t, err == RECOVERY_ERR_NONE ? RECOVERY_ACK : RECOVERY_NAK, err);
       break;
     }
@@ -182,17 +188,46 @@ void recovery_serve(const recovery_transport_t *t) {
       /* The real verify, the same function the boot path uses -- a recovery that
        * reported success by a different rule than the one that decides whether
        * the board boots would be worse than no report at all. */
-      if (stage1_image_is_good(TARGET_BASE, HAL_BOOTMAP_STAGE2_USABLE)) {
+      if (!tgt->verify(tgt->base, tgt->max_body)) {
+        reply(t, RECOVERY_NAK, RECOVERY_ERR_VERIFY);
+        break;
+      }
+      /* A signed image that is older than the floor is refused here as well as
+       * on the boot path, so a host learns before it resets the board. */
+      if (tgt->floor_ok != NULL) {
+        const hal_boot_image_header_t *h =
+            (const hal_boot_image_header_t *)tgt->base;
+        if (!tgt->floor_ok(h->version)) {
+          reply(t, RECOVERY_NAK, RECOVERY_ERR_ROLLBACK);
+          break;
+        }
+      }
+      reply(t, RECOVERY_ACK, RECOVERY_ERR_NONE);
+      break;
+
+    case RECOVERY_CMD_FLOOR: {
+      if (tgt->floor_set == NULL) {
+        reply(t, RECOVERY_NAK, RECOVERY_ERR_CMD);
+        break;
+      }
+      if (len != 4u) {
+        reply(t, RECOVERY_NAK, RECOVERY_ERR_LEN);
+        break;
+      }
+      uint32_t v = (uint32_t)payload[0] | ((uint32_t)payload[1] << 8) |
+                   ((uint32_t)payload[2] << 16) | ((uint32_t)payload[3] << 24);
+      if (tgt->floor_set(v)) {
         reply(t, RECOVERY_ACK, RECOVERY_ERR_NONE);
       } else {
-        reply(t, RECOVERY_NAK, RECOVERY_ERR_VERIFY);
+        reply(t, RECOVERY_NAK, RECOVERY_ERR_STORE);
       }
       break;
+    }
 
     case RECOVERY_CMD_RUN:
       /* Refuse to reset into something that will not boot: a reset that lands
        * straight back here tells the host nothing it did not already know. */
-      if (!stage1_image_is_good(TARGET_BASE, HAL_BOOTMAP_STAGE2_USABLE)) {
+      if (!tgt->verify(tgt->base, tgt->max_body)) {
         reply(t, RECOVERY_NAK, RECOVERY_ERR_VERIFY);
         break;
       }

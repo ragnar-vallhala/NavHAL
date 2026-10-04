@@ -16,14 +16,14 @@
  */
 
 /**
- * @file verify.c
+ * @file verify_image.c
  * @brief The image check, in one place so recovery and the boot path agree.
  */
-#include "verify.h"
+#include "verify_image.h"
 
 #include "common/hal_boot_crypto.h"
 #include "common/hal_bootmap.h"
-#include "stage1_pubkey.h"
+#include "boot_pubkey.h"
 
 #include <string.h>
 
@@ -31,7 +31,7 @@
  * then the length bound, then the hash, then the signature. Hashing before the
  * length is checked is how a verifier gets walked off the end of flash into
  * bytes an attacker chose. */
-bool stage1_image_is_good(uint32_t base, uint32_t max_body) {
+bool boot_image_is_good(uint32_t base, uint32_t max_body) {
   const hal_boot_image_header_t *h = (const hal_boot_image_header_t *)base;
 
   if (h->magic != (uint32_t)HAL_BOOTMAP_IMAGE_MAGIC)
@@ -52,6 +52,6 @@ bool stage1_image_is_good(uint32_t base, uint32_t max_body) {
   if (memcmp(digest, h->digest, sizeof digest) != 0)
     return false;
 
-  return hal_boot_ed25519_verify(h->sig, stage1_pubkey, digest,
+  return hal_boot_ed25519_verify(h->sig, boot_pubkey, digest,
                                  sizeof digest) == HAL_OK;
 }

@@ -16,15 +16,15 @@
  */
 
 /**
- * @file verify.h
- * @brief One verifier, used by the boot path and by recovery.
+ * @file verify_image.h
+ * @brief One verifier: both stages, both boot paths, and the update server.
  *
  * Shared on purpose. If recovery reported success by a different rule than the
  * one deciding whether the board boots, a host could be told an image is good
  * and then watch the board refuse it -- or worse, the reverse.
  */
-#ifndef STAGE1_VERIFY_H
-#define STAGE1_VERIFY_H
+#ifndef BOOT_VERIFY_IMAGE_H
+#define BOOT_VERIFY_IMAGE_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -38,6 +38,6 @@
  * @return true only when the magic, the length, the digest and the signature all
  *         agree.
  */
-bool stage1_image_is_good(uint32_t base, uint32_t max_body);
+bool boot_image_is_good(uint32_t base, uint32_t max_body);
 
-#endif /* STAGE1_VERIFY_H */
+#endif /* BOOT_VERIFY_IMAGE_H */

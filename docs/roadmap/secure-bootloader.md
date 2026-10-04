@@ -131,6 +131,45 @@ The numbers are repeated from `hal_bootmap.h` because a linker script cannot
 include a C header; if the two ever disagree, the header is the one that is
 right, and its static assertions are what keep it honest.
 
+## Building the images
+
+All three images -- stage1, stage2 and the app -- come from one committed
+fragment, `cmake/defconfigs/boot_cortex-m4_stm32f4_nucleo_f401re.defconfig`:
+
+```sh
+cmake -B build-stage1 -DBOOT_IMAGE=stage1 \
+  -DNAVHAL_DEFCONFIG=cmake/defconfigs/boot_cortex-m4_stm32f4_nucleo_f401re.defconfig \
+  -DNAVHAL_BOOT_PUBKEY=k.pub -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi-toolchain.cmake
+cmake --build build-stage1 -j
+```
+
+The fragment is passed explicitly rather than defaulted from the toolchain file,
+because the options it sets -- a CDC stack, the crypto backend, the key-value
+store moved to sectors 2 and 3 -- have no business in an ordinary firmware build.
+Two of them are not preferences: without the store relocation the app partition's
+sectors cannot be erased, and `updater.h` fails the build with that message
+rather than letting the first field update discover it.
+
+Signing, and flashing a complete chain:
+
+```sh
+cmake -S tools/sign -B build-sign && cmake --build build-sign
+./build-sign/navhal_sign --genkey --key k.sec --pub k.pub   # once, then keep k.sec safe
+arm-none-eabi-objcopy -O binary build-stage2/boot/stage2/stage2 s2.bin
+./build-sign/navhal_sign --partition stage2 --key k.sec --version 3 --in s2.bin --out s2.img
+# stage1 goes in raw at 0x08000000; the signed images carry their own header
+```
+
+Pin the probe by USB location rather than by serial. `st-flash --serial` finds a
+probe by scanning every ST-Link attached, and a bench with more than one board on
+it does not want a scan:
+
+```sh
+openocd -f interface/stlink.cfg -c "adapter usb location 3-1" \
+        -f target/stm32f4x.cfg -c "program s2.img 0x08010000 verify reset exit"
+```
+
 ## Image format
 
 Stage-2 and the app share one header; the signature covers it.
@@ -189,6 +228,15 @@ reset
  └ app      sniff UART and CDC for the magic sequence
             clear attempts after proven liveness
 ```
+
+The application inherits a running watchdog. Both loader stages start the IWDG
+to cover their own slowest operation -- a 371 ms hash, an erase approaching 2 s --
+and the IWDG cannot be stopped, only given a new period. An application that
+ignores it is reset on the loader's timeout, which looks like a spontaneous
+reboot every few seconds while the application itself appears healthy. It must
+call `hal_watchdog_start` with a period that suits it, then keep kicking. The
+same obligation that makes the loader adopt the application's watchdog runs in
+the other direction.
 
 Attempt accounting runs before the jump: a watchdog or window-watchdog reset
 increments, a power-on or NRST reset clears — a human intervened, so the strike

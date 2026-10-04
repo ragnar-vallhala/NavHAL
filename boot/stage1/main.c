@@ -34,8 +34,8 @@
 #include "common/hal_boot_crypto.h"
 #include "common/hal_bootmap.h"
 #include "navhal.h"
-#include "recovery.h"
-#include "verify.h"
+#include "updater.h"
+#include "verify_image.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -185,16 +185,31 @@ static void recovery(const char *why) {
   static const recovery_transport_t cdc_t = {.get = cdc_get, .put = cdc_put};
 #endif
 
+  /* Stage-1 writes stage-2 and nothing else. No rollback floor here: the floor
+   * guards the app, and the only thing that could roll stage-2 back is the stage
+   * protected by WRP. */
+  static const uint8_t stage2_sectors[] = {4u};
+  static const updater_target_t target = {
+      .base = HAL_BOOTMAP_STAGE2_BASE,
+      .size = HAL_BOOTMAP_STAGE2_SIZE,
+      .max_body = HAL_BOOTMAP_STAGE2_USABLE,
+      .sectors = stage2_sectors,
+      .sector_count = (uint8_t)(sizeof stage2_sectors / sizeof stage2_sectors[0]),
+      .verify = boot_image_is_good,
+      .floor_ok = NULL,
+      .floor_set = NULL,
+  };
+
   for (;;) {
     uint8_t b;
     (void)hal_watchdog_kick();
 
     if (hal_uart_available(BOARD_CONSOLE_UART)) {
-      recovery_serve(&uart_t); /* never returns */
+      updater_serve(&uart_t, &target); /* never returns */
     }
 #if NAVHAL_CONFIG_DRV_USB_CDC
     if (cdc && cdc_rx_tail != cdc_rx_head) {
-      recovery_serve(&cdc_t); /* never returns */
+      updater_serve(&cdc_t, &target); /* never returns */
     }
 #else
     (void)cdc;
@@ -233,7 +248,7 @@ int main(void) {
   if (hal_boot_get_attempts() >= HAL_BOOT_MAX_ATTEMPTS)
     recovery("crashloop");
 
-  if (!stage1_image_is_good(HAL_BOOTMAP_STAGE2_BASE, HAL_BOOTMAP_STAGE2_USABLE))
+  if (!boot_image_is_good(HAL_BOOTMAP_STAGE2_BASE, HAL_BOOTMAP_STAGE2_USABLE))
     recovery("stage-2 did not verify");
 
   /* Counted before the jump, not after: an image that faults immediately would

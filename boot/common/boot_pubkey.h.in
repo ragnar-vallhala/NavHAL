@@ -16,17 +16,17 @@
  */
 
 /**
- * @file stage1_pubkey.h
+ * @file boot_pubkey.h
  * @brief The public key this unit trusts. Generated at configure time from
  *        NAVHAL_BOOT_PUBKEY -- do not edit, and do not commit a generated copy.
  */
-#ifndef STAGE1_PUBKEY_H
-#define STAGE1_PUBKEY_H
+#ifndef BOOT_PUBKEY_H
+#define BOOT_PUBKEY_H
 
 #include <stdint.h>
 
 /* 32 bytes. The matching private key lives on the signing host and has never
  * been on this device. */
-static const uint8_t stage1_pubkey[32] = {@STAGE1_PUBKEY_INIT@};
+static const uint8_t boot_pubkey[32] = {@BOOT_PUBKEY_INIT@};
 
-#endif /* STAGE1_PUBKEY_H */
+#endif /* BOOT_PUBKEY_H */

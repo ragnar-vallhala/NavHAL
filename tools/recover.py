@@ -70,10 +70,20 @@ def stm32_crc32(data: bytes) -> int:
     return crc
 
 
-def exchange(ser, cmd, payload=b"", what=""):
+def exchange(ser, cmd, payload=b"", what="", timeout=None):
     ser.write(frame(cmd, payload))
     ser.flush()
-    reply = ser.read(2)
+    if timeout is not None:
+        # An erase is not a quick reply: the app partition is three 128 KiB
+        # sectors and each can approach two seconds on this part. The board kicks
+        # its watchdog throughout; the host has to be willing to wait.
+        was, ser.timeout = ser.timeout, timeout
+        try:
+            reply = ser.read(2)
+        finally:
+            ser.timeout = was
+    else:
+        reply = ser.read(2)
     if len(reply) != 2:
         print(f"  {what}: no reply")
         return None
@@ -113,7 +123,7 @@ def main() -> int:
     body = open(args.image, "rb").read()
     print(f"  image {args.image}: {len(body)} bytes")
 
-    if exchange(ser, CMD_ERASE, what="erase") is None:
+    if exchange(ser, CMD_ERASE, what="erase", timeout=30) is None:
         return 1
     print("  erased")
 
@@ -126,7 +136,8 @@ def main() -> int:
         sent += len(chunk)
     print(f"  wrote {sent} bytes")
 
-    if exchange(ser, CMD_VERIFY, what="verify") is None:
+    # Verify hashes the whole body, which is sub-second here but scales.
+    if exchange(ser, CMD_VERIFY, what="verify", timeout=15) is None:
         return 1
     print("  the board verifies the image it now holds")
 

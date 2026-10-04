@@ -643,25 +643,46 @@ that falls through to the jump -- not an error.
 
 ## Open questions
 
-* ~~Whether the image digest stays SHA-256~~ — **resolved: yes**, 896 bytes and
-  79.2 cycles/byte, which halves the dominant boot term. See Measured above.
-* ~~Which Ed25519 implementation~~ — **resolved: Monocypher**, 10,768 bytes and
-  29.2 ms on the F401. See Measured above.
-* Boot latency — **measured, and materially higher than the estimate**. Verify
-  is 29 ms; the app hash is 676 ms with SHA-512 or an estimated ~340 ms with a
-  SHA-256 this tree does not yet carry, against an estimate of ~170 ms for the
-  pair. Watching CDC from boot adds a measured ~300 ms of USB
-  enumeration, which makes the app hash the term worth attacking rather than the
-  USB stack. So the "verified once, recorded in KV" scheme is now a decision to take
-  rather than a contingency, and which hash the image uses is part of it.
-* Whether the image digest stays SHA-256. It is the right choice on speed and
-  the wrong one on flash: SHA-512 is already linked by Ed25519 and costs 58
-  bytes to reuse, where SHA-256 costs about 1.3 KB of a budget with ~21 KB left
-  for everything that is not crypto. Measure SHA-256 before deciding.
-* Whether stage-2 should be able to update stage-2, or only stage-1. Self-update
-  is convenient and is also the classic way to brick a fleet.
-* F767ZI partition table and whether that port wants the same two-stage shape.
-* Whether a sequence arriving while entry is disabled should be remembered and
-  acted on at the next `hal_boot_entry_enable`. Convenient for "reboot it as
-  soon as it lands"; also a way to arm a reboot the operator has forgotten
-  about.
+Resolved:
+
+* ~~Whether the image digest stays SHA-256~~ — **yes**, 896 bytes and 79.2
+  cycles/byte, which halves the dominant boot term. See Measured above. (The
+  entry appeared twice, once undecided; SHA-512 reuse was the cheaper-on-flash
+  option and lost on speed.)
+* ~~Which Ed25519 implementation~~ — **Monocypher**, 10,768 bytes and 29.2 ms on
+  the F401. See Measured above.
+* ~~Boot latency, and whether to record "already verified" in the KV store~~ —
+  **verify on every boot; record nothing**. The path measures ~900 ms: 495 ms of
+  USB enumeration, 371 ms hashing the app, 29 ms verifying. Skipping the hash on
+  a recorded flag would save ~400 ms and give up the two things re-verification
+  is for -- flash that has decayed since the image was written, and an image
+  swapped underneath a board that was already trusted. The flag would also be
+  unauthenticated: anything able to rewrite the app can set it, so it protects
+  nothing it does not also hand to an attacker. 900 ms is affordable on a flight
+  controller that spends longer than that bringing sensors up.
+  The term worth attacking is the 495 ms enumeration, not the hash, and it is
+  idle waiting -- hashing during the enumeration window would hide most of it.
+  Recorded here rather than done: it only matters if boot time becomes a
+  complaint.
+* ~~Whether stage-2 may update stage-2, or only stage-1~~ — **only stage-1**,
+  which is what the code does: each stage serves exactly one partition. A stage
+  that rewrites itself has a window where the thing performing the update is the
+  thing being erased, and on a single-slot layout that window ends a unit. With
+  stage-1 immutable under WRP there is always something left that can recover.
+  The cost is honest: a stage-2 bug needs stage-1's recovery path and a cable,
+  not a field update over the app's own transport.
+* ~~Whether a sequence arriving while entry is disabled is remembered~~ —
+  **dropped, not remembered**. Remembering it arms a reboot that fires at some
+  later reset, which is exactly when nobody is expecting it and whoever typed the
+  sequence has gone. A request is a request about now. Where entry is disabled
+  the sniffer should not be watching at all.
+
+Still open:
+
+* F767ZI partition table, and whether that port takes the same two-stage shape.
+  **Deferred deliberately.** The F401 layout leans on 16 KiB sectors: stage-1 in
+  0-1, the KV store in 2-3, stage-2 at sector 4, the app in 5-7. The F767 has
+  2 MB in 32/128/256 KiB sectors, so none of those numbers survive and a 32 KiB
+  stage-1 would sit in one sector with the store needing another. Worth doing
+  when that port needs a bootloader; doing it now would be a table nothing
+  compiles against.

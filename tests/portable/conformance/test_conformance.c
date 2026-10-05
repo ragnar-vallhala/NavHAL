@@ -675,6 +675,14 @@ void test_conformance_clock_rejects_unknown_bus(void) {
 void test_conformance_crc_reset_restarts_accumulation(void) {
   static const uint8_t vec[4] = {0xDE, 0xAD, 0xBE, 0xEF};
 
+  /* Initialise first. On a part whose CRC unit sits behind a clock gate -- the
+   * STM32F4 does -- an uninitialised unit swallows every write and reads back a
+   * constant, so both assertions below pass each other happily while nothing is
+   * being computed at all. This case went unnoticed because no board config
+   * enabled the driver until now. */
+  static const hal_crc_config_t cfg = {.init_value = 0xFFFFFFFFu};
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_crc_init(&cfg));
+
   uint32_t once = hal_crc_compute(vec, sizeof(vec));
 
   /* Accumulating the same bytes after a reset must land in the same place:

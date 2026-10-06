@@ -238,6 +238,19 @@ call `hal_watchdog_start` with a period that suits it, then keep kicking. The
 same obligation that makes the loader adopt the application's watchdog runs in
 the other direction.
 
+A matched sequence reaches stage-2, not stage-1. The request a console can raise
+is the one stage-2 claims (`HAL_BOOT_REQ_LOADER`), and stage-2 writes the
+application partition and nothing else. Stage-1's loader, which can replace
+stage-2 itself, answers only to `HAL_BOOT_REQ_STAGE1` and to the conditions the
+board judges for itself -- a crashloop, or a stage-2 that does not verify.
+
+The split exists because the two are not equally dangerous. Stage-1 used to claim
+the request unconditionally, which meant every sequence an operator -- or anyone
+else able to write to the console -- could send landed in the loader able to
+rewrite stage-2, and stage-2's update mode was unreachable by any request at all.
+The field had no way to ask for an application update, which is the common case;
+replacing stage-2 is the rare one.
+
 Attempt accounting runs before the jump: a watchdog or window-watchdog reset
 increments, a power-on or NRST reset clears — a human intervened, so the strike
 count starts clean. The application clears it only after a liveness threshold,
@@ -644,36 +657,46 @@ that falls through to the jump -- not an error.
 ## The RDP1 pass, measured
 
 The six functional cases run at RDP0 (`tools/boot_matrix.py`). The read-protected
-pass was run separately on a provisioned F401, and it establishes two things and
-discovers two more.
+pass was run on a provisioned F401 -- console only, after a power cycle -- and it
+covers the path a shipped unit actually has.
 
-Established:
+What it establishes:
 
 * The whole chain boots unchanged under RDP1. With WRP on sectors 0-1, BOR at
-  level 3 and RDP at Level 1 (`OPTCR = 0x0FFC55E1`), the console showed stage-1
-  verifying stage-2, stage-2 verifying the app at version 9 against a floor of 9,
-  and the app running. Nothing about verification changes, which is the claim that
-  signing is orthogonal to read protection -- now measured rather than asserted.
-* The provisioning is reversible, as the rule requires. Lifting RDP1 performs the
-  mass erase, clearing WRP makes the part flashable again, and the board came back
-  to its exact original option bytes (`0x0FFFAAED`) and a working chain.
+  level 3 and RDP at Level 1 (`OPTCR = 0x0FFC55E1`), stage-1 verified stage-2,
+  stage-2 verified the app against the floor, and the app ran. Signing being
+  orthogonal to read protection is measured, not asserted.
+* **A field update works when SWD cannot write flash at all.** The console
+  sequence reached stage-2's update mode, the host pushed a 9,772-byte signed
+  image, and the board erased three sectors, programmed them, verified the
+  signature itself and reset into the new application -- all from inside the
+  running firmware. This is the only update path a read-protected unit has, and
+  it is the case the whole provisioning story rests on.
+* The key-value store is writable under RDP1 too: the rollback floor advanced
+  from 20 to 21 as the new image booted.
+* A corrupt image is refused under RDP1 exactly as at RDP0. One flipped bit in
+  the body failed the on-board verify, and a RUN against the refused image came
+  back `NAK 0x06` (`RECOVERY_ERR_VERIFY`) -- the board will not reset into
+  something it has already judged unbootable.
+* The provisioning is reversible, as the rule requires: lifting RDP1 mass-erases,
+  clearing WRP makes the part flashable again, and the board returned to its exact
+  original option bytes (`0x0FFFAAED`) and a working chain.
 
-Discovered, and both matter operationally:
+Two findings about the bench rather than the loader:
 
-* **Attaching a debugger at RDP1 locks the running firmware up.** Flash is
-  inaccessible while the debug port is connected, so the core's next vector fetch
-  fails and it halts with `pc = 0xfffffffe, msp = 0xfffffffc`. One `mdw` of the
-  option bytes was enough. Detaching did not revive it and neither did a reset
-  over SWD: the part wants a power cycle. So RDP1 validation is console-only --
-  any openocd command, even a read, ends the run it was meant to observe.
-* **WRP on sectors 0-1 blocks reflashing stage-1**, which is the point of it, but
-  it means provisioning order matters: clearing write protection is a separate
+* **Attaching a debugger at RDP1 halts the running firmware.** Flash is
+  inaccessible while the debug port is connected, so the next vector fetch fails
+  and the core locks up at `pc = 0xfffffffe`. A single `mdw` of the option bytes
+  did it; detaching did not revive it and neither did a reset over SWD, because
+  the part needs a power-on reset. So an RDP1 run is console-only, and
+  `boot_matrix.py` cannot drive one -- every step it takes between cases is an
+  openocd command.
+* **WRP on sectors 0-1 blocks reflashing stage-1.** That is what it is for, but it
+  makes provisioning order load-bearing: clearing write protection is a separate
   step before any stage-1 update, and the tool does it.
 
-Not established: a field update over the protocol while at RDP1 -- the only
-update path a shipped unit has. The attempt was spoiled by the debugger attach
-above, and re-running it needs a power cycle at the bench rather than anything
-that can be driven over SWD. It is the one case left.
+One more thing the pass exposed, in the loader rather than the bench: the request
+routing. See Boot flow -- a sniffed sequence now reaches stage-2, not stage-1.
 
 ## Open questions
 

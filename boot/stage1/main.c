@@ -236,7 +236,11 @@ int main(void) {
   (void)hal_watchdog_start(STAGE1_WATCHDOG_MS);
   (void)hal_watchdog_kick();
 
-  if (hal_boot_get_request() == HAL_BOOT_REQ_LOADER) {
+  /* Only the privileged request. HAL_BOOT_REQ_LOADER is left alone for stage-2,
+   * which writes the app and nothing else -- stage-1 claiming it would have meant
+   * every console sequence landed in the loader that can rewrite stage-2, and
+   * that stage-2's update mode was unreachable by any request at all. */
+  if (hal_boot_get_request() == HAL_BOOT_REQ_STAGE1) {
     (void)hal_boot_clear_request(); /* consumed, so the next boot is normal */
     recovery("requested");
   }

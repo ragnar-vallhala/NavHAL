@@ -198,6 +198,33 @@ void test_boot_entry_reenable_acts_on_the_next_sequence(void) {
   TEST_ASSERT_EQUAL_UINT32(1u, s_resets);
 }
 
+/* The privilege split: the console path raises the request stage-2 claims, and
+ * only an explicit call raises the one stage-1 claims. A board where stage-1 took
+ * both would put every console sequence into the loader that can rewrite stage-2,
+ * and would leave stage-2's update mode unreachable by any request. */
+void test_boot_request_target_distinguishes_the_two_loaders(void) {
+  fresh();
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_boot_request_target(0xDEADBEEFu));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
+
+  (void)hal_boot_request_target(HAL_BOOT_REQ_STAGE1);
+  TEST_ASSERT_EQUAL_UINT32(HAL_BOOT_REQ_STAGE1, hal_boot_get_request());
+
+  (void)hal_boot_clear_request();
+  (void)hal_boot_request_target(HAL_BOOT_REQ_LOADER);
+  TEST_ASSERT_EQUAL_UINT32(HAL_BOOT_REQ_LOADER, hal_boot_get_request());
+
+  /* And a disabled entry refuses both, writing neither. */
+  (void)hal_boot_clear_request();
+  hal_boot_entry_disable();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request_target(HAL_BOOT_REQ_STAGE1));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
+  hal_boot_entry_enable();
+}
+
 void test_boot_prepare_runs_before_the_reset(void) {
   fresh();
   hal_boot_set_prepare(prepare_hook);
@@ -381,6 +408,7 @@ NAVTEST_CASE_DECL(test_boot_block_rejects_all_ones);
 NAVTEST_CASE_DECL(test_boot_clear_request_keeps_attempts);
 NAVTEST_CASE_DECL(test_boot_mark_healthy_clears_attempts);
 NAVTEST_CASE_DECL(test_boot_block_ops_refuse_an_invalid_block);
+NAVTEST_CASE_DECL(test_boot_request_target_distinguishes_the_two_loaders);
 
 static const navtest_case_t boot_sniffer_cases[] = {
     NAVTEST_CASE(test_boot_seq_has_no_prefix_suffix_overlap),
@@ -409,6 +437,7 @@ static const navtest_case_t boot_sniffer_cases[] = {
     NAVTEST_CASE(test_boot_clear_request_keeps_attempts),
     NAVTEST_CASE(test_boot_mark_healthy_clears_attempts),
     NAVTEST_CASE(test_boot_block_ops_refuse_an_invalid_block),
+    NAVTEST_CASE(test_boot_request_target_distinguishes_the_two_loaders),
 };
 
 const navtest_suite_t test_boot_sniffer_suite = {

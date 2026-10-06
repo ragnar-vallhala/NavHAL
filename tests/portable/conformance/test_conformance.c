@@ -1491,6 +1491,7 @@ NAVTEST_CASE_DECL(test_conformance_boot_block_init_validates);
 NAVTEST_CASE_DECL(test_conformance_boot_getters_are_stable);
 NAVTEST_CASE_DECL(test_conformance_boot_entry_gate_round_trips);
 NAVTEST_CASE_DECL(test_conformance_boot_request_is_refused_while_disabled);
+NAVTEST_CASE_DECL(test_conformance_boot_request_target_checks_its_argument);
 NAVTEST_CASE_DECL(test_conformance_boot_match_ignores_other_traffic);
 NAVTEST_CASE_DECL(test_conformance_boot_clear_and_heal_need_a_valid_block);
 NAVTEST_CASE_DECL(test_conformance_boot_attempt_counts_and_clears);
@@ -1549,6 +1550,36 @@ void test_conformance_boot_request_is_refused_while_disabled(void) {
 
   if (!was) {
     hal_boot_entry_enable();
+  }
+  hal_boot_match_reset();
+}
+
+void test_conformance_boot_request_target_checks_its_argument(void) {
+  /* The argument contract only. The success path resets the board, which a suite
+   * mid-run must not do -- so entry is disabled first, exactly as the case above
+   * does, and a port that resets here fails by never reaching the summary.
+   *
+   * What matters is that the two requests are distinct: the console path raises
+   * the one stage-2 claims, and only an explicit call raises the one that reaches
+   * the loader able to rewrite stage-2. */
+  bool was = hal_boot_entry_is_disabled();
+
+  hal_boot_entry_disable();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request_target(HAL_BOOT_REQ_STAGE1));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request_target(HAL_BOOT_REQ_LOADER));
+
+  /* An argument that names neither loader is refused whether entry is open or
+   * not, and the check comes before anything is written. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request_target(0u));
+
+  if (!was) {
+    hal_boot_entry_enable();
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                             (uint32_t)hal_boot_request_target(0xDEADBEEFu));
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
   }
   hal_boot_match_reset();
 }
@@ -2231,6 +2262,7 @@ static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_boot_getters_are_stable),
     NAVTEST_CASE(test_conformance_boot_entry_gate_round_trips),
     NAVTEST_CASE(test_conformance_boot_request_is_refused_while_disabled),
+    NAVTEST_CASE(test_conformance_boot_request_target_checks_its_argument),
     NAVTEST_CASE(test_conformance_boot_match_ignores_other_traffic),
     NAVTEST_CASE(test_conformance_boot_clear_and_heal_need_a_valid_block),
     NAVTEST_CASE(test_conformance_boot_attempt_counts_and_clears),

@@ -136,7 +136,12 @@ static bool _w1c_is_modelled(void) {
 /* Clearing one flag must leave its neighbours in the same register standing --
  * the difference between a single-bit write and a careless read-modify-write. */
 void test_avr_clear_pending_leaves_neighbours_standing(void) {
+  /* Both ways out of this case are a PASS, so without a word in the log there is
+   * no way to tell a run that checked the semantics from one that could not. Say
+   * which happened: on an emulator this reads "unverified" forever, and the day
+   * it runs on a part the log says so. */
   if (!_w1c_is_modelled()) {
+    navtest_write("    (write-1-to-clear not modelled here; unverified)\r\n");
     TEST_ASSERT_TRUE(1); /* the environment cannot answer; not a failure */
     return;
   }
@@ -144,9 +149,12 @@ void test_avr_clear_pending_leaves_neighbours_standing(void) {
   OCR1A = 0xFFFFu; /* so TCNT1 passing 0xFFFF raises OCF1A alongside TOV1 */
   _overflow_timer1();
   if ((TIFR1 & (uint8_t)(1u << OCF1A)) == 0u) {
+    navtest_write("    (could not stage the neighbour flag; unverified)\r\n");
     TEST_ASSERT_TRUE(1); /* could not stage the neighbour */
     return;
   }
+
+  navtest_write("    (write-1-to-clear is real here; checking for real)\r\n");
 
   TEST_ASSERT_EQUAL_UINT32(
       (uint32_t)HAL_OK,

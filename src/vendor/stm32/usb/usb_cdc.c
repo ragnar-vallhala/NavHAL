@@ -815,6 +815,14 @@ bool hal_usb_cdc_connected(void) {
          (usb_line_state & HAL_USB_CDC_LINE_DTR);
 }
 
+/* The same state without the DTR term. A host sets a configuration as the last
+ * step of enumeration, which happens with no application involved; DTR arrives
+ * only when one opens the port. A bootloader deciding whether a host is present
+ * wants the former, and would otherwise wait out its window against a charger. */
+bool hal_usb_cdc_enumerated(void) {
+  return usb_configured && !usb_suspended;
+}
+
 static hal_status_t ep_in_transfer(const uint8_t *data, uint16_t len) {
   uint32_t spins = TX_TIMEOUT_SPINS;
   while (ep_in_busy) {

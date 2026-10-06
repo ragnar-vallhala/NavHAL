@@ -30,7 +30,14 @@ endif()
 # so without this GCC still assumes a hosted libc and will rewrite an
 # ordinary loop into a call to strlen/memset. hal_strlen was compiling into
 # a call to strlen at -Os, which then failed to link.
-set(ARCH_C_FLAGS    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS} -ffreestanding")
+# -ffunction-sections / -fdata-sections with --gc-sections below: the linker then
+# drops what nothing reaches, which is most of a driver library in any one image.
+# Measured on Release: hal_blink 11,456 -> 4,864 text, hal_fatfs_posix
+# 25,376 -> 16,096. It is also the difference between stage-1's crypto fitting in
+# 32 KiB and costing 40 KB, because Monocypher's primitives share one translation
+# unit. Safe here because the linker scripts KEEP the vector table, .noinit and
+# .init_array -- the three things nothing references by name.
+set(ARCH_C_FLAGS    "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS} -ffreestanding -ffunction-sections -fdata-sections")
 set(ARCH_ASM_FLAGS  "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ${FPU_FLAGS}")
 # -L so a board's linker script can INCLUDE the shared section layout by name.
 # A board script carries only its MEMORY block; the layout lives once under
@@ -41,7 +48,7 @@ set(NAVHAL_LINK_SCRIPT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/arch/armv7e-m/link")
 # option the root CMakeLists.txt puts on `hal`.
 set(NAVHAL_LINKER_SCRIPT "${SRC_BOARD}/linker.ld")
 set(ARCH_LINK_FLAGS
-    "-T ${NAVHAL_LINKER_SCRIPT} -L ${NAVHAL_LINK_SCRIPT_DIR} -nostdlib ${FPU_FLAGS}")
+    "-T ${NAVHAL_LINKER_SCRIPT} -L ${NAVHAL_LINK_SCRIPT_DIR} -nostdlib ${FPU_FLAGS} -Wl,--gc-sections")
 
 # Used by the `if(TEST)` block in the root CMakeLists.txt — each arch picks
 # the linker setup that fits how its test ELF runs (custom linker + nostdlib
@@ -52,6 +59,6 @@ set(ARCH_LINK_FLAGS
 # carry only the memory map and INCLUDE the same section layout the boards do,
 # so the test image and the shipped image are linked the same way.
 set(NAVHAL_TEST_LINKER_FLAGS
-    "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/linker.ld -L ${NAVHAL_LINK_SCRIPT_DIR} -nostdlib ${FPU_FLAGS}")
+    "-T ${CMAKE_CURRENT_SOURCE_DIR}/tests/arch/${CMAKE_SYSTEM_PROCESSOR}/linker.ld -L ${NAVHAL_LINK_SCRIPT_DIR} -nostdlib ${FPU_FLAGS} -Wl,--gc-sections")
 set(NAVHAL_TEST_EXTRA_FLAGS  "-march=armv7e-m")
 set(NAVHAL_TEST_NEEDS_LIBGCC TRUE)

@@ -58,6 +58,20 @@
 #include "common/hal_timer.h"
 #endif
 #if NAVHAL_CONFIG_DRV_FLASH
+/* Mirrors the driver's own fallback: an unset Kconfig int arrives as an empty
+ * define, not as absent. */
+#if defined(NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR) &&                          \
+    (NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR + 0) > 0
+#define NAVHAL_CONFORMANCE_KV_PRIMARY NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR
+#else
+#define NAVHAL_CONFORMANCE_KV_PRIMARY 6
+#endif
+#if defined(NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR) &&                        \
+    (NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR + 0) > 0
+#define NAVHAL_CONFORMANCE_KV_SECONDARY NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR
+#else
+#define NAVHAL_CONFORMANCE_KV_SECONDARY 7
+#endif
 #include "common/hal_flash.h"
 #endif
 #if NAVHAL_CONFIG_DRV_ADC
@@ -356,6 +370,64 @@ void test_conformance_flash_read_rejects_null_size(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_flash_read(0u, flash_buf, NULL));
 }
 
+
+/* The raw partition API refuses what a loader must never touch. Every one of
+ * these is an argument check, so none of them writes flash -- the erase and
+ * program paths themselves want a board with the driver enabled, which no test
+ * config has yet. */
+void test_conformance_flash_raw_erase_refuses_stage1(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_erase_sector(0u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_erase_sector(1u));
+}
+
+void test_conformance_flash_raw_erase_refuses_a_sector_that_does_not_exist(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_erase_sector(8u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_erase_sector(255u));
+}
+
+/* The key/value store erases its own sectors; a loader reaching into them would
+ * take the attempt counter and the rollback floor with it. */
+void test_conformance_flash_raw_erase_refuses_the_kv_sectors(void) {
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_flash_raw_erase_sector((uint8_t)NAVHAL_CONFORMANCE_KV_PRIMARY));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_flash_raw_erase_sector((uint8_t)NAVHAL_CONFORMANCE_KV_SECONDARY));
+}
+
+void test_conformance_flash_raw_program_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x08020000UL, NULL, 2u));
+}
+
+/* Half-word granularity, so an odd address or length is refused rather than
+ * rounded -- rounding would write a byte the caller did not ask for. */
+void test_conformance_flash_raw_program_rejects_odd_address_or_length(void) {
+  static const uint8_t two[2] = {0xAA, 0x55};
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x08020001UL, two, 2u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x08020000UL, two, 1u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x08020000UL, two, 0u));
+}
+
+/* The whole range is checked, not just where it starts: a write that begins in
+ * stage-2 and runs backwards into stage-1 is the interesting case. */
+void test_conformance_flash_raw_program_rejects_a_range_reaching_stage1(void) {
+  static const uint8_t buf[4] = {0};
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_flash_raw_program(0x08007FFEUL, buf, 4u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_flash_raw_program(0x07FFFFFEUL, buf, 4u));
+}
+
 #endif /* NAVHAL_CONFIG_DRV_FLASH */
 
 
@@ -603,6 +675,14 @@ void test_conformance_clock_rejects_unknown_bus(void) {
 void test_conformance_crc_reset_restarts_accumulation(void) {
   static const uint8_t vec[4] = {0xDE, 0xAD, 0xBE, 0xEF};
 
+  /* Initialise first. On a part whose CRC unit sits behind a clock gate -- the
+   * STM32F4 does -- an uninitialised unit swallows every write and reads back a
+   * constant, so both assertions below pass each other happily while nothing is
+   * being computed at all. This case went unnoticed because no board config
+   * enabled the driver until now. */
+  static const hal_crc_config_t cfg = {.init_value = 0xFFFFFFFFu};
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_crc_init(&cfg));
+
   uint32_t once = hal_crc_compute(vec, sizeof(vec));
 
   /* Accumulating the same bytes after a reset must land in the same place:
@@ -840,6 +920,14 @@ void test_conformance_sdio_rejects_null(void) {
 #endif /* NAVHAL_CONFIG_DRV_SDIO */
 
 #if NAVHAL_CONFIG_DRV_USB_CDC
+/* Both predicates answer without a host and without init, which is all a
+ * portable case can ask: the DTR one is already covered, and this is the one a
+ * bootloader polls instead. */
+void test_conformance_usb_cdc_enumerated_answers_without_a_host(void) {
+  (void)hal_usb_cdc_enumerated();
+  TEST_ASSERT_TRUE(1);
+}
+
 void test_conformance_usb_cdc_rejects_null(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
                            (uint32_t)hal_usb_cdc_write(NULL, 1u));
@@ -1178,6 +1266,7 @@ NAVTEST_CASE_DECL(test_conformance_sdio_rejects_null);
 #endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
 NAVTEST_CASE_DECL(test_conformance_usb_cdc_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_usb_cdc_enumerated_answers_without_a_host);
 #endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
 NAVTEST_CASE_DECL(test_conformance_usb_cdc_reports_disconnected);
@@ -1288,6 +1377,12 @@ NAVTEST_CASE_DECL(test_conformance_flash_read_rejects_null_value);
 #endif
 #if NAVHAL_CONFIG_DRV_FLASH
 NAVTEST_CASE_DECL(test_conformance_flash_read_rejects_null_size);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_erase_refuses_stage1);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_erase_refuses_a_sector_that_does_not_exist);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_erase_refuses_the_kv_sectors);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_program_rejects_null);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_program_rejects_odd_address_or_length);
+NAVTEST_CASE_DECL(test_conformance_flash_raw_program_rejects_a_range_reaching_stage1);
 #endif
 #if NAVHAL_CONFIG_DRV_I2C
 NAVTEST_CASE_DECL(test_conformance_i2c_write_rejects_null_data);
@@ -1396,8 +1491,10 @@ NAVTEST_CASE_DECL(test_conformance_boot_block_init_validates);
 NAVTEST_CASE_DECL(test_conformance_boot_getters_are_stable);
 NAVTEST_CASE_DECL(test_conformance_boot_entry_gate_round_trips);
 NAVTEST_CASE_DECL(test_conformance_boot_request_is_refused_while_disabled);
+NAVTEST_CASE_DECL(test_conformance_boot_request_target_checks_its_argument);
 NAVTEST_CASE_DECL(test_conformance_boot_match_ignores_other_traffic);
 NAVTEST_CASE_DECL(test_conformance_boot_clear_and_heal_need_a_valid_block);
+NAVTEST_CASE_DECL(test_conformance_boot_attempt_counts_and_clears);
 NAVTEST_CASE_DECL(test_conformance_boot_set_prepare_accepts_null);
 #endif
 
@@ -1457,6 +1554,36 @@ void test_conformance_boot_request_is_refused_while_disabled(void) {
   hal_boot_match_reset();
 }
 
+void test_conformance_boot_request_target_checks_its_argument(void) {
+  /* The argument contract only. The success path resets the board, which a suite
+   * mid-run must not do -- so entry is disabled first, exactly as the case above
+   * does, and a port that resets here fails by never reaching the summary.
+   *
+   * What matters is that the two requests are distinct: the console path raises
+   * the one stage-2 claims, and only an explicit call raises the one that reaches
+   * the loader able to rewrite stage-2. */
+  bool was = hal_boot_entry_is_disabled();
+
+  hal_boot_entry_disable();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request_target(HAL_BOOT_REQ_STAGE1));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request_target(HAL_BOOT_REQ_LOADER));
+
+  /* An argument that names neither loader is refused whether entry is open or
+   * not, and the check comes before anything is written. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request_target(0u));
+
+  if (!was) {
+    hal_boot_entry_enable();
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                             (uint32_t)hal_boot_request_target(0xDEADBEEFu));
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
+  }
+  hal_boot_match_reset();
+}
+
 void test_conformance_boot_match_ignores_other_traffic(void) {
   /* A byte that cannot be the sequence's first one cannot advance the match,
    * whatever the port chose for hal_boot_seq. */
@@ -1487,6 +1614,19 @@ void test_conformance_boot_clear_and_heal_need_a_valid_block(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_clear_request());
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_mark_healthy());
+  TEST_ASSERT_EQUAL_UINT32(0u, hal_boot_get_attempts());
+}
+
+/* The loader's half of the crashloop defence, portable because the counter lives
+ * in the shared boot block and not in anything device-specific. Left clean on the
+ * way out: a suite that bumped the count and walked away would send the next boot
+ * of this board to recovery. */
+void test_conformance_boot_attempt_counts_and_clears(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_block_init());
+  uint32_t before = hal_boot_get_attempts();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_account_attempt());
+  TEST_ASSERT_EQUAL_UINT32(before + 1u, hal_boot_get_attempts());
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_mark_healthy());
   TEST_ASSERT_EQUAL_UINT32(0u, hal_boot_get_attempts());
 }
@@ -1897,6 +2037,7 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
     NAVTEST_CASE(test_conformance_usb_cdc_rejects_null),
+    NAVTEST_CASE(test_conformance_usb_cdc_enumerated_answers_without_a_host),
 #endif
 #if NAVHAL_CONFIG_DRV_USB_CDC
     NAVTEST_CASE(test_conformance_usb_cdc_reports_disconnected),
@@ -2007,6 +2148,12 @@ static const navtest_case_t conformance_cases[] = {
 #endif
 #if NAVHAL_CONFIG_DRV_FLASH
     NAVTEST_CASE(test_conformance_flash_read_rejects_null_size),
+    NAVTEST_CASE(test_conformance_flash_raw_erase_refuses_stage1),
+    NAVTEST_CASE(test_conformance_flash_raw_erase_refuses_a_sector_that_does_not_exist),
+    NAVTEST_CASE(test_conformance_flash_raw_erase_refuses_the_kv_sectors),
+    NAVTEST_CASE(test_conformance_flash_raw_program_rejects_null),
+    NAVTEST_CASE(test_conformance_flash_raw_program_rejects_odd_address_or_length),
+    NAVTEST_CASE(test_conformance_flash_raw_program_rejects_a_range_reaching_stage1),
 #endif
 #if NAVHAL_CONFIG_DRV_I2C
     NAVTEST_CASE(test_conformance_i2c_write_rejects_null_data),
@@ -2115,8 +2262,10 @@ static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_boot_getters_are_stable),
     NAVTEST_CASE(test_conformance_boot_entry_gate_round_trips),
     NAVTEST_CASE(test_conformance_boot_request_is_refused_while_disabled),
+    NAVTEST_CASE(test_conformance_boot_request_target_checks_its_argument),
     NAVTEST_CASE(test_conformance_boot_match_ignores_other_traffic),
     NAVTEST_CASE(test_conformance_boot_clear_and_heal_need_a_valid_block),
+    NAVTEST_CASE(test_conformance_boot_attempt_counts_and_clears),
     NAVTEST_CASE(test_conformance_boot_set_prepare_accepts_null),
 #endif
 };

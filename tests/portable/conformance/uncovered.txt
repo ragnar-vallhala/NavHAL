@@ -22,3 +22,14 @@ hal_sdio_wait_flag: spins on a card that a bare board does not have
 hal_sdio_wait_sync: spins on a card that a bare board does not have
 hal_timebase_tick: the tick ISR's own entry; calling it forges the timebase that the suite's timing cases check against
 hal_console_init: re-initialises the transport the suite prints through, at a rate a portable case cannot know; a wrong one garbles the capture
+
+# Bootloader crypto. CONFIG_BOOT_CRYPTO defaults off, so neither symbol is
+# linked into the conformance image, and turning it on would pull one of three
+# backends into every target's suite to exercise two functions. They are covered
+# where it counts instead: tests/host/test_boot_crypto.c runs all three backends
+# against Google Project Wycheproof's EdDSA corpus, and the on-target check is a
+# sample rather than a case because a verify is 29 ms on the fastest backend and
+# 1.6 s on the slowest.
+hal_boot_ed25519_verify: debt: validated on host against the Wycheproof corpus for all three backends; no portable case because CONFIG_BOOT_CRYPTO is off by default
+hal_boot_hash: debt: same -- host-validated, and the three backends' SHA-512 outputs are asserted equal there
+hal_boot_hash_split: debt: same as hal_boot_hash -- CONFIG_BOOT_CRYPTO is off by default, and tests/host/test_boot_crypto.c asserts the property that matters, that splitting a range equals hashing it whole

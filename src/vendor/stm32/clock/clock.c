@@ -254,12 +254,13 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   }
 
   // Configure flash latency based on target clock
-  volatile uint32_t *const FLASH_ACR =
-      (volatile uint32_t *)(FLASH_INTERFACE_REGISTER);
+  /* Named for what it is, not for the register macro: family/flash_reg.h now
+   * exports FLASH_ACR as the register itself, the way it exports FLASH_CR. */
+  volatile uint32_t *const acr = (volatile uint32_t *)(FLASH_INTERFACE_REGISTER);
 
   // When increasing frequency (switching to PLL), increase wait states FIRST
   if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
-    _flash_set_acr(FLASH_ACR, _target_sysclk_hz(cfg));
+    _flash_set_acr(acr, _target_sysclk_hz(cfg));
   }
 
   /* Bus prescalers. The config's dividers used to be accepted and discarded;
@@ -322,7 +323,7 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   if (cfg->source != HAL_CLOCK_SOURCE_PLL) {
     /* Also the path a board takes when it never uses the PLL at all, which is
      * why the accelerator is enabled here too rather than only on the way up. */
-    _flash_set_acr(FLASH_ACR, _target_sysclk_hz(cfg));
+    _flash_set_acr(acr, _target_sysclk_hz(cfg));
   }
 
   return HAL_OK;

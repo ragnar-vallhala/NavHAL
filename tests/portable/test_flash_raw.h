@@ -31,6 +31,14 @@ void test_hal_flash_delete_then_read_returns_error(void);
 void test_hal_flash_needs_compaction_returns_bool(void);
 void test_hal_flash_erase_returns_ok(void);
 
+#if NAVHAL_CONFIG_FAMILY_STM32F4 && NAVHAL_CONFIG_DRV_FLASH
+void test_flash_raw_refuses_the_loader_sectors(void);
+void test_flash_raw_refuses_the_kv_store(void);
+void test_flash_raw_rejects_odd_length_and_address(void);
+void test_flash_raw_erase_program_readback(void);
+#endif
+
+
 extern const navtest_suite_t test_flash_suite;
 
 

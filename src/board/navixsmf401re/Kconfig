@@ -400,3 +400,10 @@ config VAL_BOARD_AUX_UART
 config BOARD_AUX_UART_SPARE
     bool
     default n if BOARD_NAVIXSM_F401RE
+
+# No ADC input and no user button are wired on this board, so it declares neither
+# VAL_BOARD_ADC / VAL_BOARD_ADC_PIN / NUM_BOARD_ADC_CHANNEL nor USER_BUTTON. That
+# is the hardware, not an omission: 33_hal_adc and 02_hal_pupd decline this board
+# and the sample matrix reports them n/a, which is the right answer rather than a
+# gap to fill. Written down because the absence looks identical to a forgotten
+# declaration, and the matrix will ask again every time a board is added.

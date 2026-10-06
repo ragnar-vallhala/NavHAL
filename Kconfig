@@ -255,6 +255,136 @@ config DRV_SDIO
     select DRV_INTERRUPT
     select DRV_TIMER
 
+config FLASH_KV_PRIMARY_SECTOR
+    int "Flash KV primary sector"
+    depends on DRV_FLASH
+    default 6
+    range 0 7
+    help
+      Which flash sector the key-value store keeps its primary copy in. It must
+      lie OUTSIDE the running image: the store erases whole sectors, so a store
+      inside the image means the first save erases the code doing the saving.
+
+      6 and 7 suit a flat image linked from 0x08000000, which is every build
+      today -- the on-target test image alone reaches 0x0800b248.
+
+      2 and 3 are the bootloader layout, where the application is linked into its
+      own partition at 0x08020000 and the low sectors belong to stage-1 and the
+      store. See include/common/hal_bootmap.h. The linker refuses an image that
+      overlaps whichever pair is configured.
+
+config FLASH_KV_SECONDARY_SECTOR
+    int "Flash KV secondary sector"
+    depends on DRV_FLASH
+    default 7
+    range 0 7
+    help
+      The second sector, erased independently so a compaction never leaves the
+      store without a readable copy. Must differ from the primary.
+
+config BOOT_CRYPTO
+    bool "Bootloader signature verification (Ed25519)"
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7
+    default n
+    help
+      Compile hal_boot_crypto: one Ed25519 verify and one SHA-512 hash, which is
+      what a bootloader needs and all it needs. Key generation and signing stay
+      on the signing host and are never linked here.
+
+      Off by default. It is only useful to a build that verifies an image.
+
+choice
+    prompt "Ed25519 backend"
+    depends on BOOT_CRYPTO
+    # A choice takes its default from the first visible member when none is
+    # named, so name it: adding a backend alphabetically ahead of this one would
+    # otherwise move every build onto it silently.
+    default BOOT_ED25519_MONOCYPHER
+    help
+      All three verify a good signature and reject a tampered one. They are not
+      otherwise equivalent, and the differences are measured, not estimated --
+      Nucleo-F401RE at 84 MHz, Release, DWT cycles, and Google's Wycheproof
+      corpus on the host:
+
+                       flash   verify     malleable sigs accepted
+        monocypher     10,768  29.2 ms    0 of 8
+        tweetnacl       5,588  1,133 ms   4 of 8
+        compact25519    4,918  1,623 ms   4 of 8
+
+      Read the middle column before choosing on the first. A stage-1 budget of
+      32 KiB makes 5 KB of savings look attractive; a boot that takes 1.6 s to
+      check one signature is a different kind of expensive, and stage-1 is
+      write-protected once provisioned, so it is not a cheap thing to revisit.
+
+config BOOT_ED25519_MONOCYPHER
+    bool "Monocypher 4.0.2"
+    help
+      29.2 ms per verify for 10,768 bytes, and the only one of the three that
+      rejects every malleable signature in the corpus. The default.
+
+config BOOT_ED25519_TWEETNACL
+    bool "TweetNaCl"
+    help
+      5,588 bytes, 1,133 ms per verify. ~700 lines of public-domain source, the
+      easiest of the three to audit by eye. Does not range-check S, so it accepts
+      4 of 8 malleable signatures: a signature can be altered and still verify,
+      over the same message. For an image that is a weaker property than it
+      sounds -- the image still has to hash to what was signed -- but it is a
+      deviation from RFC 8032 section 5.2.7.
+
+config BOOT_ED25519_COMPACT25519
+    bool "compact25519 (c25519)"
+    help
+      4,918 bytes, the smallest, and 1,623 ms per verify, the slowest. Accepts
+      the same 4 of 8 malleable signatures as TweetNaCl.
+
+endchoice
+
+config FS_LFN
+    bool "FatFs long file names (LFN)"
+    depends on DRV_SDIO
+    default n
+    help
+      Without this, FAT has only 8.3 short names, which the spec stores
+      uppercase: mkdir shtest creates SHTEST, data.txt reads back as
+      DATA.TXT, and anything longer than 8.3 is refused outright.
+
+      Enabling it costs flash for the code-page conversion tables in
+      ffunicode.c (a few KB for CP437, the configured page), and RAM for a
+      static working buffer of (FS_LFN_MAX + 1) * 2 bytes. FILINFO.fname
+      grows to FS_LFN_MAX + 1, so a consumer that copies a dirent into a
+      fixed buffer -- VFS_NAME_MAX in vaios -- must grow it to match.
+
+      The buffer is static (FatFs FF_USE_LFN=1), which is not thread-safe;
+      that is sound here because the VFS worker is single-threaded. A
+      multi-threaded caller needs the stack or heap variants instead.
+
+      Default n so small builds stay small.
+
+config FS_LFN_MAX
+    int "Longest file name, in characters"
+    depends on FS_LFN
+    default 64
+    range 12 255
+    help
+      Sizes both the FatFs working buffer and FILINFO.fname. 255 is the
+      full LFN specification and costs 512 bytes of RAM; 64 covers real
+      names at a quarter of that.
+
+config FS_RTC
+    bool "FatFs timestamps from the RTC"
+    depends on DRV_SDIO && DRV_RTC
+    default n
+    help
+      Without this, FatFs stamps every file it creates or modifies with one
+      fixed date (FF_FS_NORTC). With it, get_fattime() reads the calendar
+      (hal_rtc_get_datetime), so files carry the time they were written.
+
+      Until hal_rtc_init has brought the RTC up -- and on a cold start the
+      32.768 kHz crystal can take seconds -- get_fattime() returns the fixed
+      fallback date instead of blocking. get_fattime() is weak, so a consumer
+      with a better clock can provide its own.
+
 config DRV_SDIO_DMA
     bool "Enable DMA-backed SDIO async API"
     default y if DRV_SDIO && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)

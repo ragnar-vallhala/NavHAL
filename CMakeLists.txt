@@ -249,6 +249,49 @@ message(STATUS "NavHAL build profile: ${CMAKE_BUILD_TYPE}")
 string(APPEND CMAKE_C_FLAGS " ${ARCH_C_FLAGS} -Wall -std=c11 ${NAVHAL_FORCE_INCLUDE}")
 string(APPEND CMAKE_ASM_FLAGS " ${ARCH_ASM_FLAGS}")
 string(APPEND CMAKE_EXE_LINKER_FLAGS " ${ARCH_LINK_FLAGS}")
+
+# Hand the linker the flash KV store's extent so it can refuse an image that
+# overlaps it. The store erases whole sectors, so a store inside the image means
+# the first save erases the code doing the saving -- a 45 KB test image linked
+# flat from 0x08000000 reaches into sector 2, which is where the bootloader
+# layout wants the store. Only the STM32F4 sector map is known here; other
+# families leave the symbols unset and the assertion stands down.
+if(CONFIG_DRV_FLASH AND CONFIG_FAMILY_STM32F4)
+    set(_kv_pri "${CONFIG_FLASH_KV_PRIMARY_SECTOR}")
+    set(_kv_sec "${CONFIG_FLASH_KV_SECONDARY_SECTOR}")
+    if(_kv_pri STREQUAL "")
+        set(_kv_pri 6)
+    endif()
+    if(_kv_sec STREQUAL "")
+        set(_kv_sec 7)
+    endif()
+    # STM32F4 512K map: 4 x 16K, 1 x 64K, 3 x 128K.
+    set(_f4_sector_base  0      16384  32768  49152  65536  131072 262144 393216)
+    set(_f4_sector_size  16384  16384  16384  16384  65536  131072 131072 131072)
+    set(_lo 99999999)
+    set(_hi 0)
+    foreach(_s ${_kv_pri} ${_kv_sec})
+        list(GET _f4_sector_base ${_s} _b)
+        list(GET _f4_sector_size ${_s} _z)
+        math(EXPR _e "${_b} + ${_z}")
+        if(_b LESS _lo)
+            set(_lo ${_b})
+        endif()
+        if(_e GREATER _hi)
+            set(_hi ${_e})
+        endif()
+    endforeach()
+    math(EXPR _kv_start "0x08000000 + ${_lo}" OUTPUT_FORMAT HEXADECIMAL)
+    math(EXPR _kv_end   "0x08000000 + ${_hi}" OUTPUT_FORMAT HEXADECIMAL)
+    message(STATUS "Flash KV store: sectors ${_kv_pri},${_kv_sec} = ${_kv_start}..${_kv_end}")
+    # Kept in a variable of its own as well: the test target replaces
+    # CMAKE_EXE_LINKER_FLAGS wholesale rather than appending, so anything only
+    # appended here is silently dropped for that image -- which is the one image
+    # large enough to collide with the store.
+    set(NAVHAL_KV_DEFSYMS
+        " -Wl,--defsym=__kv_start=${_kv_start} -Wl,--defsym=__kv_end=${_kv_end}")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS "${NAVHAL_KV_DEFSYMS}")
+endif()
 # C++ shares the arch flags; a C++ TU only appears in the C++ sample, which
 # does enable_language(CXX). Bare-metal: no exceptions / RTTI / cxa-atexit.
 string(APPEND CMAKE_CXX_FLAGS
@@ -265,6 +308,27 @@ endif()
 # build. So when -DTEST=ON, skip samples/ and src/vendor/ entirely.
 if(TEST)
   message(STATUS "TEST=ON — skipping samples/ and src/vendor/ (test build is self-contained)")
+elseif(BOOT_IMAGE)
+  # A bootloader image rather than a sample: same HAL, its own partition and so
+  # its own linker script. -DBOOT_IMAGE=stage1 builds boot/stage1.
+  #
+  # Separate from SAMPLE because these are not samples -- one of them ends up
+  # write-protected -- and because each owns a region of flash rather than the
+  # whole part.
+  message(STATUS "Boot image selected: ${BOOT_IMAGE}")
+  set(_boot_ld "${SRC_BOARD}/boot/${BOOT_IMAGE}.ld")
+  if(NOT EXISTS "${_boot_ld}")
+    message(FATAL_ERROR
+      "No linker script for BOOT_IMAGE='${BOOT_IMAGE}' on board '${BOARD}'. "
+      "Expected: ${_boot_ld}")
+  endif()
+  # -T does not compose, so the board script is replaced rather than added to.
+  string(REPLACE "-T ${NAVHAL_LINKER_SCRIPT}" "-T ${_boot_ld}"
+         CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+  message(STATUS "Boot image linker script: ${_boot_ld}")
+  add_subdirectory(${SRC_VENDOR})
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/boot/${BOOT_IMAGE})
+  set(SOURCES ${CORE_SOURCES} ${BOARD_SOURCES} ${VENDOR_SOURCES})
 elseif(SAMPLE AND NOT STANDALONE)
   message(STATUS "Sample selected: ${SAMPLE} (with HAL)")
   message(STATUS  "Linker flag: ${CMAKE_EXE_LINKER_FLAGS}")
@@ -486,6 +550,8 @@ if(TEST)
       list(APPEND TEST_FLAGS ${NAVHAL_TEST_EXTRA_FLAGS})
   endif()
   set(CMAKE_EXE_LINKER_FLAGS "${NAVHAL_TEST_LINKER_FLAGS}")
+  # Carry the KV extent across that overwrite.
+  string(APPEND CMAKE_EXE_LINKER_FLAGS "${NAVHAL_KV_DEFSYMS}")
   if(NAVHAL_TEST_NEEDS_LIBGCC)
       target_link_libraries(tests PRIVATE c gcc)
   endif()

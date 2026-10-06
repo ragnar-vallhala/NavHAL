@@ -121,8 +121,17 @@ functions.
 /     0 - Include all code pages above and configured by f_setcp()
 */
 
+/* Driven by Kconfig (CONFIG_FS_LFN): navhal_target.h is force-included into
+ * every translation unit, so the macros are in scope here without an include.
+ * 1 = static working buffer, which is not thread-safe and is sound only because
+ * the single VFS worker is the only caller. */
+#if defined(NAVHAL_CONFIG_FS_LFN) && NAVHAL_CONFIG_FS_LFN
+#define FF_USE_LFN 1
+#define FF_MAX_LFN NAVHAL_CONFIG_FS_LFN_MAX
+#else
 #define FF_USE_LFN 0
 #define FF_MAX_LFN 255
+#endif
 /* The FF_USE_LFN switches the support for LFN (long file name).
 /
 /   0: Disable LFN. FF_MAX_LFN has no effect.
@@ -151,7 +160,11 @@ ffsystem.c, need to be added to the project. */
 /  Also behavior of string I/O functions will be affected by this option.
 /  When LFN is not enabled, this option has no effect. */
 
+#if defined(NAVHAL_CONFIG_FS_LFN) && NAVHAL_CONFIG_FS_LFN
+#define FF_LFN_BUF NAVHAL_CONFIG_FS_LFN_MAX
+#else
 #define FF_LFN_BUF 255
+#endif
 #define FF_SFN_BUF 12
 /* This set of options defines size of file name members in the FILINFO
 structure /  which is used to read out directory items. These values should be
@@ -236,7 +249,13 @@ data transfer. */
 /  To enable exFAT, also LFN needs to be enabled. (FF_USE_LFN >= 1)
 /  Note that enabling exFAT discards ANSI C (C89) compatibility. */
 
+/* Driven by Kconfig (CONFIG_FS_RTC): with the RTC, timestamps come from
+ * get_fattime() (diskio.c), which reads it; without, one fixed date. */
+#if defined(NAVHAL_CONFIG_FS_RTC) && NAVHAL_CONFIG_FS_RTC
+#define FF_FS_NORTC 0
+#else
 #define FF_FS_NORTC 1
+#endif
 #define FF_NORTC_MON 1
 #define FF_NORTC_MDAY 1
 #define FF_NORTC_YEAR 2022
@@ -291,3 +310,4 @@ ffsystem.c.
 */
 
 /*--- End of configuration options ---*/
+

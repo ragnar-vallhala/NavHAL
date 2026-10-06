@@ -43,19 +43,28 @@ hal_status_t hal_interrupt_disable(hal_irq_t irq) {
   return HAL_OK;
 }
 
-/* The drivers under test own their vectors, so linking one pulls in the
- * registry it dispatches through. There is no NVIC here and no way for a host
- * suite to raise an interrupt, so these only have to exist: what the suite
- * checks against the simulated MMIO is the register writes around them --
- * IDLEIE set on attach, cleared on detach. */
+/* The drivers under test own their vectors, so linking one pulls in the registry
+ * it dispatches through. There is no NVIC here and no way for the host to raise a
+ * real interrupt, so the attach path records what was attached and a test calls it
+ * directly -- which is how the F7 UART's idle callback is exercised (see
+ * tests/host/test_uart_driver.c). What the suite checks against the simulated MMIO
+ * either side of that is the register writes: IDLEIE set on attach, cleared on
+ * detach.
+ *
+ * dispatch only has to exist: the port split gave every arch one, and a driver
+ * that routes through it has to link here even though nothing calls it. */
 void hal_interrupt_dispatch(hal_irq_t irq) { (void)irq; }
 
+/* The last handler a driver attached, and the line, so a test can run it as the
+   interrupt would. */
+void (*host_attached_isr)(void);
+hal_irq_t host_attached_irq;
+
 hal_status_t hal_interrupt_attach_callback(hal_irq_t irq, void (*cb)(void)) {
-  (void)irq;
-  (void)cb;
+  host_attached_irq = irq;
+  host_attached_isr = cb;
   return HAL_OK;
 }
-
 hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq, uint8_t prio) {
   (void)irq;
   (void)prio;

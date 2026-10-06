@@ -21,6 +21,7 @@
  */
 
 #include "test_crc.h"
+#include "internal/hal_crc_ops.h"
 #include "common/hal_config.h"
 #include "navhal_port_crc.h"
 #include "navtest/navtest.h"
@@ -120,6 +121,53 @@ void test_hal_crc_compute_mpeg2_reference_vector(void) {
   TEST_ASSERT_EQUAL_UINT32(0x0376E6E7u, hal_crc_compute(s, sizeof(s)));
 }
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
+
+#if NAVHAL_CONFIG_DRV_CRC
+/* The hardware unit must agree with the software implementation byte for byte.
+ *
+ * This is the case that matters for a CRC that crosses a wire. The unit is
+ * word-oriented, so every length that is not a multiple of four exercises the
+ * tail path -- which used to pack the remainder into a word and zero-pad it,
+ * feeding up to three bytes that were never in the buffer. The result disagreed
+ * with every other implementation of the same CRC, and nothing said so.
+ *
+ * A part that does not honour byte-width writes to CRC_DR fails here rather than
+ * silently padding again, which is the point of comparing against software
+ * instead of against a recorded constant.
+ */
+void test_crc_hardware_matches_software_every_length(void) {
+  const uint8_t data[] = "123456789abc";
+
+  for (uint32_t len = 1; len <= 8u; len++) {
+    hal_crc_sw_reset();
+    uint32_t want = hal_crc_sw_accumulate(data, len);
+
+    crc_setUp();
+    uint32_t got = hal_crc_compute(data, len);
+
+    TEST_ASSERT_EQUAL_UINT32(want, got);
+  }
+}
+
+/* And the same split that the software path survives. Each call used to pad its
+ * own tail, so two chunks of three bytes produced neither the CRC of six bytes
+ * nor anything a host could reproduce. */
+void test_crc_hardware_accumulate_is_composable(void) {
+  const uint8_t data[] = "123456789";
+
+  hal_crc_sw_reset();
+  uint32_t want = hal_crc_sw_accumulate(data, 9);
+
+  crc_setUp();
+  hal_crc_reset();
+  hal_crc_accumulate(data, 3);      /* a tail on every call */
+  hal_crc_accumulate(data + 3, 3);
+  uint32_t got = hal_crc_accumulate(data + 6, 3);
+
+  TEST_ASSERT_EQUAL_UINT32(want, got);
+}
+#endif /* NAVHAL_CONFIG_DRV_CRC */
+
 NAVTEST_CASE_DECL(test_crc_empty_returns_init);
 NAVTEST_CASE_DECL(test_crc_single_byte);
 NAVTEST_CASE_DECL(test_crc_known_vector);
@@ -127,6 +175,10 @@ NAVTEST_CASE_DECL(test_crc_accumulate_matches_compute);
 NAVTEST_CASE_DECL(test_crc_reset_restores_init);
 NAVTEST_CASE_DECL(test_hal_crc_init_rejects_null_config);
 NAVTEST_CASE_DECL(test_hal_crc_compute_mpeg2_reference_vector);
+#if NAVHAL_CONFIG_DRV_CRC
+NAVTEST_CASE_DECL(test_crc_hardware_matches_software_every_length);
+NAVTEST_CASE_DECL(test_crc_hardware_accumulate_is_composable);
+#endif
 
 
 static const navtest_case_t crc_cases[] = {
@@ -137,6 +189,10 @@ static const navtest_case_t crc_cases[] = {
     NAVTEST_CASE(test_crc_reset_restores_init),
     NAVTEST_CASE(test_hal_crc_init_rejects_null_config),
     NAVTEST_CASE(test_hal_crc_compute_mpeg2_reference_vector),
+#if NAVHAL_CONFIG_DRV_CRC
+    NAVTEST_CASE(test_crc_hardware_matches_software_every_length),
+    NAVTEST_CASE(test_crc_hardware_accumulate_is_composable),
+#endif
 };
 
 const navtest_suite_t test_crc_suite = {

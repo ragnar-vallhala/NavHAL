@@ -78,12 +78,58 @@ if(NOT TEST)
     endif()
 endif()
 
+# Bootloader crypto: exactly one backend, and only its own sources. Compiling a
+# backend that is not selected would put a second hal_boot_ed25519_verify in the
+# link, so the choice is enforced here as well as in Kconfig.
+if(CONFIG_BOOT_CRYPTO)
+    set(CRYPTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utils/crypto)
+    # The image digest is backend-independent: one SHA-256 for all three, because
+    # the signature is made over it and must still verify after a reconfigure.
+    list(APPEND COMMON_SOURCES
+        ${CRYPTO_DIR}/boot_hash.c
+        ${CRYPTO_DIR}/sha256/sha256.c)
+    set(CRYPTO_INCLUDES ${CRYPTO_DIR}/sha256)
+    if(CONFIG_BOOT_ED25519_MONOCYPHER)
+        list(APPEND COMMON_SOURCES
+            ${CRYPTO_DIR}/backend_monocypher.c
+            ${CRYPTO_DIR}/monocypher/monocypher.c
+            ${CRYPTO_DIR}/monocypher/monocypher-ed25519.c)
+        list(APPEND CRYPTO_INCLUDES ${CRYPTO_DIR}/monocypher)
+    elseif(CONFIG_BOOT_ED25519_TWEETNACL)
+        list(APPEND COMMON_SOURCES
+            ${CRYPTO_DIR}/backend_tweetnacl.c
+            ${CRYPTO_DIR}/tweetnacl/tweetnacl.c)
+        list(APPEND CRYPTO_INCLUDES ${CRYPTO_DIR}/tweetnacl)
+    elseif(CONFIG_BOOT_ED25519_COMPACT25519)
+        list(APPEND COMMON_SOURCES
+            ${CRYPTO_DIR}/backend_compact25519.c
+            ${CRYPTO_DIR}/compact25519/compact_ed25519.c
+            ${CRYPTO_DIR}/compact25519/compact_wipe.c
+            ${CRYPTO_DIR}/compact25519/c25519/ed25519.c
+            ${CRYPTO_DIR}/compact25519/c25519/edsign.c
+            ${CRYPTO_DIR}/compact25519/c25519/f25519.c
+            ${CRYPTO_DIR}/compact25519/c25519/fprime.c
+            ${CRYPTO_DIR}/compact25519/c25519/sha512.c)
+        list(APPEND CRYPTO_INCLUDES ${CRYPTO_DIR}/compact25519)
+    else()
+        message(FATAL_ERROR
+            "CONFIG_BOOT_CRYPTO is set but no Ed25519 backend is selected")
+    endif()
+endif()
+
 if(CONFIG_DRV_SDIO)
     list(APPEND COMMON_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/utils/v_fs.c
         ${CMAKE_CURRENT_SOURCE_DIR}/utils/fatfs/diskio.c
         ${CMAKE_CURRENT_SOURCE_DIR}/utils/fatfs/ff.c
     )
+    # Only with LFN on: it carries the code-page conversion tables, and with
+    # short names FatFs never calls them.
+    if(CONFIG_FS_LFN)
+        list(APPEND COMMON_SOURCES
+            ${CMAKE_CURRENT_SOURCE_DIR}/utils/fatfs/ffunicode.c
+        )
+    endif()
 endif()
 
 add_library(common OBJECT ${COMMON_SOURCES})
@@ -97,4 +143,5 @@ target_include_directories(common PRIVATE
     ${INCLUDE_FAMILY}
     ${CMAKE_BINARY_DIR}   # generated board.h
     ${CMAKE_BINARY_DIR}
-)
+
+    ${CRYPTO_INCLUDES})

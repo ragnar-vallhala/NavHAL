@@ -120,6 +120,24 @@ hal_status_t hal_uart_dma_rx_index(hal_uart_t uart, uint16_t *out_index);
  */
 hal_status_t hal_uart_dma_rx_sync(hal_uart_t uart, uint16_t from, uint16_t len);
 
+/**
+ * @brief Call @p callback from the RX DMA stream's interrupt at the half-way
+ *        and wrap points of the ring set up by ::hal_uart_init_dma_rx.
+ *
+ * With ::hal_uart_attach_idle_callback (the end of a burst), these are the
+ * events a ring consumer drains on: a burst longer than the ring raises them
+ * before DMA can overwrite unread data, which idle alone cannot promise. The
+ * line is enabled at a maskable priority, so @p callback may call an RTOS
+ * @c *_from_isr primitive; the stream's flags are cleared after it returns.
+ *
+ * @param uart      Target UART.
+ * @param callback  Invoked from ISR context; NULL detaches and disables.
+ * @return HAL_OK, or HAL_ERR_INVALID_ARG for an unknown UART / no RX stream.
+ */
+hal_status_t hal_uart_dma_rx_attach_callback(hal_uart_t uart,
+                                             void (*callback)(void));
+
+
 /** @brief Transmit a null-terminated string using DMA. */
 hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 

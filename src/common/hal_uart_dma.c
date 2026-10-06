@@ -202,6 +202,26 @@ hal_status_t hal_uart_init_dma_rx(hal_uart_t uart, uint8_t *buffer,
   return hal_dma_start(&cfg);
 }
 
+hal_status_t hal_uart_dma_rx_attach_callback(hal_uart_t uart,
+                                             void (*callback)(void)) {
+  if ((unsigned)uart >= UART_SLOTS)
+    return HAL_ERR_INVALID_ARG;
+  hal_dma_binding_t b;
+  hal_status_t st = hal_uart_dma_get_binding(uart, false, &b);
+  if (st != HAL_OK)
+    return st;
+  if (callback == NULL) {
+    hal_interrupt_disable(b.irq);
+    return hal_interrupt_detach_callback(b.irq);
+  }
+  st = hal_interrupt_attach_callback(b.irq, callback);
+  if (st != HAL_OK)
+    return st;
+  /* Maskable, like the idle and TX-complete lines, so the callback may call an
+   * RTOS *_from_isr primitive. The stream's handler clears HT/TC after it. */
+  return hal_interrupt_enable_with_priority(b.irq, HAL_IRQ_PRIORITY_DEFAULT);
+}
+
 hal_status_t hal_uart_dma_rx_sync(hal_uart_t uart, uint16_t from,
                                   uint16_t len) {
   if ((unsigned)uart >= UART_SLOTS || s_rx_buf[uart] == NULL)

@@ -114,6 +114,41 @@ void test_host_uart_enable_interrupt_sets_cr1(void) {
   TEST_ASSERT_BITS_LOW(USART_CR1_TXEIE, u(HAL_UART_3)->CR1);
 }
 
+/* The idle-line callback: attaching arms IDLEIE and the USART line; the
+ * handler runs the callback only when ISR.IDLE is set, clearing it through
+ * ICR.IDLECF (the F7 USART has no SR-then-DR clear); detaching disarms. */
+extern void (*host_attached_isr)(void);
+extern hal_irq_t host_attached_irq;
+static int s_idle_calls;
+static void idle_cb(void) { s_idle_calls++; }
+
+void test_host_uart_idle_callback(void) {
+  host_mmio_reset();
+  hal_uart_init(HAL_UART_3, &(hal_uart_config_t){.baudrate = 115200});
+  s_idle_calls = 0;
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_uart_attach_idle_callback(HAL_UART_3,
+                                                                   idle_cb));
+  TEST_ASSERT_BITS_HIGH(USART_CR1_IDLEIE, u(HAL_UART_3)->CR1);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)USART3_IRQn, (uint32_t)host_attached_irq);
+
+  /* the shared line raised for something else: no callback */
+  host_reg_set((uintptr_t)&u(HAL_UART_3)->ICR, 0u);
+  host_attached_isr();
+  TEST_ASSERT_EQUAL_UINT32(0u, (uint32_t)s_idle_calls);
+
+  host_reg_set((uintptr_t)&u(HAL_UART_3)->ISR, USART_ISR_IDLE);
+  host_attached_isr();
+  TEST_ASSERT_EQUAL_UINT32(1u, (uint32_t)s_idle_calls);
+  TEST_ASSERT_BITS_HIGH(USART_ICR_IDLECF, u(HAL_UART_3)->ICR);
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_uart_attach_idle_callback(HAL_UART_3,
+                                                                   NULL));
+  hal_uart_detach_idle_callback(HAL_UART_3);
+  TEST_ASSERT_BITS_LOW(USART_CR1_IDLEIE, u(HAL_UART_3)->CR1);
+}
+
 NAVTEST_CASE_DECL(test_host_uart_init_brr_usart3_115200);
 NAVTEST_CASE_DECL(test_host_uart_init_brr_various_bauds);
 NAVTEST_CASE_DECL(test_host_uart_init_usart1_uses_apb2_clock);
@@ -123,6 +158,7 @@ NAVTEST_CASE_DECL(test_host_uart_read_char_from_rdr);
 NAVTEST_CASE_DECL(test_host_uart_read_char_clears_errors_via_icr);
 NAVTEST_CASE_DECL(test_host_uart_available_reflects_rxne);
 NAVTEST_CASE_DECL(test_host_uart_enable_interrupt_sets_cr1);
+NAVTEST_CASE_DECL(test_host_uart_idle_callback);
 
 static const navtest_case_t uart_driver_cases[] = {
     NAVTEST_CASE(test_host_uart_init_brr_usart3_115200),
@@ -134,6 +170,7 @@ static const navtest_case_t uart_driver_cases[] = {
     NAVTEST_CASE(test_host_uart_read_char_clears_errors_via_icr),
     NAVTEST_CASE(test_host_uart_available_reflects_rxne),
     NAVTEST_CASE(test_host_uart_enable_interrupt_sets_cr1),
+    NAVTEST_CASE(test_host_uart_idle_callback),
 };
 
 const navtest_suite_t test_uart_driver_suite = {

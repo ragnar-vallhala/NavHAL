@@ -371,6 +371,20 @@ config FS_LFN_MAX
       full LFN specification and costs 512 bytes of RAM; 64 covers real
       names at a quarter of that.
 
+config FS_RTC
+    bool "FatFs timestamps from the RTC"
+    depends on DRV_SDIO && DRV_RTC
+    default n
+    help
+      Without this, FatFs stamps every file it creates or modifies with one
+      fixed date (FF_FS_NORTC). With it, get_fattime() reads the calendar
+      (hal_rtc_get_datetime), so files carry the time they were written.
+
+      Until hal_rtc_init has brought the RTC up -- and on a cold start the
+      32.768 kHz crystal can take seconds -- get_fattime() returns the fixed
+      fallback date instead of blocking. get_fattime() is weak, so a consumer
+      with a better clock can provide its own.
+
 config DRV_SDIO_DMA
     bool "Enable DMA-backed SDIO async API"
     default y if DRV_SDIO && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)

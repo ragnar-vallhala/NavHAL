@@ -41,3 +41,18 @@ hal_status_t hal_interrupt_disable(hal_irq_t irq) {
   (void)irq;
   return HAL_OK;
 }
+
+/* The last handler a driver attached, and the line, so a test can run it as
+   the interrupt would (the F7 UART's idle callback). */
+void (*host_attached_isr)(void);
+hal_irq_t host_attached_irq;
+hal_status_t hal_interrupt_attach_callback(hal_irq_t irq, void (*cb)(void)) {
+  host_attached_irq = irq;
+  host_attached_isr = cb;
+  return HAL_OK;
+}
+hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq, uint8_t prio) {
+  (void)irq;
+  (void)prio;
+  return HAL_OK;
+}

@@ -300,6 +300,32 @@ config FS_RTC
       fallback date instead of blocking. get_fattime() is weak, so a consumer
       with a better clock can provide its own.
 
+config DRV_SDIO_IGNORE_CARD_DETECT
+    bool "Ignore the SD card-detect pin"
+    default n
+    depends on DRV_SDIO
+    help
+      Treat the slot as always occupied and let the card commands decide,
+      exactly as a board that declares no card-detect pin already behaves.
+
+      For a board whose detect line is broken or absent while the card itself
+      is fine. hal_sdio_card_init() consults card detect BEFORE issuing any
+      command, so an open detect contact refuses a working card outright -- and
+      an application cannot work around it, because
+      hal_sdio_card_present() reconfigures that pin to input-with-pull-up on
+      every call, immediately before reading it.
+
+      Measured case this was added for: on a NAVIXSM-F401RE whose detect
+      contact is open, PC5 floats with a card seated (high under the internal
+      pull-up, low under the pull-down) while the card answers CMD8 with the
+      0x1AA check-pattern echo. With this set the same card identifies and
+      mounts, reaching 12 MHz in 4-bit mode.
+
+      What it costs: an empty slot is no longer reported early, so the
+      identification commands report it instead. That is the weaker signal the
+      detect pin exists to improve on, which is why this is opt-in and off by
+      default.
+
 config DRV_SDIO_DMA
     bool "Enable DMA-backed SDIO async API"
     default y if DRV_SDIO && (ARCH_CORTEX_M4 || ARCH_CORTEX_M7)

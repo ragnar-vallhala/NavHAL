@@ -9,10 +9,35 @@ config BOARD
 #
 # Every macro board.h used to define, as Kconfig symbols; tools/kconfig.py turns
 # them into the board.h that code includes, so this file is the single place the
-# board is described and any value can be overridden in .config.
+# board is described. The symbols are promptless by design, which also means they
+# are not user-assignable: an override in .config is read and discarded, so this
+# file is the only place a value changes. To describe different hardware, correct
+# this board or add one -- tools/kconfig.py now says so out loud when an assignment
+# is dropped, because it used to happen in silence.
 #
 # PIN_<name>_PORT/_PIN become HAL_GPIO_PIN(); NUM_<name> an integer; VAL_<name> is
 # emitted verbatim, for spellings no integer can carry.
+
+# ---- Not described on purpose ----
+#
+# SPI2, PWM2 and MOTOR1-4 used to be declared here with the F401 datasheet-default
+# pin sets, copied rather than traced, and they collided with what this PCB really
+# wires -- which is how you could tell:
+#
+#   SPI2  SCK/MISO/MOSI on PB13/PB14/PB15, which are LED_RGB_RED, LED_RGB_GREEN
+#         (also LED_BUILTIN) and BUZZER.
+#   PWM2  CH1-CH4 on PA0-PA3, where PA0 is battery sense and PA2/PA3 are USART2 --
+#         the console this board boots on.
+#   MOTOR1-4 on TIM3/PB4/PB5/PB0/PB1, which is the PWM3 header. The actual ESC
+#         outputs are PWM1 on PA8-PA11 (TIM1), declared below.
+#
+# They are gone rather than corrected: an undescribed peripheral is absent from the
+# driver's pin table -- the SPI driver guards each instance on
+# `#if defined(BOARD_SPI2_SCK)` -- which is this file's way of saying "not wired".
+# Re-add any of them only from the schematic.
+#
+# Still untraced and therefore still absent: the PWM3 header's pins, and whether
+# SPI1 (PA5/PA6/PA7, declared below) is the SPI1 header or something else.
 
 # 41 macros
 config PIN_LED_RGB_BLUE_PORT
@@ -114,60 +139,6 @@ config PIN_BOARD_PWM1_CH4_PORT
 config PIN_BOARD_PWM1_CH4_PIN
     int
     default 11 if BOARD_NAVIXDEV
-config VAL_BOARD_PWM2_TIMER
-    string
-    default "TIM5" if BOARD_NAVIXDEV
-config PIN_BOARD_PWM2_CH1_PORT
-    int
-    default 0 if BOARD_NAVIXDEV
-config PIN_BOARD_PWM2_CH1_PIN
-    int
-    default 0 if BOARD_NAVIXDEV
-config PIN_BOARD_PWM2_CH2_PORT
-    int
-    default 0 if BOARD_NAVIXDEV
-config PIN_BOARD_PWM2_CH2_PIN
-    int
-    default 1 if BOARD_NAVIXDEV
-config PIN_BOARD_PWM2_CH3_PORT
-    int
-    default 0 if BOARD_NAVIXDEV
-config PIN_BOARD_PWM2_CH3_PIN
-    int
-    default 2 if BOARD_NAVIXDEV
-config PIN_BOARD_PWM2_CH4_PORT
-    int
-    default 0 if BOARD_NAVIXDEV
-config PIN_BOARD_PWM2_CH4_PIN
-    int
-    default 3 if BOARD_NAVIXDEV
-config VAL_BOARD_MOTOR_TIMER
-    string
-    default "TIM3" if BOARD_NAVIXDEV
-config PIN_BOARD_MOTOR1_PORT
-    int
-    default 1 if BOARD_NAVIXDEV
-config PIN_BOARD_MOTOR1_PIN
-    int
-    default 4 if BOARD_NAVIXDEV
-config PIN_BOARD_MOTOR2_PORT
-    int
-    default 1 if BOARD_NAVIXDEV
-config PIN_BOARD_MOTOR2_PIN
-    int
-    default 5 if BOARD_NAVIXDEV
-config PIN_BOARD_MOTOR3_PORT
-    int
-    default 1 if BOARD_NAVIXDEV
-config PIN_BOARD_MOTOR3_PIN
-    int
-    default 0 if BOARD_NAVIXDEV
-config PIN_BOARD_MOTOR4_PORT
-    int
-    default 1 if BOARD_NAVIXDEV
-config PIN_BOARD_MOTOR4_PIN
-    int
-    default 1 if BOARD_NAVIXDEV
 config VAL_BOARD_SPI_BUS
     string
     default "HAL_SPI_1" if BOARD_NAVIXDEV
@@ -357,27 +328,6 @@ config PIN_BOARD_SPI1_MOSI_PIN
     int
     default 7 if BOARD_NAVIXDEV
 config NUM_BOARD_SPI1_AF
-    int
-    default 5 if BOARD_NAVIXDEV
-config PIN_BOARD_SPI2_SCK_PORT
-    int
-    default 1 if BOARD_NAVIXDEV
-config PIN_BOARD_SPI2_SCK_PIN
-    int
-    default 13 if BOARD_NAVIXDEV
-config PIN_BOARD_SPI2_MISO_PORT
-    int
-    default 1 if BOARD_NAVIXDEV
-config PIN_BOARD_SPI2_MISO_PIN
-    int
-    default 14 if BOARD_NAVIXDEV
-config PIN_BOARD_SPI2_MOSI_PORT
-    int
-    default 1 if BOARD_NAVIXDEV
-config PIN_BOARD_SPI2_MOSI_PIN
-    int
-    default 15 if BOARD_NAVIXDEV
-config NUM_BOARD_SPI2_AF
     int
     default 5 if BOARD_NAVIXDEV
 

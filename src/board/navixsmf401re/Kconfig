@@ -9,8 +9,15 @@ config BOARD
 #
 # Every macro board.h used to define, as Kconfig symbols. tools/kconfig.py turns
 # these into the board.h that code includes, so this file is the single place the
-# board is described and any value here can be overridden in .config -- including
-# which USART the console is on, which was impossible while it was a header.
+# board is described. The symbols are promptless by design, which also means they
+# are not user-assignable: an override in .config is read and discarded, so this
+# file is the only place a value changes. To describe different hardware, correct
+# this board or add one -- tools/kconfig.py now says so out loud when an assignment
+# is dropped, because it used to happen in silence.
+#
+# Which USART the console is on is described here rather than in a header, which
+# was the point of the move -- it just is not overridable from a consumer's
+# .config the way this comment used to claim.
 
 # 37 macros
 config PIN_LED_BUILTIN_PORT
@@ -142,6 +149,17 @@ config PIN_BOARD_LORA_DIO1_PORT
 config PIN_BOARD_LORA_DIO1_PIN
     int
     default 15 if BOARD_NAVIXSM_F401RE
+# BOARD_I2C_BUS is the bus this board's own devices are on: PB8/PB9, carrying the
+# IST8310 magnetometer, the DPS368 barometer and the INA226 current monitor.
+# BOARD_I2C_EXT is the pin header, PB6/PB7 through R31/R30, with nothing else on it.
+#
+# These two were the other way round, which made BOARD_I2C_BUS -- the name anything
+# reaching for "the board's bus" picks -- the external connector, so a consumer
+# talking to the onboard sensors addressed an empty header. The pins were right
+# either way; only which one is "the" bus was wrong.
+#
+# Both pin pairs are I2C1 on this part (PB6/PB7 and PB8/PB9 are alternate AF pins
+# for the same peripheral), so the two cannot be driven at once.
 config VAL_BOARD_I2C_BUS
     string
     default "HAL_I2C_1" if BOARD_NAVIXSM_F401RE
@@ -150,25 +168,25 @@ config PIN_BOARD_I2C_SCL_PORT
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_SCL_PIN
     int
-    default 6 if BOARD_NAVIXSM_F401RE
+    default 8 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_SDA_PORT
     int
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_SDA_PIN
     int
-    default 7 if BOARD_NAVIXSM_F401RE
+    default 9 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_EXT_SCL_PORT
     int
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_EXT_SCL_PIN
     int
-    default 8 if BOARD_NAVIXSM_F401RE
+    default 6 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_EXT_SDA_PORT
     int
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_EXT_SDA_PIN
     int
-    default 9 if BOARD_NAVIXSM_F401RE
+    default 7 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_USB_DM_PORT
     int
     default 0 if BOARD_NAVIXSM_F401RE

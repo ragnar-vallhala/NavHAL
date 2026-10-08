@@ -43,7 +43,7 @@ def load_kconfig_proper(kconfig_path, config_path):
         
         # Try to load existing user config if present
         if os.path.exists(config_path):
-            requested = _requested_bools(config_path)
+            requested = _requested_values(config_path)
             kb.load_config(config_path)
             print(f"Loaded user configuration from '{config_path}'")
             _report_dropped(kb, requested)
@@ -58,40 +58,100 @@ def load_kconfig_proper(kconfig_path, config_path):
         print("FATAL ERROR: Python module 'kconfiglib' is required. Please run: pip install kconfiglib", file=sys.stderr)
         sys.exit(1)
 
-def _requested_bools(config_path):
-    """The symbols a .config asked for with =y, by name."""
-    asked = set()
+def _requested_values(config_path):
+    """What a .config asked for, as {symbol: requested-value-string}.
+
+    Every assignment, not just the bools: a promptless symbol is not
+    user-assignable at all, so an int or string override is read and dropped just
+    as silently as a bool with unmet dependencies.
+    """
+    asked = {}
     with open(config_path) as f:
         for line in f:
             line = line.strip()
-            if line.startswith("CONFIG_") and line.endswith("=y"):
-                asked.add(line[len("CONFIG_"):-len("=y")])
+            if not line.startswith("CONFIG_") or "=" not in line:
+                continue
+            name, _, val = line[len("CONFIG_"):].partition("=")
+            if val.startswith('"') and val.endswith('"') and len(val) > 1:
+                val = val[1:-1]
+            asked[name] = val
     return asked
 
 
-def _report_dropped(kb, requested):
-    """Say which requested symbols this target cannot provide, and why.
+def _selectors_of(kb, target):
+    """Symbols whose Kconfig `select` can force @p target on."""
+    out = []
+    for sym in kb.unique_defined_syms:
+        for sel, _cond in sym.selects:
+            if sel is target:
+                out.append(sym)
+                break
+    return out
 
-    Kconfig drops an assignment whose dependencies are unmet, which is correct and
-    silent. Silence is the problem: a .config asking for CONFIG_DRV_GPIO=y on a port
-    with no GPIO backend used to fail the build on a missing port header, and once
-    the dependency was declared it instead built quietly without GPIO. Neither tells
-    the person what happened. Both are worse than a sentence.
+
+def _report_dropped(kb, requested):
+    """Say which requested values did not take, and why.
+
+    Kconfig drops an assignment it cannot honour, correctly and silently, and the
+    silence is the problem. Two ways it happens:
+
+      - dependencies unmet: CONFIG_DRV_GPIO=y on a port with no GPIO backend used
+        to fail the build on a missing port header; once the dependency was
+        declared it built quietly without GPIO instead.
+      - no prompt: every PIN_/NUM_/VAL_ symbol in a board description is declared
+        with a bare type and a default, and a promptless symbol is not
+        user-assignable, so the value is read and discarded. A .config asking for
+        CONFIG_PIN_BUZZER_PIN=5 still emitted 15.
+
+    Neither told anyone. Both are worse than a sentence.
     """
-    dropped = []
+    unmet, ignored, selected_by = [], [], []
     for name in sorted(requested):
         sym = kb.syms.get(name)
         if sym is None:
             continue
-        if sym.str_value == "n":
-            dep = kconfiglib.expr_str(sym.direct_dep)
-            dropped.append((name, dep))
-    if not dropped:
-        return
-    print("Warning: this target cannot provide what the configuration asked for:")
-    for name, dep in dropped:
-        print(f"  CONFIG_{name}=y ignored -- needs: {dep}")
-    print("  (the build continues without them; see docs/capabilities/README.md)")
+        want, got = requested[name], sym.str_value
+        if want == got:
+            continue
+        if got == "n" and want == "y":
+            unmet.append((name, kconfiglib.expr_str(sym.direct_dep)))
+            continue
+        # Asked for off and still on: something selects it. Name the selector --
+        # blaming a missing prompt would be wrong, and a warning that misattributes
+        # is worse than no warning.
+        forced = []
+        if want == "n" and got != "n":
+            for sel, _cond in getattr(sym, "rev_dep_info", []) or []:
+                forced.append(sel.name)
+            if not forced:
+                # Only the selectors that are themselves on: the rest could force it
+                # but are not the reason today, and naming them sends the reader to
+                # the wrong line.
+                forced = sorted({
+                    d.name for d in _selectors_of(kb, sym) if d.str_value == "y"
+                })
+        if forced:
+            selected_by.append((name, got, forced))
+        else:
+            ignored.append((name, want, got))
+
+    if unmet:
+        print("Warning: this target cannot provide what the configuration asked for:")
+        for name, dep in unmet:
+            print(f"  CONFIG_{name}=y ignored -- needs: {dep}")
+        print("  (the build continues without them; see docs/capabilities/README.md)")
+    if selected_by:
+        print("Warning: these assignments lost to a select:")
+        for name, got, who in selected_by:
+            print(f"  CONFIG_{name}=n ignored -- stayed {got}; selected by "
+                  f"{', '.join(who[:4])}")
+        print("  (a select forces a symbol on; turn off whatever selects it instead)")
+    if ignored:
+        print("Warning: these assignments were discarded; the symbol is not user-settable:")
+        for name, want, got in ignored:
+            print(f"  CONFIG_{name}={want} ignored -- the value stayed {got}")
+        print("  (a board description's symbols have no prompt by design; change the"
+              " board, or add one)")
 
 
 def generate_cmake(kconfig_obj, output_path):

@@ -80,6 +80,7 @@ osource "src/arch/*/Kconfig.features"
 config DRV_CRC
     bool "Enable CRC support"
     default n
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
     help
       Provides the hal_crc_* API. Backed by the hardware CRC unit on STM32
       (Cortex-M4/M7); on the ATmega328P, which has no CRC peripheral, it is a
@@ -168,6 +169,7 @@ config DRV_INTERRUPT
 config DRV_GPIO
     bool "Enable GPIO Driver"
     default y
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
 
 config DRV_TIMEBASE
     bool "Enable timebase (tick, millis/micros, delays)"
@@ -183,6 +185,7 @@ config DRV_TIMEBASE
 config DRV_TIMER
     bool "Enable Timer Driver"
     default y
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
     select DRV_CLOCK
     select DRV_TIMEBASE
     # The MCU timer peripheral raises an update IRQ via the NVIC. The x86
@@ -215,6 +218,7 @@ config DRV_UART_DMA
 config DRV_I2C
     bool "Enable I2C Driver"
     default n
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
     select DRV_CLOCK
     select DRV_INTERRUPT
 
@@ -231,18 +235,21 @@ config DRV_I2C_DMA
 config DRV_SPI
     bool "Enable SPI Driver"
     default n
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
     select DRV_GPIO
     select DRV_TIMER
 
 config DRV_ADC
     bool "Enable ADC Driver"
     default n
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
     select DRV_CLOCK
     select DRV_GPIO
 
 config DRV_PWM
     bool "Enable PWM Driver"
     default n
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
     select DRV_CLOCK
     select DRV_TIMER
 
@@ -462,6 +469,7 @@ config DRV_WWDG
 config DRV_FLASH
     bool "Enable Flash Driver"
     default n
+    depends on ARCH_CORTEX_M4 || ARCH_CORTEX_M7 || ARCH_AVR8
 
 config DRV_ETH
     bool "Enable Ethernet MAC Driver"

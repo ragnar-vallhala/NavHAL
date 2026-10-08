@@ -43,8 +43,10 @@ def load_kconfig_proper(kconfig_path, config_path):
         
         # Try to load existing user config if present
         if os.path.exists(config_path):
+            requested = _requested_bools(config_path)
             kb.load_config(config_path)
             print(f"Loaded user configuration from '{config_path}'")
+            _report_dropped(kb, requested)
         else:
             print(f"Warning: No configuration file found at '{config_path}'. Using default settings.")
 
@@ -55,6 +57,42 @@ def load_kconfig_proper(kconfig_path, config_path):
     except ImportError:
         print("FATAL ERROR: Python module 'kconfiglib' is required. Please run: pip install kconfiglib", file=sys.stderr)
         sys.exit(1)
+
+def _requested_bools(config_path):
+    """The symbols a .config asked for with =y, by name."""
+    asked = set()
+    with open(config_path) as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith("CONFIG_") and line.endswith("=y"):
+                asked.add(line[len("CONFIG_"):-len("=y")])
+    return asked
+
+
+def _report_dropped(kb, requested):
+    """Say which requested symbols this target cannot provide, and why.
+
+    Kconfig drops an assignment whose dependencies are unmet, which is correct and
+    silent. Silence is the problem: a .config asking for CONFIG_DRV_GPIO=y on a port
+    with no GPIO backend used to fail the build on a missing port header, and once
+    the dependency was declared it instead built quietly without GPIO. Neither tells
+    the person what happened. Both are worse than a sentence.
+    """
+    dropped = []
+    for name in sorted(requested):
+        sym = kb.syms.get(name)
+        if sym is None:
+            continue
+        if sym.str_value == "n":
+            dep = kconfiglib.expr_str(sym.direct_dep)
+            dropped.append((name, dep))
+    if not dropped:
+        return
+    print("Warning: this target cannot provide what the configuration asked for:")
+    for name, dep in dropped:
+        print(f"  CONFIG_{name}=y ignored -- needs: {dep}")
+    print("  (the build continues without them; see docs/capabilities/README.md)")
+
 
 def generate_cmake(kconfig_obj, output_path):
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)

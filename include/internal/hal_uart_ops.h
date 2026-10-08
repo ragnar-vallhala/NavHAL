@@ -35,7 +35,7 @@
 #ifndef NAVHAL_INTERNAL_HAL_UART_OPS_H
 #define NAVHAL_INTERNAL_HAL_UART_OPS_H
 
-#include "common/hal_uart.h"
+#include "common/hal_uart_types.h"
 #include "common/hal_status.h"
 
 #include <stdbool.h>

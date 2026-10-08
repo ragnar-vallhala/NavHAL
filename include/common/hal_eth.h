@@ -77,7 +77,9 @@
 
 #include "common/hal_config.h" /* sources the NAVHAL_CONFIG_DRV_ETH capability flag */
 #include "common/hal_status.h"
+#include "common/navhal_compiler.h"
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 
@@ -206,7 +208,22 @@ hal_status_t hal_eth_stop(void);
  * @param callback Function invoked on RX/TX/link/error events; NULL to clear.
  * @return ::HAL_OK.
  */
-hal_status_t hal_eth_set_callback(hal_eth_callback_t callback);
+/**
+ * @brief Attach the receive/link callback.
+ * @param callback Non-NULL; use ::hal_eth_detach_callback to clear.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
+ */
+hal_status_t hal_eth_attach_callback(hal_eth_callback_t callback);
+
+/** @brief Clear the callback. @return ::HAL_OK. */
+hal_status_t hal_eth_detach_callback(void);
+
+/** @deprecated Use ::hal_eth_attach_callback / ::hal_eth_detach_callback. */
+NAVHAL_DEPRECATED("use hal_eth_attach_callback")
+static inline hal_status_t hal_eth_set_callback(hal_eth_callback_t callback) {
+  return (callback == NULL) ? hal_eth_detach_callback()
+                            : hal_eth_attach_callback(callback);
+}
 
 /**
  * @brief Queue one frame for transmission (non-blocking).

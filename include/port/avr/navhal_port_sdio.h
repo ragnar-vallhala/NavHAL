@@ -27,6 +27,6 @@
 #ifndef NAVHAL_PORT_SDIO_H
 #define NAVHAL_PORT_SDIO_H
 
-#include "common/hal_sdio.h"
+#include "common/hal_sdio_types.h"
 
 #endif /* NAVHAL_PORT_SDIO_H */

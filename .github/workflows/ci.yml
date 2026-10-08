@@ -159,6 +159,17 @@ jobs:
       - name: Conformance coverage + vtable completeness
         run: tools/conformance_coverage.py --gate
 
+  # A module that owns an interrupt line owns its vector. One callback slot per
+  # IRQ means a second claimant unhooks the first with no diagnostic, which is
+  # how i2c and sdio came to sit in DMA stream vectors. Reads source only.
+  irq-ownership:
+    name: IRQ ownership
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No module reaches into another's vector
+        run: tools/check_irq_ownership.py
+
   # Fast pure-logic tests with the host gcc. Self-contained — no toolchain
   # download, no emulator. Always runs (arch-independent).
   host-tests:
@@ -430,6 +441,7 @@ jobs:
     if: always()
     needs:
       - dispatch
+      - irq-ownership
       - commit-lint
       - host-tests
       - build-on-target
@@ -453,6 +465,7 @@ jobs:
             esac
           }
           check dispatch          "${{ needs.dispatch.result }}"
+          check irq-ownership     "${{ needs.irq-ownership.result }}"
           check consumer          "${{ needs.consumer.result }}"
           check commit-lint       "${{ needs.commit-lint.result }}"
           check host-tests        "${{ needs.host-tests.result }}"

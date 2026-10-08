@@ -35,6 +35,11 @@
 #include "common/navhal_compiler.h"
 #include "family/interrupt_reg.h"
 #include <stdint.h>
+/* The declarations these wrappers call. Circular -- the port header pulls this
+ * shim in at its end -- which the include guards make safe either way round,
+ * and without it the file only compiles when reached through that header: a
+ * clang-based editor opening it directly reports every call undeclared. */
+#include "navhal_port_interrupt.h"
 
 
 #ifdef __cplusplus

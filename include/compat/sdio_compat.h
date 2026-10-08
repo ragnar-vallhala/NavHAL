@@ -32,15 +32,29 @@
 
 #include "common/navhal_compiler.h"
 #include <stdint.h>
+/* The declarations these wrappers call. Circular -- the port header pulls this
+ * shim in at its end -- which the include guards make safe either way round,
+ * and without it the file only compiles when reached through that header: a
+ * clang-based editor opening it directly reports every call undeclared. */
+#include "navhal_port_sdio.h"
+
+/* Compiled only where the driver is, exactly as the public header is: a shim
+ * over an API that is switched off cannot compile, and an editor opening
+ * this file with the driver off would show every reference dangling. */
+#if NAVHAL_CONFIG_DRV_SDIO
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-/** @deprecated Use hal_sdio_set_callback(). */
-NAVHAL_DEPRECATED("use hal_sdio_set_callback")
+/** @deprecated Use hal_sdio_attach_callback(). */
+NAVHAL_DEPRECATED("use hal_sdio_attach_callback")
 static inline void sdio_set_callback(hal_sdio_callback_t callback) {
-  hal_sdio_set_callback(callback);
+  /* Current name, not hal_sdio_set_callback, which is deprecated itself. */
+  if (callback == NULL)
+    (void)hal_sdio_detach_callback();
+  else
+    (void)hal_sdio_attach_callback(callback);
 }
 
 /** @deprecated Use hal_sdio_init(). */
@@ -131,6 +145,8 @@ sdio_write_blocks_async(uint32_t addr, const uint8_t *buffer, uint32_t count) {
 }
 #endif /* NAVHAL_CONFIG_DRV_SDIO_DMA */
 
+
+#endif /* NAVHAL_CONFIG_DRV_SDIO */
 
 #ifdef __cplusplus
 } /* extern "C" */

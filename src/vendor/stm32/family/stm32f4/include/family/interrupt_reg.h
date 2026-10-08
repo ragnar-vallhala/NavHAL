@@ -156,6 +156,11 @@ typedef enum {
  * convention into the contract; retained as a backward-compat alias behind
  * NAVHAL_DEPRECATED.
  */
+/** @brief External interrupt lines this part wires, and so the size of the
+ *  callback table. STM32F401 uses vector slots 0..81; the negative
+ *  hal_irq_t values are system exceptions and are not in the table. */
+#define HAL_IRQ_COUNT 82U
+
 typedef hal_irq_t IRQn_Type NAVHAL_DEPRECATED("use hal_irq_t");
 
 

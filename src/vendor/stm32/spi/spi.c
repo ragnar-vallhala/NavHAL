@@ -29,6 +29,7 @@
 #include "common/hal_clock.h"
 #include "navhal_port_spi.h"
 #include "board.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
 #include "family/rcc_reg.h"
 #include "family/spi_reg.h"

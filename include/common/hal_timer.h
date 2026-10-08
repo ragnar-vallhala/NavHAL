@@ -38,8 +38,11 @@
  */
 
 #include "common/hal_status.h"
+#include "common/hal_timer_types.h"
+#include "common/navhal_compiler.h"
 #include "common/hal_types.h"
 #include "utils/timer_types.h"
+#include <stddef.h>
 #include <stdint.h>
 
 
@@ -49,8 +52,6 @@ extern "C" {
 
 /* ===== Timebase API (SysTick-backed) ===== */
 
-/** @brief Callback invoked on every timebase tick (from the SysTick ISR). */
-typedef void (*hal_timebase_callback_t)(void);
 
 /**
  * @brief Initialize the timebase tick at the given period.
@@ -89,7 +90,22 @@ void hal_timebase_tick(void);
  * @param cb Callback function, or NULL to clear.
  * @return ::HAL_OK.
  */
-hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb);
+/**
+ * @brief Attach the per-tick callback.
+ * @param cb Non-NULL; use ::hal_timebase_detach_callback to clear.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
+ */
+hal_status_t hal_timebase_attach_callback(hal_timebase_callback_t cb);
+
+/** @brief Clear the per-tick callback. @return ::HAL_OK. */
+hal_status_t hal_timebase_detach_callback(void);
+
+/** @deprecated Use ::hal_timebase_attach_callback / ::hal_timebase_detach_callback. */
+NAVHAL_DEPRECATED("use hal_timebase_attach_callback")
+static inline hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb) {
+  return (cb == NULL) ? hal_timebase_detach_callback()
+                      : hal_timebase_attach_callback(cb);
+}
 
 /** @brief Busy-wait delay for @p ms milliseconds. */
 void hal_delay_ms(uint32_t ms);
@@ -99,14 +115,7 @@ void hal_delay_us(uint32_t us);
 
 /* ===== General-purpose timer API ===== */
 
-/** @brief Callback invoked when a timer's update interrupt fires. */
-typedef void (*hal_timer_callback_t)(void);
 
-/** @brief Timer base configuration: prescaler (PSC) and auto-reload (ARR). */
-typedef struct {
-  uint32_t prescaler;   /**< Prescaler (PSC) value. */
-  uint32_t auto_reload; /**< Auto-reload (ARR) value. */
-} hal_timer_config_t;
 
 /** @brief Initialize a timer with the given prescaler / auto-reload. */
 hal_status_t hal_timer_init(hal_timer_t timer, const hal_timer_config_t *cfg);
@@ -181,6 +190,16 @@ uint32_t hal_timer_get_auto_reload(hal_timer_t timer);
 /* Port-specific bits: SysTick / RCC register defines, vector-table entries. */
 #if NAVHAL_CONFIG_DRV_TIMER
 #include "navhal_port_timer.h"
+
+#if defined(NAVHAL_PORT_TIMER_COMPAT)
+#include "compat/timer_compat.h"
+#endif
+
+#if defined(NAVHAL_PORT_TIMEBASE_COMPAT)
+/* Static inline wrappers over the API above: they cannot be defined before
+ * the functions they forward to are declared. */
+#include "compat/timebase_compat.h"
+#endif
 #endif
 
 

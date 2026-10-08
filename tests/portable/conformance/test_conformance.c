@@ -81,6 +81,9 @@
 #if NAVHAL_CONFIG_DRV_UART
 #include "common/hal_uart.h"
 #endif
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+#include "common/hal_interrupt.h"
+#endif
 #if NAVHAL_CONFIG_DRV_DMA
 #include "common/hal_dma.h"
 #endif
@@ -120,6 +123,7 @@ static uint8_t flash_size = sizeof(flash_buf);
 #if NAVHAL_CONFIG_DRV_DMA
 static uint16_t dma_left;
 static const hal_dma_config_t dma_cfg = {0};
+static void _conf_dma_cb(void) {}
 #endif
 #if NAVHAL_CONFIG_DRV_TIMER
 #define TEST_CONF_TIMER TIM2
@@ -504,7 +508,122 @@ void test_conformance_dma_remaining_rejects_null_out(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_dma_remaining(&dma_cfg, NULL));
 }
 
+/* The stream callback belongs to the DMA module; these are the refusals that
+ * make a wrong claim visible instead of silent. The BUSY case needs a real
+ * table and lives in the DRV_DMA cap suite. */
+/* Portable only as far as "an impossible line is refused": a port with no
+ * programmable priorities answers NOT_SUPPORTED to the priority half and
+ * enables anyway, so the status for a valid line differs by port. */
+void test_conformance_dma_attach_callback_rejects_null_cb(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 0u, NULL));
+}
+
+void test_conformance_dma_attach_callback_rejects_bad_stream(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 8u, _conf_dma_cb));
+}
+
+void test_conformance_dma_detach_callback_rejects_bad_controller(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_dma_detach_callback((hal_dma_controller_t)9, 0u));
+}
+
 #endif /* NAVHAL_CONFIG_DRV_DMA */
+
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+/* The interrupt API is portable contract now that it is declared in common
+ * rather than per port, so the refusals belong here. What a port does with a
+ * *valid* line differs -- the AVR has no central enable and answers
+ * NOT_SUPPORTED -- so these assert on a line that cannot exist anywhere. */
+#define CONF_BAD_IRQ ((hal_irq_t)-99)
+
+void test_conformance_interrupt_enable_rejects_bad_irq(void) {
+  TEST_ASSERT_TRUE(hal_interrupt_enable(CONF_BAD_IRQ) != HAL_OK);
+}
+
+void test_conformance_interrupt_disable_rejects_bad_irq(void) {
+  TEST_ASSERT_TRUE(hal_interrupt_disable(CONF_BAD_IRQ) != HAL_OK);
+}
+
+void test_conformance_interrupt_attach_rejects_null_callback(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_interrupt_attach_callback((hal_irq_t)0, NULL));
+}
+
+void test_conformance_interrupt_detach_rejects_bad_irq(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_interrupt_detach_callback(CONF_BAD_IRQ));
+}
+
+void test_conformance_interrupt_clear_pending_rejects_bad_irq(void) {
+  TEST_ASSERT_TRUE(hal_interrupt_clear_pending(CONF_BAD_IRQ) != HAL_OK);
+}
+
+void test_conformance_interrupt_set_priority_rejects_bad_irq(void) {
+  TEST_ASSERT_TRUE(hal_interrupt_set_priority(CONF_BAD_IRQ, 5u) != HAL_OK);
+}
+
+/* A reader cannot be pinned to a value across ports: the ARM answers 0xFF, a
+ * sentinel for "invalid or fixed priority", while the AVR answers 0 because it
+ * has no priorities at all. Requiring 0 would have forced the ARM to return a
+ * plausible-looking priority -- 0 is the highest -- for a line that does not
+ * exist. The contract is that asking answers, without faulting. */
+void test_conformance_interrupt_get_priority_of_bad_irq_answers(void) {
+  (void)hal_interrupt_get_priority(CONF_BAD_IRQ);
+  TEST_ASSERT_TRUE(1);
+}
+
+void test_conformance_interrupt_bad_irq_is_not_pending(void) {
+  TEST_ASSERT_TRUE(!hal_interrupt_is_pending(CONF_BAD_IRQ));
+}
+
+/* Dispatching a line nobody attached to must return, not fault: the ports
+ * answer an empty slot differently in their own vectors, but the public call
+ * is a table lookup. */
+void test_conformance_interrupt_dispatch_of_empty_slot_returns(void) {
+  hal_interrupt_dispatch(CONF_BAD_IRQ);
+  TEST_ASSERT_TRUE(1);
+}
+
+/* The save/restore pair has to round-trip: disable returns the previous state
+ * and enable_global puts exactly that back. */
+void test_conformance_interrupt_global_state_round_trips(void) {
+  uint32_t state = hal_interrupt_disable_global();
+  hal_interrupt_enable_global(state);
+  TEST_ASSERT_TRUE(1);
+}
+#endif /* NAVHAL_CONFIG_DRV_INTERRUPT */
+
+void test_conformance_interrupt_enable_with_priority_rejects_bad_irq(void) {
+  TEST_ASSERT_TRUE(hal_interrupt_enable_with_priority((hal_irq_t)-99, 5u) != HAL_OK);
+}
+
+
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+/* Lifted out of the port headers, so the gate sees them now. The bindings are
+ * per-port data but the checks are not: a bad bus and a NULL out are refused
+ * the same way everywhere. */
+static uint8_t i2c_dma_buf[2];
+static void _conf_i2c_dma_cb(void) {}
+
+void test_conformance_i2c_dma_get_binding_rejects_null_out(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_i2c_dma_get_binding((hal_i2c_bus_t)0, true, NULL));
+}
+
+void test_conformance_i2c_dma_set_binding_rejects_bad_bus(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_i2c_dma_set_binding((hal_i2c_bus_t)99, true, NULL));
+}
+
+void test_conformance_i2c_read_regs_dma_rejects_null_buffer(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_i2c_read_regs_dma((hal_i2c_bus_t)0, 0x50u, 0x00u, NULL,
+                                                           sizeof(i2c_dma_buf), _conf_i2c_dma_cb));
+}
+#endif /* NAVHAL_CONFIG_DRV_I2C_DMA */
+
 
 
 #if NAVHAL_CONFIG_DRV_PWM
@@ -905,6 +1024,12 @@ void test_conformance_eth_rejects_null(void) {
   /* init/start/stop are not called: with no PHY attached they wait on a link
    * that never comes up. */
 }
+/* Attaching NULL is an argument error now that clearing has its own call; the
+ * old set_callback(NULL) had to mean "clear", so neither could be asserted. */
+void test_conformance_eth_attach_callback_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_eth_attach_callback(NULL));
+}
+
 #endif /* NAVHAL_CONFIG_DRV_ETH */
 
 #if NAVHAL_CONFIG_DRV_SDIO
@@ -917,6 +1042,12 @@ void test_conformance_sdio_rejects_null(void) {
   TEST_ASSERT_EQUAL_UINT32(0u, hal_sdio_get_sector_count());
   /* card_init, wait_flag and wait_sync all block without a card. */
 }
+/* Attaching NULL is an argument error now that clearing has its own call; the
+ * old set_callback(NULL) had to mean "clear", so neither could be asserted. */
+void test_conformance_sdio_attach_callback_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_sdio_attach_callback(NULL));
+}
+
 #endif /* NAVHAL_CONFIG_DRV_SDIO */
 
 #if NAVHAL_CONFIG_DRV_USB_CDC
@@ -946,6 +1077,12 @@ void test_conformance_usb_cdc_reports_disconnected(void) {
     TEST_ASSERT_EQUAL_UINT32(0u, (uint32_t)hal_usb_cdc_available());
   }
 }
+/* Attaching NULL is an argument error now that clearing has its own call; the
+ * old set_callback(NULL) had to mean "clear", so neither could be asserted. */
+void test_conformance_usb_cdc_attach_rx_callback_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG, (uint32_t)hal_usb_cdc_attach_rx_callback(NULL));
+}
+
 #endif /* NAVHAL_CONFIG_DRV_USB_CDC */
 
 #if NAVHAL_CONFIG_DRV_WATCHDOG
@@ -1425,6 +1562,27 @@ NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_cfg);
 #endif
 #if NAVHAL_CONFIG_DRV_DMA
 NAVTEST_CASE_DECL(test_conformance_dma_remaining_rejects_null_out);
+#if NAVHAL_CONFIG_DRV_USB_CDC
+NAVTEST_CASE_DECL(test_conformance_usb_cdc_attach_rx_callback_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_SDIO
+NAVTEST_CASE_DECL(test_conformance_sdio_attach_callback_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_ETH
+NAVTEST_CASE_DECL(test_conformance_eth_attach_callback_rejects_null);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+NAVTEST_CASE_DECL(test_conformance_i2c_read_regs_dma_rejects_null_buffer);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+NAVTEST_CASE_DECL(test_conformance_i2c_dma_set_binding_rejects_bad_bus);
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+NAVTEST_CASE_DECL(test_conformance_i2c_dma_get_binding_rejects_null_out);
+#endif
+NAVTEST_CASE_DECL(test_conformance_dma_detach_callback_rejects_bad_controller);
+NAVTEST_CASE_DECL(test_conformance_dma_attach_callback_rejects_bad_stream);
+NAVTEST_CASE_DECL(test_conformance_dma_attach_callback_rejects_null_cb);
 #endif
 #if NAVHAL_CONFIG_DRV_PWM
 NAVTEST_CASE_DECL(test_conformance_pwm_start_rejects_null);
@@ -1496,6 +1654,19 @@ NAVTEST_CASE_DECL(test_conformance_boot_match_ignores_other_traffic);
 NAVTEST_CASE_DECL(test_conformance_boot_clear_and_heal_need_a_valid_block);
 NAVTEST_CASE_DECL(test_conformance_boot_attempt_counts_and_clears);
 NAVTEST_CASE_DECL(test_conformance_boot_set_prepare_accepts_null);
+#endif
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+NAVTEST_CASE_DECL(test_conformance_interrupt_enable_rejects_bad_irq);
+NAVTEST_CASE_DECL(test_conformance_interrupt_disable_rejects_bad_irq);
+NAVTEST_CASE_DECL(test_conformance_interrupt_attach_rejects_null_callback);
+NAVTEST_CASE_DECL(test_conformance_interrupt_detach_rejects_bad_irq);
+NAVTEST_CASE_DECL(test_conformance_interrupt_clear_pending_rejects_bad_irq);
+NAVTEST_CASE_DECL(test_conformance_interrupt_set_priority_rejects_bad_irq);
+NAVTEST_CASE_DECL(test_conformance_interrupt_get_priority_of_bad_irq_answers);
+NAVTEST_CASE_DECL(test_conformance_interrupt_bad_irq_is_not_pending);
+NAVTEST_CASE_DECL(test_conformance_interrupt_dispatch_of_empty_slot_returns);
+NAVTEST_CASE_DECL(test_conformance_interrupt_global_state_round_trips);
+NAVTEST_CASE_DECL(test_conformance_interrupt_enable_with_priority_rejects_bad_irq);
 #endif
 
 
@@ -1712,10 +1883,10 @@ void test_conformance_timebase_callback_accepts_null(void) {
   /* NULL is how a caller withdraws a tick callback. A port that cannot offer
    * one says so; what it may not do is fault, or accept NULL and then call
    * through it from the tick ISR. */
-  hal_status_t s = hal_timebase_set_callback(_conf_timebase_cb);
+  hal_status_t s = hal_timebase_attach_callback(_conf_timebase_cb);
   TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED);
 
-  s = hal_timebase_set_callback(NULL);
+  s = hal_timebase_detach_callback();
   TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED ||
                    s == HAL_ERR_INVALID_ARG);
 }
@@ -1844,7 +2015,7 @@ void test_conformance_sdio_get_response_rejects_bad_register(void) {
 void test_conformance_sdio_set_callback_accepts_null(void) {
   /* Registration only; NULL is how a caller withdraws. Left empty on the way
    * out so nothing fires into this suite from a later transfer. */
-  hal_sdio_set_callback(NULL);
+  hal_sdio_detach_callback();
   TEST_ASSERT_TRUE(hal_sdio_card_present() == hal_sdio_card_present());
 }
 
@@ -1902,7 +2073,7 @@ void test_conformance_usb_cdc_getters_are_stable(void) {
 }
 
 void test_conformance_usb_cdc_set_rx_callback_accepts_null(void) {
-  hal_status_t s = hal_usb_cdc_set_rx_callback(NULL);
+  hal_status_t s = hal_usb_cdc_detach_rx_callback();
   TEST_ASSERT_TRUE(s == HAL_OK || s == HAL_ERR_NOT_SUPPORTED);
 }
 
@@ -1950,7 +2121,7 @@ void test_conformance_eth_set_callback_accepts_null(void) {
   /* Registration is state, not traffic: withdrawing a callback is legal at any
    * time, and is how a caller switches from interrupt to polled draining. */
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
-                           (uint32_t)hal_eth_set_callback(NULL));
+                           (uint32_t)hal_eth_detach_callback());
 }
 
 void test_conformance_eth_link_is_up_answers_without_a_mac(void) {
@@ -2197,6 +2368,29 @@ static const navtest_case_t conformance_cases[] = {
 #if NAVHAL_CONFIG_DRV_DMA
     NAVTEST_CASE(test_conformance_dma_remaining_rejects_null_out),
 #endif
+#if NAVHAL_CONFIG_DRV_USB_CDC
+    NAVTEST_CASE(test_conformance_usb_cdc_attach_rx_callback_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_SDIO
+    NAVTEST_CASE(test_conformance_sdio_attach_callback_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_ETH
+    NAVTEST_CASE(test_conformance_eth_attach_callback_rejects_null),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+    NAVTEST_CASE(test_conformance_i2c_read_regs_dma_rejects_null_buffer),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+    NAVTEST_CASE(test_conformance_i2c_dma_set_binding_rejects_bad_bus),
+#endif
+#if NAVHAL_CONFIG_DRV_I2C_DMA
+    NAVTEST_CASE(test_conformance_i2c_dma_get_binding_rejects_null_out),
+#endif
+#if NAVHAL_CONFIG_DRV_DMA
+    NAVTEST_CASE(test_conformance_dma_detach_callback_rejects_bad_controller),
+    NAVTEST_CASE(test_conformance_dma_attach_callback_rejects_bad_stream),
+    NAVTEST_CASE(test_conformance_dma_attach_callback_rejects_null_cb),
+#endif
 #if NAVHAL_CONFIG_DRV_PWM
     NAVTEST_CASE(test_conformance_pwm_start_rejects_null),
 #endif
@@ -2267,6 +2461,19 @@ static const navtest_case_t conformance_cases[] = {
     NAVTEST_CASE(test_conformance_boot_clear_and_heal_need_a_valid_block),
     NAVTEST_CASE(test_conformance_boot_attempt_counts_and_clears),
     NAVTEST_CASE(test_conformance_boot_set_prepare_accepts_null),
+#endif
+#if NAVHAL_CONFIG_DRV_INTERRUPT
+    NAVTEST_CASE(test_conformance_interrupt_enable_rejects_bad_irq),
+    NAVTEST_CASE(test_conformance_interrupt_disable_rejects_bad_irq),
+    NAVTEST_CASE(test_conformance_interrupt_attach_rejects_null_callback),
+    NAVTEST_CASE(test_conformance_interrupt_detach_rejects_bad_irq),
+    NAVTEST_CASE(test_conformance_interrupt_clear_pending_rejects_bad_irq),
+    NAVTEST_CASE(test_conformance_interrupt_set_priority_rejects_bad_irq),
+    NAVTEST_CASE(test_conformance_interrupt_get_priority_of_bad_irq_answers),
+    NAVTEST_CASE(test_conformance_interrupt_bad_irq_is_not_pending),
+    NAVTEST_CASE(test_conformance_interrupt_dispatch_of_empty_slot_returns),
+    NAVTEST_CASE(test_conformance_interrupt_global_state_round_trips),
+    NAVTEST_CASE(test_conformance_interrupt_enable_with_priority_rejects_bad_irq),
 #endif
 };
 

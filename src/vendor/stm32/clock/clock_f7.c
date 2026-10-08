@@ -37,6 +37,7 @@
  * place of `clock.c` when `CONFIG_FAMILY_STM32F7` is set.
  */
 
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 
 #include <stdbool.h>

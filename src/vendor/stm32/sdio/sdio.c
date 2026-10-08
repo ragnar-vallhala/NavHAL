@@ -16,13 +16,18 @@
  */
 
 #include "board.h"
+#include "common/hal_sdio.h"
 #include "navhal_port_sdio.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include "family/rcc_reg.h"
+#include "common/hal_timer.h"
 #include "navhal_port_timer.h"
-// #include "navhal_port_uart.h"
+#include "navhal_port_uart.h"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -137,7 +142,17 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config) {
   return HAL_SDIO_OK;
 }
 
-void hal_sdio_set_callback(hal_sdio_callback_t callback) { sd_callback = callback; }
+hal_status_t hal_sdio_attach_callback(hal_sdio_callback_t callback) {
+  if (callback == NULL)
+    return HAL_ERR_INVALID_ARG;
+  sd_callback = callback;
+  return HAL_OK;
+}
+
+hal_status_t hal_sdio_detach_callback(void) {
+  sd_callback = NULL;
+  return HAL_OK;
+}
 
 /* ------------------------------------------------------------- */
 /* COMMAND HANDLING */
@@ -546,7 +561,6 @@ hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buf) {
 
   if (timeout == 0) {
     SDIO->DCTRL = 0;
-//    hal_uart_write_string(HAL_UART_2, "SDIO Read DBCKEND Timeout\n\r");
     return HAL_SDIO_TIMEOUT;
   }
 
@@ -688,8 +702,8 @@ uint32_t hal_sdio_get_sector_count(void) {
 }
 
 #if NAVHAL_CONFIG_DRV_SDIO_DMA
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
-// #include "navhal_port_uart.h"
 
 static hal_dma_config_t dma2_stream3_cfg;
 static hal_dma_config_t dma2_stream6_cfg;
@@ -736,7 +750,7 @@ hal_sdio_error_t hal_sdio_read_block_async(uint32_t addr, uint8_t *buf) {
   };
 
   hal_dma_init((const hal_dma_config_t *)&dma2_stream3_cfg);
-  hal_interrupt_attach_callback(DMA2_Stream3_IRQn, _sdio_dma_rx_irq_handler);
+  hal_dma_attach_callback(HAL_DMA_CONTROLLER_2, 3, _sdio_dma_rx_irq_handler);
 
   SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512;
@@ -810,7 +824,7 @@ hal_sdio_error_t hal_sdio_write_block_async(uint32_t addr, const uint8_t *buf) {
   };
 
   hal_dma_init((const hal_dma_config_t *)&dma2_stream6_cfg);
-  hal_interrupt_attach_callback(DMA2_Stream6_IRQn, _sdio_dma_tx_irq_handler);
+  hal_dma_attach_callback(HAL_DMA_CONTROLLER_2, 6, _sdio_dma_tx_irq_handler);
 
   SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512;
@@ -883,7 +897,7 @@ hal_sdio_error_t hal_sdio_read_blocks_async(uint32_t addr, uint8_t *buf,
   };
 
   hal_dma_init((const hal_dma_config_t *)&dma2_stream3_cfg);
-  hal_interrupt_attach_callback(DMA2_Stream3_IRQn, _sdio_dma_rx_irq_handler);
+  hal_dma_attach_callback(HAL_DMA_CONTROLLER_2, 3, _sdio_dma_rx_irq_handler);
   SDIO->DCTRL = 0;
   SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
   SDIO->DLEN = 512 * count;
@@ -969,7 +983,7 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
   };
 
   hal_dma_init((const hal_dma_config_t *)&dma2_stream6_cfg);
-  hal_interrupt_attach_callback(DMA2_Stream6_IRQn, _sdio_dma_tx_irq_handler);
+  hal_dma_attach_callback(HAL_DMA_CONTROLLER_2, 6, _sdio_dma_tx_irq_handler);
 
   SDIO->ICR = 0xFFFFFFFF;
   SDIO->DTIMER = SD_DATA_TIMEOUT_CLKS;
@@ -978,7 +992,6 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
   if (hal_sdio_send_command(SD_CMD_WRITE_MULT_BLOCK, addr, 1)) {
     hal_dma_stop((const hal_dma_config_t *)&dma2_stream6_cfg);
 #if NAVHAL_CONFIG_DRV_SDIO_DMA
-//    hal_uart_write_string(HAL_UART_2, "Write Multi CMD25 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
   }

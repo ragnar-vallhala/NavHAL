@@ -61,7 +61,9 @@
 
 #include "common/hal_config.h"
 #include "common/hal_status.h"
+#include "common/navhal_compiler.h"
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -196,7 +198,22 @@ uint16_t hal_usb_cdc_available(void);
  * @param cb Callback, or NULL to go back to the ring buffer.
  * @return ::HAL_OK.
  */
-hal_status_t hal_usb_cdc_set_rx_callback(hal_usb_cdc_rx_callback_t cb);
+/**
+ * @brief Attach the receive callback.
+ * @param cb Non-NULL; use ::hal_usb_cdc_detach_rx_callback to clear.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
+ */
+hal_status_t hal_usb_cdc_attach_rx_callback(hal_usb_cdc_rx_callback_t cb);
+
+/** @brief Clear the receive callback. @return ::HAL_OK. */
+hal_status_t hal_usb_cdc_detach_rx_callback(void);
+
+/** @deprecated Use ::hal_usb_cdc_attach_rx_callback / ::hal_usb_cdc_detach_rx_callback. */
+NAVHAL_DEPRECATED("use hal_usb_cdc_attach_rx_callback")
+static inline hal_status_t hal_usb_cdc_set_rx_callback(hal_usb_cdc_rx_callback_t cb) {
+  return (cb == NULL) ? hal_usb_cdc_detach_rx_callback()
+                      : hal_usb_cdc_attach_rx_callback(cb);
+}
 
 /**
  * @brief Baud rate the host last asked for (cosmetic — see the file notes).

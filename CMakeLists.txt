@@ -187,7 +187,9 @@ set(NAVHAL_FORCE_INCLUDE "-include ${GENERATED_NAVHAL_TARGET}")
 #                               run. -Og rather than -O0 because the AVR has
 #                               32 KB of flash and -O0 more than doubled the
 #                               image; -Og measured the same size as -Os on a
-#                               loop, while keeping the debug experience.
+#                               loop, while keeping the debug experience. The
+#                               AVR is the exception and builds Debug at -Os --
+#                               see the flag block below for the measurement.
 #   Release     -Os -DNDEBUG    what ships. On an MCU the binding constraint
 #                               is flash, not instruction count, which is why
 #                               this is -Os and not CMake's usual -O3.
@@ -213,7 +215,16 @@ if(NOT CMAKE_BUILD_TYPE IN_LIST NAVHAL_BUILD_TYPES)
         "NavHAL defines: ${NAVHAL_BUILD_TYPES}")
 endif()
 
-set(CMAKE_C_FLAGS_DEBUG          "-Og -g")
+# -Og everywhere with flash to spare, -Os on the AVR, which has none: the
+# on-target test image is 28588 bytes of text at -Os and overflows the 32K part
+# at -Og. The note below measured the two as equal on a loop, and on a loop they
+# are; across a whole image -Og costs about 3.4K in inlining and spill code,
+# which is the difference between a tier that runs and one that will not link.
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
+    set(CMAKE_C_FLAGS_DEBUG      "-Os -g")
+else()
+    set(CMAKE_C_FLAGS_DEBUG      "-Og -g")
+endif()
 set(CMAKE_C_FLAGS_RELEASE        "-Os -DNDEBUG")
 set(CMAKE_C_FLAGS_RELEASELTO     "-Os -flto -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG        "${CMAKE_C_FLAGS_DEBUG}")
@@ -415,11 +426,31 @@ else()
   message(STATUS "Doxygen not found. 'doc' target will not be available.")
 endif()
 
-add_custom_target(copy_compile_commands ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_BINARY_DIR}/compile_commands.json
-        ${CMAKE_SOURCE_DIR}/compile_commands.json
-)
+# One build tree owns the repo-root compile_commands.json, and it is `build/`.
+# This target is ALL, and every tier script configures a tree of its own --
+# build-host, build-x86, the per-board trees in tools/pil and tools/samples --
+# so whichever ran last used to win. After an AVR tier that left the editor
+# resolving the whole repo against 21 ATmega translation units, and everything
+# else reported undeclared.
+#
+# Pass -DNAVHAL_EXPORT_COMPILE_COMMANDS=ON to hand ownership to another tree
+# (an IDE's, say), or =OFF to leave the root file alone.
+if(CMAKE_BINARY_DIR STREQUAL "${CMAKE_SOURCE_DIR}/build")
+    set(_navhal_cc_default ON)
+else()
+    set(_navhal_cc_default OFF)
+endif()
+option(NAVHAL_EXPORT_COMPILE_COMMANDS
+       "Copy this tree's compile_commands.json to the repo root"
+       ${_navhal_cc_default})
+
+if(NAVHAL_EXPORT_COMPILE_COMMANDS)
+    add_custom_target(copy_compile_commands ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_BINARY_DIR}/compile_commands.json
+            ${CMAKE_SOURCE_DIR}/compile_commands.json
+    )
+endif()
 
 # Startup file. The vector table names this MCU's peripherals, so it is a
 # family property and lives beside the family's register maps; a board may

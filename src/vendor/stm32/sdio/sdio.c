@@ -303,7 +303,7 @@ static hal_sdio_error_t sdio_wait_card_ready(void) {
 /* ------------------------------------------------------------- */
 
 bool hal_sdio_card_present(void) {
-#if defined(BOARD_SD_CD)
+#if defined(BOARD_SD_CD) && !NAVHAL_CONFIG_DRV_SDIO_IGNORE_CARD_DETECT
   /* Active low: the socket's detect switch closes to ground when a card is
    * seated. Measured on NAVIXSM-F401RE -- PC5 reads low with either internal
    * pull applied and a card in, so it is held by the switch rather than
@@ -320,9 +320,11 @@ bool hal_sdio_card_present(void) {
   }
   return hal_gpio_read(BOARD_SD_CD) == HAL_GPIO_LOW;
 #else
-  /* No detect pin on this board. Claiming the slot is empty would turn a
+  /* No detect pin on this board, or DRV_SDIO_IGNORE_CARD_DETECT set because
+   * the one it has cannot be trusted. Claiming the slot is empty would turn a
    * working setup into a refusal, so assume a card and let the card commands
-   * report the truth. */
+   * report the truth -- which is the stronger signal anyway: a card that
+   * answers CMD8 is present whatever a pin says. */
   return true;
 #endif
 }

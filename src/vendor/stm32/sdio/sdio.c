@@ -27,7 +27,6 @@
 #include "family/rcc_reg.h"
 #include "common/hal_timer.h"
 #include "navhal_port_timer.h"
-// #include "common/hal_uart.h"
 #include "navhal_port_uart.h"
 #include <stddef.h>
 #include <stdint.h>
@@ -562,7 +561,6 @@ hal_sdio_error_t hal_sdio_read_block(uint32_t addr, uint8_t *buf) {
 
   if (timeout == 0) {
     SDIO->DCTRL = 0;
-//    hal_uart_write_string(HAL_UART_2, "SDIO Read DBCKEND Timeout\n\r");
     return HAL_SDIO_TIMEOUT;
   }
 
@@ -706,7 +704,6 @@ uint32_t hal_sdio_get_sector_count(void) {
 #if NAVHAL_CONFIG_DRV_SDIO_DMA
 #include "common/hal_dma.h"
 #include "navhal_port_dma.h"
-// #include "navhal_port_uart.h"
 
 static hal_dma_config_t dma2_stream3_cfg;
 static hal_dma_config_t dma2_stream6_cfg;
@@ -995,7 +992,6 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr, const uint8_t *buf,
   if (hal_sdio_send_command(SD_CMD_WRITE_MULT_BLOCK, addr, 1)) {
     hal_dma_stop((const hal_dma_config_t *)&dma2_stream6_cfg);
 #if NAVHAL_CONFIG_DRV_SDIO_DMA
-//    hal_uart_write_string(HAL_UART_2, "Write Multi CMD25 failed\r\n");
 #endif
     return HAL_SDIO_ERROR;
   }

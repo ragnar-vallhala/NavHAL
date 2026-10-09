@@ -32,10 +32,15 @@ config VAL_LED_ON
 config VAL_LED_OFF
     string
     default "HAL_GPIO_HIGH" if BOARD_NAVIXSM_F401RE
-config PIN_LED_RGB_PORT
+# PC1 is not an LED pin. It goes through R29 to D3 pin 3 (DI), the data input of an
+# addressable single-wire RGB part, which needs a bit-banged or timer/DMA waveform --
+# a pin write does nothing useful. Named _DIN so it does not read like LED_BUILTIN
+# beside it, which really is a pin you can set (and is active LOW: its cathode is on
+# PC0 with the anode on 3V3 through R28, which is why VAL_LED_ON is HAL_GPIO_LOW).
+config PIN_LED_RGB_DIN_PORT
     int
     default 2 if BOARD_NAVIXSM_F401RE
-config PIN_LED_RGB_PIN
+config PIN_LED_RGB_DIN_PIN
     int
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BUZZER_PORT

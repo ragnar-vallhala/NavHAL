@@ -59,6 +59,15 @@ extern const hal_crc_ops_t _hal_crc_ops;
  * carrying its own copy of the algorithm. */
 hal_status_t hal_crc_sw_init(const hal_crc_config_t *cfg);
 hal_status_t hal_crc_sw_reset(void);
+/**
+ * @brief Step the shared CRC-32/MPEG-2 table over @p len bytes from @p crc.
+ *
+ * Stateless, so a hardware driver can finish a partial word in software and
+ * stay byte-exact. One table, one implementation: a second copy of this loop is
+ * a second chance to disagree about the same CRC.
+ */
+uint32_t hal_crc_sw_step(uint32_t crc, const uint8_t *data, uint32_t len);
+
 uint32_t hal_crc_sw_accumulate(const uint8_t *data, uint32_t len);
 uint32_t hal_crc_sw_compute(const uint8_t *data, uint32_t len);
 

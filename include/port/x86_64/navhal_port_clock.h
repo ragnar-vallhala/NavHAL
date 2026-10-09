@@ -16,7 +16,10 @@
 
 /* Intentionally empty — the public hal_clock_* API is the whole surface. */
 
-/* Deprecated two-argument init — retained as a backward-compat shim. */
-#include "compat/clock_compat.h"
+
+/* This port carries the deprecated clock names. The shims are static inline
+ * wrappers over the API, so common/hal_clock.h includes them once that API
+ * is declared -- from here they would be forwarding to nothing. */
+#define NAVHAL_PORT_CLOCK_COMPAT 1
 
 #endif /* NAVHAL_PORT_X86_64_CLOCK_H */

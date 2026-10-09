@@ -29,6 +29,8 @@
 
 #include "internal/hal_crc_ops.h"
 
+#include <stdbool.h>
+
 #if NAVHAL_CONFIG_DRV_CRC
 
 #include "family/crc_reg.h"
@@ -37,8 +39,13 @@
 /* Configured init value (HW path only). */
 static uint32_t s_crc_init_value = 0xFFFFFFFF;
 
+static uint32_t s_current = 0xFFFFFFFFu;
+static bool s_hw_in_step = true;
+
 static hal_status_t stm32_crc_reset(void) {
   CRC->CR = CRC_CR_RESET;
+  s_current = 0xFFFFFFFFu;
+  s_hw_in_step = true;
   /* Hardware always resets to 0xFFFFFFFF. If a different init value
      was requested, we would ideally write it here, but STM32F4 CRC
      doesn't let us write a custom init value without extra XOR math
@@ -60,45 +67,52 @@ static hal_status_t stm32_crc_init(const hal_crc_config_t *cfg) {
   return HAL_OK;
 }
 
+/* The running value, and whether the peripheral still holds it.
+ *
+ * The unit only consumes whole words. A byte write to CRC_DR does not feed one
+ * byte -- it feeds a padded word, which is measurable: every length that is a
+ * multiple of four agrees with the reference implementation and every other
+ * length does not. And this part has no INIT register, so once the true value
+ * and the peripheral's register disagree, the peripheral cannot be put back in
+ * step.
+ *
+ * So the peripheral takes the whole words, software finishes any tail with the
+ * shared table, and from the first tail onward the running value lives here. The
+ * fast path is the common one: a stream of word-multiple chunks never leaves the
+ * hardware. What this buys is the contract hal_crc.h actually promises --
+ * byte-exact, composable across calls, and the same answer as every other
+ * implementation of this CRC.
+ *
+ * It used to pack a tail into a word and zero-pad it, feeding up to three bytes
+ * that were never in the buffer. The result matched nothing else, including this
+ * driver's own software fallback, and the API said otherwise. It cost a
+ * debugging session in the loader's recovery protocol, which went to a software
+ * CRC instead.
+ */
+
 static uint32_t stm32_crc_accumulate(const uint8_t *data, uint32_t len) {
-  if (data == NULL || len == 0) {
-    return CRC->DR;
-  }
+  if (data == NULL || len == 0)
+    return s_current;
 
   uint32_t i = 0;
 
-  /* The STM32F4 CRC unit operates on 32-bit words.
-     When feeding bytes, we pack 4 bytes into a word (Big Endian order
-     to match standard CRC32 expectations when fed this way). */
-  while ((len - i) >= 4) {
-    uint32_t word = ((uint32_t)data[i] << 24) | ((uint32_t)data[i + 1] << 16) |
-                    ((uint32_t)data[i + 2] << 8) | ((uint32_t)data[i + 3]);
-    CRC->DR = word;
-    i += 4;
+  if (s_hw_in_step) {
+    /* Four bytes written big-endian as one word give the same result as the same
+       four bytes fed individually, which is why the bulk can go in as words. */
+    while ((len - i) >= 4u) {
+      CRC->DR = ((uint32_t)data[i] << 24) | ((uint32_t)data[i + 1] << 16) |
+                ((uint32_t)data[i + 2] << 8) | ((uint32_t)data[i + 3]);
+      i += 4u;
+    }
+    s_current = CRC->DR;
   }
 
-  /* Handle remaining 1-3 bytes */
   if (i < len) {
-    /* On standard STM32F4, we can't do byte-wise writes easily
-       without messing up the polynomial shifting. Standard practice
-       for arbitrary length buffers on this specific hardware is
-       often tricky. To be perfectly compatible with byte-stream
-       software CRC, we must pad and do manual XORs, but typically
-       hardware CRC is used on word-aligned block multiples.
-       For this HAL, we pack the remaining bytes into a word. */
-    uint32_t word = 0;
-
-    if ((len - i) >= 1)
-      word |= ((uint32_t)data[i++] << 24);
-    if ((len - i) >= 1)
-      word |= ((uint32_t)data[i++] << 16);
-    if ((len - i) >= 1)
-      word |= ((uint32_t)data[i++] << 8);
-
-    CRC->DR = word;
+    s_current = hal_crc_sw_step(s_current, &data[i], len - i);
+    s_hw_in_step = false; /* the register is behind now, and cannot be reseeded */
   }
 
-  return CRC->DR;
+  return s_current;
 }
 
 static uint32_t stm32_crc_compute(const uint8_t *data, uint32_t len) {

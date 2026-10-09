@@ -29,7 +29,7 @@
 #ifndef NAVHAL_PORT_DMA_H
 #define NAVHAL_PORT_DMA_H
 
-#include "common/hal_dma.h"
+#include "common/hal_dma_types.h"
 #include "common/hal_interrupt.h"
 
 
@@ -41,9 +41,6 @@ extern "C" {
 
 #include "family/dma_reg.h"
 
-/* Deprecated pre-standardization function names — retained as a
- * backward-compat alias behind NAVHAL_DEPRECATED. */
-#include "compat/dma_compat.h"
 
 /* DMA memory classifier + coherency helpers — no-ops on the Cortex-M4, which
  * has neither an L1 data cache nor tightly-coupled memory. The signatures match
@@ -98,5 +95,9 @@ typedef struct {
 #endif
 
 
+
+/* This port carries the deprecated dma names; the shim is included from
+ * the common header once the API is declared. */
+#define NAVHAL_PORT_DMA_COMPAT 1
 
 #endif /* NAVHAL_PORT_DMA_H */

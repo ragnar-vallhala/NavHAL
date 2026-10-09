@@ -23,6 +23,7 @@
  */
 
 #include "host_mmio.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
 #include "navtest/navtest.h"

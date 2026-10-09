@@ -178,7 +178,7 @@ static void on_uart_idle(void) { /* ISR context */
 
 #if NAVHAL_CONFIG_DRV_USB_CDC
 /**
- * hal_usb_cdc_set_rx_callback delivers bytes here *instead of* queueing them
+ * hal_usb_cdc_attach_rx_callback delivers bytes here *instead of* queueing them
  * for hal_usb_cdc_read, so whatever this does not pass on is lost. Feed the
  * watcher, then echo, in that order: an echo that blocked would otherwise
  * delay the match.
@@ -276,7 +276,7 @@ int main(void) {
    * The loop below reports the connection when one appears, on a board that
    * has the port wired. */
   if (hal_usb_cdc_init() == HAL_OK) {
-    hal_usb_cdc_set_rx_callback(on_cdc_rx);
+    hal_usb_cdc_attach_rx_callback(on_cdc_rx);
     print("CDC started; watching for a host\r\n");
   }
 #endif

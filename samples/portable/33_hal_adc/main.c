@@ -31,6 +31,14 @@
 #include "board.h"
 #include "navhal.h"
 
+/* A board that declares no ADC input cannot run this. Said out loud, because the
+ * alternative is three undeclared-identifier errors that read like the sample is
+ * broken -- which is how a board axis first reported it. Same shape as
+ * 24_hal_uart_dma_bridge: the sample states what it needs of a board. */
+#if !defined(BOARD_ADC) || !defined(BOARD_ADC_PIN) || !defined(BOARD_ADC_CHANNEL)
+#error "this sample needs an ADC input, and this board's description declares none"
+#endif
+
 int main(void) {
   hal_timebase_init(1000);
   hal_uart_init(BOARD_CONSOLE_UART, &(hal_uart_config_t){.baudrate = 9600});

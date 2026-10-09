@@ -20,6 +20,7 @@
  * @brief Standardized hal_gpio_* API tests (success + error paths).
  */
 
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
 #include "family/gpio_reg.h"
 #include "family/rcc_reg.h"

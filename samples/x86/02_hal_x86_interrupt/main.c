@@ -32,7 +32,7 @@ int main(void) {
   hal_clock_config_t ccfg = {.source = HAL_CLOCK_SOURCE_TSC};
   hal_clock_init(&ccfg);
 
-  hal_timebase_set_callback(on_tick);
+  hal_timebase_attach_callback(on_tick);
   hal_timebase_init(1000); /* 1 kHz PIT IRQ */
 
   hal_delay_ms(500); /* PIT IRQ fires ~500 times during this busy-wait */

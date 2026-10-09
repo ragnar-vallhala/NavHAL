@@ -20,6 +20,7 @@
  * @brief Standardized hal_timebase_* API tests.
  */
 
+#include "common/hal_timer.h"
 #include "navhal_port_timer.h"
 #include "navtest/navtest.h"
 #include "test_timebase.h"
@@ -70,13 +71,19 @@ void test_hal_timebase_get_reload_value_nonzero(void) {
   TEST_ASSERT_TRUE(hal_timebase_get_reload_value() != 0u);
 }
 
-void test_hal_timebase_set_callback_rejects_null(void) {
-  /* The AVR-lens decision is that an unsupported feature returns
-   * HAL_ERR_NOT_SUPPORTED; here a NULL is HAL_ERR_INVALID_ARG. Accept
-   * either — what matters is that NULL doesn't crash and is reported. */
-  hal_status_t s = hal_timebase_set_callback(NULL);
-  TEST_ASSERT_TRUE(s == HAL_ERR_INVALID_ARG || s == HAL_OK ||
-                   s == HAL_ERR_NOT_SUPPORTED);
+/* Splitting attach from detach made this contract exact, where the old
+ * set_callback(NULL) had to be accepted as either a clear or a refusal and the
+ * case could only assert that it did not crash. Attaching NULL is now always
+ * an argument error -- the common layer checks before the port sees it -- and
+ * clearing has its own call that always succeeds. */
+void test_hal_timebase_attach_callback_rejects_null(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_timebase_attach_callback(NULL));
+}
+
+void test_hal_timebase_detach_callback_succeeds(void) {
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_timebase_detach_callback());
 }
 
 void test_hal_timebase_returns_uint32(void) {
@@ -100,7 +107,8 @@ NAVTEST_CASE_DECL(test_hal_timebase_get_tick_duration_us_matches_init);
 NAVTEST_CASE_DECL(test_hal_timebase_get_millis_is_monotonic);
 NAVTEST_CASE_DECL(test_hal_timebase_get_micros_is_monotonic);
 NAVTEST_CASE_DECL(test_hal_timebase_get_reload_value_nonzero);
-NAVTEST_CASE_DECL(test_hal_timebase_set_callback_rejects_null);
+NAVTEST_CASE_DECL(test_hal_timebase_attach_callback_rejects_null);
+NAVTEST_CASE_DECL(test_hal_timebase_detach_callback_succeeds);
 NAVTEST_CASE_DECL(test_hal_timebase_returns_uint32);
 
 
@@ -111,7 +119,8 @@ static const navtest_case_t timebase_cases[] = {
     NAVTEST_CASE(test_hal_timebase_get_millis_is_monotonic),
     NAVTEST_CASE(test_hal_timebase_get_micros_is_monotonic),
     NAVTEST_CASE(test_hal_timebase_get_reload_value_nonzero),
-    NAVTEST_CASE(test_hal_timebase_set_callback_rejects_null),
+    NAVTEST_CASE(test_hal_timebase_attach_callback_rejects_null),
+    NAVTEST_CASE(test_hal_timebase_detach_callback_succeeds),
     NAVTEST_CASE(test_hal_timebase_returns_uint32),
 };
 

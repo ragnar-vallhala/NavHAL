@@ -16,8 +16,10 @@
  */
 
 #include "test_clock.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
+#include "common/hal_uart.h"
 #include "navhal_port_uart.h"
 #include "navtest/navtest.h"
 #include "utils/clock_types.h"

@@ -27,6 +27,6 @@
 #ifndef NAVHAL_PORT_UART_H
 #define NAVHAL_PORT_UART_H
 
-#include "common/hal_uart.h"
+#include "common/hal_uart_types.h"
 
 #endif /* NAVHAL_PORT_UART_H */

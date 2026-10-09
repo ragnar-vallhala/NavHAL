@@ -43,6 +43,42 @@ if(DEFINED NAVHAL_DEFCONFIG AND NOT EXISTS "${CONFIG_FILE}")
     configure_file("${NAVHAL_DEFCONFIG}" "${CONFIG_FILE}" COPYONLY)
 endif()
 
+# A board can live outside this tree. -DNAVHAL_BOARD_DIR=<path> names a directory
+# holding what an in-tree board holds -- Kconfig.choice declaring its BOARD_* symbol,
+# Kconfig describing it, a linker script, optionally startup.s -- so a consumer with
+# its own PCB owns its own description instead of patching this repo.
+#
+# Validated and exported here, before the generator runs: the Kconfig tree osources
+# $(NAVHAL_EXTRA_BOARD_DIR), and osource skips a missing file silently, so a
+# directory that is merely misspelled would otherwise fall through to an in-tree
+# board and look like it worked.
+if(NAVHAL_BOARD_DIR)
+    get_filename_component(_oot_board "${NAVHAL_BOARD_DIR}" ABSOLUTE
+                           BASE_DIR "${CMAKE_BINARY_DIR}")
+    foreach(_need Kconfig Kconfig.choice)
+        if(NOT EXISTS "${_oot_board}/${_need}")
+            message(FATAL_ERROR
+                "NAVHAL_BOARD_DIR='${NAVHAL_BOARD_DIR}' has no ${_need}. An "
+                "out-of-tree board needs Kconfig.choice (declaring its BOARD_* "
+                "symbol) and Kconfig (its description). See docs/boards.md.")
+        endif()
+    endforeach()
+    file(READ "${_oot_board}/Kconfig.choice" _oot_choice)
+    string(REGEX MATCH "config +BOARD_([A-Z0-9_]+)" _m "${_oot_choice}")
+    if(NOT CMAKE_MATCH_1)
+        message(FATAL_ERROR
+            "${_oot_board}/Kconfig.choice declares no `config BOARD_<NAME>`, so "
+            "nothing can select this board.")
+    endif()
+    string(TOLOWER "${CMAKE_MATCH_1}" _oot_slug)
+    set(ENV{NAVHAL_EXTRA_BOARD_DIR} "${_oot_board}")
+    message(STATUS "Out-of-tree board offered: ${_oot_slug} (${_oot_board})")
+else()
+    # Cleared, so a value left in the environment by a previous configure in the
+    # same shell cannot leak into this one.
+    set(ENV{NAVHAL_EXTRA_BOARD_DIR} "")
+endif()
+
 message(STATUS "Running Kconfig configuration generation...")
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${KCONFIG_SCRIPT}
@@ -154,7 +190,15 @@ message(STATUS "Building for processor: ${CMAKE_SYSTEM_PROCESSOR}")
 # AVR port will populate src/arch/avr/, src/vendor/microchip/, etc.
 # without further CMake edits.
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(SRC_BOARD ${CMAKE_CURRENT_SOURCE_DIR}/src/board/${BOARD})
+
+# Naming a directory offers the board; it does not force it. An in-tree board still
+# builds from src/board even while NAVHAL_BOARD_DIR is set.
+if(NAVHAL_BOARD_DIR AND _oot_slug STREQUAL "${BOARD}")
+    set(SRC_BOARD "${_oot_board}")
+    message(STATUS "Board from outside the tree: ${SRC_BOARD}")
+else()
+    set(SRC_BOARD ${CMAKE_CURRENT_SOURCE_DIR}/src/board/${BOARD})
+endif()
 set(SRC_ARCH ${CMAKE_CURRENT_SOURCE_DIR}/src/arch/${ARCH_ISA})
 set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
 set(INCLUDE_PORT ${CMAKE_CURRENT_SOURCE_DIR}/include/port/${CMAKE_SYSTEM_PROCESSOR})

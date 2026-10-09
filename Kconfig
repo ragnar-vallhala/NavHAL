@@ -59,6 +59,10 @@ choice
     help
       Select the target development board.
 source "src/board/*/Kconfig.choice"
+# An out-of-tree board, named by -DNAVHAL_BOARD_DIR. osource so an unset variable
+# is simply nothing, and after the in-tree entries so a board that derives from one
+# of them is offered alongside its base.
+osource "$(NAVHAL_EXTRA_BOARD_DIR)/Kconfig.choice"
 endchoice
 
 # Per-port identity strings (ARCH_ISA / VENDOR / FAMILY / BOARD /
@@ -67,6 +71,11 @@ source "src/arch/*/Kconfig"
 source "src/vendor/*/Kconfig"
 source "src/vendor/*/family/*/Kconfig"
 source "src/board/*/Kconfig"
+# The out-of-tree board's description. Sourced LAST on purpose: Kconfig takes the
+# first default whose condition holds, and a file sourced later cannot outrank an
+# earlier one -- so this is the place a board that adapts an in-tree one states only
+# what differs, having selected its base's symbol to inherit the rest.
+osource "$(NAVHAL_EXTRA_BOARD_DIR)/Kconfig"
 
 endmenu
 

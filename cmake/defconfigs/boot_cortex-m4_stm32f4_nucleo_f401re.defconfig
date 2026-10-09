@@ -1,0 +1,37 @@
+# NavHAL defconfig — bootloader images on the Nucleo-F401RE.
+#
+# A loader image needs more than the board selection: the drivers it reaches for
+# are not in any default, and the key-value store has to be moved out of the way.
+# Pass it explicitly, because it must not become the default for ordinary builds:
+#
+#   cmake -B build-stage1 -DBOOT_IMAGE=stage1 \
+#     -DNAVHAL_DEFCONFIG=cmake/defconfigs/boot_cortex-m4_stm32f4_nucleo_f401re.defconfig \
+#     -DNAVHAL_BOOT_PUBKEY=k.pub -DCMAKE_BUILD_TYPE=Release \
+#     -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi-toolchain.cmake
+#
+# Same fragment for stage1, stage2 and app: they differ by linker script, not by
+# configuration, and a loader that verified with different options than it was
+# tested with is the bug this avoids.
+
+CONFIG_ARCH_CORTEX_M4=y
+CONFIG_VENDOR_STM32=y
+CONFIG_FAMILY_STM32F4=y
+CONFIG_BOARD_NUCLEO_F401RE=y
+
+# The stage-1 decision path: a reset reason, a persisted request, a watchdog.
+CONFIG_DRV_RESET=y
+CONFIG_BOOT_SNIFFER=y
+CONFIG_DRV_FLASH=y
+CONFIG_DRV_WATCHDOG=y
+
+# The second way in. Stage-1 watches it from boot, so it is not optional here.
+CONFIG_DRV_USB_CDC=y
+
+CONFIG_BOOT_CRYPTO=y
+CONFIG_BOOT_ED25519_MONOCYPHER=y
+
+# The store must sit below the stage-2 partition. Left at its default 6 and 7 it
+# lands inside the app partition, and the raw flash API then refuses -- correctly
+# -- to erase the app's own sectors, so every update fails at the erase.
+CONFIG_FLASH_KV_PRIMARY_SECTOR=2
+CONFIG_FLASH_KV_SECONDARY_SECTOR=3

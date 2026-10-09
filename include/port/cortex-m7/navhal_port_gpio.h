@@ -28,7 +28,9 @@
 #ifndef NAVHAL_PORT_GPIO_H
 #define NAVHAL_PORT_GPIO_H
 
-#include "common/hal_gpio.h"
+#include "common/hal_status.h"
+#include "internal/hal_gpio_ops.h"
+#include "common/hal_gpio_types.h"
 
 
 #ifdef __cplusplus
@@ -49,7 +51,10 @@ extern "C" {
 } /* extern "C" */
 #endif
 
-/* Deprecated pre-standardization GPIO names — retained as a backward-compat alias. */
-#include "compat/gpio_compat.h"
+
+/* This port carries the deprecated gpio names. common/hal_gpio.h includes
+ * the shim once the API above it is declared -- a static inline wrapper
+ * cannot forward to a function nobody has declared yet. */
+#define NAVHAL_PORT_GPIO_COMPAT 1
 
 #endif /* NAVHAL_PORT_GPIO_H */

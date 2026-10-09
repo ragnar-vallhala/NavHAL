@@ -30,7 +30,7 @@
 #ifndef NAVHAL_INTERNAL_HAL_TIMER_OPS_H
 #define NAVHAL_INTERNAL_HAL_TIMER_OPS_H
 
-#include "common/hal_timer.h"
+#include "common/hal_timer_types.h"
 #include "common/hal_status.h"
 
 #include <stdbool.h>

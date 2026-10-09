@@ -219,6 +219,8 @@ static hal_status_t avr_timer_set_interrupt(hal_timer_t timer, bool on) {
       TIMSK1 |= (uint8_t)(1u << OCIE1A);
     else
       TIMSK2 |= (uint8_t)(1u << OCIE2A);
+    /* Bare sei for the same reason as timebase: the HAL pair restores a
+     * saved state and cannot express an unconditional enable. */
     sei();
   } else {
     if (timer == TIM1)

@@ -45,6 +45,7 @@ add_executable(tests_host
   test_gpio_encoding.c
   test_hal_status.c
   test_boot_sniffer.c
+  test_boot_crypto.c
 
   ${NAVHAL_ROOT}/tests/navtest_state.c
 
@@ -58,8 +59,29 @@ add_executable(tests_host
   # Boot watcher: portable by construction -- no register access, and the only
   # hardware it touches is the reset, which the suite stubs out.
   ${NAVHAL_ROOT}/src/common/hal_boot.c
+  # All three Ed25519 backends at once: the corpus has to run against each, and
+  # only one of them can wear the hal_boot_crypto symbols per build.
+  # the image digest and its entry point, which the suite checks against FIPS
+  ${NAVHAL_ROOT}/src/utils/crypto/boot_hash.c
+  ${NAVHAL_ROOT}/src/utils/crypto/sha256/sha256.c
+  ${NAVHAL_ROOT}/src/utils/crypto/monocypher/monocypher.c
+  ${NAVHAL_ROOT}/src/utils/crypto/monocypher/monocypher-ed25519.c
+  ${NAVHAL_ROOT}/src/utils/crypto/tweetnacl/tweetnacl.c
+  ${NAVHAL_ROOT}/src/utils/crypto/compact25519/compact_ed25519.c
+  ${NAVHAL_ROOT}/src/utils/crypto/compact25519/compact_wipe.c
+  ${NAVHAL_ROOT}/src/utils/crypto/compact25519/c25519/ed25519.c
+  ${NAVHAL_ROOT}/src/utils/crypto/compact25519/c25519/edsign.c
+  ${NAVHAL_ROOT}/src/utils/crypto/compact25519/c25519/f25519.c
+  ${NAVHAL_ROOT}/src/utils/crypto/compact25519/c25519/fprime.c
+  ${NAVHAL_ROOT}/src/utils/crypto/compact25519/c25519/sha512.c
 )
+target_compile_definitions(tests_host PRIVATE
+  BOOT_VECTORS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/vectors/ed25519_check")
 target_include_directories(tests_host PRIVATE
+  ${NAVHAL_ROOT}/src/utils/crypto/sha256
+  ${NAVHAL_ROOT}/src/utils/crypto/monocypher
+  ${NAVHAL_ROOT}/src/utils/crypto/tweetnacl
+  ${NAVHAL_ROOT}/src/utils/crypto/compact25519
   ${NAVHAL_ROOT}/include
   ${NAVHAL_ROOT}/include/port/cortex-m4
   ${NAVHAL_ROOT}/src/vendor/stm32/family/stm32f4/include

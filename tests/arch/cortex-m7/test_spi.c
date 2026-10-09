@@ -17,6 +17,7 @@
 
 #include "test_spi.h"
 #include "navhal_port_spi.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
 #include "family/spi_reg.h"
 #include "navtest/navtest.h"

@@ -11,6 +11,7 @@ The codebase is laid out so adding a new MCU adds directories, not build-system 
 | **Drivers, types, utilities** | See the **Topics** tab (HAL Drivers → GPIO / UART / I²C / …) |
 | **Source files** | See the **Files** tab |
 | **Per-MCU capability table** | @ref capabilities |
+| **Describing or adapting a board** | @ref boards |
 | **How to build & flash a sample** | @ref contributing "Contributing — Building" |
 | **How `nav` ecosystem modules interoperate** | @ref module_abi |
 
@@ -41,6 +42,7 @@ The Related Pages tab is structured top-down — start here:
 
 - **Using NavHAL**
   - @subpage consuming
+  - @subpage boards
 
 - **Per-target capabilities**
   - @subpage capabilities

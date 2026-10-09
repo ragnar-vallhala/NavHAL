@@ -27,6 +27,7 @@
  */
 
 #include "common/hal_boot.h"
+#include <stdint.h>
 
 #if NAVHAL_CONFIG_BOOT_SNIFFER
 
@@ -99,6 +100,20 @@ uint32_t hal_boot_get_attempts(void) {
   return hal_boot_block_valid() ? _sboot.attempts : 0u;
 }
 
+hal_status_t hal_boot_account_attempt(void) {
+  if (!hal_boot_block_valid()) {
+    return HAL_ERR_NOT_INITIALIZED;
+  }
+  uint32_t a = _sboot.attempts;
+  if (a < UINT32_MAX) {
+    a++;
+  }
+  /* Saturating, not wrapping: at 0xFFFFFFFF the next increment would read as a
+   * clean count and hand a crashlooping board back to the image crashing it. */
+  block_seal(_sboot.request, a);
+  return HAL_OK;
+}
+
 hal_status_t hal_boot_mark_healthy(void) {
   if (!hal_boot_block_valid()) {
     return HAL_ERR_NOT_INITIALIZED;
@@ -153,14 +168,17 @@ bool hal_boot_entry_is_disabled(void) { return s_entry_disabled; }
 
 void hal_boot_set_prepare(hal_boot_prepare_cb_t cb) { s_prepare = cb; }
 
-hal_status_t hal_boot_request(void) {
+hal_status_t hal_boot_request_target(uint32_t request) {
   if (s_entry_disabled) {
     return HAL_ERR_BUSY;
+  }
+  if (request != HAL_BOOT_REQ_LOADER && request != HAL_BOOT_REQ_STAGE1) {
+    return HAL_ERR_INVALID_ARG;
   }
 
   /* The attempt count carries across: this reset is deliberate, but it is not
    * evidence that the application is healthy. Only hal_boot_mark_healthy is. */
-  block_seal(HAL_BOOT_REQ_LOADER, hal_boot_get_attempts());
+  block_seal(request, hal_boot_get_attempts());
 
   if (s_prepare != NULL) {
     s_prepare();
@@ -170,6 +188,10 @@ hal_status_t hal_boot_request(void) {
    * return. Reaching the line below means the reset did not take. */
   (void)hal_system_reset();
   return HAL_ERR;
+}
+
+hal_status_t hal_boot_request(void) {
+  return hal_boot_request_target(HAL_BOOT_REQ_LOADER);
 }
 
 #endif /* NAVHAL_CONFIG_BOOT_SNIFFER */

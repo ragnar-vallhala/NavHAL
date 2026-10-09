@@ -27,19 +27,9 @@
 #ifndef NAVHAL_PORT_CLOCK_H
 #define NAVHAL_PORT_CLOCK_H
 
-#include "common/hal_clock.h"
+#include "common/hal_status.h"
+#include "utils/clock_types.h"
 
-/* AHB/APB are this port's bus names, so the convenience accessors live here
- * rather than in the portable header. They are the same indexed query. */
-static inline uint32_t hal_clock_get_ahbclk(void) {
-  return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_AHB);
-}
-static inline uint32_t hal_clock_get_apb1clk(void) {
-  return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_APB1);
-}
-static inline uint32_t hal_clock_get_apb2clk(void) {
-  return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_APB2);
-}
 
 /**
  * @brief Configure the PLL for a target SYSCLK instead of raw dividers.
@@ -55,7 +45,17 @@ static inline uint32_t hal_clock_get_apb2clk(void) {
 hal_status_t hal_clock_init_hz(hal_clock_source_t pll_input,
                                uint32_t target_hz);
 
-/* Deprecated two-argument init — retained as a backward-compat shim. */
-#include "compat/clock_compat.h"
+
+/* This port carries the deprecated clock names; the shim is included from
+ * the common header once the API is declared. */
+#define NAVHAL_PORT_CLOCK_COMPAT 1
+
+/* AHB/APB are this port's bus names, so the named accessors are this port's
+ * to offer -- but they wrap hal_clock_get_bus_clock, and a static inline
+ * cannot call a function nobody has declared. They are defined in
+ * common/hal_clock.h behind this marker, after that declaration, so the
+ * result does not depend on which header a translation unit opens first.
+ */
+#define NAVHAL_PORT_CLOCK_BUS_NAMES 1
 
 #endif /* NAVHAL_PORT_CLOCK_H */

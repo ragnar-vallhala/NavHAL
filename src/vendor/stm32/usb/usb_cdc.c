@@ -43,7 +43,9 @@
 #include "board.h"
 #include "family/rcc_reg.h"
 #include "family/usb_reg.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include <stdint.h>
 
@@ -815,6 +817,14 @@ bool hal_usb_cdc_connected(void) {
          (usb_line_state & HAL_USB_CDC_LINE_DTR);
 }
 
+/* The same state without the DTR term. A host sets a configuration as the last
+ * step of enumeration, which happens with no application involved; DTR arrives
+ * only when one opens the port. A bootloader deciding whether a host is present
+ * wants the former, and would otherwise wait out its window against a charger. */
+bool hal_usb_cdc_enumerated(void) {
+  return usb_configured && !usb_suspended;
+}
+
 static hal_status_t ep_in_transfer(const uint8_t *data, uint16_t len) {
   uint32_t spins = TX_TIMEOUT_SPINS;
   while (ep_in_busy) {
@@ -895,8 +905,15 @@ uint16_t hal_usb_cdc_read(uint8_t *buffer, uint16_t maxlen) {
 
 uint16_t hal_usb_cdc_available(void) { return ring_used(); }
 
-hal_status_t hal_usb_cdc_set_rx_callback(hal_usb_cdc_rx_callback_t cb) {
+hal_status_t hal_usb_cdc_attach_rx_callback(hal_usb_cdc_rx_callback_t cb) {
+  if (cb == NULL)
+    return HAL_ERR_INVALID_ARG;
   rx_cb = cb;
+  return HAL_OK;
+}
+
+hal_status_t hal_usb_cdc_detach_rx_callback(void) {
+  rx_cb = NULL;
   return HAL_OK;
 }
 

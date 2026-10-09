@@ -19,6 +19,7 @@
 
 #include "common/hal_interrupt.h"
 #include "internal/hal_interrupt_ops.h"
+#include "internal/hal_interrupt_table.h"
 #include "pc_io.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -32,7 +33,8 @@
 
 extern void x86_idt_init(void); /* arch layer (idt.c) */
 
-static hal_interrupt_callback_t g_cb[HAL_IRQ_COUNT];
+/* The callback table is in the common layer; this port kept a third copy
+ * of the same two lines. */
 static bool g_inited;
 
 static void pic_remap(void) {
@@ -63,8 +65,10 @@ static void ensure_init(void) {
 
 /* Called from the ISR stubs (isr.s) with the IRQ line number. */
 void x86_irq_dispatch(uint64_t irq) {
-  if (irq < HAL_IRQ_COUNT && g_cb[irq]) g_cb[irq]();
-  /* End-Of-Interrupt: slave first (if applicable), then master. */
+  (void)navhal_irq_invoke((hal_irq_t)irq);
+  /* End-Of-Interrupt: slave first (if applicable), then master. The PIC needs
+   * telling, which is why dispatch stays a port op rather than being the
+   * table lookup alone. */
   if (irq >= 8) pc_outb(PIC2_CMD, PIC_EOI);
   pc_outb(PIC1_CMD, PIC_EOI);
 }
@@ -95,19 +99,6 @@ static hal_status_t pc_interrupt_disable(hal_irq_t irq) {
   return HAL_OK;
 }
 
-static hal_status_t pc_interrupt_attach_callback(hal_irq_t irq,
-                                           hal_interrupt_callback_t cb) {
-  if ((unsigned)irq >= HAL_IRQ_COUNT) return HAL_ERR_INVALID_ARG;
-  g_cb[irq] = cb;
-  return HAL_OK;
-}
-
-static hal_status_t pc_interrupt_detach_callback(hal_irq_t irq) {
-  if ((unsigned)irq >= HAL_IRQ_COUNT) return HAL_ERR_INVALID_ARG;
-  g_cb[irq] = NULL;
-  return HAL_OK;
-}
-
 /* ---------------------------------------------------------------------------
  * The rest of the table.
  *
@@ -118,8 +109,19 @@ static hal_status_t pc_interrupt_detach_callback(hal_irq_t irq) {
  * ------------------------------------------------------------------------- */
 
 static void pc_interrupt_dispatch(hal_irq_t irq) {
-  if ((uint64_t)irq < HAL_IRQ_COUNT && g_cb[irq])
-    g_cb[irq]();
+  x86_irq_dispatch((uint64_t)irq);
+}
+
+/* HLT with IF clear never wakes -- unlike WFI, which is why this enables
+ * interrupts across the instruction and restores the caller's flags after.
+ * sti defers by one instruction, so sti;hlt cannot lose a wake. A handler may
+ * run before this returns. */
+static void pc_cpu_idle(void) {
+  uint64_t flags;
+  __asm__ volatile("pushfq; popq %0" : "=r"(flags));
+  __asm__ volatile("sti; hlt" ::: "memory");
+  if (!(flags & (1ull << 9)))
+    __asm__ volatile("cli" ::: "memory");
 }
 
 /** @brief Mask interrupts and report whether they had been enabled. */
@@ -165,9 +167,8 @@ static void pc_interrupt_clear_all_pending(void) {}
 const hal_interrupt_ops_t _hal_interrupt_ops = {
     .enable = pc_interrupt_enable,
     .disable = pc_interrupt_disable,
-    .attach_callback = pc_interrupt_attach_callback,
-    .detach_callback = pc_interrupt_detach_callback,
-    .dispatch = pc_interrupt_dispatch,
+            .dispatch = pc_interrupt_dispatch,
+    .cpu_idle = pc_cpu_idle,
     .disable_global = pc_interrupt_disable_global,
     .enable_global = pc_interrupt_enable_global,
     .set_priority = pc_interrupt_set_priority,

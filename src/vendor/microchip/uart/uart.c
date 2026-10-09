@@ -28,6 +28,7 @@
  */
 
 #include "internal/hal_uart_ops.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 
 #include <avr/interrupt.h>

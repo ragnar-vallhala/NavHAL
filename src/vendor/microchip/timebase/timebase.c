@@ -27,6 +27,7 @@
  */
 
 #include "common/hal_timer.h"
+#include "common/hal_interrupt.h"
 #include "internal/hal_timebase_ops.h"
 
 /* Forward declarations: several of these call each other (micros from tick,
@@ -88,7 +89,10 @@ static hal_status_t avr_timebase_init(uint32_t tick_us) {
   OCR0A = s_reload;
   TCNT0 = 0;
   TIMSK0 = (uint8_t)(1u << OCIE0A); /* enable compare-match-A interrupt. */
-  sei();                            /* timebase needs global interrupts on. */
+  /* Stays a bare sei: the HAL's pair is save/restore -- enable_global takes a
+   * state disable_global returned -- and has no way to say "on, regardless of
+   * what it was", which is what a timebase needs after arming its tick. */
+  sei();
   return HAL_OK;
 }
 
@@ -100,10 +104,12 @@ ISR(TIMER0_COMPA_vect) {
 
 static uint32_t avr_timebase_get_tick(void) {
   uint32_t t;
-  uint8_t sreg = SREG;
-  cli(); /* 32-bit read is non-atomic on an 8-bit core. */
+  /* A 32-bit read is four loads on an 8-bit core, and the tick ISR can land
+   * between them. Through the HAL pair rather than cli/SREG so the critical
+   * section reads the same on every port; under LTO it is the same cli. */
+  uint32_t state = hal_interrupt_disable_global();
   t = s_ticks;
-  SREG = sreg;
+  hal_interrupt_enable_global(state);
   return t;
 }
 

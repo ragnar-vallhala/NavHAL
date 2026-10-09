@@ -26,8 +26,10 @@
  * interrupt masking.
  */
 
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include "internal/hal_interrupt_ops.h"
+#include "internal/hal_interrupt_table.h"
 
 /* Forward declaration: enable_with_priority (a Cortex-M port extension, not a
  * table entry) sets the priority before unmasking, and is defined above it. */
@@ -36,16 +38,24 @@ static hal_status_t armv7em_interrupt_set_priority(hal_irq_t irq,
 #include "common/hal_status.h"
 #include <stdint.h>
 
-#define MAX_IRQ 128
-static hal_interrupt_callback_t irq_callbacks[MAX_IRQ] = {0};
+/* The callback table moved to the common layer: it was a bounds check and an
+ * indexed call, identical in every port. HAL_IRQ_COUNT comes from the family
+ * header, so the array is the size this part actually wires -- 82 lines on the
+ * F401, not a round 128. */
 
-hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq,
-                                                uint8_t priority) {
+/* Enabling a line always sets its priority first, so it can never fire at the
+ * NVIC reset default of 0 -- most urgent, and unmaskable by an RTOS BASEPRI
+ * critical section, which would let a *_from_isr call from that line corrupt
+ * the kernel. See HAL_IRQ_PRIORITY_DEFAULT.
+ *
+ * The public hal_interrupt_enable_with_priority is the common layer's, derived
+ * from set_priority and enable. It used to be defined here and called by
+ * .enable below, which under that layering would have called back into .enable
+ * for ever. */
+static hal_status_t _enable_at(hal_irq_t irq, uint8_t priority) {
   if (irq < 0)
     return HAL_ERR_INVALID_ARG; // not an NVIC interrupt
 
-  // Set the priority BEFORE enabling so the line can never fire at the
-  // reset-default priority 0 (unmaskable) in the window before it is set.
   armv7em_interrupt_set_priority(irq, priority);
 
   uint32_t irq_num = (uint32_t)irq;
@@ -54,11 +64,7 @@ hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq,
 }
 
 static hal_status_t armv7em_interrupt_enable(hal_irq_t irq) {
-  // Default to a maskable mid-range priority rather than the NVIC reset
-  // default of 0 (most urgent, unmaskable by an RTOS BASEPRI critical
-  // section, which makes a *_from_isr call from such an IRQ able to corrupt
-  // the kernel). See HAL_IRQ_PRIORITY_DEFAULT.
-  return hal_interrupt_enable_with_priority(irq, HAL_IRQ_PRIORITY_DEFAULT);
+  return _enable_at(irq, HAL_IRQ_PRIORITY_DEFAULT);
 }
 
 static hal_status_t armv7em_interrupt_disable(hal_irq_t irq) {
@@ -87,26 +93,10 @@ static bool armv7em_interrupt_is_pending(hal_irq_t irq) {
   return ((NVIC->ISPR[irq_num / 32] >> (irq_num % 32)) & 1U) != 0U;
 }
 
-static hal_status_t armv7em_interrupt_attach_callback(hal_irq_t irq,
-                                           hal_interrupt_callback_t callback) {
-  if (irq < 0 || irq >= MAX_IRQ)
-    return HAL_ERR_INVALID_ARG;
-  irq_callbacks[(uint32_t)irq] = callback;
-  return HAL_OK;
-}
-
-static hal_status_t armv7em_interrupt_detach_callback(hal_irq_t irq) {
-  if (irq < 0 || irq >= MAX_IRQ)
-    return HAL_ERR_INVALID_ARG;
-  irq_callbacks[(uint32_t)irq] = 0;
-  return HAL_OK;
-}
-
 static void armv7em_interrupt_dispatch(hal_irq_t irq) {
-  if (irq < 0 || irq >= MAX_IRQ)
-    return;
-  if (irq_callbacks[(uint32_t)irq])
-    irq_callbacks[(uint32_t)irq]();
+  /* An NVIC needs no acknowledgement: taking the exception clears the pending
+   * bit, so there is nothing to wrap the call in. */
+  (void)navhal_irq_invoke(irq);
 }
 
 // Generic vector fallback. The startup vector table routes EVERY IRQ slot that
@@ -129,10 +119,10 @@ void hal_irq_default_dispatch(void) {
   uint32_t exc = ipsr & 0x1FFu; // active exception number (0 = thread)
   if (exc >= 16u) {             // external IRQ: exc = 16 + IRQn
     uint32_t irq = exc - 16u;
-    if (irq < MAX_IRQ && irq_callbacks[irq]) {
-      irq_callbacks[irq]();
+    if (navhal_irq_invoke((hal_irq_t)irq))
       return;
-    }
+    /* else fall through to the trap: an enabled line with nothing attached is
+     * a bug, and returning would spin the exception forever */
   }
   for (;;) {
     /* unexpected exception — IPSR holds the number */
@@ -147,11 +137,18 @@ void hal_irq_default_dispatch(void) {
 #define PRIORITY_MASK ((1UL << __NVIC_PRIO_BITS) - 1)
 
 static hal_status_t armv7em_interrupt_set_priority(hal_irq_t irq, uint8_t priority) {
-  // Normalize to top 4 bits (0-15 effective priority levels)
-  uint32_t prio = (priority & PRIORITY_MASK) << (8 - __NVIC_PRIO_BITS);
+  // A LEVEL, 0..15, not a raw register value. Masking instead of refusing turns
+  // 0xE0 -- a caller meaning level 14 -- into level 0, the most urgent and the
+  // one that cannot be masked by a BASEPRI critical section. Silently.
+  if (priority > PRIORITY_MASK)
+    return HAL_ERR_INVALID_ARG;
+  uint32_t prio = priority << (8 - __NVIC_PRIO_BITS);
 
   if (irq >= 0) {
-    // External interrupts
+    // External interrupts. Bounded: IPR has one byte per wired line, and
+    // writing past it lands in whatever register follows.
+    if ((unsigned long)irq >= (unsigned long)HAL_IRQ_COUNT)
+      return HAL_ERR_INVALID_ARG;
     NVIC->IPR[(uint32_t)irq] = prio;
   } else {
     // System exceptions (negative IRQn)
@@ -174,9 +171,15 @@ static hal_status_t armv7em_interrupt_set_priority(hal_irq_t irq, uint8_t priori
     case SysTick_IRQn:
       SCB_SHPR3 = (SCB_SHPR3 & ~(0xFFU << 24)) | (prio << 24);
       break;
+    case NonMaskableInt_IRQn:
+    case HardFault_IRQn:
+    case DebugMonitor_IRQn:
+      // Fixed or highest priority in the architecture; nothing to write.
+      return HAL_ERR_NOT_SUPPORTED;
     default:
-      // HardFault, NMI and DebugMon have fixed or highest priority
-      break;
+      // Not a system exception this core has -- reporting HAL_OK for it would
+      // be claiming a priority was set on a line that does not exist.
+      return HAL_ERR_INVALID_ARG;
     }
   }
   return HAL_OK;
@@ -226,7 +229,7 @@ static uint32_t armv7em_interrupt_disable_global(void) {
   return state;
 }
 
-void hal_cpu_idle(void) {
+static void armv7em_cpu_idle(void) {
   /* DSB before WFI so prior memory writes (e.g. clearing a wake flag) retire
    * first; WFI sleeps the core until a wakeup event. A pending wakeup event at
    * entry returns immediately, so this cannot deadlock. */
@@ -269,7 +272,6 @@ __attribute__((weak)) void MemManage_Handler(void) {}
 __attribute__((weak)) void BusFault_Handler(void) {}
 __attribute__((weak)) void UsageFault_Handler(void) {}
 __attribute__((weak)) void DebugMon_Handler(void) {}
-__attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 
 /* USART vectors are this MCU's, not the core's, so they are defined by the
  * vendor's UART backend rather than here. */
@@ -278,9 +280,8 @@ __attribute__((weak)) void DMA1_Stream6_IRQHandler(void) {}
 const hal_interrupt_ops_t _hal_interrupt_ops = {
     .enable = armv7em_interrupt_enable,
     .disable = armv7em_interrupt_disable,
-    .attach_callback = armv7em_interrupt_attach_callback,
-    .detach_callback = armv7em_interrupt_detach_callback,
     .dispatch = armv7em_interrupt_dispatch,
+    .cpu_idle = armv7em_cpu_idle,
     .disable_global = armv7em_interrupt_disable_global,
     .enable_global = armv7em_interrupt_enable_global,
     .set_priority = armv7em_interrupt_set_priority,

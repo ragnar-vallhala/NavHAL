@@ -97,6 +97,15 @@ SECTIONS {
     . = ALIGN(8);
     _snoinit = .;
     KEEP(*(.noinit*))
+    /* Reserved whether or not THIS image declares any .noinit, because the boot
+       block is shared between images at a fixed address. An image that links no
+       hal_boot.c -- a stage-2 that only verifies and jumps, say -- would
+       otherwise start its .data and .bss at 0x20000000 and zero the block the
+       loader just wrote. The symptom is not a crash: the attempt counter silently
+       resets every boot, so the crashloop limit can never be reached and the one
+       defence against a crashlooping image is quietly absent.
+       HAL_BOOT_BLOCK_RESERVE must be at least sizeof(hal_boot_block_t). */
+    . = _snoinit + 16;
     . = ALIGN(8);
     _enoinit = .;
   } > RAM
@@ -106,8 +115,13 @@ SECTIONS {
     *(.data*)
     . = ALIGN(4);
     _edata = .;
-    *(.init*)
-    *(.fini*)
+    /* KEEP: with --gc-sections a C++ global constructor is only reachable from
+     * .init_array, which the startup code walks rather than calls directly, so
+     * the collector drops it and the object is never constructed. No sample
+     * relies on one today -- the C++ sample's globals are constexpr on purpose --
+     * which is exactly why this is easy to get wrong later. */
+    KEEP(*(.init*))
+    KEEP(*(.fini*))
   } > RAM AT> FLASH
 
   .bss : {
@@ -123,4 +137,21 @@ SECTIONS {
   _heap_end   = ORIGIN(RAM) + LENGTH(RAM);
   _sidata = LOADADDR(.data);
   _estack = ORIGIN(RAM) + LENGTH(RAM);
+
+  /* Where this image actually ends in flash: the .data initialisers are the last
+   * thing stored there, loaded from flash into RAM at startup. */
+  _eflash = LOADADDR(.data) + SIZEOF(.data);
+
 }
+
+/* The KV store erases whole sectors. If those sectors fall inside this image,
+ * the first hal_flash_save() erases the code running it -- which is what moving
+ * the store to sectors 2-3 would have done to a 45 KB test image linked flat
+ * from 0x08000000. CMake passes the store's extent; a build that does not gets
+ * zeros here and the check stands down. Top level, because ld does not take a
+ * bare ASSERT inside SECTIONS.
+ */
+PROVIDE(__kv_start = 0);
+PROVIDE(__kv_end = 0);
+ASSERT(__kv_end == 0 || _eflash <= __kv_start || ORIGIN(FLASH) >= __kv_end,
+       "image overlaps the flash KV store -- move CONFIG_FLASH_KV_*_SECTOR outside this image, or link the image into its own partition")

@@ -36,6 +36,7 @@
 #if NAVHAL_CONFIG_DRV_WATCHDOG
 
 #include "common/hal_watchdog.h"
+#include "common/hal_interrupt.h"
 #include "internal/hal_watchdog_ops.h"
 
 #include <avr/interrupt.h>
@@ -74,11 +75,12 @@ static hal_status_t avr_watchdog_start(uint32_t timeout_ms) {
   /* wdt_enable performs the WDCE timed sequence, which has to complete within
    * four cycles of its start — an interrupt landing in the middle makes the
    * write silently do nothing. */
-  const uint8_t sreg = SREG;
-  cli();
+  /* The WDT change sequence is timed: WDCE must be set and the new value
+   * written within four cycles, so nothing may interrupt between them. */
+  const uint32_t state = hal_interrupt_disable_global();
   wdt_reset();
   wdt_enable(step);
-  SREG = sreg;
+  hal_interrupt_enable_global(state);
 
   wdt_timeout_ms = wdt_steps_ms[step];
   wdt_running = 1U;

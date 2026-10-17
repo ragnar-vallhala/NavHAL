@@ -58,6 +58,26 @@
  * the ready bit never reaches `state`. */
 static hal_status_t _toggle_hse_clock(uint8_t state) {
   if (state) {
+#if NAVHAL_CONFIG_BOARD_HSE_BYPASS
+    /* This board is fed a driven clock on OSC_IN with nothing across OSC_OUT --
+     * a Nucleo takes it from the on-board ST-LINK's MCO pin, the crystal
+     * footprint being unpopulated. Asking the oscillator to drive a crystal
+     * that is not there leaves HSERDY low until the wait below gives up.
+     *
+     * HSEBYP is writable only while HSEON is clear, so clear it and let HSERDY
+     * fall first. Skipping that turns a configuration error into silence: the
+     * write is ignored, HSE still never readies, and the .config says bypass. */
+    /* Only when the bit actually has to change. HSEON cannot be cleared while
+     * HSE drives the system clock, directly or through the PLL, so an
+     * unconditional clear here spins until the wait gives up and leaves a
+     * re-init running on raw HSE -- which is what a second hal_clock_init on a
+     * board already clocked from HSE does. */
+    if ((RCC->CR & RCC_CR_HSEBYP) == 0u) {
+      RCC->CR &= ~RCC_CR_HSEON;
+    WAIT_OR_TIMEOUT((RCC->CR & RCC_CR_HSERDY) != 0);
+      RCC->CR |= RCC_CR_HSEBYP;
+    }
+#endif
     RCC->CR |= RCC_CR_HSEON;
   } else
     RCC->CR &= ~RCC_CR_HSEON;
@@ -234,12 +254,13 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   }
 
   // Configure flash latency based on target clock
-  volatile uint32_t *const FLASH_ACR =
-      (volatile uint32_t *)(FLASH_INTERFACE_REGISTER);
+  /* Named for what it is, not for the register macro: family/flash_reg.h now
+   * exports FLASH_ACR as the register itself, the way it exports FLASH_CR. */
+  volatile uint32_t *const acr = (volatile uint32_t *)(FLASH_INTERFACE_REGISTER);
 
   // When increasing frequency (switching to PLL), increase wait states FIRST
   if (cfg->source == HAL_CLOCK_SOURCE_PLL) {
-    _flash_set_acr(FLASH_ACR, _target_sysclk_hz(cfg));
+    _flash_set_acr(acr, _target_sysclk_hz(cfg));
   }
 
   /* Bus prescalers. The config's dividers used to be accepted and discarded;
@@ -302,7 +323,7 @@ static hal_status_t stm32_clock_init(const hal_clock_config_t *cfg) {
   if (cfg->source != HAL_CLOCK_SOURCE_PLL) {
     /* Also the path a board takes when it never uses the PLL at all, which is
      * why the accelerator is enabled here too rather than only on the way up. */
-    _flash_set_acr(FLASH_ACR, _target_sysclk_hz(cfg));
+    _flash_set_acr(acr, _target_sysclk_hz(cfg));
   }
 
   return HAL_OK;

@@ -37,7 +37,11 @@
 #ifndef NAVHAL_CLOCK_COMPAT_H
 #define NAVHAL_CLOCK_COMPAT_H
 
-#include "common/hal_clock.h"
+/* Not common/hal_clock.h: that header includes this one, once its API is
+ * declared, which is the only place these wrappers are pulled from. Including
+ * it back made the graph circular -- uart_compat.h takes the port header for
+ * the same reason. */
+#include "navhal_port_clock.h"
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 

@@ -27,6 +27,7 @@ extern "C" {
 #if NAVHAL_CONFIG_DRV_USB_CDC
 
 void test_usb_cdc_not_connected_without_host(void);
+void test_usb_cdc_not_enumerated_without_init(void);
 void test_usb_cdc_write_refused_without_host(void);
 void test_usb_cdc_write_rejects_null(void);
 void test_usb_cdc_write_string_rejects_null(void);

@@ -31,6 +31,7 @@
  * file has.
  */
 
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "internal/hal_timebase_ops.h"
 
@@ -45,6 +46,7 @@ static uint32_t armv7em_timebase_get_millis(void);
 static void armv7em_timebase_delay_us(uint32_t us);
 static void armv7em_timebase_delay_ms(uint32_t ms);
 static hal_status_t armv7em_timebase_set_callback(hal_timebase_callback_t cb);
+#include "common/hal_timer.h"
 #include "navhal_port_timer.h"
 #include <stdint.h>
 

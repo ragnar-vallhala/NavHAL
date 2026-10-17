@@ -21,6 +21,7 @@
  */
 
 #include "common/hal_diskio.h"
+#include "common/hal_sdio.h"
 #include "navhal_port_sdio.h"
 
 #if NAVHAL_CONFIG_DRV_SDIO

@@ -9,7 +9,11 @@ config BOARD
 #
 # Every macro board.h used to define, as Kconfig symbols; tools/kconfig.py turns
 # them into the board.h that code includes, so this file is the single place the
-# board is described and any value can be overridden in .config.
+# board is described. The symbols are promptless by design, which also means they
+# are not user-assignable: an override in .config is read and discarded, so this
+# file is the only place a value changes. To describe different hardware, correct
+# this board or add one -- tools/kconfig.py now says so out loud when an assignment
+# is dropped, because it used to happen in silence.
 #
 # PIN_<name>_PORT/_PIN become HAL_GPIO_PIN(); NUM_<name> an integer; VAL_<name> is
 # emitted verbatim, for spellings no integer can carry.

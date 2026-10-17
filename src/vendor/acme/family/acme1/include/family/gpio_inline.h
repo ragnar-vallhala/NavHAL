@@ -29,7 +29,9 @@
 #ifndef NAVHAL_ACME1_GPIO_INLINE_H
 #define NAVHAL_ACME1_GPIO_INLINE_H
 
-#include "common/hal_gpio.h"
+#include "common/hal_status.h"
+#include "internal/hal_gpio_ops.h"
+#include "common/hal_gpio_types.h"
 #include "family/gpio_reg.h"
 
 #ifdef __cplusplus

@@ -50,6 +50,7 @@
 #define FLASH_ACR_DCRST  (1U << 12) /**< Data cache reset.                */
 
 #define FLASH_BASE 0x40023C00UL
+#define FLASH_ACR (*(volatile uint32_t *)(FLASH_BASE + 0x00))
 #define FLASH_KEYR (*(volatile uint32_t *)(FLASH_BASE + 0x04))
 #define FLASH_SR (*(volatile uint32_t *)(FLASH_BASE + 0x0C))
 #define FLASH_CR (*(volatile uint32_t *)(FLASH_BASE + 0x10))
@@ -88,8 +89,27 @@ extern "C" {
 #define SECTOR6_ADDR 0x08040000UL // 128 KB
 #define SECTOR7_ADDR 0x08060000UL // 128 KB
 
+/* Which sectors the KV store owns. Kconfig decides, because the answer depends
+ * on where the image is linked: a flat image from 0x08000000 needs the store out
+ * at 6-7, while the bootloader layout puts it at 2-3 with the app in its own
+ * partition. The linker script asserts the two do not overlap. */
+/* The generator emits an unset int as an EMPTY definition, not as absent, so
+ * `#ifdef` is not enough -- it was, and `#if PRIMARY_FLASH_SECTOR < 0` became
+ * `#if < 0`. The +0 trick reads an empty value as zero, and 0 is not a sector
+ * this store may use anyway (it is stage-1's), so it falls through to the
+ * default. */
+#if defined(NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR) &&                          \
+    (NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR + 0) > 0
+#define PRIMARY_FLASH_SECTOR NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR
+#else
 #define PRIMARY_FLASH_SECTOR 6
+#endif
+#if defined(NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR) &&                        \
+    (NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR + 0) > 0
+#define SECONDARY_FLASH_SECTOR NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR
+#else
 #define SECONDARY_FLASH_SECTOR 7
+#endif
 
 #if PRIMARY_FLASH_SECTOR < 0 || PRIMARY_FLASH_SECTOR > 7
 #error "[NAVHAL FLASH] PRIMARY_FLASH_SECTOR must be between 0 and 7"

@@ -9,8 +9,15 @@ config BOARD
 #
 # Every macro board.h used to define, as Kconfig symbols. tools/kconfig.py turns
 # these into the board.h that code includes, so this file is the single place the
-# board is described and any value here can be overridden in .config -- including
-# which USART the console is on, which was impossible while it was a header.
+# board is described. The symbols are promptless by design, which also means they
+# are not user-assignable: an override in .config is read and discarded, so this
+# file is the only place a value changes. To describe different hardware, correct
+# this board or add one -- tools/kconfig.py now says so out loud when an assignment
+# is dropped, because it used to happen in silence.
+#
+# Which USART the console is on is described here rather than in a header, which
+# was the point of the move -- it just is not overridable from a consumer's
+# .config the way this comment used to claim.
 
 # 37 macros
 config PIN_LED_BUILTIN_PORT
@@ -25,10 +32,15 @@ config VAL_LED_ON
 config VAL_LED_OFF
     string
     default "HAL_GPIO_HIGH" if BOARD_NAVIXSM_F401RE
-config PIN_LED_RGB_PORT
+# PC1 is not an LED pin. It goes through R29 to D3 pin 3 (DI), the data input of an
+# addressable single-wire RGB part, which needs a bit-banged or timer/DMA waveform --
+# a pin write does nothing useful. Named _DIN so it does not read like LED_BUILTIN
+# beside it, which really is a pin you can set (and is active LOW: its cathode is on
+# PC0 with the anode on 3V3 through R28, which is why VAL_LED_ON is HAL_GPIO_LOW).
+config PIN_LED_RGB_DIN_PORT
     int
     default 2 if BOARD_NAVIXSM_F401RE
-config PIN_LED_RGB_PIN
+config PIN_LED_RGB_DIN_PIN
     int
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BUZZER_PORT
@@ -142,6 +154,17 @@ config PIN_BOARD_LORA_DIO1_PORT
 config PIN_BOARD_LORA_DIO1_PIN
     int
     default 15 if BOARD_NAVIXSM_F401RE
+# BOARD_I2C_BUS is the bus this board's own devices are on: PB8/PB9, carrying the
+# IST8310 magnetometer, the DPS368 barometer and the INA226 current monitor.
+# BOARD_I2C_EXT is the pin header, PB6/PB7 through R31/R30, with nothing else on it.
+#
+# These two were the other way round, which made BOARD_I2C_BUS -- the name anything
+# reaching for "the board's bus" picks -- the external connector, so a consumer
+# talking to the onboard sensors addressed an empty header. The pins were right
+# either way; only which one is "the" bus was wrong.
+#
+# Both pin pairs are I2C1 on this part (PB6/PB7 and PB8/PB9 are alternate AF pins
+# for the same peripheral), so the two cannot be driven at once.
 config VAL_BOARD_I2C_BUS
     string
     default "HAL_I2C_1" if BOARD_NAVIXSM_F401RE
@@ -150,25 +173,25 @@ config PIN_BOARD_I2C_SCL_PORT
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_SCL_PIN
     int
-    default 6 if BOARD_NAVIXSM_F401RE
+    default 8 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_SDA_PORT
     int
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_SDA_PIN
     int
-    default 7 if BOARD_NAVIXSM_F401RE
+    default 9 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_EXT_SCL_PORT
     int
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_EXT_SCL_PIN
     int
-    default 8 if BOARD_NAVIXSM_F401RE
+    default 6 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_EXT_SDA_PORT
     int
     default 1 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_I2C_EXT_SDA_PIN
     int
-    default 9 if BOARD_NAVIXSM_F401RE
+    default 7 if BOARD_NAVIXSM_F401RE
 config PIN_BOARD_USB_DM_PORT
     int
     default 0 if BOARD_NAVIXSM_F401RE
@@ -193,6 +216,18 @@ config NUM_BOARD_HSI_FREQ_HZ
 config NUM_BOARD_HSE_FREQ_HZ
     int
     default 8000000 if BOARD_NAVIXSM_F401RE
+
+# ---- HSE source ----
+# How the 8 MHz above reaches OSC_IN, which the frequency alone cannot say. A
+# fitted crystal is driven by the oscillator across OSC_IN/OSC_OUT; a board
+# without one is fed a square wave on OSC_IN only -- a Nucleo takes it from the
+# on-board ST-LINK's MCO pin, since the crystal footprint is left unpopulated.
+# The second case needs RCC_CR.HSEBYP set before HSEON, and without it HSERDY
+# never rises: hal_clock_init times out and leaves the system on HSI, so every
+# derived rate is wrong and USB loses its exact 48 MHz.
+config BOARD_HSE_BYPASS
+    bool
+    default n if BOARD_NAVIXSM_F401RE
 
 # ---- SDIO ----
 # The bus signals are fixed by the alternate-function mux rather than freely
@@ -388,3 +423,10 @@ config VAL_BOARD_AUX_UART
 config BOARD_AUX_UART_SPARE
     bool
     default n if BOARD_NAVIXSM_F401RE
+
+# No ADC input and no user button are wired on this board, so it declares neither
+# VAL_BOARD_ADC / VAL_BOARD_ADC_PIN / NUM_BOARD_ADC_CHANNEL nor USER_BUTTON. That
+# is the hardware, not an omission: 33_hal_adc and 02_hal_pupd decline this board
+# and the sample matrix reports them n/a, which is the right answer rather than a
+# gap to fill. Written down because the absence looks identical to a forgotten
+# declaration, and the matrix will ask again every time a board is added.

@@ -25,6 +25,7 @@
 #include "common/hal_features.h"
 #if NAVHAL_CONFIG_DRV_DMA
 
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
 #include "family/rcc_reg.h"
 #include "navtest/navtest.h"
@@ -206,7 +207,50 @@ NAVTEST_CASE_DECL(test_dma_clear_flags_clears_isr);
 NAVTEST_CASE_DECL(test_hal_dma_init_rejects_null_config);
 NAVTEST_CASE_DECL(test_hal_dma_start_rejects_null_config);
 NAVTEST_CASE_DECL(test_hal_dma_stop_rejects_null_config);
+NAVTEST_CASE_DECL(test_dma_attach_refuses_a_second_owner);
+NAVTEST_CASE_DECL(test_dma_attach_is_idempotent_for_one_owner);
+NAVTEST_CASE_DECL(test_dma_detach_frees_the_stream);
 
+
+
+/* ---- stream callback ownership ------------------------------------------
+ * Stream 2 of DMA1 is used here because nothing in the tree claims it: i2c
+ * takes DMA1 streams 0 and 5, sdio takes DMA2 streams 3 and 6. */
+
+static void _cb_a(void) {}
+static void _cb_b(void) {}
+
+/* The bug this API exists for: a second owner used to take the stream in
+ * silence, because the IRQ had exactly one callback slot and the last writer
+ * won. It is now reported, and the first owner keeps the stream. */
+void test_dma_attach_refuses_a_second_owner(void) {
+  hal_dma_detach_callback(HAL_DMA_CONTROLLER_1, 2u);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 2u, _cb_a));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 2u, _cb_b));
+  hal_dma_detach_callback(HAL_DMA_CONTROLLER_1, 2u);
+}
+
+/* Re-arming with the same callback is how sdio sets up every transfer, so it
+ * has to stay a no-op rather than a second claim. */
+void test_dma_attach_is_idempotent_for_one_owner(void) {
+  hal_dma_detach_callback(HAL_DMA_CONTROLLER_1, 2u);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 2u, _cb_a));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 2u, _cb_a));
+  hal_dma_detach_callback(HAL_DMA_CONTROLLER_1, 2u);
+}
+
+void test_dma_detach_frees_the_stream(void) {
+  hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 2u, _cb_a);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_dma_detach_callback(HAL_DMA_CONTROLLER_1, 2u));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 2u, _cb_b));
+  hal_dma_detach_callback(HAL_DMA_CONTROLLER_1, 2u);
+}
 
 static const navtest_case_t dma_cases[] = {
     NAVTEST_CASE(test_dma_clock_enable_dma1),
@@ -227,6 +271,10 @@ static const navtest_case_t dma_cases[] = {
     NAVTEST_CASE(test_hal_dma_init_rejects_null_config),
     NAVTEST_CASE(test_hal_dma_start_rejects_null_config),
     NAVTEST_CASE(test_hal_dma_stop_rejects_null_config),
+    /* stream callback ownership */
+    NAVTEST_CASE(test_dma_attach_refuses_a_second_owner),
+    NAVTEST_CASE(test_dma_attach_is_idempotent_for_one_owner),
+    NAVTEST_CASE(test_dma_detach_frees_the_stream),
 };
 
 const navtest_suite_t test_dma_suite = {

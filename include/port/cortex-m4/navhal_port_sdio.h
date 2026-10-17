@@ -30,7 +30,7 @@
 #ifndef NAVHAL_PORT_SDIO_H
 #define NAVHAL_PORT_SDIO_H
 
-#include "common/hal_sdio.h"
+#include "common/hal_sdio_types.h"
 #include "navhal_port_config.h"
 
 
@@ -67,9 +67,11 @@ hal_sdio_error_t hal_sdio_write_blocks_async(uint32_t addr,
 #endif
 
 #if NAVHAL_CONFIG_DRV_SDIO
-/* Deprecated pre-standardization SDIO names — retained as a backward-compat
- * alias behind NAVHAL_DEPRECATED. */
-#include "compat/sdio_compat.h"
 #endif /* NAVHAL_CONFIG_DRV_SDIO */
+
+/* This port carries the deprecated sdio names. The shims are static inline
+ * wrappers over the API, so common/hal_sdio.h includes them once that API
+ * is declared -- from here they would be forwarding to nothing. */
+#define NAVHAL_PORT_SDIO_COMPAT 1
 
 #endif /* NAVHAL_PORT_SDIO_H */

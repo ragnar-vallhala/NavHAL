@@ -27,6 +27,6 @@
 #ifndef NAVHAL_PORT_DMA_H
 #define NAVHAL_PORT_DMA_H
 
-#include "common/hal_dma.h"
+#include "common/hal_dma_types.h"
 
 #endif /* NAVHAL_PORT_DMA_H */

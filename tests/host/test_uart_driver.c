@@ -24,6 +24,7 @@
  */
 
 #include "host_mmio.h"
+#include "common/hal_uart.h"
 #include "navhal_port_uart.h"
 #include "family/uart_reg.h"
 #include "family/rcc_reg.h"
@@ -149,6 +150,35 @@ void test_host_uart_idle_callback(void) {
   TEST_ASSERT_BITS_LOW(USART_CR1_IDLEIE, u(HAL_UART_3)->CR1);
 }
 
+/* A UART this part does not serve must be refused, not quietly aimed at another
+ * one. GET_USARTx_BASE yields 0 for anything but USART1/2/3/6 and the attach path
+ * guards on that -- which is the whole of the protection, so it is worth an
+ * assertion. Two implementations of this callback were written independently and
+ * both leaned on exactly this guard, and neither had a case for it. */
+void test_host_uart_idle_callback_refuses_an_absent_uart(void) {
+  host_mmio_reset();
+  s_idle_calls = 0;
+  host_attached_isr = NULL;
+
+  /* 4 and 5 are not in this port's hal_uart_t: the cast is the point, since the
+     caller a guard protects against is the one passing something unmapped. */
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_attach_idle_callback((hal_uart_t)4, idle_cb));
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_attach_idle_callback((hal_uart_t)5, idle_cb));
+
+  /* Refused means nothing was armed: no handler registered, and no CR1 write to
+     some other instance's register. */
+  TEST_ASSERT_TRUE(host_attached_isr == NULL);
+  TEST_ASSERT_BITS_LOW(USART_CR1_IDLEIE, u(HAL_UART_2)->CR1);
+
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_ERR_INVALID_ARG,
+      (uint32_t)hal_uart_detach_idle_callback((hal_uart_t)4));
+}
+
 NAVTEST_CASE_DECL(test_host_uart_init_brr_usart3_115200);
 NAVTEST_CASE_DECL(test_host_uart_init_brr_various_bauds);
 NAVTEST_CASE_DECL(test_host_uart_init_usart1_uses_apb2_clock);
@@ -159,6 +189,7 @@ NAVTEST_CASE_DECL(test_host_uart_read_char_clears_errors_via_icr);
 NAVTEST_CASE_DECL(test_host_uart_available_reflects_rxne);
 NAVTEST_CASE_DECL(test_host_uart_enable_interrupt_sets_cr1);
 NAVTEST_CASE_DECL(test_host_uart_idle_callback);
+NAVTEST_CASE_DECL(test_host_uart_idle_callback_refuses_an_absent_uart);
 
 static const navtest_case_t uart_driver_cases[] = {
     NAVTEST_CASE(test_host_uart_init_brr_usart3_115200),
@@ -171,6 +202,7 @@ static const navtest_case_t uart_driver_cases[] = {
     NAVTEST_CASE(test_host_uart_available_reflects_rxne),
     NAVTEST_CASE(test_host_uart_enable_interrupt_sets_cr1),
     NAVTEST_CASE(test_host_uart_idle_callback),
+    NAVTEST_CASE(test_host_uart_idle_callback_refuses_an_absent_uart),
 };
 
 const navtest_suite_t test_uart_driver_suite = {

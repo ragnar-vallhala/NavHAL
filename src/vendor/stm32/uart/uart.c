@@ -32,14 +32,19 @@
 #include "board.h"
 #include "internal/hal_uart_ops.h"
 #include "internal/hal_uart_dma_ops.h"
+#include "common/hal_uart.h"
 #include "navhal_port_uart.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include "family/rcc_reg.h"
 #include "family/uart_reg.h"
 #include <stdint.h>
 #if NAVHAL_CONFIG_DRV_UART_DMA
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
 #endif
 
@@ -370,6 +375,7 @@ static hal_status_t stm32_uart_dma_set_request(hal_uart_t uart, bool tx,
   return HAL_OK;
 }
 
+
 /** @brief The STM32 UART-over-DMA backend. */
 const hal_uart_dma_ops_t _hal_uart_dma_ops = {
     .binding = stm32_uart_dma_binding,
@@ -377,15 +383,23 @@ const hal_uart_dma_ops_t _hal_uart_dma_ops = {
 };
 
 
+#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
+
 /* ---------------------------------------------------------------------------
  * USART interrupt vectors.
  *
  * Named by this MCU's vector table, so they belong with the driver that owns
- * the peripheral rather than in the shared arch interrupt file. Each hands
- * off to the registry so a caller's attached callback runs.
+ * the peripheral rather than in the shared arch interrupt file. Each hands off
+ * to the registry so a caller's attached callback runs.
+ *
+ * Outside the UART-DMA guard deliberately. These were once inside it, which
+ * left the vectors on the weak Default_Handler alias in any build with UART DMA
+ * off -- so an interrupt-driven UART depended on a DMA driver it never used. The
+ * arch fallback does dispatch by IPSR, but the on-target suite requires a
+ * dedicated handler per driver-enabled line, and relying on the fallback also
+ * gives up the trap that catches a line enabled with nothing attached.
  * ------------------------------------------------------------------------- */
 void USART1_IRQHandler(void) { hal_interrupt_dispatch(USART1_IRQn); }
 void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }
 void USART6_IRQHandler(void) { hal_interrupt_dispatch(USART6_IRQn); }
 
-#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */

@@ -29,7 +29,7 @@
 #ifndef NAVHAL_PORT_TIMER_H
 #define NAVHAL_PORT_TIMER_H
 
-#include "common/hal_timer.h"
+#include "common/hal_timer_types.h"
 #include "common/hal_types.h"
 
 
@@ -76,7 +76,14 @@ void TIM12_IRQHandler(void);
 #endif
 
 /* Deprecated pre-standardization timebase/timer names — retained as a backward-compat alias. */
-#include "compat/timebase_compat.h"
-#include "compat/timer_compat.h"
+
+/* This port carries the deprecated timer names; the shim is included from
+ * the common header once the API is declared. */
+#define NAVHAL_PORT_TIMEBASE_COMPAT 1
+
+/* This port carries the deprecated timer names. The shims are static inline
+ * wrappers over the API, so common/hal_timer.h includes them once that API
+ * is declared -- from here they would be forwarding to nothing. */
+#define NAVHAL_PORT_TIMER_COMPAT 1
 
 #endif /* NAVHAL_PORT_TIMER_H */

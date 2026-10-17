@@ -56,6 +56,12 @@ void hal_delay_us(uint32_t us) { _hal_timebase_ops.delay_us(us); }
 
 void hal_delay_ms(uint32_t ms) { _hal_timebase_ops.delay_ms(ms); }
 
-hal_status_t hal_timebase_set_callback(hal_timebase_callback_t cb) {
+hal_status_t hal_timebase_attach_callback(hal_timebase_callback_t cb) {
+  if (cb == NULL)
+    return HAL_ERR_INVALID_ARG;
   return _hal_timebase_ops.set_callback(cb);
+}
+
+hal_status_t hal_timebase_detach_callback(void) {
+  return _hal_timebase_ops.set_callback(NULL);
 }

@@ -38,9 +38,11 @@
 #include "internal/hal_spi_ops.h"
 #include "common/hal_clock.h"
 #include "board.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
 #include "family/rcc_reg.h"
 #include "family/spi_reg.h"
+#include "common/hal_timer.h"
 #include "navhal_port_timer.h"
 
 static inline volatile SPI_Reg_Typedef *_get_spi(hal_spi_instance_t spi) {

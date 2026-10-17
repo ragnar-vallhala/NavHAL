@@ -18,6 +18,7 @@
  */
 
 #include <stdint.h>
+#include "common/hal_interrupt.h"
 
 /** 64-bit interrupt-gate descriptor (16 bytes). */
 typedef struct __attribute__((packed)) {

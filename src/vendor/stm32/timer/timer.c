@@ -30,8 +30,11 @@
  */
 
 #include "internal/hal_timer_ops.h"
+#include "common/hal_timer.h"
 #include "navhal_port_timer.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include "family/rcc_reg.h"
 #include "family/timer_reg.h"

@@ -28,7 +28,7 @@
 #ifndef NAVHAL_PORT_UART_H
 #define NAVHAL_PORT_UART_H
 
-#include "common/hal_uart.h"
+#include "common/hal_uart_types.h"
 
 #include <stdbool.h>
 #include "navhal_port_config.h"
@@ -159,7 +159,38 @@ hal_status_t hal_uart_write_string_dma(hal_uart_t uart, const char *s);
 } /* extern "C" */
 #endif
 
-/* Deprecated pre-standardization UART names — retained as a backward-compat alias. */
-#include "compat/uart_compat.h"
+
+/* Idle-line callbacks are an STM32 feature, declared per port rather than in
+ * common/hal_uart.h: the ATmega328P USART raises no idle-line interrupt, and a
+ * common declaration would promise a symbol that port cannot link.
+ */
+/**
+ * @brief Call @p callback when the receive line goes idle.
+ *
+ * An idle line is how a UART frames a variable-length message: the peripheral
+ * raises IDLE once a full character time passes with nothing arriving, so a
+ * reader learns a burst has ended without a length header or a terminator.
+ *
+ * The callback runs in interrupt context at a BASEPRI-maskable priority, so it
+ * may call an RTOS *_from_isr primitive. Attaching replaces whatever was
+ * attached for that UART.
+ *
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a UART this part does not
+ *         have or a NULL callback.
+ */
+hal_status_t hal_uart_attach_idle_callback(hal_uart_t uart,
+                                          void (*callback)(void));
+
+/**
+ * @brief Stop calling back on an idle line; the UART keeps receiving.
+ *
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a UART this part does not have.
+ */
+hal_status_t hal_uart_detach_idle_callback(hal_uart_t uart);
+
+/* This port carries the deprecated uart names. common/hal_uart.h includes
+ * the shim once the API above it is declared -- a static inline wrapper
+ * cannot forward to a function nobody has declared yet. */
+#define NAVHAL_PORT_UART_COMPAT 1
 
 #endif /* NAVHAL_PORT_UART_H */

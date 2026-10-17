@@ -30,6 +30,7 @@
 /* Target backend: route navtest output to the per-target console UART
  * (NAVTEST_UART, defined in tests/navtest_target.h per arch). The host
  * backend lives in tests/host/host_backend.c and routes to stdout. */
+#include "common/hal_uart.h"
 #include "navhal_port_uart.h"
 #include "navtest_target.h"
 

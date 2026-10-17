@@ -4,17 +4,25 @@
 
 What the HAL capability contract reports for each supported MCU. The canonical gate is `NAVHAL_CONFIG_DRV_*` (a 1:1 mirror of Kconfig, force-included into every TU); the `NAVHAL_HAS_*` names below are the **deprecated** aliases kept for out-of-tree consumers. Macro definitions and the contract semantics live in [`../api_standardization.md`](../api_standardization.md); this directory only tracks per-target availability and implementation status.
 
-**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_navixsmf401re &nbsp;·&nbsp; @subpage cap_navixdev &nbsp;·&nbsp; @subpage cap_atmega328p &nbsp;·&nbsp; @subpage cap_stm32f767zi
+**Per-MCU detail pages:** @subpage cap_stm32f401re &nbsp;·&nbsp; @subpage cap_navixsmf401re &nbsp;·&nbsp; @subpage cap_navixdev &nbsp;·&nbsp; @subpage cap_atmega328p &nbsp;·&nbsp; @subpage cap_stm32f767zi &nbsp;·&nbsp; @subpage cap_x86_64_qemu
 
 ## Symbol legend
 
 | Symbol | Meaning |
-|---|---|
+|---|---|---|
 | ✓     | Hardware supports it AND the driver is implemented; `NAVHAL_HAS_X == 1` in the default config. |
 | ◐     | Hardware supports it but the driver is partial / has documented caveats (see the per-MCU page). |
 | —     | Hardware doesn't have the peripheral; `NAVHAL_HAS_X == 0`. Symbols are absent at link time. |
 | ✗     | Hardware *does* have it but the driver isn't implemented yet. Treated the same as `—` at compile time. |
 | s/w   | No hardware peripheral, but the public `hal_*` API is satisfied by a software fallback (only `hal_crc_*` today). |
+
+**x86-64 footnotes.** ¶ The interrupt controller is the 8259 PIC, not an NVIC, and
+its port owns the EOI — which is why `dispatch` is a per-port op rather than a
+common loop. ‖ `✗` here means Kconfig offers the symbol's row elsewhere but this
+port has no `navhal_port_<x>.h`, so it cannot be selected: `hal_timebase_*` is the
+port's timing surface (PIT-backed) and `hal_timer_*` has no ops table, while
+`hal_crc_*` cannot reach its software fallback. Enabling either is refused at
+configure time with the reason printed.
 
 ## Matrix
 
@@ -23,46 +31,46 @@ MCUs carries, whether or not NavHAL drives it yet. A `NAVHAL_HAS_*` macro exists
 only for the blocks NavHAL actually exposes (the `✓`/`◐`/`s/w` rows); silicon
 that has no driver yet shows `✗` and carries no macro (`—` in that column).
 
-| Class | Capability | `NAVHAL_HAS_*` | [F401RE](stm32f401re.md) | [ATmega328P](atmega328p.md) | [F767ZI](stm32f767zi.md) |
-|---|---|---|---|---|---|
-| Core   | Interrupt ctrl (NVIC)     | `INTERRUPT`     | ✓ | ✓ | ✓ |
-| Core   | Cycle counter (DWT)       | `CYCLE_COUNTER` | ✓ | — | ✓ |
-| Core   | FPU                       | `FPU`           | ✓ † | — | ✓ † |
-| Core   | MPU (memory protection) § | `MPU`           | ✓ (8-region) | — | ✓ (16-region) |
-| Core   | L1 I-cache / D-cache      | `CACHE`         | — | — | ◐ |
-| Core   | DTCM / ITCM               | `TCM`           | — | — | ✓ |
-| System | Clock subsystem           | `CLOCK`         | ✓ | ◐ | ✓ |
-| System | Flash (KV store)          | `FLASH`         | ✓ | ◐ | ✓ |
-| System | DMA controller            | `DMA`           | ✓ | — | ✓ |
-| System | Hardware CRC              | `CRC_HW`        | ✓ | s/w | ✓ |
-| System | RTC (calendar + backup)   | `RTC`           | ✓ | — | ✗ ‡ |
-| System | Reset + reset cause       | `RESET`         | ✓ | ✓ | ✓ |
-| System | Independent watchdog      | `WATCHDOG`      | ✓ (IWDG) | ✓ (WDT) | ✓ (IWDG) |
-| System | Window watchdog           | `WWDG`          | ✓ | — | ✓ |
-| I/O    | GPIO                      | `GPIO`          | ✓ | ✓ | ✓ |
-| I/O    | Timer                     | `TIMER`         | ✓ | ✓ | ✓ |
-| I/O    | PWM                       | `PWM`           | ✓ | ✓ | ✓ |
-| Bus    | UART                      | `UART`          | ✓ | ✓ | ✓ |
-| Bus    | UART → DMA backend        | `UART_DMA`      | ✓ | — | ✓ |
-| Bus    | I²C                       | `I2C`           | ✓ | ✓ | ✓ |
-| Bus    | I²C → DMA backend         | `I2C_DMA`       | ✓ | — | ✓ |
-| Bus    | SPI                       | `SPI`           | ✓ | ✓ | ◐ |
-| Bus    | SDIO / SDMMC              | `SDIO`          | ✓ (1×) | — | ◐ (2×) |
-| Bus    | SDIO async (DMA)          | `SDIO_DMA`      | ✓ | — | ◐ ¶ |
-| Bus    | Ethernet MAC (frame-level)| `ETH`           | — | — | ✓ |
-| Bus    | USB OTG FS (CDC-ACM dev)  | `USB_CDC`       | ✓ | — | ✗ |
-| Bus    | USB OTG HS                | *(none)*        | — | — | ✗ |
-| Bus    | CAN (bxCAN)               | *(none)*        | — | — | ✗ (3×) |
-| Bus    | QUAD-SPI                  | *(none)*        | — | — | ✗ |
-| Bus    | FMC (ext-memory ctrl)     | *(none)*        | — | — | ✗ |
-| Bus    | SAI (serial audio)        | *(none)*        | — | — | ✗ (2×) |
-| Bus    | SPDIFRX                   | *(none)*        | — | — | ✗ |
-| Analog | ADC                       | `ADC`           | ✓ (1×12-bit) | ✓ (10-bit) | ✓ (3×12-bit) |
-| Analog | DAC                       | *(none)*        | — | — | ✗ (2-ch) |
-| Video  | DCMI (camera)             | *(none)*        | — | — | ✗ |
-| Video  | LTDC (LCD-TFT)            | *(none)*        | — | — | ✗ |
-| Video  | DMA2D (Chrom-ART)         | *(none)*        | — | — | ✗ |
-| Crypto | RNG (true RNG)            | *(none)*        | — | — | ✗ |
+| Class | Capability | `NAVHAL_HAS_*` | [F401RE](stm32f401re.md) | [ATmega328P](atmega328p.md) | [F767ZI](stm32f767zi.md) | [x86-64 (QEMU)](x86_64_qemu.md) |
+|---|---|---|---|---|---|---|
+| Core   | Interrupt ctrl (NVIC)     | `INTERRUPT`     | ✓ | ✓ | ✓ | ✓ ¶ |
+| Core   | Cycle counter (DWT)       | `CYCLE_COUNTER` | ✓ | — | ✓ | — |
+| Core   | FPU                       | `FPU`           | ✓ † | — | ✓ † | — |
+| Core   | MPU (memory protection) § | `MPU`           | ✓ (8-region) | — | ✓ (16-region) | — |
+| Core   | L1 I-cache / D-cache      | `CACHE`         | — | — | ◐ | — |
+| Core   | DTCM / ITCM               | `TCM`           | — | — | ✓ | — |
+| System | Clock subsystem           | `CLOCK`         | ✓ | ◐ | ✓ | ✓ |
+| System | Flash (KV store)          | `FLASH`         | ✓ | ◐ | ✓ | — |
+| System | DMA controller            | `DMA`           | ✓ | — | ✓ | — |
+| System | Hardware CRC              | `CRC_HW`        | ✓ | s/w | ✓ | ✗ ‖ |
+| System | RTC (calendar + backup)   | `RTC`           | ✓ | — | ✗ ‡ | — |
+| System | Reset + reset cause       | `RESET`         | ✓ | ✓ | ✓ | — |
+| System | Independent watchdog      | `WATCHDOG`      | ✓ (IWDG) | ✓ (WDT) | ✓ (IWDG) | — |
+| System | Window watchdog           | `WWDG`          | ✓ | — | ✓ | — |
+| I/O    | GPIO                      | `GPIO`          | ✓ | ✓ | ✓ | — |
+| I/O    | Timer                     | `TIMER`         | ✓ | ✓ | ✓ | ✗ ‖ |
+| I/O    | PWM                       | `PWM`           | ✓ | ✓ | ✓ | — |
+| Bus    | UART                      | `UART`          | ✓ | ✓ | ✓ | ✓ (16550) |
+| Bus    | UART → DMA backend        | `UART_DMA`      | ✓ | — | ✓ | — |
+| Bus    | I²C                       | `I2C`           | ✓ | ✓ | ✓ | — |
+| Bus    | I²C → DMA backend         | `I2C_DMA`       | ✓ | — | ✓ | — |
+| Bus    | SPI                       | `SPI`           | ✓ | ✓ | ◐ | — |
+| Bus    | SDIO / SDMMC              | `SDIO`          | ✓ (1×) | — | ◐ (2×) | — |
+| Bus    | SDIO async (DMA)          | `SDIO_DMA`      | ✓ | — | ◐ ¶ | — |
+| Bus    | Ethernet MAC (frame-level)| `ETH`           | — | — | ✓ | — |
+| Bus    | USB OTG FS (CDC-ACM dev)  | `USB_CDC`       | ✓ | — | ✗ | — |
+| Bus    | USB OTG HS                | *(none)*        | — | — | ✗ | — |
+| Bus    | CAN (bxCAN)               | *(none)*        | — | — | ✗ (3×) | — |
+| Bus    | QUAD-SPI                  | *(none)*        | — | — | ✗ | — |
+| Bus    | FMC (ext-memory ctrl)     | *(none)*        | — | — | ✗ | — |
+| Bus    | SAI (serial audio)        | *(none)*        | — | — | ✗ (2×) | — |
+| Bus    | SPDIFRX                   | *(none)*        | — | — | ✗ | — |
+| Analog | ADC                       | `ADC`           | ✓ (1×12-bit) | ✓ (10-bit) | ✓ (3×12-bit) | — |
+| Analog | DAC                       | *(none)*        | — | — | ✗ (2-ch) | — |
+| Video  | DCMI (camera)             | *(none)*        | — | — | ✗ | — |
+| Video  | LTDC (LCD-TFT)            | *(none)*        | — | — | ✗ | — |
+| Video  | DMA2D (Chrom-ART)         | *(none)*        | — | — | ✗ | — |
+| Crypto | RNG (true RNG)            | *(none)*        | — | — | ✗ | — |
 
 A `✓` is a statement about both *hardware presence* and *current driver completeness*. It does **not** mean the cap is on by default in the shipped Kconfig — most non-core caps default to `n` and must be selected explicitly. See `Kconfig` and each MCU's detail page for the default state and the `select` cascade.
 

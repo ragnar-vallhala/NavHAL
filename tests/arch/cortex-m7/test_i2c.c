@@ -16,6 +16,7 @@
  */
 
 #include "test_i2c.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_i2c.h"
 #include "family/i2c_reg.h"

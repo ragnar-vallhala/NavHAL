@@ -35,6 +35,11 @@
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 #include <stdint.h>
+/* The declarations these wrappers call. Circular -- the port header pulls this
+ * shim in at its end -- which the include guards make safe either way round,
+ * and without it the file only compiles when reached through that header: a
+ * clang-based editor opening it directly reports every call undeclared. */
+#include "navhal_port_timer.h"
 
 
 #ifdef __cplusplus
@@ -82,10 +87,16 @@ static inline uint32_t hal_get_micros(void) {
   return hal_timebase_get_micros();
 }
 
-/** @deprecated Use hal_timebase_set_callback(). */
-NAVHAL_DEPRECATED("use hal_timebase_set_callback")
+/** @deprecated Use hal_timebase_attach_callback(). */
+NAVHAL_DEPRECATED("use hal_timebase_attach_callback")
 static inline void hal_systick_set_callback(hal_timebase_callback_t cb) {
-  hal_timebase_set_callback(cb);
+  /* Points at the current name, not at hal_timebase_set_callback, which is
+   * itself deprecated now -- a chain of shims sends a caller from one
+   * deprecation to the next. */
+  if (cb == NULL)
+    (void)hal_timebase_detach_callback();
+  else
+    (void)hal_timebase_attach_callback(cb);
 }
 
 

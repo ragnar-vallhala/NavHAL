@@ -47,7 +47,9 @@
 #include "family/rcc_reg.h"
 #include "navhal_port_eth.h"
 #include "board.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 
 #define ETH_SPIN 1000000U /* bounded wait iterations for MDIO / DMA reset */
@@ -283,8 +285,15 @@ hal_status_t hal_eth_get_mac_address(uint8_t mac[HAL_ETH_MAC_ADDR_LEN]) {
   return HAL_OK;
 }
 
-hal_status_t hal_eth_set_callback(hal_eth_callback_t callback) {
+hal_status_t hal_eth_attach_callback(hal_eth_callback_t callback) {
+  if (callback == NULL)
+    return HAL_ERR_INVALID_ARG;
   _cb = callback;
+  return HAL_OK;
+}
+
+hal_status_t hal_eth_detach_callback(void) {
+  _cb = NULL;
   return HAL_OK;
 }
 

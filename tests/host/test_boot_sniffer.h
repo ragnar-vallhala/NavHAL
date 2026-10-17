@@ -28,6 +28,12 @@
 extern "C" {
 #endif
 
+void test_boot_attempt_counts_up(void);
+void test_boot_attempts_reach_the_limit(void);
+void test_boot_healthy_clears_attempts_but_keeps_the_request(void);
+void test_boot_attempts_saturate_instead_of_wrapping(void);
+void test_boot_attempt_refused_on_an_invalid_block(void);
+
 extern const navtest_suite_t test_boot_sniffer_suite;
 
 #ifdef __cplusplus

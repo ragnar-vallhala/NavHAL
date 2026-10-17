@@ -32,4 +32,14 @@ MEMORY
   RAM   (rwx) : ORIGIN = 0x20000000, LENGTH = 96K
 }
 
+/* Same overlap check as the arch script: the KV store erases whole sectors, and
+ * this image is the one big enough to reach into the low ones. CMake passes the
+ * store's extent; without it the symbols are zero and the check stands down. */
+PROVIDE(__kv_start = 0);
+PROVIDE(__kv_end = 0);
+ASSERT(__kv_end == 0 || (LOADADDR(.data) + SIZEOF(.data)) <= __kv_start ||
+           ORIGIN(FLASH) >= __kv_end,
+       "test image overlaps the flash KV store -- CONFIG_FLASH_KV_*_SECTOR must be outside this image")
+
+
 INCLUDE cortex-m4.ld

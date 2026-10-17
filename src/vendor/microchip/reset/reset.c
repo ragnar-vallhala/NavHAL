@@ -31,6 +31,7 @@
 #if NAVHAL_CONFIG_DRV_RESET
 
 #include "common/hal_reset.h"
+#include "common/hal_interrupt.h"
 #include "internal/hal_reset_ops.h"
 
 #include <avr/interrupt.h>
@@ -76,7 +77,8 @@ static hal_status_t avr_reset_system_reset(void) {
    * The next boot therefore reports HAL_RESET_CAUSE_WATCHDOG rather than
    * _SOFTWARE — the hardware keeps no separate flag for "firmware asked", and
    * inventing one would mean claiming to know something MCUSR does not say. */
-  cli();
+  /* Nothing to restore: the watchdog below resets the part. */
+  (void)hal_interrupt_disable_global();
   wdt_enable(WDTO_15MS);
   for (;;) {
   }

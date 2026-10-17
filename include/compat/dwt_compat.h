@@ -33,6 +33,12 @@
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 #include <stdint.h>
+#include "navhal_port_dwt.h"
+
+/* Compiled only where the driver is, exactly as the public header is: a shim
+ * over an API that is switched off cannot compile, and an editor opening
+ * this file with the driver off would show every reference dangling. */
+#if NAVHAL_CONFIG_DRV_DWT
 
 
 #ifdef __cplusplus
@@ -58,6 +64,8 @@ static inline void dwt_delay_cycles(uint32_t cycles) {
   hal_cycle_counter_delay(cycles);
 }
 
+
+#endif /* NAVHAL_CONFIG_DRV_DWT */
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -86,6 +86,96 @@ void test_hal_flash_needs_compaction_returns_bool(void) {
 void test_hal_flash_erase_returns_ok(void) {
   TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_flash_erase());
 }
+
+/* -------------------- Raw erase and program -------------------- *
+ *
+ * The paths a bootloader uses, which nothing exercised: the argument checks ran
+ * on the host and the sectors were never touched. Only on silicon -- the raw API
+ * belongs to the STM32 flash driver, and Renode's model is not the thing under
+ * test here.
+ *
+ * Safety is the case's own job. It erases the first sector past this image and
+ * proves it is past it first, so the suite stays runnable on a bare board rather
+ * than on a bench someone has prepared.
+ *
+ * F4 only, and not because the F7 lacks the driver: the sector number and the
+ * address below are one geometry. On the F767 sector 4 starts at 0x08020000, so
+ * a check that cleared 0x08010000 would prove one sector free and then erase a
+ * different one. That port needs its own pair, not a wider guard.
+ */
+#if NAVHAL_CONFIG_FAMILY_STM32F4 && NAVHAL_CONFIG_DRV_FLASH
+
+/* Image end, from the linker script: LOADADDR(.data) + SIZEOF(.data). */
+extern char _eflash[];
+
+/* F401 sector 4: 64 KiB at 0x08010000, the first sector above the 16 KiB bank.
+ * A 52 KiB test image ends inside sector 3, which is what makes this safe. */
+#define RAW_TEST_SECTOR 4u
+#define RAW_TEST_BASE   0x08010000u
+
+void test_flash_raw_refuses_the_loader_sectors(void) {
+  /* Sectors 0 and 1 hold stage-1. A loader that can erase itself is a loader
+   * that can erase itself halfway. */
+  TEST_ASSERT_TRUE(hal_flash_raw_erase_sector(0u) != HAL_OK);
+  TEST_ASSERT_TRUE(hal_flash_raw_erase_sector(1u) != HAL_OK);
+  /* And the same range check through the program path, not just the erase. */
+  const uint16_t pattern = 0x1234u;
+  TEST_ASSERT_TRUE(hal_flash_raw_program(0x08000000u, &pattern, 2u) != HAL_OK);
+}
+
+void test_flash_raw_refuses_the_kv_store(void) {
+  /* The store owns its sectors; erasing them behind its back loses every key. */
+  TEST_ASSERT_TRUE(
+      hal_flash_raw_erase_sector(NAVHAL_CONFIG_FLASH_KV_PRIMARY_SECTOR) != HAL_OK);
+  TEST_ASSERT_TRUE(
+      hal_flash_raw_erase_sector(NAVHAL_CONFIG_FLASH_KV_SECONDARY_SECTOR) != HAL_OK);
+}
+
+void test_flash_raw_rejects_odd_length_and_address(void) {
+  /* Half-word granularity: the driver must refuse rather than program half of
+   * what it was handed. */
+  const uint8_t buf[4] = {1, 2, 3, 4};
+  TEST_ASSERT_TRUE(hal_flash_raw_program(RAW_TEST_BASE + 1u, buf, 2u) != HAL_OK);
+  TEST_ASSERT_TRUE(hal_flash_raw_program(RAW_TEST_BASE, buf, 3u) != HAL_OK);
+  TEST_ASSERT_TRUE(hal_flash_raw_program(RAW_TEST_BASE, NULL, 2u) != HAL_OK);
+}
+
+void test_flash_raw_erase_program_readback(void) {
+  /* Refuse to touch the sector if this image reaches into it. A bigger test
+   * image than the one this was written against must skip, not erase itself. */
+  if ((uint32_t)(uintptr_t)_eflash > RAW_TEST_BASE) {
+    TEST_ASSERT_TRUE(1); /* skipped: the image extends into the test sector */
+    return;
+  }
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_flash_raw_erase_sector(RAW_TEST_SECTOR));
+
+  /* Erased flash reads as all ones. Check both ends, because a sector erase that
+   * only cleared the first page would pass a single-word check. */
+  const volatile uint32_t *p = (const volatile uint32_t *)RAW_TEST_BASE;
+  TEST_ASSERT_EQUAL_UINT32(0xFFFFFFFFu, p[0]);
+  TEST_ASSERT_EQUAL_UINT32(0xFFFFFFFFu, p[(0x10000u / 4u) - 1u]);
+
+  const uint8_t pattern[8] = {0xDE, 0xAD, 0xBE, 0xEF, 0x01, 0x23, 0x45, 0x67};
+  TEST_ASSERT_EQUAL_UINT32(
+      (uint32_t)HAL_OK,
+      (uint32_t)hal_flash_raw_program(RAW_TEST_BASE, pattern, sizeof pattern));
+
+  const volatile uint8_t *b = (const volatile uint8_t *)RAW_TEST_BASE;
+  for (unsigned i = 0; i < sizeof pattern; i++)
+    TEST_ASSERT_EQUAL_UINT32((uint32_t)pattern[i], (uint32_t)b[i]);
+
+  /* Leave it as it was found. A sector left programmed would make the next run
+   * of this case program over existing data, which yields the AND of the two
+   * and fails for a reason that has nothing to do with the driver. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK,
+                           (uint32_t)hal_flash_raw_erase_sector(RAW_TEST_SECTOR));
+  TEST_ASSERT_EQUAL_UINT32(0xFFFFFFFFu, p[0]);
+}
+
+#endif /* FAMILY_STM32F4 && DRV_FLASH */
+
 /* PROGMEM slot for each case name on AVR; no-op elsewhere. */
 NAVTEST_CASE_DECL(test_flash_storage_integration);
 NAVTEST_CASE_DECL(test_hal_flash_save_rejects_null_value);
@@ -93,6 +183,12 @@ NAVTEST_CASE_DECL(test_hal_flash_read_rejects_null_pointers);
 NAVTEST_CASE_DECL(test_hal_flash_delete_then_read_returns_error);
 NAVTEST_CASE_DECL(test_hal_flash_needs_compaction_returns_bool);
 NAVTEST_CASE_DECL(test_hal_flash_erase_returns_ok);
+#if NAVHAL_CONFIG_FAMILY_STM32F4 && NAVHAL_CONFIG_DRV_FLASH
+NAVTEST_CASE_DECL(test_flash_raw_refuses_the_loader_sectors);
+NAVTEST_CASE_DECL(test_flash_raw_refuses_the_kv_store);
+NAVTEST_CASE_DECL(test_flash_raw_rejects_odd_length_and_address);
+NAVTEST_CASE_DECL(test_flash_raw_erase_program_readback);
+#endif
 
 
 static const navtest_case_t flash_cases[] = {
@@ -102,6 +198,12 @@ static const navtest_case_t flash_cases[] = {
     NAVTEST_CASE(test_hal_flash_delete_then_read_returns_error),
     NAVTEST_CASE(test_hal_flash_needs_compaction_returns_bool),
     NAVTEST_CASE(test_hal_flash_erase_returns_ok),
+#if NAVHAL_CONFIG_FAMILY_STM32F4 && NAVHAL_CONFIG_DRV_FLASH
+    NAVTEST_CASE(test_flash_raw_refuses_the_loader_sectors),
+    NAVTEST_CASE(test_flash_raw_refuses_the_kv_store),
+    NAVTEST_CASE(test_flash_raw_rejects_odd_length_and_address),
+    NAVTEST_CASE(test_flash_raw_erase_program_readback),
+#endif
 };
 
 const navtest_suite_t test_flash_suite = {

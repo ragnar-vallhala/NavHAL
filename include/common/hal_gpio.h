@@ -39,27 +39,13 @@
  */
 
 #include "common/hal_status.h"
-#include "utils/gpio_types.h"
+#include "common/hal_gpio_types.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- * @brief Aggregate configuration for a single GPIO pin.
- *
- * Passed to ::hal_gpio_init. The @c output_type and @c output_speed fields
- * apply only when @ref mode is ::HAL_GPIO_MODE_OUTPUT or ::HAL_GPIO_MODE_AF;
- * the @c alternate field applies only when @ref mode is ::HAL_GPIO_MODE_AF.
- */
-typedef struct {
-  hal_gpio_mode_t mode;                 /**< Pin mode. */
-  hal_gpio_pull_t pull;                 /**< Pull-up/pull-down configuration. */
-  hal_gpio_output_type_t output_type;   /**< Output driver type. */
-  hal_gpio_output_speed_t output_speed; /**< Output slew rate. */
-  hal_gpio_af_t alternate;              /**< Alternate function selector. */
-} hal_gpio_config_t;
 
 /**
  * @brief Configure a GPIO pin from an aggregate ::hal_gpio_config_t.
@@ -128,6 +114,15 @@ hal_status_t hal_gpio_set_output_speed(hal_gpio_pin_t pin,
 /* Port-specific hot-path inlines + register-backed defines. */
 #if NAVHAL_CONFIG_DRV_GPIO
 #include "navhal_port_gpio.h"
+
+/* The deprecated-name shims are static inline wrappers over the API above,
+ * so they are included here rather than from the port header: a wrapper
+ * cannot be defined before the function it forwards to is declared, and
+ * reaching back for the API from inside the port header is what made this
+ * include graph circular. */
+#if defined(NAVHAL_PORT_GPIO_COMPAT)
+#include "compat/gpio_compat.h"
+#endif
 #endif
 
 

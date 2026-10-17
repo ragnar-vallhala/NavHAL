@@ -15,11 +15,14 @@
  * limitations under the License.
  */
 
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_pwm.h"
 #include "family/rcc_reg.h"
+#include "common/hal_timer.h"
 #include "navhal_port_timer.h"
 #include "family/timer_reg.h"
+#include "common/hal_uart.h"
 #include "navhal_port_uart.h"
 #include "navtest/navtest.h"
 #include "utils/timer_types.h"

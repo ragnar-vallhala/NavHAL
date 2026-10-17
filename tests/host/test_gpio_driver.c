@@ -25,6 +25,7 @@
  */
 
 #include "host_mmio.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
 #include "family/gpio_reg.h"
 #include "family/rcc_reg.h"

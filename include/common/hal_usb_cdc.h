@@ -193,14 +193,14 @@ uint16_t hal_usb_cdc_read(uint8_t *buffer, uint16_t maxlen);
 uint16_t hal_usb_cdc_available(void);
 
 /**
- * @brief Deliver received bytes to @p cb from interrupt context instead of
- *        queueing them for ::hal_usb_cdc_read.
- * @param cb Callback, or NULL to go back to the ring buffer.
- * @return ::HAL_OK.
- */
-/**
  * @brief Attach the receive callback.
- * @param cb Non-NULL; use ::hal_usb_cdc_detach_rx_callback to clear.
+ *
+ * Received bytes go to @p cb from interrupt context instead of being queued for
+ * ::hal_usb_cdc_read -- it takes the stream over rather than tapping it, so a
+ * caller that also wants to read must forward from its own callback.
+ *
+ * @param cb Non-NULL; use ::hal_usb_cdc_detach_rx_callback to clear and go back
+ *           to the ring buffer.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
  */
 hal_status_t hal_usb_cdc_attach_rx_callback(hal_usb_cdc_rx_callback_t cb);

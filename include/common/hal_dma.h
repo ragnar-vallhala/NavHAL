@@ -76,11 +76,6 @@ extern "C" {
 
 
 /**
- * @brief Initialize a DMA stream from @p cfg.
- * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p cfg is NULL.
- */
-
-/**
  * @brief Attach a callback to one DMA stream.
  *
  * The DMA driver owns its stream vectors; this is how anything else -- a
@@ -114,6 +109,10 @@ hal_status_t hal_dma_attach_callback(hal_dma_controller_t controller,
 hal_status_t hal_dma_detach_callback(hal_dma_controller_t controller,
                                      uint8_t stream);
 
+/**
+ * @brief Initialize a DMA stream from @p cfg.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG if @p cfg is NULL.
+ */
 hal_status_t hal_dma_init(const hal_dma_config_t *cfg);
 
 /**

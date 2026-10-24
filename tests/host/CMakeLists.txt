@@ -42,6 +42,7 @@ add_executable(tests_host
   host_backend.c
   test_conversion.c
   test_crc_sw.c
+  test_freestanding.c
   test_gpio_encoding.c
   test_hal_status.c
   test_boot_sniffer.c

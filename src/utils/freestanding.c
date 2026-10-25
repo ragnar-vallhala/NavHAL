@@ -35,6 +35,9 @@
  *  - short tails and copies under two words stay byte loops;
  *  - AVR keeps byte loops throughout: a byte is its native width.
  *
+ * On ARMv7-M / ARMv7E-M memcpy is newlib's hand-scheduled assembly instead
+ * (@c memcpy-armv7m.S beside this file), which copies 64-byte blocks.
+ *
  * These are the definitions, not wrappers: @c hal_memcpy and friends in
  * @c util.c forward here. Each body is built with loop-pattern distribution
  * off, so GCC can never turn a loop in it into a call to itself.
@@ -65,8 +68,15 @@ typedef uint32_t word_t;
 typedef uint32_t __attribute__((may_alias)) aword_t; /* an aligned word */
 typedef uint32_t __attribute__((may_alias, aligned(1))) uword_t; /* any address */
 #define W sizeof(word_t)
+
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+#define ASM_MEMCPY 1 /* memcpy-armv7m.S */
+#else
+#define ASM_MEMCPY 0
+#endif
 #define MIS(p) ((uintptr_t)(p) & (W - 1u))
 
+#if !ASM_MEMCPY
 /* memmove relies on this copying forwards in blocks that are read before they
  * are written, which makes it safe for an overlap with dest below src. */
 NO_LIBCALL void *memcpy(void *dest, const void *src, size_t n) {
@@ -109,6 +119,9 @@ NO_LIBCALL void *memcpy(void *dest, const void *src, size_t n) {
     *d++ = *s++;
   return dest;
 }
+#else
+void *memcpy(void *dest, const void *src, size_t n);
+#endif
 
 NO_LIBCALL void *memmove(void *dest, const void *src, size_t n) {
   unsigned char *d = (unsigned char *)dest;

@@ -72,6 +72,25 @@ void test_dcache_maintenance_smoke(void) {
   TEST_ASSERT_TRUE(intact);
 }
 
+/* Disable must write dirty lines back and return. (The stack corruption it
+ * used to suffer -- see hal_dcache_disable -- shows in a vaios image on the
+ * F767 but not in this suite, so this checks the write-back, not that.) */
+void test_dcache_disable_writes_back_and_returns(void) {
+  static uint32_t buf[NAVHAL_CACHE_LINE] NAVHAL_DMA_ALIGN;
+  hal_dcache_enable();
+  for (unsigned i = 0; i < NAVHAL_CACHE_LINE; i++)
+    buf[i] = 0xC0DE0000u + i;
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_dcache_disable());
+  bool off = !hal_dcache_is_enabled();
+  bool intact = true; /* read from memory now: the cache is off */
+  for (unsigned i = 0; i < NAVHAL_CACHE_LINE; i++)
+    intact = intact && buf[i] == 0xC0DE0000u + i;
+  hal_dcache_enable();
+  TEST_ASSERT_TRUE(intact);
+  NAVTEST_SKIP_ON_PIL(); /* SCB_CCR.DC may not be modelled by the emulator */
+  TEST_ASSERT_TRUE(off);
+}
+
 /* PROGMEM slot for each case name on AVR; no-op elsewhere (never links on AVR —
  * the cache cap is Cortex-M7 only — but keep the portable idiom). */
 NAVTEST_CASE_DECL(test_icache_enable_returns_ok);
@@ -79,6 +98,7 @@ NAVTEST_CASE_DECL(test_icache_enabled_after_enable);
 NAVTEST_CASE_DECL(test_dcache_enable_returns_ok);
 NAVTEST_CASE_DECL(test_dcache_enabled_after_enable);
 NAVTEST_CASE_DECL(test_dcache_maintenance_smoke);
+NAVTEST_CASE_DECL(test_dcache_disable_writes_back_and_returns);
 
 static const navtest_case_t cache_cases[] = {
     NAVTEST_CASE(test_icache_enable_returns_ok),
@@ -86,6 +106,7 @@ static const navtest_case_t cache_cases[] = {
     NAVTEST_CASE(test_dcache_enable_returns_ok),
     NAVTEST_CASE(test_dcache_enabled_after_enable),
     NAVTEST_CASE(test_dcache_maintenance_smoke),
+    NAVTEST_CASE(test_dcache_disable_writes_back_and_returns),
 };
 
 const navtest_suite_t test_cache_suite = {

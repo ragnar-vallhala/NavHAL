@@ -28,6 +28,7 @@
  *   arch/<X>/   — run only on the matching arch (white-box, register pokes)
  */
 #include "portable/test_crc.h"
+#include "portable/test_mem.h"
 #include "portable/test_flash_raw.h"
 #include "portable/test_timebase.h"
 #include "portable/conformance/test_conformance.h"
@@ -121,6 +122,7 @@ static const navtest_suite_t *const all_suites[] = {
                                   __FILE__/msg strings out of AVR .data). */
     &test_vtable_suite,        /* every linked ops table is fully filled in */
     &test_timebase_suite,
+    &test_mem_suite,
 #if NAVHAL_CONFIG_BOOT_SNIFFER
     &test_boot_suite,
 #endif

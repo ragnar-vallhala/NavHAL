@@ -16,30 +16,21 @@
  */
 
 #include "utils/util.h"
+#include <stddef.h>
+
+// The word-at-a-time definitions in freestanding.c; declared here because a
+// freestanding build has no <string.h>.
+void *memcpy(void *dest, const void *src, size_t n);
+void *memset(void *dest, int c, size_t n);
+int memcmp(const void *s1, const void *s2, size_t n);
 
 void hal_memcpy(void *dest, const void *src, uint32_t len) {
-  uint8_t *d = (uint8_t *)dest;
-  const uint8_t *s = (const uint8_t *)src;
-
-  while (len--)
-    *d++ = *s++;
+  memcpy(dest, src, len);
 }
-void hal_memset(void *dest, int val, uint32_t len) {
-  uint8_t *d = (uint8_t *)dest;
-  while (len--)
-    *d++ = (uint8_t)val;
-}
+void hal_memset(void *dest, int val, uint32_t len) { memset(dest, val, len); }
 
 int hal_memcmp(const void *s1, const void *s2, uint32_t len) {
-  const uint8_t *p1 = (const uint8_t *)s1;
-  const uint8_t *p2 = (const uint8_t *)s2;
-  while (len--) {
-    if (*p1 != *p2)
-      return (int)*p1 - (int)*p2;
-    p1++;
-    p2++;
-  }
-  return 0;
+  return memcmp(s1, s2, len);
 }
 
 uint32_t hal_strlen(const char *s) {

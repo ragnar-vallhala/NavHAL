@@ -4,6 +4,7 @@ set(COMMON_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/conversion.c
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/util.c
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/freestanding.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils/memcpy-armv7m.S # empty off ARMv7-M
 )
 
 # Not a driver: the console dispatches to whichever transport the board routed it

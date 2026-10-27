@@ -31,6 +31,7 @@
  * @c port/cortex-m4/navhal_port_gpio.h.
  */
 
+#include "common/hal_gpio.h"
 #include "internal/hal_gpio_ops.h"
 #include "family/gpio_reg.h"
 #include "family/rcc_reg.h"

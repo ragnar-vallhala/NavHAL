@@ -447,6 +447,17 @@ if(TARGET hal AND GENERATED_NAVHAL_TARGET)
   target_compile_options(hal INTERFACE "SHELL:-include ${GENERATED_NAVHAL_TARGET}")
 endif()
 
+# And the ABI-selecting flags (-mcpu/-mthumb/float ABI, -mmcu, -m64), also only
+# in CMAKE_C_FLAGS. Without them a consumer compiles its own sources and links
+# against the toolchain's default ARM-mode multilib, and the 14.2 arm-none-eabi
+# linker rejects that mix with NavHAL's Thumb code: "Unknown destination type
+# (ARM/Thumb) ... dangerous relocation".
+if(TARGET hal AND ARCH_ASM_FLAGS)
+  separate_arguments(_navhal_abi_flags UNIX_COMMAND "${ARCH_ASM_FLAGS}")
+  target_compile_options(hal INTERFACE ${_navhal_abi_flags})
+  target_link_options(hal INTERFACE ${_navhal_abi_flags})
+endif()
+
 add_custom_target(
   clean-all
   COMMAND ${CMAKE_COMMAND} --build . --target clean

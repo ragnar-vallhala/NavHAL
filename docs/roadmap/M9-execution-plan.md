@@ -191,7 +191,7 @@ common-layer gate is clean rather than an awkward `DRV_TIMER OR DRV_UART`.
   remain are application callbacks dispatched from an ISR — see the exit
   criteria in @ref roadmap_m9.
 
-**Phase E — docs + final verification.** Update @ref roadmap_m9: flip every
+**Phase E — docs + final verification.** Update @ref roadmap_m9 "M9": flip every
 subsystem row to done, document the arch-ops variant and the timebase
 unification, and mark the cost-of-abstraction section validated. Then run the
 full matrix below.

@@ -86,11 +86,6 @@ uint32_t hal_timebase_get_micros(void);
 void hal_timebase_tick(void);
 
 /**
- * @brief Register a callback invoked on every timebase tick.
- * @param cb Callback function, or NULL to clear.
- * @return ::HAL_OK.
- */
-/**
  * @brief Attach the per-tick callback.
  * @param cb Non-NULL; use ::hal_timebase_detach_callback to clear.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
@@ -157,7 +152,6 @@ hal_status_t hal_timer_disable_channel(hal_timer_t timer, uint32_t channel);
 /* Configuration query / update */
 /** @brief Get a timer's current base frequency in Hz. */
 uint32_t hal_timer_get_frequency(hal_timer_t timer);
-/** @brief Set a timer's prescaler (PSC). */
 /**
  * @brief Set a timer's prescaler.
  * @deprecated The argument means different things per port -- the STM32 PSC

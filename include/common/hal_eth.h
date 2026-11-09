@@ -197,19 +197,14 @@ hal_status_t hal_eth_start(void);
 hal_status_t hal_eth_stop(void);
 
 /**
- * @brief Register the callback for asynchronous Ethernet events.
+ * @brief Attach the callback for asynchronous Ethernet events.
  *
  * Set this before ::hal_eth_start to run in interrupt-driven mode: the callback
  * is invoked from the MAC ISR on RX/TX/link/error events and is expected to
- * drain received frames with ::hal_eth_receive. With no callback registered at
+ * drain received frames with ::hal_eth_receive. With no callback attached at
  * start time the driver runs in polling mode (interrupts off) and the caller
  * polls ::hal_eth_receive itself.
  *
- * @param callback Function invoked on RX/TX/link/error events; NULL to clear.
- * @return ::HAL_OK.
- */
-/**
- * @brief Attach the receive/link callback.
  * @param callback Non-NULL; use ::hal_eth_detach_callback to clear.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
  */

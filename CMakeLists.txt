@@ -141,7 +141,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # disagree: bumping one without the other is a release-process bug, not
 # something we want to silently build. This check runs on every configure,
 # including when NavHAL is consumed as a submodule.
-set(NAVHAL_VERSION 0.4.0) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
+set(NAVHAL_VERSION 0.4.1) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/navhal.h" _navhal_h)
 string(REGEX MATCH "#define[ \t]+VERSION_MAJOR[ \t]+([0-9]+)" _ "${_navhal_h}")
 set(_navhal_h_major "${CMAKE_MATCH_1}")
@@ -445,6 +445,17 @@ endif()
 # path together as two arguments and stops CMake de-duplicating them.
 if(TARGET hal AND GENERATED_NAVHAL_TARGET)
   target_compile_options(hal INTERFACE "SHELL:-include ${GENERATED_NAVHAL_TARGET}")
+endif()
+
+# And the ABI-selecting flags (-mcpu/-mthumb/float ABI, -mmcu, -m64), also only
+# in CMAKE_C_FLAGS. Without them a consumer compiles its own sources and links
+# against the toolchain's default ARM-mode multilib, and the 14.2 arm-none-eabi
+# linker rejects that mix with NavHAL's Thumb code: "Unknown destination type
+# (ARM/Thumb) ... dangerous relocation".
+if(TARGET hal AND ARCH_ASM_FLAGS)
+  separate_arguments(_navhal_abi_flags UNIX_COMMAND "${ARCH_ASM_FLAGS}")
+  target_compile_options(hal INTERFACE ${_navhal_abi_flags})
+  target_link_options(hal INTERFACE ${_navhal_abi_flags})
 endif()
 
 add_custom_target(

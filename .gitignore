@@ -27,3 +27,6 @@ docs/*.toc
 docs/*.pdf
 docs/sections/*.aux
 __pycache__/
+
+# Python virtualenv (kconfiglib for the build)
+.venv/

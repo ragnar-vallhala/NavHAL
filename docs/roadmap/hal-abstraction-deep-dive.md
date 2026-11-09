@@ -171,7 +171,7 @@ compounds. This is the wall M9 is meant to remove.
 
 Split each driver into a **shared public layer** (validate + dispatch) and
 a **vendor backend** (register-poking only), connected by a per-subsystem
-ops table. From @ref roadmap_m9:
+ops table. From @ref roadmap_m9 "M9":
 
 ```c
 /* include/internal/hal_gpio_ops.h — NOT public */

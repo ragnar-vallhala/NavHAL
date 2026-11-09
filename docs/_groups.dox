@@ -2,8 +2,8 @@
  * @file _groups.dox
  * @brief Top-level Doxygen group definitions for the Modules tab.
  *
- * This file only contains @defgroup declarations — no code. Each public
- * header in include/common/ and include/utils/ declares @ingroup for one
+ * This file only contains \@defgroup declarations — no code. Each public
+ * header in include/common/ and include/utils/ declares \@ingroup for one
  * of these, so the Modules sidebar groups the API by subsystem rather
  * than the flat alphabetical file index.
  */

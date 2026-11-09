@@ -3,9 +3,16 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
 set(COMMON_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/conversion.c
     ${CMAKE_CURRENT_SOURCE_DIR}/utils/util.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils/freestanding.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils/memcpy-armv7m.S # empty off ARMv7-M
 )
+
+# NavHAL's own mem* functions, unless the image takes them from a C library
+# (Kconfig NAVHAL_MEM_FUNCS). The test build always needs them.
+if(CONFIG_NAVHAL_MEM_FUNCS OR TEST)
+    list(APPEND COMMON_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/utils/freestanding.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/utils/memcpy-armv7m.S # empty off ARMv7-M
+    )
+endif()
 
 # Not a driver: the console dispatches to whichever transport the board routed it
 # to, so it is always available and gated on nothing. The TEST build picks it up

@@ -62,6 +62,13 @@ configure and is what selects the arch, vendor, family and board. Copy the
 defconfig for your target into NavHAL's root before configuring, or pass
 `-DNAVHAL_DEFCONFIG=<path>`, which seeds it when no `.config` exists yet.
 
+The `.config` lives in NavHAL's root by default, which is shared by every
+project that uses the same NavHAL checkout. Pass
+`-DNAVHAL_CONFIG_FILE=<path>` to keep it in your own tree instead, for example
+your build directory. NavHAL reads it from there, seeds it there from
+`NAVHAL_DEFCONFIG`, and writes its resolved selections back to it. A relative
+path is taken from the build directory.
+
 ## Why the target carries all this
 
 It is not decoration. NavHAL's own builds get these flags from `CMAKE_C_FLAGS`

@@ -86,6 +86,22 @@ menu "System & Features Configuration"
 # arch-specific features.
 osource "src/arch/*/Kconfig.features"
 
+config NAVHAL_MEM_FUNCS
+    bool "Provide memcpy, memset, memmove and memcmp"
+    default y
+    help
+      NavHAL defines these four (src/utils/freestanding.c, plus the ARMv7-M
+      assembly memcpy) because GCC emits calls to them for struct copies and
+      -nostdlib links no C library. They are weak, so a C library listed
+      before NavHAL on the link line replaces them.
+
+      Say n when the image links a C library and NavHAL is linked first, for
+      example with --whole-archive: weak definitions already satisfy every
+      reference, so the library's versions are never pulled in. With n the
+      C library supplies all four, and hal_memcpy, hal_memset and hal_memcmp
+      forward to its versions. An image linked with -nostdlib and no C
+      library then fails with undefined references to them.
+
 config DRV_CRC
     bool "Enable CRC support"
     default n

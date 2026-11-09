@@ -20,7 +20,18 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 set(KCONFIG_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/tools/kconfig.py")
 set(KCONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/Kconfig")
-set(CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.config")
+# The .config defaults to this tree's root. A consumer sharing one NavHAL
+# checkout between projects passes -DNAVHAL_CONFIG_FILE=<path> so each keeps its
+# own, instead of copying it in here. It is read, seeded and written back there.
+if(NAVHAL_CONFIG_FILE)
+    get_filename_component(CONFIG_FILE "${NAVHAL_CONFIG_FILE}" ABSOLUTE
+                           BASE_DIR "${CMAKE_BINARY_DIR}")
+    get_filename_component(_config_dir "${CONFIG_FILE}" DIRECTORY)
+    file(MAKE_DIRECTORY "${_config_dir}")
+    message(STATUS "Using .config at ${CONFIG_FILE}")
+else()
+    set(CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/.config")
+endif()
 set(GENERATED_CMAKE "${CMAKE_BINARY_DIR}/config.cmake")
 set(GENERATED_HEADER "${CMAKE_BINARY_DIR}/autoconf.h")
 set(GENERATED_NAVHAL_TARGET "${CMAKE_BINARY_DIR}/navhal_target.h")
@@ -141,7 +152,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # disagree: bumping one without the other is a release-process bug, not
 # something we want to silently build. This check runs on every configure,
 # including when NavHAL is consumed as a submodule.
-set(NAVHAL_VERSION 0.4.1) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
+set(NAVHAL_VERSION 0.4.2) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/navhal.h" _navhal_h)
 string(REGEX MATCH "#define[ \t]+VERSION_MAJOR[ \t]+([0-9]+)" _ "${_navhal_h}")
 set(_navhal_h_major "${CMAKE_MATCH_1}")

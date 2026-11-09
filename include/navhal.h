@@ -36,8 +36,30 @@
 /* Release version (SemVer) — the version of this NavHAL distribution. */
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 4
-#define VERSION_PATCH 1
-#define VERSION "0.4.1"
+#define VERSION_PATCH 2
+#define VERSION "0.4.2"
+
+/**
+ * @brief The release version under NavHAL's own prefix, for application code.
+ *
+ * Derived from the four lines above, which stay the single source of truth
+ * (the CMake and SemVer-gate checks parse them). @c NAVHAL_VERSION packs the
+ * three parts as 0xMMmmpp, so a caller can bridge an API rename with
+ * `#if NAVHAL_VERSION >= NAVHAL_VERSION_ENCODE(0, 4, 1)`.
+ */
+#define NAVHAL_VERSION_MAJOR  VERSION_MAJOR
+/** @brief Minor part of the release version. */
+#define NAVHAL_VERSION_MINOR  VERSION_MINOR
+/** @brief Patch part of the release version. */
+#define NAVHAL_VERSION_PATCH  VERSION_PATCH
+/** @brief The release version as a string, e.g. "0.4.1". */
+#define NAVHAL_VERSION_STRING VERSION
+/** @brief Pack a version as 0xMMmmpp, comparable with @c NAVHAL_VERSION. */
+#define NAVHAL_VERSION_ENCODE(major, minor, patch) \
+    (((major) << 16) | ((minor) << 8) | (patch))
+/** @brief This release, packed by @c NAVHAL_VERSION_ENCODE. */
+#define NAVHAL_VERSION \
+    NAVHAL_VERSION_ENCODE(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
 
 /**
  * @brief NavHAL public-API contract version.

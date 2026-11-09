@@ -24,9 +24,11 @@
  * Above @c -O0 GCC emits @c memcpy / @c memset for an aggregate assignment or
  * a zero-initialised struct return -- C11 4.6 lets a freestanding
  * implementation require exactly these -- and with @c -nostdlib nothing else
- * defines them. Because these definitions win over newlib's in any image that
- * links NavHAL, every kernel and driver copy runs through them, so they move
- * a word at a time, as newlib does:
+ * defines them. They are weak, so an image that also links a C library (newlib's
+ * @c -lc, avr-libc) links in any order: where the library's strong definition
+ * is pulled in it is used, and these fill in for the rest. Under @c -nostdlib
+ * they are the only definitions, so every kernel and driver copy runs through
+ * them, and they move a word at a time, as newlib does:
  *  - align the destination with byte stores, then copy words, four per
  *    iteration where the source is aligned too;
  *  - a misaligned source is read a word at a time where the core allows it
@@ -76,10 +78,20 @@ typedef uint32_t __attribute__((may_alias, aligned(1))) uword_t; /* any address 
 #endif
 #define MIS(p) ((uintptr_t)(p) & (W - 1u))
 
-#if !ASM_MEMCPY
-/* memmove relies on this copying forwards in blocks that are read before they
- * are written, which makes it safe for an overlap with dest below src. */
-NO_LIBCALL void *memcpy(void *dest, const void *src, size_t n) {
+/* Weak, so a C library's strong definition replaces these instead of clashing
+ * with them. Strong, the four sharing one object meant that pulling NavHAL's
+ * memcmp after libc had supplied memset was a multiple definition. */
+#if defined(__GNUC__) || defined(__clang__)
+#define WEAK __attribute__((weak))
+#else
+#define WEAK
+#endif
+
+/* Copies forwards in blocks that are read before they are written, which makes
+ * it safe for an overlap with dest below src. memmove relies on that, so it
+ * calls this directly and not memcpy: memcpy is weak and may be a C library's,
+ * which promises nothing about overlap. */
+static NO_LIBCALL void *copy_forward(void *dest, const void *src, size_t n) {
   unsigned char *d = (unsigned char *)dest;
   const unsigned char *s = (const unsigned char *)src;
 #if WORD_COPY
@@ -119,17 +131,20 @@ NO_LIBCALL void *memcpy(void *dest, const void *src, size_t n) {
     *d++ = *s++;
   return dest;
 }
-#else
-void *memcpy(void *dest, const void *src, size_t n);
-#endif
 
-NO_LIBCALL void *memmove(void *dest, const void *src, size_t n) {
+#if !ASM_MEMCPY
+WEAK NO_LIBCALL void *memcpy(void *dest, const void *src, size_t n) {
+  return copy_forward(dest, src, n);
+}
+#endif /* on ARMv7-M, memcpy-armv7m.S defines it, weak as well */
+
+WEAK NO_LIBCALL void *memmove(void *dest, const void *src, size_t n) {
   unsigned char *d = (unsigned char *)dest;
   const unsigned char *s = (const unsigned char *)src;
   if (d == s || n == 0u)
     return dest;
   if (d < s || d >= s + n)
-    return memcpy(dest, src, n);
+    return copy_forward(dest, src, n);
 
   /* dest above src and overlapping: copy downwards so the tail is read before
    * it is overwritten. */
@@ -166,7 +181,7 @@ NO_LIBCALL void *memmove(void *dest, const void *src, size_t n) {
   return dest;
 }
 
-NO_LIBCALL void *memset(void *dest, int c, size_t n) {
+WEAK NO_LIBCALL void *memset(void *dest, int c, size_t n) {
   unsigned char *d = (unsigned char *)dest;
   unsigned char b = (unsigned char)c;
 #if WORD_COPY
@@ -193,7 +208,7 @@ NO_LIBCALL void *memset(void *dest, int c, size_t n) {
   return dest;
 }
 
-NO_LIBCALL int memcmp(const void *s1, const void *s2, size_t n) {
+WEAK NO_LIBCALL int memcmp(const void *s1, const void *s2, size_t n) {
   const unsigned char *a = (const unsigned char *)s1;
   const unsigned char *b = (const unsigned char *)s2;
 #if WORD_COPY

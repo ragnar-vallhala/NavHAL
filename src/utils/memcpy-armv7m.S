@@ -92,7 +92,7 @@
 	.syntax unified
 	.text
 	.align	2
-	.global	memcpy
+	.weak	memcpy /* a C library's strong memcpy replaces this one */
 	.thumb
 	.thumb_func
 	.cfi_sections .debug_frame

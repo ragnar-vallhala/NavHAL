@@ -30,7 +30,7 @@
  * @note These functions do not handle scientific notation or hexadecimal formats
  * @note No overflow/underflow checking is performed
  *
- * @ingroup UTILS
+ * @ingroup HAL_UTILS
  * @author Ashutosh Vishwakarma
  * @date 2025-07-23
  */

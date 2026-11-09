@@ -80,7 +80,8 @@ bool hal_icache_is_enabled(void) { return (SCB_CCR & SCB_CCR_IC) != 0UL; }
 /**
  * @brief Walk every set/way of the L1 D-cache, writing @p sw_reg per line.
  *
- * Drives either DCISW (invalidate) or DCCISW (clean+invalidate). Set and way
+ * Drives DCISW (invalidate) for enable; disable cannot call it -- see
+ * hal_dcache_disable -- and walks inline instead. Set and way
  * field positions are derived from CCSIDR so this is independent of the actual
  * cache size (F767: 16 KB, 4-way, 32-byte line).
  */
@@ -133,10 +134,52 @@ hal_status_t hal_dcache_enable(void) {
   return HAL_OK;
 }
 
+/*
+ * Once CCR.DC is clear, a store goes straight to memory while the cache may
+ * still hold an older dirty copy of the same line; the flush then writes that
+ * old copy back over it. A flush that pushes a return address or spills a
+ * local loses it that way (seen on the F767: a HardFault on the return). So
+ * clearing DC and the whole set/way walk are one asm block that touches only
+ * registers, as CMSIS does, with interrupts masked so exception entry cannot
+ * stack a frame in that window either; the geometry is read before it, while
+ * stores still hit the cache and get flushed with everything else.
+ */
 hal_status_t hal_dcache_disable(void) {
-  __asm volatile("dsb 0xF" ::: "memory");
-  SCB_CCR &= ~SCB_CCR_DC;
-  dcache_walk_sets_ways(&SCB_DCCISW); /* flush dirty lines out on the way down */
+  SCB_CSSELR = 0UL; /* select level-1 data cache */
+  cache_barrier();
+  uint32_t ccsidr = SCB_CCSIDR;
+  uint32_t set_shift = (ccsidr & 7UL) + 4UL;
+  uint32_t ways = (ccsidr >> 3) & 0x3FFUL;
+  uint32_t way_shift = (uint32_t)__builtin_clz(ways);
+  uint32_t sets = (ccsidr >> 13) & 0x7FFFUL;
+  uint32_t w, t, u, pm;
+
+  __asm volatile("mrs   %[pm], primask\n"
+                 "cpsid i\n"
+                 "dsb 0xF\n"
+                 "ldr   %[t], [%[ccr]]\n"
+                 "bic   %[t], %[t], #(1 << 16)\n" /* SCB_CCR_DC */
+                 "str   %[t], [%[ccr]]\n"
+                 "dsb 0xF\n"
+                 "isb 0xF\n"
+                 "1: mov   %[w], %[ways]\n"
+                 "2: lsl   %[t], %[s], %[ss]\n"
+                 "lsl   %[u], %[w], %[ws]\n"
+                 "orr   %[t], %[t], %[u]\n"
+                 "str   %[t], [%[sw]]\n"
+                 "subs  %[w], %[w], #1\n"
+                 "bpl   2b\n"
+                 "subs  %[s], %[s], #1\n"
+                 "bpl   1b\n"
+                 "dsb 0xF\n"
+                 "isb 0xF\n"
+                 "msr   primask, %[pm]\n"
+                 : [s] "+r"(sets), [w] "=&r"(w), [t] "=&r"(t), [u] "=&r"(u),
+                   [pm] "=&r"(pm)
+                 : [ccr] "r"(&SCB_CCR), [sw] "r"(&SCB_DCCISW),
+                   [ways] "r"(ways), [ss] "r"(set_shift),
+                   [ws] "r"(way_shift)
+                 : "cc", "memory");
   return HAL_OK;
 }
 

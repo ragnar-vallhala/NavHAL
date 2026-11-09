@@ -20,6 +20,7 @@
  * @brief Standardized hal_interrupt_* (NVIC) tests.
  */
 
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include "family/interrupt_reg.h"
 #include "navtest/navtest.h"

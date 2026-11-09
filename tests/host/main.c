@@ -28,6 +28,7 @@
 #include "test_boot_crypto.h"
 #include "test_boot_sniffer.h"
 #include "test_crc_sw.h"
+#include "test_freestanding.h"
 #include "test_gpio_encoding.h"
 #include "test_hal_status.h"
 
@@ -37,6 +38,7 @@ static const navtest_suite_t *const host_suites[] = {
     &test_hal_status_suite,
     &test_conversion_suite,
     &test_crc_sw_suite,
+    &test_freestanding_suite,
     &test_gpio_encoding_suite,
     &test_boot_sniffer_suite,
     &test_boot_crypto_suite,

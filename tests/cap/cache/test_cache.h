@@ -31,6 +31,7 @@ void test_icache_enabled_after_enable(void);
 void test_dcache_enable_returns_ok(void);
 void test_dcache_enabled_after_enable(void);
 void test_dcache_maintenance_smoke(void);
+void test_dcache_disable_writes_back_and_returns(void);
 
 extern const navtest_suite_t test_cache_suite;
 

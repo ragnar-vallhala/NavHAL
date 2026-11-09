@@ -159,6 +159,17 @@ jobs:
       - name: Conformance coverage + vtable completeness
         run: tools/conformance_coverage.py --gate
 
+  # A module that owns an interrupt line owns its vector. One callback slot per
+  # IRQ means a second claimant unhooks the first with no diagnostic, which is
+  # how i2c and sdio came to sit in DMA stream vectors. Reads source only.
+  irq-ownership:
+    name: IRQ ownership
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No module reaches into another's vector
+        run: tools/check_irq_ownership.py
+
   # Fast pure-logic tests with the host gcc. Self-contained — no toolchain
   # download, no emulator. Always runs (arch-independent).
   host-tests:
@@ -171,6 +182,16 @@ jobs:
           cmake -S tests/host -B build-host
           cmake --build build-host -j
           ctest --test-dir build-host --output-on-failure
+
+      - name: Signing tool round trip
+        shell: bash
+        run: |
+          # Signs an image with the vendored Monocypher, then verifies it with
+          # the firmware's own hal_boot_hash and hal_boot_ed25519_verify, and
+          # requires a flipped byte to break it.
+          cmake -S tools/sign -B build-sign
+          cmake --build build-sign -j
+          ctest --test-dir build-sign --output-on-failure
 
   # Cross-compile the on-target navtest ELF. Uploads the binary as a
   # workflow artifact so the (separate) renode.yml workflow can consume
@@ -290,8 +311,14 @@ jobs:
             gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
       - name: Install kconfiglib
         run: pip install kconfiglib
-      - name: Build every sample
-        run: tools/samples.sh m4
+      # --all-boards, not m4 alone: the arch's other boards (navixdev,
+      # navixsm_f401re) differ in board.h and in which drivers their Kconfig
+      # admits, and until this they were built only by a HIL run -- which CI does
+      # not do. Boards are discovered from the defconfigs, so adding one is
+      # covered here without editing this file. Three boards instead of one, so
+      # this step takes roughly three times as long as it did.
+      - name: Build every sample, for every board of this arch
+        run: tools/samples.sh m4 --all-boards
 
   # Same idea but on the AVR (ATmega328P) port. Builds only samples in
   # samples/portable/ — those are the contract for "runs on both arches".
@@ -311,7 +338,7 @@ jobs:
       - name: Install kconfiglib
         run: pip install kconfiglib
       - name: Build every portable sample under AVR config
-        run: tools/samples.sh avr
+        run: tools/samples.sh avr --all-boards
 
   # Same idea on the STM32F767ZI (Cortex-M7) port. Builds the portable-sample
   # tier under the F767 toolchain/defconfig so the F7 port can't bit-rot.
@@ -332,7 +359,7 @@ jobs:
       - name: Install kconfiglib
         run: pip install kconfiglib
       - name: Build every portable sample under F767 config
-        run: tools/samples.sh m7
+        run: tools/samples.sh m7 --all-boards
 
   # Bare-metal x86-64 port: build the samples, boot each in QEMU (headless via a
   # GRUB multiboot2 ISO), and assert the expected line on COM1. Catches boot /
@@ -414,6 +441,7 @@ jobs:
     if: always()
     needs:
       - dispatch
+      - irq-ownership
       - commit-lint
       - host-tests
       - build-on-target
@@ -437,6 +465,7 @@ jobs:
             esac
           }
           check dispatch          "${{ needs.dispatch.result }}"
+          check irq-ownership     "${{ needs.irq-ownership.result }}"
           check consumer          "${{ needs.consumer.result }}"
           check commit-lint       "${{ needs.commit-lint.result }}"
           check host-tests        "${{ needs.host-tests.result }}"

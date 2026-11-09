@@ -25,6 +25,7 @@
  */
 
 #include "common/hal_status.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include <stdint.h>
 
@@ -42,10 +43,23 @@ hal_status_t hal_interrupt_disable(hal_irq_t irq) {
   return HAL_OK;
 }
 
-/* The last handler a driver attached, and the line, so a test can run it as
-   the interrupt would (the F7 UART's idle callback). */
+/* The drivers under test own their vectors, so linking one pulls in the registry
+ * it dispatches through. There is no NVIC here and no way for the host to raise a
+ * real interrupt, so the attach path records what was attached and a test calls it
+ * directly -- which is how the F7 UART's idle callback is exercised (see
+ * tests/host/test_uart_driver.c). What the suite checks against the simulated MMIO
+ * either side of that is the register writes: IDLEIE set on attach, cleared on
+ * detach.
+ *
+ * dispatch only has to exist: the port split gave every arch one, and a driver
+ * that routes through it has to link here even though nothing calls it. */
+void hal_interrupt_dispatch(hal_irq_t irq) { (void)irq; }
+
+/* The last handler a driver attached, and the line, so a test can run it as the
+   interrupt would. */
 void (*host_attached_isr)(void);
 hal_irq_t host_attached_irq;
+
 hal_status_t hal_interrupt_attach_callback(hal_irq_t irq, void (*cb)(void)) {
   host_attached_irq = irq;
   host_attached_isr = cb;

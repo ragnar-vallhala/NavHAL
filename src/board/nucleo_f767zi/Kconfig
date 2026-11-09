@@ -22,7 +22,11 @@ config DTCM_SIZE
 #
 # Every macro board.h used to define, as Kconfig symbols; tools/kconfig.py turns
 # them into the board.h that code includes, so this file is the single place the
-# board is described and any value can be overridden in .config.
+# board is described. The symbols are promptless by design, which also means they
+# are not user-assignable: an override in .config is read and discarded, so this
+# file is the only place a value changes. To describe different hardware, correct
+# this board or add one -- tools/kconfig.py now says so out loud when an assignment
+# is dropped, because it used to happen in silence.
 #
 # PIN_<name>_PORT/_PIN become HAL_GPIO_PIN(); NUM_<name> an integer; VAL_<name> is
 # emitted verbatim, for spellings no integer can carry.
@@ -271,6 +275,18 @@ config NUM_BOARD_HSI_FREQ_HZ
 config NUM_BOARD_HSE_FREQ_HZ
     int
     default 8000000 if BOARD_NUCLEO_F767ZI
+
+# ---- HSE source ----
+# How the 8 MHz above reaches OSC_IN, which the frequency alone cannot say. A
+# fitted crystal is driven by the oscillator across OSC_IN/OSC_OUT; a board
+# without one is fed a square wave on OSC_IN only -- a Nucleo takes it from the
+# on-board ST-LINK's MCO pin, since the crystal footprint is left unpopulated.
+# The second case needs RCC_CR.HSEBYP set before HSEON, and without it HSERDY
+# never rises: hal_clock_init times out and leaves the system on HSI, so every
+# derived rate is wrong and USB loses its exact 48 MHz.
+config BOARD_HSE_BYPASS
+    bool
+    default y if BOARD_NUCLEO_F767ZI
 
 # ---- SDIO ----
 # The bus signals are fixed by the alternate-function mux rather than freely

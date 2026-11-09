@@ -37,6 +37,10 @@
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
 #include "utils/gpio_types.h"
+/* The declarations these wrappers call. Circular with the port header, which
+ * the include guards make safe, and without it clang reports every call
+ * undeclared when the file is opened on its own. */
+#include "navhal_port_gpio.h"
 
 
 #ifdef __cplusplus

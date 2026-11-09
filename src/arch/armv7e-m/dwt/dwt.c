@@ -28,6 +28,7 @@
 #include "navhal_port_config.h"
 #if NAVHAL_CONFIG_DRV_DWT
 
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "navhal_port_dwt.h"
 #include "family/dwt_reg.h"

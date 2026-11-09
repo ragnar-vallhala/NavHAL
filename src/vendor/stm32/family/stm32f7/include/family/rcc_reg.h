@@ -92,6 +92,7 @@ typedef struct {
 /* RCC_CR bit positions */
 #define RCC_CR_HSE_ON_BIT 16    /**< HSE clock enable bit */
 #define RCC_CR_HSE_READY_BIT 17 /**< HSE clock ready flag */
+#define RCC_CR_HSE_BYP_BIT 18   /**< HSE bypass: OSC_IN is driven, not a crystal */
 #define RCC_CR_HSI_ON_BIT 0     /**< HSI clock enable bit */
 #define RCC_CR_HSI_READY_BIT 1  /**< HSI clock ready flag */
 #define RCC_CR_PLL_ON_BIT 24    /**< PLL enable bit */
@@ -100,6 +101,7 @@ typedef struct {
 /* RCC_CR masks */
 #define RCC_CR_HSEON (1 << RCC_CR_HSE_ON_BIT)   /**< Enable external HSE clock */
 #define RCC_CR_HSERDY (1 << RCC_CR_HSE_READY_BIT) /**< External HSE clock ready flag */
+#define RCC_CR_HSEBYP (1 << RCC_CR_HSE_BYP_BIT) /**< Take HSE from a driven clock */
 #define RCC_CR_HSION (1 << RCC_CR_HSI_ON_BIT)   /**< Enable internal HSI clock */
 #define RCC_CR_HSIRDY (1 << RCC_CR_HSI_READY_BIT) /**< Internal HSI clock ready flag */
 #define RCC_CR_PLLON (1 << RCC_CR_PLL_ON_BIT)   /**< Enable PLL */

@@ -33,6 +33,7 @@
 #include "internal/hal_i2c_ops.h"
 #include "internal/hal_i2c_dma_ops.h"
 #include "navhal_port_i2c.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "family/i2c_reg.h"
 #include "family/rcc_reg.h"
@@ -50,6 +51,7 @@ static int _wait_flag(volatile uint32_t *reg, uint32_t mask);
 static uint8_t stm32_i2c_get_init_status(void) { return __i2c_init_status; }
 
 #if NAVHAL_CONFIG_DRV_I2C_DMA
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 
 static void (*_i2c_dma_rx_callback)(void) = NULL;
@@ -113,16 +115,22 @@ static hal_status_t stm32_i2c_dma_read_regs(hal_i2c_bus_t bus, uint8_t dev_addr,
   // Init/Start the DMA (CR, NDTR, M0AR config + Enable)
   hal_dma_init(&_active_i2c_dma_config);
 
-  // Register our internal handler for the chosen stream
+  // Claim the stream through the DMA module rather than past it: the IRQ's
+  // single callback slot used to be taken directly, so whoever attached last
+  // silently unhooked the other.
   if (_active_i2c_dma_config.controller == HAL_DMA_CONTROLLER_1) {
     // Maskable priority: the DMA completion ISR may call an RTOS *_from_isr
     // API, which is only safe if a BASEPRI critical section can mask this line.
     if (_active_i2c_dma_config.stream == 0) {
-      hal_interrupt_attach_callback(DMA1_Stream0_IRQn, _i2c_dma_irq_handler);
+      if (hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 0,
+                                  _i2c_dma_irq_handler) != HAL_OK)
+        return HAL_ERR_BUSY;
       hal_interrupt_enable_with_priority(DMA1_Stream0_IRQn,
                                          HAL_IRQ_PRIORITY_DEFAULT);
     } else if (_active_i2c_dma_config.stream == 5) {
-      hal_interrupt_attach_callback(DMA1_Stream5_IRQn, _i2c_dma_irq_handler);
+      if (hal_dma_attach_callback(HAL_DMA_CONTROLLER_1, 5,
+                                  _i2c_dma_irq_handler) != HAL_OK)
+        return HAL_ERR_BUSY;
       hal_interrupt_enable_with_priority(DMA1_Stream5_IRQn,
                                          HAL_IRQ_PRIORITY_DEFAULT);
     }

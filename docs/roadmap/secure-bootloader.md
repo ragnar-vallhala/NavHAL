@@ -3,14 +3,10 @@
 # Secure bootloader
 
 > Status: **next** — the current track, taken ahead of M10 (2026-09-27).
-> **RDP2 is deferred**: ship and validate at RDP1. That means authenticated
-> updates and crashloop recovery — integrity, not confidentiality. Flash stays
-> readable over SWD and an attacker with physical access can simply reflash, so
-> this is not secure boot until RDP2 lands. The two-stage shape is unaffected:
-> stage-1 is WRP'd and immutable either way. Slice 3 (boot block) shipped in
-> 0.3.x.
-> Scope: a two-stage, signature-verified bootloader for STM32F401RE, with the
-> production part locked at RDP Level 2.
+> **RDP1 is the ceiling. RDP2 is not used, on any unit, ever** — see the rule
+> below. Slice 3 (boot block) shipped in 0.3.x.
+> Scope: a two-stage, signature-verified bootloader for STM32F401RE, shipping at
+> RDP Level 1.
 > Predecessor: none — additive, but it re-partitions flash, so it must land
 > before any board ships with an app larger than 256 KiB.
 > Unlocks: authenticated field updates over UART and USB CDC; crashloop
@@ -19,35 +15,58 @@
 ## Goal
 
 Firmware that only runs images signed by NAVRobotec, updatable over the links
-the drone already has, and recoverable when the application crashes. The
-production part runs at RDP Level 2 — no SWD, option bytes frozen — so the
-design is shaped by one fact: **whatever is immutable is immutable forever.**
+the drone already has, and recoverable when the application crashes.
 
-SWD stays open during development. That is a bench convenience, not part of the
-threat model; the code is identical at every protection level and only the
-embedded public key differs.
+## The RDP rule
+
+**Units ship at RDP Level 1. RDP Level 2 is never set.** The provisioning tool
+refuses it rather than offering it, and that is a rule rather than a default.
+
+Level 2 is irreversible: no SWD, option bytes frozen, no system bootloader. A
+single defect in a write-protected stage-1 would then be unfixable on every unit
+carrying it, and a returned board could not be attached to at all. The protection
+it adds over Level 1 is not worth a fleet that cannot be diagnosed or rescued.
+
+Level 1 gives what is actually wanted: flash and backup SRAM cannot be read
+through a debugger, and recovering full debug access costs a mass erase, so an
+attacker gets a blank part rather than the firmware. The unit stays serviceable,
+because that erase is a path back.
+
+### Signing does not depend on any of this
+
+Signature verification and readout protection are independent. Stage-1 accepts an
+image because it carries a valid signature over its digest, and that is true at
+Level 0 on a bench and at Level 1 in the field — the code is identical and only
+the embedded public key differs. RDP decides who can read flash or bypass the
+loader through the debug port; signing decides what the device will run through
+its own update path. Neither waits for the other, and the signing work is
+complete and useful without any option byte being set.
+
+What RDP1 adds is that an attacker with a probe cannot read the image out, and
+what it does not add is immutability against someone willing to mass-erase the
+part. That is understood and accepted.
 
 ## Design decisions (load-bearing)
 
 | Decision | Choice | Why |
 |---|---|---|
-| Stage count | **two** | RDP2 is irreversible. A USB CDC stack frozen for the life of the product is not an acceptable risk; only the trust anchor is frozen. |
+| Stage count | **two** | A USB CDC stack carried in the write-protected stage would be frozen for the life of the product. Only the trust anchor goes in stage-1; everything replaceable lives in stage-2. |
 | Slots | **single, no A/B** | A second slot needs the app under 192 KiB on this part. The crashloop counter plus the RX sniffer cover the realistic failure modes at a fraction of the flash. |
 | Signature | **Ed25519 over a SHA-256 digest** | Asymmetric is mandatory: a shared HMAC key is extractable through SWD on a dev board and would then sign anything. SHA-256 rather than SHA-512 roughly halves the per-boot hash of a 384 KiB app. |
 | Integrity | **SHA-256 in the image, CRC-32 as a cheap pre-check** | `hal_crc` is hardware-backed and rejects a truncated transfer in microseconds before the expensive hash runs. |
-| Stage-1 transport | **UART only** | Every byte in stage-1 is permanent. USB enumeration and the CDC class belong in the replaceable stage. |
+| Stage-1 transport | **UART and CDC, both watched from boot** | A board that can be flashed over CDC should be recoverable over CDC: needing a UART to rescue a USB-only unit is a recovery path that is not there when it is wanted. Decided against the original UART-only line, whose reasoning is kept below as the cost being accepted. |
 | Boot-mode signalling | **`.noinit` block in SRAM** | Survives reset for free — `Reset_Handler` only zeroes what the linker's zero table lists (`boot.c:90`). |
-| Rollback floor | **KV store key** | Already exists; no new persistence mechanism. Meaningful only once RDP2 stops an attacker erasing it. |
+| Rollback floor | **KV store key** | Already exists; no new persistence mechanism. It stops a signed-but-old image being accepted through the update path, which is the attack it is for. Someone with a probe can still mass-erase the part, and that is out of scope at RDP1. |
 
 ## What is deliberately NOT in this bootloader
 
 * **A/B slots and rollback-on-failure** — see above. Revisiting means
   re-partitioning, so the decision is recorded rather than left open.
-* **Firmware encryption** — buys nothing while SWD is open in dev, and at RDP2
+* **Firmware encryption** — buys nothing while SWD is open in dev, and at RDP1
   the readout it would protect against is already blocked.
 * **Delta or partial updates** — the app spans 128 KiB sectors; that is the
   smallest erasable unit up there.
-* **ROM DFU / BOOT0 fallback** — unreachable at RDP2.
+* **ROM DFU / BOOT0 fallback** — at RDP1 the system bootloader cannot read flash, and stage-1's own recovery covers the same need over links the board already has.
 
 ## Flash partition (STM32F401RE, 512 KiB)
 
@@ -76,11 +95,80 @@ declares the full 512 KiB while the KV store squats at `0x08040000`, so an app
 over 256 KiB silently collides with it today, and a KV compaction erasing
 sector 6 would take app code with it.
 
-Stage-1 carries no header. It is the root of trust, protected by WRP and RDP2
+Stage-1 carries no header. It is the root of trust, protected by WRP
 rather than by a signature, and the CPU boots straight into its vector table.
 
 F767ZI has a different sector map and needs its own table before that port
 adopts this.
+
+### Linker scripts, one per image
+
+`src/board/nucleo_f401re/boot/` holds `stage1.ld`, `stage2.ld` and `app.ld`.
+Each is a MEMORY block over the region that image owns plus `INCLUDE
+cortex-m4.ld`, the same shape as a board script, so the section layout stays
+shared. Pass one with `-T`, and `-L src/arch/armv7e-m/link` so ld can find the
+include -- ld resolves an INCLUDE against the search path, never against the
+directory of the script doing the including.
+
+Verified by linking a stub with each:
+
+| Script | Vector table | Partition |
+|---|---|---|
+| `stage1.ld` | `0x08000000` | sectors 0-1, no header |
+| `stage2.ld` | `0x08010200` | sector 4, base + 512 header |
+| `app.ld` | `0x08020200` | sectors 5-7, base + 512 header |
+
+The header offset is what keeps the payload's vector table 512-byte aligned,
+which VTOR requires.
+
+With these, **the KV store at sectors 2-3 stops colliding with anything**:
+stage-1 ends below `0x08008000`, stage-2 and the app begin above `0x0800FFFF`.
+All three link with `CONFIG_FLASH_KV_PRIMARY_SECTOR=2` and `=3`, where a flat
+image over 32 KiB is refused. That is the dependency the partition had on the
+scripts, and it is now discharged.
+
+The numbers are repeated from `hal_bootmap.h` because a linker script cannot
+include a C header; if the two ever disagree, the header is the one that is
+right, and its static assertions are what keep it honest.
+
+## Building the images
+
+All three images -- stage1, stage2 and the app -- come from one committed
+fragment, `cmake/defconfigs/boot_cortex-m4_stm32f4_nucleo_f401re.defconfig`:
+
+```sh
+cmake -B build-stage1 -DBOOT_IMAGE=stage1 \
+  -DNAVHAL_DEFCONFIG=cmake/defconfigs/boot_cortex-m4_stm32f4_nucleo_f401re.defconfig \
+  -DNAVHAL_BOOT_PUBKEY=k.pub -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/arm-none-eabi-toolchain.cmake
+cmake --build build-stage1 -j
+```
+
+The fragment is passed explicitly rather than defaulted from the toolchain file,
+because the options it sets -- a CDC stack, the crypto backend, the key-value
+store moved to sectors 2 and 3 -- have no business in an ordinary firmware build.
+Two of them are not preferences: without the store relocation the app partition's
+sectors cannot be erased, and `updater.h` fails the build with that message
+rather than letting the first field update discover it.
+
+Signing, and flashing a complete chain:
+
+```sh
+cmake -S tools/sign -B build-sign && cmake --build build-sign
+./build-sign/navhal_sign --genkey --key k.sec --pub k.pub   # once, then keep k.sec safe
+arm-none-eabi-objcopy -O binary build-stage2/boot/stage2/stage2 s2.bin
+./build-sign/navhal_sign --partition stage2 --key k.sec --version 3 --in s2.bin --out s2.img
+# stage1 goes in raw at 0x08000000; the signed images carry their own header
+```
+
+Pin the probe by USB location rather than by serial. `st-flash --serial` finds a
+probe by scanning every ST-Link attached, and a bench with more than one board on
+it does not want a scan:
+
+```sh
+openocd -f interface/stlink.cfg -c "adapter usb location 3-1" \
+        -f target/stm32f4x.cfg -c "program s2.img 0x08010000 verify reset exit"
+```
 
 ## Image format
 
@@ -140,6 +228,28 @@ reset
  └ app      sniff UART and CDC for the magic sequence
             clear attempts after proven liveness
 ```
+
+The application inherits a running watchdog. Both loader stages start the IWDG
+to cover their own slowest operation -- a 371 ms hash, an erase approaching 2 s --
+and the IWDG cannot be stopped, only given a new period. An application that
+ignores it is reset on the loader's timeout, which looks like a spontaneous
+reboot every few seconds while the application itself appears healthy. It must
+call `hal_watchdog_start` with a period that suits it, then keep kicking. The
+same obligation that makes the loader adopt the application's watchdog runs in
+the other direction.
+
+A matched sequence reaches stage-2, not stage-1. The request a console can raise
+is the one stage-2 claims (`HAL_BOOT_REQ_LOADER`), and stage-2 writes the
+application partition and nothing else. Stage-1's loader, which can replace
+stage-2 itself, answers only to `HAL_BOOT_REQ_STAGE1` and to the conditions the
+board judges for itself -- a crashloop, or a stage-2 that does not verify.
+
+The split exists because the two are not equally dangerous. Stage-1 used to claim
+the request unconditionally, which meant every sequence an operator -- or anyone
+else able to write to the console -- could send landed in the loader able to
+rewrite stage-2, and stage-2's update mode was unreachable by any request at all.
+The field had no way to ask for an application update, which is the common case;
+replacing stage-2 is the rare one.
 
 Attempt accounting runs before the jump: a watchdog or window-watchdog reset
 increments, a power-on or NRST reset clears — a human intervened, so the strike
@@ -304,19 +414,21 @@ uses: four times fewer program cycles at 3.3 V.
 
 ## Provisioning
 
-RDP2 freezes the option bytes, WRP and BOR included, so the order is one-way:
+Nothing here is one-way, which is the point of stopping at Level 1:
 
 1. Flash stage-1, stage-2 and app over SWD
 2. Set WRP on sectors 0–1
 3. Set BOR level — a browned-out core executing garbage bypasses every check
    above, and this is the cheapest mitigation available
-4. Set RDP2 **last**
+4. Set RDP Level 1 **last**
 
-Steps 2 and 3 are permanent once step 4 runs.
+Every step is reversible at the cost of a mass erase, so a unit that comes back
+can be rescued and a provisioning mistake costs a reflash rather than a board.
+The tool refuses RDP Level 2; see the RDP rule above.
 
-Three tiers: development at RDP0 with SWD, validation at RDP1, production at
-RDP2. RDP1 blocks readout but downgrading mass-erases, so those boards stay
-recoverable and are where the full matrix runs before any unit is locked.
+Two tiers rather than three: development at RDP0 with SWD open, and shipped units
+at RDP1. There is no production tier beyond that, so the matrix that runs at RDP1
+is the one that gates a release rather than a rehearsal for a stricter state.
 
 ## Slices
 
@@ -352,9 +464,9 @@ callback, CDC on a forwarding RX callback — the `hal_boot_entry_disable`
 policy gate, and the liveness clear of the attempt counter.
 
 ### Slice 8 — Provisioning and lockdown
-Option-byte tool and full RDP1 validation. **RDP2 is deferred** — the step is
-irreversible, so it waits until the RDP1 matrix has run clean on real units and
-there is a reason to take it.
+Option-byte tool and the full RDP1 validation matrix. The tool sets WRP, BOR and
+RDP Level 1, and **refuses Level 2** -- the rule is enforced in the thing that
+would otherwise make the mistake, not just written down.
 
 Slices 1–3 are independently useful and carry no cryptographic risk. The chain
 of trust does not exist until slice 5.
@@ -383,18 +495,251 @@ mid-program.
 * A power cut at any point during an update leaves the board updatable.
 * An RDP1 unit completes a signed update over CDC.
 
+## Measured — slice 4a
+
+Everything below is from a Nucleo-F401RE at 84 MHz, `Release` (`-Os`), cycles
+read from DWT CYCCNT. Each candidate verified the same Ed25519 signature over a
+32-byte digest; a valid one, so the whole verify runs rather than an early
+reject. All three accepted that signature and all three rejected it with one bit
+flipped, which is also the first interop check between them.
+
+| Implementation | Flash (verify only) | .bss | Cycles | Time |
+|---|---|---|---|---|
+| **Monocypher 4.0.2** | **10,768** | 0 | **2,456,320** | **29.2 ms** |
+| TweetNaCl 20140427 | 5,588 | 96 | 95,192,514 | 1,133 ms |
+| compact25519 (c25519) | 4,918 | 0 | 136,291,886 | 1,623 ms |
+
+**Decision: Monocypher.** It costs about twice the flash of the other two and
+runs 39× and 55× faster. The two small ones are not slow in a way that trades
+against anything -- a single verify at over a second is ten times the whole boot
+budget on its own, before the app is hashed.
+
+Flash figures are verify-only: `-ffunction-sections` with `--gc-sections`, no
+`mem*` (the HAL supplies those in `src/utils/freestanding.c`), and no signing or
+key generation, none of which stage-1 performs.
+
+### The image digest: SHA-256, decided and measured
+
+| Stage-1 crypto content | Flash | Against verify-only |
+|---|---|---|
+| Ed25519 verify only | 10,768 | — |
+| plus SHA-512 for the image | 10,826 | **+58** |
+| plus BLAKE2b for the image | 26,800 | +16,032 |
+
+Ed25519 contains SHA-512 by construction (RFC 8032 hashes `R ‖ A ‖ M` with it),
+so reusing it for the image digest costs 58 bytes. BLAKE2b, despite being in
+Monocypher's core and the faster hash per byte, pulls 16 KB -- half the stage-1
+budget -- so it is out on size alone.
+
+**SHA-256 it is**, and it costs less and saves more than the estimate said: 896
+bytes of flash (640 text, 256 rodata) against a guess of 1.3 KB, and 79.15
+cycles/byte against SHA-512's 144.4 -- so a 384 KiB app hashes in 371 ms rather
+than 676 ms. 305 ms for 896 bytes, with 11 KB of stage-1 still unused.
+
+It is one implementation for every backend, not per-backend: the signature is
+made over this digest, so a signed image has to keep verifying if the backend is
+reconfigured. Ed25519's internal SHA-512 stays where it is and is untouched by
+this.
+
+Checked against the FIPS 180-4 known answers before being vendored -- empty,
+"abc", the 56-byte case and 1,000,000 'a' -- and `tests/host/test_boot_crypto.c`
+keeps all four, driven through `hal_boot_hash` rather than the implementation, so
+the entry point stage-1 actually calls is the thing under test.
+
+### Hash throughput, and what it does to the boot-latency estimate
+
+| Hash | Cycles/byte | 384 KiB app | Flash cost here |
+|---|---|---|---|
+| **SHA-256 (chosen)** | **79.2** | **371 ms** | **+896 B** |
+| SHA-512 (already linked) | 144.4 | 676 ms | +58 B |
+| BLAKE2b | 59.0 | 276 ms | +16 KB |
+
+Measured over 64 KiB read from flash, which is what the real hash does, so the
+flash wait states are in the number rather than hidden by a RAM-resident buffer.
+
+**The ~170 ms estimate in Open questions below does not survive this.** Measured,
+the boot path is a 371 ms app hash, about 300 ms of USB enumeration and a 29 ms
+verify -- roughly 700 ms, four times the estimate. Whether that is worth
+weakening the guarantee to "verified once, recorded in KV" is now a judgement
+about 700 ms rather than an open measurement, and the hash is already the cheaper
+of the two large terms.
+
+Stage-1's 32 KiB has to hold the 10.8 KB of crypto plus startup, clock, the
+flash driver, UART recovery and the verify logic. That leaves about 21 KB, which
+looks workable but is not roomy.
+
+### Reproducing
+
+A throwaway sample flashed to the board, deliberately not committed: it needed
+the candidates vendored at scratch paths, and slice 4b is where the chosen one
+lands in-tree with its test vectors. The method is one warm call, then three
+timed verifies -- all three runs agreed to within two cycles, which is how the
+measurement says it is sound.
+
+### Stage-1 budget, measured
+
+A probe that calls each layer stage-1 needs, on an F401 at `-Os` with
+`-ffunction-sections -fdata-sections -Wl,--gc-sections`:
+
+| Layer | text | Added |
+|---|---|---|
+| vectors, startup, jump | 1,984 | — |
+| + clock to 84 MHz | 4,288 | +2,304 |
+| + UART tx | 5,312 | +1,024 |
+| + UART rx | 5,344 | +32 |
+| + flash KV (attempt accounting) | 6,304 | +960 |
+| + watchdog kick | 6,656 | +352 |
+| + Ed25519 verify (SHA-512 comes with it) | 17,504 | +10,848 |
+| + USB CDC | 20,288 | +2,784 |
+| **+ SHA-256 for the image digest** | **~21,184** | **+896** |
+
+20,288 of 32,768, or 17,788 with LTO. Either leaves 12 KB or more spare, so the
+backend choice is not forced by size: compact25519 would save about 6 KB and cost
+1.6 s per verify, which buys nothing here.
+
+**Section garbage collection is the whole difference.** Without those flags the
+same image is about 57 KB, because Monocypher's primitives share a translation
+unit and nothing is dropped. Stage-1's build must set them; the arch linker
+script already `KEEP`s `.isr_vector`, so it is safe. LTO additionally needs
+`-Wl,-u,memset`: it synthesises a call that cannot see the freestanding one once
+the archive has been scanned, and the link fails without it.
+
+Two costs of watching CDC from boot, accepted deliberately:
+
+* **Enumeration is on the fast path, and costs about 495 ms.** Measured from
+  inside the firmware on the navixsm: `hal_usb_cdc_init()` to
+  `hal_usb_cdc_enumerated()` returning true is 494,504 us. An earlier host-side
+  figure of 290 ms -- sysfs losing and regaining the device across a reset -- is
+  the wrong measurement to budget against: it starts when the device drops off
+  the bus rather than when the firmware begins, and the device-side number is
+  what stage-1 experiences. Against a 371 ms app hash with SHA-256, enumeration
+  is now the *largest* single term, not the second.
+
+* **Do not wait on DTR.** `hal_usb_cdc_connected()` requires it, and DTR arrives
+  only when an application opens the port -- measured at 8.4 s in the same run,
+  which was simply when a human got round to it. A board plugged into a charger
+  never asserts it at all. `hal_usb_cdc_enumerated()` exists for this: same
+  state without the DTR term, true as soon as a host has set a configuration.
+  A window of roughly 750 ms covers the measured 495 ms with margin for a slower
+  host or an intervening hub.
+* **The USB stack is in the permanent stage.** Stage-1 is write-protected, so a
+  bug in 2.8 KB of USB and CDC code cannot be fixed in the field, where the same
+  bug in stage-2 is an update. UART rx, for comparison, is 32 bytes.
+
+Functional validation needs a board with a USB device connector; the Nucleo-64
+does not carry one, so the CDC half of stage-1 is exercised on the navixsm,
+whose HIL config already enables the driver.
+
+**Renode cannot stand in for that.** Its STM32F4 platform has no USB controller
+model -- only `Tag <0x50000000, 0x5003FFFF> "USB_OTG_FS"`, a stub whose own
+comment says it exists so CubeMX init passes -- and no Renode platform declares a
+USB device model at all. The one piece of USB machinery it ships is a host-side
+USB/IP server used for the nRF52840 Arduino flow, which synthesises a device for
+the host and bypasses the target's peripheral. The PIL tier does compile the CDC
+driver (`CONFIG_DRV_USB_CDC=y` on the F401) and does run its argument checks
+against those tagged registers, so what is missing is enumeration and transfer,
+not the code path's existence.
+
+What the navixsm does cover, with `tools/hil/usb_cdc_check.py` against the CDC
+sample: enumeration, both interfaces, a byte-exact 16 KiB echo at 372 KiB/s, a
+packet-boundary transfer, survival of a break, line-coding round-trip, the bulk
+endpoint pair, and halt then clear-halt with the endpoint recovering. Nine checks,
+all passing. They are worth running against the right firmware -- the same script
+reports three failures against a board flashed with something else, which says
+nothing about the driver.
+
+That makes one thing a requirement rather than a nicety: **the wait for
+enumeration has to be bounded.** A stage-1 that blocks until a USB host answers
+never boots on a unit with nothing plugged in, and never boots under Renode
+either. The CDC watch window gets a deadline, and expiry is an ordinary outcome
+that falls through to the jump -- not an error.
+
+## The RDP1 pass, measured
+
+The six functional cases run at RDP0 (`tools/boot_matrix.py`). The read-protected
+pass was run on a provisioned F401 -- console only, after a power cycle -- and it
+covers the path a shipped unit actually has.
+
+What it establishes:
+
+* The whole chain boots unchanged under RDP1. With WRP on sectors 0-1, BOR at
+  level 3 and RDP at Level 1 (`OPTCR = 0x0FFC55E1`), stage-1 verified stage-2,
+  stage-2 verified the app against the floor, and the app ran. Signing being
+  orthogonal to read protection is measured, not asserted.
+* **A field update works when SWD cannot write flash at all.** The console
+  sequence reached stage-2's update mode, the host pushed a 9,772-byte signed
+  image, and the board erased three sectors, programmed them, verified the
+  signature itself and reset into the new application -- all from inside the
+  running firmware. This is the only update path a read-protected unit has, and
+  it is the case the whole provisioning story rests on.
+* The key-value store is writable under RDP1 too: the rollback floor advanced
+  from 20 to 21 as the new image booted.
+* A corrupt image is refused under RDP1 exactly as at RDP0. One flipped bit in
+  the body failed the on-board verify, and a RUN against the refused image came
+  back `NAK 0x06` (`RECOVERY_ERR_VERIFY`) -- the board will not reset into
+  something it has already judged unbootable.
+* The provisioning is reversible, as the rule requires: lifting RDP1 mass-erases,
+  clearing WRP makes the part flashable again, and the board returned to its exact
+  original option bytes (`0x0FFFAAED`) and a working chain.
+
+Two findings about the bench rather than the loader:
+
+* **Attaching a debugger at RDP1 halts the running firmware.** Flash is
+  inaccessible while the debug port is connected, so the next vector fetch fails
+  and the core locks up at `pc = 0xfffffffe`. A single `mdw` of the option bytes
+  did it; detaching did not revive it and neither did a reset over SWD, because
+  the part needs a power-on reset. So an RDP1 run is console-only, and
+  `boot_matrix.py` cannot drive one -- every step it takes between cases is an
+  openocd command.
+* **WRP on sectors 0-1 blocks reflashing stage-1.** That is what it is for, but it
+  makes provisioning order load-bearing: clearing write protection is a separate
+  step before any stage-1 update, and the tool does it.
+
+One more thing the pass exposed, in the loader rather than the bench: the request
+routing. See Boot flow -- a sniffed sequence now reaches stage-2, not stage-1.
+
 ## Open questions
 
-* Which Ed25519 implementation — stage-1 fitting in 32 KiB depends on it, and a
-  miss changes the partition table. Resolve in slice 4, before slice 1 is hard
-  to undo.
-* Measured boot latency. The estimate is ~170 ms for the app hash plus verify at
-  84 MHz; if it lands materially higher, the app hash may need to move behind a
-  "verified once, recorded in KV" scheme, which weakens the guarantee.
-* Whether stage-2 should be able to update stage-2, or only stage-1. Self-update
-  is convenient and is also the classic way to brick a fleet.
-* F767ZI partition table and whether that port wants the same two-stage shape.
-* Whether a sequence arriving while entry is disabled should be remembered and
-  acted on at the next `hal_boot_entry_enable`. Convenient for "reboot it as
-  soon as it lands"; also a way to arm a reboot the operator has forgotten
-  about.
+Resolved:
+
+* ~~Whether the image digest stays SHA-256~~ — **yes**, 896 bytes and 79.2
+  cycles/byte, which halves the dominant boot term. See Measured above. (The
+  entry appeared twice, once undecided; SHA-512 reuse was the cheaper-on-flash
+  option and lost on speed.)
+* ~~Which Ed25519 implementation~~ — **Monocypher**, 10,768 bytes and 29.2 ms on
+  the F401. See Measured above.
+* ~~Boot latency, and whether to record "already verified" in the KV store~~ —
+  **verify on every boot; record nothing**. The path measures ~900 ms: 495 ms of
+  USB enumeration, 371 ms hashing the app, 29 ms verifying. Skipping the hash on
+  a recorded flag would save ~400 ms and give up the two things re-verification
+  is for -- flash that has decayed since the image was written, and an image
+  swapped underneath a board that was already trusted. The flag would also be
+  unauthenticated: anything able to rewrite the app can set it, so it protects
+  nothing it does not also hand to an attacker. 900 ms is affordable on a flight
+  controller that spends longer than that bringing sensors up.
+  The term worth attacking is the 495 ms enumeration, not the hash, and it is
+  idle waiting -- hashing during the enumeration window would hide most of it.
+  Recorded here rather than done: it only matters if boot time becomes a
+  complaint.
+* ~~Whether stage-2 may update stage-2, or only stage-1~~ — **only stage-1**,
+  which is what the code does: each stage serves exactly one partition. A stage
+  that rewrites itself has a window where the thing performing the update is the
+  thing being erased, and on a single-slot layout that window ends a unit. With
+  stage-1 immutable under WRP there is always something left that can recover.
+  The cost is honest: a stage-2 bug needs stage-1's recovery path and a cable,
+  not a field update over the app's own transport.
+* ~~Whether a sequence arriving while entry is disabled is remembered~~ —
+  **dropped, not remembered**. Remembering it arms a reboot that fires at some
+  later reset, which is exactly when nobody is expecting it and whoever typed the
+  sequence has gone. A request is a request about now. Where entry is disabled
+  the sniffer should not be watching at all.
+
+Still open:
+
+* F767ZI partition table, and whether that port takes the same two-stage shape.
+  **Deferred deliberately.** The F401 layout leans on 16 KiB sectors: stage-1 in
+  0-1, the KV store in 2-3, stage-2 at sector 4, the app in 5-7. The F767 has
+  2 MB in 32/128/256 KiB sectors, so none of those numbers survive and a 32 KiB
+  stage-1 would sit in one sector with the store needing another. Worth doing
+  when that port needs a bootloader; doing it now would be a table nothing
+  compiles against.

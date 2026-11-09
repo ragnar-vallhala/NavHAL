@@ -48,6 +48,7 @@
 #define FLASH_ACR_ARTRST (1U << 11) /**< ART Accelerator reset.           */
 
 #define FLASH_BASE 0x40023C00UL
+#define FLASH_ACR (*(volatile uint32_t *)(FLASH_BASE + 0x00))
 #define FLASH_KEYR (*(volatile uint32_t *)(FLASH_BASE + 0x04))
 #define FLASH_SR (*(volatile uint32_t *)(FLASH_BASE + 0x0C))
 #define FLASH_CR (*(volatile uint32_t *)(FLASH_BASE + 0x10))

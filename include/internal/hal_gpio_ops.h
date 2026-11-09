@@ -41,7 +41,7 @@
 #ifndef NAVHAL_INTERNAL_HAL_GPIO_OPS_H
 #define NAVHAL_INTERNAL_HAL_GPIO_OPS_H
 
-#include "common/hal_gpio.h"
+#include "common/hal_gpio_types.h"
 #include "common/hal_status.h"
 
 #ifdef __cplusplus

@@ -85,6 +85,25 @@ uint32_t hal_clock_get_bus_clock(uint8_t bus);
 
 #if NAVHAL_CONFIG_DRV_CLOCK
 #include "navhal_port_clock.h"
+
+#if defined(NAVHAL_PORT_CLOCK_BUS_NAMES)
+/* AHB/APB are this port's bus names, so the convenience accessors live here
+ * rather than in the portable header. They are the same indexed query. */
+static inline uint32_t hal_clock_get_ahbclk(void) {
+  return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_AHB);
+}
+static inline uint32_t hal_clock_get_apb1clk(void) {
+  return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_APB1);
+}
+static inline uint32_t hal_clock_get_apb2clk(void) {
+  return hal_clock_get_bus_clock((uint8_t)HAL_CLOCK_BUS_APB2);
+}
+#endif
+
+#if defined(NAVHAL_PORT_CLOCK_COMPAT)
+/* Static inline wrappers over the API above. */
+#include "compat/clock_compat.h"
+#endif
 #endif
 
 

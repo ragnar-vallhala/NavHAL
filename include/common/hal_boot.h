@@ -62,8 +62,27 @@ extern "C" {
 /** @brief No request pending; boot normally. */
 #define HAL_BOOT_REQ_NONE 0x00000000u
 
-/** @brief Stay in the bootloader instead of starting the application. */
+/** @brief Stay in the bootloader to replace the application.
+ *
+ * What ::hal_boot_request raises, and so what a matched console sequence raises.
+ * Claimed by stage-2, which writes the application partition and nothing else.
+ *
+ * Deliberately not claimed by stage-1. A request that anyone able to write to a
+ * console can raise should reach the least privileged updater there is: stage-2
+ * can replace the app, where stage-1 can replace stage-2 itself. Stage-1's own
+ * recovery stays reachable by the conditions the board judges for itself -- a
+ * crashloop, or a stage-2 that does not verify -- and by ::HAL_BOOT_REQ_STAGE1.
+ */
 #define HAL_BOOT_REQ_LOADER 0x10ADED00u
+
+/** @brief Stay in stage-1, to replace stage-2.
+ *
+ * The privileged request, and the only way to reach stage-1's loader on a board
+ * whose stage-2 verifies correctly. Nothing a console can raise sets it: it comes
+ * from a tool over SWD, or from stage-2 itself, which may not rewrite stage-2 but
+ * can ask the stage that may to do it on the next boot.
+ */
+#define HAL_BOOT_REQ_STAGE1 0x10ADED01u
 
 /** @brief Consecutive failed boots before the bootloader stops trying. */
 #define HAL_BOOT_MAX_ATTEMPTS 3u
@@ -80,7 +99,7 @@ extern "C" {
  */
 typedef struct {
   uint32_t magic;    /**< ::HAL_BOOT_MAGIC once seeded. */
-  uint32_t request;  /**< ::HAL_BOOT_REQ_NONE or ::HAL_BOOT_REQ_LOADER. */
+  uint32_t request;  /**< ::HAL_BOOT_REQ_NONE, _LOADER or _STAGE1. */
   uint32_t attempts; /**< Consecutive boots that have not proven liveness. */
   uint32_t check;    /**< Guards the three above; see ::hal_boot_block_valid. */
 } hal_boot_block_t;
@@ -123,7 +142,8 @@ hal_status_t hal_boot_block_init(void);
 
 /**
  * @brief The request left by the previous boot.
- * @return ::HAL_BOOT_REQ_LOADER, or ::HAL_BOOT_REQ_NONE if none or invalid.
+ * @return The request as left, or ::HAL_BOOT_REQ_NONE if none or the block is
+ *         not valid.
  */
 uint32_t hal_boot_get_request(void);
 
@@ -149,6 +169,27 @@ uint32_t hal_boot_get_attempts(void);
  * @return ::HAL_OK, or ::HAL_ERR_NOT_INITIALIZED if the block is not valid.
  */
 hal_status_t hal_boot_mark_healthy(void);
+
+/**
+ * @brief Count this boot attempt, before handing control to the next image.
+ *
+ * A loader calls this on the way past: the counter it raises is what makes a
+ * crashloop recoverable. An image that boots, faults and resets raises it again,
+ * and once it reaches ::HAL_BOOT_MAX_ATTEMPTS the loader stops handing control
+ * over and goes to recovery instead.
+ *
+ * Nothing else raises it. ::hal_boot_mark_healthy is the other half -- the
+ * application clears the count once it has proven it is alive, never at startup,
+ * or a fault that happens after main() resets its own strike count forever.
+ *
+ * Saturates rather than wrapping. A counter that rolls over to zero would hand a
+ * crashlooping board back to the image that is crashing, which is the one
+ * outcome this exists to prevent.
+ *
+ * @return ::HAL_OK, or ::HAL_ERR_NOT_INITIALIZED if the block is not valid --
+ *         call ::hal_boot_block_init first.
+ */
+hal_status_t hal_boot_account_attempt(void);
 
 /* -------------------------------------------------------------------------- *
  * Watcher
@@ -246,6 +287,21 @@ void hal_boot_set_prepare(hal_boot_prepare_cb_t cb);
  * @return Does not return on success. ::HAL_ERR if the reset did not happen.
  */
 hal_status_t hal_boot_request(void);
+
+/**
+ * @brief Request a specific loader on the next boot, then reset.
+ *
+ * ::hal_boot_request is this with ::HAL_BOOT_REQ_LOADER, which is what an
+ * application and the console matcher raise. ::HAL_BOOT_REQ_STAGE1 is the
+ * privileged one: it reaches the stage that may rewrite stage-2, so nothing
+ * driven by a console should pass it.
+ *
+ * @param request ::HAL_BOOT_REQ_LOADER or ::HAL_BOOT_REQ_STAGE1.
+ * @retval HAL_ERR_INVALID_ARG Any other value; nothing was written.
+ * @retval HAL_ERR_BUSY Entry is disabled; nothing was written.
+ * @return Does not return on success. ::HAL_ERR if the reset did not happen.
+ */
+hal_status_t hal_boot_request_target(uint32_t request);
 
 #endif /* NAVHAL_CONFIG_BOOT_SNIFFER */
 

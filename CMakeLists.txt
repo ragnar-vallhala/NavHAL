@@ -43,6 +43,42 @@ if(DEFINED NAVHAL_DEFCONFIG AND NOT EXISTS "${CONFIG_FILE}")
     configure_file("${NAVHAL_DEFCONFIG}" "${CONFIG_FILE}" COPYONLY)
 endif()
 
+# A board can live outside this tree. -DNAVHAL_BOARD_DIR=<path> names a directory
+# holding what an in-tree board holds -- Kconfig.choice declaring its BOARD_* symbol,
+# Kconfig describing it, a linker script, optionally startup.s -- so a consumer with
+# its own PCB owns its own description instead of patching this repo.
+#
+# Validated and exported here, before the generator runs: the Kconfig tree osources
+# $(NAVHAL_EXTRA_BOARD_DIR), and osource skips a missing file silently, so a
+# directory that is merely misspelled would otherwise fall through to an in-tree
+# board and look like it worked.
+if(NAVHAL_BOARD_DIR)
+    get_filename_component(_oot_board "${NAVHAL_BOARD_DIR}" ABSOLUTE
+                           BASE_DIR "${CMAKE_BINARY_DIR}")
+    foreach(_need Kconfig Kconfig.choice)
+        if(NOT EXISTS "${_oot_board}/${_need}")
+            message(FATAL_ERROR
+                "NAVHAL_BOARD_DIR='${NAVHAL_BOARD_DIR}' has no ${_need}. An "
+                "out-of-tree board needs Kconfig.choice (declaring its BOARD_* "
+                "symbol) and Kconfig (its description). See docs/boards.md.")
+        endif()
+    endforeach()
+    file(READ "${_oot_board}/Kconfig.choice" _oot_choice)
+    string(REGEX MATCH "config +BOARD_([A-Z0-9_]+)" _m "${_oot_choice}")
+    if(NOT CMAKE_MATCH_1)
+        message(FATAL_ERROR
+            "${_oot_board}/Kconfig.choice declares no `config BOARD_<NAME>`, so "
+            "nothing can select this board.")
+    endif()
+    string(TOLOWER "${CMAKE_MATCH_1}" _oot_slug)
+    set(ENV{NAVHAL_EXTRA_BOARD_DIR} "${_oot_board}")
+    message(STATUS "Out-of-tree board offered: ${_oot_slug} (${_oot_board})")
+else()
+    # Cleared, so a value left in the environment by a previous configure in the
+    # same shell cannot leak into this one.
+    set(ENV{NAVHAL_EXTRA_BOARD_DIR} "")
+endif()
+
 message(STATUS "Running Kconfig configuration generation...")
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${KCONFIG_SCRIPT}
@@ -105,7 +141,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # disagree: bumping one without the other is a release-process bug, not
 # something we want to silently build. This check runs on every configure,
 # including when NavHAL is consumed as a submodule.
-set(NAVHAL_VERSION 0.3.16) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
+set(NAVHAL_VERSION 0.4.0) # keep in sync with VERSION_MAJOR/MINOR/PATCH in include/navhal.h
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/include/navhal.h" _navhal_h)
 string(REGEX MATCH "#define[ \t]+VERSION_MAJOR[ \t]+([0-9]+)" _ "${_navhal_h}")
 set(_navhal_h_major "${CMAKE_MATCH_1}")
@@ -154,7 +190,15 @@ message(STATUS "Building for processor: ${CMAKE_SYSTEM_PROCESSOR}")
 # AVR port will populate src/arch/avr/, src/vendor/microchip/, etc.
 # without further CMake edits.
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(SRC_BOARD ${CMAKE_CURRENT_SOURCE_DIR}/src/board/${BOARD})
+
+# Naming a directory offers the board; it does not force it. An in-tree board still
+# builds from src/board even while NAVHAL_BOARD_DIR is set.
+if(NAVHAL_BOARD_DIR AND _oot_slug STREQUAL "${BOARD}")
+    set(SRC_BOARD "${_oot_board}")
+    message(STATUS "Board from outside the tree: ${SRC_BOARD}")
+else()
+    set(SRC_BOARD ${CMAKE_CURRENT_SOURCE_DIR}/src/board/${BOARD})
+endif()
 set(SRC_ARCH ${CMAKE_CURRENT_SOURCE_DIR}/src/arch/${ARCH_ISA})
 set(SRC_VENDOR ${CMAKE_CURRENT_SOURCE_DIR}/src/vendor/${VENDOR})
 set(INCLUDE_PORT ${CMAKE_CURRENT_SOURCE_DIR}/include/port/${CMAKE_SYSTEM_PROCESSOR})
@@ -187,7 +231,9 @@ set(NAVHAL_FORCE_INCLUDE "-include ${GENERATED_NAVHAL_TARGET}")
 #                               run. -Og rather than -O0 because the AVR has
 #                               32 KB of flash and -O0 more than doubled the
 #                               image; -Og measured the same size as -Os on a
-#                               loop, while keeping the debug experience.
+#                               loop, while keeping the debug experience. The
+#                               AVR is the exception and builds Debug at -Os --
+#                               see the flag block below for the measurement.
 #   Release     -Os -DNDEBUG    what ships. On an MCU the binding constraint
 #                               is flash, not instruction count, which is why
 #                               this is -Os and not CMake's usual -O3.
@@ -213,7 +259,16 @@ if(NOT CMAKE_BUILD_TYPE IN_LIST NAVHAL_BUILD_TYPES)
         "NavHAL defines: ${NAVHAL_BUILD_TYPES}")
 endif()
 
-set(CMAKE_C_FLAGS_DEBUG          "-Og -g")
+# -Og everywhere with flash to spare, -Os on the AVR, which has none: the
+# on-target test image is 28588 bytes of text at -Os and overflows the 32K part
+# at -Og. The note below measured the two as equal on a loop, and on a loop they
+# are; across a whole image -Og costs about 3.4K in inlining and spill code,
+# which is the difference between a tier that runs and one that will not link.
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
+    set(CMAKE_C_FLAGS_DEBUG      "-Os -g")
+else()
+    set(CMAKE_C_FLAGS_DEBUG      "-Og -g")
+endif()
 set(CMAKE_C_FLAGS_RELEASE        "-Os -DNDEBUG")
 set(CMAKE_C_FLAGS_RELEASELTO     "-Os -flto -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG        "${CMAKE_C_FLAGS_DEBUG}")
@@ -238,6 +293,49 @@ message(STATUS "NavHAL build profile: ${CMAKE_BUILD_TYPE}")
 string(APPEND CMAKE_C_FLAGS " ${ARCH_C_FLAGS} -Wall -std=c11 ${NAVHAL_FORCE_INCLUDE}")
 string(APPEND CMAKE_ASM_FLAGS " ${ARCH_ASM_FLAGS}")
 string(APPEND CMAKE_EXE_LINKER_FLAGS " ${ARCH_LINK_FLAGS}")
+
+# Hand the linker the flash KV store's extent so it can refuse an image that
+# overlaps it. The store erases whole sectors, so a store inside the image means
+# the first save erases the code doing the saving -- a 45 KB test image linked
+# flat from 0x08000000 reaches into sector 2, which is where the bootloader
+# layout wants the store. Only the STM32F4 sector map is known here; other
+# families leave the symbols unset and the assertion stands down.
+if(CONFIG_DRV_FLASH AND CONFIG_FAMILY_STM32F4)
+    set(_kv_pri "${CONFIG_FLASH_KV_PRIMARY_SECTOR}")
+    set(_kv_sec "${CONFIG_FLASH_KV_SECONDARY_SECTOR}")
+    if(_kv_pri STREQUAL "")
+        set(_kv_pri 6)
+    endif()
+    if(_kv_sec STREQUAL "")
+        set(_kv_sec 7)
+    endif()
+    # STM32F4 512K map: 4 x 16K, 1 x 64K, 3 x 128K.
+    set(_f4_sector_base  0      16384  32768  49152  65536  131072 262144 393216)
+    set(_f4_sector_size  16384  16384  16384  16384  65536  131072 131072 131072)
+    set(_lo 99999999)
+    set(_hi 0)
+    foreach(_s ${_kv_pri} ${_kv_sec})
+        list(GET _f4_sector_base ${_s} _b)
+        list(GET _f4_sector_size ${_s} _z)
+        math(EXPR _e "${_b} + ${_z}")
+        if(_b LESS _lo)
+            set(_lo ${_b})
+        endif()
+        if(_e GREATER _hi)
+            set(_hi ${_e})
+        endif()
+    endforeach()
+    math(EXPR _kv_start "0x08000000 + ${_lo}" OUTPUT_FORMAT HEXADECIMAL)
+    math(EXPR _kv_end   "0x08000000 + ${_hi}" OUTPUT_FORMAT HEXADECIMAL)
+    message(STATUS "Flash KV store: sectors ${_kv_pri},${_kv_sec} = ${_kv_start}..${_kv_end}")
+    # Kept in a variable of its own as well: the test target replaces
+    # CMAKE_EXE_LINKER_FLAGS wholesale rather than appending, so anything only
+    # appended here is silently dropped for that image -- which is the one image
+    # large enough to collide with the store.
+    set(NAVHAL_KV_DEFSYMS
+        " -Wl,--defsym=__kv_start=${_kv_start} -Wl,--defsym=__kv_end=${_kv_end}")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS "${NAVHAL_KV_DEFSYMS}")
+endif()
 # C++ shares the arch flags; a C++ TU only appears in the C++ sample, which
 # does enable_language(CXX). Bare-metal: no exceptions / RTTI / cxa-atexit.
 string(APPEND CMAKE_CXX_FLAGS
@@ -254,6 +352,27 @@ endif()
 # build. So when -DTEST=ON, skip samples/ and src/vendor/ entirely.
 if(TEST)
   message(STATUS "TEST=ON — skipping samples/ and src/vendor/ (test build is self-contained)")
+elseif(BOOT_IMAGE)
+  # A bootloader image rather than a sample: same HAL, its own partition and so
+  # its own linker script. -DBOOT_IMAGE=stage1 builds boot/stage1.
+  #
+  # Separate from SAMPLE because these are not samples -- one of them ends up
+  # write-protected -- and because each owns a region of flash rather than the
+  # whole part.
+  message(STATUS "Boot image selected: ${BOOT_IMAGE}")
+  set(_boot_ld "${SRC_BOARD}/boot/${BOOT_IMAGE}.ld")
+  if(NOT EXISTS "${_boot_ld}")
+    message(FATAL_ERROR
+      "No linker script for BOOT_IMAGE='${BOOT_IMAGE}' on board '${BOARD}'. "
+      "Expected: ${_boot_ld}")
+  endif()
+  # -T does not compose, so the board script is replaced rather than added to.
+  string(REPLACE "-T ${NAVHAL_LINKER_SCRIPT}" "-T ${_boot_ld}"
+         CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+  message(STATUS "Boot image linker script: ${_boot_ld}")
+  add_subdirectory(${SRC_VENDOR})
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/boot/${BOOT_IMAGE})
+  set(SOURCES ${CORE_SOURCES} ${BOARD_SOURCES} ${VENDOR_SOURCES})
 elseif(SAMPLE AND NOT STANDALONE)
   message(STATUS "Sample selected: ${SAMPLE} (with HAL)")
   message(STATUS  "Linker flag: ${CMAKE_EXE_LINKER_FLAGS}")
@@ -351,11 +470,31 @@ else()
   message(STATUS "Doxygen not found. 'doc' target will not be available.")
 endif()
 
-add_custom_target(copy_compile_commands ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_BINARY_DIR}/compile_commands.json
-        ${CMAKE_SOURCE_DIR}/compile_commands.json
-)
+# One build tree owns the repo-root compile_commands.json, and it is `build/`.
+# This target is ALL, and every tier script configures a tree of its own --
+# build-host, build-x86, the per-board trees in tools/pil and tools/samples --
+# so whichever ran last used to win. After an AVR tier that left the editor
+# resolving the whole repo against 21 ATmega translation units, and everything
+# else reported undeclared.
+#
+# Pass -DNAVHAL_EXPORT_COMPILE_COMMANDS=ON to hand ownership to another tree
+# (an IDE's, say), or =OFF to leave the root file alone.
+if(CMAKE_BINARY_DIR STREQUAL "${CMAKE_SOURCE_DIR}/build")
+    set(_navhal_cc_default ON)
+else()
+    set(_navhal_cc_default OFF)
+endif()
+option(NAVHAL_EXPORT_COMPILE_COMMANDS
+       "Copy this tree's compile_commands.json to the repo root"
+       ${_navhal_cc_default})
+
+if(NAVHAL_EXPORT_COMPILE_COMMANDS)
+    add_custom_target(copy_compile_commands ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${CMAKE_BINARY_DIR}/compile_commands.json
+            ${CMAKE_SOURCE_DIR}/compile_commands.json
+    )
+endif()
 
 # Startup file. The vector table names this MCU's peripherals, so it is a
 # family property and lives beside the family's register maps; a board may
@@ -455,6 +594,8 @@ if(TEST)
       list(APPEND TEST_FLAGS ${NAVHAL_TEST_EXTRA_FLAGS})
   endif()
   set(CMAKE_EXE_LINKER_FLAGS "${NAVHAL_TEST_LINKER_FLAGS}")
+  # Carry the KV extent across that overwrite.
+  string(APPEND CMAKE_EXE_LINKER_FLAGS "${NAVHAL_KV_DEFSYMS}")
   if(NAVHAL_TEST_NEEDS_LIBGCC)
       target_link_libraries(tests PRIVATE c gcc)
   endif()

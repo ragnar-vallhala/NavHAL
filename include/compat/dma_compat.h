@@ -32,6 +32,11 @@
 
 #include "common/hal_status.h"
 #include "common/navhal_compiler.h"
+/* The declarations these wrappers call. Circular -- the port header pulls this
+ * shim in at its end -- which the include guards make safe either way round,
+ * and without it the file only compiles when reached through that header: a
+ * clang-based editor opening it directly reports every call undeclared. */
+#include "navhal_port_dma.h"
 
 
 #ifdef __cplusplus

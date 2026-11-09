@@ -60,12 +60,15 @@ typedef struct {
   /** Mask one line. */
   hal_status_t (*disable)(hal_irq_t irq);
 
-  /** Install a callback. NULL @p cb rejected upstream. */
-  hal_status_t (*attach_callback)(hal_irq_t irq, hal_interrupt_callback_t cb);
-  /** Remove a callback. */
-  hal_status_t (*detach_callback)(hal_irq_t irq);
-  /** Run the callback registered for @p irq, from the vector. */
+  /** Run the callback for @p irq, from the vector, with whatever hardware
+   *  acknowledgement this controller needs around it -- the PIC's EOI on
+   *  x86, nothing on an NVIC. The table lookup itself is navhal_irq_invoke,
+   *  in the common layer; attach and detach are not port business and are
+   *  no longer here. */
   void (*dispatch)(hal_irq_t irq);
+  /** Sleep until an interrupt would occur, leaving the caller's global
+   *  interrupt state as it was. WFI, SLEEP, HLT. */
+  void (*cpu_idle)(void);
 
   /** Mask interrupts globally; returns the previous state to restore. */
   uint32_t (*disable_global)(void);

@@ -30,6 +30,8 @@
 
 #if NAVHAL_CONFIG_DRV_INTERRUPT
 
+#include "internal/hal_interrupt_table.h"
+#include <stdbool.h>
 #include <stddef.h>
 
 hal_status_t hal_interrupt_enable(hal_irq_t irq) {
@@ -40,20 +42,57 @@ hal_status_t hal_interrupt_disable(hal_irq_t irq) {
   return _hal_interrupt_ops.disable(irq);
 }
 
+/* The callback table. Every port had this: an array, a bounds check and an
+ * indexed call, written out three times over three private arrays. It is the
+ * same code each time because nothing about it is hardware -- what differs is
+ * only how many lines the part wires, which the family header states. */
+static hal_interrupt_callback_t _irq_cb[HAL_IRQ_COUNT];
+
+/* Negative hal_irq_t values are system exceptions, which have their own
+ * vectors and never reach the table. */
+static inline bool _irq_indexes_table(hal_irq_t irq) {
+  return (long)irq >= 0 && (unsigned long)irq < (unsigned long)HAL_IRQ_COUNT;
+}
+
+bool navhal_irq_invoke(hal_irq_t irq) {
+  if (!_irq_indexes_table(irq) || _irq_cb[(unsigned long)irq] == NULL)
+    return false;
+  _irq_cb[(unsigned long)irq]();
+  return true;
+}
+
 hal_status_t hal_interrupt_attach_callback(hal_irq_t irq,
                                            hal_interrupt_callback_t callback) {
-  if (callback == NULL)
+  if (callback == NULL || !_irq_indexes_table(irq))
     return HAL_ERR_INVALID_ARG;
-  return _hal_interrupt_ops.attach_callback(irq, callback);
+  _irq_cb[(unsigned long)irq] = callback;
+  return HAL_OK;
 }
 
 hal_status_t hal_interrupt_detach_callback(hal_irq_t irq) {
-  return _hal_interrupt_ops.detach_callback(irq);
+  if (!_irq_indexes_table(irq))
+    return HAL_ERR_INVALID_ARG;
+  _irq_cb[(unsigned long)irq] = NULL;
+  return HAL_OK;
 }
 
 void hal_interrupt_dispatch(hal_irq_t irq) {
   _hal_interrupt_ops.dispatch(irq);
 }
+
+/* Derived, not a port op: priority first, because enabling first leaves a
+ * window in which the line can fire at the reset-default priority 0. A port
+ * without programmable priorities answers HAL_ERR_NOT_SUPPORTED to the first
+ * call, which is not a reason to skip the second. */
+hal_status_t hal_interrupt_enable_with_priority(hal_irq_t irq,
+                                                uint8_t priority) {
+  hal_status_t st = _hal_interrupt_ops.set_priority(irq, priority);
+  if (st != HAL_OK && st != HAL_ERR_NOT_SUPPORTED)
+    return st;
+  return _hal_interrupt_ops.enable(irq);
+}
+
+void hal_cpu_idle(void) { _hal_interrupt_ops.cpu_idle(); }
 
 uint32_t hal_interrupt_disable_global(void) {
   return _hal_interrupt_ops.disable_global();

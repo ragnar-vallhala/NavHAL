@@ -31,6 +31,7 @@
 #include "common/hal_boot.h"
 #include "common/hal_reset.h"
 #include "navtest/navtest.h"
+#include <stdint.h>
 #include <string.h>
 
 /* ---------------------------------------------------------------------------
@@ -197,6 +198,33 @@ void test_boot_entry_reenable_acts_on_the_next_sequence(void) {
   TEST_ASSERT_EQUAL_UINT32(1u, s_resets);
 }
 
+/* The privilege split: the console path raises the request stage-2 claims, and
+ * only an explicit call raises the one stage-1 claims. A board where stage-1 took
+ * both would put every console sequence into the loader that can rewrite stage-2,
+ * and would leave stage-2's update mode unreachable by any request. */
+void test_boot_request_target_distinguishes_the_two_loaders(void) {
+  fresh();
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_INVALID_ARG,
+                           (uint32_t)hal_boot_request_target(0xDEADBEEFu));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
+
+  (void)hal_boot_request_target(HAL_BOOT_REQ_STAGE1);
+  TEST_ASSERT_EQUAL_UINT32(HAL_BOOT_REQ_STAGE1, hal_boot_get_request());
+
+  (void)hal_boot_clear_request();
+  (void)hal_boot_request_target(HAL_BOOT_REQ_LOADER);
+  TEST_ASSERT_EQUAL_UINT32(HAL_BOOT_REQ_LOADER, hal_boot_get_request());
+
+  /* And a disabled entry refuses both, writing neither. */
+  (void)hal_boot_clear_request();
+  hal_boot_entry_disable();
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_BUSY,
+                           (uint32_t)hal_boot_request_target(HAL_BOOT_REQ_STAGE1));
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_BOOT_REQ_NONE, hal_boot_get_request());
+  hal_boot_entry_enable();
+}
+
 void test_boot_prepare_runs_before_the_reset(void) {
   fresh();
   hal_boot_set_prepare(prepare_hook);
@@ -281,7 +309,85 @@ void test_boot_block_ops_refuse_an_invalid_block(void) {
                            (uint32_t)hal_boot_mark_healthy());
 }
 
+
+/* ---------------------------------------------------------------------------
+ * Attempt accounting -- the crashloop defence
+ * ------------------------------------------------------------------------- */
+
+/* Nothing raised this counter before, so the "attempts >= MAX goes to recovery"
+ * rule in the boot flow could never fire. These cover the half a loader owns. */
+void test_boot_attempt_counts_up(void) {
+  fresh();
+  TEST_ASSERT_EQUAL_UINT32(0u, hal_boot_get_attempts());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_account_attempt());
+  TEST_ASSERT_EQUAL_UINT32(1u, hal_boot_get_attempts());
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_account_attempt());
+  TEST_ASSERT_EQUAL_UINT32(2u, hal_boot_get_attempts());
+}
+
+/* A crashloop reaches the limit, which is what sends the next boot to recovery
+ * instead of back to the image that is failing. */
+void test_boot_attempts_reach_the_limit(void) {
+  fresh();
+  for (unsigned i = 0; i < HAL_BOOT_MAX_ATTEMPTS; i++)
+    (void)hal_boot_account_attempt();
+  TEST_ASSERT_TRUE(hal_boot_get_attempts() >= HAL_BOOT_MAX_ATTEMPTS);
+}
+
+/* The application's half: proven liveness clears the count, and the request is
+ * left alone -- clearing a pending loader request here would lose it. */
+void test_boot_healthy_clears_attempts_but_keeps_the_request(void) {
+  fresh();
+  (void)hal_boot_account_attempt();
+  (void)hal_boot_account_attempt();
+  (void)hal_boot_request(); /* sets REQ_LOADER */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_mark_healthy());
+  TEST_ASSERT_EQUAL_UINT32(0u, hal_boot_get_attempts());
+  TEST_ASSERT_EQUAL_UINT32(HAL_BOOT_REQ_LOADER, hal_boot_get_request());
+}
+
+/* Saturation, not wrap: a counter rolling to zero reads as a clean boot and
+ * hands a crashlooping board straight back to the image crashing it.
+ *
+ * The boundary cannot be reached by calling the increment four billion times, so
+ * the block is sealed by hand here. That means repeating hal_boot.c's own check
+ * formula -- magic ^ request ^ attempts ^ 0xA5A5A5A5 -- which is white-box and
+ * has to be updated with it. This file already pokes _sboot directly to simulate
+ * a cold boot, so the seam is not new.
+ */
+void test_boot_attempts_saturate_instead_of_wrapping(void) {
+  fresh();
+  _sboot.magic = HAL_BOOT_MAGIC;
+  _sboot.request = HAL_BOOT_REQ_NONE;
+  _sboot.attempts = UINT32_MAX - 1u;
+  _sboot.check = HAL_BOOT_MAGIC ^ HAL_BOOT_REQ_NONE ^ (UINT32_MAX - 1u) ^ 0xA5A5A5A5u;
+  TEST_ASSERT_TRUE(hal_boot_block_valid());
+  TEST_ASSERT_EQUAL_UINT32(UINT32_MAX - 1u, hal_boot_get_attempts());
+
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_account_attempt());
+  TEST_ASSERT_EQUAL_UINT32(UINT32_MAX, hal_boot_get_attempts());
+
+  /* And again: it stays there rather than becoming zero. */
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_OK, (uint32_t)hal_boot_account_attempt());
+  TEST_ASSERT_EQUAL_UINT32(UINT32_MAX, hal_boot_get_attempts());
+  TEST_ASSERT_TRUE(hal_boot_block_valid());
+}
+
+/* An invalid block is refused rather than silently counted: a loader that cannot
+ * record the attempt must know, because the alternative is a crashloop nobody
+ * is counting. */
+void test_boot_attempt_refused_on_an_invalid_block(void) {
+  memset((void *)&_sboot, 0, sizeof _sboot);
+  TEST_ASSERT_EQUAL_UINT32((uint32_t)HAL_ERR_NOT_INITIALIZED,
+                           (uint32_t)hal_boot_account_attempt());
+}
+
 NAVTEST_CASE_DECL(test_boot_seq_has_no_prefix_suffix_overlap);
+NAVTEST_CASE_DECL(test_boot_attempt_counts_up);
+NAVTEST_CASE_DECL(test_boot_attempts_reach_the_limit);
+NAVTEST_CASE_DECL(test_boot_healthy_clears_attempts_but_keeps_the_request);
+NAVTEST_CASE_DECL(test_boot_attempts_saturate_instead_of_wrapping);
+NAVTEST_CASE_DECL(test_boot_attempt_refused_on_an_invalid_block);
 NAVTEST_CASE_DECL(test_boot_seq_bytes_are_distinct);
 NAVTEST_CASE_DECL(test_boot_match_fires_once_on_the_sequence);
 NAVTEST_CASE_DECL(test_boot_match_survives_every_split);
@@ -302,9 +408,15 @@ NAVTEST_CASE_DECL(test_boot_block_rejects_all_ones);
 NAVTEST_CASE_DECL(test_boot_clear_request_keeps_attempts);
 NAVTEST_CASE_DECL(test_boot_mark_healthy_clears_attempts);
 NAVTEST_CASE_DECL(test_boot_block_ops_refuse_an_invalid_block);
+NAVTEST_CASE_DECL(test_boot_request_target_distinguishes_the_two_loaders);
 
 static const navtest_case_t boot_sniffer_cases[] = {
     NAVTEST_CASE(test_boot_seq_has_no_prefix_suffix_overlap),
+    NAVTEST_CASE(test_boot_attempt_counts_up),
+    NAVTEST_CASE(test_boot_attempts_reach_the_limit),
+    NAVTEST_CASE(test_boot_healthy_clears_attempts_but_keeps_the_request),
+    NAVTEST_CASE(test_boot_attempts_saturate_instead_of_wrapping),
+    NAVTEST_CASE(test_boot_attempt_refused_on_an_invalid_block),
     NAVTEST_CASE(test_boot_seq_bytes_are_distinct),
     NAVTEST_CASE(test_boot_match_fires_once_on_the_sequence),
     NAVTEST_CASE(test_boot_match_survives_every_split),
@@ -325,6 +437,7 @@ static const navtest_case_t boot_sniffer_cases[] = {
     NAVTEST_CASE(test_boot_clear_request_keeps_attempts),
     NAVTEST_CASE(test_boot_mark_healthy_clears_attempts),
     NAVTEST_CASE(test_boot_block_ops_refuse_an_invalid_block),
+    NAVTEST_CASE(test_boot_request_target_distinguishes_the_two_loaders),
 };
 
 const navtest_suite_t test_boot_sniffer_suite = {

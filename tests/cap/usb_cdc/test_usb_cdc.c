@@ -41,6 +41,14 @@ void test_usb_cdc_not_connected_without_host(void) {
   TEST_ASSERT_FALSE(hal_usb_cdc_connected());
 }
 
+/* Enumeration is the weaker claim of the two -- it drops the DTR term -- so a
+ * suite that never calls hal_usb_cdc_init() must see it false as well. The board
+ * this runs on may well be plugged into a host; what makes the assertion hold is
+ * that the device never attached to the bus, not that nothing is listening. */
+void test_usb_cdc_not_enumerated_without_init(void) {
+  TEST_ASSERT_FALSE(hal_usb_cdc_enumerated());
+}
+
 void test_usb_cdc_write_refused_without_host(void) {
   const uint8_t byte = 'x';
   /* Not INVALID_ARG: the arguments are fine, there is just no configured
@@ -109,7 +117,7 @@ void test_usb_cdc_break_is_zero_without_host(void) {
 
 void test_usb_cdc_rx_callback_accepts_null(void) {
   /* NULL is how a caller detaches. */
-  TEST_ASSERT_EQUAL_UINT32(HAL_OK, hal_usb_cdc_set_rx_callback(NULL));
+  TEST_ASSERT_EQUAL_UINT32(HAL_OK, hal_usb_cdc_detach_rx_callback());
 }
 
 void test_usb_cdc_init_requires_48mhz(void) {
@@ -130,6 +138,7 @@ void test_usb_cdc_deinit_before_init_is_a_noop(void) {
 /* -------------------- Suite -------------------- */
 
 NAVTEST_CASE_DECL(test_usb_cdc_not_connected_without_host);
+NAVTEST_CASE_DECL(test_usb_cdc_not_enumerated_without_init);
 NAVTEST_CASE_DECL(test_usb_cdc_write_refused_without_host);
 NAVTEST_CASE_DECL(test_usb_cdc_write_rejects_null);
 NAVTEST_CASE_DECL(test_usb_cdc_write_string_rejects_null);
@@ -147,6 +156,7 @@ NAVTEST_CASE_DECL(test_usb_cdc_deinit_before_init_is_a_noop);
 
 static const navtest_case_t usb_cdc_cases[] = {
     NAVTEST_CASE(test_usb_cdc_not_connected_without_host),
+    NAVTEST_CASE(test_usb_cdc_not_enumerated_without_init),
     NAVTEST_CASE(test_usb_cdc_write_refused_without_host),
     NAVTEST_CASE(test_usb_cdc_write_rejects_null),
     NAVTEST_CASE(test_usb_cdc_write_string_rejects_null),

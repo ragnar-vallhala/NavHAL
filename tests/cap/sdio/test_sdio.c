@@ -30,6 +30,7 @@
 #if NAVHAL_CONFIG_DRV_SDIO
 
 #include "family/sdio_reg.h"
+#include "common/hal_sdio.h"
 #include "navhal_port_sdio.h"
 #include "navtest/navtest.h"
 #include "navtest/navtest_pil.h"
@@ -179,8 +180,8 @@ static void sdio_test_cb(hal_sdio_error_t err) {
 
 void test_hal_sdio_set_callback_smoke(void) {
   s_sdio_cb_hits = 0;
-  hal_sdio_set_callback(sdio_test_cb);
-  hal_sdio_set_callback(NULL); /* re-clear */
+  hal_sdio_attach_callback(sdio_test_cb);
+  hal_sdio_detach_callback(); /* re-clear */
   TEST_ASSERT_TRUE(1);
 }
 

@@ -142,16 +142,21 @@ hal_status_t hal_crc_sw_reset(void) {
   return HAL_OK;
 }
 
-uint32_t hal_crc_sw_accumulate(const uint8_t *data, uint32_t len) {
-  if (data == NULL || len == 0)
-    return s_sw_current;
-  uint32_t crc = s_sw_current;
+uint32_t hal_crc_sw_step(uint32_t crc, const uint8_t *data, uint32_t len) {
+  if (data == NULL)
+    return crc;
   for (uint32_t i = 0; i < len; i++) {
     uint8_t table_index = (uint8_t)((crc >> 24) ^ data[i]);
     crc = (crc << 8) ^ CRC_TABLE_READ(table_index);
   }
-  s_sw_current = crc;
   return crc;
+}
+
+uint32_t hal_crc_sw_accumulate(const uint8_t *data, uint32_t len) {
+  if (data == NULL || len == 0)
+    return s_sw_current;
+  s_sw_current = hal_crc_sw_step(s_sw_current, data, len);
+  return s_sw_current;
 }
 
 uint32_t hal_crc_sw_compute(const uint8_t *data, uint32_t len) {

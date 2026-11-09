@@ -31,6 +31,11 @@
 #include "board.h"
 #include "navhal.h"
 
+/* Needs a button to pull the pin. A board without one is not a broken build. */
+#if !defined(USER_BUTTON)
+#error "this sample needs a user button, and this board's description declares none"
+#endif
+
 int main(void) {
   hal_timebase_init(1000);
   hal_gpio_set_mode(LED_BUILTIN, HAL_GPIO_MODE_OUTPUT, HAL_GPIO_PULL_NONE);

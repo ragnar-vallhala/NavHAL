@@ -53,6 +53,12 @@
  * exists today; a cortex-m7 build skips this tier (its registers differ — e.g.
  * the F7 USART) and runs the portable + cap + conformance tiers below. Add a
  * parallel NAVTEST_ARCH_CORTEX_M7 block when tests/arch/cortex-m7/ lands. */
+/* The AVR's white-box tier. Its own macro because the arch gate above is
+ * written in NAVTEST_ARCH_* terms the AVR build does not set. */
+#if defined(__AVR__)
+#include "arch/avr/test_interrupt.h"
+#endif
+
 #if defined(NAVTEST_ARCH_CORTEX_M4)
 #include "arch/cortex-m4/test_adc.h"
 #include "arch/cortex-m4/test_clock.h"
@@ -106,6 +112,9 @@ static const navtest_suite_t *const all_suites[] = {
     &test_spi_suite,
     &test_i2c_suite,
     &test_adc_suite,
+#endif
+#if defined(__AVR__)
+    &test_avr_interrupt_suite,
 #endif
     &test_conformance_suite,   /* portable HAL-contract assertions; runs
                                   on every arch (navtest PROGMEM keeps

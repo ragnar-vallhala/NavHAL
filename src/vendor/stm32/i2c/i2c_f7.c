@@ -37,7 +37,9 @@
 #include "internal/hal_i2c_ops.h"
 #include "internal/hal_i2c_dma_ops.h"
 #include "board.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
 #include "family/rcc_reg.h"
 #include "family/i2c_reg.h"
@@ -229,7 +231,9 @@ static hal_status_t stm32f7_i2c_write_read(hal_i2c_bus_t bus, uint8_t dev_addr,
  * fires the caller's callback.
  *===========================================================================*/
 #if NAVHAL_CONFIG_DRV_I2C_DMA
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 
 static void (*_i2c_dma_rx_callback)(void) = NULL;
@@ -293,8 +297,14 @@ static hal_status_t stm32f7_i2c_dma_read_regs(hal_i2c_bus_t bus, uint8_t dev_add
 
   hal_dma_init(&_active_i2c_dma_config);
   if (_active_i2c_dma_config.controller == HAL_DMA_CONTROLLER_1) {
+    /* Claim the stream through the DMA module, as i2c.c does: the IRQ's single
+     * callback slot used to be taken directly here, so whichever driver
+     * attached last silently unhooked the other. */
     hal_irq_t irq = _dma1_stream_irq(_active_i2c_dma_config.stream);
-    hal_interrupt_attach_callback(irq, _i2c_dma_irq_handler);
+    if (hal_dma_attach_callback(HAL_DMA_CONTROLLER_1,
+                                _active_i2c_dma_config.stream,
+                                _i2c_dma_irq_handler) != HAL_OK)
+      return HAL_ERR_BUSY;
     hal_interrupt_enable_with_priority(irq, HAL_IRQ_PRIORITY_DEFAULT);
   }
   hal_dma_start(&_active_i2c_dma_config);

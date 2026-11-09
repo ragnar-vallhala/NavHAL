@@ -96,6 +96,44 @@ hal_status_t hal_flash_erase(void);
  */
 bool hal_flash_needs_compaction(void);
 
+/**
+ * @brief Erase one flash sector, by sector number.
+ *
+ * For a loader writing an image, where the key/value store's notion of "erase"
+ * is the wrong shape. Refuses any sector the caller does not own: stage-1,
+ * because it is the root of trust and write-protected, and the two sectors the
+ * key/value store keeps its records in, because that layer owns them. What is
+ * left is stage-2 and the application.
+ *
+ * Belt and braces behind WRP rather than a replacement for it: a loader bug that
+ * aims at stage-1 should surface as a clean error in development instead of a
+ * WRP fault in the field.
+ *
+ * @param sector Sector number, 0..7 on this part.
+ * @return ::HAL_OK, ::HAL_ERR_INVALID_ARG for a sector that does not exist or
+ *         that the caller may not touch, ::HAL_ERR_TIMEOUT if the controller
+ *         never reports the erase finished.
+ */
+hal_status_t hal_flash_raw_erase_sector(uint8_t sector);
+
+/**
+ * @brief Program @p len bytes at @p addr.
+ *
+ * Same ownership rule as ::hal_flash_raw_erase_sector, applied to the whole
+ * range rather than to one address, so a write that starts inside the app and
+ * runs off its end is refused before it begins.
+ *
+ * The target must already be erased; flash bits go one-to-zero only, so
+ * programming over existing data silently yields the AND of the two. Half-word
+ * granularity, so @p addr and @p len are both even.
+ *
+ * @return ::HAL_OK, ::HAL_ERR_INVALID_ARG for a NULL buffer, an odd address or
+ *         length, or a range the caller does not own, ::HAL_ERR_TIMEOUT if the
+ *         controller stops responding, ::HAL_ERR_IO if a programmed half-word
+ *         does not read back.
+ */
+hal_status_t hal_flash_raw_program(uint32_t addr, const void *data, uint32_t len);
+
 /* -------------------------------------------------------------------------- *
  * Deprecated — pre-standardization Flash type names. The status enum is now
  * ::hal_status_t. Retained as a backward-compat alias.

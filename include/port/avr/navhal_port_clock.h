@@ -26,9 +26,12 @@
 #ifndef NAVHAL_PORT_CLOCK_H
 #define NAVHAL_PORT_CLOCK_H
 
-#include "common/hal_clock.h"
+#include "common/hal_status.h"
+#include "utils/clock_types.h"
 
-/* Deprecated two-argument init — retained as a backward-compat shim. */
-#include "compat/clock_compat.h"
+
+/* This port carries the deprecated clock names; the shim is included from
+ * the common header once the API is declared. */
+#define NAVHAL_PORT_CLOCK_COMPAT 1
 
 #endif /* NAVHAL_PORT_CLOCK_H */

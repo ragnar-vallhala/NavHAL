@@ -43,14 +43,19 @@
 #include "board.h"
 #include "internal/hal_uart_ops.h"
 #include "internal/hal_uart_dma_ops.h"
+#include "common/hal_uart.h"
 #include "navhal_port_uart.h"
+#include "common/hal_clock.h"
 #include "navhal_port_clock.h"
+#include "common/hal_gpio.h"
 #include "navhal_port_gpio.h"
+#include "common/hal_interrupt.h"
 #include "navhal_port_interrupt.h"
 #include "family/rcc_reg.h"
 #include "family/uart_reg.h"
 #include <stdint.h>
 #if NAVHAL_CONFIG_DRV_UART_DMA
+#include "common/hal_dma.h"
 #include "navhal_port_dma.h"
 #endif
 
@@ -370,22 +375,19 @@ const hal_uart_dma_ops_t _hal_uart_dma_ops = {
 };
 
 
+#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
+
 /* ---------------------------------------------------------------------------
- * USART interrupt vectors.
- *
- * Named by this MCU's vector table, so they belong with the driver that owns
- * the peripheral rather than in the shared arch interrupt file. Each hands
- * off to the registry so a caller's attached callback runs.
+ * USART interrupt vectors. Outside the UART-DMA guard deliberately -- see the
+ * F4 driver for why. Slot 39 (USART3) is the Nucleo-F767ZI console: the F767
+ * vector table has always named the handler, and for a while nothing defined
+ * it, so it resolved to the weak Default_Handler alias.
  * ------------------------------------------------------------------------- */
 void USART1_IRQHandler(void) { hal_interrupt_dispatch(USART1_IRQn); }
 void USART2_IRQHandler(void) { hal_interrupt_dispatch(USART2_IRQn); }
-/* Slot 39. The F767 vector table has always named this handler, but nothing
- * defined it, so it resolved to the weak Default_Handler alias and an
- * interrupt-driven USART3 -- the Nucleo-F767ZI console -- dispatched nowhere. */
 void USART3_IRQHandler(void) { hal_interrupt_dispatch(USART3_IRQn); }
 void USART6_IRQHandler(void) { hal_interrupt_dispatch(USART6_IRQn); }
 
-#endif /* NAVHAL_CONFIG_DRV_DMA && NAVHAL_CONFIG_DRV_UART_DMA */
 
 /** @brief The F7 UART primitives; every derived write lives in the shared layer. */
 const hal_uart_ops_t _hal_uart_ops = {

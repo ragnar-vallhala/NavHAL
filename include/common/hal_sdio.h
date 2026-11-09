@@ -46,6 +46,12 @@
 
 #include "common/hal_config.h" /* NAVHAL_CONFIG_DRV_SDIO: force-included, or pulled here when reachable */
 #include <stdbool.h>
+/* hal_status_t and NAVHAL_DEPRECATED arrived with the attach/detach pair:
+ * every callback function here used to return void. */
+#include "common/hal_status.h"
+#include "common/hal_sdio_types.h"
+#include "common/navhal_compiler.h"
+#include <stddef.h>
 #include <stdint.h>
 
 
@@ -72,54 +78,28 @@ extern "C" {
 #define SD_ACMD_SD_SEND_OP_COND 41
 #define SD_ACMD_SET_BUS_WIDTH 6
 
-/**
- * @brief How many data lines the bus uses.
- *
- * An enum rather than a count or a flag. The value written to the peripheral is
- * neither: the STM32 WIDBUS field encodes 1-bit as 0, 4-bit as 1 and 8-bit as 2,
- * so a plain lane count would be wrong at every call site and a boolean would
- * have nowhere to put the third case. Naming the widths keeps the mapping in one
- * place and leaves room for 8-bit, which the peripheral supports and SD cards do
- * not -- so it is absent until something needs it.
- */
-typedef enum {
-  HAL_SDIO_BUS_WIDTH_1BIT = 0, /**< DAT0 only. Always available. */
-  HAL_SDIO_BUS_WIDTH_4BIT = 1, /**< DAT0..DAT3, negotiated with ACMD6. */
-} hal_sdio_bus_width_t;
+
+
+
 
 /**
- * @brief SDIO initialization configuration.
+ * @brief Attach the completion callback for asynchronous SDIO operations.
+ * @param callback Non-NULL; pass ::hal_sdio_detach_callback to clear.
+ * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
  */
-typedef struct {
-  uint32_t clock_div; /**< SDIO_CK = SDIOCLK / (clock_div + 2). */
-  hal_sdio_bus_width_t bus_width; /**< Data lines to use; see the enum. */
-} hal_sdio_config_t;
+hal_status_t hal_sdio_attach_callback(hal_sdio_callback_t callback);
 
-/**
- * @brief SDIO operation status / error codes.
- */
-typedef enum {
-  HAL_SDIO_OK = 0,
-  HAL_SDIO_ERROR,
-  HAL_SDIO_TIMEOUT,
-  HAL_SDIO_CRC_FAIL,
-  HAL_SDIO_RX_OVERRUN,
-  HAL_SDIO_TX_UNDERRUN,
-  HAL_SDIO_PENDING,
-  HAL_SDIO_BUSY,
-  HAL_SDIO_NO_CARD /**< The slot is empty; see ::hal_sdio_card_present. */
-} hal_sdio_error_t;
+/** @brief Clear the completion callback. @return ::HAL_OK. */
+hal_status_t hal_sdio_detach_callback(void);
 
-/**
- * @brief SDIO completion callback type for asynchronous operations.
- */
-typedef void (*hal_sdio_callback_t)(hal_sdio_error_t error);
-
-/**
- * @brief Set the callback for asynchronous SDIO operations.
- * @param callback Function invoked when an async operation completes.
- */
-void hal_sdio_set_callback(hal_sdio_callback_t callback);
+/** @deprecated Use ::hal_sdio_attach_callback / ::hal_sdio_detach_callback. */
+NAVHAL_DEPRECATED("use hal_sdio_attach_callback")
+static inline void hal_sdio_set_callback(hal_sdio_callback_t callback) {
+  if (callback == NULL)
+    (void)hal_sdio_detach_callback();
+  else
+    (void)hal_sdio_attach_callback(callback);
+}
 
 /**
  * @brief Initialize the SDIO peripheral and its GPIOs.
@@ -128,10 +108,6 @@ void hal_sdio_set_callback(hal_sdio_callback_t callback);
  */
 hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config);
 
-/**
- * @brief Run the full SD-card initialization sequence (CMD0/8/ACMD41/2/3/7).
- * @return Initialization status.
- */
 /**
  * @brief Whether a card is in the slot.
  *
@@ -145,6 +121,10 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config);
  */
 bool hal_sdio_card_present(void);
 
+/**
+ * @brief Run the full SD-card initialization sequence (CMD0/8/ACMD41/2/3/7).
+ * @return Initialization status.
+ */
 hal_sdio_error_t hal_sdio_card_init(void);
 
 /**
@@ -210,6 +190,10 @@ uint32_t hal_sdio_get_sector_count(void);
 /* Port-specific bits: register-bit defines, async/DMA prototypes, compat. */
 #if NAVHAL_CONFIG_DRV_SDIO
 #include "navhal_port_sdio.h"
+
+#if defined(NAVHAL_PORT_SDIO_COMPAT)
+#include "compat/sdio_compat.h"
+#endif
 #endif
 
 

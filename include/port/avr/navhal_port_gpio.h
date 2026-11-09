@@ -33,7 +33,9 @@
 #ifndef NAVHAL_PORT_GPIO_H
 #define NAVHAL_PORT_GPIO_H
 
-#include "common/hal_gpio.h"
+#include "common/hal_status.h"
+#include "internal/hal_gpio_ops.h"
+#include "common/hal_gpio_types.h"
 
 #include <avr/io.h>
 #include <stdint.h>

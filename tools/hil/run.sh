@@ -400,8 +400,14 @@ run_board() {  # $1 = board name; returns the on-target failure count
     # which resets the board and restarts the run from its banner -- the same
     # auto-reset avrdude just used to enter the bootloader.
     echo ">> flashing $board (avrdude -c $PROGRAMMER -p $MCU)"
+    # No -b unless the board definition asks for one. avrdude picks the baud its
+    # config gives the programmer, which is right for every board on this bench;
+    # a hard-coded 115200 here is what made a Nano whose bootloader sits
+    # elsewhere fail to flash while tools/flash.sh -- which passes no -b -- worked.
+    avrdude_baud=()
+    [ -n "${UPLOAD_BAUD:-}" ] && avrdude_baud=(-b "$UPLOAD_BAUD")
     if ! avrdude -c "$PROGRAMMER" -p "$MCU" -P "$DETECTED_PORT" \
-                 -b "${UPLOAD_BAUD:-115200}" -U "flash:w:$BUILD_DIR/tests.hex:i" \
+                 "${avrdude_baud[@]}" -U "flash:w:$BUILD_DIR/tests.hex:i" \
                  >/dev/null 2>&1; then
       echo "!! avrdude failed on $DETECTED_PORT"
       return 2

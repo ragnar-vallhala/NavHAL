@@ -83,10 +83,6 @@ extern "C" {
 
 
 /**
- * @brief Set the callback for asynchronous SDIO operations.
- * @param callback Function invoked when an async operation completes.
- */
-/**
  * @brief Attach the completion callback for asynchronous SDIO operations.
  * @param callback Non-NULL; pass ::hal_sdio_detach_callback to clear.
  * @return ::HAL_OK, or ::HAL_ERR_INVALID_ARG for a NULL callback.
@@ -113,10 +109,6 @@ static inline void hal_sdio_set_callback(hal_sdio_callback_t callback) {
 hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config);
 
 /**
- * @brief Run the full SD-card initialization sequence (CMD0/8/ACMD41/2/3/7).
- * @return Initialization status.
- */
-/**
  * @brief Whether a card is in the slot.
  *
  * Reads the board's card-detect pin, named by @c BOARD_SD_CD. The switch closes
@@ -129,6 +121,10 @@ hal_sdio_error_t hal_sdio_init(const hal_sdio_config_t *config);
  */
 bool hal_sdio_card_present(void);
 
+/**
+ * @brief Run the full SD-card initialization sequence (CMD0/8/ACMD41/2/3/7).
+ * @return Initialization status.
+ */
 hal_sdio_error_t hal_sdio_card_init(void);
 
 /**

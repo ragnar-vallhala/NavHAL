@@ -14,11 +14,24 @@
 ## Overview
 
 **NavHAL™** is a hardware abstraction layer (HAL) written in C for embedded
-systems. Its API is architecture-agnostic *by design* — the layered
-arch / vendor / family / board structure and the Kconfig-driven build are
-built to host multiple targets — but the v1 release ships **one implemented
-port: ARM Cortex-M4 / STM32F4, on the Nucleo-F401RE.** An AVR / ATmega328P
-port is the next milestone (M6); the Kconfig schema already models it.
+systems. Its API is architecture-agnostic *by design*: the layered
+arch / vendor / family / board structure and the Kconfig-driven build let one
+`hal_*` interface sit over several targets.
+
+Implemented ports (details and per-peripheral status in
+[`docs/capabilities/`](docs/capabilities/README.md)):
+
+| Target | Core | Page |
+|---|---|---|
+| Nucleo-F401RE (STM32F401RE) — the reference target | ARM Cortex-M4 | [`stm32f401re`](docs/capabilities/stm32f401re.md) |
+| NAVIXSM-F401RE — custom flight-controller board on the same MCU | ARM Cortex-M4 | [`navixsmf401re`](docs/capabilities/navixsmf401re.md) |
+| NAVIXDEV v0.0.3 — development breakout board, same MCU | ARM Cortex-M4 | [`navixdev`](docs/capabilities/navixdev.md) |
+| Nucleo-F767ZI (STM32F767ZI) | ARM Cortex-M7 | [`stm32f767zi`](docs/capabilities/stm32f767zi.md) |
+| ATmega328P | AVR (8-bit) | [`atmega328p`](docs/capabilities/atmega328p.md) |
+| x86-64 PC under QEMU (proves the API is not Cortex-shaped; small capability set) | x86-64 | [`x86_64_qemu`](docs/capabilities/x86_64_qemu.md) |
+
+Each release is tested on real hardware on the Nucleo-F401RE, Nucleo-F767ZI
+and ATmega328P (see [`docs/testing/`](docs/testing/README.md)).
 
 The public `hal_*` API is frozen at `HAL_API_VERSION 1` (see
 [`docs/api_standardization.md`](docs/api_standardization.md)).
@@ -30,7 +43,8 @@ NavHAL is developed and maintained by **NAVRobotec**, a company dedicated to inn
 ## Key Features
 
 * Standardized, versioned `hal_*` C API (`HAL_API_VERSION 1`) — frozen contract
-* Implemented today on ARM Cortex-M4 / STM32F4 (Nucleo-F401RE)
+* Ports for ARM Cortex-M4 (STM32F4), Cortex-M7 (STM32F7), AVR (ATmega328P) and x86-64 (QEMU); see
+  [`docs/capabilities/`](docs/capabilities/README.md)
 * Layered arch / vendor / family / board source tree, Kconfig-driven build —
   designed so a new port adds directories, not build-system changes
 * Clean, minimal, and efficient C core for portability and performance
@@ -94,6 +108,9 @@ Documentation will be available in `docs/html`.
 Other docs in this repository:
 
 - [`docs/api_standardization.md`](docs/api_standardization.md) — the v1 public-API contract.
+- [`docs/capabilities/`](docs/capabilities/README.md) — which peripherals are implemented on which target.
+- [`docs/consuming.md`](docs/consuming.md) — building an application against NavHAL from your own project.
+- [`docs/boards.md`](docs/boards.md) — describing a board, in tree or out of tree.
 - [`docs/testing/`](docs/testing/README.md) — test report (SIL/PIL/HIL framework,
   coverage matrix, findings from real-board runs) and the build/run how-to.
 

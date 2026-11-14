@@ -25,13 +25,13 @@ Implemented ports (details and per-peripheral status in
 |---|---|---|
 | Nucleo-F401RE (STM32F401RE) — the reference target | ARM Cortex-M4 | [`stm32f401re`](docs/capabilities/stm32f401re.md) |
 | NAVIXSM-F401RE — custom flight-controller board on the same MCU | ARM Cortex-M4 | [`navixsmf401re`](docs/capabilities/navixsmf401re.md) |
-| NAVIXDEV v0.0.3 — development breakout board, same MCU | ARM Cortex-M4 | [`navixdev`](docs/capabilities/navixdev.md) |
+| NAVIXDEV v0.0.3 — development-revision flight-controller board, a breakout with sensors on pin headers; same MCU | ARM Cortex-M4 | [`navixdev`](docs/capabilities/navixdev.md) |
 | Nucleo-F767ZI (STM32F767ZI) | ARM Cortex-M7 | [`stm32f767zi`](docs/capabilities/stm32f767zi.md) |
 | ATmega328P | AVR (8-bit) | [`atmega328p`](docs/capabilities/atmega328p.md) |
 | x86-64 PC under QEMU (proves the API is not Cortex-shaped; small capability set) | x86-64 | [`x86_64_qemu`](docs/capabilities/x86_64_qemu.md) |
 
-Each release is tested on real hardware on the Nucleo-F401RE, Nucleo-F767ZI
-and ATmega328P (see [`docs/testing/`](docs/testing/README.md)).
+Hardware-in-the-loop runs are done on demand, not on every commit; the 0.4.2
+release was run on the Nucleo-F401RE, Nucleo-F767ZI and ATmega328P (see [`docs/testing/`](docs/testing/README.md)).
 
 The public `hal_*` API is frozen at `HAL_API_VERSION 1` (see
 [`docs/api_standardization.md`](docs/api_standardization.md)).

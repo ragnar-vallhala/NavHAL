@@ -232,7 +232,9 @@ include("${_NAVHAL_ARCH_FILE}")
 # (Linux `-include autoconf.h` style). This makes NAVHAL_CONFIG_* (and the
 # deprecated NAVHAL_HAS_* aliases) ambient, so drivers gate on them without any
 # #include and without the old navhal_port_config.h -> _*_ENABLED bridge.
-set(NAVHAL_FORCE_INCLUDE "-include ${GENERATED_NAVHAL_TARGET}")
+# Quoted: the build directory can contain a space, and CMAKE_C_FLAGS is split on
+# whitespace, so an unquoted path became two arguments (and a second input file).
+set(NAVHAL_FORCE_INCLUDE "-include \"${GENERATED_NAVHAL_TARGET}\"")
 
 # ---- Build profiles -------------------------------------------------------
 # Three, selected with -DCMAKE_BUILD_TYPE=<name>:
@@ -455,7 +457,7 @@ endif()
 # consumer's own translation units never saw it. SHELL: keeps `-include` and its
 # path together as two arguments and stops CMake de-duplicating them.
 if(TARGET hal AND GENERATED_NAVHAL_TARGET)
-  target_compile_options(hal INTERFACE "SHELL:-include ${GENERATED_NAVHAL_TARGET}")
+  target_compile_options(hal INTERFACE "SHELL:-include \"${GENERATED_NAVHAL_TARGET}\"")
 endif()
 
 # And the ABI-selecting flags (-mcpu/-mthumb/float ABI, -mmcu, -m64), also only

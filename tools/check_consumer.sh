@@ -86,13 +86,21 @@ check_arch() {
     label="$arch+submodule"
     submodule_line="add_compile_definitions(SUBMODULE)"
   fi
+  # A project in a folder whose name has a space in it. The force-included
+  # navhal_target.h lives in the build directory, so the space reaches the
+  # compiler command line; unquoted it split into a second input file.
+  local dirname="$arch-$mode"
+  if [[ "$mode" == spaces ]]; then
+    label="$arch+spaces"
+    dirname="$arch with spaces"
+  fi
 
   if ! command -v arm-none-eabi-gcc >/dev/null 2>&1; then
     echo "  SKIP $label — arm-none-eabi-gcc not installed"
     return 0
   fi
 
-  proj="$WORK/$arch-$mode"
+  proj="$WORK/$dirname"
   mkdir -p "$proj/src"
 
   # The whole point: no -I, no -L, no -include, no knowledge of NavHAL's
@@ -193,6 +201,7 @@ main() {
   for a in "${arches[@]}"; do
     check_arch "$a" || rc=1
     check_arch "$a" submodule || rc=1
+    check_arch "$a" spaces || rc=1
   done
   [[ $rc -eq 0 ]] && echo "==== NavHAL is consumable ====" \
                   || echo "==== a consumer cannot build NavHAL ===="

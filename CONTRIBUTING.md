@@ -22,7 +22,7 @@ Search existing issues and discussions before opening a new one.
 You'll need:
 
 * `arm-none-eabi-gcc` toolchain (`gcc-arm-none-eabi`, `binutils-arm-none-eabi`, `libnewlib-arm-none-eabi` on Debian/Ubuntu) — for the Cortex-M4 / STM32 port. The `pre-push` hook warns and skips the cap-contract + Cortex-M sample matrix if it's missing.
-* `avr-gcc` toolchain (`gcc-avr`, `avr-libc`, `binutils-avr` on Debian/Ubuntu) — for the AVR / ATmega328P port. The `pre-push` hook warns and skips the AVR sample matrix if it's missing.
+* `avr-gcc` toolchain (`gcc-avr`, `avr-libc`, `binutils-avr` on Debian/Ubuntu) — for the AVR / ATmega328P port; GCC 6 or newer, since older versions cannot parse the headers. The `pre-push` hook warns and skips the AVR sample matrix if it's missing.
 
 Missing either toolchain only delays failure detection to PR-time — server CI gates both arches as required checks regardless.
 * `cmake` ≥ 3.20

@@ -12,7 +12,7 @@ The M6 target. An 8-bit AVR — none of the optional Cortex-M caps (DMA, FPU, DW
 | Vendor (`NAVHAL_TARGET_VENDOR`) | `microchip` |
 | Family (`NAVHAL_TARGET_FAMILY`) | `atmega328p` |
 | Board (`NAVHAL_TARGET_BOARD`)   | `atmega328p` |
-| Toolchain                     | `avr-` (`gcc-avr`, `avr-libc`, `binutils-avr`) |
+| Toolchain                     | `avr-` (`gcc-avr`, `avr-libc`, `binutils-avr`); GCC 6 or newer (see below) |
 | Defconfig                     | [`cmake/defconfigs/avr_atmega328p.defconfig`](../../cmake/defconfigs/avr_atmega328p.defconfig) |
 | Toolchain file                | [`cmake/toolchains/avr-toolchain.cmake`](../../cmake/toolchains/avr-toolchain.cmake) |
 | Default sysclk                | 16 MHz external crystal (Arduino-Uno wiring), reflected by the `F_CPU=16000000UL` define set in `CMakeLists.txt`. |
@@ -73,10 +73,13 @@ The `—` rows are hard-wired at 0 — even if a user sets `CONFIG_DRV_DMA=y` in
 * `hal_clock` doesn't reconfigure the prescaler; it reports `F_CPU`. If your application needs to slow the CPU at runtime, write CLKPR yourself and re-build with the new `F_CPU`.
 * `hal_flash` write requires the application to run from the bootloader section so SPM works. Out-of-the-box samples that touch flash assume this.
 * **On a bootloader board (Arduino Uno and clones) `hal_reset_get_cause()` reports `UNKNOWN`.** The bootloader reads MCUSR and clears it before the application starts — it has to, since a watchdog reset otherwise loops forever — and the bootloader on the board tested here keeps no copy the application can reach. Measured directly: MCUSR is 0 at `main()`, and `r2` holds 0xFE rather than a valid MCUSR value, so this is not the optiboot convention of passing the flags in `r2`. The watchdog itself works normally; it is only the reporting that the bootloader takes away. A bare chip programmed over ISP reports the cause properly.
+* **avr-gcc older than GCC 6 cannot build NavHAL.** The public headers put `__attribute__((deprecated))` on enumerators, which GCC only accepts from version 6; `gcc-avr` 5.4 (Ubuntu 16.04) stops with a parse error. Builds are known to work with avr-gcc 7.3 and with the toolchain on the CI runner.
 * The AVR port is recent (M6) — peripheral edge cases will surface as samples in `samples/portable/` exercise them.
 
 ## Sample matrix coverage
 
 * CI job: `Build all AVR samples` in `.github/workflows/ci.yml` — builds every sample under `samples/portable/` against the AVR toolchain.
 * Iterates: `samples/portable/` only. Samples under `samples/cortex-m/` and `samples/no_hal/` are not portable to AVR and are skipped by design.
-* No PIL: there's no Renode (or simavr) job for AVR yet. AVR samples are build-tested only; runtime verification is HIL on a real board.
+* The samples are build-tested only. Runtime checks come from the navtest suite, which runs two ways:
+  * PIL: the `PIL atmega328p` job in `.github/workflows/renode.yml` builds the suite and runs it in simavr (`tools/simavr/run_tests.sh`, board definition in `tools/pil/boards/atmega328p.conf`).
+  * HIL: `tools/hil/run.sh atmega328p` runs it on a real board.

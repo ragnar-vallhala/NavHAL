@@ -147,6 +147,20 @@ jobs:
       - name: Lint commit messages
         run: tools/lint_commits.sh origin/${{ github.base_ref }}..HEAD
 
+  # No todo or room-message numbers in added lines or commit messages: they are
+  # renumbered when the tracker is archived and mean nothing to a reader of the
+  # repository. Only runs on pull_request, like commit-lint.
+  no-tracker-refs:
+    name: No tracker references
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check added lines and commit messages
+        run: tools/check_tracker_refs.sh origin/${{ github.base_ref }}..HEAD
+
   # The port contract stays checkable: no public entry point may land without
   # either a conformance case or a line saying why it cannot have one, and no
   # ops table may land without a completeness case. Reads headers only — no
@@ -443,6 +457,7 @@ jobs:
       - dispatch
       - irq-ownership
       - commit-lint
+      - no-tracker-refs
       - host-tests
       - build-on-target
       - build-on-target-f767
@@ -468,6 +483,7 @@ jobs:
           check irq-ownership     "${{ needs.irq-ownership.result }}"
           check consumer          "${{ needs.consumer.result }}"
           check commit-lint       "${{ needs.commit-lint.result }}"
+          check no-tracker-refs   "${{ needs.no-tracker-refs.result }}"
           check host-tests        "${{ needs.host-tests.result }}"
           check build-on-target   "${{ needs.build-on-target.result }}"
           check build-on-target-f767 "${{ needs.build-on-target-f767.result }}"

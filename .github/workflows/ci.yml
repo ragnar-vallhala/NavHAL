@@ -306,6 +306,9 @@ jobs:
         run: pip install kconfiglib
       - name: Run cap contract tests
         run: tools/test_cap_contract.sh
+      # Configure-only: a boot image must keep the flash KV store in sectors 2/3.
+      - name: Check the boot image KV placement guard
+        run: tools/test_boot_kv_guard.sh
 
   # Catches missing `select` clauses on SAMPLE_* Kconfig entries: a sample
   # that needs DRV_SDIO but doesn't select it will silently fall back to

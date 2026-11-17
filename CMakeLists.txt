@@ -383,6 +383,28 @@ elseif(BOOT_IMAGE)
   string(REPLACE "-T ${NAVHAL_LINKER_SCRIPT}" "-T ${_boot_ld}"
          CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
   message(STATUS "Boot image linker script: ${_boot_ld}")
+  # All three loader images share one flash layout (include/common/hal_bootmap.h):
+  # stage-1 in sectors 0-1, the KV store in 2-3, stage-2 in 4, the
+  # app 5-7. The store's default sectors, 6 and 7, are inside the app partition,
+  # and an image that keeps them links without complaint if it is small -- the
+  # linker only refuses an image that actually reaches the store -- and then every
+  # update fails at the erase, because the flash API will not erase the app's own
+  # sectors. boot/common/updater.h asserts the same for stage-1 and stage-2 once
+  # they are compiled; this refuses at configure time, for every boot image
+  # including the app, which never includes updater.h.
+  if(CONFIG_DRV_FLASH AND CONFIG_FAMILY_STM32F4)
+    if(NOT "${CONFIG_FLASH_KV_PRIMARY_SECTOR}" STREQUAL "2"
+       OR NOT "${CONFIG_FLASH_KV_SECONDARY_SECTOR}" STREQUAL "3")
+      message(FATAL_ERROR
+        "BOOT_IMAGE='${BOOT_IMAGE}' needs the flash KV store in sectors 2 and 3 "
+        "(HAL_BOOTMAP_KV_PRIMARY_SEC / _SECONDARY_SEC), below the stage-2 and app "
+        "partitions, but the configuration has primary='${CONFIG_FLASH_KV_PRIMARY_SECTOR}' "
+        "secondary='${CONFIG_FLASH_KV_SECONDARY_SECTOR}' (the defaults 6 and 7 are "
+        "inside the app partition). Set CONFIG_FLASH_KV_PRIMARY_SECTOR=2 and "
+        "CONFIG_FLASH_KV_SECONDARY_SECTOR=3, as "
+        "cmake/defconfigs/boot_cortex-m4_stm32f4_nucleo_f401re.defconfig does.")
+    endif()
+  endif()
   add_subdirectory(${SRC_VENDOR})
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/boot/${BOOT_IMAGE})
   set(SOURCES ${CORE_SOURCES} ${BOARD_SOURCES} ${VENDOR_SOURCES})

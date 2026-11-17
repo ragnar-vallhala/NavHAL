@@ -303,7 +303,9 @@ config FLASH_KV_PRIMARY_SECTOR
       2 and 3 are the bootloader layout, where the application is linked into its
       own partition at 0x08020000 and the low sectors belong to stage-1 and the
       store. See include/common/hal_bootmap.h. The linker refuses an image that
-      overlaps whichever pair is configured.
+      overlaps whichever pair is configured, but only once the image reaches the
+      store; a small one with the defaults links fine. So a -DBOOT_IMAGE build
+      is refused at configure time unless this is 2 and the secondary is 3.
 
 config FLASH_KV_SECONDARY_SECTOR
     int "Flash KV secondary sector"
